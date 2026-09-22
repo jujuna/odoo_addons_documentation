@@ -6,30 +6,42 @@
 # Martin Trigaux, 2022
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Maitê Dietze (madi)" <madi@odoo.com>, 2025.
+# "Maitê Dietze (madi)" <madi@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:22+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/"
-"odoo-19/account_bank_statement_import/pt_BR/>\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 03:08+0000\n"
+"Last-Translator: \"Maitê Dietze (madi)\" <madi@odoo.com>\n"
+"Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
+"master/account_bank_statement_import/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "%d transactions had a zero amount and were ignored."
+msgstr "%d As transações tinham valor zero e foram ignoradas."
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "%d transactions had already been imported and were ignored."
 msgstr "%d transações já haviam sido importadas e foram ignoradas."
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "1 transaction had a zero amount and was ignored."
+msgstr "1 transação apresentou valor zero e foi ignorada."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -43,6 +55,11 @@ msgid "A bank account transactions can be imported only once!"
 msgstr "Transações de contas bancárias podem ser importadas apenas uma vez."
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,shortdesc:base.module_account_bank_statement_import
+msgid "Account Bank Statement Import"
+msgstr "Importar extrato bancário de conta"
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "All or part of the following file(s) could not be imported:\n"
@@ -50,9 +67,19 @@ msgstr ""
 "Não foi possível importar todo ou parte do(s) seguinte(s) arquivo(s):\n"
 
 #. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"All transactions in this file either have a zero amount or have already been "
+"imported. There is nothing to import."
+msgstr ""
+"Todas as transações neste arquivo têm valor zero ou já foram importadas. Não "
+"há nada para importar."
+
+#. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Linha de extrato bancário"
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_setup_bank_manual_config
@@ -103,6 +130,21 @@ msgid "Display Name"
 msgstr "Exibir nome"
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,description:base.module_account_bank_statement_import
+msgid ""
+"Generic Wizard to Import Bank Statements.\n"
+"\n"
+"(This module does not include any type of import format.)\n"
+"\n"
+"OFX and QIF imports are available in Enterprise version."
+msgstr ""
+"Assistente genérico para importar extratos bancários.\n"
+"\n"
+"(Esse módulo não inclui nenhum tipo de formato de importação.)\n"
+"\n"
+"As importações de OFX e QIF estão disponíveis na versão Enterprise."
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "Go to Apps"
@@ -126,14 +168,8 @@ msgid "Import ID"
 msgstr "ID da importação"
 
 #. module: account_bank_statement_import
-#. odoo-python
-#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
-msgid "Import Template for Bank Statement Lines"
-msgstr "Modelo de importação para linhas de extrato bancário"
-
-#. module: account_bank_statement_import
 #. odoo-javascript
-#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import_model.js:0
+#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import/account_bank_statement_import_model.js:0
 msgid "Import Template for Bank Statements"
 msgstr "Importar modelo de extrato bancário"
 
@@ -171,6 +207,12 @@ msgstr "Não foram encontradas transações que correspondam a seus filtros."
 #: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
 msgid "Nothing to do here!"
 msgstr "Nada para fazer!"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
+msgid "Template for Bank Statement Lines"
+msgstr "Modelo para linhas de extrato bancário"
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -219,6 +261,16 @@ msgstr ""
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"This file only contains transactions with a zero amount. There is nothing to "
+"import."
+msgstr ""
+"Este arquivo contém apenas transações com valor zero. Não há nada para "
+"importar."
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "View successfully imported statements"
 msgstr "Ver extratos importados com sucesso"
 
@@ -240,41 +292,5 @@ msgstr "É necessário definir uma conta padrão para o diário: %s"
 msgid "You uploaded an invalid or empty file."
 msgstr "Você carregou um arquivo inválido ou vazio."
 
-#~ msgid ""
-#~ "Cannot find in which journal import this statement. Please manually "
-#~ "select a journal."
-#~ msgstr ""
-#~ "Não foi possível encontrar em qual diário importar este extrato. Por "
-#~ "favor, selecione manualmente um diário."
-
-#~ msgid ""
-#~ "If it contains transactions for more than one account, it must be "
-#~ "imported on each of them."
-#~ msgstr ""
-#~ "Se o arquivo contém transações para mais de uma conta, você deve importar "
-#~ "para cada conta individualmente."
-
-#~ msgid ""
-#~ "The account of this statement (%s) is not the same as the journal (%s)."
-#~ msgstr "A conta deste extrato (%s) não é a mesma que o diário (%s)."
-
-#~ msgid ""
-#~ "The currency of the bank statement (%s) is not the same as the currency "
-#~ "of the journal (%s)."
-#~ msgstr ""
-#~ "A moeda do extrato bancário (%s) não é a mesma da moeda do diário (%s)."
-
-#~ msgid "The following files could not be imported:\n"
-#~ msgstr "Não foi possível importar os seguintes arquivos:\n"
-
-#~ msgid "This file doesn't contain any statement for account %s."
-#~ msgstr "Este arquivo não contém nenhum extrato para a conta %s."
-
-#~ msgid "This file doesn't contain any transaction for account %s."
-#~ msgstr "Este arquivo não contém nenhuma transação para a conta %s."
-
-#~ msgid "Transactions"
-#~ msgstr "Transações"
-
-#~ msgid "or"
-#~ msgstr "ou"
+#~ msgid "Bank Statement Line"
+#~ msgstr "Linha de extrato bancário"

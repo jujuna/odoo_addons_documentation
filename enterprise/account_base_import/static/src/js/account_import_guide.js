@@ -2,14 +2,14 @@ import { _t } from "@web/core/l10n/translation";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, onWillRender } from "@odoo/owl";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { Component, onWillStart, useProps } from "@odoo/owl";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { user } from "@web/core/user";
 
 export class AccountImportGuide extends Component {
     static template = "account_base_import.accountImportTemplate";
     static components = { ControlPanel };
-    static props = { ...standardActionServiceProps };
+    props = useProps(standardActionServiceProps);
     setup() {
         this.actionService = useService("action");
         this.orm = useService("orm");
@@ -19,9 +19,10 @@ export class AccountImportGuide extends Component {
             this.data = await this.orm.searchRead("res.company", [["id", "=", current_company_id]], ["country_code"])
             this.isFecImportModuleInstalled = await this.orm.searchCount("ir.module.module", [["name", "=", "l10n_fr_fec_import"], ["state", "=", "installed"]]);
         });
-        onWillRender(() => {
-            this.countryCode = this.data[0].country_code
-        });
+    }
+
+    get countryCode() {
+        return this.data[0].country_code || "";
     }
 
     get downloadAssetTemplateUrl() {

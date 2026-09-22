@@ -13,10 +13,10 @@
                 <footer>
                     <button string="Save" special="save" data-hotkey="q" class="btn btn-primary" close="1"
                             groups="event.group_event_manager"/>
-                    <button string="Discard" special="cancel" data-hotkey="x" class="btn-secondary" close="1"/>
+                    <button special="cancel" data-hotkey="x" class="btn-secondary" close="1"/>
                     <button name="action_unschedule" type="object" string="Unschedule" class="btn-secondary" close="1"
                             invisible="not id" groups="event.group_event_manager"/>
-                    <button name="unlink" type="object" icon="fa-trash" title="Delete" class="btn-secondary float-end"
+                    <button name="unlink" type="object" icon="delete" icon_class="oi-filled" title="Delete" class="btn-secondary float-end"
                             close="1" invisible="not id"
                             groups="event.group_event_manager" data-hotkey="d"/>
                 </footer>
@@ -40,13 +40,18 @@
                 color="color"
                 default_group_by="location_id"
                 dynamic_range="1">
-                <templates>
-                    <div t-name="gantt-popover">
-                        <div><strong>Start — </strong> <t t-out="date.toFormat('f')"/></div>
-                        <div t-if="partner_name"><strong>Proposed By — </strong> <t t-out="partner_name"/></div>
-                    </div>
-                </templates>
-                <field name="partner_name"/>
+                <popover>
+                    <field name="partner_name"/>
+                    <templates>
+                        <t t-name="popover-header">
+                            <field name="display_name"/>
+                        </t>
+                        <t t-name="popover-body">
+                            <div><strong>Start — </strong> <field name="date"/></div>
+                            <div invisible="not partner_name"><strong>Proposed By — </strong> <field name="partner_name"/></div>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         </field>
     </record>

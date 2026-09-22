@@ -1,17 +1,20 @@
-import { BankRecChatter } from "./chatter/chatter";
+import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { BankRecQuickCreate } from "./quick_create/quick_create";
 import { BankRecKanbanController } from "./kanban_controller";
 import { BankRecStatementLine } from "./statement_line/statement_line";
 import { BankRecStatementSummary } from "./statement_summary/statement_summary";
 import { browser } from "@web/core/browser/browser";
 import { KanbanRenderer } from "@web/views/kanban/kanban_renderer";
+import { RelationalModel } from "@web/model/relational_model/relational_model";
 import { kanbanView } from "@web/views/kanban/kanban_view";
 import { _t } from "@web/core/l10n/translation";
 import { formatMonetary } from "@web/views/fields/formatters";
-import { useState, onWillStart, onWillDestroy } from "@odoo/owl";
+import { onWillStart, onWillDestroy, proxy } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { useBankReconciliation } from "./bank_reconciliation_service";
+import { BankRecControlPanel } from "./control_action/control_action";
+import { user } from "@web/core/user";
 
 export class BankRecKanbanRenderer extends KanbanRenderer {
     static template = "account_accountant.BankRecKanbanRenderer";
@@ -20,7 +23,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
         BankRecQuickCreate,
         BankRecStatementSummary,
         BankRecStatementLine,
-        BankRecChatter,
+        Chatter,
     };
 
     setup() {
@@ -29,13 +32,9 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
         this.orm = useService("orm");
         this.ui = useService("ui");
         this.bankReconciliation = useBankReconciliation();
-        this.globalState = useState({
+        this.globalState = proxy({
             resModel: this.env.model.config.resModel,
             context: this.env.model.config.context,
-            quickCreate: {
-                isVisible: false,
-                quickCreateView: this.props.archInfo.quickCreateView,
-            },
             journalId:
                 this.env.model.config.context.default_journal_id ||
                 this.env.model.config.context.active_id,
@@ -44,11 +43,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
 
         this.env.model.hooks.onRootLoaded = async (newRoot) => {
             await this.prepareInitialState(newRoot.records);
-        }
-
-        this.env.bus.addEventListener("createRecordQuickCreate", () => {
-            this.globalState.quickCreate.isVisible = true;
-        });
+        };
 
         onWillStart(async () => {
             await this.prepareInitialState(this.env.model.root.records);
@@ -61,7 +56,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
             );
             browser.sessionStorage.setItem(
                 "bankReconciliationStatementLineId",
-                this.bankReconciliation.chatterState.statementLine?.data.id
+                this.bankReconciliation.statementLineId
             );
             this.bankReconciliation.chatterState.statementLine = null;
         });
@@ -73,11 +68,14 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
      * @param {Array<Object>} records - Bank statement line records
      * @returns {Promise<void>} Resolves when all computations are done
      */
-    async prepareInitialState(records){
+    async prepareInitialState(records) {
+        this.bankReconciliation.modelRootRecords = records;
         await Promise.all([
             this.getJournalTotalAmount(),
             this.bankReconciliation.computeReconcileLineCountPerPartnerId(records),
             this.bankReconciliation.computeAvailableReconcileModels(records),
+            this.bankReconciliation.computeAvailableReconcileLines(records),
+            this.bankReconciliation.computeAvailableAnalyticAccounts(records),
         ]);
         const statementLineId =
             parseInt(browser.sessionStorage.getItem("bankReconciliationStatementLineId")) ||
@@ -90,14 +88,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
     /**
         Override.
     **/
-    cancelQuickCreate() {
-        this.globalState.quickCreate.isVisible = false;
-    }
-
-    /**
-        Override.
-    **/
-    async validateQuickCreate(recordId, mode) {
+    async validateQuickCreate(recordId) {
         // When adding a record, some information needs to be recomputed
         await this.bankReconciliation.updateAvailableReconcileModels(recordId);
         await this.env.model.load();
@@ -105,10 +96,6 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
         await this.bankReconciliation.computeReconcileLineCountPerPartnerId(
             this.env.model.root.records
         );
-
-        if (mode === "add_close") {
-            this.globalState.quickCreate.isVisible = false;
-        }
     }
 
     async getJournalTotalAmount() {
@@ -130,7 +117,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
             [
                 this.env.model.config.context.default_journal_id ||
                     this.env.model.config.context.active_id,
-            ],
+            ]
         );
         this.action.doAction(actionData);
     }
@@ -144,9 +131,22 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
             target: "current",
             context: {
                 form_view_ref: "account_accountant.view_bank_statement_form_bank_rec_widget",
+                from_bank_reco: false,
+                from_statement_view: true,
+                default_journal_id: this.globalState.journalId,
             },
         };
 
+        this.action.doAction(action);
+    }
+
+    async actionReviewStatement(statementId) {
+        const action = await this.orm.call(
+            "account.bank.statement",
+            "action_open_statements_to_review",
+            [statementId],
+            { context: this.globalState.context }
+        );
         this.action.doAction(action);
     }
 
@@ -155,17 +155,16 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
     // -----------------------------------------------------------------------------
 
     get quickCreateContext() {
+        // This is needed because you could end up with inconsistent between the model context
+        // and the user context, since the kanban controller directly modifies the user context,
+        // we put priority on the user context.
         return {
             ...this.globalState.context,
+            ...user.context,
         };
     }
 
-    // TODO: remove in master
-    get hideCurrentBalance() {
-        return false;
-    }
-
-    get hasStatementLine() {
+    get numberOfStatementLines() {
         return this.env.model.root.count;
     }
 
@@ -175,7 +174,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
 
     // hide no content helper if quick create is visible and there is no data either isGrouped or not
     get showNoContentHelper() {
-        return !this.isQuickCreateVisible && !this.props.list.model.hasData();
+        return !this.props.quickCreateState?.isOpen && !this.props.list.model.hasData();
     }
 
     /**
@@ -196,6 +195,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
                         currencyId: record.data.currency_id.id,
                     }),
                     isValid: record.data.statement_complete && record.data.statement_valid,
+                    problemDescription: record.data.statement_problem_description,
                 };
                 lastStatementId = statementId;
             } else {
@@ -215,15 +215,29 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
         return statementGroups;
     }
 
-    get isQuickCreateVisible() {
-        return this.globalState.quickCreate.isVisible;
+    get isReviewFilterActive() {
+        const reviewFilter = Object.values(this.env.searchModel.searchItems).find(
+            ({ name }) => name === "statement_to_review"
+        );
+
+        return this.env.searchModel.facets.some(
+            (facet) =>
+                facet.groupId === reviewFilter?.groupId &&
+                facet.values.includes(reviewFilter.description)
+        );
     }
+}
+
+export class BankRecModel extends RelationalModel {
+    static withCache = false;
 }
 
 export const BankRecKanbanView = {
     ...kanbanView,
+    ControlPanel: BankRecControlPanel,
     Controller: BankRecKanbanController,
     Renderer: BankRecKanbanRenderer,
+    Model: BankRecModel,
     searchMenuTypes: ["filter", "favorite"],
 };
 

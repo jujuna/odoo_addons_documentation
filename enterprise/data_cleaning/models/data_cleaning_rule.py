@@ -4,7 +4,7 @@
 import re
 
 from odoo import models, api, fields
-from odoo.tools import html2plaintext
+from odoo.tools import html2plaintext, SQL
 from odoo.exceptions import ValidationError
 
 
@@ -20,12 +20,12 @@ ACTIONS_PYTHON = {
 
 ACTIONS_SQL = {
     # {action_technical: (operator, action, composable))}
-    'trim_all': ('<>', "REPLACE(%s, ' ', '')", True),
-    'trim_superfluous': ('<>', r"TRIM(REGEXP_REPLACE(%s, '\s+', ' ', 'g'))", True),
-    'case_first': ('<>', 'INITCAP(%s)', True),
-    'case_upper': ('<>', 'UPPER(%s)', True),
-    'case_lower': ('<>', 'LOWER(%s)', True),
-    'html': ('~', "'<[a-z]+.*>'", False),
+    'trim_all': (SQL('<>'), lambda val: SQL("REPLACE(%s, ' ', '')", val), True),
+    'trim_superfluous': (SQL('<>'), lambda val: SQL(r"TRIM(REGEXP_REPLACE(%s, '\s+', ' ', 'g'))", val), True),
+    'case_first': (SQL('<>'), lambda val: SQL('INITCAP(%s)', val), True),
+    'case_upper': (SQL('<>'), lambda val: SQL('UPPER(%s)', val), True),
+    'case_lower': (SQL('<>'), lambda val: SQL('LOWER(%s)', val), True),
+    'html': (SQL('~'), lambda _val: SQL("'<[a-z]+.*>'"), False),
     # special cases (operator is False),
     # needs to be treated in Python with data_cleaning.model's method '_clean_records_%s' % action_technical
     'phone': (False, 'format_phone', False),
@@ -86,12 +86,10 @@ class Data_CleaningRule(models.Model):
         for rule in self:
             action, action_display = get_display_name(rule, 'action')
             action_display = action_display or ''
-            for action_with_detail in ('trim', 'case'):
-                if action == action_with_detail:
-                    action_detail, action_display_detail = get_display_name(rule, f'action_{action}')
-                    action = f"{action}_{action_detail}"
-                    action_display = f"{action_display} ({action_display_detail})"
-                    break
+            if action in ('trim', 'case'):
+                action_detail, action_display_detail = get_display_name(rule, f'action_{action}')
+                action = f"{action}_{action_detail}"
+                action_display = f"{action_display} ({action_display_detail})"
             rule.action_technical = action
             rule.action_display = action_display
 
@@ -99,26 +97,16 @@ class Data_CleaningRule(models.Model):
         field_actions = {}
         for rule in self:
             operator, action, composable = ACTIONS_SQL.get(rule.action_technical)
+            field_action = field_actions.setdefault(rule.name, {
+                'action': (lambda v: v) if composable else action,
+                'rule_ids': [],
+                'field_name': rule.name,
+                'field_id': rule.field_id.id,
+                'operator': operator,
+            })
+            field_action['rule_ids'].extend(rule.ids)
             if composable:
-                field_action = field_actions.setdefault(rule.name, {
-                    'action': '%s',
-                    'rule_ids': [],
-                    'field_name': rule.name,
-                    'field_id': rule.field_id.id,
-                    'operator': operator,
-                    'composable': True
-                })
-                field_action['rule_ids'].append(rule.id)
-                field_action['action'] = action % field_action['action']
-            else:
-                field_actions.setdefault(rule.name, {
-                    'action': action,
-                    'rule_ids': rule.ids,
-                    'field_name': rule.name,
-                    'field_id': rule.field_id.id,
-                    'operator': operator,
-                    'composable': False,
-                })
+                field_action['action'] = lambda v, *, a=action, b=field_action['action']: a(b(v))
         return field_actions
 
     def _action_to_python(self):

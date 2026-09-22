@@ -6,11 +6,6 @@ from odoo import models, api
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    @api.depends('account_id.fiscal_category_id')
-    def _compute_need_vehicle(self):
-        for record in self:
-            record.need_vehicle = record.account_id.fiscal_category_id.sudo().car_category and record.move_id.move_type == 'in_invoice'
-
     @api.model
     def _get_deferred_lines_values(self, account_id, balance, ref, analytic_distribution, line=None):
         deferred_lines_values = super()._get_deferred_lines_values(account_id, balance, ref, analytic_distribution, line)

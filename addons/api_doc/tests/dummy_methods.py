@@ -1,5 +1,6 @@
+from typing import Self
+
 from odoo import api, models
-from odoo.api import Self
 
 
 class DummyMethods:
@@ -25,12 +26,13 @@ class DummyMethods:
         </div>""",
     }
 
-    def multiple_args_and_error(self, a: int, b: list[int]) -> int:
+    def multiple_args_and_error(self, a: int, b: list[int], c: dict[str, list[str]]) -> int:
         """
         Another dummy function.
 
         :param int a: an int.
         :param list[int] b: a list of int.
+        :param dict[str, list[str]] c: a dict of lists.
         :raises ValueError: raise an error if ``a`` is greater than ``len(b)``.
         :returns: returns the element of ``b`` at index ``a``.
         :rtype: int
@@ -38,10 +40,11 @@ class DummyMethods:
         return a
 
     multiple_args_and_error.expected = {
-        "signature": "(a, b) -> int",
+        "signature": "(a, b, c) -> int",
         "parameters": {
             "a": {"annotation": "int", "doc": "<p>an int.</p>"},
             "b": {"annotation": "list[int]", "doc": "<p>a list of int.</p>"},
+            "c": {"annotation": "dict[str, list[str]]", "doc": "<p>a dict of lists.</p>"},
         },
         'raise': {'ValueError': '<p>raise an error if <tt class="docutils literal">a</tt> is greater than <tt class="docutils literal">len(b)</tt>.</p>'},
         "return": {"annotation": "int", "doc": '<p>returns the element of <tt class="docutils literal">b</tt> at index <tt class="docutils literal">a</tt>.</p>'},
@@ -74,20 +77,6 @@ class DummyMethods:
         "signature": "(a) -> int",
         "parameters": {"a": {"annotation": "int"}},
         "return": {"annotation": "int"},
-    }
-
-    # the cls param should be stripped away
-    @classmethod
-    def class_method(cls, a):
-        """
-        :param a: an A
-        """
-        pass
-
-    class_method.__func__.expected = {
-        'signature': '(a)',
-        'parameters': {'a': {'doc': '<p>an A</p>'}},
-        'doc': '<div class="document"></div>'
     }
 
     # the self param should be stripped away
@@ -189,3 +178,19 @@ class DummyMethods:
         <p>a bit more text</p>
         </div>""",
     }
+
+    # Those methods cannot be called over RPC and should not appear in /doc
+    @classmethod
+    def class_method(cls):
+        pass
+
+    @staticmethod
+    def static_method():
+        pass
+
+    @api.private
+    def private_method(self):
+        pass
+
+    def _underscope_method(self):
+        pass

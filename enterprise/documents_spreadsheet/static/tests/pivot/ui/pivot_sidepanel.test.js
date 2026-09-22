@@ -11,6 +11,7 @@ import {
 import * as dsHelpers from "@web/../tests/core/tree_editor/condition_tree_editor_test_helpers";
 import { contains, onRpc, MockServer } from "@web/../tests/web_test_helpers";
 import { updatePivot } from "@spreadsheet/../tests/helpers/commands";
+import { editSelectComponent } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 
 defineDocumentSpreadsheetModels();
 describe.current.tags("desktop");
@@ -140,8 +141,8 @@ test("Can change measure display as from the side panel", async function () {
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
 
-    await contains(".pivot-measure .fa-cog").click();
-    await contains(".o-sidePanel select").select("%_of");
+    await contains(".pivot-measure [data-icon='settings_f']").click();
+    await editSelectComponent(".o-sidePanel .o-select", "%_of");
 
     expect(model.getters.getPivotCoreDefinition(pivotId).measures[0]).toEqual({
         id: "probability:avg",

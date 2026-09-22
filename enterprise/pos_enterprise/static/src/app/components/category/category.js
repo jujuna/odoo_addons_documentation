@@ -1,11 +1,13 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { usePrepDisplay } from "@pos_enterprise/app/services/preparation_display_service";
+import { PosCategory } from "@point_of_sale/app/models/pos_category";
+import { roundQuantity } from "@pos_enterprise/app/utils/utils";
 
 export class Category extends Component {
     static template = "pos_enterprise.Category";
-    static props = {
-        category: Object,
-    };
+    props = useProps({
+        category: t.instanceOf(PosCategory),
+    });
 
     setup() {
         this.prepDisplay = usePrepDisplay();
@@ -20,41 +22,49 @@ export class Category extends Component {
 
         this.productCount = 0;
 
-        for (const state of category.states) {
-            if (state.isStageDone(this.prepDisplay.lastStage.id)) {
+        for (const prepLine of category.prepLines) {
+            if (prepLine.isStageDone()) {
                 continue;
             }
-            if (state.stage_id.id === selectedStageId || !selectedStageId) {
-                const quantity = state.prep_line_id.quantity;
-                const cancelled = state.prep_line_id.cancelled;
+            if (prepLine.stage_id.id === selectedStageId || !selectedStageId) {
+                const quantity = prepLine.quantity;
+                const cancelled = prepLine.cancelled;
 
-                if (!products[state.product.id]) {
-                    products[state.product.id] = {
-                        id: state.product.id,
-                        name: state.prep_line_id.product_id.display_name,
-                        categoryIds: state.categories.map((categ) => categ.id),
+                if (!products[prepLine.product.id]) {
+                    products[prepLine.product.id] = {
+                        id: prepLine.product.id,
+                        name: prepLine.product_id.display_name,
+                        categoryIds: prepLine.categories.map((categ) => categ.id),
                         quantity: quantity,
                         cancelled: cancelled,
                     };
                 } else {
-                    products[state.product.id].quantity += quantity;
-                    products[state.product.id].cancelled += cancelled;
+                    products[prepLine.product.id].quantity += quantity;
+                    products[prepLine.product.id].cancelled += cancelled;
                 }
 
-                this.productCount += state.prep_line_id.quantity - state.prep_line_id.cancelled;
+                this.productCount += prepLine.quantity - prepLine.cancelled;
             }
             if (
-                !products[state.product.id] &&
-                this.prepDisplay.selectedProductIds.has(state.product.id)
+                !products[prepLine.product.id] &&
+                this.prepDisplay.selectedProductIds.has(prepLine.product.id)
             ) {
-                products[state.product.id] = {
-                    id: state.product.id,
-                    name: state.prep_line_id.product_id.display_name,
-                    categoryIds: state.categories.map((categ) => categ.id),
+                products[prepLine.product.id] = {
+                    id: prepLine.product.id,
+                    name: prepLine.product_id.display_name,
+                    categoryIds: prepLine.categories.map((categ) => categ.id),
                     quantity: 0,
                     cancelled: 0,
                 };
             }
+        }
+
+        const models = this.prepDisplay.data.models;
+        this.productCount = roundQuantity(this.productCount, models);
+        for (const product of Object.values(products)) {
+            product.quantity = roundQuantity(product.quantity, models);
+            product.cancelled = roundQuantity(product.cancelled, models);
+            product.todoQuantity = roundQuantity(product.quantity - product.cancelled, models);
         }
 
         this.products = Object.values(products).sort((a, b) => b.quantity - a.quantity);

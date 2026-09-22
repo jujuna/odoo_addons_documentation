@@ -6,7 +6,7 @@ import { SelectMenu } from "@web/core/select_menu/select_menu";
 import { useAutofocus, useService } from "@web/core/utils/hooks";
 import { uuid } from "@web/core/utils/strings";
 
-import { Component, onWillStart, useExternalListener, useState } from "@odoo/owl";
+import { Component, onWillStart, useProps, proxy, signal, t, useListener } from "@odoo/owl";
 
 /**
  * Dialog allowing to dynamically edit the item calendar view configuration
@@ -15,39 +15,35 @@ import { Component, onWillStart, useExternalListener, useState } from "@odoo/owl
  */
 export class ItemCalendarPropsDialog extends Component {
     static template = "knowledge.ItemCalendarPropsDialog";
+
+    autofocusRef = signal.ref();
     static components = {
         DropdownItem,
         Dialog,
         SelectMenu,
     };
-    static props = {
-        knowledgeArticleId: { type: Number, optional: true },
-        close: { type: Function, optional: true },
-        colorPropertyId: { type: String, optional: true },
-        dateStartPropertyId: { type: String, optional: true },
-        dateStopPropertyId: { type: String, optional: true },
-        dateType: { type: String, optional: true },
-        isNew: { type: Boolean, optional: true },
-        name: { type: String, optional: true },
-        saveItemCalendarProps: { type: Function },
-        scale: { type: String, optional: true },
-        showWeekEnds: { type: Boolean, optional: true },
-        slotMaxTime: { type: String, optional: true },
-        slotMinTime: { type: String, optional: true },
-    };
-
-    static defaultProps = {
-        showWeekEnds: true,
-        slotMinTime: "00:00",
-        slotMaxTime: "24:00",
-    };
+    props = useProps({
+        knowledgeArticleId: t.number().optional(),
+        close: t.function().optional(),
+        colorPropertyId: t.string().optional(),
+        dateStartPropertyId: t.string().optional(),
+        dateStopPropertyId: t.string().optional(),
+        dateType: t.string().optional(),
+        isNew: t.boolean().optional(),
+        name: t.string().optional(),
+        saveItemCalendarProps: t.function(),
+        scale: t.string().optional(),
+        showWeekEnds: t.boolean().optional(true),
+        slotMaxTime: t.string().optional("24:00"),
+        slotMinTime: t.string().optional("00:00"),
+    });
 
     setup() {
         super.setup();
-        useAutofocus();
+        useAutofocus({ ref: this.autofocusRef });
         this.orm = useService("orm");
         this.notification = useService("notification");
-        this.state = useState({
+        this.state = proxy({
             name: this.props.name,
             scale: this.props.scale || "week",
             showWeekEnds: this.props.showWeekEnds,
@@ -122,7 +118,7 @@ export class ItemCalendarPropsDialog extends Component {
         });
 
         // Save when pressing on enter
-        useExternalListener(window, "keydown", (event) => {
+        useListener(window, "keydown", (event) => {
             if (event.key === "Enter") {
                 this.save();
             }

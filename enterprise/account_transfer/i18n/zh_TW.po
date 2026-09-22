@@ -10,17 +10,26 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:24+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
-"projects/odoo-19/account_transfer/zh_Hant/>\n"
+"projects/odoo-master/account_transfer/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_transfer
+#: model:ir.module.module,description:base.module_account_transfer
+msgid ""
+"\n"
+"Account Transfers\n"
+"===========================\n"
+"A helper model for managing transfers between accounts.\n"
+msgstr ""
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -59,6 +68,11 @@ msgstr "轉帳項目模型"
 #: model:ir.model,name:account_transfer.model_account_transfer_model_line
 msgid "Account Transfer Model Line"
 msgstr "賬戶轉賬模型資料行"
+
+#. module: account_transfer
+#: model:ir.module.module,shortdesc:base.module_account_transfer
+msgid "Account Transfers"
+msgstr ""
 
 #. module: account_transfer
 #: model:ir.actions.server,name:account_transfer.ir_cron_auto_transfer_ir_actions_server
@@ -192,6 +206,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__id
 msgid "ID"
 msgstr "識別號"
+
+#. module: account_transfer
+#. odoo-python
+#: code:addons/account_transfer/demo/account_demo.py:0
+#: model:account.journal.group,name:account_transfer.ifrs_group
+msgid "IFRS"
+msgstr ""
 
 #. module: account_transfer
 #. odoo-python
@@ -421,109 +442,3 @@ msgstr "例如，月度費用轉帳"
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "forever"
 msgstr "永遠"
-
-#~ msgid "Account automatic transfers: Perform transfers"
-#~ msgstr "賬戶自動轉賬：執行轉賬"
-
-#~ msgid "Activate"
-#~ msgstr "啟動"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these analytic accounts to the destination account"
-#~ msgstr "增加條件以僅將與這些分析帳戶匹配的原始項目的明細總和轉帳到目標項目"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these partners to the destination account"
-#~ msgstr "增加條件以僅將與這些合作夥伴匹配的來源項目明細總和轉帳到目標項目"
-
-#~ msgid "Analytic Filter"
-#~ msgstr "分析篩選"
-
-#~ msgid "Automated Transfer"
-#~ msgstr "自動轉帳"
-
-#~ msgid "Automatic Transfer (%(percent)s%% from account %(origin_account)s)"
-#~ msgstr "自動轉賬（%(percent)s%% 由賬戶 %(origin_account)s）"
-
-#~ msgid "Automatic Transfer (-%s%%)"
-#~ msgstr "自動轉帳 (-%s%%)"
-
-#~ msgid ""
-#~ "Automatic Transfer (entries with analytic account(s): %"
-#~ "(analytic_accounts)s and partner(s): %(partners)s)"
-#~ msgstr ""
-#~ "自動轉賬（有分析賬戶的記項，分析賬戶：%(analytic_accounts)s，合作夥伴：%"
-#~ "(partners)s）"
-
-#~ msgid "Automatic Transfer (entries with analytic account(s): %s)"
-#~ msgstr "自動轉賬 (帶有分析帳戶的分錄: %s)"
-
-#~ msgid "Automatic Transfer (entries with partner(s): %s)"
-#~ msgstr "自動轉賬 (帶有合作夥伴的分錄: %s)"
-
-#~ msgid ""
-#~ "Automatic Transfer (from account %(origin_account)s with analytic "
-#~ "account(s): %(analytic_accounts)s and partner(s): %(partners)s)"
-#~ msgstr ""
-#~ "自動轉賬（從賬戶：%(origin_account)s，分析賬戶：%(analytic_accounts)s，合"
-#~ "作夥伴：%(partners)s）"
-
-#~ msgid ""
-#~ "Automatic Transfer (from account %(origin_account)s with analytic "
-#~ "account(s): %(analytic_accounts)s)"
-#~ msgstr ""
-#~ "自動轉賬（從賬戶：%(origin_account)s，分析賬戶：%(analytic_accounts)s）"
-
-#~ msgid ""
-#~ "Automatic Transfer (from account %(origin_account)s with partner(s): %"
-#~ "(partners)s)"
-#~ msgstr "自動轉賬（從賬戶：%(origin_account)s，合作夥伴：%(partners)s）"
-
-#~ msgid "Automatic Transfer (to account %s)"
-#~ msgstr "自動轉帳 (到項目 %s)"
-
-#~ msgid "Automatic Transfers"
-#~ msgstr "自動轉帳"
-
-#~ msgid "IFRS Automatic Transfers"
-#~ msgstr "IFRS 自動轉賬"
-
-#~ msgid "Partner Filter"
-#~ msgstr "合作夥伴篩選"
-
-#~ msgid "Percent (%)"
-#~ msgstr "百分比（%）"
-
-#~ msgid "Percent Is Readonly"
-#~ msgstr "百分比是唯讀"
-
-#~ msgid "Running"
-#~ msgstr "執行中"
-
-#~ msgid "The analytic filter %s is duplicated"
-#~ msgstr "分析篩選 %s 重複"
-
-#~ msgid ""
-#~ "The partner filter %(partner_filter)s in combination with the analytic "
-#~ "filter %(analytic_filter)s is duplicated"
-#~ msgstr ""
-#~ "合作夥伴篩選器 %(partner_filter)s 與分析篩選器 %(analytic_filter)s 的組合"
-#~ "重複"
-
-#~ msgid "The partner filter %s is duplicated"
-#~ msgstr "合作夥伴篩選 %s 重複"
-
-#~ msgid ""
-#~ "You cannot delete an automatic transfer that has draft moves attached "
-#~ "('%s'). Please delete them before deleting this transfer."
-#~ msgstr "不可刪除附有草稿分錄的自動轉賬（'%s'）。請在刪除此轉賬前刪除它們。"
-
-#~ msgid ""
-#~ "You cannot delete an automatic transfer that has posted moves attached "
-#~ "('%s')."
-#~ msgstr "不可刪除附有已過賬分錄的自動轉賬（'%s'）。"
-
-#~ msgid "You cannot set Tax on Automatic Transfer's entries."
-#~ msgstr "你不可對自動轉賬記項設立稅項。"

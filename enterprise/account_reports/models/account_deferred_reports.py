@@ -2,11 +2,13 @@
 import calendar
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
+from psycopg2 import sql
 
 from odoo import models, fields, _, api, Command
 from odoo.exceptions import UserError
 from odoo.tools import groupby, SQL
 from odoo.addons.account_accountant.models.account_move import DEFERRED_DATE_MIN, DEFERRED_DATE_MAX
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 
 class AccountDeferredReportHandler(models.AbstractModel):
@@ -153,7 +155,7 @@ class AccountDeferredReportHandler(models.AbstractModel):
 
     @api.model
     def _get_grouping_fields_deferral_lines(self):
-        return ()
+        return ('deferred_account_id',)
 
     @api.model
     def _group_by_deferral_fields(self, line):
@@ -197,7 +199,7 @@ class AccountDeferredReportHandler(models.AbstractModel):
 
         options_per_col_group = report._split_options_per_column_group(options)
         for column_dict in options['columns']:
-            column_options = options_per_col_group[column_dict['column_group_key']]
+            column_options = options_per_col_group[column_dict['column_group_index']]
             column_dict['name'] = column_options['date']['string']
             column_dict['date_from'] = column_options['date']['date_from']
             column_dict['date_to'] = column_options['date']['date_to']
@@ -224,13 +226,27 @@ class AccountDeferredReportHandler(models.AbstractModel):
             'date_from': DEFERRED_DATE_MIN,
             'date_to': fields.Date.to_string(fields.Date.to_date(options['columns'][0]['date_from']) - relativedelta(days=1)),
         }]
-        later_column = [{
-            **options['columns'][0],
-            'name': _('Later'),
-            'expression_label': 'later',
-            'date_from': fields.Date.to_string(fields.Date.to_date(options['columns'][-1]['date_to']) + relativedelta(days=1)),
-            'date_to': DEFERRED_DATE_MAX,
-        }]
+        report_date_to = fields.Date.to_date(options['columns'][-1]['date_to'])
+        # Split the "Later to be recognized" column into:
+        # - short-term (within 12 months)
+        # - long-term (after 12 months) part
+        twelve_months_later = report_date_to + relativedelta(years=1)
+        later_columns = [
+            {
+                **options['columns'][0],
+                'name': _('≤ 12 Months'),
+                'expression_label': 'within_year',
+                'date_from': fields.Date.to_string(report_date_to + relativedelta(days=1)),
+                'date_to': fields.Date.to_string(twelve_months_later),
+            },
+            {
+                **options['columns'][0],
+                'name': _('> 12 Months'),
+                'expression_label': 'after_year',
+                'date_from': fields.Date.to_string(twelve_months_later + relativedelta(days=1)),
+                'date_to': DEFERRED_DATE_MAX,
+            },
+        ]
         recognized_column = [{
             **options['columns'][0],
             'name': _('Recognized'),
@@ -238,7 +254,7 @@ class AccountDeferredReportHandler(models.AbstractModel):
             'date_from': DEFERRED_DATE_MIN,
             'date_to': options['columns'][-1]['date_to'],  # Covers up to end of current period
         }]
-        options['columns'] = total_column + not_started_column + before_column + options['columns'] + recognized_column + later_column
+        options['columns'] = total_column + not_started_column + before_column + options['columns'] + recognized_column + later_columns
         options['column_headers'] = []
         options['deferred_report_type'] = self._get_deferred_report_type()
         options['deferred_grouping_field'] = previous_options.get('deferred_grouping_field') or 'account_id'
@@ -278,7 +294,7 @@ class AccountDeferredReportHandler(models.AbstractModel):
         report = self.env['account.report'].browse(options['report_id'])
         column_values = next(
             (column for column in options['columns'] if (
-                column['column_group_key'] == params.get('column_group_key')
+                column['column_group_index'] == params.get('column_group_index')
                 and column['expression_label'] == params.get('expression_label')
             )),
             None
@@ -292,8 +308,8 @@ class AccountDeferredReportHandler(models.AbstractModel):
         report_date_to = fields.Date.to_date(options['date']['date_to'])
 
         # Corrections for comparisons
-        if column_values['expression_label'] in ('not_started', 'later'):
-            # Not Started and Later period start one day after `report_date_to`
+        if column_values['expression_label'] == 'not_started':
+            # Not Started period starts one day after `report_date_to`
             column_date_from = report_date_to + relativedelta(days=1)
         if column_values['expression_label'] == 'before':
             # Before period ends one day before `report_date_from`
@@ -405,22 +421,21 @@ class AccountDeferredReportHandler(models.AbstractModel):
 
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
         def get_columns(totals):
-            return [
-                {
-                    **report._build_column_dict(
-                        totals[(
-                            fields.Date.to_date(column['date_from']),
-                            fields.Date.to_date(column['date_to']),
-                            column['expression_label']
-                        )],
-                        column,
-                        options=options,
-                        currency=self.env.company.currency_id,
-                    ),
-                    'auditable': True,
-                }
-                for column in options['columns']
-            ]
+            columns = []
+            for column in options['columns']:
+                column = report._build_column_data(
+                    totals[
+                        fields.Date.to_date(column['date_from']),
+                        fields.Date.to_date(column['date_to']),
+                        column['expression_label']
+                    ],
+                    column,
+                    options=options,
+                    currency=self.env.company.currency_id,
+                )
+                column.auditable = True
+                columns.append(column)
+            return columns
 
         lines = self._get_lines(report, options)
         periods = [
@@ -448,20 +463,21 @@ class AccountDeferredReportHandler(models.AbstractModel):
             if options['deferred_grouping_field'] == 'product_id':
                 grouping_field_description = _("Product")
             grouping_name = grouping_record.display_name or _("(No %s)", grouping_field_description)
-            report_lines.append((0, {
-                'id': report._get_generic_line_id(grouping_model, grouping_record.id),
-                'name': grouping_name,
-                'caret_options': 'deferred_caret',
-                'level': 1,
-                'columns': get_columns(totals_grouping_field),
-            }))
+
+            report_lines.append((0, AccountReportLineData(
+                id=report._get_generic_line_id(grouping_model, grouping_record.id),
+                name=grouping_name,
+                caret_options='deferred_caret',
+                level=1,
+                columns=get_columns(totals_grouping_field),
+            )))
         if totals_per_grouping_field:
-            report_lines.append((0, {
-                'id': report._get_generic_line_id(None, None, markup='total'),
-                'name': 'Total',
-                'level': 1,
-                'columns': get_columns(totals_all_grouping_field),
-            }))
+            report_lines.append((0, AccountReportLineData(
+                id=report._get_generic_line_id(None, None, markup='total'),
+                name=self.env._("Total"),
+                level=1,
+                columns=get_columns(totals_all_grouping_field),
+            )))
 
         return report_lines
 
@@ -488,9 +504,9 @@ class AccountDeferredReportHandler(models.AbstractModel):
         report = self.env["account.report"].browse(options["report_id"])
         self.env['account.move.line'].flush_model()
         lines = self._get_lines(report, options, filter_already_generated=True)
-        deferral_entry_period = self.env['account.report']._get_dates_period(date_from, date_to, 'range', period_type='month')
-        ref = _("Grouped Deferral Entry of %s", deferral_entry_period['string'])
-        ref_rev = _("Reversal of Grouped Deferral Entry of %s", deferral_entry_period['string'])
+        deferral_entry_period = self.env['account.report']._build_date_dict(options, date_from, date_to, period_type='month')
+        ref = self.env._("Grouped Deferral Entry of %s", deferral_entry_period['string'])
+        ref_rev = self.env._("Reversal of Grouped Deferral Entry of %s", deferral_entry_period['string'])
         deferred_account = self.env.company.deferred_expense_account_id if self._get_deferred_report_type() == 'expense' else self.env.company.deferred_revenue_account_id
         move_lines, original_move_ids = self._get_deferred_lines(lines, deferred_account, (date_from, date_to, 'current'), self._get_deferred_report_type() == 'expense', ref)
         return move_lines, original_move_ids, ref, ref_rev, date_to
@@ -526,11 +542,11 @@ class AccountDeferredReportHandler(models.AbstractModel):
         # We create the relation (original deferred move, deferral entry)
         # using SQL. This avoids a MemoryError using the ORM which will
         # load huge amounts of moves in memory for nothing
-        self.env.cr.execute_values("""
+        self.env.cr.execute_values(sql.SQL("""
             INSERT INTO account_move_deferred_rel(original_move_id, deferred_move_id)
                  VALUES %s
             ON CONFLICT DO NOTHING
-        """, [
+        """), [
             (original_move_id, deferral_move.id)
             for original_move_id in original_move_ids
             for deferral_move in new_deferred_moves
@@ -543,6 +559,7 @@ class AccountDeferredReportHandler(models.AbstractModel):
     def _get_current_key_totals_dict(self, lines_per_key, sign):
         return {
             'account_id': lines_per_key[0]['account_id'],
+            'deferred_account_id': lines_per_key[0].get('deferred_account_id'),
             'product_id': lines_per_key[0]['product_id'],
             'product_category_id': lines_per_key[0]['product_category_id'],
             'amount_total': sign * sum(line['balance'] for line in lines_per_key),
@@ -556,10 +573,21 @@ class AccountDeferredReportHandler(models.AbstractModel):
         And the move_ids of the original lines that created these deferred
         (to keep track of the original invoice in the deferred entries).
         """
-        if not deferred_account:
-            raise UserError(_("Please set the deferred accounts in the accounting settings."))
+        # Resolve the deferred account to use for each original account: the one set on the
+        # account itself if any, otherwise the generic account from the accounting settings.
+        accounts = self.env['account.account'].browse({line['account_id'] for line in lines})
+        deferred_account_per_account = {
+            account.id: account.deferred_account_id or deferred_account
+            for account in accounts
+        }
+        if not all(deferred_account_per_account.values()):
+            raise UserError(_("Please set a deferred account on the related account or in the accounting settings."))
+        for line in lines:
+            line['deferred_account_id'] = deferred_account_per_account[line['account_id']].id
 
         deferred_amounts_by_line = self.env['account.move']._get_deferred_amounts_by_line(lines, [period], is_reverse)
+        for line in deferred_amounts_by_line:
+            line['deferred_account_id'] = deferred_account_per_account[line['account_id']].id
         deferred_amounts_by_key, deferred_amounts_totals = self._group_deferred_amounts_by_grouping_field(deferred_amounts_by_line, [period], is_reverse, filter_already_generated=True)
         totals_aggregated = deferred_amounts_totals['totals_aggregated']
         if totals_aggregated == deferred_amounts_totals[period]:
@@ -625,7 +653,7 @@ class AccountDeferredReportHandler(models.AbstractModel):
             deferral_lines.append(
                 Command.create(
                     self.env['account.move.line']._get_deferred_lines_values(
-                        account_id=deferred_account.id,
+                        account_id=lines_per_key[0]['deferred_account_id'],
                         balance=balance,
                         ref=ref,
                         analytic_distribution=deferred_anal_dist[key] or False,

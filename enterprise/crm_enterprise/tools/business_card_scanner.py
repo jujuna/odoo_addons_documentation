@@ -44,7 +44,7 @@ class BusinessCardScanner:
     def business_cards_to_leads(self, attachments):
         """ Create opportunities from the details extracted from images of business cards. """
 
-        openai_api_key = self.env["ir.config_parameter"].sudo().get_param("crm_enterprise.business_card_reader.openai_key")
+        openai_api_key = self.env["ir.config_parameter"].sudo().get_str("crm_enterprise.business_card_reader.openai_key")
 
         valid_attachments = []
         lead_values_list = []
@@ -113,6 +113,10 @@ class BusinessCardScanner:
                     state = self.env['res.country.state'].search(domain, limit=1)
                     if state:
                         lead_values['state_id'] = state.id
+
+                # extract city
+                if data.get('city'):
+                    lead_values['city'] = data['city']
 
                 # format phone
                 if lead_values.get('phone'):
@@ -199,10 +203,8 @@ class BusinessCardScanner:
 
     def _ocr_from_iap(self, image_url):
         IrConfigParameter = self.env["ir.config_parameter"].sudo()
-        olg_api_endpoint = IrConfigParameter.get_param(
-            "html_editor.olg_api_endpoint", "https://olg.api.odoo.com"
-        )
-        database_id = IrConfigParameter.get_param("database.uuid")
+        olg_api_endpoint = IrConfigParameter.get_str("html_editor.olg_api_endpoint") or "https://olg.api.odoo.com"
+        database_id = IrConfigParameter.get_str('database.uuid')
         response = iap_tools.iap_jsonrpc(
             url_join(olg_api_endpoint, "/api/olg/1/chat"),
             params={
@@ -217,6 +219,7 @@ class BusinessCardScanner:
                 "database_id": database_id,
             },
             timeout=20,
+            raise_user_error=True,
         )
         if response['status'] != 'success':
             return {}  # nothing to log in this case, IAP provides 0 info

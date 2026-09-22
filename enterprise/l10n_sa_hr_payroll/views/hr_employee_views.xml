@@ -7,13 +7,14 @@
         <field name="arch" type="xml">
             <group name="payroll_group" position="inside">
                 <group string='Saudi Payroll Information' invisible="company_country_code != 'SA'">
-                    <field name="l10n_sa_employee_code"/>
+                    <field name="l10n_sa_employee_code" placeholder="e.g. 3141592653"/>
                     <label for="l10n_sa_remaining_annual_leave_balance" string="Annual Leave Balance"
                            help="Number of valid allocated leave days that are annual leave days"/>
                     <div class="o_row" name="l10n_sa_remaining_annual_leave_balance">
                         <field name="l10n_sa_remaining_annual_leave_balance" class="o_hr_narrow_field"/>
                         <span>days</span>
                     </div>
+                    <field name="l10n_sa_eos_number_of_days_in_year"/>
 
                     <separator string="Allowances"/>
                     <label for="l10n_sa_housing_allowance" string="Housing"/>
@@ -31,21 +32,6 @@
                         <field class="o_hr_narrow_field" name="l10n_sa_other_allowances"/>
                         <span>/ month</span>
                     </div>
-                    <label for="l10n_sa_iqama_annual_amount" string="Iqama"/>
-                    <div class="o_row" name="l10n_sa_iqama_annual_amount">
-                        <field name="l10n_sa_iqama_annual_amount" class="o_hr_narrow_field"/>
-                        <span>/ year</span>
-                    </div>
-                    <label for="l10n_sa_medical_insurance_annual_amount" string="Medical Insurance"/>
-                    <div class="o_row" name="l10n_sa_medical_insurance_annual_amount">
-                        <field name="l10n_sa_medical_insurance_annual_amount" class="o_hr_narrow_field"/>
-                        <span>/ year</span>
-                    </div>
-                    <label for="l10n_sa_work_permit_annual_amount" string="Work Permit"/>
-                    <div class="o_row" name="l10n_sa_work_permit_annual_amount">
-                        <field name="l10n_sa_work_permit_annual_amount" class="o_hr_narrow_field"/>
-                        <span>/ year</span>
-                    </div>
 
                     <separator string="Annual Leaves Provisions"/>
                     <label for="l10n_sa_number_of_days" string="Eligibility"/>
@@ -53,11 +39,22 @@
                         <field name="l10n_sa_number_of_days" class="o_hr_narrow_field"/>
                         <span>days / year</span>
                     </div>
-
-                    <separator string="WPS Information"/>
-                    <field name="l10n_sa_wps_description"/>
+                </group>
+                <group name="l10n_sa_hr_payroll_contributions" string="GOSI" invisible="country_code != 'SA'" colspan="2">
+                    <group name="l10n_sa_hr_payroll_contributions_company" string="Company Contributions" >
+                        <field name="l10n_sa_company_social_insurance_percentage" string="Social Insurance" class="mw-25" widget="percentage"/>
+                        <field name="l10n_sa_company_oh_insurance_percentage" string="Occupational Hazard Insurance" class="mw-25" widget="percentage"/>
+                        <field name="l10n_sa_company_unemployment_insurance_percentage" string="Unemployment Insurance" class="mw-25" widget="percentage"/>
+                    </group>
+                    <group name="l10n_sa_hr_payroll_contributions_employee" string="Employee Contributions">
+                        <field name="l10n_sa_employee_social_insurance_percentage" string="Social Insurance" class="mw-25" widget="percentage"/>
+                        <field name="l10n_sa_employee_unemployment_insurance_percentage" string="Unemployment Insurance" class="mw-25" widget="percentage"/>
+                    </group>
                 </group>
             </group>
+            <field name="identification_id" position="after">
+                <field name="l10n_sa_ssn" invisible="country_code != 'SA'"/>
+            </field>
         </field>
     </record>
 </odoo>

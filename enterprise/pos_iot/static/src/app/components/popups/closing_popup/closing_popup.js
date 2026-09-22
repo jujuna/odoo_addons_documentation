@@ -3,9 +3,9 @@ import { patch } from "@web/core/utils/patch";
 
 patch(ClosePosPopup.prototype, {
     async closeSession() {
-        const { iotId, identifier } = this.pos.hardwareProxy.deviceControllers.display || {};
-        if (this.pos.config.iface_display_id && iotId && identifier) {
-            this.pos.iotHttp.action(iotId, identifier, { action: "close" });
+        if (this.pos.config.iot_display_id) {
+            const { iot_id, identifier } = this.pos.config.iot_display_id;
+            this.pos.iotHttp.action(iot_id, identifier, { action: "update_url", url: "" });
         }
         await super.closeSession(...arguments);
     },

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': "UPS Shipping (Legacy)",
@@ -6,7 +5,6 @@
         Please install the new \"UPS Shipping\" module and uninstall this one as soon as possible. This integration will stop working in 2024.",
     'category': 'Shipping Connectors',
     'sequence': 275,
-    'version': '1.0',
     'depends': ['stock_delivery', 'mail'],
     'data': [
         'data/delivery_ups_data.xml',

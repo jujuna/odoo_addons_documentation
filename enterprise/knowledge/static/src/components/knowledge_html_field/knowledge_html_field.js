@@ -1,5 +1,6 @@
+import { useSubEnv } from "@web/owl2/utils";
+import { onWillUpdateProps, proxy } from "@odoo/owl";
 import { HtmlField, htmlField } from "@html_editor/fields/html_field";
-import { withSequence } from "@html_editor/utils/resource";
 import {
     KNOWLEDGE_EMBEDDINGS,
     KNOWLEDGE_READONLY_EMBEDDINGS,
@@ -9,13 +10,10 @@ import {
     KNOWLEDGE_PLUGINS,
 } from "@knowledge/editor/plugin_sets";
 import { registry } from "@web/core/registry";
-import { useState, useSubEnv } from "@odoo/owl";
 import { KnowledgeHtmlViewer } from "../knowledge_html_viewer/knowledge_html_viewer";
 import { KnowledgeWysiwyg } from "../knowledge_wysiwyg/knowledge_wysiwyg";
 import { CallbackRecorder } from "@web/search/action_hook";
-import { useRecordObserver } from "@web/model/relational_model/utils";
 import { useService } from "@web/core/utils/hooks";
-import { _t } from "@web/core/l10n/translation";
 
 export class KnowledgeHtmlField extends HtmlField {
     static components = {
@@ -29,16 +27,21 @@ export class KnowledgeHtmlField extends HtmlField {
             __onLayoutGeometryChange__: new CallbackRecorder(),
         });
         this.commentsService = useService("knowledge.comments");
-        this.commentsState = useState(this.commentsService.getCommentsState());
-        useRecordObserver((record) => {
+        this.tocService = useService("knowledge.toc");
+        this.commentsState = proxy(this.commentsService.getCommentsState());
+
+        const initializeServices = ({ record }) => {
             if (record.resId !== this.commentsState.articleId) {
+                this.tocService.setArticleId(record.resId);
                 this.commentsService.setArticleId(record.resId);
                 this.commentsService.loadRecords(record.resId, {
                     ignoreBatch: true,
                     includeLoaded: true,
                 });
             }
-        });
+        };
+        initializeServices(this.props);
+        onWillUpdateProps(initializeServices);
     }
 
     getConfig() {
@@ -49,15 +52,13 @@ export class KnowledgeHtmlField extends HtmlField {
                 ...(config.resources.embedded_components || []),
                 ...KNOWLEDGE_EMBEDDINGS,
             ];
+            // TableOfContent Plugin is replaced by one specific for Knowledge
+            // Replace the file plugin with the embedded file plugin
+            config.Plugins = config.Plugins.filter(
+                (P) => P.id !== "tableOfContent" && P.id !== "file"
+            );
             config.Plugins.push(...KNOWLEDGE_EMBEDDED_COMPONENT_PLUGINS);
         }
-        config.resources.hints = [
-            ...(config.resources.hints || []),
-            withSequence(20, {
-                selector: ".odoo-editor-editable > h1:only-child",
-                text: _t("Start with a title..."),
-            }),
-        ];
         config.Plugins.push(...KNOWLEDGE_PLUGINS);
         config.onLayoutGeometryChange = () => this.onLayoutGeometryChange();
         return config;

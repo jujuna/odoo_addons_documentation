@@ -7,10 +7,6 @@ from odoo import fields, models, _
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    l10n_us_ca_ett_tax = fields.Boolean(
-        string="ETT Tax",
-        related='company_id.l10n_us_ca_ett_tax',
-        readonly=False)
     l10n_us_signatory_id = fields.Many2one(
         string="Signatory",
         related='company_id.l10n_us_signatory_id',
@@ -18,6 +14,10 @@ class ResConfigSettings(models.TransientModel):
     l10n_us_business_structure = fields.Selection(
         string="Business Structure",
         related='company_id.l10n_us_business_structure',
+        readonly=False)
+    l10n_us_state_identifier = fields.Char(
+        string="State ID",
+        related='company_id.l10n_us_state_identifier',
         readonly=False)
 
     def action_open_suta_rule_parameters(self):

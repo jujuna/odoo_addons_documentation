@@ -1,42 +1,29 @@
-import base64
-from pytz import timezone
-from datetime import datetime
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import datetime, UTC
+from zoneinfo import ZoneInfo
 
-from odoo.tools import misc, file_open
-from odoo.addons.account_edi.tests.common import AccountEdiTestCommon
+from odoo.tools import file_open
+
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 MAX_WAIT_ITER = 6
-CODE_98_ERROR_MSG = "<p>The cancellation request has not yet finished processing by SUNAT. Please retry in a few minutes.<br><br><b>SOAP status code: </b>98</p>"
-
-
-def mocked_l10n_pe_edi_post_invoice_web_service(edi_format, invoice, edi_filename, edi_str):
-    # simulate the EDI always success.
-    zip_edi_str = edi_format._l10n_pe_edi_zip_edi_document([('%s.xml' % edi_filename, edi_str)])
-    return {
-        'attachment': edi_format.env['ir.attachment'].create({
-            'res_model': invoice._name,
-            'res_id': invoice.id,
-            'type': 'binary',
-            'name': '%s.zip' % edi_filename,
-            'datas': base64.encodebytes(zip_edi_str),
-            'mimetype': 'application/zip',
-        })
-    }
+CODE_98_ERROR_MSG = "The cancellation request has not yet finished processing by SUNAT. Please retry in a few minutes.\n*SOAP status code: *98"
 
 
 def _get_pe_current_datetime():
-    return datetime.now(tz=timezone('America/Lima'))
+    return datetime.now(tz=ZoneInfo('America/Lima'))
 
 
-class TestPeEdiCommon(AccountEdiTestCommon):
+class TestPeEdiCommon(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
-    @AccountEdiTestCommon.setup_country('pe')
-    @AccountEdiTestCommon.setup_edi_format('l10n_pe_edi.edi_pe_ubl_2_1')
+    @AccountTestInvoicingCommon.setup_country('pe')
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.frozen_today = datetime(year=2017, month=1, day=1, hour=0, minute=0, second=0, tzinfo=timezone('utc'))
+        cls.frozen_today = datetime(year=2017, month=1, day=1, hour=0, minute=0, second=0, tzinfo=UTC)
 
         # Allow to see the full result of AssertionError.
         cls.maxDiff = None
@@ -48,8 +35,7 @@ class TestPeEdiCommon(AccountEdiTestCommon):
 
         cls.certificate = cls.env['certificate.certificate'].create({
             'name': 'PE test certificate',
-            'content': base64.encodebytes(
-                misc.file_open('l10n_pe_edi/demo/certificates/certificate.pfx', 'rb').read()),
+            'content': cls.file_read('l10n_pe_edi/demo/certificates/certificate.pfx'),
             'pkcs12_password': '12345678a',
             'company_id': cls.company_data['company'].id,
         })
@@ -61,15 +47,16 @@ class TestPeEdiCommon(AccountEdiTestCommon):
             'l10n_pe_edi_test_env': True,
         })
 
-        cls.national_bank = cls.env.ref("l10n_pe.peruvian_national_bank")
         cls.national_bank_account = cls.env['res.partner.bank'].create({
-            'acc_number': 'CUENTAPRUEBA',
-            'bank_id': cls.national_bank.id,
-            'partner_id': cls.company_data['company'].partner_id.id
+            'account_number': 'CUENTAPRUEBA',
+            'bank_bic': 'BANCPEPL',
+            'clearing_label_id': cls.env.ref('base.clearing_label_pe').id,
+            'clearing_number': 18,
+            'partner_id': cls.company_data['company'].partner_id.id,
+            'allow_out_payment': True,
         })
         cls.company_data['company'].partner_id.write({
             'vat': "20557912879",
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_pe.it_RUC').id,
         })
 
         cls.company_data['default_journal_sale'].l10n_latam_use_documents = True
@@ -119,7 +106,6 @@ class TestPeEdiCommon(AccountEdiTestCommon):
 
         cls.partner_a.write({
             'vat': '20462509236',
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_pe.it_RUC').id,
             'country_id': cls.env.ref('base.pe').id,
         })
 
@@ -142,7 +128,22 @@ class TestPeEdiCommon(AccountEdiTestCommon):
         with file_open('l10n_pe_edi/tests/test_files/debit_note.xml', 'rb') as expected_debit_note_file:
             cls.expected_debit_note_xml_values = expected_debit_note_file.read()
 
-    def _create_invoice(self, **kwargs):
+    def _create_isc_tax(self, name, isc_type, amount, amount_type='percent'):
+        # sequence -1 ensures ISC precedes IGV so include_base_amount cascades.
+        return self.env['account.tax'].create({
+            'name': name,
+            'sequence': -1,
+            'amount_type': amount_type,
+            'amount': amount,
+            'include_base_amount': True,
+            'l10n_pe_edi_tax_code': '2000',
+            'l10n_pe_edi_unece_category': 'S',
+            'l10n_pe_edi_isc_type': isc_type,
+            'type_tax_use': 'sale',
+            'tax_group_id': self.env['account.chart.template'].ref('tax_group_isc').id,
+        })
+
+    def _create_invoice_pe(self, **kwargs):
         vals = {
             'name': 'F FFI-%s1' % self.time_name,
             'move_type': 'out_invoice',
@@ -166,7 +167,7 @@ class TestPeEdiCommon(AccountEdiTestCommon):
         return self.env['account.move'].create(vals)
 
     def _create_refund(self, **kwargs):
-        invoice = self._create_invoice(name='F FFI-%s2' % self.time_name, **kwargs)
+        invoice = self._create_invoice_pe(name='F FFI-%s2' % self.time_name, **kwargs)
         vals = {
             'name': 'F CNE-%s1' % self.time_name,
             'move_type': 'out_refund',
@@ -190,7 +191,7 @@ class TestPeEdiCommon(AccountEdiTestCommon):
         return self.env['account.move'].create(vals)
 
     def _create_debit_note(self, **kwargs):
-        invoice = self._create_invoice(name='F FFI-%s3' % self.time_name, **kwargs)
+        invoice = self._create_invoice_pe(name='F FFI-%s3' % self.time_name, **kwargs)
         vals = {
             'name': 'F NDI-%s1' % self.time_name,
             'move_type': 'out_invoice',

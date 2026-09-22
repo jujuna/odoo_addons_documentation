@@ -57,7 +57,7 @@ class WhatsappTemplate(models.Model):
                                         website_url, tracker_values
                                     )
                     shortened_link = shortened_link + f'/w/{whatsapp_message.id}'
-                    component['parameters'][0]['text'] = shortened_link.replace(self.env['link.tracker'].get_base_url(), '').lstrip('/')
+                    component['parameters'][0]['text'] = shortened_link
 
         # check variable links
         url_template_parameters = [

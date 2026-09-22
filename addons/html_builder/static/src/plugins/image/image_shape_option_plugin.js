@@ -1,5 +1,4 @@
 import { Plugin } from "@html_editor/plugin";
-import { registry } from "@web/core/registry";
 import { DEFAULT_PALETTE } from "@html_editor/utils/color";
 import { getShapeURL } from "@html_builder/plugins/image/image_helpers";
 import {
@@ -7,8 +6,8 @@ import {
     createDataURL,
     cropperDataFields,
     loadImage,
-    loadImageInfo,
     isGif,
+    loadImageInfo,
 } from "@html_editor/utils/image_processing";
 import { getValueFromVar } from "@html_builder/utils/utils";
 import { imageShapeDefinitions } from "@html_builder/plugins/image/image_shapes_definition";
@@ -21,6 +20,8 @@ import { BuilderAction } from "@html_builder/core/builder_action";
 import { getMimetype } from "@html_editor/utils/image";
 import { withSequence } from "@html_editor/utils/resource";
 import { deepCopy, deepMerge } from "@web/core/utils/objects";
+import { handleImagesIfDataset } from "@html_builder/utils/image";
+import { applyFunDependOnSelectorAndExclude } from "../utils";
 
 /**
  * @typedef {Object.<string, {
@@ -37,7 +38,7 @@ import { deepCopy, deepMerge } from "@web/core/utils/objects";
  *   }>,
  * }>} ImageShapeGroups
  * @typedef {((shapeGroups: ImageShapeGroups) => ImageShapeGroups | void)[]} image_shape_groups_providers
- * @typedef {((dataset: DOMStringMap) => string)[]} default_shape_handlers
+ * @typedef {((dataset: DOMStringMap) => string)[]} default_shape_providers
  * @typedef {((
  *     svg: SVGElement,
  *     params: {
@@ -47,7 +48,7 @@ import { deepCopy, deepMerge } from "@web/core/utils/objects";
  *         shapeAnimationSpeed: number,
  *         shapeColors: string,
  *     }
- * ) => Promise<void>)[]} post_compute_shape_listeners
+ * ) => Promise<void>)[]} on_shape_computed_handlers
  */
 
 // Regex definitions to apply speed modification in SVG files
@@ -73,8 +74,10 @@ export class ImageShapeOptionPlugin extends Plugin {
         "isTechnicalShape",
         "isAnimableShape",
         "isTogglableRatioShape",
+        "aspectRatioShape",
         "getShapeLabel",
         "loadShape",
+        "getShapeCategory",
     ];
     /** @type {import("plugins").BuilderResources} */
     resources = {
@@ -84,12 +87,28 @@ export class ImageShapeOptionPlugin extends Plugin {
             FlipImageShapeAction,
             RotateImageShapeAction,
             SetImageShapeSpeedAction,
+            ResetImageShapeTransformationAction,
             ToggleImageShapeRatioAction,
         },
-        process_image_warmup_handlers: this.processImageWarmup.bind(this),
-        process_image_post_handlers: this.processImagePost.bind(this),
-        hover_effect_allowed_predicates: (el) => this.canHaveHoverEffect(el),
+        on_will_process_image_handlers: this.processImageWarmup.bind(this),
+        on_image_processed_handlers: this.processImagePost.bind(this),
+        // This is done to clean the dataset of the images saved in the db.
+        on_will_save_handlers: () =>
+            applyFunDependOnSelectorAndExclude(
+                (imgEl) => this.resetShapeDataset(imgEl),
+                this.editable,
+                {
+                    selector: "img",
+                    exclude: "[data-oe-type='image'] > img",
+                }
+            ),
+        on_will_save_media_dialog_handlers: withSequence(
+            5,
+            this.onWillSaveMediaDialogHandlers.bind(this)
+        ),
         image_shape_groups_providers: withSequence(0, () => deepCopy(imageShapeDefinitions)),
+        hover_effect_image_dataset_providers: this.hoverEffectImageDatasetProviders.bind(this),
+        on_website_color_updated_handlers: this.syncImageShapeColorsWithTheme.bind(this),
     };
     setup() {
         this.shapeSvgTextCache = {};
@@ -100,24 +119,60 @@ export class ImageShapeOptionPlugin extends Plugin {
             this.imageShapes[oldShapeId] = this.imageShapes[shapeId];
         }
     }
-    async canHaveHoverEffect(imgEl) {
-        const dataset = Object.assign({}, imgEl.dataset, await loadImageInfo(imgEl));
-        return (
-            imgEl.tagName === "IMG" &&
-            !this.isDeviceShape(imgEl) &&
-            !this.isAnimableShape(dataset.shape) &&
-            this.isImageSupportedForShapes(imgEl, dataset)
+    async onWillSaveMediaDialogHandlers(elements, { node }) {
+        const callback = async function (toProcessEl, nodeEl) {
+            const data = await loadImageInfo(toProcessEl);
+            if (!data.originalSrc) {
+                return;
+            }
+            toProcessEl.dataset.shape = nodeEl.dataset.shape;
+            for (const shapeInfo of ["shapeColors", "shapeFlip", "shapeRotate"]) {
+                if (nodeEl.dataset[shapeInfo]) {
+                    toProcessEl.dataset[shapeInfo] = nodeEl.dataset[shapeInfo];
+                }
+            }
+        };
+        await handleImagesIfDataset(elements, node, "shape", callback);
+    }
+    getShapeCategory(img) {
+        const shapeName = img.dataset.shape;
+        return shapeName?.split("/")[1];
+    }
+    /**
+     * Update the shape color (when a theme color is selected) whenever the
+     * theme preset color changes.
+     *
+     * @param {String[]} updatedColorVariables - Updated theme color variables.
+     */
+    async syncImageShapeColorsWithTheme(updatedColorVariables) {
+        for (const colorVar of updatedColorVariables) {
+            if (!colorVar.startsWith("o-color-")) {
+                continue;
+            }
+            const selector = `img[data-shape][data-shape-colors*="${colorVar};"], img[data-shape][data-shape-colors$="${colorVar}"]`;
+            await this.refreshImgShapes([...this.document.querySelectorAll(selector)]);
+            await this.config.snippetModel.updateContent(
+                "snippet_custom",
+                async (snippetContent) => {
+                    await this.refreshImgShapes([...snippetContent.querySelectorAll(selector)]);
+                }
+            );
+        }
+    }
+    async refreshImgShapes(shapeEls) {
+        // Promise.allSettled is used here to ensure that all shapes are
+        // processed, even if some fail to refresh. This prevents a single
+        // failure from blocking updates to the remaining shapes.
+        await Promise.allSettled(
+            shapeEls.map(async (imgEl) => {
+                const updateImageAttributes = await this.loadShape(imgEl, {
+                    shapeColors: imgEl.dataset.shapeColors,
+                });
+                updateImageAttributes();
+            })
         );
     }
-    isDeviceShape(img) {
-        const shapeName = img.dataset.shape;
-        if (!shapeName) {
-            return false;
-        }
-        const shapeCategory = shapeName.split("/")[1];
-        return shapeCategory === "devices";
-    }
-    isImageSupportedForShapes(img, dataset = img.dataset) {
+    async isImageSupportedForShapes(img, dataset = img.dataset) {
         // todo: The hover effect and shape code should probably be define somewhere else.
         if (!!dataset.hoverEffect || !!dataset.shape) {
             return true;
@@ -125,7 +180,7 @@ export class ImageShapeOptionPlugin extends Plugin {
         if (!dataset.originalId) {
             return false;
         }
-        return isImageSupportedForProcessing(getMimetype(img, dataset));
+        return isImageSupportedForProcessing(await getMimetype(img, dataset));
     }
     async getShapeSvgText(shapeName) {
         // Compatibility with old shapes.
@@ -162,6 +217,15 @@ export class ImageShapeOptionPlugin extends Plugin {
             newDataset.shapeColors ??
             (isNewShape ? defaultShapeColors : img.dataset.shapeColors ?? defaultShapeColors);
 
+        // Get animation speed - only for animable shapes.
+        if (this.isAnimableShape(shapeId)) {
+            newDataset.shapeAnimationSpeed =
+                newDataset.shapeAnimationSpeed ??
+                (isNewShape ? "0" : img.dataset.shapeAnimationSpeed ?? "0");
+        } else {
+            newDataset.shapeAnimationSpeed = "";
+        }
+
         const getNaturalWidth = async () => {
             if (img.naturalWidth) {
                 return img.naturalWidth;
@@ -182,18 +246,27 @@ export class ImageShapeOptionPlugin extends Plugin {
             shapeColors: newDataset.shapeColors,
         });
 
+        if (!svg) {
+            return;
+        }
+
         const svgAspectRatio =
             parseInt(svg.getAttribute("width")) / parseInt(svg.getAttribute("height"));
         const imgAspectRatio = svg.dataset.imgAspectRatio;
 
-        if (isNewShape && !("aspectRatio" in newDataset)) {
+        const isNewImage = "originalSrc" in newDataset;
+        if ((isNewImage || isNewShape) && !("aspectRatio" in newDataset)) {
             const data = getImageTransformationData({ ...img.dataset, ...newDataset });
 
             // The togglable ratio is squared by default.
-            const shouldBeSquared =
-                this.imageShapes[shapeId].togglableRatio && !img.dataset.aspectRatio;
-            if (shouldBeSquared && !shouldPreventGifTransformation(data)) {
-                newDataset.aspectRatio = "1/1";
+            const isDefaultAspectRatio =
+                !img.dataset.aspectRatio ||
+                img.dataset.aspectRatio === this.aspectRatioShape(img.dataset.shape);
+
+            if (isDefaultAspectRatio && !shouldPreventGifTransformation(data)) {
+                newDataset.aspectRatio = this.isTogglableRatioShape(shapeId)
+                    ? this.aspectRatioShape(shapeId)
+                    : undefined;
             }
         }
 
@@ -204,7 +277,9 @@ export class ImageShapeOptionPlugin extends Plugin {
         const postProcessCroppedCanvas = async (canvas) => {
             const img = await loadImage(canvas.toDataURL());
             document.createElement("div").appendChild(img);
-            const cropper = await activateCropper(img, 1, { y: 0 });
+            const [ratioWidth, ratioHeight] = imgAspectRatio.split(":");
+            const shapeAspectRatio = parseFloat(ratioWidth) / parseFloat(ratioHeight);
+            const cropper = await activateCropper(img, shapeAspectRatio, { y: 0 });
             const croppedCanvas = cropper.getCroppedCanvas();
             cropper.destroy();
             return croppedCanvas;
@@ -255,6 +330,13 @@ export class ImageShapeOptionPlugin extends Plugin {
         const dataURL = await createDataURL(blob);
         return [dataURL, { ...handlerDataset, mimetype: "image/svg+xml" }];
     }
+    async hoverEffectImageDatasetProviders(imgEl) {
+        const dataset = Object.assign({}, imgEl.dataset, await loadImageInfo(imgEl));
+        const isImageSupportedForShapes = await this.isImageSupportedForShapes(imgEl, dataset);
+        return {
+            isImageSupportedForShapes,
+        };
+    }
 
     /**
      * Sets the image in the supplied SVG and replace the src with a dataURL
@@ -265,6 +347,10 @@ export class ImageShapeOptionPlugin extends Plugin {
      */
     async computeShape(svgText, params) {
         const { shapeId, shapeFlip, shapeRotate, shapeAnimationSpeed, shapeColors } = params;
+
+        if (!this.imageShapes[shapeId]) {
+            return;
+        }
         // Apply the colors to the shape.
         svgText = this.replaceSvgColors(svgText, shapeColors.split(";"));
         // Apply the right animation speed if there is an animated shape.
@@ -298,9 +384,7 @@ export class ImageShapeOptionPlugin extends Plugin {
             );
         }
 
-        for (const cb of this.getResource("post_compute_shape_listeners")) {
-            await cb(svg, params);
-        }
+        await this.triggerAsync("on_shape_computed_handlers", svg, params);
 
         svg.removeChild(svg.querySelector("#preview"));
         return svg;
@@ -373,43 +457,50 @@ export class ImageShapeOptionPlugin extends Plugin {
     }
     getThemedSvgColors(shapeSvgText) {
         const svgColors = this.getSvgColors(shapeSvgText);
-        return svgColors.map((color, i) =>
-            color !== null
-                ? this.dependencies.imageToolOption.getCSSColorValue(`o-color-${i + 1}`)
-                : null
-        );
+        return svgColors.map((color, i) => (color !== null ? `o-color-${i + 1}` : null));
     }
+
+    getImageShape(shapeId) {
+        return this.imageShapes[shapeId] || {};
+    }
+
     applyShapeColors(editingElement, newColors) {}
     isTransformableShape(shapeId) {
         if (!shapeId) {
             return false;
         }
-        const canTransform = this.imageShapes[shapeId].transform;
+        const canTransform = this.getImageShape(shapeId).transform;
         return typeof canTransform === "undefined" ? true : canTransform;
     }
     isTechnicalShape(shapeId) {
         if (!shapeId) {
             return false;
         }
-        return this.imageShapes[shapeId].isTechnical;
+        return this.getImageShape(shapeId).isTechnical;
     }
     getShapeLabel(shapeId) {
         if (!shapeId) {
             return _t("None");
         }
-        return this.imageShapes[shapeId].selectLabel || _t("None");
+        return this.getImageShape(shapeId).selectLabel || _t("None");
     }
     isAnimableShape(shape) {
         if (!shape) {
             return false;
         }
-        return this.imageShapes[shape].animated;
+        return !!this.getImageShape(shape).animated;
     }
     isTogglableRatioShape(shape) {
         if (!shape) {
             return false;
         }
-        return this.imageShapes[shape].togglableRatio;
+        return !!this.getImageShape(shape).togglableRatio;
+    }
+    aspectRatioShape(shape) {
+        if (!shape || !this.isTogglableRatioShape(shape)) {
+            return undefined;
+        }
+        return this.getImageShape(shape).aspectRatio || "1/1";
     }
     getImageShapeGroups() {
         if (!this.imageShapeGroups) {
@@ -435,11 +526,44 @@ export class ImageShapeOptionPlugin extends Plugin {
         return Object.fromEntries(entries);
     }
     getDefaultShapeId(dataset) {
-        for (const fn of this.getResource("default_shape_handlers")) {
+        for (const fn of this.getResource("default_shape_providers")) {
             const shapeId = fn(dataset);
             if (shapeId) {
                 return shapeId;
             }
+        }
+    }
+    async resetShapeDataset(imgEl) {
+        const { originalSrc } = imgEl.dataset.originalSrc
+            ? imgEl.dataset
+            : await loadImageInfo(imgEl);
+        if (!originalSrc) {
+            delete imgEl.dataset.shape;
+        }
+        const shapeId = imgEl.dataset.shape;
+        // If there's no shape, remove the shape related values.
+        if (!shapeId) {
+            const imgFilename = originalSrc?.split("/").pop().split(".")[0];
+            // If there's no originalSrc or the file name was set by 'setShape' action,
+            // we should remove it.
+            if (!originalSrc || (imgFilename && imgEl.dataset.fileName === `${imgFilename}.svg`)) {
+                delete imgEl.dataset.fileName;
+            }
+        }
+        if (!this.isAnimableShape(shapeId)) {
+            delete imgEl.dataset.shapeAnimationSpeed;
+        }
+
+        if (
+            !shapeId ||
+            (imgEl.dataset.shapeColors &&
+                !imgEl.dataset.shapeColors.split(";").some((color) => color))
+        ) {
+            delete imgEl.dataset.shapeColors;
+        }
+        if (!this.isTransformableShape(shapeId)) {
+            delete imgEl.dataset.shapeFlip;
+            delete imgEl.dataset.shapeRotate;
         }
     }
 }
@@ -448,7 +572,14 @@ export class SetImageShapeAction extends BuilderAction {
     static id = "setImageShape";
     static dependencies = ["imageShapeOption"];
     async load({ editingElement: img, value: shapeId }) {
-        const params = { shape: shapeId };
+        const params = {
+            shape: shapeId,
+            shapeFlip: undefined,
+            shapeRotate: undefined,
+            shapeColors: undefined,
+            shapeAnimationSpeed: undefined,
+            fileName: undefined,
+        };
         // A crop is applied to the image at the same time as certain shapes,
         // which is why we reset the crop here or when the shape is removed.
         // However, we don’t reset it when the crop was applied intentionally.
@@ -461,13 +592,14 @@ export class SetImageShapeAction extends BuilderAction {
         ) {
             params["aspectRatio"] = undefined;
         }
-        // todo nby: re-read the old option method `setImgShape` and be sure all the logic is in there
         return this.dependencies.imageShapeOption.loadShape(img, params);
     }
     apply({ editingElement: img, loadResult: updateImageAttributes }) {
         updateImageAttributes();
-        const imgFilename = img.dataset.originalSrc.split("/").pop().split(".")[0];
-        img.dataset.fileName = `${imgFilename}.svg`;
+        if (img.dataset.shape) {
+            const imgFilename = img.dataset.originalSrc.split("/").pop().split(".")[0];
+            img.dataset.fileName = `${imgFilename}.svg`;
+        }
     }
     isApplied({ editingElement: img, value }) {
         const datasetShape = img.dataset.shape;
@@ -483,16 +615,18 @@ export class SetImgShapeColorAction extends BuilderAction {
     static id = "setImgShapeColor";
     static dependencies = ["imageShapeOption", "imageToolOption"];
     getValue({ editingElement: img, params: { index: colorIndex } }) {
-        return img.dataset.shapeColors?.split(";")[colorIndex] || "";
+        // The load function must work with a color variable to keep the color
+        // in sync with theme color changes. Therefore, here the corresponding
+        // hex value of color is returned.
+        const color = img.dataset.shapeColors?.split(";")[colorIndex];
+        return this.dependencies.imageToolOption.getCSSColorValue(color);
     }
     async load({ editingElement: img, params: { index: colorIndex }, value: color }) {
         color = getValueFromVar(color);
         const newColorId = parseInt(colorIndex);
         const oldColors = img.dataset.shapeColors.split(";");
         const newColors = oldColors.slice(0);
-        newColors[newColorId] = this.dependencies.imageToolOption.getCSSColorValue(
-            color === "" ? `o-color-${newColorId + 1}` : color
-        );
+        newColors[newColorId] = color === "" ? `o-color-${newColorId + 1}` : color;
         return this.dependencies.imageShapeOption.loadShape(img, {
             shapeColors: newColors.join(";"),
         });
@@ -546,17 +680,35 @@ export class SetImageShapeSpeedAction extends BuilderAction {
         updateImageAttributes();
     }
 }
+export class ResetImageShapeTransformationAction extends BuilderAction {
+    static id = "resetImageShapeTransformation";
+    static dependencies = ["imageShapeOption"];
+    async load({ editingElement: img }) {
+        return this.dependencies.imageShapeOption.loadShape(img, {
+            shapeFlip: undefined,
+            shapeRotate: undefined,
+        });
+    }
+    apply({ loadResult: updateImageAttributes }) {
+        updateImageAttributes();
+    }
+}
 export class ToggleImageShapeRatioAction extends BuilderAction {
     static id = "toggleImageShapeRatio";
     static dependencies = ["imageShapeOption"];
 
     isApplied({ editingElement: img }) {
-        return img.dataset.aspectRatio !== "1/1";
+        return (
+            img.dataset.aspectRatio !==
+            this.dependencies.imageShapeOption.aspectRatioShape(img.dataset.shape)
+        );
     }
     async load({ editingElement: img }) {
-        const isStretched = img.dataset.aspectRatio !== "1/1";
+        const unstretchedAspectRatio = this.dependencies.imageShapeOption.aspectRatioShape(
+            img.dataset.shape
+        );
         return this.dependencies.imageShapeOption.loadShape(img, {
-            aspectRatio: isStretched ? "1/1" : "0/0",
+            aspectRatio: this.isApplied({ editingElement: img }) ? unstretchedAspectRatio : "0/0",
             x: undefined,
             y: undefined,
             width: undefined,
@@ -567,8 +719,6 @@ export class ToggleImageShapeRatioAction extends BuilderAction {
         updateImageAttributes();
     }
 }
-
-registry.category("builder-plugins").add(ImageShapeOptionPlugin.id, ImageShapeOptionPlugin);
 
 /**
  * @param {String} mimetype

@@ -1,6 +1,6 @@
-import { useEffect } from "@odoo/owl";
+import { onMounted, usePlugin } from "@odoo/owl";
+import { ORM } from "@web/core/orm_plugin";
 import { evaluateExpr } from "@web/core/py_js/py";
-import { useService } from "@web/core/utils/hooks";
 import { KanbanRenderer } from "@web/views/kanban/kanban_renderer";
 
 const { DateTime } = luxon;
@@ -8,9 +8,10 @@ const { DateTime } = luxon;
 
 export class AccountReturnBaseKanbanRenderer extends KanbanRenderer
 {
+    orm = usePlugin(ORM);
+
     setup() {
         super.setup();
-        this.orm = useService("orm");
 
         // Retrieve the allowed categories from xml arch
         const optionsArch = this.props.archInfo.xmlDoc.getAttribute('options');
@@ -20,7 +21,7 @@ export class AccountReturnBaseKanbanRenderer extends KanbanRenderer
             this.allowedCategories = options.allowed_categories;
         }
 
-        useEffect(() => {this.runAllReturnChecks()}, () => []);
+        onMounted(() => {this.runAllReturnChecks()});
     }
 
     async runAllReturnChecks() {

@@ -1,4 +1,4 @@
-from odoo import Command
+from odoo import Command, fields
 from odoo.addons.account_reports.models.account_report import AccountReportFileDownloadException
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.tests import tagged
@@ -6,6 +6,8 @@ from odoo.tests import tagged
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAccountMaExport(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('ma')
     def setUpClass(cls):
@@ -60,7 +62,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
 
     def test_export_tax_report_with_data(self):
         """ This will test a simple export with moves data. """
-        self.partner_ma.company_registry = '123456789123456'
+        self.partner_ma.additional_identifiers = {'MA_ICE': '001561191000066'}
 
         bill = self.env['account.move'].create({
             'move_type': 'in_invoice',
@@ -99,7 +101,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
                             <refF>
                                 <if>22233412</if>
                                 <nom>Ma customer</nom>
-                                <ice>123456789123456</ice>
+                                <ice>001561191000066</ice>
                             </refF>
                             <tx>20.0</tx>
                             <mp>
@@ -122,7 +124,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
             'name': 'Ma customer with ice',
             'vat': '22233411',
             'country_id': self.env.ref('base.ma').id,
-            'company_registry': '123456789123456',
+            'additional_identifiers': {'MA_ICE': '001561191000066'},
         })
 
         bills = self.env['account.move'].create([
@@ -182,7 +184,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
                                 <refF>
                                     <if>22233411</if>
                                     <nom>Ma customer with ice</nom>
-                                    <ice>123456789123456</ice>
+                                    <ice>001561191000066</ice>
                                 </refF>
                                 <tx>20.0</tx>
                                 <mp>
@@ -203,7 +205,7 @@ class TestAccountMaExport(TestAccountReportsCommon):
             - When the period selected of the report is not monthly or quarterly
         """
         self.env.company.vat = False
-        self.partner_ma.company_registry = '123456789123456'
+        self.partner_ma.additional_identifiers = {'MA_ICE': '001561191000066'}
 
         bill = self.env['account.move'].create({
             'move_type': 'in_invoice',
@@ -229,7 +231,6 @@ class TestAccountMaExport(TestAccountReportsCommon):
 
         except AccountReportFileDownloadException as download_exception:
             self.assertTrue('company_vat_missing' in download_exception.errors)
-            self.assertFalse(download_exception.content)
 
         self.env.company.vat = '22233411'
         self.env.company.account_return_periodicity = 'semester'
@@ -242,10 +243,9 @@ class TestAccountMaExport(TestAccountReportsCommon):
 
         except AccountReportFileDownloadException as download_exception:
             self.assertTrue('period_invalid' in download_exception.errors)
-            self.assertFalse(download_exception.content)
 
     def test_export_tax_report_foreign_customer(self):
-        # 'vat' value must be random to avoid the partner auto-completion feature that would overwrite the company_registry (ICE)
+        # 'vat' value must be random to avoid the partner auto-completion feature that would overwrite the ICE
         foreign_customer = self.env['res.partner'].create({
             'name': 'Foreign customer with no ice',
             'vat': 'US12345',
@@ -298,6 +298,60 @@ class TestAccountMaExport(TestAccountReportsCommon):
                             <dpai>2019-01-01</dpai>
                             <dfac>2019-01-01</dfac>
                         </rd>
+                    </releveDeductions>
+                </DeclarationReleveDeduction>
+            """,
+        )
+
+    def test_export_tax_report_with_reversed_entries(self):
+        """This will test make sure that no entries with a zero balance appears in the report"""
+        self.partner_ma._set_additional_identifier('MA_ICE', '001561191000066')
+
+        bill = self.env["account.move"].create({
+            "move_type": "in_invoice",
+            "date": "2025-12-31",
+            "invoice_date": "2025-12-31",
+            "partner_id": self.partner_ma.id,
+            "currency_id": self.other_currency.id,
+            "invoice_line_ids": [
+                Command.create({
+                    "product_id": self.product_a.id,
+                    "price_unit": 100.0,
+                    "tax_ids": [
+                        Command.set(self.company_data["default_tax_purchase"].ids)
+                    ],
+                })
+            ],
+        })
+
+        bill.action_post()
+        self.pay_with_statement_line(
+            bill, self.company_data["default_journal_bank"].id, "2026-04-14", -100
+        )
+
+        # Lock to force CABA reversal
+        bill.company_id.fiscalyear_lock_date = fields.Date.from_string("2026-04-15")
+
+        # Unreconcile the bill
+        bill_payable_lines = bill.line_ids.filtered(
+            lambda l: l.account_id.account_type == "liability_payable"
+        )
+        bill_payable_lines.remove_move_reconcile()
+        self.pay_with_statement_line(
+            bill, self.company_data["default_journal_bank"].id, "2026-05-14", -100
+        )
+        self.assertEqual(len(bill.tax_cash_basis_created_move_ids.ids), 3)
+        self.env.flush_all()
+
+        self._report_compare_with_test_file(
+            self.report.dispatch_report_action(self._generate_options(self.report, '2026-04-01', '2026-04-30'), 'l10n_ma_reports_export_vat_to_xml'),
+            test_xml="""
+                <DeclarationReleveDeduction>
+                    <idf>22233411</idf>
+                    <annee>2026</annee>
+                    <periode>4</periode>
+                    <regime>1</regime>
+                    <releveDeductions>
                     </releveDeductions>
                 </DeclarationReleveDeduction>
             """,

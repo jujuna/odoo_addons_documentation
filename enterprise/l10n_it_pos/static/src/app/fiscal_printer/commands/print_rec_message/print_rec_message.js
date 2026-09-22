@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 
 const Alignment = {
     LEFT: 1,
@@ -8,25 +8,17 @@ const Alignment = {
 
 export class PrintRecMessage extends Component {
     static template = "l10n_it_pos.PrintRecMessage";
-    static props = {
-        operator: { type: Number, optional: true },
-        messageType: {
-            type: Number,
-            validate: (messageType) => 1 <= messageType && messageType <= 8,
-        },
-        index: { type: Number, optional: true, validate: (index) => index > 0 },
-        font: { type: Number, optional: true },
-        message: { type: String },
-        alignment: {
-            type: Number,
-            validate: (alignment) => Object.values(Alignment).includes(alignment),
-            optional: true,
-        },
-    };
-    static defaultProps = {
-        operator: 1,
-        alignment: Alignment.LEFT,
-    };
+    props = useProps({
+        operator: t.number().optional(1),
+        messageType: t.customValidator(
+            t.number(),
+            (messageType) => 1 <= messageType && messageType <= 8
+        ),
+        index: t.customValidator(t.number(), (index) => index > 0).optional(),
+        font: t.number().optional(),
+        message: t.string(),
+        alignment: t.selection(Object.values(Alignment)).optional(Alignment.LEFT),
+    });
 
     get message() {
         const { messageType, message, alignment } = this.props;

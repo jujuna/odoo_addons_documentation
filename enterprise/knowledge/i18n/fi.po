@@ -3,24 +3,24 @@
 # * knowledge
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Saara Hakanen <sahak@odoo.com>, 2025, 2026.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-15 16:48+0000\n"
-"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:46+0000\n"
+"PO-Revision-Date: 2026-09-18 03:42+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "knowledge/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: knowledge
 #. odoo-javascript
@@ -59,8 +59,8 @@ msgid ""
 "\"%(article_name)s\" is a template and can not be a child of an article (\"%"
 "(parent_article_name)s\")."
 msgstr ""
-"\"%(article_name)s\" on mallipohja, eikä se voi olla artikkelille (\"%"
-"(parent_article_name)s\") alisteinen."
+"\"%(article_name)s\" on malli, eikä se voi olla artikkelin (\"%"
+"(parent_article_name)s\") alemman tason artikkeli."
 
 #. module: knowledge
 #. odoo-python
@@ -69,8 +69,8 @@ msgid ""
 "\"%(article_name)s\" is an article and can not be a child of a template (\"%"
 "(parent_article_name)s\").\""
 msgstr ""
-"\"%(article_name)s\" on artikkeli, eikä se voi olla mallipohjalle (\"%"
-"(parent_article_name)s\") alisteinen.\""
+"\"%(article_name)s\" on artikkeli, eikä se voi olla mallin (\"%"
+"(parent_article_name)s\") alemman tason artikkeli.\""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
@@ -96,8 +96,8 @@ msgstr "%(article_name)s (kopio)"
 #. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/knowledge_article.py:0
-msgid "%s has been sent to Trash"
-msgstr "%s on siirretty roskakoriin"
+msgid "%s has been moved to Trash"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -752,37 +752,37 @@ msgstr ""
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
 msgid ""
-"<i class=\"fa fa-w fa-info-circle\"/> All external users you selected won't "
-"be added to the members."
+"<i class=\"oi oi-fw\" data-icon=\"info\"/> All external users you selected "
+"won't be added to the members."
 msgstr ""
-"<i class=\"fa fa-w fa-info-circle\"/> Kaikkia valitsemiasi ulkoisia "
+"<i class=\"oi oi-fw\" data-icon=\"info\"/> Kaikkia valitsemiasi ulkoisia "
 "käyttäjiä ei lisätä jäseniksi."
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_kanban_items
 msgid ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Remove "
-"from favorites\"/>\n"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Remove from favorites\"/>\n"
 "                                    <i invisible=\"is_user_favorite\" "
-"class=\"fa fa-star-o\" title=\"Add to favorites\"/>"
+"class=\"oi\" data-icon=\"star\" title=\"Add to favorites\"/>"
 msgstr ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Poista "
-"suosikeista\"/>\n"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Poista suosikeista\"/>\n"
 "                                    <i invisible=\"is_user_favorite\" "
-"class=\"fa fa-star-o\" title=\"Lisää suosikkeihin\"/>"
+"class=\"oi\" data-icon=\"star\" title=\"Lisää suosikkeihin\"/>"
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_kanban
 msgid ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Remove "
-"from favorites\"/>\n"
-"                                <i invisible=\"is_user_favorite\" class=\"fa "
-"fa-star-o\" title=\"Add to favorites\"/>"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Remove from favorites\"/>\n"
+"                                <i invisible=\"is_user_favorite\" "
+"class=\"oi\" data-icon=\"star\" title=\"Add to favorites\"/>"
 msgstr ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Poista "
-"suosikeista\"/>\n"
-"                                <i invisible=\"is_user_favorite\" class=\"fa "
-"fa-star-o\" title=\"Lisää suosikkeihin\"/>"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Poista suosikeista\"/>\n"
+"                                <i invisible=\"is_user_favorite\" "
+"class=\"oi\" data-icon=\"star\" title=\"Lisää suosikkeihin\"/>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_account_management
@@ -2038,8 +2038,9 @@ msgid ""
 "<strong>N</strong>on-<strong>R</strong>ecurring <strong>R</strong>evenues\n"
 "                            (<em>consultancy services, ...</em>)"
 msgstr ""
-"<strong>Kerta</strong> <strong>luontoiset</strong>tuotot</strong>\n"
-"                           (<em>konsulttipalvelut, ...</em>)"
+"<strong>K</strong>erta<strong>l</strong>uonteinen <strong>l</"
+"strong>iikevaihto\n"
+"                            (<em>konsultointipalvelut, ...</em>)"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -2073,7 +2074,8 @@ msgid ""
 "                            Advantage that makes you stand out from the "
 "competition."
 msgstr ""
-"<strong>Ainutlaatuinen</strong> <strong>myyntitarjous</strong>:\n"
+"<strong>Ainut</strong>laatuinen <strong>m</strong>yynti<strong>v</"
+"strong>äittämä:\n"
 "                            Etu, joka erottaa sinut kilpailijoista."
 
 #. module: knowledge
@@ -2207,6 +2209,12 @@ msgid "Activity Exception Decoration"
 msgstr "Toimenpiteen poikkeuksen tyyli"
 
 #. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__activity_plans_ids
+#, fuzzy
+msgid "Activity Plans"
+msgstr "Toimintasuunnitelmat"
+
+#. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__activity_state
 msgid "Activity State"
 msgstr "Toimenpiteen tila"
@@ -2274,7 +2282,7 @@ msgstr "Lisää kommentti..."
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/plugins/foldable_section_plugin/foldable_section_plugin.js:0
 msgid "Add a foldable section."
-msgstr ""
+msgstr "Lisää taitettava osio."
 
 #. module: knowledge
 #. odoo-javascript
@@ -2286,13 +2294,13 @@ msgstr "Lisää satunnainen kuvake"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/plugins/foldable_section_plugin/foldable_section_plugin.js:0
 msgid "Add a title to your section"
-msgstr ""
+msgstr "Lisää otsikko osioosi"
 
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Add an Article"
-msgstr ""
+msgstr "Lisää artikkeli"
 
 #. module: knowledge
 #: model_terms:ir.actions.act_window,help:knowledge.knowledge_article_stage_action
@@ -2306,11 +2314,11 @@ msgstr ""
 #. module: knowledge
 #: model_terms:ir.actions.act_window,help:knowledge.knowledge_article_favorite_action
 msgid ""
-"Add articles in your list of favorites by clicking on the <i class=\"fa fa-"
-"star-o\"></i> next to the article name."
+"Add articles in your list of favorites by clicking on the <i class=\"oi\" "
+"data-icon=\"star\"></i> next to the article name."
 msgstr ""
 "Lisää artikkeleita suosikkiluetteloosi klikkaamalla artikkelin nimen "
-"vieressä olevaa <i class=\"fa fa-star-o\"></i>."
+"vieressä olevaa <i class=\"oi\" data-icon=\"star\"></i>."
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
@@ -2319,15 +2327,9 @@ msgstr "Lisää henkilöitä tai sähköpostiosoitteita"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
-msgid "Add people..."
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "Add to Favorite"
 msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Add to Favorites"
-msgstr "Lisää suosikkeihin"
 
 #. module: knowledge
 #. odoo-javascript
@@ -2366,63 +2368,48 @@ msgstr "Mainokset, joka näkyy verkossa tai televisiossa"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "After-Sales Service <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Myynnin jälkeinen palvelu <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 msgid ""
 "After-Sales Service <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Myynnin jälkeinen palvelu <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-"
-"o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
 "After-Sales Service <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Myynnin jälkeinen palvelu <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "After-Sales Service​ <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Myynnin jälkeinen palvelu <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "After-Sales Service​ <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Myynnin jälkeinen palvelu <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-"i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa "
-"fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
@@ -2448,19 +2435,13 @@ msgstr "Ikä: 42"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
-msgid "All Discussions"
-msgstr "Kaikki keskustelut"
+msgid "All"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_product_catalog
 msgid "All Models 📖"
 msgstr "Kaikki mallit 📖"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "All changes saved"
-msgstr "Kaikki muutokset tallennettu"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -2471,7 +2452,7 @@ msgstr "Kaikki toimenpiteeni koodataan aina CRM-järjestelmään"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/article_annexe_picker_dialog/article_annexe_picker_no_content_helper.xml:0
 msgid "All pages have already been loaded."
-msgstr ""
+msgstr "Kaikki sivut on jo ladattu."
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
@@ -2606,6 +2587,12 @@ msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
+msgid "Are you sure you want to move this article to the trash?"
+msgstr ""
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.js:0
 msgid ""
 "Are you sure you want to remove this template from the list?\n"
@@ -2650,12 +2637,6 @@ msgid ""
 msgstr ""
 "Haluatko varmasti rajoittaa pääsyä tähän artikkeliin? Se ei enää peri "
 "pääsyoikeuksia ylemmiltä artikkeleilta."
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
-msgid "Are you sure you want to send this article to the trash?"
-msgstr "Oletko varma, että haluat siirtää tämän artikkelin roskiin?"
 
 #. module: knowledge
 #. odoo-javascript
@@ -2722,7 +2703,7 @@ msgstr "Artikkelimallin luokka"
 #. module: knowledge
 #: model:ir.actions.act_window,name:knowledge.knowledge_article_template_action
 msgid "Article Templates"
-msgstr "Artikkelimallit"
+msgstr "Artikkelipohjat"
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__article_url
@@ -2822,7 +2803,7 @@ msgstr "Liitteiden määrä"
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__template_child_default_create
 msgid "Auto-Create Child Article"
-msgstr ""
+msgstr "Luo alisteinen artikkeli automaattisesti"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_product_catalog
@@ -2840,6 +2821,12 @@ msgid "BOOK NOW"
 msgstr "VARAA NYT"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+msgid "Back to My Account"
+msgstr ""
+
+#. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
 msgid "Background:"
 msgstr "Tausta:"
@@ -2847,7 +2834,7 @@ msgstr "Tausta:"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_personal_organizer
 msgid "Backlog"
-msgstr "Rästityöt"
+msgstr "Rästissä"
 
 #. module: knowledge
 #. odoo-javascript
@@ -2892,62 +2879,44 @@ msgstr "Brändiominaisuudet"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Tuotemerkin houkuttelevuus <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Tuotemerkin houkuttelevuus <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-"
-"o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Tuotemerkin houkuttelevuus <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Tuotemerkin houkuttelevuus <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-"i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa "
-"fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
 msgid "Brand Name Rules"
 msgstr "Tuotemerkin nimisäännöt"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
-msgid "Browse Templates"
-msgstr "Selaa malleja"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_release_note
@@ -2957,20 +2926,14 @@ msgstr "Vikakorjaukset 🔨"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Build an Item Calendar"
-msgstr "Rakenna kohteen kalenteri"
+msgid "Build an"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Build an Item Kanban"
-msgstr "Rakenna kohteen Kanban-näkymä"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Build an Item List"
-msgstr "Rakenna kohdeluettelo"
+msgid "Build an Item database"
+msgstr ""
 
 #. module: knowledge
 #: model:knowledge.article,template_description:knowledge.knowledge_article_template_marketing_customer_personas
@@ -2990,6 +2953,12 @@ msgstr "Mutta myös..."
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_account_management
 msgid "Buying Process"
 msgstr "Ostoprosessi"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Calendar"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -3063,7 +3032,6 @@ msgstr "Voiko käyttäjä nähdä artikkelin?"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover.xml:0
-#: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.xml:0
 msgid "Cancel"
 msgstr "Peruuta"
 
@@ -3124,6 +3092,12 @@ msgid ""
 msgstr ""
 "Keskitä tiimitapaamiset yhteen artikkeliin ja varmista samalla, että "
 "muistiinpanoja käsitellään tehokkaasti."
+
+#. module: knowledge
+#: model:ir.module.module,description:base.module_knowledge
+#: model:ir.module.module,summary:base.module_knowledge
+msgid "Centralize, manage, share and grow your knowledge library"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_account_management
@@ -3200,13 +3174,13 @@ msgstr "Sulje"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Close chatter panel"
 msgstr "Sulje chatter-paneeli"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Close comments panel"
 msgstr "Sulje kommenttipaneeli"
 
@@ -3215,6 +3189,12 @@ msgstr "Sulje kommenttipaneeli"
 #: code:addons/knowledge/static/src/editor/plugins/comments_plugin/comments_plugin.js:0
 msgid "Comment"
 msgstr "Kommentti"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
+msgid "Comments"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -3330,6 +3310,12 @@ msgstr "Kopioi linkki"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/knowledge_readonly_heading_link/knowledge_readonly_heading_link.xml:0
+msgid "Copy a link to this heading in the clipboard"
+msgstr ""
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/core/clipboard/embedded_clipboard.xml:0
 msgid "Copy to Clipboard"
 msgstr "Kopioi leikepöydälle"
@@ -3391,6 +3377,7 @@ msgstr "Luo \""
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Create a Copy"
 msgstr "Luo kopio"
 
@@ -3550,13 +3537,13 @@ msgstr "Poista suodatin"
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.js:0
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.xml:0
 msgid "Delete Template"
-msgstr "Poista malli"
+msgstr "Poista mallipohja"
 
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index_list.xml:0
 msgid "Delete article"
-msgstr ""
+msgstr "Poista artikkeli"
 
 #. module: knowledge
 #. odoo-javascript
@@ -3604,18 +3591,17 @@ msgstr ""
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.xml:0
 #: code:addons/knowledge/static/src/components/item_calendar_props_dialog/item_calendar_props_dialog.xml:0
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover_dialog.xml:0
-#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.js:0
+#: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.xml:0
 #: code:addons/knowledge/static/src/components/prompt_embedded_view_name_dialog/prompt_embedded_view_name_dialog.xml:0
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/embedded_view_link/embedded_view_link_edit_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
 msgid "Discard"
 msgstr "Hylkää"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "Discard all changes"
-msgstr "Hylkää kaikki muutokset"
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
+msgid "Discussions"
+msgstr ""
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_ir_attachment__display_name
@@ -3674,7 +3660,7 @@ msgstr "Valmis"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 msgid "Download PDF"
-msgstr ""
+msgstr "Lataa PDF"
 
 #. module: knowledge
 #. odoo-javascript
@@ -3822,8 +3808,6 @@ msgid "Favorite Articles"
 msgstr "Suosikkiartikkelit"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.actions.act_window,name:knowledge.knowledge_article_favorite_action
 #: model:ir.ui.menu,name:knowledge.knowledge_article_favorite_menu
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_favorite_view_tree
@@ -3831,7 +3815,13 @@ msgid "Favorites"
 msgstr "Suosikit"
 
 #. module: knowledge
-#: model_terms:ir.ui.view,arch_db:knowledge.portal_my_home_knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
+msgid "Filter discussions"
+msgstr ""
+
+#. module: knowledge
+#: model:portal.entry,description:knowledge.portal_knowledge_entry
 msgid "Find all articles shared with you"
 msgstr "Etsi kaikki kanssasi jaetut artikkelit"
 
@@ -3850,7 +3840,7 @@ msgstr "Taitettava osio"
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_stage__fold
 msgid "Folded in kanban view"
-msgstr "Taitettu kanban-näkymässä"
+msgstr "Laskostettu Kanban-näkymässä"
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__message_follower_ids
@@ -3863,11 +3853,6 @@ msgstr "Seuraajat"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_thread__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Seuraajat (kumppanit)"
-
-#. module: knowledge
-#: model:ir.model.fields,help:knowledge.field_knowledge_article__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome -kuvake, esim. fa-tasks"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
@@ -3915,6 +3900,12 @@ msgstr "Sukupuoli: N"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
 msgid "General Access"
+msgstr "Yleinen pääsy"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Get started with"
 msgstr ""
 
 #. module: knowledge
@@ -4016,27 +4007,9 @@ msgstr "Piilotettu"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Hide Chatter"
-msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Hide Comments"
-msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Hide Properties"
-msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Hide sub-articles"
-msgstr ""
+msgstr "Piilota osa-artikkelit"
 
 #. module: knowledge
 #. odoo-javascript
@@ -4055,8 +4028,6 @@ msgid "History metadata"
 msgstr "Historian metatiedot"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
 #: model:ir.ui.menu,name:knowledge.knowledge_menu_home
 msgid "Home"
 msgstr "Aloitussivu"
@@ -4225,6 +4196,18 @@ msgid ""
 "If set, this will automatically create this child article when its parent "
 "template is used"
 msgstr ""
+"Jos valittuna, tämä alisteinen artikkeli luodaan automaattisesti sen "
+"päämallipohjaa käytettäessä"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "If this was a mistake, you can recover it from the"
+msgstr ""
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "If this was a mistake, you can recover them from the"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_post_mortem
@@ -4282,7 +4265,7 @@ msgstr "Teollisuus ⚙-"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_account_management
 msgid "Industry:"
-msgstr "Teollisuus:"
+msgstr "Toimiala:"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_hr_faq
@@ -4421,18 +4404,6 @@ msgid "Invitation to access an article"
 msgstr "Kutsu artikkeliin"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
-#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
-msgid "Invite"
-msgstr "Kutsu"
-
-#. module: knowledge
-#: model:ir.actions.act_window,name:knowledge.knowledge_invite_action_from_article
-msgid "Invite people"
-msgstr "Kutsu henkilöitä"
-
-#. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_favorite__is_article_active
 msgid "Is Article Active"
 msgstr "Onko artikkeli aktiivinen"
@@ -4539,6 +4510,12 @@ msgid "Item Stage"
 msgstr "Kohteen vaihe"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Item database"
+msgstr ""
+
+#. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_calendar_items
 msgid "Items"
 msgstr "Kohteet"
@@ -4566,6 +4543,12 @@ msgstr "Julius"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Kanban"
+msgstr ""
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.js:0
 msgid "Kanban of %s"
 msgstr "Kanban %s"
@@ -4582,14 +4565,6 @@ msgid "Keep track of your company to-dos and share them with your colleagues."
 msgstr "Seuraa yrityksesi tehtäviä ja jaa ne kollegoidesi kanssa."
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Keep writing, or choose an option below to jump right in!"
-msgstr ""
-"Jatka kirjoittamista tai valitse alla olevista vaihtoehdoista aloittaaksesi "
-"heti!"
-
-#. module: knowledge
 #: model:knowledge.article,template_description:knowledge.knowledge_article_template_company_newsletter
 msgid ""
 "Keep your colleagues informed about the company's latest developments and "
@@ -4602,9 +4577,10 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/external_embedded_view_favorite_menu/insert_embedded_view.xml:0
 #: code:addons/knowledge/static/src/editor/embedded_components/plugins/article_index_plugin/article_index_plugin.js:0
+#: model:ir.module.module,shortdesc:base.module_knowledge
 #: model:ir.ui.menu,name:knowledge.knowledge_menu_root
 #: model:ir.ui.menu,name:knowledge.knowledge_menu_technical
-#: model_terms:ir.ui.view,arch_db:knowledge.portal_my_home_knowledge
+#: model:portal.entry,name:knowledge.portal_knowledge_entry
 msgid "Knowledge"
 msgstr "Tietokirjasto"
 
@@ -4646,15 +4622,9 @@ msgid "Last Edited on"
 msgstr "Viimeksi muokattu"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Last Edited ·"
-msgstr ""
-
-#. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__last_edition_user_avatar
 msgid "Last Editor's Avatar"
-msgstr ""
+msgstr "Viimeisen muokkaajan avatar"
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__write_uid
@@ -4679,6 +4649,13 @@ msgstr "Viimeksi päivittänyt"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_invite__write_date
 msgid "Last Updated on"
 msgstr "Viimeksi päivitetty"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "Last edited by"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
@@ -4727,6 +4704,12 @@ msgstr "Linkki kopioitu leikepöydälle."
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "List"
+msgstr ""
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.js:0
 msgid "List of %s"
 msgstr "Luettelo - %s"
@@ -4751,7 +4734,6 @@ msgstr "Lataa mallipohja"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Load a Template"
 msgstr "Lataa mallipohja"
@@ -4809,7 +4791,7 @@ msgstr "Hallitse tiimisi aikataulua tulevaa sprinttiä varten."
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_actions.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_actions.js:0
 msgid "Mark the discussion as resolved"
 msgstr "Merkitse keskustelu ratkaistuksi"
 
@@ -4823,6 +4805,11 @@ msgstr "Markkinointi"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_campaign_brief
 msgid "Marketing Campaign Brief"
 msgstr "Markkinointikampanjan lyhyt kuvaus"
+
+#. module: knowledge
+#: model:ir.model.fields,help:knowledge.field_knowledge_article__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -4861,6 +4848,7 @@ msgstr "Jäsen"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
 #: code:addons/knowledge/static/src/components/topbar/topbar.xml:0
 #: model:ir.actions.act_window,name:knowledge.knowledge_article_member_action
 #: model:ir.ui.menu,name:knowledge.knowledge_article_member_menu
@@ -4887,6 +4875,11 @@ msgid "Menu Article"
 msgstr "Artikkelivalikko"
 
 #. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__root_article_emoji
+msgid "Menu Article Emoji"
+msgstr ""
+
+#. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_invite__message
 msgid "Message"
 msgstr "Viesti"
@@ -4895,17 +4888,17 @@ msgstr "Viesti"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__message_has_error
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_thread__message_has_error
 msgid "Message Delivery error"
-msgstr "Ongelma viestin toimituksessa"
+msgstr "Viestin toimitusvirhe"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_model_patch.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_model_patch.js:0
 msgid "Message Link Copied!"
 msgstr "Viestin linkki kopioitu!"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_model_patch.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_model_patch.js:0
 msgid "Message Link Copy Failed (Permission denied?)!"
 msgstr "Viesti linkin kopiointi epäonnistui (puuttuvat käyttöoikeudet?)!"
 
@@ -4926,6 +4919,13 @@ msgstr "Kalenterin kokoonpano puuttuu."
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 msgid "More actions"
 msgstr "Lisää toimia"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+#, fuzzy
+msgid "More options"
+msgstr "Lisää vaihtoehtoja"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_company_newsletter
@@ -4958,6 +4958,7 @@ msgstr "Siirrä artikkeli"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Move To"
 msgstr "Siirrä kohteeseen"
 
@@ -4993,7 +4994,9 @@ msgstr "Siirrä jaettuun"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 #: code:addons/knowledge/static/src/components/permission_panel/permission_panel.js:0
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_tree
 msgid "Move to Trash"
 msgstr "Siirrä roskakoriin"
 
@@ -5002,6 +5005,19 @@ msgstr "Siirrä roskakoriin"
 #: code:addons/knowledge/static/src/components/sidebar/sidebar.js:0
 msgid "Move to Workspace"
 msgstr "Siirry työtilaan"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
+#, fuzzy
+msgid "Move to trash"
+msgstr "Siirrä roskiin"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
+#, fuzzy
+msgid "My Activities"
+msgstr "Toimenpiteeni"
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__my_activity_date_deadline
@@ -5061,7 +5077,7 @@ msgstr "Uusi"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+#: code:addons/knowledge/static/src/components/knowledge_wysiwyg/knowledge_wysiwyg.js:0
 msgid "New Article"
 msgstr "Uusi artikkeli"
 
@@ -5075,6 +5091,12 @@ msgstr "Uudet ominaisuudet 🎉"
 #: code:addons/knowledge/models/knowledge_article_thread.py:0
 msgid "New Mention in %s"
 msgstr "Uusi maininta %s"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+msgid "New article"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -5147,6 +5169,12 @@ msgid "No Members yet!"
 msgstr "Ei vielä jäseniä!"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/toc_panel/toc_panel.xml:0
+msgid "No Title found"
+msgstr ""
+
+#. module: knowledge
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article_member__permission__none
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_invite__permission__none
 msgid "No access"
@@ -5156,7 +5184,7 @@ msgstr "Ei pääsyä"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/article_annexe_picker_dialog/article_annexe_picker_no_content_helper.xml:0
 msgid "No annex found!"
-msgstr ""
+msgstr "Liitettä ei löytynyt!"
 
 #. module: knowledge
 #. odoo-javascript
@@ -5304,16 +5332,11 @@ msgstr "Ei tuloksia. Kokeile toista hakua."
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
 #: code:addons/knowledge/static/src/components/embedded_view_actions_menu/embedded_view_actions_menu.xml:0
 #: code:addons/knowledge/static/src/views/item_calendar/item_calendar_views.xml:0
 msgid "Open"
 msgstr "Avaa"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
-msgid "Open Discussions"
-msgstr "Avaa keskustelut"
 
 #. module: knowledge
 #. odoo-javascript
@@ -5323,21 +5346,22 @@ msgstr "Avaa versiohistoria"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Open chatter panel"
 msgstr "Avaa chatter-paneeli"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Open comments panel"
 msgstr "Avaa kommenttipaneeli"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
-msgid "Open the Trash"
-msgstr "Avaa roskakori"
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+#, fuzzy
+msgid "Open in new tab"
+msgstr "Avaa uudessa välilehdessä"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_meeting_example_branding
@@ -5365,7 +5389,7 @@ msgid ""
 "Our catalog can be found here and is updated every 2 years. If you do not "
 "manage to find the specific model you are looking for,"
 msgstr ""
-"Luettelomme löytyy täältä, ja se päivitetään joka toinen vuosi. Jos et löydä "
+"Katalogimme löytyy täältä ja se päivitetään joka toinen vuosi. Jos et löydä "
 "etsimääsi mallia,"
 
 #. module: knowledge
@@ -5392,6 +5416,11 @@ msgstr "Kipupisteet<em>(rastita asiaankuuluvat</em>)"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__parent_id
 msgid "Parent Article"
 msgstr "Ylemmän tason artikkeli"
+
+#. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__parent_emoji
+msgid "Parent Emoji"
+msgstr ""
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__parent_path
@@ -5482,7 +5511,7 @@ msgstr "Podcast-päivitykset 📻"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/composer/composer_patch.js:0
+#: code:addons/knowledge/static/src/mail/core/common/composer_patch.js:0
 msgid "Post"
 msgstr "Tallenna"
 
@@ -5506,8 +5535,8 @@ msgstr "Mahdolliset riskit:"
 msgid ""
 "Prepare your demos in advance and integrate the prospect's use case into it"
 msgstr ""
-"Valmistele demosi etukäteen ja integroi siihen potentiaalisen asiakkaan "
-"käyttötapaus"
+"Valmistele demosi etukäteen ja integroi siihen potentiaalisen asiakkaasi "
+"esimerkkitapaus"
 
 #. module: knowledge
 #. odoo-javascript
@@ -5518,57 +5547,50 @@ msgstr "Esikatselu"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Hinta <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Hinta <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
+"span>"
 msgstr ""
-"Hinta <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Hinta <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>​"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i></span>​"
 msgstr ""
-"Hinta <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #. odoo-javascript
@@ -5579,7 +5601,6 @@ msgstr "Ensisijainen"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.js:0
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article__category__private
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Private"
@@ -5596,6 +5617,8 @@ msgid "Productivity"
 msgstr "Tuottavuus"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__article_properties
 msgid "Properties"
 msgstr "Ominaisuudet"
@@ -5659,11 +5682,11 @@ msgstr "LUE"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__rating_ids
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_thread__rating_ids
 msgid "Ratings"
-msgstr "Arvioinnit"
+msgstr "Arvostelut"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_actions.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_actions.js:0
 msgid "Re-open the discussion"
 msgstr "Avaa keskustelu uudelleen"
 
@@ -5715,13 +5738,7 @@ msgstr "Poista kansi"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Remove From Favorites"
-msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-#: code:addons/knowledge/static/src/mail/emoji_picker/emoji_picker_patch.xml:0
+#: code:addons/knowledge/static/src/mail/core/web/emoji_picker_patch.xml:0
 msgid "Remove Icon"
 msgstr "Poista kuvake"
 
@@ -5751,6 +5768,12 @@ msgstr "Poista kansi"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "Remove from Favorite"
+msgstr ""
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.xml:0
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 msgid "Remove from Templates"
@@ -5766,6 +5789,7 @@ msgstr "Poista suosikeista"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/prompt_embedded_view_name_dialog/prompt_embedded_view_name_dialog.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Rename"
 msgstr "Uudelleennimeä"
 
@@ -5796,8 +5820,8 @@ msgstr "Sijoita kansi uudelleen"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
-msgid "Resolved Discussions"
-msgstr "Ratkaistut keskustelut"
+msgid "Resolved"
+msgstr ""
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__activity_user_id
@@ -5893,12 +5917,6 @@ msgstr "Tallenna sijainti"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "Save manually"
-msgstr "Tallenna manuaalisesti"
-
-#. module: knowledge
-#. odoo-javascript
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover.xml:0
 msgid "Save position"
 msgstr "Tallenna sijainti"
@@ -5991,15 +6009,8 @@ msgstr "Lähetä viestinä"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_tree
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Send to Trash"
-msgstr "Lähetä roskakoriin"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
-msgid "Send to trash"
 msgstr "Lähetä roskakoriin"
 
 #. module: knowledge
@@ -6007,24 +6018,33 @@ msgstr "Lähetä roskakoriin"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_favorite__sequence
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_stage__sequence
 msgid "Sequence"
-msgstr "Järjestys"
+msgstr "Sekvenssi"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 #: code:addons/knowledge/static/src/components/topbar/topbar.xml:0
+#: model:ir.actions.act_window,name:knowledge.knowledge_invite_action_from_article
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
 msgid "Share"
 msgstr "Jaa"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/permission_panel_dialog/permission_panel_dialog.xml:0
-msgid "Share settings"
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.js:0
+msgid "Share Settings for %(title)s"
 msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/permission_panel_dialog/permission_panel_dialog.js:0
+msgid "Share settings"
+msgstr "Jaa asetukset"
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.js:0
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article__category__shared
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Shared"
@@ -6044,18 +6064,6 @@ msgstr "Jaettu tehtävälista"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Show Chatter"
-msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Show Comments"
-msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
 #: code:addons/knowledge/static/src/comments/comment/comment.xml:0
 msgid "Show Less"
 msgstr "Näytä vähemmän"
@@ -6068,10 +6076,15 @@ msgstr "Näytä lisää"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-#: code:addons/knowledge/static/src/components/topbar/topbar.xml:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.xml:0
 msgid "Show Properties"
 msgstr "Näytä ominaisuudet"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.xml:0
+msgid "Show Table of Contents"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -6090,7 +6103,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
 msgid "Show in Workspace"
-msgstr ""
+msgstr "Näytä työtilassa"
 
 #. module: knowledge
 #. odoo-javascript
@@ -6102,7 +6115,7 @@ msgstr "Näytä sisäkkäiset artikkelit"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Show sub-articles"
-msgstr ""
+msgstr "Näytä osa-artikkelit"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -6112,61 +6125,51 @@ msgstr "Koko:"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
-"Social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i class=\"fa "
-"fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
+"Social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i class=\"oi "
+"oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Sosiaalinen <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "Social Status <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Sosiaalinen asema <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "Social Status <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Sosiaalinen asema <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "Social Status <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Sosiaalinen asema <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 msgid ""
 "Social Status ​<span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Sosiaalinen asema<span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model:knowledge.article,template_name:knowledge.knowledge_article_template_software_specification
@@ -6177,8 +6180,8 @@ msgstr "Ohjelmiston tekniset tiedot"
 #. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/knowledge_article.py:0
-msgid "Some articles have been sent to Trash"
-msgstr "Joitakin artikkeleita on lähetetty Roskakoriin"
+msgid "Some articles have been moved to Trash"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -6200,50 +6203,40 @@ msgstr "Lähteen palaute"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "Speed of Service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Palvelun nopeus <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "Speed of Service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Palvelun nopeus <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
 "Speed of Service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Palvelun nopeus <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "Speed of Service ​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Palvelun nopeus<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model:knowledge.article,template_name:knowledge.knowledge_article_template_sprint_calendar
@@ -6280,7 +6273,7 @@ msgstr "Sidosryhmien/osakkaiden analyysi"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/item_calendar_props_dialog/item_calendar_props_dialog.xml:0
 msgid "Start Date"
-msgstr "Alkupäivä"
+msgstr "Aloituspäivä"
 
 #. module: knowledge
 #. odoo-javascript
@@ -6293,12 +6286,6 @@ msgstr "Aloituspäivä ja -aika"
 #: code:addons/knowledge/static/src/components/item_calendar_props_dialog/item_calendar_props_dialog.xml:0
 msgid "Start typing"
 msgstr "Ala kirjoittaa"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/knowledge_html_field/knowledge_html_field.js:0
-msgid "Start with a title..."
-msgstr "Aloita otsikolla..."
 
 #. module: knowledge
 #: model_terms:digest.tip,tip_description:knowledge.digest_tip_knowledge_2
@@ -6329,10 +6316,23 @@ msgid "Stop Date"
 msgstr "Lopetuspäivä"
 
 #. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__summary
+#, fuzzy
+msgid "Summary"
+msgstr "Yhteenveto"
+
+#. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Switch Mode"
 msgstr "Vaihda tila"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
+#, fuzzy
+msgid "Table of Contents"
+msgstr "Sisällysluettelo"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -6403,9 +6403,12 @@ msgstr "Mallipohjan otsikko"
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__origin_template_id
 msgid "Template used to generate the article"
-msgstr ""
+msgstr "Artikkelin luomiseen käytettävä mallipohja"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
 #: model:ir.ui.menu,name:knowledge.knowledge_article_template_menu
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Templates"
@@ -6464,6 +6467,12 @@ msgid "The Future Entrepreneurship Fair"
 msgstr "Tulevaisuuden yrittäjyysmessut"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/toc_panel/toc_panel.xml:0
+msgid "The Table of Contents will appear here."
+msgstr ""
+
+#. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/knowledge_article.py:0
 msgid "The article '%s' needs at least one member with 'Write' access."
@@ -6488,6 +6497,16 @@ msgid ""
 msgstr ""
 "Kohteen %(article_name)s sijoitus on epäselvä, sinun pitäisi määrittää "
 "luokka."
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "The following article has been moved to Trash:"
+msgstr ""
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "The following articles have been moved to Trash:"
+msgstr ""
 
 #. module: knowledge
 #. odoo-python
@@ -6702,7 +6721,10 @@ msgid "Toggle aside menu"
 msgstr "Vaihda sivuvalikko"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
 #: model:ir.actions.act_window,name:knowledge.knowledge_article_action_trashed
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_tree_items
 msgid "Trash"
 msgstr "Roskakori"
@@ -6734,13 +6756,7 @@ msgstr "Kirjattu poikkeustoimenpiteen tyyppi."
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/plugins/foldable_section_plugin/foldable_section_plugin.js:0
 msgid "Type something inside this section"
-msgstr ""
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "Unable to save. Correct the issue or discard all changes"
-msgstr "Tallentaminen ei onnistu. Korjaa ongelma tai hylkää kaikki muutokset"
+msgstr "Kirjoita jotain tähän osioon"
 
 #. module: knowledge
 #. odoo-javascript
@@ -6748,6 +6764,11 @@ msgstr "Tallentaminen ei onnistu. Korjaa ongelma tai hylkää kaikki muutokset"
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_form
 msgid "Unarchive"
 msgstr "Palauta arkistosta"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "Unless restored,"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -6763,9 +6784,12 @@ msgstr "Avaa lukitus"
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.xml:0
 #: code:addons/knowledge/static/src/components/hierarchy/hierarchy.xml:0
 #: code:addons/knowledge/static/src/components/permission_panel/permission_panel.js:0
+#: code:addons/knowledge/static/src/components/sidebar/rename_popover.xml:0
 #: code:addons/knowledge/static/src/components/sidebar/sidebar.js:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.js:0
 #: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 #: code:addons/knowledge/static/src/editor/html_migrations/migration-1.0.js:0
+#: code:addons/knowledge/static/src/editor/plugins/article_plugin/article_plugin.js:0
 #: code:addons/knowledge/static/src/webclient/commands/knowledge_providers.js:0
 #: code:addons/knowledge/static/src/xml/knowledge_command_palette.xml:0
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_hierarchy
@@ -6800,6 +6824,12 @@ msgstr "Käytä liitteenä"
 #: model_terms:digest.tip,tip_description:knowledge.digest_tip_knowledge_1
 msgid "Use the /clipboard command on a Knowledge Article and get going."
 msgstr "Käytä /clipboard -komentoa Tietokirjaston artikkelissa ja aloita."
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/toc_panel/toc_panel.xml:0
+msgid "Use the /heading command to insert your first title."
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
@@ -6875,18 +6905,6 @@ msgid "We already cannot wait for the next one🏃"
 msgstr "Emme malta odottaa seuraavaa kertaa 🏃"
 
 #. module: knowledge
-#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__website_message_ids
-#: model:ir.model.fields,field_description:knowledge.field_knowledge_article_thread__website_message_ids
-msgid "Website Messages"
-msgstr "Verkkosivun viestit"
-
-#. module: knowledge
-#: model:ir.model.fields,help:knowledge.field_knowledge_article__website_message_ids
-#: model:ir.model.fields,help:knowledge.field_knowledge_article_thread__website_message_ids
-msgid "Website communication history"
-msgstr "Verkkosivun viestintähistoria"
-
-#. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/res_users.py:0
 msgid "Welcome %s"
@@ -6932,17 +6950,12 @@ msgstr ""
 #. module: knowledge
 #: model:ir.model.fields,help:knowledge.field_knowledge_article__to_delete
 msgid ""
-"When sent to trash, articles are flagged to be deleted\n"
+"When moved to trash, articles are flagged to be deleted\n"
 "                days after last edit. knowledge_article_trash_limit_days "
 "config\n"
 "                parameter can be used to modify the number of days. \n"
 "                (default is 30)"
 msgstr ""
-"Kun artikkelit lähetetään roskakoriin, ne merkitään poistettaviksi\n"
-"                päivää viimeisimmän muokkauksen jälkeen. "
-"knowledge_article_trash_limit_days config\n"
-"                parametrilla voidaan muuttaa päivien määrää.\n"
-"                (oletusarvo on 30)"
 
 #. module: knowledge
 #: model:ir.model.fields,help:knowledge.field_knowledge_article__full_width
@@ -7037,7 +7050,6 @@ msgstr "Miksi kulujani ei ole korvattu? Se on kuitenkin hyväksytty."
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.js:0
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article__category__workspace
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Workspace"
@@ -7175,7 +7187,7 @@ msgstr "Sinulla ei ole pääsyoikeutta tähän artikkeliin"
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 msgid "You have no private Article."
-msgstr ""
+msgstr "Sinulla ei ole yksityistä artikkelia."
 
 #. module: knowledge
 #. odoo-python
@@ -7292,19 +7304,25 @@ msgstr ""
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "and the following child article(s) have"
-msgstr "ja seuraavilla aliartikkeleilla on"
+msgid "and the following child"
+msgstr ""
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "article"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/webclient/commands/knowledge_providers.js:0
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
 msgid "articles"
 msgstr "artikkelit"
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "been sent to Trash.<br/>"
-msgstr "on siirretty roskakoriin.<br/>"
+msgid "at any time before then."
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -7322,6 +7340,18 @@ msgstr "ota yhteyttä kalustopäällikköön"
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover.xml:0
 msgid "cover"
 msgstr "kansi"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+#, fuzzy
+msgid "day"
+msgstr "päivä"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+#, fuzzy
+msgid "days"
+msgstr "päivää"
 
 #. module: knowledge
 #. odoo-javascript
@@ -7348,13 +7378,13 @@ msgstr "esim. tehtävälistat"
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "has"
-msgstr "on"
+msgid "has been moved to Trash."
+msgstr ""
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "have"
-msgstr "on"
+msgid "have been moved to Trash:"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_mail_invite
@@ -7400,6 +7430,16 @@ msgid "the article"
 msgstr "artikkeli"
 
 #. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "these articles will be permanently deleted in"
+msgstr ""
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "this article will be permanently deleted in"
+msgstr ""
+
+#. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_form
 msgid "to unleash the power of Knowledge !"
 msgstr "vapauttaaksesi Tietokirjaston voiman !"
@@ -7412,35 +7452,29 @@ msgstr "kirjoita"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_software_specification
 msgid ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"​<span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"<span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_software_specification
 msgid ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_software_specification
 msgid ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"​<span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"<span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_campaign_brief
@@ -7516,7 +7550,7 @@ msgstr "🔗 Linkit"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_personal_organizer
 msgid "🗓 WEEKLY AGENDA"
-msgstr "🗓 VIIKOTTAINEN OHJELMA"
+msgstr "🗓 VIIKOITTAINEN OHJELMA"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_meeting_example_branding

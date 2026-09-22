@@ -1,5 +1,7 @@
 
 from odoo import models, fields, api
+from odoo.tools.business_data import split_vat
+
 from odoo.addons.account_batch_payment.models.sepa_mapping import sanitize_communication
 
 
@@ -7,7 +9,7 @@ class ResCompany(models.Model):
     _inherit = "res.company"
 
     iso20022_orgid_id = fields.Char('Identification', size=35, copy=False, compute='_compute_iso20022_orgid', readonly=False, store=True,
-        help="Identification assigned by an institution (eg. VAT number).")
+        help="Identification assigned by an institution (eg. Tax ID).")
     iso20022_orgid_issr = fields.Char('Issuer', size=35, copy=False, compute='_compute_iso20022_orgid', readonly=False, store=True,
         help="Entity that assigns the identification (eg. KBE-BCO or Finanzamt Muenchen IV).")
     iso20022_initiating_party_name = fields.Char('Your Company Name', size=70, copy=False,
@@ -35,7 +37,8 @@ class ResCompany(models.Model):
                 continue
             if company.partner_id.country_id.code == 'BE':
                 company.iso20022_orgid_issr = 'KBO-BCE'
-                company.iso20022_orgid_id = company.vat[:2].upper() + company.vat[2:].replace(' ', '') if company.vat else ''
+                country_code, country_vat = split_vat(company.vat, default_country_code="be")
+                company.iso20022_orgid_id = country_code + country_vat
             else:
                 company.iso20022_orgid_issr = ''
                 company.iso20022_orgid_id = ''

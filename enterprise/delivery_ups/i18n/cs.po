@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-13 13:10+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 01:59+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
 "delivery_ups/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_ups
 #. odoo-python
@@ -124,6 +124,11 @@ msgstr "Kontakt"
 #: model:ir.model,website_form_label:delivery_ups.model_res_partner
 msgid "Create a Customer"
 msgstr "Vytvořit zákazníka"
+
+#. module: delivery_ups
+#: model:ir.model,name:delivery_ups.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
 
 #. module: delivery_ups
 #: model:ir.model.fields,field_description:delivery_ups.field_delivery_carrier__display_name
@@ -506,11 +511,6 @@ msgid "Shipper phone extension must contain only numbers."
 msgstr "Telefonní přípona odesílatele musí obsahovat pouze čísla."
 
 #. module: delivery_ups
-#: model:ir.model,name:delivery_ups.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Přepravní metody"
-
-#. module: delivery_ups
 #: model:ir.model,name:delivery_ups.model_stock_package_type
 msgid "Stock package type"
 msgstr "Typ balení"
@@ -629,6 +629,14 @@ msgid "The selected service is not valid with the selected packaging."
 msgstr "Vybraná služba není platná s vybraným balením."
 
 #. module: delivery_ups
+#: model:ir.module.module,description:base.module_delivery_ups
+msgid ""
+"This is the legacy integration with UPS that is no longer supported.         "
+"Please install the new \"UPS Shipping\" module and uninstall this one as "
+"soon as possible. This integration will stop working in 2024."
+msgstr ""
+
+#. module: delivery_ups
 #. odoo-python
 #: code:addons/delivery_ups/models/ups_request.py:0
 msgid ""
@@ -734,6 +742,11 @@ msgid "UPS Service Type"
 msgstr "UPS typ služby"
 
 #. module: delivery_ups
+#: model:ir.module.module,shortdesc:base.module_delivery_ups
+msgid "UPS Shipping (Legacy)"
+msgstr ""
+
+#. module: delivery_ups
 #: model:delivery.carrier,name:delivery_ups.delivery_carrier_ups_us
 #: model:product.template,name:delivery_ups.product_product_delivery_ups_us_product_template
 msgid "UPS US"
@@ -810,12 +823,3 @@ msgstr "Musíte zadat číslo účtu UPS."
 #: model:ir.model.fields.selection,name:delivery_ups.selection__delivery_carrier__ups_label_file_type__zpl
 msgid "ZPL"
 msgstr "ZPL"
-
-#~ msgid "UPS Package Type"
-#~ msgstr "Typ balíčku UPS"
-
-#~ msgid "UPS Shipper Number"
-#~ msgstr "Číslo zásilky UPS"
-
-#~ msgid "UPS Shipping Methods"
-#~ msgstr "Způsoby přepravy UPS"

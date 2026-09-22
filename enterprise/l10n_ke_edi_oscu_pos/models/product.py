@@ -68,3 +68,7 @@ class ProductCode(models.Model):
     @api.model
     def _load_pos_data_fields(self, config):
         return ['code']
+
+    @api.model
+    def _load_pos_data_domain(self, data):
+        return [('id', 'in', data['product.product'].unspsc_code_id.ids)]

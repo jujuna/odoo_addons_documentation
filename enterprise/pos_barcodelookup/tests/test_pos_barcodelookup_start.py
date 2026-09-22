@@ -5,6 +5,8 @@ from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCom
 
 @tagged('post_install', '-at_install')
 class TestPOSBarcodelookup(TestPointOfSaleHttpCommon, TestBarcodelookup):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_01_pos_barcodelookup_flow(self):
         with self.mockBarcodelookupAutofill():
             self.main_pos_config.open_ui()

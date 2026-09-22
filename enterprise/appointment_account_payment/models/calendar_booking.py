@@ -7,7 +7,6 @@ from datetime import datetime
 from markupsafe import escape, Markup
 
 from odoo import api, Command, fields, models, _
-from odoo.tools import format_date, format_time
 
 
 class CalendarBooking(models.Model):
@@ -117,29 +116,9 @@ class CalendarBooking(models.Model):
         """ Returns a multiline description of the booking """
         self.ensure_one()
         tz = self.env.context.get('tz') or self.partner_id.tz or self.appointment_type_id.appointment_tz
-        env_tz = self.with_context(tz=tz).env
-        if self.staff_user_id:
-            return _(
-                "%(name)s with %(staff_user)s\n%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%(timezone)s)",
-                name=self.appointment_type_id.name,
-                staff_user=self.staff_user_id.display_name,
-                date_start=format_date(env_tz, self.start),
-                time_start=format_time(env_tz, self.start, tz=tz),
-                date_end=format_date(env_tz, self.stop),
-                time_end=format_time(env_tz, self.stop, tz=tz),
-                timezone=tz,
-            )
-        else:
-            return _(
-                "%(name)s\n%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%(timezone)s)",
-                name=self.appointment_type_id.name,
-                staff_user=self.staff_user_id.display_name,
-                date_start=format_date(env_tz, self.start),
-                time_start=format_time(env_tz, self.start, tz=tz),
-                date_end=format_date(env_tz, self.stop),
-                time_end=format_time(env_tz, self.stop, tz=tz),
-                timezone=tz,
-            )
+        return self.appointment_type_id._get_booking_multiline_description(
+            self.start, self.stop, self.staff_user_id, tz
+        )
 
     def _log_booking_collisions(self):
         """ Logs an error message on reference invoice listing the bookings that were not

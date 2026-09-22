@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Chile - Accounting Reports',
@@ -17,8 +16,7 @@ Accounting reports for Chile
         'data/f29_report.xml',
         'data/account_return_data.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_cl', 'account_reports'],
-    'website': 'http://cubicERP.com',
+    'website': 'https://cubicERP.com',
     'license': 'OEEL-1',
 }

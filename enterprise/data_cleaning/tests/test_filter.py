@@ -2,8 +2,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from . import test_common
-from odoo.tests.common import users
+from odoo.tests.common import tagged, users
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestFilter(test_common.TestCommon):
 
     @users('admin')

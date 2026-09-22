@@ -13,26 +13,32 @@ export class AppointmentResource extends models.ServerModel {
         {
             id: 1,
             pos_table_ids: [2],
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 2,
             pos_table_ids: [3],
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 3,
             pos_table_ids: [4],
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 4,
             pos_table_ids: [14],
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 5,
             pos_table_ids: [15],
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 6,
             pos_table_ids: [16],
+            write_date: "2025-01-01 10:00:00",
         },
     ];
 }

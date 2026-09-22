@@ -1,22 +1,65 @@
-import { Component, onWillStart, onWillUpdateProps } from "@odoo/owl";
+import { Component, providePlugins, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 
+import { BaseEditorTabComponent } from "@web_studio/client_action/editor/editor_menu/editor_menu";
 import { useReportEditorModel } from "@web_studio/client_action/report_editor/report_editor_model";
-import { ReportEditorWysiwyg } from "@web_studio/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg";
-import { ReportEditorXml } from "@web_studio/client_action/report_editor/report_editor_xml/report_editor_xml";
+import {
+    ReportEditorWysiwyg,
+    ReportEditorWysiwygSidebar,
+} from "@web_studio/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg";
+import {
+    ReportEditorResourcesPlugin,
+    ReportEditorXml,
+    ReportResourceSelector,
+} from "@web_studio/client_action/report_editor/report_editor_xml/report_editor_xml";
+import { ReportEditorPreview } from "./report_editor_preview/report_editor_preview";
 
 import { getCssFromPaperFormat } from "./utils";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
-import { useService } from "@web/core/utils/hooks";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { _t } from "@web/core/l10n/translation";
+import { ReportEditorSidebar, ReportEditorSidebarPlugin } from "./report_editor_sidebar";
+import { ReportPrintButton, ReportRecordNavigation } from "./report_editor_components";
 
 class ReportEditor extends Component {
     static template = "web_studio.ReportEditor";
-    static components = { ReportEditorWysiwyg, ReportEditorXml };
-    static props = { ...standardActionServiceProps };
+    static components = {
+        ReportEditorSidebar,
+        ReportEditorWysiwyg,
+        ReportEditorXml,
+        ReportEditorPreview,
+    };
+    props = useProps(standardActionServiceProps);
 
     setup() {
         this.reportEditorModel = useReportEditorModel();
+        providePlugins([ReportEditorSidebarPlugin, ReportEditorResourcesPlugin], {
+            reportEditorModel: this.reportEditorModel,
+            pages: [
+                {
+                    title: _t("Editor"),
+                    name: "wysiwyg_mode",
+                    icon: "edit",
+                    mode: "wysiwyg",
+                    components: [ReportEditorWysiwygSidebar],
+                },
+                {
+                    title: _t("Preview"),
+                    icon: "visibility",
+                    name: "preview_mode",
+                    mode: "preview",
+                    components: [ReportRecordNavigation],
+                },
+                {
+                    title: _t("Sources"),
+                    icon: "code",
+                    name: "report_edit_sources",
+                    mode: "xml",
+                    components: [ReportRecordNavigation, ReportResourceSelector],
+                },
+            ],
+        });
+
+        usePlugin(ReportEditorSidebarPlugin).addComponent(ReportPrintButton, "end");
     }
 
     get paperFormatStyle() {
@@ -40,27 +83,7 @@ class ReportEditor extends Component {
 }
 registry.category("actions").add("web_studio.report_editor", ReportEditor);
 
-class ReportsTab extends Component {
-    static template = "web_studio.ReportEditor.ReportsTab";
-    static props = {
-        tab: Object,
-        editedAction: Object,
-        openTab: Function,
-    };
-
-    setup() {
-        this.studio = useService("studio");
-        onWillStart(() => this.updateFromModel(this.props.editedAction.res_model));
-        onWillUpdateProps((next) => this.updateFromModel(next.editedAction.res_model));
-    }
-
-    onClick() {
-        if (this.isDisabled) {
-            return;
-        }
-        this.props.openTab(this.props.tab.id);
-    }
-
+class ReportsTab extends BaseEditorTabComponent {
     get isDisabled() {
         return !this.modelInfo.record_ids.length;
     }
@@ -73,10 +96,6 @@ class ReportsTab extends Component {
             model_name: this.modelInfo.name,
             model: this.modelInfo.model,
         });
-    }
-
-    async updateFromModel(resModel) {
-        this.modelInfo = await this.studio.IrModelInfo.read(resModel);
     }
 }
 

@@ -15,22 +15,14 @@
         </field>
     </record>
 
-    <record id="helpdesk_ticket_view_form_inherited" model="ir.ui.view">
-        <field name="name">helpdesk.ticket.form.inherited</field>
-        <field name="model">helpdesk.ticket</field>
-        <field name="priority">100</field>
-        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form" />
-        <field name="arch" type="xml">
-            <xpath expr="header" position="inside">
-                <button class="btn btn-secondary" type="object" string="Convert to Lead"
-                        name="action_convert_ticket_to_lead_or_opportunity"
-                        invisible="not active"
-                        groups="crm.group_use_lead" data-hotkey="q"/>
-                <button class="btn btn-secondary" type="object" string="Convert to Opportunity"
-                        name="action_convert_ticket_to_lead_or_opportunity"
-                        invisible="not active"
-                        groups="!crm.group_use_lead" data-hotkey="q"/>
-            </xpath>
+    <record id="action_server_convert_ticket_to_lead_or_opportunity" model="ir.actions.server">
+        <field name="name">Convert to Opportunity/Lead</field>
+        <field name="model_id" ref="model_helpdesk_ticket"/>
+        <field name="binding_model_id" ref="model_helpdesk_ticket"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = record.action_convert_ticket_to_lead_or_opportunity()
         </field>
     </record>
 

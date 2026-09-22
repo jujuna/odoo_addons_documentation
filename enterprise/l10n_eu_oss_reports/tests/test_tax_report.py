@@ -9,6 +9,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class OSSTaxReportTest(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -20,26 +22,9 @@ class OSSTaxReportTest(TestAccountReportsCommon):
         cls.env.company.email = 'test@example.com'
         cls.env.company.currency_id = cls.env.ref('base.EUR')
 
-        account_payable = cls.env['account.account'].create({
-            'name': "VAT Payable: VAT Current Account (C/A)",
-            'code': "4512",
-            'account_type': 'liability_payable',
-            'reconcile': True,
-            'non_trade': True,
-        })
-        account_receivable = cls.env['account.account'].create({
-            'name': "VAT Recoverable: VAT Current Account (C/A)",
-            'code': "4112",
-            'account_type': 'asset_receivable',
-            'reconcile': True,
-            'non_trade': True,
-        })
-
         tax_group = cls.env['account.tax.group'].create({
             'name': 'tax_group',
             'country_id': cls.env.ref('base.be').id,
-            'tax_payable_account_id': account_payable.id,
-            'tax_receivable_account_id': account_receivable.id,
         })
 
         tax_21, tax_06 = cls.env['account.tax'].create([
@@ -60,6 +45,21 @@ class OSSTaxReportTest(TestAccountReportsCommon):
         ])
         cls.tax_06 = tax_06
         cls.tax_21 = tax_21
+
+        # OSS derives its own settlement accounts from the domestic return's, so the company needs
+        # a domestic tax return to derive them from.
+        cls.env['account.return.type'].create({
+            'name': "BE VAT Return",
+            'country_id': cls.env.ref('base.be').id,
+            'report_id': cls.env['account.report'].create({
+                'name': "BE Tax Report",
+                'country_id': cls.env.ref('base.be').id,
+                'root_report_id': cls.env.ref('account.generic_tax_report').id,
+                'column_ids': [Command.create({'name': 'balance', 'sequence': 1, 'expression_label': 'balance'})],
+            }).id,
+            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].id,
+            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].id,
+        })
 
         cls.env.company._map_eu_taxes()
 
@@ -114,7 +114,7 @@ class OSSTaxReportTest(TestAccountReportsCommon):
         """ Test tax report's content for 'domestic' foreign VAT fiscal position option.
         """
         report = self.env.ref('l10n_eu_oss_reports.oss_sales_report')
-        options = self._generate_options(report, fields.Date.from_string('2021-04-01'), fields.Date.from_string('2021-06-30'))
+        options = self._generate_options(report, '2021-04-01', '2021-06-30')
 
         self.assertLinesValues(
             # pylint: disable=C0326
@@ -150,7 +150,7 @@ class OSSTaxReportTest(TestAccountReportsCommon):
             'company_id': self.env.company.id,
         })
         with self.allow_pdf_render():
-            tax_return.action_validate(bypass_failing_tests=True)
+            tax_return.action_validate()
 
         self.assertEqual(len(tax_return.closing_move_ids), 1)
 
@@ -190,7 +190,7 @@ class OSSTaxReportTest(TestAccountReportsCommon):
 
     def test_generate_oss_xml_be(self):
         report = self.env.ref('l10n_eu_oss_reports.oss_sales_report')
-        options = self._generate_options(report, fields.Date.from_string('2021-04-01'), fields.Date.from_string('2021-06-30'))
+        options = self._generate_options(report, '2021-04-01', '2021-06-30')
 
         expected_xml = """
             <ns0:OSSConsignment
@@ -271,6 +271,8 @@ class OSSTaxReportTest(TestAccountReportsCommon):
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestTaxReportOSSNoMapping(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -294,8 +296,6 @@ class TestTaxReportOSSNoMapping(TestAccountReportsCommon):
         cls.env['account.tax.group'].create({
             'name': 'tax_group',
             'country_id': cls.company_data['company'].account_fiscal_country_id.id,
-            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].id,
-            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].id,
         })
         oss_tag = cls.env.ref('l10n_eu_oss.tag_oss')
         oss_fp = cls.env['account.fiscal.position'].create({
@@ -387,7 +387,7 @@ class TestTaxReportOSSNoMapping(TestAccountReportsCommon):
             'company_id': self.env.company.id,
         })
         with self.allow_pdf_render():
-            oss_return.action_validate(bypass_failing_tests=True)
+            oss_return.action_validate()
 
         tax_closing_entry_lines = oss_return.closing_move_ids.line_ids.filtered(lambda l: l.balance != 0.0)
 

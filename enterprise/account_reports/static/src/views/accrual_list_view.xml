@@ -1,15 +1,15 @@
 <templates>
     <t t-name="account_reports.AccrualListView.Buttons" t-inherit="web.ListView.Buttons" t-inherit-mode="primary">
         <xpath expr="." position="inside">
-            <div id="filter_date" t-ref="filterDate"
+            <div id="filter_date" t-ref="this.dateFilterRef"
                  class="d-print-none me-1"
-                 t-on-click="onDateClick">
+                 t-on-click="this.onDateClick">
                 <button class="btn btn-secondary">
-                    <i class="fa fa-calendar me-1"/>As of <t t-out="date"/>
+                    <i class="oi oi-filled me-1" data-icon="calendar_today"/>As of <t t-out="this.date"/>
                 </button>
             </div>
             <div class="d-none d-print-block">
-                At the date of <t t-out="date"/>
+                At the date of <t t-out="this.date"/>
             </div>
         </xpath>
     </t>

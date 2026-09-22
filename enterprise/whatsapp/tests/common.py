@@ -1,4 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import base64
 import hashlib
 import hmac
 import json
@@ -13,21 +14,40 @@ from unittest.mock import patch
 
 from odoo.addons.base.models.res_partner import ResPartner
 from odoo.addons.mail.tests.common import MailCommon, mail_new_test_user
-from odoo.addons.whatsapp.tools.whatsapp_api import WhatsAppApi
+from odoo.addons.whatsapp.tools.whatsapp_api import DEFAULT_ENDPOINT, WhatsAppApi
 from odoo.addons.whatsapp.models.whatsapp_message import WhatsappMessage
 from odoo.addons.whatsapp.tests.template_data import template_data
 from odoo.addons.whatsapp.tools.whatsapp_exception import WhatsAppError
 from odoo.tests import common, Form
+from odoo.tools import BinaryValue
+
+PROXY_ENDPOINT = 'https://whatsapp.odoo.test/api/whatsapp/1'
 
 
 class MockOutgoingWhatsApp(common.BaseCase):
     """ Mock calls to WhatsApp API, provide tools and patch to know what happens
     when contacting it. """
 
+    @staticmethod
     @contextmanager
-    def mockWhatsappGateway(self, exp_json_data=None):
+    def mockWhatsappBlockStatus(update_block_status):
+        """Mock WhatsApp's block-users endpoint response.
+
+        This deliberately does not rely on test-instance state so it can also
+        be used while building class-level fixtures in ``setUpClass``.
+        """
+        with patch.object(
+            WhatsAppApi,
+            '_update_block_status',
+            side_effect=update_block_status,
+        ):
+            yield
+
+    @contextmanager
+    def mockWhatsappGateway(self, exp_json_data=None, block_status_result=None):
         self._init_wa_mock()
-        wa_msg_origin = WhatsappMessage.create
+        wa_msg_create_origin = WhatsappMessage.create
+        wa_msg_write_origin = WhatsappMessage.write
         partner_create_origin = ResPartner.create
 
         # ------------------------------------------------------------
@@ -46,12 +66,13 @@ class MockOutgoingWhatsApp(common.BaseCase):
         def _get_whatsapp_document(document_id):
             return self._wa_document_store.get(document_id, "abcd")
 
-        def _send_whatsapp(number, *, send_vals, **kwargs):
+        def _send_whatsapp_to_identifier(bsuid, number, message_type=None, send_vals=None, parent_message_id=False):
             if send_vals:
                 msg_uid = f'test_wa_{time.time() + len(self._wa_msg_sent):.9f}'
                 self._wa_msg_sent.append(msg_uid)
                 self._wa_msg_sent_vals.append(send_vals)
-                return msg_uid
+                self._wa_msg_sent_recipients.append({'bsuid': bsuid, 'number': number})
+                return {'msg_uid': msg_uid, 'wa_id': number or bsuid}
             raise WhatsAppError("Please make sure to define a template before proceeding.")
 
         def _submit_template_new(json_data):
@@ -87,11 +108,27 @@ class MockOutgoingWhatsApp(common.BaseCase):
 
         def _get_header_data_from_handle(url):
             if url == 'demo_image_url':
-                return b'R0lGODlhAQABAIAAANvf7wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', 'image/jpeg'
+                return base64.b64decode(b'R0lGODlhAQABAIAAANvf7wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='), 'image/jpeg'
             raise WhatsAppError("Please ensure you are using the correct file type and try again.")
 
         def _get_phone_number(phone_uid):
             return "+91 12345 67890"
+
+        def _update_block_status(action, numbers):
+            """ By default, consider numbers are correctly (un)blocked """
+            ignored_numbers = (block_status_result or {}).get('ignored_numbers') or []
+            failed_numbers = (block_status_result or {}).get('failed_numbers') or []
+            if failed_numbers:
+                failures = {number: "Failure Error" for number in failed_numbers}
+            else:
+                failures = (block_status_result or {}).get('failures', {})
+            updated_numbers = (block_status_result or {}).get('updated_numbers')
+            if updated_numbers is None:
+                updated_numbers = [number for number in numbers if number not in failed_numbers and number not in ignored_numbers]
+            return {
+                "updated_numbers": updated_numbers,
+                "failures": failures,
+            }
 
         # ------------------------------------------------------------
         # Whatsapp Models
@@ -103,7 +140,7 @@ class MockOutgoingWhatsApp(common.BaseCase):
             return records
 
         def _wa_message_create(model, *args, **kwargs):
-            res = wa_msg_origin(model, *args, **kwargs)
+            res = wa_msg_create_origin(model, *args, **kwargs)
             self._new_wa_msg += res.sudo()
             return res
 
@@ -113,12 +150,15 @@ class MockOutgoingWhatsApp(common.BaseCase):
              patch.object(WhatsAppApi, '_get_whatsapp_document', side_effect=_get_whatsapp_document), \
              patch.object(WhatsAppApi, '_upload_demo_document', side_effect=_upload_demo_document), \
              patch.object(WhatsAppApi, '_upload_whatsapp_document', side_effect=_upload_whatsapp_document), \
-             patch.object(WhatsAppApi, '_send_whatsapp', side_effect=_send_whatsapp), \
+             patch.object(WhatsAppApi, '_send_whatsapp_to_identifier', side_effect=_send_whatsapp_to_identifier), \
              patch.object(WhatsAppApi, '_submit_template_new', side_effect=_submit_template_new), \
              patch.object(WhatsAppApi, '_get_header_data_from_handle', side_effect=_get_header_data_from_handle), \
              patch.object(WhatsAppApi, '_get_phone_number', side_effect=_get_phone_number), \
-             patch.object(WhatsappMessage, 'create', autospec=True, wraps=WhatsappMessage, side_effect=_wa_message_create) as mock_wa_msg_create:
+             patch.object(WhatsappMessage, 'create', autospec=True, wraps=WhatsappMessage, side_effect=_wa_message_create) as mock_wa_msg_create, \
+             patch.object(WhatsappMessage, 'write', autospec=True, wraps=WhatsappMessage, side_effect=wa_msg_write_origin) as mock_wa_msg_write, \
+             self.mockWhatsappBlockStatus(_update_block_status):
             self._mock_wa_msg_create = mock_wa_msg_create
+            self._mock_wa_msg_write = mock_wa_msg_write
             yield
 
     def _init_wa_mock(self):
@@ -129,15 +169,21 @@ class MockOutgoingWhatsApp(common.BaseCase):
         self._wa_document_store = {}
         self._wa_uploaded_document_count = 0
         self._wa_msg_sent_vals = []
+        self._wa_msg_sent_recipients = []
 
     @contextmanager
     def mockWhatsappHTTPResponse(self, response_map):
-        """Mock request response when testing response handling."""
+        """Mock request responses when testing response handling.
+
+        ``response_map`` may also be a callable taking the requested URL.  This
+        lets specialised test fixtures expose domain-level mock options without
+        duplicating the HTTP patching setup.
+        """
         self._init_wa_http_mock()
 
         def _make_request(request_type, call_url, params=None, headers=None, data=None, files=None, timeout=None):
             response = Response()
-            response_vals = response_map.get(call_url)
+            response_vals = response_map(call_url) if callable(response_map) else response_map.get(call_url)
             content = response_vals['content']
 
             response.status_code = response_vals.get('status_code', 200)
@@ -188,6 +234,13 @@ class MockIncomingWhatsApp(common.HttpCase):
         return hmac.new(
             account.app_secret.encode(),
             msg=message_data.encode(),
+            digestmod=hashlib.sha256,
+        ).hexdigest()
+
+    def _get_proxy_signature(self, account, payload):
+        return hmac.new(
+            account.shared_webhook_secret.encode(),
+            msg=payload.encode(),
             digestmod=hashlib.sha256,
         ).hexdigest()
 
@@ -254,9 +307,40 @@ class MockIncomingWhatsApp(common.HttpCase):
             }
         )
 
+    def _receive_whatsapp_interactive_message(self, account, interactive_message_values, sender_phone_number, additional_message_values=None):
+        message_data = json.dumps({
+            "entry": [{
+                "id": account.account_uid,
+                "changes": [{
+                    "field": "messages",
+                    "value": {
+                        "metadata": {"phone_number_id": account.phone_uid},
+                        "messages": [
+                            dict({
+                                "id": f"test_wa_{time.time():.9f}",
+                                "from": sender_phone_number,
+                                "type": "interactive",
+                                "interactive": interactive_message_values,
+                            }, **(additional_message_values or {}))
+                        ],
+                    }
+                }]
+            }]
+        })
+
+        return self._make_webhook_request(
+            account,
+            message_data=message_data,
+            headers={
+                "Content-Type": "application/json",
+                "X-Hub-Signature-256": f"sha256={self._get_message_signature(account, message_data)}",
+            }
+        )
+
     def _receive_whatsapp_message(
-        self, account, body, sender_phone_number, message_type="text",
+        self, account, body, sender_phone_number='', message_type="text",
         additional_message_values=None, content_values=None, sender_name='',
+        sender_bsuid='',
     ):
         body = body or ""
         cnt = self.env['whatsapp.message'].sudo().search_count([])
@@ -268,6 +352,8 @@ class MockIncomingWhatsApp(common.HttpCase):
             "timestamp": f"{time.time():.0f}",
             "type": message_type,
         }
+        if sender_bsuid:
+            message_vals["from_user_id"] = sender_bsuid
         match message_type:
             case "text":
                 message_vals.update(text={"body": body} | content_values)
@@ -288,6 +374,13 @@ class MockIncomingWhatsApp(common.HttpCase):
             case _:
                 raise Exception(f"Unsupported whatsapp message type {message_type}")
         message_vals.update(additional_message_values)
+        contact_val = {"profile": {"name": sender_name}}
+        if sender_phone_number:
+            # In production wa_id is the customer's phone number without the '+'
+            # (it's stored as a string by WhatsApp). Match that so wa_id-based routing works.
+            contact_val["wa_id"] = sender_phone_number.lstrip('+')
+        if sender_bsuid:
+            contact_val["user_id"] = sender_bsuid
         message_data = json.dumps({
             "object": "whatsapp_business_account",
             "entry": [{
@@ -297,10 +390,7 @@ class MockIncomingWhatsApp(common.HttpCase):
                     "value": {
                         "messaging_product": "whatsapp",
                         "metadata": {"phone_number_id": account.phone_uid, "display_phone_number": "12345678912"},
-                        "contacts": [{
-                            "profile": {"name": sender_name},
-                            "wa_id": f"{time.time() % 9 // 1:.0f}{sender_phone_number[1:]}",  # not necessarily the actual phone number
-                        }],
+                        "contacts": [contact_val],
                         "messages": [message_vals],
                     }
                 }]
@@ -401,6 +491,20 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             'wa_template_id': template.id,
         })
 
+    def _instantiate_wa_interactive_composer_from_channel(self, interactive, discuss_channel,
+                                                          with_user=False, add_context=None):
+        """ Create a whatsapp interactive composer to run 'interactive' on 'discuss_channel'.
+
+        :param with_user: a user to set on environment, allowing to check ACLs;
+        :param add_context: optional additional context values given to the
+          composer creation;
+        """
+        composer = self.env['whatsapp.interactive.composer'].with_context(**(add_context or {}))
+        return composer.with_user(with_user or self.env.user).create({
+            'discuss_channel_id': discuss_channel.id,
+            'wa_interactive_id': interactive.id,
+        })
+
     def send_template(self, template, records, with_user=False):
         composer = self._instanciate_wa_composer_from_records(
             template, records,
@@ -431,11 +535,13 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             wa_msg_count=exp_wa_msg_count,
         )
 
-    def whatsapp_answer_with_records(self, records, body=None, mock=False):
+    def whatsapp_answer_with_records(self, records, body=None, find_in_mock=True, mock=False):
+        """ Simulate an answer through webhook """
         # if mock is used -> internal wa_msgs is reset, prepare beforehand
-        wa_msgs = []
-        for record in records:
-            wa_msgs.append(self._find_wa_msg_wrecord(record))
+        if find_in_mock:
+            wa_msgs = [self._find_wa_msg_wrecord(record) for record in records]
+        else:
+            wa_msgs = [self._find_wa_msg_inrecord(record) for record in records]
         with self.mockWhatsappGateway() if mock else nullcontext(), \
                 self.patchWhatsappCronTrigger() if mock else nullcontext():
             for record, wa_msg in zip(records, wa_msgs):
@@ -470,7 +576,7 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             )
 
     def whatsapp_msg_click_with_records(self, records, body=False, button_index=None):
-        """ Simulate a 'read' message event through webhook """
+        """ Simulate a 'click' message event through calling 'add_click' """
         for record in records:
             wa_msg = self._find_wa_msg_wrecord(record)
             self.assertTrue(wa_msg)
@@ -495,21 +601,25 @@ class WhatsAppCase(MockOutgoingWhatsApp):
                 whatsapp_message_id=wa_msg_id,
             )
 
-    def whatsapp_msg_read_with_records(self, records):
+    def whatsapp_msg_read_with_records(self, records, find_in_mock=True, mock=False):
         """ Simulate a 'read' message event through webhook """
-        for record in records:
-            wa_msg = self._find_wa_msg_wrecord(record)
-            self.assertTrue(wa_msg)
-            self._receive_message_update(
-                account=self.whatsapp_account,
-                display_phone_number=wa_msg.mobile_number,
-                extra_value={
-                    "statuses": [{
-                        "id": wa_msg.msg_uid,
-                        "status": "read",
-                    }],
-                },
-            )
+        if find_in_mock:
+            wa_msgs = [self._find_wa_msg_wrecord(record) for record in records]
+        else:
+            wa_msgs = [self._find_wa_msg_inrecord(record) for record in records]
+        with self.mockWhatsappGateway() if mock else nullcontext(), \
+                self.patchWhatsappCronTrigger() if mock else nullcontext():
+            for record, wa_msg in zip(records, wa_msgs):
+                self._receive_message_update(
+                    account=self.whatsapp_account,
+                    display_phone_number=wa_msg.mobile_number,
+                    extra_value={
+                        "statuses": [{
+                            "id": wa_msg.msg_uid,
+                            "status": "read",
+                        }],
+                    },
+                )
 
     # ------------------------------------------------------------
     # MESSAGE FIND AND ASSERTS
@@ -525,7 +635,7 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             for wa_sent in self._wa_msg_sent
         )
         raise AssertionError(
-            f'Sent whatsapp message not found for msg_uid {msg_uid}\n{debug_info})'
+            f'Sent whatsapp message not found for msg_uid {msg_uid}\n{debug_info}'
         )
 
     def _find_wa_msg_wnumber(self, mobile_number):
@@ -538,7 +648,7 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             for wa_msg in self._new_wa_msg
         )
         raise AssertionError(
-            f'whatsapp.message not found for number {mobile_number}\n{debug_info})'
+            f'whatsapp.message not found for number {mobile_number}\n{debug_info}'
         )
 
     def _find_wa_msg_wrecord(self, record):
@@ -551,8 +661,17 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             for wa_msg in self._new_wa_msg
         )
         raise AssertionError(
-            f'whatsapp.message not found for record {record.display_name} ({record._name}/{record.id}\n{debug_info})'
+            f'whatsapp.message not found for record {record.display_name} ({record._name}/{record.id})\n{debug_info}'
         )
+
+    def _find_wa_msg_inrecord(self, record):
+        """ Find a WA message, using linked record through its mail.message """
+        wa_msg = record.message_ids.wa_message_ids[0]
+        if not wa_msg:
+            raise AssertionError(
+                f'whatsapp.message not found for record {record.display_name} ({record._name}/{record.id})'
+            )
+        return wa_msg
 
     def _assertWAMessage(self, wa_message, status='sent',
                          fields_values=None, attachment_values=None,
@@ -617,6 +736,8 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             for fname, fvalue in attachment_values.items():
                 with self.subTest(fname=fname, fvalue=fvalue):
                     attachment_value = attachment[fname]
+                    if isinstance(attachment_value, BinaryValue):
+                        attachment_value = attachment_value.content
                     self.assertEqual(
                         attachment_value, fvalue,
                         f'whatsapp.message invalid attachment: expected {fvalue} for {fname}, got {attachment_value}'
@@ -766,13 +887,13 @@ class WhatsAppCase(MockOutgoingWhatsApp):
 
         if attachment_values:
             # check attachment values
-            attachment = template.header_attachment_ids
-            # only support one attachment for whatsapp templates
-            self.assertEqual(len(attachment), 1, 'whatsapp.template: should have only one attachment')
+            attachment = template.header_attachment_id
 
             for fname, fvalue in (attachment_values).items():
                 with self.subTest(fname=fname, fvalue=fvalue):
                     attachment_value = attachment[fname]
+                    if isinstance(attachment_value, BinaryValue):
+                        attachment_value = attachment_value.content
                     self.assertEqual(
                         attachment_value, fvalue,
                         f'whatsapp.template invalid attachment: expected {fvalue} for {fname}, got {attachment_value}'
@@ -904,20 +1025,135 @@ class WhatsAppCommon(MailCommon, WhatsAppCase):
         audio_data = '/+MYxAAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
         documents = cls.env['ir.attachment'].with_user(cls.user_employee).create([
-            {'name': 'Document.pdf', 'datas': pdf_data},
-            {'name': 'Image.jpg', 'datas': image_data},
-            {'name': 'Video.mp4', 'datas': video_data},
-            {'name': 'Payload.wasm', 'datas': "AGFzbQEAAAA=", 'mimetype': 'application/octet-stream'},
+            {'name': 'Document.pdf', 'raw': base64.b64decode(pdf_data)},
+            {'name': 'Image.jpg', 'raw': base64.b64decode(image_data)},
+            {'name': 'Video.mp4', 'raw': base64.b64decode(video_data)},
+            {'name': 'Payload.wasm', 'raw': base64.b64decode("AGFzbQEAAAA="), 'mimetype': 'application/octet-stream'},
         ])
         cls.document_attachment, cls.image_attachment, cls.video_attachment, cls.invalid_attachment = documents
         documents_wa_admin = cls.env['ir.attachment'].with_user(cls.user_wa_admin).create([
-            {'name': 'Document.pdf', 'datas': pdf_data},
-            {'name': 'Image.jpg', 'datas': image_data},
-            {'name': 'Video.mpg', 'datas': video_data},
-            {'name': 'Payload.wasm', 'datas': "AGFzbQEAAAA=", 'mimetype': 'application/octet-stream'},
-            {'name': 'Audio.mp3', 'datas': audio_data},
+            {'name': 'Document.pdf', 'raw': base64.b64decode(pdf_data)},
+            {'name': 'Image.jpg', 'raw': base64.b64decode(image_data)},
+            {'name': 'Video.mpg', 'raw': base64.b64decode(video_data)},
+            {'name': 'Payload.wasm', 'raw': base64.b64decode("AGFzbQEAAAA="), 'mimetype': 'application/octet-stream'},
+            {'name': 'Audio.mp3', 'raw': base64.b64decode(audio_data)},
         ])
         cls.document_attachment_wa_admin, cls.image_attachment_wa_admin, cls.video_attachment_wa_admin, cls.invalid_attachment_wa_admin, cls.audio_attachment_wa_admin = documents_wa_admin
+
+    @contextmanager
+    def mockWhatsappOAuthGateway(
+        self,
+        *,
+        is_phone_registered=True,
+        is_webhook_subscribed=True,
+        access_token='new_access_token',
+        phone_numbers=None,
+        granular_scopes=None,
+        proxy_webhook_data=None,
+        register_phone_error=None,
+    ):
+        """Mock the WhatsApp gateway using OAuth-domain response values.
+
+        The HTTP boundary remains mocked, so API response handling is still
+        exercised.  Callers only provide the data relevant to their scenario,
+        not endpoint paths or HTTP response envelopes.
+        """
+        def get_response(call_url):
+            # The host is part of what the tests check, a Graph call must not reach the proxy.
+            on_proxy = call_url.startswith(PROXY_ENDPOINT)
+            on_graph = call_url.startswith(DEFAULT_ENDPOINT)
+            if on_proxy and call_url.endswith('/get_access_token'):
+                return {'content': {'access_token': access_token} if access_token else {}}
+            if on_proxy and call_url.endswith('/debug_token'):
+                return {'content': {'data': {'granular_scopes': granular_scopes or []}}}
+            if on_proxy and call_url.endswith('/register_account'):
+                return {'content': proxy_webhook_data or {
+                    'shared_webhook_secret': 'new_shared_secret',
+                    'webhook_url': f'{PROXY_ENDPOINT}/webhook/new_hook',
+                }}
+            if on_proxy and call_url.endswith('/unregister_account'):
+                return {'content': {'success': True}}
+            if on_graph and call_url.endswith('/phone_numbers'):
+                return {'content': {'data': phone_numbers or []}}
+            if on_graph and call_url.endswith('/register'):
+                if register_phone_error:
+                    return {'content': {
+                        'error': {'code': 133005, 'message': register_phone_error},
+                    }}
+                return {'content': {'success': True}}
+            if on_graph and call_url.endswith('/subscribed_apps'):
+                return {'content': {'success': True}}
+            if on_graph and call_url.endswith(f'/{self.whatsapp_account_oauth.phone_uid}'):
+                return {'content': {
+                    'status': 'CONNECTED' if is_phone_registered else 'PENDING',
+                    'webhook_configuration': {
+                        'whatsapp_business_account': self.whatsapp_account_oauth.proxy_webhook_url
+                        if is_webhook_subscribed else 'https://another-provider.example.com/hook',
+                    },
+                }}
+            self.fail(f'Unexpected WhatsApp API request: {call_url}')
+
+        with (
+            self.mockWhatsappGateway(),
+            patch.object(WhatsAppApi, '_test_connection'),
+            self.mockWhatsappHTTPResponse(get_response),
+        ):
+            yield
+
+    @classmethod
+    def _prepare_interactive_templates(cls):
+        """ Interactive templates, setup only in tests using them """
+        cls.test_interactive_cta_url, cls.test_interactive_list, cls.test_interactive_reply = cls.env['whatsapp.interactive'].sudo().create([
+            {
+                'body': 'Test Interactive CTA URL body',
+                'button_ids': [(0, 0, {
+                    'name': 'Test CTA URL Button',
+                    'button_type': 'url',
+                    'website_url': 'https://www.odoo.com',
+                })],
+                'interactive_type': 'cta_url',
+                'name': 'Test Interactive CTA URL',
+            }, {
+                'body': 'Test Interactive List body',
+                'button_ids': [
+                    (0, 0, {'name': 'Section 1', 'button_type': 'section'}),
+                    (0, 0, {'name': 'Question 1', 'button_type': 'question', 'description': 'Description 1'}),
+                    (0, 0, {'name': 'Question 2', 'button_type': 'question', 'description': 'Description 2'}),
+                    (0, 0, {'name': 'Section 2', 'button_type': 'section'}),
+                    (0, 0, {'name': 'Question 3', 'button_type': 'question', 'description': 'Description 3'}),
+                    (0, 0, {'name': 'Question 4', 'button_type': 'question', 'description': 'Description 4'}),
+                ],
+                'list_button_label': 'Test List Button',
+                'name': 'Test Interactive List',
+            }, {
+                'body': 'Test Interactive Reply body',
+                'button_ids': [
+                    (0, 0, {'name': 'Test Reply Button 1'}),
+                    (0, 0, {'name': 'Test Reply Button 2'}),
+                    (0, 0, {'name': 'Test Reply Button 3'}),
+                ],
+                'interactive_type': 'button',
+                'name': 'Test Interactive Reply',
+            },
+        ]).sudo(False)
+
+    @classmethod
+    def _prepare_oauth_account(cls):
+        """ Account onboarded through Embedded Signup, setup only in tests using it """
+        cls.env['ir.config_parameter'].sudo().set_str('whatsapp.proxy_endpoint', PROXY_ENDPOINT)
+        cls.whatsapp_account_oauth = cls.env['whatsapp.account'].with_user(cls.user_wa_admin).create({
+            'account_uid': 'waba_oauth_123',
+            'app_uid': 'app_oauth_123',
+            'is_oauth_onboarded': True,
+            'is_phone_registered': True,
+            'is_webhook_subscribed': True,
+            'name': 'odoo oauth account',
+            'notify_user_ids': cls.user_wa_admin.ids,
+            'phone_uid': '111222333444',
+            'proxy_webhook_url': f'{PROXY_ENDPOINT}/webhook/oauth_hook',
+            'shared_webhook_secret': 'shared_secret_oauth',
+            'token': 'oauth_access_token',
+        })
 
     @classmethod
     def _setup_share_users(cls):

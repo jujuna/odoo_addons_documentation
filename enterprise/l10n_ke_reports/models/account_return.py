@@ -7,9 +7,9 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         # EXTENDS account_reports
-        res = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit)
+        res = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
         if country_code == 'KE':
             withholding_return_type = self.env.ref('l10n_ke_reports.ke_wh_tax_return_type')
 
@@ -36,6 +36,10 @@ class AccountReturnType(models.Model):
                     withholding_return_type._try_create_return_for_period(start, main_company, tax_unit)
 
         return res
+
+
+class AccountReturn(models.Model):
+    _inherit = 'account.return'
 
     def _get_vat_closing_entry_additional_domain(self):
         # EXTENDS account_reports

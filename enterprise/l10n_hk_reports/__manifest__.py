@@ -2,16 +2,17 @@
 
 {
     'name': 'Hong Kong - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
         Accounting reports for Hong Kong
     """,
     'depends': ['l10n_hk', 'account_reports'],
-    'installable': True,
-    'post_init_hook': '_l10n_hk_reports_post_init',
     'auto_install': ['l10n_hk', 'account_reports'],
     'website': 'https://www.odoo.com/app/accounting',
+    'data': [
+        'data/balance_sheet.xml',
+        'data/profit_and_loss.xml',
+    ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

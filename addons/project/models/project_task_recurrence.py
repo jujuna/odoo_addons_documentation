@@ -33,7 +33,7 @@ class ProjectTaskRecurrence(models.Model):
 
     @api.constrains('repeat_type', 'repeat_until')
     def _check_repeat_until_date(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         if self.filtered(lambda t: t.repeat_type == 'until' and t.repeat_until < today):
             raise ValidationError(_('The end date should be in the future'))
 
@@ -67,22 +67,29 @@ class ProjectTaskRecurrence(models.Model):
     @api.model
     def _create_next_occurrences(self, occurrences_from):
         tasks_copy = self.env['project.task']
-        occurrences_from = occurrences_from.filtered(lambda task:
-            task.recurrence_id.repeat_type != 'until' or
-            not task.date_deadline or task.recurrence_id.repeat_until and
-            (task.date_deadline + task.recurrence_id._get_recurrence_delta()).date() <= task.recurrence_id.repeat_until
-        )
-        if occurrences_from:
-            recurrence_by_task = {task: task.recurrence_id for task in occurrences_from}
-            tasks_copy = self.env['project.task'].create(
-                self._create_next_occurrences_values(recurrence_by_task)
+
+        def should_create_occurrence(task):
+            rec = task.recurrence_id.sudo()
+            return (
+                rec.repeat_type != 'until' or
+                not task.date_deadline or
+                rec.repeat_until and
+                (task.date_deadline + rec._get_recurrence_delta()).date() <= rec.repeat_until
             )
+
+        occurrences_from = occurrences_from.filtered(should_create_occurrence)
+
+        if occurrences_from:
+            recurrence_by_task = {task: task.recurrence_id.sudo() for task in occurrences_from}
+            tasks_copy = self.env['project.task'].sudo().create(
+                self._create_next_occurrences_values(recurrence_by_task)
+            ).sudo(False)
             occurrences_from._resolve_copied_dependencies(tasks_copy)
         return tasks_copy
 
     @api.model
     def _create_next_occurrences_values(self, recurrence_by_task):
-        tasks = self.env['project.task'].concat(*recurrence_by_task.keys())
+        tasks = self.env['project.task'].concat(recurrence_by_task.keys())
         list_create_values = []
         list_copy_data = tasks.with_context(copy_project=True, active_test=False).sudo().copy_data()
         list_fields_to_copy = tasks._read_format(self._get_recurring_fields_to_copy())

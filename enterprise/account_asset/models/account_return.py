@@ -10,7 +10,7 @@ class AccountReturn(models.Model):
         if 'check_fixed_assets' not in check_codes_to_ignore:
             domain = [
                 ('company_id', 'in', self.company_ids.ids),
-                ('state', '=', 'open'),
+                ('main_variant_state', '=', 'open'),
                 ('depreciation_move_ids', '!=', False),
                 ('depreciation_move_ids.date', '<=', fields.Date.to_string(self.date_to)),
                 ('depreciation_move_ids.date', '>=', fields.Date.to_string(self.date_from)),

@@ -4,7 +4,7 @@
         <field name="name">hr.employee.form.inherit.l10n_au_hr_payroll</field>
         <field name="model">hr.employee</field>
         <field name="priority" eval="110"/>
-        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="after">
                 <div
@@ -65,7 +65,7 @@
                         </span>
                     </div>
                     <field name="l10n_au_training_loan"/>
-                    <field name="l10n_au_medicare_variation_form" filename="l10n_au_medicare_variation_form_filename" widget="binary" invisible="l10n_au_employment_basis_code == 'C'"/>
+                    <field name="l10n_au_medicare_variation_form" widget="binary" invisible="l10n_au_employment_basis_code == 'C'"/>
                     <field name="l10n_au_medicare_surcharge" invisible="not l10n_au_medicare_variation_form or l10n_au_employment_basis_code == 'C'"/>
                     <field name="l10n_au_medicare_exemption" invisible="not l10n_au_medicare_variation_form or not l10n_au_tax_free_threshold or l10n_au_employment_basis_code == 'C'"/>
                     <field name="l10n_au_medicare_reduction" invisible="not l10n_au_tax_free_threshold or not l10n_au_medicare_variation_form or l10n_au_employment_basis_code == 'C'"/>
@@ -82,8 +82,7 @@
                         <field name="l10n_au_withholding_variation" nolabel="1" class="oe_inline"/>
                         <field name="l10n_au_withholding_variation_amount"
                             invisible="l10n_au_withholding_variation == 'none'" nolabel="1"
-                            widget="float" class="oe_inline o_input_6ch"/>
-                        <span invisible="l10n_au_withholding_variation == 'none'" class="opacity-50 p-2"> %</span>
+                            widget="percentage" class="oe_inline o_input_6ch"/>
                     </div>
                     <field name="l10n_au_additional_withholding_amount"/>
                 </group>
@@ -94,10 +93,9 @@
                     invisible="country_code != 'AU'">
                     <field name="l10n_au_eligible_for_leave_loading"/>
                     <field name="l10n_au_leave_loading" invisible="not l10n_au_eligible_for_leave_loading"/>
-                    <field name="l10n_au_leave_loading_leave_types" invisible="not l10n_au_eligible_for_leave_loading or l10n_au_leave_loading != 'once'">
+                    <field name="l10n_au_leave_loading_work_entry_types" invisible="not l10n_au_eligible_for_leave_loading or l10n_au_leave_loading != 'once'">
                         <list editable="bottom">
                             <field name="display_name"/>
-                            <field name="work_entry_type_id"/>
                         </list>
                     </field>
                     <field name="l10n_au_leave_loading_rate" invisible="not l10n_au_eligible_for_leave_loading or not l10n_au_leave_loading"/>

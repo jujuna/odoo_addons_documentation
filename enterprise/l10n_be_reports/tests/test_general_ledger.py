@@ -10,6 +10,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class BelgiumGeneralLedgerTest(AccountSalesReportCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountSalesReportCommon.setup_country('be')
     def setUpClass(cls):

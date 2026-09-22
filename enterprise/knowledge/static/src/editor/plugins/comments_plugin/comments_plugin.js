@@ -16,10 +16,9 @@ import {
     isListItemElement,
 } from "@html_editor/utils/dom_info";
 import { uniqueId } from "@web/core/utils/functions";
-import { effect } from "@web/core/utils/reactive";
-import { batched } from "@web/core/utils/timing";
 import { withSequence } from "@html_editor/utils/resource";
 import { isHtmlContentSupported } from "@html_editor/core/selection_plugin";
+import { effect } from "@odoo/owl";
 
 export class KnowledgeCommentsPlugin extends Plugin {
     static id = "knowledgeComments";
@@ -39,7 +38,7 @@ export class KnowledgeCommentsPlugin extends Plugin {
         user_commands: [
             {
                 id: "addComments",
-                icon: "fa-commenting-o",
+                icon: "mode_comment",
                 run: this.addCommentToSelection.bind(this),
                 isAvailable: isHtmlContentSupported,
             },
@@ -83,11 +82,11 @@ export class KnowledgeCommentsPlugin extends Plugin {
         ],
 
         /** Handlers */
-        layout_geometry_change_handlers: () => {
+        on_layout_geometry_change_handlers: () => {
             this.commentBeaconManager?.drawThreadOverlays();
             this.config.onLayoutGeometryChange();
         },
-        selectionchange_handlers: (selectionData) => {
+        on_selectionchange_handlers: (selectionData) => {
             if (
                 !selectionData.documentSelectionIsInEditable ||
                 !selectionData.editableSelection ||
@@ -106,22 +105,29 @@ export class KnowledgeCommentsPlugin extends Plugin {
             }
             this.commentBeaconManager.activateRelatedThread(target);
         },
-        restore_savepoint_handlers: this.updateBeacons.bind(this),
-        history_reset_handlers: () => this.updateBeacons(),
-        history_reset_from_steps_handlers: this.updateBeacons.bind(this),
-        step_added_handlers: () => this.commentBeaconManager.drawThreadOverlays(),
-        external_step_added_handlers: this.updateBeacons.bind(this),
-        clean_for_save_handlers: this.cleanForSave.bind(this),
-        normalize_handlers: this.normalize.bind(this),
+        on_savepoint_restored_handlers: this.updateBeacons.bind(this),
+        on_will_reset_history_handlers: () => this.updateBeacons(),
+        on_history_rebased_handlers: this.updateBeacons.bind(this),
+        on_committed_to_history_handlers: () => this.commentBeaconManager.drawThreadOverlays(),
+
+        /** Processors */
+        clean_for_save_processors: this.cleanForSave.bind(this),
+        normalize_processors: this.normalize.bind(this),
 
         /** Overrides */
         delete_forward_overrides: withSequence(1, this.handleDeleteForward.bind(this)),
         delete_backward_overrides: withSequence(1, this.handleDeleteBackward.bind(this)),
 
+        /** Providers */
         feff_providers: this.addFeffToBeacon.bind(this),
         selectors_for_feff_providers: () => ".oe_thread_beacon",
 
-        intangible_char_for_keyboard_navigation_predicates: this.arrowShouldSkip.bind(this),
+        /** Predicates */
+        is_char_tangible_for_keyboard_navigation_predicates: (ev, char, lastSkipped) => {
+            if (this.arrowShouldSkip(ev, char, lastSkipped)) {
+                return false;
+            }
+        },
     };
 
     setup() {
@@ -132,31 +138,29 @@ export class KnowledgeCommentsPlugin extends Plugin {
         // reset pending beacons
         let previousActiveThreadId;
         this.alive = true;
-        effect(
-            batched((state) => {
-                if (!this.alive) {
-                    return;
+        const disposeEffect = effect(() => {
+            if (!this.alive) {
+                return;
+            }
+            if (previousActiveThreadId === this.commentsState.activeThreadId) {
+                return;
+            }
+            if (
+                previousActiveThreadId !== "undefined" &&
+                this.commentsState.activeThreadId === "undefined"
+            ) {
+                this.commentBeaconManager.pendingBeacons = new Set();
+            } else if (previousActiveThreadId === "undefined") {
+                this.commentBeaconManager.sortThreads();
+                if (this.commentBeaconManager.bogusBeacons.size) {
+                    this.commentBeaconManager.removeBogusBeacons();
+                    this.dependencies.history.commit();
                 }
-                if (previousActiveThreadId === state.activeThreadId) {
-                    return;
-                }
-                if (
-                    previousActiveThreadId !== "undefined" &&
-                    state.activeThreadId === "undefined"
-                ) {
-                    this.commentBeaconManager.pendingBeacons = new Set();
-                } else if (previousActiveThreadId === "undefined") {
-                    this.commentBeaconManager.sortThreads();
-                    if (this.commentBeaconManager.bogusBeacons.size) {
-                        this.commentBeaconManager.removeBogusBeacons();
-                        this.dependencies.history.addStep();
-                    }
-                    this.commentBeaconManager.drawThreadOverlays();
-                }
-                previousActiveThreadId = state.activeThreadId;
-            }),
-            [this.commentsState]
-        );
+                this.commentBeaconManager.drawThreadOverlays();
+            }
+            previousActiveThreadId = this.commentsState.activeThreadId;
+        });
+        this._cleanups.push(disposeEffect);
         this.localOverlay =
             this.dependencies.localOverlay.makeLocalOverlay("KnowledgeThreadBeacons");
         this.commentBeaconManager = new CommentBeaconManager({
@@ -167,8 +171,8 @@ export class KnowledgeCommentsPlugin extends Plugin {
             peerId: this.peerId,
             removeBeacon: this.removeBeacon.bind(this),
             setSelection: this.dependencies.selection.setSelection,
-            onStep: () => {
-                this.dependencies.history.addStep();
+            commit: () => {
+                this.dependencies.history.commit();
             },
         });
         this.addDomListener(window, "click", this.onWindowClick.bind(this));
@@ -179,9 +183,7 @@ export class KnowledgeCommentsPlugin extends Plugin {
                 Component: KnowledgeCommentsHandler,
                 props: {
                     commentBeaconManager: this.commentBeaconManager,
-                    contentRef: {
-                        el: this.editable,
-                    },
+                    contentRef: () => this.editable,
                 },
             },
             { force: true }
@@ -389,7 +391,7 @@ export class KnowledgeCommentsPlugin extends Plugin {
         this.commentsState.displayMode = "handler";
         this.commentsService.createVirtualThread();
         this.commentsState.activeThreadId = "undefined";
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 
     canAddCommentToSelection() {
@@ -425,6 +427,7 @@ export class KnowledgeCommentsPlugin extends Plugin {
             }
             this.dependencies.protectedNode.setProtectingNode(beacon, true);
         }
+        return elem;
     }
 
     cleanZwnbsp(beacon) {
@@ -473,7 +476,7 @@ export class KnowledgeCommentsPlugin extends Plugin {
         this.localOverlay.remove();
     }
 
-    cleanForSave({ root }) {
+    cleanForSave(root) {
         const bogusIds = new Set(["undefined"]);
         for (const beacon of this.commentBeaconManager.bogusBeacons) {
             bogusIds.add(beacon.dataset.id);
@@ -487,5 +490,6 @@ export class KnowledgeCommentsPlugin extends Plugin {
                 delete beacon.dataset.peerId;
             }
         }
+        return root;
     }
 }

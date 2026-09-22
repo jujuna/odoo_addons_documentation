@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add('account_reports_hide_0_lines', {
-    url: '/odoo/action-account_reports.action_account_report_bs',
     steps: () => [
         {
             content: 'test if the Bank and Cash line is present (but the value is 0)',
@@ -14,8 +13,8 @@ registry.category("web_tour.tours").add('account_reports_hide_0_lines', {
             run: "click",
         },
         {
-            content: 'test if the Unallocated Earnings line is present (but value is different from 0 and so should be there after the hide_0_lines',
-            trigger: '.line_name:contains("Unallocated Earnings")',
+            content: 'test if the Earnings line is present (but value is different from 0 and so should be there after the hide_0_lines',
+            trigger: '.line_name:contains("Earnings")',
             run: "click",
         },
         {
@@ -29,8 +28,8 @@ registry.category("web_tour.tours").add('account_reports_hide_0_lines', {
             run: 'click',
         },
         {
-            content: 'test if the Unallocated Earnings line is still present',
-            trigger: '.line_name:contains("Unallocated Earnings")',
+            content: 'test if the Earnings line is still present',
+            trigger: '.line_name:contains("Earnings")',
             run: "click",
         },
         {
@@ -62,16 +61,15 @@ registry.category("web_tour.tours").add('account_reports_hide_0_lines', {
 });
 
 registry.category("web_tour.tours").add('account_reports_hide_0_lines_with_string_columns', {
-    url: '/odoo/action-account_reports.action_account_report_general_ledger',
     steps: () => [
         {
-            content: "Check if the 211000 Account Payable line is present (but the value is 0)",
-            trigger: ".name:contains('211000 Account Payable')",
+            content: "Check if the 211000 Accounts Payable line is present (but the value is 0)",
+            trigger: "td:contains('211000 Accounts Payable')",
             run: "click",
         },
         {
             content: "Check if the MISC item line is present with string values set up, but all amounts are at 0",
-            trigger: ".name:contains('Coucou les biloutes')",
+            trigger: "td:contains('Coucou les biloutes')",
         },
         {
             content: "Open options selector",
@@ -99,7 +97,7 @@ registry.category("web_tour.tours").add('account_reports_hide_0_lines_with_strin
         },
         {
             content: "Check again if the MISC item line is present (but the value is 0)",
-            trigger: ".name:contains('Coucou les biloutes')",
+            trigger: "td:contains('Coucou les biloutes')",
         },
     ]
 });

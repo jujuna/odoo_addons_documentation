@@ -19,6 +19,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 @tagged('post_install', '-at_install')
 class TestSubscriptionRenew(TestSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def default_env_context(cls):
         return {}
@@ -113,16 +115,14 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
 
         with freeze_time("2021-01-01"), patch.object(SaleOrder, '_get_unpaid_subscriptions', lambda x: []):
             self.subscription.plan_id.auto_close_limit = 5000  # don't close automatically contract if unpaid invoices
-            # so creation with mail tracking
-            context_mail = {'tracking_disable': False}
-            sub = self.env['sale.order'].with_context(context_mail).create({
+            sub = self.env['sale.order'].create({
                 'name': 'Parent Sub',
                 'is_subscription': True,
                 'note': "original subscription description",
                 'partner_id': self.user_portal.partner_id.id,
                 'sale_order_template_id': self.subscription_tmpl.id,
             })
-            free_sub = self.env['sale.order'].with_context(context_mail).create({
+            free_sub = self.env['sale.order'].create({
                 'name': 'Parent free Sub',
                 'is_subscription': True,
                 'note': "original subscription description",
@@ -138,7 +138,7 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
                     })],
             })
 
-            future_sub = self.env['sale.order'].with_context(context_mail).create({
+            future_sub = self.env['sale.order'].create({
                 'name': 'FutureSub',
                 'is_subscription': True,
                 'note': "original subscription description",
@@ -163,23 +163,21 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
             self.flush_tracking()
             self.assertEqual(sub.recurring_monthly, 21, "20 + 1 for both lines")
             self.assertEqual(sub.subscription_state, "3_progress")
-            self.env['sale.order'].with_context(tracking_disable=False)._cron_recurring_create_invoice()
+            self.env['sale.order']._cron_recurring_create_invoice()
         with freeze_time("2021-02-01"):
-            self.env['sale.order'].with_context(tracking_disable=False)._cron_recurring_create_invoice()
+            self.env['sale.order']._cron_recurring_create_invoice()
         with freeze_time("2021-03-01"):
-            self.env['sale.order'].with_context(tracking_disable=False)._cron_recurring_create_invoice()
+            self.env['sale.order']._cron_recurring_create_invoice()
         with freeze_time("2021-04-01"):
             # We create a renewal order in april for the new year
             self.env['sale.order']._cron_recurring_create_invoice()
-            action = sub.with_context(tracking_disable=False).prepare_renewal_order()
+            action = sub.prepare_renewal_order()
             renewal_so = self.env['sale.order'].browse(action['res_id'])
-            renewal_so = renewal_so.with_context(tracking_disable=False)
             renewal_so.order_line.product_uom_qty = 3
             renewal_so.name = "Renewal"
             self.flush_tracking()
-            action = free_sub.with_context(tracking_disable=False).prepare_renewal_order()
+            action = free_sub.prepare_renewal_order()
             free_renewal_so = self.env['sale.order'].browse(action['res_id'])
-            free_renewal_so = free_renewal_so.with_context(tracking_disable=False)
             free_renewal_so.order_line.write({'product_uom_qty': 2, 'price_unit': 0})
             self.flush_tracking()
             self.assertEqual(renewal_so.subscription_state, '2_renewal')
@@ -427,9 +425,7 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
         # 3) confirm the renewal
 
         with freeze_time("2021-01-01"), patch.object(SaleOrder, '_get_unpaid_subscriptions', lambda x: []):
-            # so creation with mail tracking
-            context_mail = {'tracking_disable': False}
-            sub = self.env['sale.order'].with_context(context_mail).create({
+            sub = self.env['sale.order'].create({
                 'name': 'Parent Sub',
                 'is_subscription': True,
                 'note': "original subscription description",
@@ -443,9 +439,8 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
             sub.action_confirm()
             sub._create_recurring_invoice()
             self.flush_tracking()
-            action = sub.with_context(tracking_disable=False).prepare_renewal_order()
+            action = sub.prepare_renewal_order()
             renewal_so = self.env['sale.order'].browse(action['res_id'])
-            renewal_so = renewal_so.with_context(tracking_disable=False)
             renewal_so.order_line.product_uom_qty = 3
             renewal_so.name = "Renewal"
             self.flush_tracking()
@@ -471,8 +466,7 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
         self.flush_tracking()
         with freeze_time("2024-01-22 08:00:00"):
             today = datetime.date.today()
-            context_mail = {'tracking_disable': False}
-            sub = self.env['sale.order'].with_context(context_mail).create({
+            sub = self.env['sale.order'].create({
                 'name': 'TestSubscription',
                 'is_subscription': True,
                 'note': "original subscription description",
@@ -488,11 +482,10 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
             sub.order_line.product_uom_qty = 2
             self.flush_tracking()
 
-            self.env['sale.order'].with_context(tracking_disable=False)._cron_recurring_create_invoice()
+            self.env['sale.order']._cron_recurring_create_invoice()
             self.flush_tracking()
-            action = sub.with_context(tracking_disable=False).prepare_renewal_order()
+            action = sub.prepare_renewal_order()
             renewal_so = self.env['sale.order'].browse(action['res_id'])
-            renewal_so = renewal_so.with_context(tracking_disable=False)
             renewal_so.order_line.product_uom_qty = 3
             renewal_so.name = "Renewal"
             self.flush_tracking()
@@ -528,9 +521,8 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
             self.assertEqual(self.subscription.plan_id, self.plan_month)
             self.subscription.action_confirm()
             self.subscription._create_recurring_invoice()
-            action = self.subscription.with_context(tracking_disable=False).prepare_renewal_order()
+            action = self.subscription.prepare_renewal_order()
             renewal_so = self.env['sale.order'].browse(action['res_id'])
-            renewal_so = renewal_so.with_context(tracking_disable=False)
             renewal_so.order_line.product_uom_qty = 3
             renewal_so.name = "Renewal"
             renewal_so.plan_id = self.plan_year
@@ -570,7 +562,7 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
         renew_so = self.env['sale.order'].browse(action['res_id'])
         self.assertEqual(renew_so.amount_total, 42)
         renew_so.pricelist_id = pricelist_eur.id
-        renew_so.action_update_prices()
+        renew_so._onchange_pricelist_id_recompute_prices()
         self.assertEqual(renew_so.amount_total, 420)
 
     def test_renew_pricelist_currency_update(self):
@@ -631,11 +623,9 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
 
             # Assert that parent_line_id is saved in renewed subscription.
             self.assertEqual(renewal_so.order_line[0].parent_line_id.id, sub.order_line[0].id, "The parent line of the order line should have been saved after subscription renewal.")
-            renewal_so.pricelist_id = other_pricelist.id
 
-            # Computes the updated price unit through 'Update Prices' button.
-            renewal_so.action_update_prices()
-            renewal_so.invalidate_recordset()
+            renewal_so.pricelist_id = other_pricelist.id
+            renewal_so._onchange_pricelist_id_recompute_prices()
 
             # Assert that updated pricing has the correct currency, price_unit and pricelist.
             self.assertEqual(renewal_so.pricelist_id.id, other_pricelist.id, "Pricelist must update to the new one (in EUR) after performing a manual update.")
@@ -724,6 +714,30 @@ class TestSubscriptionRenew(TestSubscriptionCommon):
         })
         self.subscription.action_confirm()
         self.subscription._create_recurring_invoice()
-        action = self.subscription.with_context(tracking_disable=False).prepare_renewal_order()
+        action = self.subscription.prepare_renewal_order()
         renewal_so = self.env['sale.order'].browse(action['res_id'])
         self.assertFalse(renewal_so.duplicated_order_ids, "Renewal qutation should not marked as duplicate order and not show warning")
+
+    def test_renewal_productless(self):
+        """
+        Test that a renewal order can be created for a subscription that has no products in its order lines.
+        """
+        subscription = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'plan_id': self.plan_month.id,
+            'order_line': [
+                Command.create({
+                    'name': "Productless Line",
+                    'product_uom_qty': 2,
+                    'price_unit': 100,
+                }),
+            ],
+        })
+
+        subscription.action_confirm()
+        subscription._create_recurring_invoice()
+
+        action = subscription.prepare_renewal_order()
+        renewal_so = self.env['sale.order'].browse(action['res_id'])
+        renewal_line = renewal_so.order_line.filtered(lambda l: not l.display_type)
+        self.assertEqual(len(renewal_line), 1)

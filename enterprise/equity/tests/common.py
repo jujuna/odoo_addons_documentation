@@ -7,15 +7,13 @@ class TestEquityCommon(TransactionCase):
         super().setUpClass()
         cls.company = cls.env['res.partner'].create({
             'name': 'Company',
-            'is_company': True,
+            'email': 'company@example.com',
         })
         cls.contact_1 = cls.env['res.partner'].create({
             'name': 'Company Holder 1',
-            'is_company': False,
         })
         cls.contact_2 = cls.env['res.partner'].create({
             'name': 'Company Holder 2',
-            'is_company': False,
         })
 
         cls.share_class_ord = cls.env['equity.security.class'].create({'name': 'ORD'})

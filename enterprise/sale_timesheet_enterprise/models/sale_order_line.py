@@ -21,7 +21,7 @@ class SaleOrderLine(models.Model):
     def _timesheet_compute_delivered_quantity_domain(self):
         domain = super()._timesheet_compute_delivered_quantity_domain()
         # force to use only the validated timesheet
-        param_invoiced_timesheet = self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET)
+        param_invoiced_timesheet = self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET
         if param_invoiced_timesheet == 'approved':
             domain = Domain.AND([domain, [('validated', '=', True)]])
         return domain

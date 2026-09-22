@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields
 from odoo.tests import tagged
 
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
 @tagged('post_install', '-at_install')
 class TestReports(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -18,7 +19,7 @@ class TestReports(TestAccountReportsCommon):
         The wizard in documents_account overrides the one in account_reports.
         This test makes sure that the folder_id and tag_ids are properly set on get_attachment_vals()
         '''
-        options = self._generate_options(self.report, fields.Date.from_string('2017-02-01'), fields.Date.from_string('2017-02-01'))
+        options = self._generate_options(self.report, '2017-02-01', '2017-02-01')
 
         action = self.report.open_report_export_wizard(options)
 

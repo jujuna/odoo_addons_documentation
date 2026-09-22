@@ -66,7 +66,7 @@ class MarketingAutomationActivity extends models.Model {
 defineModels([MarketingAutomationCampaign, MarketingAutomationActivity]);
 defineMailModels();
 
-test("render basic hierarchy kanban", async () => {
+test.skip("render basic hierarchy kanban", async () => {
     await mountView({
         type: "form",
         resModel: "marketing.automation.campaign",

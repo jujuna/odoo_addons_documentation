@@ -4,6 +4,7 @@ export class HelpdeskTicket extends models.Model {
     _name = "helpdesk.ticket";
 
     name = fields.Char({ string: "Name" });
+    partner_id = fields.Many2one({ relation: "res.partner" });
     sla_status_ids = fields.One2many({ string: "SLA's", relation: "helpdesk.sla.status" });
     sla_deadline = fields.Date({
         string: "SLA Deadline",

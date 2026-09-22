@@ -3,27 +3,36 @@
 # * appointment_hr
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Kira Petersen François (peti)" <peti@odoo.com>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-09-25 13:36+0000\n"
+"POT-Creation-Date: 2026-08-28 18:00+0000\n"
+"PO-Revision-Date: 2026-09-18 01:50+0000\n"
 "Last-Translator: \"Kira Petersen François (peti)\" <peti@odoo.com>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "appointment_hr/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: appointment_hr
+#: model:ir.module.module,description:base.module_appointment_hr
+msgid ""
+"\n"
+"Take into account the working schedule (sick leaves, part time, ...) of "
+"employees when scheduling appointments\n"
+"--------------------------------------------------------------------------------------------------------------\n"
+msgstr ""
 
 #. module: appointment_hr
 #: model_terms:ir.ui.view,arch_db:appointment_hr.appointment_type_view_form_inherit_appointment_hr
 msgid "<span>enforced</span>"
-msgstr ""
+msgstr "<span>gennemført</span>"
 
 #. module: appointment_hr
 #: model:ir.model,name:appointment_hr.model_appointment_type
@@ -39,11 +48,16 @@ msgstr "Kalenderbegivenhed"
 #: model:ir.model.fields,field_description:appointment_hr.field_appointment_type__display_name
 #: model:ir.model.fields,field_description:appointment_hr.field_calendar_event__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: appointment_hr
 #: model:ir.model.fields,field_description:appointment_hr.field_appointment_type__work_hours_activated
 msgid "Employee Schedule"
+msgstr "Medarbejderplan"
+
+#. module: appointment_hr
+#: model:ir.module.module,shortdesc:base.module_appointment_hr
+msgid "Employees on Appointments"
 msgstr ""
 
 #. module: appointment_hr
@@ -51,3 +65,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:appointment_hr.field_calendar_event__id
 msgid "ID"
 msgstr "ID"
+
+#. module: appointment_hr
+#: model:ir.module.module,summary:base.module_appointment_hr
+msgid "Manage Appointments with Employees"
+msgstr ""
+
+#. module: appointment_hr
+#: model:ir.model.fields,help:appointment_hr.field_appointment_type__work_hours_activated
+msgid ""
+"Takes the employee working hours into account in availabilities.\n"
+"        Note that calendar events where you're marked as \"busy\" are always "
+"taken into account, regardless of this setting."
+msgstr ""
+"Tager højde for medarbejderens arbejdstid, når tilgængeligheden vises.\n"
+"        Bemærk, at kalenderarrangementer, hvor du er markeret som "
+"\"optaget\", altid påvirker tilgængeligheden, uanset denne indstilling."

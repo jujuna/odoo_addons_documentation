@@ -27,7 +27,7 @@
                     <cbc:DocumentType><t t-out="related_document"/></cbc:DocumentType>
                     <cac:IssuerParty t-if="record.l10n_pe_edi_related_document_type in ('01', '03', '04', '09', '12', '48')">
                         <cac:PartyIdentification>
-                            <cbc:ID t-att-schemeID="record.company_id.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code"
+                            <cbc:ID t-att-schemeID="record.company_id.partner_id.l10n_pe_sunat_id_code"
                                 schemeName="Documento de Identidad"
                                 schemeAgencyName="PE:SUNAT"
                                 schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.company_id.vat'/></cbc:ID>
@@ -37,7 +37,7 @@
                 <cac:DespatchSupplierParty>
                     <cac:Party>
                         <cac:PartyIdentification>
-                            <cbc:ID t-att-schemeID="record.company_id.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code"
+                            <cbc:ID t-att-schemeID="record.company_id.partner_id.l10n_pe_sunat_id_code"
                                 schemeName="Documento de Identidad"
                                 schemeAgencyName="PE:SUNAT"
                                 schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.company_id.vat'/></cbc:ID>
@@ -50,26 +50,26 @@
                 <cac:DeliveryCustomerParty>
                     <cac:Party>
                         <cac:PartyIdentification>
-                            <cbc:ID t-att-schemeID="record.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code"
+                            <cbc:ID t-att-schemeID="partner.l10n_pe_sunat_id_code"
                                 schemeName="Documento de Identidad"
                                 schemeAgencyName="PE:SUNAT"
-                                schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.partner_id.vat'/></cbc:ID>
+                                schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='partner.l10n_pe_sunat_id_value'/></cbc:ID>
                         </cac:PartyIdentification>
                         <cac:PartyLegalEntity>
-                            <cbc:RegistrationName><t t-out='record.partner_id.commercial_partner_id.name'/></cbc:RegistrationName>
+                            <cbc:RegistrationName><t t-out='partner.commercial_partner_id.name'/></cbc:RegistrationName>
                         </cac:PartyLegalEntity>
                     </cac:Party>
                 </cac:DeliveryCustomerParty>
                 <cac:BuyerCustomerParty t-if="record.l10n_pe_edi_reason_for_transfer in ('03', '13')">
                     <cac:Party>
                         <cac:PartyIdentification>
-                            <cbc:ID t-att-schemeID="record.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code"
+                            <cbc:ID t-att-schemeID="partner.l10n_pe_sunat_id_code"
                                 schemeName="Documento de Identidad"
                                 schemeAgencyName="PE:SUNAT"
-                                schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.partner_id.vat'/></cbc:ID>
+                                schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='partner.l10n_pe_sunat_id_value'/></cbc:ID>
                         </cac:PartyIdentification>
                         <cac:PartyLegalEntity>
-                            <cbc:RegistrationName><t t-out='record.partner_id.commercial_partner_id.name'/></cbc:RegistrationName>
+                            <cbc:RegistrationName><t t-out='partner.commercial_partner_id.name'/></cbc:RegistrationName>
                         </cac:PartyLegalEntity>
                     </cac:Party>
                 </cac:BuyerCustomerParty>
@@ -90,10 +90,10 @@
                         </cac:TransitPeriod>
                         <cac:CarrierParty>
                             <cac:PartyIdentification t-if="record.l10n_pe_edi_transport_type == '01'">
-                                <cbc:ID t-att-schemeID="record.l10n_pe_edi_operator_id.l10n_latam_identification_type_id.l10n_pe_vat_code"
+                                <cbc:ID t-att-schemeID="record.l10n_pe_edi_operator_id.l10n_pe_sunat_id_code"
                                     schemeName="Documento de Identidad"
                                     schemeAgencyName="PE:SUNAT"
-                                    schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.l10n_pe_edi_operator_id.vat'/></cbc:ID>
+                                    schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.l10n_pe_edi_operator_id.l10n_pe_sunat_id_value'/></cbc:ID>
                            </cac:PartyIdentification>
                            <cac:PartyLegalEntity>
                                <cbc:RegistrationName t-if="record.l10n_pe_edi_transport_type == '01'"><t t-out='record.l10n_pe_edi_operator_id.name'/></cbc:RegistrationName>
@@ -109,11 +109,14 @@
                                     </cac:PartyLegalEntity>
                                </cac:AgentParty>
                         </cac:CarrierParty>
+                        <cac:LoadingTransportEvent t-if="record.l10n_pe_edi_transport_type == '01'">
+                            <cbc:OccurrenceDate t-out='format_date(record.l10n_pe_edi_departure_start_date)'/>
+                        </cac:LoadingTransportEvent>
                         <cac:DriverPerson t-if="record.l10n_pe_edi_transport_type == '02' and not record.l10n_pe_edi_vehicle_id.is_m1l">
-                            <cbc:ID t-att-schemeID="record.l10n_pe_edi_operator_id.l10n_latam_identification_type_id.l10n_pe_vat_code"
+                            <cbc:ID t-att-schemeID="record.l10n_pe_edi_operator_id.l10n_pe_sunat_id_code"
                                 schemeName="Documento de Identidad"
                                 schemeAgencyName="PE:SUNAT"
-                                schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.l10n_pe_edi_operator_id.vat'/></cbc:ID>
+                                schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06"><t t-out='record.l10n_pe_edi_operator_id.l10n_pe_sunat_id_value'/></cbc:ID>
                             <cbc:FirstName><t t-out='record.l10n_pe_edi_operator_id.name'/></cbc:FirstName>
                             <cbc:FamilyName><t t-out='record.l10n_pe_edi_operator_id.name'/></cbc:FamilyName>
                             <cbc:JobTitle>Principal</cbc:JobTitle>
@@ -125,15 +128,15 @@
                     <cac:Delivery>
                         <cac:DeliveryAddress>
                             <cbc:ID schemeName="Ubigeos"
-                                schemeAgencyName="PE:INEI"><t t-out="record.partner_id.l10n_pe_district.code"/></cbc:ID>
-                            <t t-if="record.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code == '6'">
+                                schemeAgencyName="PE:INEI"><t t-out="delivery_address.l10n_pe_district.code"/></cbc:ID>
+                            <t t-if="partner.l10n_pe_sunat_id_code == '6'">
                                 <cbc:AddressTypeCode
-                                    t-att-listID="record.partner_id.vat"
+                                    t-att-listID="partner.vat"
                                     listAgencyName="PE:SUNAT"
                                     listName="Establecimientos anexos">0</cbc:AddressTypeCode>
                             </t>
                             <cac:AddressLine>
-                                <cbc:Line><t t-out="'%s %s %s %s' % (record.partner_id.street or '', record.partner_id.l10n_pe_district.name or '', record.partner_id.city or '', record.partner_id.state_id.name or '')"/></cbc:Line>
+                                <cbc:Line><t t-out="'%s %s %s %s' % (delivery_address.street or '', delivery_address.l10n_pe_district.name or '', delivery_address.city or '', delivery_address.state_id.name or '')"/></cbc:Line>
                             </cac:AddressLine>
                         </cac:DeliveryAddress>
                         <cac:Despatch>
@@ -163,7 +166,7 @@
                 <t t-foreach="moves" t-as="move">
                     <cac:DespatchLine>
                         <cbc:ID t-out="move_index + 1"/>
-                        <cbc:DeliveredQuantity t-att-unitCode="move.product_uom.l10n_pe_edi_measure_unit_code"
+                        <cbc:DeliveredQuantity t-att-unitCode="move.uom_id.l10n_pe_edi_measure_unit_code"
                             unitCodeListID="UN/ECE rec 20"
                             unitCodeListAgencyName="United Nations Economic Commission for Europe"><t t-out='format_float(move.quantity, 10)'/></cbc:DeliveredQuantity>
                         <cac:OrderLineReference>

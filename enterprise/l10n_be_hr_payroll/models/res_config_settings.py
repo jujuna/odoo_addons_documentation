@@ -6,56 +6,6 @@ from odoo import fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    default_commission_on_target = fields.Float(
-        string="Commission on Target",
-        default_model="hr.version")
-    default_fuel_card = fields.Float(
-        string="Fuel Card",
-        default_model="hr.version")
-    default_representation_fees = fields.Float(
-        string="Representation Fees",
-        default_model="hr.version")
-    default_internet = fields.Float(
-        string="Internet",
-        default_model="hr.version")
-    default_mobile = fields.Float(
-        string="Mobile",
-        default_model="hr.version")
-    default_meal_voucher_amount = fields.Float(
-        string="Meal Vouchers",
-        default_model="hr.version")
-    default_eco_checks = fields.Float(
-        string="Eco Vouchers",
-        default_model="hr.version")
-    onss_company_id = fields.Char(
-        related='company_id.onss_company_id',
-        readonly=False)
-    onss_registration_number = fields.Char(
-        related='company_id.onss_registration_number',
-        readonly=False)
-    dmfa_employer_class = fields.Char(
-        related='company_id.dmfa_employer_class',
-        readonly=False)
-    l10n_be_company_number = fields.Char(
-        'Company Number',
-        related='company_id.l10n_be_company_number',
-        readonly=False)
-    l10n_be_revenue_code = fields.Char(
-        'Revenue Code',
-        related='company_id.l10n_be_revenue_code',
-        readonly=False)
-    hospital_insurance_amount_child = fields.Float(
-        string="Hospital Insurance Amount per Child",
-        config_parameter='hr_contract_salary.hospital_insurance_amount_child')
-    hospital_insurance_amount_adult = fields.Float(
-        string="Hospital Insurance Amount per Adult",
-        config_parameter='hr_contract_salary.hospital_insurance_amount_adult')
-    default_l10n_be_canteen_cost = fields.Float(
-        string="Canteen Cost",
-        default_model="hr.version")
-    l10n_be_ffe_employer_type = fields.Selection(
-        related='company_id.l10n_be_ffe_employer_type', string='Ffe Employer Type',
-        readonly=False)
     onss_expeditor_number = fields.Char(
         related="company_id.onss_expeditor_number",
         readonly=False,
@@ -63,14 +13,6 @@ class ResConfigSettings(models.TransientModel):
     onss_certificate_id = fields.Many2one(
         related="company_id.onss_certificate_id",
         readonly=False)
-    accident_insurance_name = fields.Char(
-        related="company_id.accident_insurance_name",
-        readonly=False,
-        groups="hr_payroll.group_hr_payroll_user")
-    accident_insurance_number = fields.Char(
-        related="company_id.accident_insurance_number",
-        readonly=False,
-        groups="hr_payroll.group_hr_payroll_user")
     onss_technical_user_name = fields.Char(
         related="company_id.onss_technical_user_name",
         readonly=False,
@@ -79,10 +21,53 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.onss_sftp_private_key",
         readonly=False,
         groups="hr_payroll.group_hr_payroll_user")
-
-    # Deprecated
-    l10n_be_legal_time_off_type = fields.Many2one(
-        related='company_id.l10n_be_legal_time_off_type',
+    nsso_immatriculation_date = fields.Date(
+        related="company_id.nsso_immatriculation_date",
         readonly=False,
-        groups='hr_payroll.group_hr_payroll_user'
+        groups="hr_payroll.group_hr_payroll_user")
+    l10n_be_dimona_environment = fields.Selection(
+        related='company_id.l10n_be_dimona_environment',
+        readonly=False,
+        groups='hr_payroll.group_hr_payroll_user')
+    module_pos_blackbox_be = fields.Boolean(string="POS Blackbox BE")
+    l10n_be_cash_register_active = fields.Boolean(
+        related='company_id.l10n_be_cash_register_active',
+        readonly=False)
+    l10n_be_cash_register_number = fields.Char(
+        related='company_id.l10n_be_cash_register_number',
+        readonly=False)
+    l10n_be_cash_register_registration_start = fields.Date(
+        related='company_id.l10n_be_cash_register_registration_start',
+        readonly=False)
+    l10n_be_cash_register_registration_end = fields.Date(
+        related='company_id.l10n_be_cash_register_registration_end',
+        readonly=False)
+    l10n_be_daily_registration_recording = fields.Selection(
+        related='company_id.l10n_be_daily_registration_recording',
+        readonly=False)
+    l10n_be_employer_category_has_cp302 = fields.Boolean(
+        related='company_id.l10n_be_employer_category_has_cp302')
+    l10n_be_max_unused_cars = fields.Integer(string='Maximum unused cars', default=5,
+        related="company_id.l10n_be_max_unused_cars", readonly=False, store=True
     )
+    l10n_be_temporary_car_option = fields.Boolean(related="company_id.l10n_be_temporary_car_option",
+        readonly=False, store=True)
+    l10n_be_cbe_inscription = fields.Date(
+        related='company_id.l10n_be_cbe_inscription',
+        readonly=False,
+        groups="hr_payroll.group_hr_payroll_user",
+    )
+    l10n_be_has_white_cash_register = fields.Boolean(
+        related='company_id.l10n_be_has_white_cash_register',
+        readonly=False
+    )
+
+    def action_open_hr_payroll_localization(self):
+        return {
+            'name': self.env._('Payroll Localization'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'payroll.config.settings',
+            'view_mode': 'list,form',
+            'domain': [('company_id', '=', self.company_id.id)],
+            'target': 'current',
+        }

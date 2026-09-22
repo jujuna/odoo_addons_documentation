@@ -94,14 +94,11 @@ class EsgDashboard(Controller):
         }
 
     def _get_carbon_analytics_section_data(self):
-        has_unassigned_emissions = request.env['account.move.line'].search_count([
+        has_unassigned_emissions = request.env['esg.carbon.emission.report'].search_count([
             ('esg_emission_factor_id', '=', False),
-            ('quantity', '>', 0),
-            ('parent_state', '=', 'posted'),
-            ('account_id.account_type', 'in', request.env['account.account'].ESG_VALID_ACCOUNT_TYPES),
         ], limit=1)
         return {
-            'has_unassigned_emissions':  has_unassigned_emissions,
+            'has_unassigned_emissions':  bool(has_unassigned_emissions),
         }
 
     def _build_data_per_month(self, start_date, end_date):
@@ -219,6 +216,19 @@ class EsgDashboard(Controller):
                 section_data['last_year_percentage'] = round(((current_month_value - last_year_value) / last_year_value) * 100, 2)
         return section_data
 
+    def _get_action_box_data(self):
+        total_count = self.env['esg.action'].search_count([])
+        undefined_count = self.env['esg.action'].search_count([('has_target', '=', False)])
+        reached_count = self.env['esg.action'].search_count([('is_reached', '=', True)])
+        not_reached_count = total_count - undefined_count - reached_count
+
+        return {
+            'total_count': total_count,
+            'reached_count': reached_count,
+            'not_reached_count': not_reached_count,
+            'undefined_count': undefined_count,
+        }
+
     def _get_dashboard_data(self):
         end_date = date.today()
         # Create data for bar chart grouped by scope
@@ -234,6 +244,8 @@ class EsgDashboard(Controller):
         graph_config_per_month = self._build_graph_config_per_month(data_per_month['data'], data_per_month['is_sample'])
         carbon_footprint_section_data = self._get_carbon_footprint_section_data(data_per_month['data'], data_per_month['is_sample'])
 
+        action_box_data = self._get_action_box_data() if self.env.user.has_group('esg.esg_group_manager') else None
+
         return {
             'carbon_analytics_box': {
                 'graph_config': graph_config_per_scope,
@@ -244,6 +256,7 @@ class EsgDashboard(Controller):
                 'last_months_percentage': carbon_footprint_section_data['last_months_percentage'],
                 'last_year_percentage': carbon_footprint_section_data['last_year_percentage'],
             },
+            'action_box': action_box_data,
         }
 
     @route('/esg/dashboard', type='jsonrpc', auth='user')

@@ -1,43 +1,40 @@
-import { Component, toRaw } from "@odoo/owl";
-
+import { Component, t, useProps } from "@odoo/owl";
+import { Session } from "@voip/core/web/session";
 import { ActionButton } from "@voip/softphone/action_button";
 import { useService } from "@web/core/utils/hooks";
 
 export class CallBanner extends Component {
     static components = { ActionButton };
-    static props = { call: Object };
     static template = "voip.CallBanner";
 
+    props = useProps({
+        backSession: t.instanceOf(Session),
+        isFirst: t.boolean().optional(),
+    });
+
     setup() {
-        this.userAgent = useService("voip.user_agent");
-        this.softphone = useService("voip").softphone;
+        const voip = useService("voip");
+        this.userAgent = voip.userAgent;
+    }
+
+    get backSession() {
+        return this.props.backSession;
     }
 
     get contactName() {
-        return this.props.call?.partner_id?.voipName || this.props.call?.phone_number || "";
-    }
-
-    get isCallOnHold() {
-        return toRaw(this.userAgent.activeSession) === toRaw(this.userAgent.mainSession)
-            ? this.userAgent.mainSession?.isOnHold
-            : this.userAgent.transferSession?.isOnHold;
+        return (
+            this.backSession.alias ||
+            this.backSession.call?.partner_id?.voipName ||
+            this.backSession.displayedPhoneNumber ||
+            ""
+        );
     }
 
     onClickHangUp() {
-        this.userAgent.hangup({
-            session:
-                toRaw(this.userAgent.activeSession) === toRaw(this.userAgent.mainSession)
-                    ? this.userAgent.transferSession
-                    : this.userAgent.mainSession,
-        });
+        this.backSession.hangup();
     }
 
     onClickSwitchCall() {
-        this.userAgent.activeSession.isOnHold = true;
-        this.userAgent.activeSession =
-            toRaw(this.userAgent.activeSession) === toRaw(this.userAgent.mainSession)
-                ? this.userAgent.transferSession
-                : this.userAgent.mainSession;
-        this.userAgent.activeSession.isOnHold = false;
+        this.userAgent.promoteToFront(this.backSession.key);
     }
 }

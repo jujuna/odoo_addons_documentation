@@ -10,19 +10,7 @@ class HrJob(models.Model):
     job_post_count = fields.Integer(
         compute='_compute_job_post_count', string='Number of Job Posts', groups="hr_recruitment.group_hr_recruitment_user")
     job_post_ids = fields.One2many('hr.job.post', 'job_id', string='Job Posts', groups="hr_recruitment.group_hr_recruitment_user")
-    currency_id = fields.Many2one(
-        'res.currency', related='company_id.currency_id', readonly=True, groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")
-    salary_min = fields.Monetary('Minimum Salary', currency_field='currency_id', groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")
-    salary_max = fields.Monetary('Maximum Salary', currency_field='currency_id', groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")
-    payment_interval = fields.Selection([
-        ('hourly', 'Hour'),
-        ('daily', 'Day'),
-        ('weekly', 'Week'),
-        ('biweekly', 'Bi-Week'),
-        ('monthly', 'Month'),
-        ('yearly', 'Year'),
-    ], string='Salary Time Unit', default='monthly', required=True, groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")
-    schedule_id = fields.Many2one('resource.calendar', string='Working Schedule', groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")
+    schedule_id = fields.Many2one('resource.calendar', string='Working Schedule', groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user", check_company=True)
     date_from = fields.Date(help="Is set, update applicants availability once hired for that specific mission.", groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")
     date_to = fields.Date(groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")
 
@@ -31,11 +19,6 @@ class HrJob(models.Model):
         for job in self:
             open_posts = job.job_post_ids.filtered(lambda post: post.status != 'deleted')
             job.job_post_count = len(open_posts)
-
-    @api.onchange('salary_min', 'salary_max', 'payment_interval')
-    def _onchange_salary(self):
-        if self.salary_min > self.salary_max:
-            self.salary_min, self.salary_max = self.salary_max, self.salary_min
 
     def write(self, vals):
         res = super().write(vals)

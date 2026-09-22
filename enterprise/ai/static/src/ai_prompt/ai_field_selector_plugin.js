@@ -16,12 +16,12 @@ export class AIFieldSelectorPlugin extends Plugin {
                 id: "openAIFieldSelector",
                 title: _t("Field Selector"),
                 description: _t("Insert a field"),
-                icon: _t("fa-hashtag"),
+                icon: _t("tag"),
                 run: () => this.open(),
                 isAvailable: isHtmlContentSupported,
             },
         ],
-        normalize_handlers: withSequence(-1, this.normalize.bind(this)),
+        normalize_processors: withSequence(-1, this.normalize.bind(this)),
         powerbox_categories: { id: "ai_prompt_tools", name: _t("AI Prompt Tools") },
         powerbox_items: { categoryId: "ai_prompt_tools", commandId: "openAIFieldSelector" },
         selectors_for_feff_providers: () => AI_FIELD_SELECTOR,
@@ -40,6 +40,7 @@ export class AIFieldSelectorPlugin extends Plugin {
         for (const fieldEl of element.querySelectorAll(AI_FIELD_SELECTOR)) {
             fieldEl.dataset.oeProtected = true;
         }
+        return element;
     }
 
     open(fieldsPath) {
@@ -48,7 +49,7 @@ export class AIFieldSelectorPlugin extends Plugin {
                 close: this.close.bind(this),
                 resModel: this.config.fieldSelectorResModel,
                 aiFieldPath: this.config.aiFieldPath,
-                followRelations: true,
+                followRelation: true,
                 isDebugMode: this.config.debug,
                 showSearchInput: true,
                 update: (path, field) => {},
@@ -81,6 +82,6 @@ export class AIFieldSelectorPlugin extends Plugin {
             this.dependencies.dom.insert(span);
             this.dependencies.dom.insert(fieldInfo === fieldsInfo.at(-1) ? "\u00A0" : ", ");
         }
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 }

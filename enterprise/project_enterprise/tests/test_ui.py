@@ -49,4 +49,4 @@ class ProjectEnterpriseTestUi(HttpCase):
         task.create(task._convert_to_write(task._cache))
 
     def test_01_ui(self):
-        self.start_tour("/", 'project_test_tour', login='admin')
+        self.start_tour("/odoo", 'project_test_tour', login='admin')

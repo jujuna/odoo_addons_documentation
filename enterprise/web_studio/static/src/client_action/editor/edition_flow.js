@@ -1,6 +1,7 @@
+import { useEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
 import { rpc, rpcBus } from "@web/core/network/rpc";
-import { toRaw, useState, useEnv, reactive, onMounted, onWillUnmount, markRaw } from "@odoo/owl";
+import { effect, toRaw, onMounted, onWillUnmount, markRaw, proxy } from "@odoo/owl";
 import { Reactive } from "@web_studio/client_action/utils";
 
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
@@ -30,7 +31,8 @@ export class EditionFlow extends Reactive {
             }
             requestId = studio.requestId;
         };
-        const studio = reactive(this.studio, () => updateBreadcrumbs(studio));
+        const studio = proxy(this.studio);
+        this.dispose = effect(() => updateBreadcrumbs(studio));
         this.studio = studio;
         this.breadcrumbs = [];
         updateBreadcrumbs(studio);
@@ -92,10 +94,10 @@ export function useEditorBreadcrumbs(initialCrumb) {
     const editionFlow = env.editionFlow;
 
     if (initialCrumb && !editionFlow.breadcrumbs.length) {
-        onMounted(() => editionFlow.pushBreadcrumb(initialCrumb));
+        onMounted(() => toRaw(editionFlow).pushBreadcrumb(initialCrumb));
     }
 
-    const crumbs = useState(editionFlow.breadcrumbs);
+    const crumbs = proxy(editionFlow.breadcrumbs);
     const push = (crumb) => editionFlow.pushBreadcrumb(crumb);
     return { crumbs, push };
 }

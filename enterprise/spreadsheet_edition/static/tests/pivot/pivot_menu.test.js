@@ -82,13 +82,13 @@ test("re-insert PIVOT day_of_week with order from the server", async function ()
         ["Friday"],
         ["Saturday"],
     ]);
-    expect(getCell(model, "A3").content).toBe('=PIVOT.HEADER(1,"date:day_of_week",7)');
-    expect(getCell(model, "A4").content).toBe('=PIVOT.HEADER(1,"date:day_of_week",1)');
-    expect(getCell(model, "A5").content).toBe('=PIVOT.HEADER(1,"date:day_of_week",2)');
-    expect(getCell(model, "A6").content).toBe('=PIVOT.HEADER(1,"date:day_of_week",3)');
-    expect(getCell(model, "A7").content).toBe('=PIVOT.HEADER(1,"date:day_of_week",4)');
-    expect(getCell(model, "A8").content).toBe('=PIVOT.HEADER(1,"date:day_of_week",5)');
-    expect(getCell(model, "A9").content).toBe('=PIVOT.HEADER(1,"date:day_of_week",6)');
+    expect(getCell(model, "A3").compiledFormula.toFormulaString(model.getters)).toBe('=PIVOT.HEADER(1,"date:day_of_week",7)');
+    expect(getCell(model, "A4").compiledFormula.toFormulaString(model.getters)).toBe('=PIVOT.HEADER(1,"date:day_of_week",1)');
+    expect(getCell(model, "A5").compiledFormula.toFormulaString(model.getters)).toBe('=PIVOT.HEADER(1,"date:day_of_week",2)');
+    expect(getCell(model, "A6").compiledFormula.toFormulaString(model.getters)).toBe('=PIVOT.HEADER(1,"date:day_of_week",3)');
+    expect(getCell(model, "A7").compiledFormula.toFormulaString(model.getters)).toBe('=PIVOT.HEADER(1,"date:day_of_week",4)');
+    expect(getCell(model, "A8").compiledFormula.toFormulaString(model.getters)).toBe('=PIVOT.HEADER(1,"date:day_of_week",5)');
+    expect(getCell(model, "A9").compiledFormula.toFormulaString(model.getters)).toBe('=PIVOT.HEADER(1,"date:day_of_week",6)');
 });
 
 test("Insert pivot from odoo model", async () => {

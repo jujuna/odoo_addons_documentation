@@ -6,6 +6,8 @@ from odoo.fields import Command
 
 class TestAccountBudgetCommon(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

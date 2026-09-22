@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
+from odoo.tools import BinaryBytes
 
 from dateutil.relativedelta import relativedelta
-
-import base64
 
 MAX_PAYMENT_AMOUNT = 999999999.99
 
@@ -15,7 +13,7 @@ class AccountBatchPayment(models.Model):
     _inherit = 'account.batch.payment'
 
     bacs_multi_mode = fields.Boolean(string="BACS Multi Mode", help="Payments in batch get processed on their individual date.",)
-    bacs_processing_date = fields.Date(string="BACS Processing Date", default=fields.Date.today(), help="The processing day of the BACS transaction.")
+    bacs_processing_date = fields.Date(string="BACS Processing Date", default=fields.Date.context_today, help="The processing day of the BACS transaction.")
     bacs_expiry_date = fields.Date(string="BACS Expiry Date", help="The date on which the file will expire.")
     bacs_submission_serial = fields.Char(string="BACS Submission Serial", store=True, default=lambda self: self._default_bacs_submission_serial())
 
@@ -36,7 +34,7 @@ class AccountBatchPayment(models.Model):
         if self.date:
             day_of_year = self.date.strftime('%j')
         else:
-            day_of_year = fields.Date.today().strftime('%j')
+            day_of_year = fields.Date.context_today(self).strftime('%j')
         sequence = 1
         last_submission = self.search(
             [
@@ -58,11 +56,12 @@ class AccountBatchPayment(models.Model):
         rslt.append('bacs_dd')
         return rslt
 
-    def validate_batch(self):
+    def validate_batch(self, initiate_payment=False):
+        today = fields.Date.context_today(self)
         for batch in self.filtered(lambda x: x.payment_method_code == 'bacs_dc' or x.payment_method_code == 'bacs_dd'):
             company = self.env.company
             if not batch.bacs_processing_date:
-                batch.bacs_processing_date = fields.Date.today()
+                batch.bacs_processing_date = today
             if not batch.bacs_expiry_date:
                 if batch.bacs_multi_mode:
                     max_payment_date = max(batch.payment_ids.mapped('date'))
@@ -71,12 +70,17 @@ class AccountBatchPayment(models.Model):
                     batch.bacs_expiry_date = batch.bacs_processing_date + relativedelta(days=90)
             if not company.bacs_sun:
                 raise UserError(_("The company '%s' requires a SUN to generate BACS files. Please configure it first.", company.name))
-            if batch.journal_id.bank_account_id.acc_type != 'iban':
-                raise UserError(_("The account %(account)s, of journal '%(journal)s', is not of type IBAN.\nA valid IBAN account is required to use BACS features.", account=batch.journal_id.bank_account_id.acc_number, journal=batch.journal_id.name))
-            if batch.bacs_processing_date < fields.Date.today():
+            if not batch.journal_id.bank_account_id:
+                raise UserError(_(
+                    "The journal '%(journal)s' requires a UK bank account to initiate a BACS Payment. "
+                    "Please configure an account number first.", journal=batch.journal_id.name
+                ))
+            if not batch.journal_id.bank_account_id._is_valid_uk_bank_account():
+                raise UserError(_("The account %(account)s, of journal '%(journal)s', is not a UK bank account.\nA valid UK bank account is required to use BACS features.", account=batch.journal_id.bank_account_id.account_number, journal=batch.journal_id.name))
+            if batch.bacs_processing_date < today:
                 raise UserError(_("The processing date cannot be in the past."))
 
-        return super(AccountBatchPayment, self).validate_batch()
+        return super().validate_batch(initiate_payment=initiate_payment)
 
     def check_payments_for_errors(self):
         rslt = super(AccountBatchPayment, self).check_payments_for_errors()
@@ -125,7 +129,7 @@ class AccountBatchPayment(models.Model):
             payment_template = self._generate_bacs_dc_payment_template(payments)
         bacs_file = self.journal_id.create_bacs_file(payment_template, self.payment_method_code, self.bacs_submission_serial, self.bacs_multi_mode, self.bacs_processing_date, self.bacs_expiry_date, self.name, self.date)
         return {
-            'file': base64.encodebytes(bacs_file.encode()),
+            'file': BinaryBytes(bacs_file.encode()),
             'filename': f"{self.payment_method_code}_{self.bacs_submission_serial}.txt"
         }
 
@@ -162,7 +166,9 @@ class AccountBatchPayment(models.Model):
                 'payment_type' : payment.payment_type,
                 'ref' : payment.name,
                 'partner_name' : payment.partner_id.name,
-                'partner_bank_iban': payment.partner_bank_id.sanitized_acc_number,
+                'partner_bank_iban': payment.partner_bank_id.sanitized_account_number if payment.partner_bank_id.account_type == 'iban' else False,
+                'partner_account_number': payment.partner_bank_id.sanitized_account_number,
+                'partner_sort_code': payment.partner_bank_id._get_clearing_number('GB'),
             }
 
             payment_dicts.append(payment_dict)

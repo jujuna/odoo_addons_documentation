@@ -5,8 +5,9 @@ import json
 
 from werkzeug.datastructures import FileStorage
 
-from odoo import http, _
-from odoo.http import content_disposition, request
+from odoo import _, http
+from odoo.http import request
+from odoo.http.stream import content_disposition
 from odoo.tools import osutil
 
 

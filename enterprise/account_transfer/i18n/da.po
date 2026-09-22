@@ -9,21 +9,31 @@
 # Martin Trigaux, 2022
 # Mads Søndergaard, 2022
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:24+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:32+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "account_transfer/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_transfer
+#: model:ir.module.module,description:base.module_account_transfer
+msgid ""
+"\n"
+"Account Transfers\n"
+"===========================\n"
+"A helper model for managing transfers between accounts.\n"
+msgstr ""
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -34,7 +44,7 @@ msgstr "<span> til </span>"
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model_line.py:0
 msgid "A destination account must be set on each line."
-msgstr ""
+msgstr "Der skal angives en modtagerkonto på hver linje."
 
 #. module: account_transfer
 #: model:ir.model.fields,help:account_transfer.field_account_transfer_model__conditions
@@ -42,6 +52,8 @@ msgid ""
 "A domain to filter the accounts from which the resulting entry will transfer "
 "amounts."
 msgstr ""
+"Et domæne til at filtrere de konti, hvorfra den resulterende postering skal "
+"overføre beløb."
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -51,22 +63,27 @@ msgstr "Konto"
 #. module: account_transfer
 #: model:ir.model,name:account_transfer.model_account_chart_template
 msgid "Account Chart Template"
-msgstr "Kontoplansskabelon"
+msgstr "Kontoplanskabelon"
 
 #. module: account_transfer
 #: model:ir.model,name:account_transfer.model_account_transfer_model
 msgid "Account Transfer Model"
-msgstr "Konto overførsel model"
+msgstr "Kontooverførselsmodel"
 
 #. module: account_transfer
 #: model:ir.model,name:account_transfer.model_account_transfer_model_line
 msgid "Account Transfer Model Line"
-msgstr "Konto overførsel model linje"
+msgstr "Kontooverførselsmodellinje"
+
+#. module: account_transfer
+#: model:ir.module.module,shortdesc:base.module_account_transfer
+msgid "Account Transfers"
+msgstr ""
 
 #. module: account_transfer
 #: model:ir.actions.server,name:account_transfer.ir_cron_auto_transfer_ir_actions_server
 msgid "Account transfers: Compute transfer entries"
-msgstr ""
+msgstr "Kontooverførsler: Beregn overførselsposteringer"
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -97,7 +114,7 @@ msgstr "Virksomhed knyttet til denne konto"
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "Compute Transfer"
-msgstr "Udregn overførsel"
+msgstr "Beregn overførsel"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__conditions
@@ -129,7 +146,7 @@ msgstr "Destination"
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__account_id
 msgid "Destination Account"
-msgstr "Destinations konto"
+msgstr "Destinationskonto"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__line_ids
@@ -159,7 +176,7 @@ msgstr "Deaktiveret"
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__display_name
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -184,7 +201,7 @@ msgstr "Genererede bevægelser"
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__has_draft_moves
 msgid "Has Draft Moves"
-msgstr ""
+msgstr "Har kladdebogføringer"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_chart_template__id
@@ -199,19 +216,26 @@ msgstr "ID"
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/demo/account_demo.py:0
+#: model:account.journal.group,name:account_transfer.ifrs_group
+msgid "IFRS"
+msgstr "IFRS"
+
+#. module: account_transfer
+#. odoo-python
+#: code:addons/account_transfer/demo/account_demo.py:0
 msgid "IFRS Transfers"
-msgstr ""
+msgstr "IFRS-overførsler"
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/demo/account_demo.py:0
 msgid "IFRS rent expense transfer"
-msgstr ""
+msgstr "IFRS-overførsel af renteudgifter"
 
 #. module: account_transfer
 #: model:ir.model.fields.selection,name:account_transfer.selection__account_transfer_model__state__in_progress
 msgid "In Progress"
-msgstr "I gang"
+msgstr "Behandles"
 
 #. module: account_transfer
 #: model:ir.model,name:account_transfer.model_account_journal
@@ -259,12 +283,12 @@ msgstr "Bevæg ID antal"
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "Move Model"
-msgstr "Bevæg model"
+msgstr "Bogføringsmodel"
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_tree
 msgid "Move Models"
-msgstr "Bevæg modeller"
+msgstr "Bogføringsmodeller"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__name
@@ -274,7 +298,7 @@ msgstr "Navn"
 #. module: account_transfer
 #: model:ir.model.constraint,message:account_transfer.constraint_account_transfer_model_line_unique_account_by_transfer_model
 msgid "Only one account occurrence by transfer model"
-msgstr "Kun en konto per overførsel model"
+msgstr "Kun én konto pr. overførselsmodel"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__account_ids
@@ -312,6 +336,8 @@ msgid ""
 "Puts the transfer model in a state in which it will automatically recompute "
 "its draft entries' values every day."
 msgstr ""
+"Sætter overførselsmodellen i en tilstand, hvor den automatisk genberegner "
+"værdierne for sine kladdeposteringer hver dag."
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -319,6 +345,8 @@ msgid ""
 "Puts the transfer model in a state in which it will not automatically "
 "recompute its draft entries' values every day."
 msgstr ""
+"Sætter overførselsmodellen i en tilstand, hvor den ikke automatisk "
+"genberegner værdierne for sine kladdeposteringer hver dag."
 
 #. module: account_transfer
 #: model:ir.model.fields.selection,name:account_transfer.selection__account_transfer_model__frequency__quarter
@@ -328,7 +356,7 @@ msgstr "Kvartalvis"
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "Rate (%)"
-msgstr "Andel (%)"
+msgstr "Kurs (%)"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__sequence
@@ -338,45 +366,45 @@ msgstr "Sekvens"
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__date_start
 msgid "Start Date"
-msgstr "Start dato"
+msgstr "Startdato"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__state
 msgid "State"
-msgstr "Stat"
+msgstr "Status"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__date_stop
 msgid "Stop Date"
-msgstr "Stop dato"
+msgstr "Slutdato"
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model.py:0
 msgid "The total percentage (%s) should be less or equal to 100!"
-msgstr ""
+msgstr "Den samlede procentdel (%s) skal være mindre end eller lig med 100!"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__total_percent
 msgid "Total Percent"
-msgstr "Samlet procent"
+msgstr "Samlet procentdel"
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model.py:0
 msgid "Transfer (%(percent)s%% from %(account)s)"
-msgstr ""
+msgstr "Overførsel (%(percent)s%% fra %(account)s)"
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model.py:0
 msgid "Transfer (-%(percent)s%% to %(account)s)"
-msgstr ""
+msgstr "Overfør (-%(percent)s%% til %(account)s)"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__transfer_model_id
 msgid "Transfer Model"
-msgstr "Overførsel model"
+msgstr "Overførselsmodel"
 
 #. module: account_transfer
 #: model:ir.actions.act_window,name:account_transfer.transfer_model_action
@@ -388,13 +416,13 @@ msgstr "Overførsler"
 #. module: account_transfer
 #: model:ir.model.fields.selection,name:account_transfer.selection__account_transfer_model__frequency__year
 msgid "Yearly"
-msgstr "Årligt"
+msgstr "Årlig"
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/demo/account_demo.py:0
 msgid "Yearly liabilites auto transfers"
-msgstr ""
+msgstr "Automatiske overførsler af årlige forpligtelser"
 
 #. module: account_transfer
 #. odoo-python
@@ -403,6 +431,9 @@ msgid ""
 "You cannot delete a transfer model that has draft moves attached ('%s'). "
 "Please delete them before deleting this transfer."
 msgstr ""
+"Det er ikke muligt at slette en overførselsmodel, som har tilknyttede "
+"kladdebogføringsposter ('%s'). Slet venligst disse bogføringsposter, før du "
+"sletter overførslen."
 
 #. module: account_transfer
 #. odoo-python
@@ -410,107 +441,21 @@ msgstr ""
 msgid ""
 "You cannot delete a transfer model that has posted moves attached ('%s')."
 msgstr ""
+"Du kan ikke slette en overførselsmodel, der har tilknyttede posteringer "
+"('%s')."
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/models/account_move_line.py:0
 msgid "You cannot set Tax on computed Transfer's entries."
-msgstr ""
+msgstr "Du kan ikke angive skat på poster for beregnede overførsler."
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "e.g. Monthly Expense Transfer"
-msgstr ""
+msgstr "f.eks. månedlig overførsel af udgifter"
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "forever"
 msgstr "for altid"
-
-#~ msgid "Activate"
-#~ msgstr "Aktivér"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these analytic accounts to the destination account"
-#~ msgstr ""
-#~ "Tilføjer en betingelse til kun at overføre summen af linjerne fra "
-#~ "oprindelseskonti som stemmer overens med disse analytiske konti, til "
-#~ "destinations kontoen"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these partners to the destination account"
-#~ msgstr ""
-#~ "Tilføj en betingelse til kun at overføre summen af linjerne fra "
-#~ "oprindelseskonti der stemmer overens med disse partnere, til destinations "
-#~ "kontoen"
-
-#~ msgid "Analytic Filter"
-#~ msgstr "Aanlytisk filter"
-
-#~ msgid "Automated Transfer"
-#~ msgstr "Automatiseret overførsel"
-
-#~ msgid "Automatic Transfer (%s%% from account %s)"
-#~ msgstr "Automatiseret overførsel (%s %% fra konto %s)"
-
-#~ msgid "Automatic Transfer (-%s%%)"
-#~ msgstr "Automatisk overførsel (-%s%%)"
-
-#~ msgid ""
-#~ "Automatic Transfer (entries with analytic account(s): %s and partner(s): "
-#~ "%s)"
-#~ msgstr ""
-#~ "Automatisk Overførsel (posteringer med analytisk konti: %s og partner(e): "
-#~ "%s)"
-
-#~ msgid "Automatic Transfer (entries with analytic account(s): %s)"
-#~ msgstr "Automatisk overførsel (posteringer med analytisk konti: %s)"
-
-#~ msgid "Automatic Transfer (entries with partner(s): %s)"
-#~ msgstr "Automatisk Overførsel (posteringer med partner(e): %s)"
-
-#~ msgid ""
-#~ "Automatic Transfer (from account %s with analytic account(s): %s and "
-#~ "partner(s): %s)"
-#~ msgstr ""
-#~ "Automatisk overførsel (fra konto %s med analytisk konti: %s og "
-#~ "partner(e): %s)"
-
-#~ msgid "Automatic Transfer (from account %s with analytic account(s): %s)"
-#~ msgstr "Automatisk overførsel (fra konto %s med analytisk konti: %s)"
-
-#~ msgid "Automatic Transfer (from account %s with partner(s): %s)"
-#~ msgstr "Automatisk Overførsel (fra konto %s med partner(e): %s)"
-
-#~ msgid "Automatic Transfer (to account %s)"
-#~ msgstr "Automatisk overførsel (til konto %s)"
-
-#~ msgid "Automatic Transfers"
-#~ msgstr "Automatiske overførsler"
-
-#~ msgid "Partner Filter"
-#~ msgstr "Partner filter"
-
-#~ msgid "Percent (%)"
-#~ msgstr "Procent (%)"
-
-#~ msgid "Percent Is Readonly"
-#~ msgstr "Procent er skrivebeskyttet"
-
-#~ msgid "Running"
-#~ msgstr "Kører"
-
-#~ msgid "The analytic filter %s is duplicated"
-#~ msgstr "Det analytiske filter %s er duplikeret"
-
-#~ msgid ""
-#~ "The partner filter %s in combination with the analytic filter %s is "
-#~ "duplicated"
-#~ msgstr ""
-#~ "Partner filtret %s i kombination med det analytiske filter %s er "
-#~ "duplikeret"
-
-#~ msgid "The partner filter %s is duplicated"
-#~ msgstr "Partnerfiltret %s er duplikeret"

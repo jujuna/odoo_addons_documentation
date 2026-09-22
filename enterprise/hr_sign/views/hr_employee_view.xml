@@ -5,15 +5,8 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//header" position="inside">
-                <!--
-                    hr.group_hr_manager implies sign.group_sign_manager
-                    https://github.com/odoo/enterprise/blob/435fa269064d358c8b78a957b8201dc6b6aeb6af/hr_contract_sign/security/security.xml#L4
-                 -->
-                <button name="%(sign_contract_wizard_action)d" string="Signature Request" type="action" invisible="not id" groups="hr.group_hr_manager" context="{'default_version_id': version_id}"/>
-            </xpath>
             <button name="action_open_versions" position="before">
-                <button groups="hr.group_hr_manager" name="open_employee_sign_requests" type="object" class="oe_stat_button" icon="fa-pencil" invisible="sign_request_count == 0">
+                <button groups="hr.group_hr_manager" name="open_employee_sign_requests" type="object" class="oe_stat_button" icon="edit" icon_class="oi-filled" invisible="sign_request_count == 0">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value"><field name="sign_request_count"/></span>
                         <span class="o_stat_text">Signature Requests</span>
@@ -31,11 +24,14 @@
         <field name="sequence">7</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="binding_model_id" ref="hr.model_hr_employee"/>
-        <field name="binding_view_types">list,kanban</field>
+        <field name="binding_view_types">form,list,kanban</field>
         <field name="state">code</field>
         <field name="group_ids" eval="[(4, ref('hr.group_hr_manager'))]"/>
         <field name="code">
-            action = model._open_sign_document_wizard()
+if len(records) == 1:
+    action = records._open_sign_document_wizard()
+else:
+    action = model._open_sign_document_wizard()
         </field>
     </record>
 </odoo>

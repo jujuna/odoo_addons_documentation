@@ -22,11 +22,6 @@ defineModels({ DocumentsToDashboardWizard });
 test("open wizard action", async () => {
     const { env } = await createSpreadsheet({
         spreadsheetId: 2,
-        mockRPC: async function (route, args) {
-            if (args.method === "save_spreadsheet_snapshot") {
-                return true;
-            }
-        },
     });
     mockActionService((actionRequest, options) => {
         if (actionRequest.res_model === "spreadsheet.document.to.dashboard") {
@@ -39,31 +34,27 @@ test("open wizard action", async () => {
                 target: "new",
                 res_model: "spreadsheet.document.to.dashboard",
             });
-            expect(options).toEqual({
-                additionalContext: {
-                    default_document_id: 2,
-                    default_name: "My spreadsheet",
-                },
-            });
+            expect(options.additionalContext.default_document_id).toBe(2);
+            expect(options.additionalContext.default_name).toBe("My spreadsheet");
+            expect(options.additionalContext).toInclude("default_spreadsheet_data");
         }
     });
     await doMenuAction(topbarMenuRegistry, ["file", "add_document_to_dashboard"], env);
     expect.verifySteps(["open_wizard_action"]);
 });
 
-test("document's data is saved when opening wizard", async () => {
+test("current spreadsheet data is passed when opening wizard", async () => {
     const { env, model } = await createSpreadsheet({
         spreadsheetId: 2,
-        mockRPC: async function (route, args) {
-            if (args.method === "save_spreadsheet_snapshot") {
-                expect.step("save_spreadsheet_snapshot");
-                const snapshotData = args.args[1];
-                expect(snapshotData.sheets[0].cells.A1).toBe("a cell updated");
-                return true;
-            }
-        },
+    });
+    mockActionService((actionRequest, options) => {
+        if (actionRequest.res_model === "spreadsheet.document.to.dashboard") {
+            expect.step("open_wizard_action");
+            const spreadsheetData = JSON.parse(options.additionalContext.default_spreadsheet_data);
+            expect(spreadsheetData.sheets[0].cells.A1).toBe("a cell updated");
+        }
     });
     setCellContent(model, "A1", "a cell updated");
     await doMenuAction(topbarMenuRegistry, ["file", "add_document_to_dashboard"], env);
-    expect.verifySteps(["save_spreadsheet_snapshot"]);
+    expect.verifySteps(["open_wizard_action"]);
 });

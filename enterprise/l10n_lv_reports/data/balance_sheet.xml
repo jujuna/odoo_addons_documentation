@@ -4,6 +4,7 @@
         <field name="name">Balance Sheet</field>
         <field name="name@lv">Bilance</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_period_comparison" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
         <field name="country_id" ref="base.lv"/>
@@ -45,8 +46,6 @@
                                 <field name="name">Intangible assets</field>
                                 <field name="name@lv">Nemateriālie aktīvi</field>
                                 <field name="code">LV_intangible_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_intangible_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -59,8 +58,6 @@
                                 <field name="name">Accumulated amortisation of intangible assets</field>
                                 <field name="name@lv">Nemateriālo aktīvu uzkrātā amortizācija</field>
                                 <field name="code">LV_acc_dep_intangible_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_accumulated_amortisation_intangible_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -73,8 +70,6 @@
                                 <field name="name">Tangible assets</field>
                                 <field name="name@lv">Materiālie aktīvi</field>
                                 <field name="code">LV_tangible_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_tangible_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -87,8 +82,6 @@
                                 <field name="name">Accumulated depreciation of tangible assets</field>
                                 <field name="name@lv">Materiālo aktīvu uzkrātais nolietojums</field>
                                 <field name="code">LV_acc_dep_tangible_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_accumulated_depreciation_tangible_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -101,8 +94,6 @@
                                 <field name="name">Long-term investment</field>
                                 <field name="name@lv">Ilgtermiņa ieguldījums</field>
                                 <field name="code">LV_long_financial_investment</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_long_financial_investment_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -110,7 +101,7 @@
                                         <field name="formula">13</field>
                                     </record>
                                 </field>
-                            </record>     
+                            </record>
                         </field>
                     </record>
                     <record id="account_financial_report_lv_curr_asset" model="account.report.line">
@@ -141,8 +132,6 @@
                                         <field name="name">Inventory</field>
                                         <field name="name@lv">Inventārs</field>
                                         <field name="code">LV_inventory</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_inventory_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -155,8 +144,6 @@
                                         <field name="name">Productive and working animals</field>
                                         <field name="name@lv">Ražojošie un darba dzīvnieki</field>
                                         <field name="code">LV_productive_working_animals</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_productive_working_animals_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -171,8 +158,6 @@
                                 <field name="name">Debtors</field>
                                 <field name="name@lv">Parādnieki</field>
                                 <field name="code">LV_debtors</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_debtors_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -185,8 +170,6 @@
                                 <field name="name">Securities as part of current assets and short-term participation in capital</field>
                                 <field name="name@lv">Vērtspapīri kā daļa no apgrozāmajiem līdzekļiem un īstermiņa līdzdalība kapitālā</field>
                                 <field name="code">LV_securities</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_securities_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -199,8 +182,6 @@
                                 <field name="name">Cash at bank and in hand</field>
                                 <field name="name@lv">Skaidra nauda bankā un kasē</field>
                                 <field name="code">LV_cash</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_cash_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -213,8 +194,6 @@
                                 <field name="name">Other current assets</field>
                                 <field name="name@lv">Citi apgrozāmie līdzekļi</field>
                                 <field name="code">LV_other_current</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_other_current_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -256,8 +235,6 @@
                                 <field name="name">Capital</field>
                                 <field name="name@lv">Kapitāls</field>
                                 <field name="code">LV_capital</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_capital_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -270,8 +247,6 @@
                                 <field name="name">Reserve</field>
                                 <field name="name@lv">Rezerve</field>
                                 <field name="code">LV_reserve</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_lv_reserve_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -280,7 +255,7 @@
                                     </record>
                                 </field>
                             </record>
-                            
+
                             <record id="account_financial_report_lv_retained_earnings_prev_years" model="account.report.line">
                                 <field name="name">Retained earnings of previous years or uncovered losses</field>
                                 <field name="name@lv">Iepriekšējo gadu nesadalītā peļņa vai nesegtie zaudējumi</field>
@@ -307,7 +282,7 @@
                                         <field name="label">cross_report</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">LV_annual_profit_loss.balance</field>
-                                        <field name="subformula">cross_report(l10n_lv_reports.account_financial_report_lv_pnl)</field>
+                                        <field name="subformula">cross_report(l10n_lv_reports.account_financial_report_lv_pnl, force_date_scope)</field>
                                         <field name="date_scope">to_beginning_of_fiscalyear</field>
                                     </record>
                                     <record id="account_financial_report_lv_retained_earnings_balance" model="account.report.expression">
@@ -326,7 +301,7 @@
                                         <field name="label">balance</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">LV_annual_profit_loss.balance</field>
-                                        <field name="subformula">cross_report(l10n_lv_reports.account_financial_report_lv_pnl)</field>
+                                        <field name="subformula">cross_report(l10n_lv_reports.account_financial_report_lv_pnl, force_date_scope)</field>
                                         <field name="date_scope">from_fiscalyear</field>
                                     </record>
                                 </field>
@@ -361,8 +336,6 @@
                                         <field name="name">Private Accounts</field>
                                         <field name="name@lv">Privātie konti</field>
                                         <field name="code">LV_private_accounts</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_private_accounts_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -375,8 +348,6 @@
                                         <field name="name">Settlement of loans</field>
                                         <field name="name@lv">Aizdevumu nomaksa</field>
                                         <field name="code">LV_settlement_loans_short</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_loans_short_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -389,8 +360,6 @@
                                         <field name="name">Settlements for advances received</field>
                                         <field name="name@lv">Norēķini par saņemtajiem avansiem</field>
                                         <field name="code">LV_settlement_advances</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_advances_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -403,8 +372,6 @@
                                         <field name="name">Settlements with suppliers and contractors</field>
                                         <field name="name@lv">Norēķini ar piegādātājiem un darbuzņēmējiem</field>
                                         <field name="code">LV_settlement_suppliers</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_suppliers_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -417,8 +384,6 @@
                                         <field name="name">Promissory notes payable</field>
                                         <field name="name@lv">Apmaksājamās parādzīmes</field>
                                         <field name="code">LV_bills_payable</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_bills_payable_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -431,8 +396,6 @@
                                         <field name="name">Settlements with companies, memebers and staff</field>
                                         <field name="name@lv">Norēķini ar uzņēmumiem, biedriem un darbiniekiem</field>
                                         <field name="code">LV_settlement_company_members_staff</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_company_members_staff_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -445,8 +408,6 @@
                                         <field name="name">Settlements for wages and deductions</field>
                                         <field name="name@lv">Norēķini par algām un atskaitījumiem</field>
                                         <field name="code">LV_settlement_wages</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_wages_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -459,8 +420,6 @@
                                         <field name="name">Settlements for wages and deductions</field>
                                         <field name="name@lv">Norēķini par algām un atskaitījumiem</field>
                                         <field name="code">LV_settlement_taxes</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_taxes_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -473,8 +432,6 @@
                                         <field name="name">Settlements for dividends</field>
                                         <field name="name@lv">Norēķini par dividendēm</field>
                                         <field name="code">LV_settlement_dividends</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_dividends_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -487,8 +444,6 @@
                                         <field name="name">Deferred earnings</field>
                                         <field name="name@lv">Atliktie ieņēmumi</field>
                                         <field name="code">LV_deferred_earning</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_deferred_earning_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -515,8 +470,6 @@
                                         <field name="name">Provisions for liabilities equated to pensions</field>
                                         <field name="name@lv">Uzkrājumi pensijām pielīdzinātajām saistībām</field>
                                         <field name="code">LV_provisions_pensions</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_provisions_pensions_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -529,8 +482,6 @@
                                         <field name="name">Provisions for estimated taxes</field>
                                         <field name="name@lv">Uzkrājumi paredzamajiem nodokļiem</field>
                                         <field name="code">LV_provisions_taxes</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_provisions_taxes_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -543,8 +494,6 @@
                                         <field name="name">Other savings</field>
                                         <field name="name@lv">Citi ietaupījumi</field>
                                         <field name="code">LV_other_savings</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_other_savings_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -557,8 +506,6 @@
                                         <field name="name">Long term debt</field>
                                         <field name="name@lv">Ilgtermiņa parāds</field>
                                         <field name="code">LV_settlement_borrowings_long</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_lv_settlement_borrowings_long_expr" model="account.report.expression">
                                                 <field name="label">balance</field>

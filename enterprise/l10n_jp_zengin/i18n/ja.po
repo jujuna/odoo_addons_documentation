@@ -4,25 +4,35 @@
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Ryoko Tsuda <ryoko@quartile.co>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:07+0000\n"
-"PO-Revision-Date: 2025-12-20 09:32+0000\n"
-"Last-Translator: Ryoko Tsuda <ryoko@quartile.co>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19-l10n/"
+"POT-Creation-Date: 2026-08-28 18:21+0000\n"
+"PO-Revision-Date: 2026-09-18 05:04+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "l10n_jp_zengin/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_acc_holder_name_kana
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_acc_holder_name_kana
+#: model:ir.module.module,description:base.module_l10n_jp_zengin
+msgid ""
+"\n"
+"This module enables the generation of Zengin-compliant files to send to your "
+"bank in order to\n"
+"push a set of payments.\n"
+msgstr ""
+
+#. module: l10n_jp_zengin
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_holder_name_kana
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_holder_name_kana
 msgid "Account Holder Name (Kana)"
 msgstr "口座名義 (カナ)"
 
@@ -33,20 +43,39 @@ msgid "Account Type"
 msgstr "口座種別"
 
 #. module: l10n_jp_zengin
-#: model:ir.model,name:l10n_jp_zengin.model_res_bank
-msgid "Bank"
-msgstr "銀行"
+#. odoo-python
+#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
+msgid "Account holder name in Kana"
+msgstr "口座名義 (カナ)"
+
+#. module: l10n_jp_zengin
+#. odoo-python
+#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
+msgid "BIC"
+msgstr "BIC"
 
 #. module: l10n_jp_zengin
 #: model:ir.model,name:l10n_jp_zengin.model_res_partner_bank
-msgid "Bank Accounts"
+msgid "Bank Account"
 msgstr "銀行口座"
+
+#. module: l10n_jp_zengin
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_bank_name_kana
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_bank_name_kana
+msgid "Bank Name (Kana)"
+msgstr "銀行名 (カナ)"
 
 #. module: l10n_jp_zengin
 #. odoo-python
 #: code:addons/l10n_jp_zengin/models/account_journal.py:0
 msgid "Bank Name: %(bank)s"
 msgstr "銀行名: %(bank)s"
+
+#. module: l10n_jp_zengin
+#. odoo-python
+#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
+msgid "Bank name in Kana"
+msgstr "銀行名 (カナ)"
 
 #. module: l10n_jp_zengin
 #: model:ir.model,name:l10n_jp_zengin.model_account_batch_payment
@@ -72,29 +101,14 @@ msgid "Bill of Exchange"
 msgstr "為替手形"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_branch_code
-msgid "Branch Code"
-msgstr "支店コード"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/res_bank.py:0
-msgid "Branch Code must be 3 digits long."
-msgstr "支店コードは3桁です。"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/res_bank.py:0
-msgid "Branch Code must be a number."
-msgstr "支店コードは数字です。"
-
-#. module: l10n_jp_zengin
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_branch_name
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_branch_name
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_branch_name
 msgid "Branch Name"
 msgstr "支店名"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_branch_name_kana
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_branch_name_kana
+#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_branch_name_kana
 msgid "Branch Name (Kana)"
 msgstr "支店名 (カナ)"
 
@@ -103,6 +117,12 @@ msgstr "支店名 (カナ)"
 #: code:addons/l10n_jp_zengin/models/account_journal.py:0
 msgid "Branch Name: %(branch)s"
 msgstr "支店名: %(branch)s"
+
+#. module: l10n_jp_zengin
+#. odoo-python
+#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
+msgid "Branch name in Kana"
+msgstr "支店名 (カナ)"
 
 #. module: l10n_jp_zengin
 #. odoo-python
@@ -135,20 +155,10 @@ msgid "Client Code must be a number."
 msgstr "委託者コードは数字です。"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,help:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_branch_code
-msgid "Code of the branch of the bank."
-msgstr "銀行支店コード。"
-
-#. module: l10n_jp_zengin
 #: model:ir.model.fields,help:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_client_code
 #: model:ir.model.fields,help:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_client_code
 msgid "Code of the client of the bank."
 msgstr "銀行の顧客のコード。"
-
-#. module: l10n_jp_zengin
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_bank__country_code
-msgid "Country Code"
-msgstr "国名コード"
 
 #. module: l10n_jp_zengin
 #: model:ir.model.fields.selection,name:l10n_jp_zengin.selection__res_partner_bank__l10n_jp_zengin_account_type__current
@@ -166,7 +176,6 @@ msgstr "預金"
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_journal__display_name
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_payment__display_name
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_payment_method__display_name
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_bank__display_name
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__display_name
 msgid "Display Name"
 msgstr "表示名"
@@ -186,8 +195,9 @@ msgstr "為替"
 #. module: l10n_jp_zengin
 #. odoo-python
 #: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
-msgid "Go to Bank"
-msgstr "銀行へ移動"
+msgid ""
+"Following fields are missing for %(bank)s bank account of %(partner)s:\n"
+msgstr "%(bank)s 銀行口座(%(partner)s)で、次の項目が未入力です:\n"
 
 #. module: l10n_jp_zengin
 #. odoo-python
@@ -200,7 +210,6 @@ msgstr "銀行口座へ移動"
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_journal__id
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_payment__id
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_payment_method__id
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_bank__id
 #: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__id
 msgid "ID"
 msgstr "ID"
@@ -230,10 +239,9 @@ msgid "Interest Rate: %(integer)s.%(decimal)s%"
 msgstr "利率: %(integer)s.%(decimal)s%"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_bank_country_code
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_bank_country_code
-msgid "JP: Country Code"
-msgstr "JP: 国名コード"
+#: model:ir.module.module,shortdesc:base.module_l10n_jp_zengin
+msgid "Japan - Zengin Payment"
+msgstr ""
 
 #. module: l10n_jp_zengin
 #: model:ir.model,name:l10n_jp_zengin.model_account_journal
@@ -259,28 +267,26 @@ msgid "Merge collective payments for Zengin files"
 msgstr "複数の支払を全銀ファイルにまとめる"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,field_description:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_name_kana
-msgid "Name (Kana)"
-msgstr "銀行名 (カナ)"
-
-#. module: l10n_jp_zengin
-#: model:ir.model.fields,help:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_acc_holder_name_kana
-#: model:ir.model.fields,help:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_acc_holder_name_kana
+#: model:ir.model.fields,help:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_holder_name_kana
+#: model:ir.model.fields,help:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_holder_name_kana
 msgid "Name of the account holder in Kana."
 msgstr "口座名義カナ表記。"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,help:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_name_kana
+#: model:ir.model.fields,help:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_bank_name_kana
+#: model:ir.model.fields,help:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_bank_name_kana
 msgid "Name of the bank in Kana."
 msgstr "銀行名カナ表記。"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,help:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_branch_name_kana
+#: model:ir.model.fields,help:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_branch_name_kana
+#: model:ir.model.fields,help:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_branch_name_kana
 msgid "Name of the branch of the bank in Kana."
 msgstr "銀行支店名カナ表記。"
 
 #. module: l10n_jp_zengin
-#: model:ir.model.fields,help:l10n_jp_zengin.field_res_bank__l10n_jp_zengin_branch_name
+#: model:ir.model.fields,help:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_branch_name
+#: model:ir.model.fields,help:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_branch_name
 msgid "Name of the branch of the bank."
 msgstr "銀行支店名。"
 
@@ -298,14 +304,14 @@ msgid "Other"
 msgstr "その他"
 
 #. module: l10n_jp_zengin
-#: model:ir.model,name:l10n_jp_zengin.model_account_payment_method
-msgid "Payment Methods"
-msgstr "支払方法"
+#: model:ir.model,name:l10n_jp_zengin.model_account_payment
+msgid "Payment"
+msgstr "支払"
 
 #. module: l10n_jp_zengin
-#: model:ir.model,name:l10n_jp_zengin.model_account_payment
-msgid "Payments"
-msgstr "支払"
+#: model:ir.model,name:l10n_jp_zengin.model_account_payment_method
+msgid "Payment Method"
+msgstr "支払方法"
 
 #. module: l10n_jp_zengin
 #. odoo-python
@@ -322,49 +328,9 @@ msgstr "定期金利: %(amount)s"
 #. module: l10n_jp_zengin
 #. odoo-python
 #: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
-msgid "Please set a BIC on the %(bank)s bank."
-msgstr "銀行: %(bank)s にBIC(SWIFT)コードを設定して下さい。"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
-msgid "Please set a bank name in Kana on the %(bank)s bank."
-msgstr "銀行: %(bank)s に銀行名カナ表記を設定して下さい。"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
-msgid "Please set a branch code on the %(bank)s bank."
-msgstr "銀行: %(bank)s に支店コードを設定して下さい。"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
-msgid "Please set a branch name in Kana on the %(bank)s bank."
-msgstr "銀行: %(bank)s に支店名カナ表記を設定して下さい。"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
 msgid ""
 "Please set a client code on the %(account)s bank account for %(partner)s."
 msgstr "%(partner)s 用の銀行口座 %(account)s に委託者コードを設定して下さい。"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
-msgid ""
-"Please set an account holder name in Kana on the %(account)s bank account "
-"for %(partner)s."
-msgstr ""
-"%(partner)s 用の銀行口座: %(account)s に口座名義カナ表記を設定して下さい。"
-
-#. module: l10n_jp_zengin
-#. odoo-python
-#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
-msgid ""
-"Please set an account type on the %(account)s bank account for %(partner)s."
-msgstr "%(partner)s 用の銀行口座: %(account)s に口座種別を設定して下さい。"
 
 #. module: l10n_jp_zengin
 #. odoo-python
@@ -389,8 +355,8 @@ msgid ""
 "Savings account type is not supported for Zengin on %(account)s bank account "
 "for %(partner)s."
 msgstr ""
-"%(partner)s 用の銀行口座 %(account)s では全銀用に普通預金種別は使用できませ"
-"ん。"
+"%(partner)s 用の銀行口座 %(account)s では全銀用に普通預金種別は使用できません"
+"。"
 
 #. module: l10n_jp_zengin
 #. odoo-python
@@ -403,17 +369,6 @@ msgstr "振込元銀行支店: %(branch)s"
 #: code:addons/l10n_jp_zengin/models/account_journal.py:0
 msgid "Sending Bank: %(bank)s"
 msgstr "振込元銀行: %(bank)s"
-
-#. module: l10n_jp_zengin
-#: model:ir.model.fields,help:l10n_jp_zengin.field_account_setup_bank_manual_config__l10n_jp_zengin_bank_country_code
-#: model:ir.model.fields,help:l10n_jp_zengin.field_res_bank__country_code
-#: model:ir.model.fields,help:l10n_jp_zengin.field_res_partner_bank__l10n_jp_zengin_bank_country_code
-msgid ""
-"The ISO country code in two chars. \n"
-"You can use this field for quick search."
-msgstr ""
-"ISO国名コードを2文字で入力します。 \n"
-"このフィールドはクイック検索に利用できます。"
 
 #. module: l10n_jp_zengin
 #. odoo-python
@@ -455,3 +410,15 @@ msgstr "全銀 入金/出金 - %(date)s"
 #: code:addons/l10n_jp_zengin/models/account_journal.py:0
 msgid "Zengin Transfer - %(date)s"
 msgstr "全銀振替 - %(date)s"
+
+#. module: l10n_jp_zengin
+#. odoo-python
+#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
+msgid "Zengin account type"
+msgstr "全銀 口座種別"
+
+#. module: l10n_jp_zengin
+#. odoo-python
+#: code:addons/l10n_jp_zengin/models/account_batch_payment.py:0
+msgid "Zengin branch code"
+msgstr "全銀 支店コード"

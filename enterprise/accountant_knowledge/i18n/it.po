@@ -2,22 +2,28 @@
 # This file contains the translation of the following modules:
 # * accountant_knowledge
 #
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-27 10:55+0000\n"
-"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 01:46+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "accountant_knowledge/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/models/audit_report.py:0
+msgid "%(title)s (copy)"
+msgstr "%(title)s (copia)"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_attestation
@@ -46,14 +52,28 @@ msgid "<em>To be completed...</em>"
 msgstr "<em>Da completare...</em>"
 
 #. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
 #: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
-msgid "<i class=\"fa fa-fw fa-building me-2\" title=\"Company\"/>"
-msgstr "<i class=\"fa fa-fw fa-building me-2\" title=\"Azienda\"/>"
+msgid "<i class=\"oi me-2\" data-icon=\"east\" title=\"arrow\"/>"
+msgstr ""
 
 #. module: accountant_knowledge
 #: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
-msgid "<i class=\"fa fa-fw fa-calendar me-2\" title=\"Calendar\"/>"
-msgstr "<i class=\"fa fa-fw fa-calendar me-2\" title=\"Calendario\"/>"
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"business\" "
+"title=\"Company\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"business\" "
+"title=\"Azienda\"/>"
+
+#. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"calendar_today\" "
+"title=\"Calendar\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"calendar_today\" "
+"title=\"Calendario\"/>"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_supporting_documents
@@ -242,9 +262,9 @@ msgid ""
 msgstr ""
 "Gli anticipi ricevuti da organizzazioni pubbliche o private per finanziare "
 "le attività della società, il cui rimborso è condizionato, sono presentati "
-"nel bilancio alla voce “Altre partecipazioni” del patrimonio netto. Gli "
-"interessi passivi corrispondenti sono registrati come passività alla voce "
-"“Prestiti e altri debiti finanziari”."
+"nello stato patrimoniale alla voce “Altre partecipazioni” del patrimonio "
+"netto. Gli interessi passivi corrispondenti sono registrati come passività "
+"alla voce “Prestiti e altri debiti finanziari”."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
@@ -272,9 +292,23 @@ msgid "Annexes"
 msgstr "Allegati"
 
 #. module: accountant_knowledge
+#: model:ir.model,name:accountant_knowledge.model_audit_report
 #: model:ir.ui.menu,name:accountant_knowledge.menu_action_accountant_audit_report
+#: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_audit_report
 msgid "Annual Report"
 msgstr "Resoconto annuale"
+
+#. module: accountant_knowledge
+#: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__knowledge_template_article_id
+#: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__is_audit_report_template
+msgid "Annual Report Template"
+msgstr "Modello di rendicontazione annuale"
+
+#. module: accountant_knowledge
+#: model:ir.actions.act_window,name:accountant_knowledge.action_audit_report
+#: model:ir.module.module,shortdesc:base.module_accountant_knowledge
+msgid "Annual Reports"
+msgstr "Resoconti annuali"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__knowledge_article_id
@@ -333,27 +367,9 @@ msgid "Attestation"
 msgstr "Attestazione"
 
 #. module: accountant_knowledge
-#: model:ir.model,name:accountant_knowledge.model_audit_report
 #: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__audit_report_id
-#: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_audit_report
 msgid "Audit Report"
 msgstr "Rapporto di controllo"
-
-#. module: accountant_knowledge
-#: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__knowledge_template_article_id
-#: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__is_audit_report_template
-msgid "Audit Report Template"
-msgstr "Modello rapporto di controllo"
-
-#. module: accountant_knowledge
-#: model:ir.actions.act_window,name:accountant_knowledge.action_audit_report
-msgid "Audit Reports"
-msgstr "Rapporti di controllo"
-
-#. module: accountant_knowledge
-#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
-msgid "Audit Template"
-msgstr "Modello di audit"
 
 #. module: accountant_knowledge
 #: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_balance_sheet
@@ -480,10 +496,15 @@ msgstr ""
 "I costi relativi alla sottoattività sono esclusi dal valore del magazzino."
 
 #. module: accountant_knowledge
+#: model:ir.module.module,summary:base.module_accountant_knowledge
+msgid "Create Annual Reports with Knowledge"
+msgstr ""
+
+#. module: accountant_knowledge
 #: model:ir.actions.act_window,name:accountant_knowledge.action_audit_report_quick_create
 #: model_terms:ir.actions.act_window,help:accountant_knowledge.action_audit_report
-msgid "Create an Audit Report"
-msgstr "Crea un rapporto di controllo"
+msgid "Create an Annual Report"
+msgstr "Crea un resoconto annuale"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__create_uid
@@ -618,13 +639,11 @@ msgstr ""
 #. module: accountant_knowledge
 #. odoo-javascript
 #: code:addons/accountant_knowledge/static/src/components/export_audit_report_to_pdf_dialog/export_audit_report_to_pdf_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
 msgid "Discard"
 msgstr "Annulla"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__display_name
-#: model:ir.model.fields,field_description:accountant_knowledge.field_ir_actions_report__display_name
 #: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__display_name
 msgid "Display Name"
 msgstr "Nome visualizzato"
@@ -655,6 +674,19 @@ msgstr "Scarica PDF"
 #: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_search
 msgid "Draft"
 msgstr "Bozza"
+
+#. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_list
+msgid "Duplicate"
+msgstr "Duplicato"
+
+#. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/models/audit_report.py:0
+msgid "Duplicate Annual Report"
+msgstr "Duplica resoconto annuale"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_attestation
@@ -690,8 +722,8 @@ msgstr ""
 #. module: accountant_knowledge
 #. odoo-python
 #: code:addons/accountant_knowledge/models/audit_report.py:0
-msgid "Edit Audit Report"
-msgstr "Modifica rapporto di controllo"
+msgid "Edit Annual Report"
+msgstr "Modifica resoconto annuale"
 
 #. module: accountant_knowledge
 #: model_terms:ir.actions.act_window,help:accountant_knowledge.action_audit_report
@@ -824,6 +856,11 @@ msgid "Fiscal Year N<br>"
 msgstr "Anno fiscale N<br>"
 
 #. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_front_cover
+msgid "Fiscal period from"
+msgstr "Esercizio fiscale dal"
+
+#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_intangible_and_tangible_assets
 msgid "Fixtures and fittings: 10 years"
 msgstr "Infissi e accessori: 10 anni"
@@ -917,7 +954,6 @@ msgstr "Continuità aziendale"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__id
-#: model:ir.model.fields,field_description:accountant_knowledge.field_ir_actions_report__id
 #: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__id
 msgid "ID"
 msgstr "ID"
@@ -1340,6 +1376,16 @@ msgid "Performance & Operations"
 msgstr "Prestazioni e operazioni"
 
 #. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/controller/main.py:0
+msgid ""
+"Please make sure a document layout has been set for the company linked to "
+"the audit report you intend to export."
+msgstr ""
+"Assicurati che sia stato configurato un layout del documento per l'azienda "
+"collegata al resoconto di audit che vuoi esportare."
+
+#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_income_statement
 msgid ""
 "Please provide details of your share of results from joint operations of a "
@@ -1501,11 +1547,6 @@ msgid "Repayable Advances"
 msgstr "Anticipi rimborsabili"
 
 #. module: accountant_knowledge
-#: model:ir.model,name:accountant_knowledge.model_ir_actions_report
-msgid "Report Action"
-msgstr "Segnala azione"
-
-#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_attestation
 msgid "Report on Work Conducted"
 msgstr "Relazione sul lavoro svolto"
@@ -1663,7 +1704,7 @@ msgstr "Controllate e partecipazioni"
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_entity_information
 msgid "Subsidiary Details"
-msgstr "Dettagli sulla controllata"
+msgstr "Dettagli sulla filiale"
 
 #. module: accountant_knowledge
 #: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_subventions
@@ -1676,6 +1717,11 @@ msgstr "Sovvenzioni"
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_supporting_documents
 msgid "Supporting Documents"
 msgstr "Documenti di supporto"
+
+#. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_table_of_content
+msgid "Table of content"
+msgstr "Indice"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_intangible_and_tangible_assets
@@ -1718,6 +1764,11 @@ msgstr "Tassazione"
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_financial_commitments_and_guarantees
 msgid "Technical installations, equipment, and tools<br>"
 msgstr "Impianti tecnici, attrezzature e strumenti<br>"
+
+#. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
+msgid "Template"
+msgstr "Modello"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_account_principles_and_methods
@@ -1878,6 +1929,16 @@ msgstr ""
 "risultato è {{ total balance sheet }}."
 
 #. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/models/knowledge_article.py:0
+msgid ""
+"This article does not have an associated audit report, so the PDF cannot be "
+"generated."
+msgstr ""
+"Questo articolo non dispone di un resoconto di verifica associato pertanto "
+"non è possibile generare il PDF."
+
+#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_entity_information
 msgid "This company is part of a group, and owns the following subsidiaries"
 msgstr "Quest'azienda fa parte di un gruppo e possiede le seguenti controllate"
@@ -2001,3 +2062,8 @@ msgstr "Forza lavoro impiegata durante il periodo"
 #: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
 msgid "e.g. Annual Financial Overview"
 msgstr "ad es. Panoramica finanziaria annuale"
+
+#. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_front_cover
+msgid "to"
+msgstr "fino al"

@@ -8,8 +8,11 @@ from odoo import Command
 @odoo.tests.tagged('post_install', '-at_install')
 class TestUi(TestPointOfSaleHttpCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_01_pos_iot_scale(self):
         env = self.env
+        self.whiteboard_pen.to_weight = True
 
         # Create IoT Box
         iotbox_id = env['iot.box'].sudo().create({
@@ -29,7 +32,8 @@ class TestUi(TestPointOfSaleHttpCommon):
 
         # Select IoT Box, tick electronic scale
         self.main_pos_config.write({
-            'iface_scale_id': iot_device_id.id,
+            'use_iot_box': True,
+            'iot_scale_id': iot_device_id.id,
         })
 
         self.main_pos_config.with_user(self.pos_user).open_ui()

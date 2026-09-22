@@ -1,12 +1,27 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command
+from odoo.tools import mute_logger
 from odoo.tests import tagged
 from odoo.addons.stock_barcode.tests.test_barcode_client_action import TestBarcodeClientAction
 
 
 @tagged('post_install', '-at_install')
 class TestBarcodeClientActionPicking(TestBarcodeClientAction):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.barcode_worker = cls.env['res.users'].create({
+            'name': 'Barcode Worker',
+            'login': 'barcode_worker',
+            'email': 'barcode@test.com',
+            'group_ids': [
+                Command.link(cls.env.ref('stock.group_stock_user').id),
+                Command.link(cls.env.ref('quality.group_quality_user').id),
+            ]
+        })
 
     def test_operation_quality_check_barcode(self):
         """
@@ -45,7 +60,7 @@ class TestBarcodeClientActionPicking(TestBarcodeClientAction):
             },
         ])
 
-        self.start_tour("/odoo/barcode", "test_operation_quality_check_barcode", login="admin")
+        self.start_tour("/odoo/barcode", "test_operation_quality_check_barcode", login="barcode_worker")
 
         quality_checks = self.env['quality.check'].search([('point_id', 'in', quality_points.ids)])
         self.assertRecordValues(quality_checks.sorted('title'), [
@@ -84,7 +99,7 @@ class TestBarcodeClientActionPicking(TestBarcodeClientAction):
         action_id = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
         url = "/web#action=" + str(action_id.id)
 
-        self.start_tour(url, 'test_operation_quality_check_delivery_barcode', login='admin')
+        self.start_tour(url, 'test_operation_quality_check_delivery_barcode', login='barcode_worker')
 
         quality_checks = self.env['quality.check'].search([('point_id', 'in', quality_points.ids)])
         self.assertRecordValues(quality_checks.sorted('title'), [
@@ -92,6 +107,31 @@ class TestBarcodeClientActionPicking(TestBarcodeClientAction):
             {'title': 'check product 2', 'quality_state': 'fail'},
         ])
         self.assertEqual(quality_checks.picking_id.state, "done")
+
+    def test_operation_quality_check_kept_on_partial_barcode_exit(self):
+        """
+        Receiving less than the demand in Barcode then leaving with the back
+        button must keep the receipt's pending operation quality check.
+        """
+        self.env['quality.point'].create({
+            'measure_on': "operation",
+            'picking_type_ids': [Command.link(self.picking_type_in.id)],
+        })
+        receipt = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_in.id,
+            'location_id': self.supplier_location.id,
+            'location_dest_id': self.stock_location.id,
+            'move_ids': [Command.create({
+                'product_id': self.product1.id,
+                'product_uom_qty': 2,
+            })],
+        })
+        receipt.action_confirm()
+
+        url = self._get_client_action_url(receipt)
+        self.start_tour(url, "test_operation_quality_check_kept_on_partial_barcode_exit", login="admin")
+
+        self.assertTrue(receipt.check_ids)
 
     def test_quality_check_partial_reception_barcode(self):
         """
@@ -115,7 +155,7 @@ class TestBarcodeClientActionPicking(TestBarcodeClientAction):
             'move_ids': [
                 Command.create({
                     'product_id': product.id,
-                    'product_uom': product.uom_id.id,
+                    'uom_id': product.uom_id.id,
                     'product_uom_qty': 2,
                     'location_id': self.supplier_location.id,
                     'location_dest_id': self.stock_location.id,
@@ -128,8 +168,41 @@ class TestBarcodeClientActionPicking(TestBarcodeClientAction):
             {'product_id': self.productserial1.id, 'measure_on': 'move_line'},
             {'product_id': self.productserial1.id, 'measure_on': 'move_line'},
         ])
-        self.start_tour("/odoo/barcode", "test_quality_check_partial_reception_barcode", login="admin")
+        with mute_logger('odoo.http'):  # ignore the intended UserError in the test
+            self.start_tour("/odoo/barcode", "test_quality_check_partial_reception_barcode", login="barcode_worker")
         self.assertEqual(picking_in.state, 'done')
         self.assertRecordValues(picking_in.check_ids, [
             {'product_id': self.productserial1.id, 'measure_on': 'move_line', 'quality_state': 'pass', 'lot_name': 'SN001'},
         ])
+
+    def test_quality_check_packages_lots_tour(self):
+        """
+        Test quality check creation on an incoming shipment
+        using packages and lots in the Barcode app.
+        """
+        grp_lot = self.env.ref('stock.group_tracking_lot')
+        self.barcode_worker.write({'group_ids': [Command.link(grp_lot.id)]})
+        product_lot = self.productlot1
+        self.env['quality.point'].create({
+            'product_ids': [Command.link(product_lot.id)],
+            'picking_type_ids': [Command.link(self.picking_type_in.id)],
+            'measure_on': 'move_line',
+        })
+        receipt = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_in.id,
+            'partner_id': self.owner.id,
+            'move_ids': [
+                Command.create({
+                    'product_id': product_lot.id,
+                    'product_uom_qty': 4,
+                    'uom_id': product_lot.uom_id.id,
+                    'location_id': self.supplier_location.id,
+                    'location_dest_id': self.stock_location.id,
+                })
+            ],
+        })
+        receipt.action_confirm()
+        self.start_tour(
+            self._get_client_action_url(receipt),
+            'test_quality_check_packages_lots_tour', login='barcode_worker'
+        )

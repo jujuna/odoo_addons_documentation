@@ -1,4 +1,5 @@
 from odoo import models
+from odoo.exceptions import UserError
 
 
 class HrExpenseSplit(models.TransientModel):
@@ -7,6 +8,8 @@ class HrExpenseSplit(models.TransientModel):
 
     def _get_values(self):
         values = super()._get_values()
+        if self.expense_id.dispute_id:
+            raise UserError(self.env._("Cannot split an expense that is already disputed."))
         # Add any additional fields or modifications specific to hr_expense_stripe here
         values.update({
             'stripe_authorization_id': self.expense_id.stripe_authorization_id,

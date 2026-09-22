@@ -7,9 +7,21 @@
     'summary': 'Documents Testing Module',
     'website': 'https://www.odoo.com/app/documents',
     'depends': [
-        'account_bank_statement_extract',
+        'documents',
         'documents_account',
+        'knowledge',
+        'l10n_be_codabox',
+        'test_mail',
     ],
+    'data': [
+        'data/documents_folder_data.xml',
+        'security/ir.access.csv',
+    ],
+    'assets': {
+        'web.assets_unit_tests': [
+            'test_documents_full/static/tests/**/*',
+        ],
+    },
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { click } from "@odoo/hoot-dom";
+import { click, queryFirst } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 
 import {
@@ -41,7 +41,6 @@ onRpc("helpdesk.team", "retrieve_dashboard", () => ({
     my_all: { count: 0, hours: 0, failed: 0 },
     my_high: { count: 0, hours: 0, failed: 0 },
     my_urgent: { count: 0, hours: 0, failed: 0 },
-    rating_enable: false,
     show_demo: false,
     success_rate_enable: false,
     today: { count: 0, rating: 0, success: 0 },
@@ -62,7 +61,7 @@ test("dashboard basic rendering", async () => {
     expect(".o_helpdesk_content > .o_helpdesk_banner").toHaveCount(1, {
         message: "dashboard should be sibling of renderer element",
     });
-    expect(".o_target_to_set").toHaveText("12");
+    expect(queryFirst(".o_target_to_set")).toHaveText("12");
 });
 
 test("edit the target", async () => {

@@ -1,225 +1,316 @@
-import { Component, onWillStart, onWillUnmount, toRaw, useState } from "@odoo/owl";
-import { XmlResourceEditor } from "@web_studio/client_action/xml_resource_editor/xml_resource_editor";
-import { useEditorMenuItem } from "@web_studio/client_action/editor/edition_flow";
-import { ReportEditorSnackbar } from "@web_studio/client_action/report_editor/report_editor_snackbar";
-import { ReportRecordNavigation } from "./report_record_navigation";
-import { user } from "@web/core/user";
-import { useBus, useOwnedDialogs } from "@web/core/utils/hooks";
+import {
+    Component,
+    computed,
+    onWillStart,
+    onWillUnmount,
+    useConfig,
+    usePlugin,
+    Plugin,
+    useProps,
+    proxy,
+    signal,
+    t,
+} from "@odoo/owl";
+import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
+import { throttleForAnimation } from "@web/core/utils/timing";
+
+import { _t } from "@web/core/l10n/translation";
+import { useCodeEditorState } from "@web/core/code_editor/code_editor";
+import { IrUiViewCodeEditor } from "@web/core/ir_ui_view_code_editor/code_editor";
+import { ResizablePanel } from "@web/core/resizable_panel/resizable_panel";
+
+import { loadResources } from "@web_studio/client_action/xml_resource_editor/xml_resource_editor";
+import { OptionsContainer, UndoRedo } from "../report_editor_components";
 import { ReportEditorIframe } from "../report_editor_iframe";
-import { localization } from "@web/core/l10n/localization";
-import { TranslationDialog } from "@web/views/fields/translation_dialog";
-import { View } from "@web/views/view";
-import { CheckBox } from "@web/core/checkbox/checkbox";
+import { ReportEditorSidebarPlugin } from "../report_editor_sidebar";
+import { TranslationButton } from "./translate_xml";
 
-class ReportResourceEditor extends XmlResourceEditor {
-    static props = { ...XmlResourceEditor.props, slots: Object };
-    setup() {
-        super.setup();
-        useBus(this.env.reportEditorModel.bus, "node-clicked", (ev) => {
-            const { viewId } = ev.detail;
-            const nextResource = this.state.resourcesOptions.find((opt) => opt.value === viewId);
-            if (nextResource) {
-                this.state.currentResourceId = nextResource.value;
-            }
-        });
-    }
+function isCustomization(resource) {
+    return resource && resource.name.endsWith(" report customization");
 }
 
-class TranslationButton extends Component {
-    static template = "web.TranslationButton";
-    static props = {
-        resourceId: Number,
-    };
+export class ReportEditorResourcesPlugin extends Plugin {
+    reportEditorModel = useConfig("reportEditorModel");
 
-    setup() {
-        this.addDialog = useOwnedDialogs();
+    resources = signal([]);
+    currentResource = signal(null);
+    currentResourceId = computed(() => this.currentResource()?.id ?? "");
+    xmlChanges = signal.Object({});
+    isDirty = computed(() => Object.keys(this.xmlChanges()).length > 0);
+
+    resourcesMap = computed(() => Object.fromEntries(this.resources().map((r) => [r.id, r])));
+    subResources = computed(() => {
+        const resourcesMap = this.resourcesMap();
+        const resources = this.resources().filter(
+            (resource) =>
+                this.isSubResource(resource) && !resourcesMap[resource.inherit_id[0]]?.combined_arch
+        );
+        return Object.groupBy(resources, (resource) => resource.inherit_id[0]);
+    });
+    mainResources = computed(() =>
+        this.resources().filter((r) => !isCustomization(r) && !this.isSubResource(r))
+    );
+    customResources = computed(() => this.resources().filter((r) => isCustomization(r)));
+
+    isResourceDirty(resource) {
+        return this.xmlChanges()?.[resource.id];
     }
 
-    get isMultiLang() {
-        return localization.multiLang;
+    isSubResource(resource) {
+        return resource && resource.inherit_id && !("combined_arch" in resource);
     }
-    get lang() {
-        return new Intl.Locale(user.lang).language.toUpperCase();
-    }
-    onClick() {
-        this.addDialog(TranslationDialog, {
-            fieldName: "arch_db",
-            resModel: "ir.ui.view",
-            resId: this.props.resourceId,
-            onSave: () => {
-                const model = this.env.reportEditorModel;
-                model.loadReportHtml({ resId: model.reportEnv.currentId });
-            },
+
+    async loadResources() {
+        const { resources, defaultResource } = await loadResources({
+            mainResourceId: this.reportEditorModel.reportData.report_name,
+            url: "/web_studio/get_report_resources",
+            checkMainViewKey: true,
         });
-    }
-}
 
-class _View extends View {
-    async loadView() {
-        const res = await super.loadView(...arguments);
-        const Controller = this.Controller;
-        if (
-            !("afterExecuteActionButton" in Controller.props) &&
-            "afterExecuteActionButton" in Controller.prototype
-        ) {
-            class _Controller extends Controller {
-                afterExecuteActionButton(clickParams) {
-                    const res = super.afterExecuteActionButton(...arguments);
-                    this.props.afterExecuteActionButton(this.model, ...arguments);
-                    return res;
-                }
-            }
-            _Controller.props = {
-                ...Controller.props,
-                afterExecuteActionButton: { type: Function },
-            };
-            this.Controller = _Controller;
+        this.xmlChanges.set({});
+        this.resources.set(resources);
+
+        if (this.currentResource()) {
+            this.currentResource.set(this.resourcesMap()[this.currentResource().id]);
+        } else {
+            this.currentResource.set(defaultResource);
         }
-        return res;
     }
+}
+
+export class ReportResourceSelector extends Component {
+    static template = "web_studio.ReportEditorXml.ResourceSelector";
+    static components = { OptionsContainer };
+    resourcesPlugin = usePlugin(ReportEditorResourcesPlugin);
 }
 
 export class ReportEditorXml extends Component {
     static components = {
-        XmlResourceEditor: ReportResourceEditor,
-        ReportRecordNavigation,
         ReportEditorIframe,
+        IrUiViewCodeEditor,
+        ResizablePanel,
         TranslationButton,
-        View: _View,
-        CheckBox,
     };
     static template = "web_studio.ReportEditorXml";
-    static props = {
-        paperFormatStyle: String,
-    };
+
+    props = useProps({ paperFormatStyle: t.string() });
+
+    resourcesPlugin = usePlugin(ReportEditorResourcesPlugin);
+    sidebarPlugin = usePlugin(ReportEditorSidebarPlugin);
+
+    warningMessage = signal("");
+    cursorPosition = signal.Object({ row: 0, column: 0 });
+
+    xmlCode = computed(() => {
+        if (!this.currentResource) {
+            return "";
+        }
+        if (this.resourcesPlugin.xmlChanges()?.[this.currentResource.id]) {
+            return this.resourcesPlugin.xmlChanges()[this.currentResource.id];
+        }
+        return this.currentResource[this.getResourceArchField(this.currentResource)];
+    });
+
+    translateButtonProps = computed(() => this._getTranslateButtonProps());
 
     setup() {
-        this.reportEditorModel = useState(this.env.reportEditorModel);
-        this.state = useState({
-            xmlChanges: null,
-            reloadSources: 1,
-            viewIdToDiff: false,
-            warningMessage: "",
-            get isDirty() {
-                return !!this.xmlChanges;
-            },
+        this.action = useService("action");
+        this.addDialog = useOwnedDialogs();
+        this.reportEditorModel = proxy(this.env.reportEditorModel);
+        this.codeEditorState = useCodeEditorState();
+
+        onWillStart(async () => {
+            await this.resourcesPlugin.loadResources();
+            await this.reportEditorModel.loadReportHtml();
         });
 
-        useEditorMenuItem({
-            component: ReportEditorSnackbar,
-            props: {
-                state: this.state,
-                onSave: this.save.bind(this),
-                onDiscard: this.discardChanges.bind(this),
-            },
+        onWillUnmount(() => this.save({ urgent: true }));
+        this.sidebarPlugin.useSave({
+            isDirty: this.resourcesPlugin.isDirty,
+            save: () => this.save(),
+            discard: () => this.resourcesPlugin.loadResources(),
         });
-
-        onWillStart(() => this.reportEditorModel.loadReportHtml());
-
-        onWillUnmount(() => {
-            this.save({ urgent: true });
+        this.sidebarPlugin.addComponent(UndoRedo, "start", {
+            canUndo: computed(() => this.codeEditorState.canUndo),
+            canRedo: computed(() => this.codeEditorState.canRedo),
+            undo: () => this.codeEditorState.undo(),
+            redo: () => this.codeEditorState.redo(),
         });
     }
 
-    get minWidth() {
-        const factor = this.state.viewIdToDiff ? 0.2 : 0.4;
+    get currentResource() {
+        return this.resourcesPlugin.currentResource();
+    }
+
+    get editorInitialWidth() {
+        const factor = 0.4;
         return Math.floor(document.documentElement.clientWidth * factor);
     }
 
-    async onCloseXmlEditor() {
-        await this.save();
-        this.reportEditorModel.mode = "wysiwyg";
+    onCodeChange(code) {
+        if (!this.currentResource) {
+            return;
+        }
+
+        if (this.currentResource[this.getResourceArchField(this.currentResource)] !== code) {
+            this.resourcesPlugin.xmlChanges()[this.currentResource.id] = code;
+        } else {
+            delete this.resourcesPlugin.xmlChanges()[this.currentResource.id];
+        }
     }
 
-    onXmlChanged(changes) {
-        this.state.xmlChanges = changes;
+    onFormat() {
+        this.onCodeChange(window.vkbeautify.xml(this.xmlCode(), 4), { row: 0, column: 0 });
     }
 
-    getDefaultResource(resourcesOptions, mainKey) {
-        let mainResource;
-        if (mainKey) {
-            mainResource = resourcesOptions.find((opt) => opt.resource.key === mainKey);
+    getResourceArchField(resource) {
+        return "combined_arch" in resource ? "combined_arch" : "arch";
+    }
+
+    getChanges() {
+        const changes = {};
+        const mapResources = Object.fromEntries(
+            this.resourcesPlugin.resources().map((res) => [res.id, res])
+        );
+        for (const [resourceId, code] of Object.entries({ ...this.resourcesPlugin.xmlChanges() })) {
+            const resource = mapResources[resourceId];
+            const codeField = this.getResourceArchField(resource);
+            changes[resourceId] = { [codeField]: code };
         }
-        if (mainResource) {
-            const studioExtension = resourcesOptions.find((opt) => {
-                const key = opt.resource.key;
-                const parentId = opt.resource.inherit_id && opt.resource.inherit_id[0];
-                return (
-                    key.includes("web_studio.report_editor_customization") &&
-                    parentId === mainResource.resource.id
-                );
-            });
-            return studioExtension || mainResource;
-        }
+        return changes;
     }
 
     async save({ urgent = false } = {}) {
-        const changes = { ...toRaw(this.state.xmlChanges) };
+        const changes = this.getChanges();
         const result = await this.reportEditorModel.saveReport({
             urgent,
             xmlVerbatim: changes,
         });
-        this.state.warningMessage = this.reportEditorModel.warningMessage;
+        this.warningMessage.set(this.reportEditorModel.warningMessage);
         if (result !== false) {
-            this.state.xmlChanges = null;
             if (!urgent && Object.keys(changes).length) {
-                this.state.reloadSources++;
+                await this.resourcesPlugin.loadResources();
             }
         }
     }
 
-    async discardChanges() {
-        this.state.xmlChanges = null;
-        this.state.reloadSources++;
+    getBrandingTargetInfo(target) {
+        let viewId;
+        let targetResource;
+        const xmlResourceIds = this.resourcesPlugin.resourcesMap();
+        while (target) {
+            viewId = target.getAttribute(`data-ws-main-view-id`);
+            viewId = viewId ? parseInt(viewId) : null;
+            targetResource = viewId in xmlResourceIds ? viewId : null;
+            if (!viewId || !targetResource) {
+                target = target.parentElement?.closest(`[data-ws-main-view-id]`);
+            } else {
+                break;
+            }
+        }
+        if (target) {
+            const sourceLine = parseInt(target.getAttribute("data-ws-main-sourceLine"));
+            return {
+                viewId,
+                sourceLine,
+                target,
+                targetResource,
+            };
+        }
+        return {};
     }
 
     onIframeLoaded({ iframeRef }) {
-        iframeRef.el.contentWindow.document.addEventListener("click", (ev) => {
-            const target = ev.target;
-            const brandingTarget = target.closest(
-                `[data-oe-model="ir.ui.view"][data-oe-field="arch"]`
-            );
-            if (!brandingTarget) {
-                return;
+        const iDocument = iframeRef().contentWindow.document;
+        const highlightOverlay = iDocument.createElement("div");
+        highlightOverlay.classList.add("pe-none", "position-fixed");
+        highlightOverlay.style.setProperty(
+            "background-color",
+            "rgba(1, 186, 210, 0.3)",
+            "important"
+        );
+        iDocument.body.style.cursor = "pointer";
+        iDocument.body.append(highlightOverlay);
+
+        let highlightData;
+        iDocument.addEventListener("click", (ev) => {
+            if (highlightData && highlightData.resourceId) {
+                const sourceLine = highlightData.sourceLine ?? 1;
+                const resource = this.resourcesPlugin.resourcesMap()[highlightData.resourceId];
+                if (resource) {
+                    this.resourcesPlugin.currentResource.set(resource);
+                    this.cursorPosition.set({ row: sourceLine - 1 });
+                }
             }
-            const viewId = parseInt(brandingTarget.getAttribute("data-oe-id"));
-            this.reportEditorModel.bus.trigger("node-clicked", { viewId });
+        });
+
+        const onMouseover = throttleForAnimation((ev) => {
+            const { sourceLine, targetResource, target } = this.getBrandingTargetInfo(ev.target);
+            if (target) {
+                highlightData = {
+                    resourceId: targetResource,
+                    sourceLine,
+                };
+                const targetRect = target.getBoundingClientRect();
+                const highlightOverlayStyle = highlightOverlay.style;
+                for (const measure of ["left", "top", "width", "height"]) {
+                    highlightOverlayStyle.setProperty(measure, `${targetRect[measure]}px`);
+                }
+            }
+        });
+        iDocument.addEventListener("mouseover", onMouseover);
+        iframeRef().addEventListener("mouseleave", () => {
+            highlightData = null;
+            const highlightOverlayStyle = highlightOverlay.style;
+            for (const measure of ["left", "top", "width", "height"]) {
+                highlightOverlayStyle.setProperty(measure, `0px`);
+            }
         });
         this.reportEditorModel.setInEdition(false);
     }
 
-    async switchToDiff(viewId) {
+    canEditDiff() {
+        return this.currentResource && !this.currentResource.combined_arch;
+    }
+
+    async toggleDiff() {
         await this.save();
-        this.state.viewIdToDiff = viewId;
+        await this.action.doAction(
+            {
+                type: "ir.actions.act_window",
+                res_model: "reset.view.arch.wizard",
+                views: [[false, "form"]],
+                target: "new",
+                context: {
+                    studio: false,
+                    studio_report_diff: true,
+                    active_ids: [this.resourcesPlugin.currentResourceId()],
+                    active_model: "ir.ui.view",
+                },
+            },
+            {
+                onClose: (options) => {
+                    if (!options || (!options.dismiss && !options.special)) {
+                        this.reportEditorModel._resetInternalArchs();
+                        this.reportEditorModel.loadReportHtml();
+                        this.resourcesPlugin.loadResources();
+                    }
+                },
+            }
+        );
     }
 
-    get diffProps() {
+    _getTranslateButtonProps() {
+        const fieldName = this.currentResource?.inherit_id?.length ? "arch" : "combined_arch";
         return {
-            type: "form",
-            resModel: "reset.view.arch.wizard",
-            context: {
-                studio: false,
-                studio_report_diff: true,
-                active_ids: [this.state.viewIdToDiff],
-                active_model: "ir.ui.view",
-            },
-            afterExecuteActionButton: (model, clickParams) => {
-                if (
-                    model.root.resModel === "reset.view.arch.wizard" &&
-                    clickParams.name === "reset_view_button"
-                ) {
-                    this.state.reloadSources++;
-                    this.reportEditorModel._resetInternalArchs();
-                    this.reportEditorModel.loadReportHtml();
-                }
-            },
-            preventCreate: true,
+            fieldName,
+            fieldType: "text",
+            resId: this.resourcesPlugin.currentResourceId(),
+            resModel: "ir.ui.view",
+            dialogTitle: computed(() => _t(`Translate Report`)),
+            classes: signal.Object({ "btn-flat": true, "btn-link": null }),
+            beforeOpen: () => this.save({ urgent: true }),
+            onSaved: () => this.resourcesPlugin.loadResources(),
         };
-    }
-
-    onResourceChanged(resource) {
-        if (this.state.viewIdToDiff) {
-            this.state.viewIdToDiff = resource.id;
-        }
     }
 }

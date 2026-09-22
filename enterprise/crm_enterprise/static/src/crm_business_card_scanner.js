@@ -10,7 +10,6 @@ export class CrmBusinessCardScanner extends Component {
     static components = {
         FileUploader,
     };
-    static props = {};
 
     setup() {
         this.orm = useService("orm");
@@ -25,7 +24,7 @@ export class CrmBusinessCardScanner extends Component {
             name: file.name,
             type: 'binary',
             mimetype: file.type,
-            datas: file.data,
+            raw: file.data,
         };
         this.env.services.ui.block();
         try {
@@ -44,10 +43,16 @@ export class CrmBusinessCardScanner extends Component {
     async onUploadComplete() {
         this.env.services.ui.block();
         try {
+            const context = {};
+            const default_team_id = this.env.searchModel.context.default_team_id;
+            if (default_team_id) {
+                context.default_team_id = default_team_id;
+            }
             const actionValues = await this.orm.call(
                 "crm.lead",
                 "action_ocr_business_cards",
-                [[], this.businessCardsAttachmentsIds]
+                [[], this.businessCardsAttachmentsIds],
+                { context },
             );
             if (actionValues) {
                 this.action.doAction(actionValues);

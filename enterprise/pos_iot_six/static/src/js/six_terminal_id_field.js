@@ -1,9 +1,9 @@
+import { proxy } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
 import { useDebounced } from "@web/core/utils/timing";
 import { CharField, charField } from "@web/views/fields/char/char_field";
-import { useState } from "@odoo/owl";
-import { formatEndpoint } from "@iot_base/network_utils/http";
+import { formatEndpoint } from "@iot/network_utils/http";
 
 const DEBOUNCE_DELAY_MS = 500;
 
@@ -12,7 +12,7 @@ export class SixTerminalIdField extends CharField {
 
     setup() {
         super.setup(...arguments);
-        this.state = useState({ isTerminalIdValid: true, terminalIdSentSuccessfully: null });
+        this.state = proxy({ isTerminalIdValid: true, terminalIdSentSuccessfully: null });
 
         this.sendTerminalIdToIotBox = useDebounced(async (terminalId) => {
             try {

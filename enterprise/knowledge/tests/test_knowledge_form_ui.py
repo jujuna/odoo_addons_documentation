@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import timedelta
-import base64
 import io
 import os
 import re
@@ -34,6 +32,9 @@ class TestKnowledgeUI(TestKnowledgeUICommon):
 
     def test_knowledge_history(self):
         """This tour will check that the history works properly."""
+        # First reset the bus so it doesn't interfere.
+        self.env.cr.precommit.data.get("bus.bus.values", []).clear()
+        self.env["bus.bus"].sudo().search([]).unlink()
         self.start_tour('/odoo?debug=1', 'knowledge_history_tour', login='demo')
 
     def test_knowledge_load_template(self):
@@ -60,9 +61,9 @@ class TestKnowledgeUI(TestKnowledgeUICommon):
         article = self.env['knowledge.article'].search([('id', '!=', template.id)], limit=1)
         self.assertTrue(bool(article))
 
-        # Strip collaborative steps ids from the body for content-only
+        # Strip collaborative commits ids from the body for content-only
         # comparison
-        body = re.sub(r'\s*data-last-history-steps="[^"]*"', '', article.body)
+        body = re.sub(r'\s*data-last-history-commits="[^"]*"', '', article.body)
         body = re.sub(r'\s*data-oe-version="[^"]*"', '', body)
 
         self.assertEqual(template.template_body, body)
@@ -74,18 +75,18 @@ class TestKnowledgeUI(TestKnowledgeUICommon):
         # Patching 'now' to allow checking the order of trashed articles, as
         # they are sorted using their deletion date which is based on the
         # 'write_date' field
-        self.patch(self.env.cr, 'now', lambda: fields.Datetime.now() - timedelta(days=1))
-        article_1 = self.env['knowledge.article'].create({
-            'name': 'Article 1',
-            'active': False,
-            'to_delete': True,
-        })
-        article_1.flush_recordset()
+        with self.mock_datetime_and_now(fields.Datetime.now() - timedelta(days=1)):
+            article_1 = self.env['knowledge.article'].create({
+                'name': 'Article 1',
+                'active': False,
+                'to_delete': True,
+            })
+            article_1.flush_recordset()
 
         # as the knowledge.article#_resequence method is based on write date
         # force the write_date to be correctly computed
         # otherwise it always returns the same value as we are in a single transaction
-        self.patch(self.env.cr, 'now', fields.Datetime.now)
+        self.enterContext(self.mock_datetime_and_now(fields.Datetime.now()))
         self.env['knowledge.article'].create({
             'name': 'Article 2',
             'active': False,
@@ -155,7 +156,8 @@ class TestKnowledgeUI(TestKnowledgeUICommon):
         # as the knowledge.article#_resequence method is based on write date
         # force the write_date to be correctly computed
         # otherwise it always returns the same value as we are in a single transaction
-        self.patch(self.env.cr, 'now', fields.Datetime.now)
+        now = fields.Datetime.now()
+        self.enterContext(self.mock_datetime_and_now(now))
 
         # create initial set of data:
         # - one regular internal article
@@ -213,10 +215,10 @@ class TestKnowledgeUI(TestKnowledgeUICommon):
         with io.BytesIO() as f:
             Image.new('RGB', (50, 50)).save(f, 'PNG')
             f.seek(0)
-            image = base64.b64encode(f.read())
+            image = f.read()
         attachment = self.env['ir.attachment'].create({
             'name': 'odoo_logo.png',
-            'datas': image,
+            'raw': image,
             'res_model': 'knowledge.cover',
             'res_id': 0,
         })
@@ -387,8 +389,8 @@ class TestKnowledgeUIWithUnsplash(TestKnowledgeUICommon):
         cls.UNSPLASH_APP_ID = os.getenv("UNSPLASH_APP_ID")
         cls.UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 
-        cls.env["ir.config_parameter"].set_param("unsplash.app_id", cls.UNSPLASH_APP_ID)
-        cls.env["ir.config_parameter"].set_param("unsplash.access_key", cls.UNSPLASH_ACCESS_KEY)
+        cls.env["ir.config_parameter"].set_str("unsplash.app_id", cls.UNSPLASH_APP_ID)
+        cls.env["ir.config_parameter"].set_str("unsplash.access_key", cls.UNSPLASH_ACCESS_KEY)
 
     def test_knowledge_cover_selector_unsplash(self):
         """Check the behaviour of the cover selector when unsplash credentials

@@ -4,7 +4,7 @@
         <field name="name">whatsapp.account.view.list</field>
         <field name="model">whatsapp.account</field>
         <field name="arch" type="xml">
-            <list>
+            <list js_class="whatsapp.whatsapp_account_list">
                 <field name="name"/>
                 <field name="phone_uid"/>
                 <field name="account_uid"/>
@@ -17,17 +17,36 @@
         <field name="name">whatsapp.account.view.form</field>
         <field name="model">whatsapp.account</field>
         <field name="arch" type="xml">
-            <form string="WhatsApp Business Account">
+            <form string="WhatsApp Business Account" create="0">
+                <header groups="whatsapp.group_whatsapp_admin"
+                        invisible="not is_oauth_onboarded or (not token and not is_webhook_subscribed)">
+                    <button name="button_disconnect"
+                            type="object"
+                            string="Disconnect"
+                            confirm="Disconnect this WhatsApp account? This will stop sending and receiving WhatsApp messages."
+                            class="btn btn-primary"/>
+                </header>
+                <div role="status" class="alert alert-danger mb-0" invisible="not is_oauth_onboarded or is_phone_registered or not active">
+                    <i class="oi" data-icon="warning"/> Register your phone number to send WhatsApp messages.
+                    <button type="object"
+                        name="action_open_registration_wizard" class="btn-link p-0">
+                        <i class="oi" data-icon="east"/>
+                        Register
+                    </button>
+                </div>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button type="object" name="action_open_templates" class="oe_stat_button" icon="fa-whatsapp">
+                        <button type="object" name="action_open_templates" class="oe_stat_button" icon="oi_whatsapp">
                             <field name="templates_count" string="Templates" widget="statinfo"/>
+                        </button>
+                        <button type="object" name="action_open_blocklist" class="oe_stat_button" icon="block">
+                            <field name="blocklist_count" string="Blocked Recipients" widget="statinfo"/>
                         </button>
                         <button name="action_debug"
                                 invisible="debug_logging"
                                 groups="base.group_erp_manager"
                                 class="oe_stat_button"
-                                type="object" icon="fa-code">
+                                type="object" icon="code">
                             <div class="o_stat_info">
                                 <span class="o_stat_text text-danger">No debug</span>
                             </div>
@@ -36,23 +55,28 @@
                                 invisible="not debug_logging"
                                 groups="base.group_erp_manager"
                                 class="oe_stat_button"
-                                type="object" icon="fa-code">
+                                type="object" icon="code">
                             <div class="o_stat_info">
                                 <span class="text-success">Debug requests</span>
                             </div>
                         </button>
                     </div>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="state"
+                        class="float-end"
+                        widget="badge"
+                        invisible="not is_oauth_onboarded"
+                        decoration-success="state == 'connected'"
+                        decoration-danger="state == 'disconnected'"/>
                     <div class="oe_title" id='title'>
                         <label for="name" string="Name"/>
                         <h1 id="name"><field name="name" required="1" placeholder='e.g. "Acme Inc. Business Account"'/></h1>
                     </div>
                     <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bolder small">
                         Sending Messages
-                        <widget name="documentation_link" path="/applications/productivity/whatsapp.html" icon="fa-question-circle"/>
+                        <widget name="documentation_link" path="/applications/productivity/whatsapp.html" icon="help"/>
                     </div>
-                    <field name="active" invisible="1"/>
-                    <div class="row mt16 o_settings_container" id="app_setup">
+                    <div class="row mt16 o_settings_container" id="app_setup" invisible="is_oauth_onboarded">
                         <setting documentation="https://developers.facebook.com/docs/development/create-an-app">
                             <field name="app_uid" placeholder="e.g. 123456789012345"/>
                         </setting>
@@ -74,15 +98,22 @@
                             <field name="phone_number"/>
 +                        </setting>
                         <div class="content-group">
-                            <button name="button_test_connection" type="object" string="Test Credentials" icon="fa-key" class="btn-link p-1"/><br/>
-                            <button name="button_sync_whatsapp_account_templates" type="object" string="Synchronize Templates" class="btn-link p-1" icon="fa-refresh"/>
+                            <button name="button_test_connection" type="object" string="Test Credentials" icon="key" class="btn-link p-1"/><br/>
+                            <button name="button_sync_whatsapp_account_templates" type="object" string="Synchronize Templates" class="btn-link p-1" icon="refresh"/><br/>
+                            <button name="button_subscribe_webhook"
+                                    type="object"
+                                    string="Subscribe Webhook"
+                                    class="btn-link p-1"
+                                    icon="notifications"
+                                    groups="base.group_no_one"
+                                    invisible="not is_oauth_onboarded or is_webhook_subscribed or not active"/>
                         </div>
                     </div>
-                    <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bolder small">
+                    <div name="receiving_messages" class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bolder small" invisible="is_oauth_onboarded">
                         Receiving Messages
-                        <widget name="documentation_link" path="/applications/productivity/whatsapp.html" icon="fa-question-circle"/>
+                        <widget name="documentation_link" path="/applications/productivity/whatsapp.html" icon="help"/>
                     </div>
-                    <div class="row mt16 o_settings_container" id="toreceive_msg">
+                    <div class="row mt16 o_settings_container" id="toreceive_msg" invisible="is_oauth_onboarded">
                         <setting documentation="https://developers.facebook.com/docs/whatsapp/cloud-api/guides/set-up-webhooks">
                             <field name="callback_url" widget="CopyClipboardURL"/>
                         </setting>

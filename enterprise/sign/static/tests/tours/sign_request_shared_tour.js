@@ -3,7 +3,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("shared_sign_request_tour", {
-    url: "/odoo",
     steps: () => [
         {
             content: "Open Sign APP",
@@ -13,7 +12,6 @@ registry.category("web_tour.tours").add("shared_sign_request_tour", {
         {
             content: "Click on Template Menu",
             trigger: 'a[data-menu-xmlid="sign.sign_template_menu"]',
-            tooltipPosition: "bottom",
             run: "click",
         },
         {

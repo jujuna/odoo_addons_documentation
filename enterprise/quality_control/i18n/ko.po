@@ -13,17 +13,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:43+0000\n"
-"PO-Revision-Date: 2026-01-23 18:02+0000\n"
-"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:22+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "quality_control/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality_control
+#: model:ir.module.module,description:base.module_quality_control
+msgid ""
+"\n"
+"Quality Control\n"
+"===============\n"
+"* Define quality points that will generate quality checks on pickings,\n"
+"  manufacturing orders or work orders (quality_mrp)\n"
+"* Quality alerts can be created independently or related to quality checks\n"
+"* Possibility to add a measure to the quality check with a min/max "
+"tolerance\n"
+"* Define your stages for the quality alerts\n"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -34,7 +48,7 @@ msgstr "시간 비율"
 #. odoo-python
 #: code:addons/quality_control/models/quality.py:0
 msgid "%(product_name)s is not in Picking %(picking_name)s"
-msgstr "%(product_name)s 품목은 %(picking_name)s 피킹 대상이 아닙니다"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.actions.report,print_report_name:quality_control.quality_check_report
@@ -48,27 +62,13 @@ msgid "15.3 cm"
 msgstr "15.3 cm"
 
 #. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
-msgid "2023-08-15"
-msgstr "2023-08-15"
-
-#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_dashboard_view_kanban
 msgid ""
-"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"Domain alias\" "
+"<i class=\"oi\" data-icon=\"mail\" role=\"img\" aria-label=\"Domain alias\" "
 "title=\"Domain alias\"/>&amp;nbsp;"
 msgstr ""
-"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"Domain alias\" "
+"<i class=\"oi\" data-icon=\"mail\" role=\"img\" aria-label=\"Domain alias\" "
 "title=\"Domain alias\"/>&amp;nbsp;"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid ""
-"<span class=\"fa fa-2x\" data-icon=\"∑\" style=\"padding-left: 10px;\" "
-"role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
-msgstr ""
-"<span class=\"fa fa-2x\" data-icon=\"∑\" style=\"padding-left: 10px;\" "
-"role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
@@ -118,6 +118,18 @@ msgstr "<span class=\"o_stat_text\">품질 검사</span>"
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "<span class=\"o_stat_text\">Quality Checks</span>"
 msgstr "<span class=\"o_stat_text\">품질 검사</span>"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.res_partner_view_form_inherit_quality_control
+msgid "<span class=\"o_stat_text\">Quality Rate</span>"
+msgstr ""
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+msgid ""
+"<span class=\"oi o_button_icon\" data-icon=\"troubleshoot\" style=\"padding-"
+"left: 10px;\" role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -246,9 +258,19 @@ msgid "Back"
 msgstr "뒤로"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_stock_picking_batch
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__check_ids
 msgid "Check"
 msgstr "확인"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_move_line_view_list_from_batch
+msgid "Check Quality"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__check_state
@@ -300,6 +322,11 @@ msgid "Confirm Measure"
 msgstr "측정 확인"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__measure_frequency_type
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
 msgid "Control Frequency"
@@ -335,6 +362,11 @@ msgid "Control per:"
 msgstr "제어 단위:"
 
 #. module: quality_control
+#: model:ir.module.module,summary:base.module_quality_control
+msgid "Control the quality of your products"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
 msgid "Correct Measure"
 msgstr "정확한 측정"
@@ -348,6 +380,11 @@ msgstr "시정 조치"
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
 msgid "Create Alert"
 msgstr "알람 만들기"
+
+#. module: quality_control
+#: model:ir.model,website_form_label:quality_control.model_res_partner
+msgid "Create a Customer"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_alert_action_check
@@ -395,12 +432,6 @@ msgid "Days"
 msgstr "일"
 
 #. module: quality_control
-#: model:ir.model.fields,help:quality_control.field_quality_check__uom_id
-#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__uom_id
-msgid "Default unit of measure used for all stock operations."
-msgstr "모든 재고 운용에 사용되는 기본 단위입니다."
-
-#. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_main
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_team
 msgid ""
@@ -446,14 +477,11 @@ msgid "Determines if only a fraction of the lot should be tested"
 msgstr "LOT의 일부만 검사를 시행할지의 여부를 결정합니다"
 
 #. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
-msgid "Discard"
-msgstr "작성 취소"
-
-#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_ir_http__display_name
 #: model:ir.model.fields,field_description:quality_control.field_product_product__display_name
 #: model:ir.model.fields,field_description:quality_control.field_product_template__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_alert__display_name
+#: model:ir.model.fields,field_description:quality_control.field_quality_alert_team__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__display_name
@@ -461,10 +489,12 @@ msgstr "작성 취소"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_name
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet__display_name
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet_internal__display_name
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_lot__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_move__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__display_name
 msgid "Display Name"
 msgstr "표시명"
 
@@ -480,15 +510,14 @@ msgid "Edit"
 msgstr "편집"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Effective Date Last Year"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_form
 msgid "Email Alias"
 msgstr "이메일 별칭"
-
-#. module: quality_control
-#: model:ir.model.fields,help:quality_control.field_quality_check__product_tracking
-#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__product_tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "창고에 저장 가능한 품목의 추적성을 확인하십시오."
 
 #. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_success__fail
@@ -540,6 +569,11 @@ msgid "Future Activities"
 msgstr "향후 활동"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_ir_http
+msgid "HTTP Routing"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__hide_picking_id
 msgid "Hide Picking"
 msgstr "피킹 숨기기"
@@ -555,9 +589,11 @@ msgid "Hide Repair"
 msgstr "수리 숨기기"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_ir_http__id
 #: model:ir.model.fields,field_description:quality_control.field_product_product__id
 #: model:ir.model.fields,field_description:quality_control.field_product_template__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_alert__id
+#: model:ir.model.fields,field_description:quality_control.field_quality_alert_team__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__id
@@ -565,10 +601,12 @@ msgstr "수리 숨기기"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__id
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet__id
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet_internal__id
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_lot__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_move__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__id
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__id
 msgid "ID"
 msgstr "ID"
 
@@ -642,6 +680,12 @@ msgid "Late Activities"
 msgstr "지연된 활동"
 
 #. module: quality_control
+#: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__move_line
+#: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_on__move_line
+msgid "Lot"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_line_id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__lot_line_id
 msgid "Lot Line"
@@ -661,7 +705,6 @@ msgstr "Lot/SN"
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_stock_lot
-#: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_ids
 msgid "Lot/Serial"
 msgstr "LOT/일련번호"
 
@@ -733,12 +776,6 @@ msgid "Nb Checks"
 msgstr "Nb 검사"
 
 #. module: quality_control
-#. odoo-python
-#: code:addons/quality_control/models/quality.py:0
-msgid "New"
-msgstr "신규"
-
-#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Next"
 msgstr "다음"
@@ -802,6 +839,11 @@ msgid "Notes"
 msgstr "메모"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
+msgid "OK"
+msgstr "예"
+
+#. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_frequency_type__on_demand
 msgid "On-demand"
 msgstr "온디맨드"
@@ -823,14 +865,10 @@ msgstr "생산 관리"
 #: model:ir.model.fields,help:quality_control.field_quality_point__measure_on
 msgid ""
 "Operation = One quality check is requested at the operation level.\n"
-"                  Product = A quality check is requested per product.\n"
-"                 Quantity = A quality check is requested for each new "
-"product quantity registered, with partial quantity checks also possible."
+"                Product = A quality check is requested per product.\n"
+"                Lot = A quality check is requested for each new product "
+"quantity registered, with partial quantity checks also possible."
 msgstr ""
-"운영 = 운영 단계에서 품질 검사를 한 번 요청합니다.\n"
-"                  품목 = 품목별로 품질 검사를 요청합니다.\n"
-"                 수량 = 새로 등록된 품목 수량마다 품질 검사를 요청하며, 부분 "
-"수량 검사도 수행할 수 있습니다."
 
 #. module: quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_dashboard
@@ -844,6 +882,7 @@ msgstr "부분 테스트"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 msgid "Partner"
 msgstr "협력사"
 
@@ -927,11 +966,6 @@ msgid "Product Variant"
 msgstr "품목 세부선택"
 
 #. module: quality_control
-#: model:ir.ui.menu,name:quality_control.quality_control_menu_product_variant
-msgid "Product Variants"
-msgstr "품목 세부사항"
-
-#. module: quality_control
 #: model:ir.ui.menu,name:quality_control.quality_control_menu_product
 #: model:ir.ui.menu,name:quality_control.quality_product_menu_product_template
 msgid "Products"
@@ -948,6 +982,7 @@ msgid "Qty Failed"
 msgstr "불합격 수량"
 
 #. module: quality_control
+#: model:ir.module.module,shortdesc:base.module_quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_root
 msgid "Quality"
 msgstr "품질 관리"
@@ -958,6 +993,7 @@ msgstr "품질 관리"
 #: model:ir.actions.server,name:quality_control.stock_picking_action_quality_alert
 #: model:ir.model,name:quality_control.model_quality_alert
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_calendar
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_form
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_search_inherit_quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "Quality Alert"
@@ -984,6 +1020,11 @@ msgstr "품질 경고 수량"
 #: model:ir.ui.menu,name:quality_control.menu_quality_config_alert_stage
 msgid "Quality Alert Stages"
 msgstr "품질 경고 단계"
+
+#. module: quality_control
+#: model:ir.model,name:quality_control.model_quality_alert_team
+msgid "Quality Alert Team"
+msgstr "품질 경고 팀"
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_alert_stage_action
@@ -1025,6 +1066,12 @@ msgid "Quality Check Analysis"
 msgstr "품질 경고 분석"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_check_count
+#: model:ir.model.fields,field_description:quality_control.field_res_users__quality_check_count
+msgid "Quality Check Count"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__quality_check_fail
 msgid "Quality Check Fail"
 msgstr "품질 검사 실패"
@@ -1053,6 +1100,11 @@ msgid "Quality Check Qty"
 msgstr "품질 검사 수량"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__quality_check_todo
+msgid "Quality Check Todo"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
 msgid "Quality Check:"
 msgstr "품질 검사:"
@@ -1064,6 +1116,7 @@ msgstr "품질 검사:"
 #: model:ir.actions.act_window,name:quality_control.quality_check_action_team
 #: model:ir.ui.menu,name:quality_control.menu_quality_checks
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_search_inherit_quality
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_production_lot_form_quality_control
@@ -1114,6 +1167,13 @@ msgstr "품질 검사 합격 수"
 #: model_terms:ir.ui.view,arch_db:quality_control.product_template_form_view_quality_control
 msgid "Quality Points"
 msgstr "품질 검사점"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check__quality_rate
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_rate
+#: model:ir.model.fields,field_description:quality_control.field_res_users__quality_rate
+msgid "Quality Rate"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_spreadsheet_template_action_config
@@ -1171,10 +1231,14 @@ msgstr ""
 "              품질 검사를 정의합니다."
 
 #. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/quality_spreadsheet_template.py:0
+msgid "Quality templates"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_line
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__qty_line
-#: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__move_line
-#: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_on__move_line
 msgid "Quantity"
 msgstr "수량"
 
@@ -1247,7 +1311,7 @@ msgstr "담당자"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_check_spreadsheet_action/quality_check_spreadsheet_action.xml:0
 msgid "Save in"
-msgstr "저장 위치"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__show_lot_text
@@ -1283,6 +1347,12 @@ msgstr "스프레드시트 데이터"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
 msgstr "스프레드시트 파일 이름"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr "스프레드시트 이미지"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_revision_ids
@@ -1342,6 +1412,16 @@ msgid "Success cell"
 msgstr "성공 셀"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_point__supplier_count
+msgid "Supplier Count"
+msgstr ""
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+msgid "Suppliers"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_search
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_tree
 msgid "Tags"
@@ -1367,6 +1447,14 @@ msgstr "팀:"
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_tree
 msgid "Teams"
 msgstr "팀"
+
+#. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_check__product_tracking
+#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__test_type
@@ -1404,6 +1492,11 @@ msgstr ""
 "째 시트가 선택됩니다."
 
 #. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_check__quality_rate
+msgid "The percentage of quality checks that passed."
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_point__measure_frequency_value
 msgid "The probability of each quality check being generated"
 msgstr "각 품질 검사가 생성될 확률"
@@ -1421,6 +1514,11 @@ msgid "Title"
 msgstr "제목"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_form
+msgid "Title..."
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 msgid "Today Activities"
 msgstr "오늘의 활동"
@@ -1433,8 +1531,8 @@ msgstr "공차"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__product_tracking
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__product_tracking
-msgid "Tracking"
-msgstr "추적"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_stock_picking
@@ -1476,6 +1574,7 @@ msgid "Untitled spreadsheet"
 msgstr "제목없는 스프레드시트"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Validate"
 msgstr "승인"
@@ -1545,6 +1644,14 @@ msgstr "검사 전 사진을 제공해야 합니다"
 #. module: quality_control
 #. odoo-python
 #: code:addons/quality_control/models/stock_picking.py:0
+msgid ""
+"You need to supply a Lot/Serial Number for product:\n"
+"%(products)s"
+msgstr ""
+
+#. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/stock_picking.py:0
 msgid "You still need to do the quality checks!"
 msgstr "품질 검사를 해야 합니다!"
 
@@ -1563,38 +1670,8 @@ msgstr "예. QA 마스터"
 msgid "e.g. mycompany.com"
 msgstr "예: mycompany.com"
 
-#~ msgid ""
-#~ "<span attrs=\"{'invisible': [('measure_frequency_type', '=', 'all')]}"
-#~ "\">Every </span>"
-#~ msgstr ""
-#~ "<span attrs=\"{'invisible': [('measure_frequency_type', '=', 'all')]}\">매"
-#~ "일 </span>"
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
+#~ msgstr "창고에 저장 가능한 품목의 추적성을 확인하십시오."
 
-#~ msgid "<strong>Operations:</strong>"
-#~ msgstr "<strong>운영:</strong>"
-
-#~ msgid "<strong>Products:</strong>"
-#~ msgstr "<strong>품목:</strong>"
-
-#~ msgid "Cancel"
-#~ msgstr "취소"
-
-#~ msgid "Group By"
-#~ msgstr "그룹별"
-
-#~ msgid "In #{kanban_getcolorname(record.color.raw_value)}"
-#~ msgstr "In #{kanban_getcolorname(record.color.raw_value)}"
-
-#~ msgid "OK"
-#~ msgstr "확인"
-
-#~ msgid "Product Unit of Measure"
-#~ msgstr "품목 단위"
-
-#~ msgid "Quality Control Points"
-#~ msgstr "품질 관리점"
-
-#~ msgid "You measured %.2f %s and it should be between %.2f and %.2f %s."
-#~ msgstr ""
-#~ "당신은 %.2f %s를 측정하였습니다. 그것은 %.2f와 %.2f %s 사이에 있어야 합니"
-#~ "다."
+#~ msgid "Tracking"
+#~ msgstr "추적"

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 {
     'name': "Barcode",
@@ -8,26 +7,28 @@ This module enables the barcode scanning feature for the warehouse management sy
     """,
     'category': 'Supply Chain/Inventory',
     'sequence': 255,
-    'version': '1.0',
     'depends': ['stock', 'web_tour', 'web_mobile'],
     'data': [
-        'security/ir.model.access.csv',
         'views/stock_inventory_views.xml',
+        'views/stock_package_type_views.xml',
         'views/stock_picking_views.xml',
+        'views/stock_picking_batch_views.xml',
         'views/stock_picking_type_views.xml',
         'views/stock_move_line_views.xml',
+        'views/stock_move_views.xml',
         'views/stock_barcode_views.xml',
         'views/res_config_settings_views.xml',
-        'views/stock_scrap_views.xml',
         'views/stock_location_views.xml',
+        'views/stock_lot_views.xml',
+        'views/stock_quant_views.xml',
         'wizard/stock_barcode_cancel_operation.xml',
         'wizard/stock_backorder_confirmation_views.xml',
         'data/data.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/demo.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'application': True,
     'author': 'Odoo S.A.',
@@ -50,5 +51,8 @@ This module enables the barcode scanning feature for the warehouse management sy
         'web.assets_tests': [
             'stock_barcode/static/tests/tours/**/*',
         ],
-    }
+    },
+    'other_files': [
+        'data/epc_template.xml',
+    ],
 }

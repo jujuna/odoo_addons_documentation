@@ -278,6 +278,7 @@ import { computeReportMeasures, processMeasure } from "@web/views/utils";
  * @property {boolean} useSampleModel
  * @property {Object} widgets
  * @property {Map} customGroupBys
+ * @property {string[]} archMeasures
  * @property {string[]} expandedRowGroupBys
  * @property {string[]} expandedColGroupBys
  * @property {Object} sortedColumn
@@ -318,6 +319,7 @@ export class PivotModel extends Model {
      * @param {string|null} params.metaData.defaultOrder
      * @param {boolean} params.metaData.disableLinking
      * @param {boolean} params.metaData.useSampleModel
+     * @param {string[]} [params.metaData.archMeasures=[]]
      * @param {Map} [params.metaData.customGroupBys={}]
      * @param {string[]} [params.metaData.expandedColGroupBys=[]]
      * @param {string[]} [params.metaData.expandedRowGroupBys=[]]
@@ -356,6 +358,7 @@ export class PivotModel extends Model {
             numbering: {},
         };
         const metaData = Object.assign({}, params.metaData, {
+            archMeasures: params.metaData.archMeasures || params.metaData.activeMeasures,
             customGroupBys: params.metaData.customGroupBys || new Map(),
             expandedRowGroupBys: params.metaData.expandedRowGroupBys || [],
             expandedColGroupBys: params.metaData.expandedColGroupBys || [],
@@ -672,7 +675,9 @@ export class PivotModel extends Model {
             metaData.expandedColGroupBys = [];
         }
 
-        const allActivesMeasures = new Set(this.metaData.activeMeasures);
+        const allActivesMeasures = new Set(
+            this.metaData.activeMeasures.concat(this.metaData.archMeasures)
+        );
         if (processedMeasures) {
             processedMeasures.forEach((e) => allActivesMeasures.add(e));
         }
@@ -730,7 +735,7 @@ export class PivotModel extends Model {
             metaData.activeMeasures.push(fieldName);
             const config = { metaData, data: this.data };
             await this._loadData(config);
-            this.useSampleModel = false;
+            this.useSampleModel = false; // can be removed
         }
         this.nextActiveMeasures = null;
         this.notify();
@@ -783,6 +788,7 @@ export class PivotModel extends Model {
         metaData.activeMeasures = [...metaData.activeMeasures];
         metaData.colGroupBys = [...metaData.colGroupBys];
         metaData.rowGroupBys = [...metaData.rowGroupBys];
+        metaData.archMeasures = [...metaData.archMeasures];
         metaData.expandedColGroupBys = [...metaData.expandedColGroupBys];
         metaData.expandedRowGroupBys = [...metaData.expandedRowGroupBys];
         metaData.customGroupBys = new Map([...metaData.customGroupBys]);
@@ -914,7 +920,7 @@ export class PivotModel extends Model {
      * @param {Object} group
      * @param {string[]} groupBys
      * @param {Config} config
-     * @returns {string[]}
+     * @returns {TranslatedString[]}
      */
     _getGroupLabels(group, groupBys, config) {
         return groupBys.map((gb) => {
@@ -1310,12 +1316,14 @@ export class PivotModel extends Model {
         // keep folded groups folded after the reload if the structure of the table is the same
         if (prune && this._hasData(data) && this._hasData(this.data)) {
             if (
-                symmetricalDifference(metaData.rowGroupBys, this.metaData.rowGroupBys).length === 0
+                symmetricalDifference(metaData.fullRowGroupBys, this.metaData.fullRowGroupBys)
+                    .length === 0
             ) {
                 this._pruneTree(data.rowGroupTree, this.data.rowGroupTree);
             }
             if (
-                symmetricalDifference(metaData.colGroupBys, this.metaData.colGroupBys).length === 0
+                symmetricalDifference(metaData.fullColGroupBys, this.metaData.fullColGroupBys)
+                    .length === 0
             ) {
                 this._pruneTree(data.colGroupTree, this.data.colGroupTree);
             }
@@ -1429,11 +1437,8 @@ export class PivotModel extends Model {
         }
         [...tree.directSubTrees.keys()].forEach((subTreeKey) => {
             const subTree = tree.directSubTrees.get(subTreeKey);
-            if (!oldTree.directSubTrees.has(subTreeKey)) {
-                subTree.directSubTrees.clear();
-                delete subTree.sortedKeys;
-            } else {
-                const oldSubTree = oldTree.directSubTrees.get(subTreeKey);
+            const oldSubTree = oldTree.directSubTrees.get(subTreeKey);
+            if (oldSubTree) {
                 this._pruneTree(subTree, oldSubTree);
             }
         });
@@ -1446,7 +1451,7 @@ export class PivotModel extends Model {
      * @param {any} value
      * @param {string} groupBy
      * @param {Config} config
-     * @returns {string}
+     * @returns {TranslatedString}
      */
     _sanitizeLabel(value, groupBy, config) {
         const { metaData } = config;

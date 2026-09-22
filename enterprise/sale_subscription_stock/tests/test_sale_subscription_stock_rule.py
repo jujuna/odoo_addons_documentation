@@ -8,6 +8,8 @@ from odoo.tests import users, tagged
 @tagged('post_install', '-at_install')
 class TestSaleSubscriptionStockRule(TestSubscriptionStockCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def setUp(self):
         super().setUp()
         if 'mrp.production' not in self.env:
@@ -15,15 +17,10 @@ class TestSaleSubscriptionStockRule(TestSubscriptionStockCommon):
 
     @users('admin')
     def test_post_invoice_for_mto_product(self):
-        warehouse = self.env.ref('stock.warehouse0')
-        route_manufacture = warehouse.manufacture_pull_id.route_id.id
-        route_mto = warehouse.mto_pull_id.route_id.id
-
         prod = self.env['product.product'].create({
             'name': 'Test',
             'is_storable': True,
             'recurring_invoice': True,
-            'route_ids': [Command.link(route_manufacture), Command.link(route_mto)],
         })
         sub = self.env['sale.order'].create({
             'name': 'Order',

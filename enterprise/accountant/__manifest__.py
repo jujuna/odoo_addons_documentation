@@ -22,7 +22,6 @@ It assigns manager and user access rights to the Administrator for the accountin
         'views/partner_views.xml',
     ],
     'demo': ['demo/account_accountant_demo.xml'],
-    'installable': True,
     'application': True,
     'post_init_hook': '_accounting_post_init',
     'uninstall_hook': "uninstall_hook",

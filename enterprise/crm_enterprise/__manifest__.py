@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': "CRM enterprise",
-    'version': "1.0",
     'category': "Sales/CRM",
     'summary': "Advanced features for CRM",
     'description': """
@@ -14,13 +12,16 @@ business cards to generate new leads from them
     'data': [
         'views/crm_lead_views.xml',
     ],
-    'installable': True,
     'auto_install': ['crm'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'crm_enterprise/static/src/**/*',
+            ('remove', 'crm_enterprise/static/src/views/**'),
+        ],
+        'web.assets_backend_lazy': [
+            'crm_enterprise/static/src/views/**',
         ],
         'web.assets_unit_tests': [
             'crm_enterprise/static/tests/**/*',

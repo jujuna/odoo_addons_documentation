@@ -1,8 +1,6 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Luxembourg - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Luxembourg
 =================================
@@ -36,15 +34,14 @@ Necessary master data is also included.
         'views/res_company_views.xml',
         'views/res_partner_views.xml',
         'views/l10n_lu_stored_sales_report_views.xml',
+        'wizard/l10n_lu_annual_tax_report_submission_wizard.xml',
         'wizard/l10n_lu_ec_sales_list_submission_wizard.xml',
         'wizard/l10n_lu_generate_accounts_report.xml',
         'wizard/l10n_lu_generate_sales_report.xml',
         'wizard/l10n_lu_tax_return_submission_wizard.xml',
-        'security/ir.model.access.csv',
-        'security/l10n_lu_yearly_tax_report_appendix_security.xml',
+        'security/ir.access.csv',
     ],
     'demo': ['demo/demo_company.xml'],
-    'post_init_hook': '_l10n_lu_reports_post_init',
     'auto_install': ['l10n_lu', 'account_asset'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

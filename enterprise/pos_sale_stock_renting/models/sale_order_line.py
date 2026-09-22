@@ -24,7 +24,7 @@ class SaleOrderLine(models.Model):
                 for move in outgoing_moves:
                     if move.state != 'done':
                         continue
-                    qty += move.product_uom._compute_quantity(move.quantity, line.product_uom_id, rounding_method='HALF-UP')
+                    qty += move.uom_id._compute_quantity(move.quantity, line.product_uom_id, rounding_method='HALF-UP')
                 delivered_qties[line] = qty
                 if all(picking.state == 'done' for picking in line.pos_order_line_ids.order_id.picking_ids) and line.product_id.type != 'service':
                     delivered_qties[line] += sum((self._convert_qty(line, pos_line.qty, 'p2s') for pos_line in line.pos_order_line_ids), 0)

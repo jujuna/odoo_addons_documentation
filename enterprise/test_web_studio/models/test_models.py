@@ -16,6 +16,8 @@ class TestStudioModel_Action(models.Model):
     custom_binary = fields.Binary()
     custom_binary_filename = fields.Char()
 
+    admin_integer = fields.Integer(groups="base.group_system")
+
     def action_confirm(self):
         for rec in self:
             rec.confirmed = True
@@ -51,6 +53,7 @@ class TestStudio_ExportModel1(models.Model):
     )
     binary_data = fields.Binary()
     model2_id = fields.Many2one("test.studio_export.model2")
+    properties_definition = fields.PropertiesDefinition()
 
 
 class TestStudio_ExportModel2(models.Model):
@@ -68,3 +71,12 @@ class TestStudio_ExportModel3(models.Model):
     _description = "Test Model for Studio Exports 3"
     name = fields.Char()
     model1_id = fields.Many2one("test.studio_export.model1")
+    properties = fields.Properties(definition='model1_id.properties_definition')
+
+
+class TestStudio_ReportModel(models.Model):
+    _name = "test.studio_report_model"
+    _description = "Test Model for reports"
+
+    some_partner = fields.Many2one("res.partner")
+    some_company = fields.Many2one("res.company")

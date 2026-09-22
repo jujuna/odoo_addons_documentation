@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -9,18 +8,20 @@
     'description': """Manage your X accounts and schedule posts""",
     'depends': ['social', 'iap'],
     'data': [
-        'security/ir.model.access.csv',
         'data/social_media_data.xml',
         'views/social_post_template_views.xml',
+        'views/social_post_views.xml',
         'views/social_stream_views.xml',
         'views/social_stream_post_views.xml',
         'views/social_twitter_templates.xml',
         'views/res_config_settings_views.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
     'assets': {
         'web.assets_backend': [
             'social_twitter/static/src/scss/social_twitter.scss',
+            'social_twitter/static/src/js/social_post_message_field.js',
             'social_twitter/static/src/js/stream_post_comment.js',
             'social_twitter/static/src/js/stream_post_comment_list.js',
             'social_twitter/static/src/js/stream_post_comments.js',

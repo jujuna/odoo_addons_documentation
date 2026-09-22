@@ -1,6 +1,4 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-from odoo import api, fields, models, Command
+from odoo import api, fields, models
 
 
 class Account_FollowupManual_Reminder(models.TransientModel):
@@ -8,140 +6,73 @@ class Account_FollowupManual_Reminder(models.TransientModel):
     _inherit = ['mail.composer.mixin']
     _description = "Wizard for sending manual reminders to clients"
 
-    @api.model
-    def default_get(self, fields):
-        defaults = super().default_get(fields)
-        assert self.env.context['active_model'] == 'res.partner'
-        partner = self.env['res.partner'].browse(self.env.context['active_ids'])
-        partner.ensure_one()
-        followup_line = partner.followup_line_id
-        if followup_line:
-            defaults.update(self._get_defaults_from_followup_line(followup_line))
-        defaults.update(
-            partner_id=partner.id,
-            attachment_ids=[Command.set(partner.unreconciled_aml_ids.move_id.message_main_attachment_id.ids)],
-            render_model='res.partner'
+    move_ids = fields.Many2many(comodel_name='account.move')
+    preview_subject = fields.Char('Subject Preview', compute='_compute_preview_fields')
+    preview_body = fields.Html('Body Preview', compute='_compute_preview_fields')
+    alerts = fields.Json(compute='_compute_alerts')
+
+    @api.depends('template_id', 'move_ids')
+    def _compute_preview_fields(self):
+        """Render template preview with selected customer as sample.
+        If several customers are selected, the first one is used as preview
+        record and the due amount for that customer is injected in context,
+        similarly to the actual send flow.
+        """
+        for wizard in self:
+            if not wizard.template_id or not wizard.move_ids:
+                wizard.preview_subject = False
+                wizard.preview_body = False
+                continue
+
+            partner = wizard.move_ids[:1].partner_id or self.env.user.partner_id
+            amount_due = sum(wizard.move_ids.filtered(lambda m: m.partner_id == partner).mapped('amount_residual'))
+            values = wizard.template_id.with_context(amount_due=amount_due)._generate_template(
+                [partner.id],
+                ['subject', 'body_html'],
+            )[partner.id]
+            wizard.preview_subject = values.get('subject')
+            wizard.preview_body = values.get('body_html')
+
+    @api.depends('move_ids')
+    def _compute_alerts(self):
+        for wizard in self:
+            alerts = {}
+            partners_without_mail = wizard.move_ids.partner_id.filtered(lambda p: not p.email)
+
+            if partners_without_mail:
+                alerts['account_missing_email'] = {
+                    'level': 'warning',
+                    'message': self.env._("Partner(s) should have an email address."),
+                    'action_text': self.env._("View Partner(s)"),
+                    'action': (
+                        partners_without_mail._get_records_action(name=self.env._("Check Partner(s) Email(s)"))
+                    ),
+                }
+            wizard.alerts = alerts
+
+    def send_reminder(self):
+        self.ensure_one()
+
+        partner_data = self.env['account.move']._read_group(
+            domain=[('id', 'in', self.move_ids.ids)],
+            aggregates=['amount_residual:sum', 'id:recordset'],
+            groupby=['partner_id'],
         )
-        return defaults
 
-    partner_id = fields.Many2one(comodel_name='res.partner')
+        for partner, amount_residual, moves in partner_data:
+            # Render template per partner with their specific context
+            template_ctx = self.template_id.with_context(
+                amount_due=amount_residual,
+            )
+            body = template_ctx._render_field('body_html', [partner.id])[partner.id]
 
-    # email fields
-    email = fields.Boolean()
-    email_recipient_ids = fields.Many2many(string="Extra Recipients", comodel_name='res.partner',
-                                           compute='_compute_email_recipient_ids', store=True, readonly=False,
-                                           relation='rel_followup_manual_reminder_res_partner')  # override
+            attachment_ids = moves.invoice_pdf_report_id.ids
+            followup_report = partner._get_followup_report(options=None)
+            attachment_ids = attachment_ids + [followup_report]
+            partner.message_post(
+                body=body,
+                partner_ids=[partner.id],
+                attachment_ids=attachment_ids,
+            )
 
-    # sms fields
-    sms = fields.Boolean()
-    sms_body = fields.Char(compute='_compute_sms_body', readonly=False, store=True)
-    sms_template_id = fields.Many2one(comodel_name='sms.template', domain=[('model', '=', 'res.partner')])
-
-    # print fields
-    print = fields.Boolean(default=True)
-    join_invoices = fields.Boolean(string="Attach Invoices")
-
-    # attachments fields
-    attachment_ids = fields.Many2many(comodel_name='ir.attachment', bypass_search_access=True)
-
-    # Wizard buttons visibility controllers
-    show_send_button = fields.Boolean(compute="_compute_show_send_button")
-    show_print_button = fields.Boolean(compute="_compute_show_print_button")
-
-    @api.depends('email', 'sms')
-    def _compute_show_send_button(self):
-        for wizard in self:
-            wizard.show_send_button = wizard.email or wizard.sms
-
-    @api.depends('print')
-    def _compute_show_print_button(self):
-        for wizard in self:
-            wizard.show_print_button = wizard.print
-
-    def _compute_render_model(self):
-        # OVERRIDES mail.renderer.mixin
-        self.render_model = 'res.partner'
-
-    def _get_defaults_from_followup_line(self, followup_line):
-        return {
-            'email': followup_line.send_email,
-            'sms': followup_line.send_sms,
-            'template_id': followup_line.mail_template_id.id,
-            'sms_template_id': followup_line.sms_template_id.id,
-            'join_invoices': followup_line.join_invoices,
-        }
-
-    @api.depends('template_id')
-    def _compute_subject(self):
-        for wizard in self:
-            options = {
-                'partner_id': wizard.partner_id.id,
-                'mail_template': wizard.template_id,
-            }
-            wizard.subject = self.env['account.followup.report']._get_email_subject(options)
-
-    @api.depends('template_id')
-    def _compute_body(self):
-        # OVERRIDES mail.composer.mixin
-        for wizard in self:
-            options = {
-                'partner_id': wizard.partner_id.id,
-                'mail_template': wizard.template_id,
-            }
-            wizard.body = self.env['account.followup.report']._get_main_body(options)
-
-    @api.depends('template_id')
-    def _compute_email_recipient_ids(self):
-        for wizard in self:
-            partner = wizard.partner_id
-            template = wizard.template_id
-            wizard.email_recipient_ids = partner._get_all_followup_contacts() or partner
-            if template:
-                rendered_values = template._generate_template_recipients(
-                    [partner.id],
-                    {'partner_to', 'email_cc', 'email_to'},
-                    find_or_create_partners=True,
-                )[partner.id]
-                if rendered_values.get('partner_ids'):
-                    wizard.email_recipient_ids = [Command.link(partner_id) for partner_id in rendered_values['partner_ids']]
-
-    @api.depends('sms_template_id')
-    def _compute_sms_body(self):
-        for wizard in self:
-            options = {
-                'partner_id': wizard.partner_id.id,
-                'sms_template': wizard.sms_template_id,
-            }
-            wizard.sms_body = self.env['account.followup.report']._get_sms_body(options)
-
-    def _get_wizard_options(self):
-        """ Returns a dictionary of options, containing values from this wizard that are needed to process the followup
-        """
-        return {
-            'partner_id': self.partner_id,
-            'email': self.email,
-            'email_from': self.template_id.email_from,
-            'email_subject': self.subject,
-            'email_recipient_ids': self.email_recipient_ids,
-            'body': self.body,
-            'attachment_ids': self.attachment_ids.ids,
-            'sms': self.sms,
-            'sms_body': self.sms_body,
-            'print': self.print,
-            'join_invoices': self.join_invoices,
-            'manual_followup': True,
-            'template_id': self.template_id,
-        }
-
-    def process_followup(self):
-        """ Method run by pressing the 'Send and Print' button in the wizard.
-        It will process the followup for the active partner, taking into account the fields from the wizard.
-        Send email/sms and print the followup letter (pdf) depending on which is activated.
-        Once the followup has been processed, we simply close the wizard.
-        """
-        options = self._get_wizard_options()
-        options['author_id'] = self.env.user.partner_id.id
-        action = self.partner_id.execute_followup(options)
-        return action or {
-            'type': 'ir.actions.act_window_close',
-        }
+        self.move_ids.last_reminder = fields.Date.context_today(self)

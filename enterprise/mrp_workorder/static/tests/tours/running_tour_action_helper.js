@@ -1,6 +1,6 @@
 import { assert, fail } from "@stock/../tests/tours/tour_helper";
 import { patch } from "@web/core/utils/patch";
-import { TourHelpers } from "@web_tour/js/tour_automatic/tour_helpers";
+import { TourHelpers } from "@web_tour/tour_helpers/tour_helpers";
 
 patch(TourHelpers.prototype, {
     async scan(barcode) {
@@ -81,7 +81,7 @@ export function assertStep(values) {
     const { index, label, value, workcenter } = values;
     const recordEl = values.record || getRecord();
     const headerEl = recordEl.querySelector("&>.card-header");
-    const moName = headerEl.querySelector(".o_record_name h4").innerText;
+    const moName = headerEl.querySelector(".o_record_name_box > span").innerText;
     const lineEl = values.step || recordEl.querySelectorAll("&>ul>li")[index];
     const lineLabelSelector = workcenter ? ".o_mrp_operation_name" : ".o_line_label";
     const lineLabel = lineEl.querySelector(lineLabelSelector).innerText;
@@ -119,7 +119,7 @@ export function assertWorkcenterButtons(buttons) {
     for (let i = 0; i < buttons.length; i++) {
         const { name, count, active = false } = buttons[i];
         const buttonEl = buttonEls[i];
-        const buttonName = buttonEl.firstChild.data;
+        const buttonName = buttonEl.firstElementChild.textContent.trim();
         const buttonCount = Number(buttonEl.querySelector(".o_tabular_nums").innerText);
         assert(buttonName, name, "Not the right button");
         assert(buttonCount, count, `Not the right count for button "${name}"`);
@@ -152,8 +152,8 @@ export function assertWorkOrderValues(values) {
     const headerEl = recordEl.querySelector("&>.card-header");
     const linesEl = recordEl.querySelectorAll("&>ul>li");
     // Check record's name (and operation in case of a Work Order.)
-    const moName = headerEl.querySelector(".o_record_name h4").innerText;
-    const operationName = headerEl.querySelector("h5")?.innerText;
+    const moName = headerEl.querySelector(".o_record_name_box > span").innerText;
+    const operationName = headerEl.querySelector(".o_mrp_operation_name")?.innerText;
     assert(moName, name, "Wrong record's name");
     if (operation) {
         assert(operationName, operation, `Wrong operation for record "${name}"`);

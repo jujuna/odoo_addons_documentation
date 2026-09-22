@@ -4,24 +4,27 @@ import { useService } from "@web/core/utils/hooks";
 import { Many2XAutocomplete } from "@web/views/fields/relational_utils";
 import { computeAppsAndMenuItems } from "@web/webclient/menus/menu_helpers";
 
-import { Component, useState, useExternalListener, useRef, onMounted } from "@odoo/owl";
+import { Component, onMounted, proxy, signal, t, useListener, useProps } from "@odoo/owl";
 
 export class IrMenuSelector extends Component {
     static components = { Many2XAutocomplete };
     static template = "spreadsheet_edition.IrMenuSelector";
-    static props = {
-        menuId: { type: Number, optional: true },
-        onValueChanged: Function,
-        autoFocus: { type: Boolean, optional: true },
-    };
+
+    props = useProps({
+        menuId: t.number().optional(),
+        onValueChanged: t.function(),
+        autoFocus: t.boolean().optional(),
+        class: t.string().optional(),
+    });
+
+    menuSelectorRef = signal.ref();
 
     setup() {
         super.setup();
-        this.ref = useRef("menuSelectorRef");
         this.menus = useService("menu");
         onMounted(() => {
             if (this.props.autoFocus) {
-                this.ref.el.querySelector("input")?.focus();
+                this.menuSelectorRef()?.querySelector("input")?.focus();
             }
         });
     }
@@ -93,13 +96,14 @@ export class IrMenuSelector extends Component {
 export class IrMenuSelectorDialog extends Component {
     static components = { Dialog, IrMenuSelector };
     static template = "spreadsheet_edition.IrMenuSelectorDialog";
-    static props = {
-        onMenuSelected: Function,
-        close: Function, // prop added by Dialog service
-    };
+
+    props = useProps({
+        onMenuSelected: t.function(),
+        close: t.function(), // prop added by Dialog service
+    });
 
     setup() {
-        this.selectedMenu = useState({
+        this.selectedMenu = proxy({
             id: undefined,
         });
         // Clicking anywhere will close the link editor menu. It should be
@@ -109,7 +113,7 @@ export class IrMenuSelectorDialog extends Component {
         // However, the autocomplete dropdown of the Many2OneField widget is *not*
         // a child of this component. It's actually a direct child of "body" ¯\_(ツ)_/¯
         // The following external listener handles this.
-        useExternalListener(document.body, "click", (ev) => {
+        useListener(document.body, "click", (ev) => {
             ev.stopPropagation();
             ev.preventDefault(); // stop jumping to odoo home page
         });

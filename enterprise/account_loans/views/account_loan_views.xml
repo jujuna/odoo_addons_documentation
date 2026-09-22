@@ -42,7 +42,7 @@
                         <div class="oe_button_box" name="button_box">
                             <button
                                 class="oe_stat_button"
-                                icon="fa-bars"
+                                icon="menu"
                                 type="object"
                                 name="action_open_loan_entries"
                                 invisible="state == 'draft'"
@@ -51,7 +51,7 @@
                             </button>
                             <button
                                 class="oe_stat_button"
-                                icon="fa-bars"
+                                icon="menu"
                                 type="object"
                                 name="action_open_linked_assets"
                                 invisible="count_linked_assets == 0"
@@ -77,8 +77,8 @@
                                     <label for="duration" string="Duration"/>
                                     <div>
                                         <field name="duration" class="oe_inline" decoration-danger="duration_difference != 0" readonly="state != 'draft'"/>
-                                        <span class="oe_inline" invisible="duration == 1">months</span>
-                                        <span class="oe_inline" invisible="duration != 1">month</span>
+                                        <span invisible="duration == 1">months</span>
+                                        <span invisible="duration != 1">month</span>
                                     </div>
                                     <field name="asset_group_id"/>
                                 </group>
@@ -96,6 +96,7 @@
                                         <field name="short_term_account_id" readonly="state != 'draft'"/>
                                         <field name="expense_account_id" readonly="state != 'draft'"/>
                                         <field name="journal_id" readonly="state != 'draft'"/>
+                                        <field name="analytic_distribution" widget="analytic_distribution" readonly="state != 'draft'"/>
                                     </group>
                                     <group name="loan_settings_column2">
                                         <field name="skip_until_date" readonly="state != 'draft'" placeholder="1st amortization schedule"/>
@@ -259,6 +260,43 @@
              </field>
         </record>
 
+        <record id="account_loan_line_kanban_view" model="ir.ui.view">
+            <field name="name">account.loan.line.kanban</field>
+            <field name="model">account.loan.line</field>
+             <field name="arch" type="xml">
+                <kanban>
+                    <templates>
+                        <t t-name="card">
+                            <field name="currency_id" invisible="1"/>  <!-- Needed for monetary widget -->
+                            <div class="text-center fw-bold fs-4">
+                                <field name="date"/> - <field name="payment"/>
+                            </div>
+                            <hr class="my-2"/>
+                            <div>Principals: <field name="principal"/></div>
+                            <div>Interests: <field name="interest"/></div>
+                            <div class="text-end fw-bold fs-5">
+                                Balance: <field name="outstanding_balance"/>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+             </field>
+        </record>
+
+        <record id="account_loan_line_form_view" model="ir.ui.view">
+            <field name="name">account.loan.line.form</field>
+            <field name="model">account.loan.line</field>
+             <field name="arch" type="xml">
+                 <form string="Account Loan Line">
+                    <group>
+                        <field name="date"/>
+                        <field name="principal"/>
+                        <field name="interest"/>
+                    </group>
+                 </form>
+             </field>
+        </record>
+
 <!--        ACCOUNT MOVE LIST VIEW-->
 
         <record id="account_loan_view_account_move_list_view" model="ir.ui.view">
@@ -325,7 +363,7 @@
             name="Loans Analysis"
             sequence="30"
             action="action_view_account_loans_analysis"
-            parent="account_reports.account_audit_inventory_entries_menu"
+            parent="account.account_reports_management_menu"
             groups="account.group_account_readonly"
         />
 

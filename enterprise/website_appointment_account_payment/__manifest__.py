@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Pay to Book on Website',
-    'version': '1.0',
     'category': 'Services/Appointment',
     'summary': 'Up-front payment on bookings on website',
     'description': """Add a payment step at the end of appointment and resource bookings, on website""",

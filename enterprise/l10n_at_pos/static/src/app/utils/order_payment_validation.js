@@ -7,12 +7,12 @@ patch(OrderPaymentValidation.prototype, {
             const [signed, receipt_number, qr_data] = await this.pos.data.call(
                 "pos.order",
                 "sign_order_receipt",
-                [this.pos.selectedOrder.id]
+                [this.pos.getOrder().id]
             );
             // updating values after signing receipt for the selected order
-            this.pos.selectedOrder.is_fiskaly_order_receipt_signed = signed;
-            this.pos.selectedOrder.l10n_at_pos_order_receipt_qr_data = qr_data;
-            this.pos.selectedOrder.l10n_at_pos_order_receipt_number = receipt_number;
+            this.pos.getOrder().is_fiskaly_order_receipt_signed = signed;
+            this.pos.getOrder().l10n_at_pos_order_receipt_qr_data = qr_data;
+            this.pos.getOrder().l10n_at_pos_order_receipt_number = receipt_number;
         }
         await super.afterOrderValidation(...arguments);
     },

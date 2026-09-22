@@ -1,10 +1,10 @@
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { components, stores } from "@odoo/o-spreadsheet";
-import { Component, onWillStart, onWillUpdateProps, useRef } from "@odoo/owl";
+import { Component, onWillStart, signal, t, useProps } from "@odoo/owl";
 import { OdooPivotLayoutConfigurator } from "./odoo_pivot_layout_configurator/odoo_pivot_layout_configurator";
 import { SidePanelDomain } from "../../components/side_panel_domain/side_panel_domain";
-import { RelatedFiltersSection } from "../../global_filters/components/related_filters_section/related_fitlers_section";
+import { RelatedFiltersSection } from "../../global_filters/components/related_filters_section/related_filters_section";
 
 const { Checkbox, Section, ValidationMessages, PivotTitleSection, PivotDeferUpdate } = components;
 const { useLocalStore, PivotSidePanelStore } = stores;
@@ -21,27 +21,26 @@ export class PivotDetailsSidePanel extends Component {
         RelatedFiltersSection,
         SidePanelDomain,
     };
-    static props = {
-        onCloseSidePanel: Function,
-        pivotId: String,
-    };
+
+    props = useProps({
+        onCloseSidePanel: t.function(),
+        pivotId: t.string(),
+    });
+
+    pivotSidePanelRef = signal.ref();
 
     setup() {
         this.notification = useService("notification");
         /**@type {PivotSidePanelStore} */
         this.store = useLocalStore(PivotSidePanelStore, this.props.pivotId);
-        this.pivotSidePanelRef = useRef("pivotSidePanel");
-
-        const loadData = async () => {
+        this.modelDisplayName = undefined;
+        onWillStart(async () => {
             await this.pivot.load();
-            this.modelDisplayName = this.isModelValid && (await this.pivot.getModelLabel());
-        };
-        onWillStart(loadData);
-        onWillUpdateProps(loadData);
-    }
-
-    get isModelValid() {
-        return this.pivot.isModelValid();
+            this.isModelValid = this.pivot.isModelValid();
+            if (this.isModelValid) {
+                this.modelDisplayName = await this.pivot.getModelLabel();
+            }
+        });
     }
 
     /** @returns {import("@spreadsheet/pivot/odoo_pivot").default} */
@@ -50,7 +49,7 @@ export class PivotDetailsSidePanel extends Component {
     }
 
     getScrollableContainerEl() {
-        return this.pivotSidePanelRef.el;
+        return this.pivotSidePanelRef();
     }
 
     /**
@@ -95,6 +94,10 @@ export class PivotDetailsSidePanel extends Component {
     }
 
     onDimensionsUpdated(definition) {
+        this.store.update(definition);
+    }
+
+    onFiltersUpdated(definition) {
         this.store.update(definition);
     }
 

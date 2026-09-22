@@ -1,13 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 import io
 
 from odoo.exceptions import AccessError
-from odoo.tests import TransactionCase, users
+from odoo.tests import tagged, TransactionCase, users
 from odoo.tools.pdf import PdfFileWriter
-from odoo.tools import mute_logger
+from odoo.tools import BinaryBytes, mute_logger
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class testAttachmentAccess(TransactionCase):
     @classmethod
     def setUpClass(cls):
@@ -21,13 +21,13 @@ class testAttachmentAccess(TransactionCase):
         with io.BytesIO() as stream:
             PdfFileWriter().write(stream)
             stream.seek(0)
-            cls.pdf = base64.b64encode(stream.read())
+            cls.pdf_raw = stream.read()
 
     def test_user_template_attachment_without_res_fields(self):
         """Test an employee can create a template linked to an attachment without res_model/res_id"""
         env_user = self.env(user=self.user)
         # As user, create an attachment without res_model/res_id
-        attachment = env_user['ir.attachment'].create({'name': 'foo', 'datas': self.pdf})
+        attachment = env_user['ir.attachment'].create({'name': 'foo', 'raw': self.pdf_raw})
         # As user, create a sign.template
         template = env_user['sign.template'].create({})
         # As user, create a sign.document linked to that attachment
@@ -36,20 +36,20 @@ class testAttachmentAccess(TransactionCase):
             'template_id': template.id,
         })
         # As user, ensure the content of the attachment can be read through the document
-        self.assertEqual(document.datas, self.pdf)
+        self.assertEqual(document.raw.content, self.pdf_raw)
         # As user, create another attachment without res_model/res_id
-        attachment_2 = env_user['ir.attachment'].create({'name': 'foo', 'datas': self.pdf})
+        attachment_2 = env_user['ir.attachment'].create({'name': 'foo', 'raw': self.pdf_raw})
         # As user, change the attachment of the template to this second attachment
         document.write({'attachment_id': attachment_2.id})
         # As user, ensure the content of this second attachment can be read through the document
-        self.assertEqual(document.datas, self.pdf)
+        self.assertEqual(document.raw.content, self.pdf_raw)
 
     def test_user_template_attachment_without_res_fields_created_by_admin(self):
         """Test an employee can read the content of the template's attachment created by another user, the admin,
         and the attachment does not have a res_model/res_id
         """
         # As admin, create an attachment without res_model/res_id
-        attachment = self.env['ir.attachment'].create({'name': 'foo', 'datas': self.pdf})
+        attachment = self.env['ir.attachment'].create({'name': 'foo', 'raw': self.pdf_raw})
         # As admin, create a sign.document and sign.template linked to that attachment
         template = self.env['sign.template'].create({})
         document = self.env['sign.document'].create({
@@ -60,34 +60,34 @@ class testAttachmentAccess(TransactionCase):
         # As user, ensure the attachment itself cannot be read
         self.env.invalidate_all()
         with self.assertRaises(AccessError):
-            attachment.with_user(self.user).datas
+            attachment.with_user(self.user).raw
         # But, as user, the content of the attachment can be read through the template
-        self.assertEqual(document.with_user(self.user).datas, self.pdf)
+        self.assertEqual(document.with_user(self.user).raw.content, self.pdf_raw)
 
         # As admin, create a second attachment without res_model/res_id
-        attachment = self.env['ir.attachment'].create({'name': 'bar', 'datas': self.pdf})
+        attachment = self.env['ir.attachment'].create({'name': 'bar', 'raw': self.pdf_raw})
         # As admin, link this second attachment to the previously created document (write instead of create)
         document.write({'attachment_id': attachment.id})
 
         # As user ensure the attachment itself cannot be read
         self.env.invalidate_all()
         with self.assertRaises(AccessError):
-            self.assertEqual(attachment.with_user(self.user).datas, self.pdf)
+            attachment.with_user(self.user).raw
         # But, as user, the content of the attachment can be read through the document
-        self.assertEqual(document.with_user(self.user).datas, self.pdf)
+        self.assertEqual(document.with_user(self.user).raw.content, self.pdf_raw)
 
     def test_user_read_unallowed_attachment(self):
         """Test a user cannot access an attachment he is not supposed to through a sign template"""
         # As admin, create an attachment for which you require the settings group to access
         autovacuum_job = self.env.ref('base.autovacuum_job')
         attachment_forbidden = self.env['ir.attachment'].create({
-            'name': 'foo', 'datas': self.pdf,
+            'name': 'foo', 'raw': self.pdf_raw,
             'res_model': autovacuum_job._name, 'res_id': autovacuum_job.id,
         })
         # As user, make sure this is indeed not possible to access that attachment data directly
         self.env.invalidate_all()
         with self.assertRaises(AccessError):
-            attachment_forbidden.with_user(self.user).datas
+            attachment_forbidden.with_user(self.user).raw
         # As user, create a template pointing to that attachment
         # and make sure it raises an access error
         with self.assertRaises(AccessError):
@@ -96,12 +96,12 @@ class testAttachmentAccess(TransactionCase):
                 'attachment_id': attachment_forbidden.id,
                 'template_id': template.id,
             })
-            document.datas
+            document.raw
 
         # As user, update the attachment of an existing template to the unallowed attachment
         # and make sure it raises an access error
         attachment_tmp = self.env['ir.attachment'].with_user(self.user).create({
-            'name': 'bar', 'datas': self.pdf,
+            'name': 'bar', 'raw': self.pdf_raw,
         })
         template = self.env['sign.template'].with_user(self.user).create({
             'name': "test template",
@@ -112,10 +112,39 @@ class testAttachmentAccess(TransactionCase):
         })
         with self.assertRaises(AccessError):
             document.write({'attachment_id': attachment_forbidden.id})
-            document.datas
+            document.raw
+
+        with self.assertRaises(AccessError):
+            self.env["sign.document"].with_user(self.user).onchange(
+                {"attachment_id": attachment_forbidden.id},
+                ["attachment_id"],
+                {"raw": {}},
+            )
+
+        with self.assertRaises(AccessError):
+            self.env["sign.document"].with_user(self.user).with_context(
+                default_attachment_id=attachment_forbidden.id,
+            ).onchange(
+                {},
+                [],
+                {"attachment_id": {}, "raw": {}},
+            )
+
+        self.env["ir.default"].with_user(self.user).set(
+            "sign.document",
+            "attachment_id",
+            attachment_forbidden.id,
+            user_id=True,
+        )
+        with self.assertRaises(AccessError):
+            self.env["sign.document"].with_user(self.user).onchange(
+                {},
+                [],
+                {"attachment_id": {}, "raw": {}},
+            )
 
     @users('foo')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule', 'odoo.models')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models')
     def test_access_sign_user_fields(self):
         """Test an employee can read and write his own signature / initials but not others"""
         # This test doesn't make sense if the record read/updated are sudo,
@@ -135,9 +164,9 @@ class testAttachmentAccess(TransactionCase):
 
         # Set a signature / initials for the admin, to test if the employee can read or change it later on
         for field in sign_user_fields:
-            admin.sudo()[field] = base64.b64encode(b'admin')
+            admin.sudo()[field] = BinaryBytes(b'admin')
 
-        signature = base64.b64encode(b'foo')
+        signature = BinaryBytes(b'foo')
         for field in sign_user_fields:
             # A user must be able to change his own signature / initials
             my_user[field] = signature
@@ -151,22 +180,24 @@ class testAttachmentAccess(TransactionCase):
 
             # Let's take the assumption the employee obtains the attachment id linked to the admin attachments somehow.
             # Hence herebelow the sudo just to get the id of the attachment
+            field_data = f'{field}_data'
             attachment_id = self.env['ir.attachment'].sudo().search([
                 ('res_model', '=', 'res.users'),
                 ('res_id', '=', admin.id),
-                ('res_field', '=', field),
+                ('res_field', '=', field_data),
             ]).id
+            self.assertTrue(attachment_id, "Attachment not created?")
 
             with self.assertRaises(
                 AccessError,
                 msg=f'An employee must not be able to read the attachment related to the {field!r} of another user'
             ):
-                self.env['ir.attachment'].browse(attachment_id).datas
+                self.env['ir.attachment'].browse(attachment_id).raw
 
     def test_user_sign_item(self):
         env_user = self.env(user=self.user)
-        attachment = env_user['ir.attachment'].create({'name': 'foo', 'datas': self.pdf})
-        attachment_2 = env_user['ir.attachment'].create({'name': 'foo', 'datas': self.pdf})
+        attachment = env_user['ir.attachment'].create({'name': 'foo', 'raw': self.pdf_raw})
+        attachment_2 = env_user['ir.attachment'].create({'name': 'foo', 'raw': self.pdf_raw})
         template = env_user['sign.template'].create({})
         template_2 = self.env['sign.template'].create({})
         document = env_user['sign.document'].create({

@@ -3,6 +3,7 @@
     <record id="account_financial_report_rw_pnl" model="account.report">
         <field name="name">Profit and loss</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="country_id" ref="base.rw"/>
@@ -29,8 +30,6 @@
                     <record id="account_financial_report_rw_revenue" model="account.report.line">
                         <field name="name">Revenue</field>
                         <field name="code">rw_revenue</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_revenue_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -42,8 +41,6 @@
                     <record id="account_financial_report_rw_other_income" model="account.report.line">
                         <field name="name">Other income</field>
                         <field name="code">rw_other_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_other_income_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -55,8 +52,6 @@
                     <record id="account_financial_report_rw_change_inventories" model="account.report.line">
                         <field name="name">Change in inventories</field>
                         <field name="code">rw_change_inventories</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_change_inventories_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -68,8 +63,6 @@
                     <record id="account_financial_report_rw_cost_material" model="account.report.line">
                         <field name="name">Costs of material</field>
                         <field name="code">rw_costs_material</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_cost_material_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -81,8 +74,6 @@
                     <record id="account_financial_report_rw_employee_expense" model="account.report.line">
                         <field name="name">Employee benefits expense</field>
                         <field name="code">rw_employee_expense</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_employee_expense_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -94,8 +85,6 @@
                     <record id="account_financial_report_rw_change_fair_value_investment" model="account.report.line">
                         <field name="name">Change in fair value of investment property</field>
                         <field name="code">rw_change_fair_value_investment</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_change_fair_value_investment_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -107,8 +96,6 @@
                     <record id="account_financial_report_rw_depreciation" model="account.report.line">
                         <field name="name">Depreciation, amortisation and impairment of non-financial assets</field>
                         <field name="code">rw_depreciation</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_depreciation_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -120,8 +107,6 @@
                     <record id="account_financial_report_rw_impairment_losses" model="account.report.line">
                         <field name="name">Impairment losses of financial assets</field>
                         <field name="code">rw_impairment_losses</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_impairment_losses_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -133,8 +118,6 @@
                     <record id="account_financial_report_rw_other_expenses" model="account.report.line">
                         <field name="name">Other expenses</field>
                         <field name="code">rw_other_expenses</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_other_expenses_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -160,8 +143,6 @@
                     <record id="account_financial_report_rw_share_profit_equity" model="account.report.line">
                         <field name="name">Share of profit from equity accounted investments</field>
                         <field name="code">rw_share_profit_equity</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_share_profit_equity_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -173,8 +154,6 @@
                     <record id="account_financial_report_rw_finance_costs" model="account.report.line">
                         <field name="name">Finance costs</field>
                         <field name="code">rw_finance_costs</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_finance_costs_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -186,8 +165,6 @@
                     <record id="account_financial_report_rw_finance_income" model="account.report.line">
                         <field name="name">Finance income</field>
                         <field name="code">rw_finance_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_finance_income_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -199,8 +176,6 @@
                     <record id="account_financial_report_rw_other_financial_items" model="account.report.line">
                         <field name="name">Other financial items</field>
                         <field name="code">rw_other_finance</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_rw_other_financial_items_expr" model="account.report.expression">
                                 <field name="label">balance</field>

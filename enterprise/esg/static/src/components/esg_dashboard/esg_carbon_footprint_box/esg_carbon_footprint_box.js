@@ -1,13 +1,14 @@
 import { EsgGraphDashboard } from "@esg/components/esg_dashboard/esg_graph_dashboard/esg_graph_dashboard";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class EsgCarbonFootprintBox extends Component {
     static template = "esg.CarbonFootprintBox";
     static components = { EsgGraphDashboard };
-    static props = {
-        data: Object,
-    };
+
+    props = useProps({
+        data: t.object(),
+    });
 
     setup() {
         this.actionService = useService("action");

@@ -7,3 +7,6 @@ from . import hr_employee
 from . import hr_payroll_structure_type
 from . import l10n_mx_hr_infonavit
 from . import l10n_mx_hr_fonacot
+from . import res_company
+from . import res_config_settings
+from . import hr_work_entry_type

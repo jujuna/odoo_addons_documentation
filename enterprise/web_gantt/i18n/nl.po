@@ -7,28 +7,31 @@
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2023, 2025.
 # Martin Trigaux, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Bren Driesen <brdri@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-17 14:02+0000\n"
-"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/web_gantt/"
-"nl/>\n"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 00:48+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"web_gantt/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%(hour)sh%(minute)s"
-msgstr "%(hour)su%(minute)s"
+#: model:ir.module.module,description:base.module_web_gantt
+msgid ""
+"\n"
+"Odoo Web Gantt chart view.\n"
+"=============================\n"
+"\n"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -38,9 +41,10 @@ msgstr "%s kan niet in het verlden plaatsvinden"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%sh"
-msgstr "%su"
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "%s to schedule"
+msgstr "%s te plannen"
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_ir_actions_act_window_view
@@ -49,12 +53,14 @@ msgstr "Actie venster weergave"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Dichte weergave activeren"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Ruime weergave activeren"
@@ -104,11 +110,17 @@ msgstr "Verwijderen"
 #: model:ir.model.fields,field_description:web_gantt.field_ir_actions_act_window_view__display_name
 #: model:ir.model.fields,field_description:web_gantt.field_ir_ui_view__display_name
 msgid "Display Name"
-msgstr "Weergavenaam"
+msgstr "Schermnaam"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Drop here to unschedule"
+msgstr "Hier neerzetten om uit planning te halen"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Edit"
 msgstr "Bewerken"
 
@@ -151,8 +163,8 @@ msgstr "Gantt-weergave"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt child can only be field or template, got %s"
-msgstr "Onderliggende Gantt kan alleen een veld of sjabloon zijn, krijg %s"
+msgid "Gantt child can only be field or popover, got %s"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -177,6 +189,18 @@ msgstr ""
 "'dependency_field' is gespecifieerd"
 
 #. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover can contain only one templates tag"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover child can only be field or template, got %s"
+msgstr ""
+
+#. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_scale_selector.js:0
 msgid "Gantt start date"
@@ -191,8 +215,8 @@ msgstr "Gantt-einddatum"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt view can contain only one templates tag"
-msgstr "De Gantt-weergave kan slechts één sjabloon-label bevatten"
+msgid "Gantt view can contain only one popover tag"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model.fields,field_description:web_gantt.field_ir_actions_act_window_view__id
@@ -211,6 +235,14 @@ msgstr "Je kunt niet in het verleden plannen."
 #: code:addons/web_gantt/models/models.py:0
 msgid "Insufficient fields for Gantt View!"
 msgstr "Niet genoeg velden voor Gantt-weergave!"
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid ""
+"Invalid attributes (%(invalid_attributes)s) in gantt popover. Attributes "
+"must be in (%(valid_attributes)s)"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -248,15 +280,15 @@ msgstr "Ongeldige herplanmethode %s"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Month"
-msgstr "Maand"
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Load More"
+msgstr "Meer laden"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
-msgid "Name"
-msgstr "Naam"
+#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
+msgid "Month"
+msgstr "Maand"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -269,6 +301,13 @@ msgstr "Nieuw"
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "No, keep it"
 msgstr "Nee, hou het"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "Nothing to schedule"
+msgstr "Niets te plannen"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -321,7 +360,13 @@ msgstr "Record herpland"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Show dependencies"
+msgstr "Afhankelijkheden weergeven"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Start"
 msgstr "Start"
 
@@ -333,7 +378,7 @@ msgstr "De startdatum kan niet na de einddatum liggen"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Stop"
 msgstr "Stop"
 
@@ -358,6 +403,12 @@ msgstr "Vandaag"
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Toggle Side Panel"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Toolbar menu"
 msgstr "Werkbalkmenu"
 
@@ -375,7 +426,7 @@ msgstr "Niet gedefinieerd %s"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 #: model:ir.model,name:web_gantt.model_ir_ui_view
 msgid "View"
 msgstr "Bekijk"
@@ -387,16 +438,15 @@ msgid "View Type"
 msgstr "Soort weergave"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week"
-msgstr "Week"
+#: model:ir.module.module,shortdesc:base.module_web_gantt
+msgid "Web Gantt"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week %(week)s, %(startDate)s - %(endDate)s"
-msgstr "Week %(week)s, %(startDate)s - %(endDate)s"
+msgid "Week"
+msgstr "Week"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -422,49 +472,5 @@ msgstr "minuten"
 msgid "months"
 msgstr "maanden"
 
-#~ msgid "From"
-#~ msgstr "Van"
-
-#~ msgid "From: %(from_date)s to: %(to_date)s"
-#~ msgstr "Vanaf: %(from_date)s t/m: %(to_date)s"
-
-#~ msgid "to"
-#~ msgstr "tot"
-
-#~ msgid "Are you sure to delete this record?"
-#~ msgstr "Ben je zeker dat je dit record wilt verwijderen?"
-
-#~ msgid "Grouping by date is not supported"
-#~ msgstr "Groeperen op datum wordt niet ondersteund."
-
-#~ msgid "Invalid attributes (%s) in gantt view. Attributes must be in (%s)"
-#~ msgstr ""
-#~ "Ongeldige kenmerken (%s) in Gantt-weergave. Kenmerken moeten zijn in (%s)"
-
-#~ msgid "Next"
-#~ msgstr "Volgende"
-
-#~ msgid "Plan existing"
-#~ msgstr "Plan bestaande taak"
-
-#~ msgid "Previous"
-#~ msgstr "Vorige"
-
-#~ msgid ""
-#~ "Records that are in the past cannot be automatically rescheduled. They "
-#~ "should be manually rescheduled instead."
-#~ msgstr ""
-#~ "Records die in het verleden liggen, kunnen niet automatisch opnieuw "
-#~ "worden gepland. Ze moeten in plaats daarvan handmatig opnieuw worden "
-#~ "gepland."
-
-#~ msgid "You cannot reschedule %s towards %s."
-#~ msgstr "Je kan %s niet opnieuw plannen op %s."
-
-#~ msgid ""
-#~ "You cannot reschedule tasks that do not follow a direct dependency path. "
-#~ "Only the first task has been automatically rescheduled."
-#~ msgstr ""
-#~ "Je kan geen taken opnieuw plannen die geen rechtstreeks "
-#~ "afhankelijkheidspad volgen. Alleen de eerste taak is automatisch opnieuw "
-#~ "ingepland."
+msgid "Name"
+msgstr "Naam"

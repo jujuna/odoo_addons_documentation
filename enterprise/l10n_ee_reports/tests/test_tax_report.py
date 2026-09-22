@@ -11,6 +11,8 @@ from odoo.addons.account_reports.tests.account_sales_report_common import Accoun
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class EstonianTaxReportTest(AccountSalesReportCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountSalesReportCommon.setup_country('ee')
     def setUpClass(cls):
@@ -18,22 +20,19 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
 
         cls.company.write({
             'vat': 'EE123456780',
-            'company_registry': '12345678',
+            'additional_identifiers': {'EE_EN': '12345678'},
         })
-
         cls.partner_ee_1 = cls.env['res.partner'].create({
             'name': 'Partner EE 1',
             'country_id': cls.env.ref('base.ee').id,
-            'company_registry': '98765432',
+            'additional_identifiers': {'EE_EN': '98765438'},
             'vat': 'EE023456783',
-            'is_company': True,
         })
 
         cls.partner_ee_2 = cls.env['res.partner'].create({
             'name': 'Partner EE 2',
             'country_id': cls.env.ref('base.ee').id,
             'vat': 'EE113456787',
-            'is_company': True,
         })
 
         cls.company_id = cls.env.company.id
@@ -88,7 +87,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
         })
         cls.vat_out_13_s = cls.env['account.chart.template'].ref('l10n_ee_vat_out_13_s')
 
-        cls.kmd_report = cls.env.ref('l10n_ee.tax_report')
+        cls.kmd_report = cls.env.ref('l10n_ee.kmd_inf_tax_report')
         cls.kmd_inf_a_report = cls.env.ref('l10n_ee_reports.kmd_inf_report_part_a')
         cls.kmd_inf_b_report = cls.env.ref('l10n_ee_reports.kmd_inf_report_part_b')
 
@@ -98,15 +97,15 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
         res['company'].update({
             'country_id': cls.env.ref('base.ee').id,
             'vat': 'EE123456780',
-            'company_registry': '12345678',
+            'additional_identifiers': {'EE_EN': '12345678'},
         })
         return res
 
     @classmethod
-    def create_invoice(cls, post=True, **kwargs):
+    def _create_invoice_ee(cls, post=True, **kwargs):
         move_type = kwargs.get('move_type')
         invoice_date = kwargs.get('invoice_date')
-        journal_id = cls.company_data['default_journal_purchase'].id if move_type == 'in_invoice' else cls.company_data['default_journal_sale'].id
+        journal_id = cls.company_data['default_journal_purchase'].id if move_type in ['in_invoice', 'in_refund'] else cls.company_data['default_journal_sale'].id
 
         invoice = cls.env['account.move'].create({
             'move_type': move_type,
@@ -125,14 +124,14 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
 
     @freeze_time('2023-02-01')
     def test_generate_xml_purchase(self):
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2023-01-11',
             ref='INV001',
-            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_in_22_g.ids}],
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 1000, 'tax_ids': self.vat_in_22_g.ids}],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2023-01-13',
@@ -157,7 +156,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <noPurchases>false</noPurchases>
                     <sumPerPartnerSales>false</sumPerPartnerSales>
                     <sumPerPartnerPurchases>false</sumPerPartnerPurchases>
-                    <inputVatTotal>257.00</inputVatTotal>
+                    <inputVatTotal>367.00</inputVatTotal>
                 </declarationBody>
                 <purchasesAnnex>
                     <purchaseLine>
@@ -169,12 +168,12 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>11</comments>
                     </purchaseLine>
                     <purchaseLine>
-                        <sellerRegCode>98765432</sellerRegCode>
+                        <sellerRegCode>98765438</sellerRegCode>
                         <sellerName>Partner EE 1</sellerName>
                         <invoiceNumber>INV001</invoiceNumber>
                         <invoiceDate>2023-01-11</invoiceDate>
-                        <invoiceSumVat>610.00</invoiceSumVat>
-                        <vatInPeriod>110.00</vatInPeriod>
+                        <invoiceSumVat>1220.00</invoiceSumVat>
+                        <vatInPeriod>220.00</vatInPeriod>
                     </purchaseLine>
                 </purchasesAnnex>
             </vatDeclaration>
@@ -190,13 +189,13 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
 
     @freeze_time('2023-02-01')
     def test_generate_xml_sale(self):
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2023-01-11',
-            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_out_22_g.ids}]
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 1000, 'tax_ids': self.vat_out_22_g.ids}]
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2023-01-13',
@@ -220,7 +219,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <noPurchases>true</noPurchases>
                     <sumPerPartnerSales>false</sumPerPartnerSales>
                     <sumPerPartnerPurchases>false</sumPerPartnerPurchases>
-                    <transactions22>1000.00</transactions22>
+                    <transactions22>1500.00</transactions22>
                     <transactions9>300.00</transactions9>
                     <transactions5>200.00</transactions5>
                     <transactionsZeroVat>150.00</transactionsZeroVat>
@@ -254,13 +253,13 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>3</comments>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2023/00001</invoiceNumber>
                         <invoiceDate>2023-01-11</invoiceDate>
-                        <invoiceSum>500.00</invoiceSum>
+                        <invoiceSum>1000.00</invoiceSum>
                         <taxRate>22</taxRate>
-                        <sumForRateInPeriod>500.00</sumForRateInPeriod>
+                        <sumForRateInPeriod>1000.00</sumForRateInPeriod>
                     </saleLine>
                 </salesAnnex>
             </vatDeclaration>
@@ -276,17 +275,17 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
 
     @freeze_time('2023-02-01')
     def test_generate_xml_mixed_all(self):
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2023-01-11',
             ref='INV001',
             invoice_line_ids=[
                 {'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_in_22_g.ids},
-                {'name': 'PT2', 'price_unit': 400, 'tax_ids': self.vat_in_0_kms_41_2.ids},
+                {'name': 'PT2', 'price_unit': 600, 'tax_ids': self.vat_in_0_kms_41_2.ids},
             ]
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2023-01-13',
@@ -298,7 +297,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT4', 'price_unit': 150, 'tax_ids': self.vat_in_0_g.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_a.id,
             invoice_date='2023-01-20',
@@ -314,7 +313,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT8', 'price_unit': 100, 'tax_ids': self.vat_in_0_kms_41_2.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2023-01-11',
@@ -324,7 +323,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT3', 'price_unit': 300, 'tax_ids': self.vat_out_22_erikord.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2023-01-13',
@@ -335,7 +334,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT4', 'price_unit': 150, 'tax_ids': self.vat_out_0_g.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_a.id,
             invoice_date='2023-01-25',
@@ -365,9 +364,9 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 ('VAT 9%',                                '',            'Partner EE 2',    'INV/2023/00002',    '01/13/2023',    1150,            '9',            300,              '3'),
                 ('VAT 5%',                                '',            'Partner EE 2',    'INV/2023/00002',    '01/13/2023',    1150,            '5',            200,              '3'),
                 ('INV/2023/00001',                        '',            '',                '',                  '',              '',              '',             '',               ''),
-                ('VAT 22%',                               '98765432',    'Partner EE 1',    'INV/2023/00001',    '01/11/2023',    1200,            '22',           500,              ''),
-                ('VAT 22% special procedure §41^1',       '98765432',    'Partner EE 1',    'INV/2023/00001',    '01/11/2023',    1200,            '22',           '',               '2'),
-                ('VAT 22% special procedure §41/42',      '98765432',    'Partner EE 1',    'INV/2023/00001',    '01/11/2023',    1200,            '22erikord',    300,              '1'),
+                ('VAT 22%',                               '98765438',    'Partner EE 1',    'INV/2023/00001',    '01/11/2023',    1200,            '22',           500,              ''),
+                ('VAT 22% special procedure §41^1',       '98765438',    'Partner EE 1',    'INV/2023/00001',    '01/11/2023',    1200,            '22',           '',               '2'),
+                ('VAT 22% special procedure §41/42',      '98765438',    'Partner EE 1',    'INV/2023/00001',    '01/11/2023',    1200,            '22erikord',    300,              '1'),
             ],
             options_kmd_inf_a,
             currency_map={
@@ -383,7 +382,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
             [
                 ('Part B - Invoices Received',    '',            '',                '',               '',              '',              '',     ''),
                 ('BILL/2023/01/0002 (INV002)',    '',            'Partner EE 2',    'INV002',         '01/13/2023',    1297,            147,    '11'),
-                ('BILL/2023/01/0001 (INV001)',    '98765432',    'Partner EE 1',    'INV001',         '01/11/2023',    1098,            198,    '12'),
+                ('BILL/2023/01/0001 (INV001)',    '98765438',    'Partner EE 1',    'INV001',         '01/11/2023',    1342,            242,    '12'),
             ],
             options_kmd_inf_b,
         )
@@ -400,7 +399,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <noPurchases>false</noPurchases>
                     <sumPerPartnerSales>false</sumPerPartnerSales>
                     <sumPerPartnerPurchases>false</sumPerPartnerPurchases>
-                    <transactions22>3300.00</transactions22>
+                    <transactions22>3500.00</transactions22>
                     <transactions9>300.00</transactions9>
                     <transactions5>200.00</transactions5>
                     <transactionsZeroVat>3150.00</transactionsZeroVat>
@@ -408,15 +407,15 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <euSupplyGoodsZeroVat>800.00</euSupplyGoodsZeroVat>
                     <exportZeroVat>1100.00</exportZeroVat>
                     <salePassengersWithReturnVat>500.00</salePassengersWithReturnVat>
-                    <inputVatTotal>1316.00</inputVatTotal>
+                    <inputVatTotal>1360.00</inputVatTotal>
                     <importVat>344.00</importVat>
                     <fixedAssetsVat>88.00</fixedAssetsVat>
                     <carsVat>132.00</carsVat>
                     <carsPartialVat>55.00</carsPartialVat>
                     <euAcquisitionsGoodsAndServicesTotal>1500.00</euAcquisitionsGoodsAndServicesTotal>
                     <euAcquisitionsGoods>800.00</euAcquisitionsGoods>
-                    <acquisitionOtherGoodsAndServicesTotal>500.00</acquisitionOtherGoodsAndServicesTotal>
-                    <acquisitionImmovablesAndScrapMetalAndGold>500.00</acquisitionImmovablesAndScrapMetalAndGold>
+                    <acquisitionOtherGoodsAndServicesTotal>700.00</acquisitionOtherGoodsAndServicesTotal>
+                    <acquisitionImmovablesAndScrapMetalAndGold>700.00</acquisitionImmovablesAndScrapMetalAndGold>
                     <supplyExemptFromTax>300.00</supplyExemptFromTax>
                     <supplySpecialArrangements>600.00</supplySpecialArrangements>
                 </declarationBody>
@@ -449,7 +448,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>3</comments>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2023/00001</invoiceNumber>
                         <invoiceDate>2023-01-11</invoiceDate>
@@ -458,7 +457,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <sumForRateInPeriod>500.00</sumForRateInPeriod>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2023/00001</invoiceNumber>
                         <invoiceDate>2023-01-11</invoiceDate>
@@ -467,7 +466,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>2</comments>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2023/00001</invoiceNumber>
                         <invoiceDate>2023-01-11</invoiceDate>
@@ -487,12 +486,12 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>11</comments>
                     </purchaseLine>
                     <purchaseLine>
-                        <sellerRegCode>98765432</sellerRegCode>
+                        <sellerRegCode>98765438</sellerRegCode>
                         <sellerName>Partner EE 1</sellerName>
                         <invoiceNumber>INV001</invoiceNumber>
                         <invoiceDate>2023-01-11</invoiceDate>
-                        <invoiceSumVat>1098.00</invoiceSumVat>
-                        <vatInPeriod>198.00</vatInPeriod>
+                        <invoiceSumVat>1342.00</invoiceSumVat>
+                        <vatInPeriod>242.00</vatInPeriod>
                         <comments>12</comments>
                     </purchaseLine>
                 </purchasesAnnex>
@@ -512,13 +511,13 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
         there are only invoices with invoice lines with a single
         tax
         """
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2023-01-11',
             invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_out_22_g.ids}],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2023-01-13',
@@ -543,7 +542,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
             </declarationBody>
             <salesAnnex>
                 <saleLine>
-                <buyerRegCode>98765432</buyerRegCode>
+                <buyerRegCode>98765438</buyerRegCode>
                 <buyerName>Partner EE 1</buyerName>
                 <invoiceNumber>INV/2023/00002</invoiceNumber>
                 <invoiceDate>2023-01-13</invoiceDate>
@@ -552,7 +551,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 <sumForRateInPeriod>500.00</sumForRateInPeriod>
                 </saleLine>
                 <saleLine>
-                <buyerRegCode>98765432</buyerRegCode>
+                <buyerRegCode>98765438</buyerRegCode>
                 <buyerName>Partner EE 1</buyerName>
                 <invoiceNumber>INV/2023/00001</invoiceNumber>
                 <invoiceDate>2023-01-11</invoiceDate>
@@ -574,21 +573,21 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
 
     @freeze_time('2025-02-01')
     def test_generate_xml_purchase_13_tax(self):
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2025-01-11',
             ref='INV001',
-            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_in_13_s.ids}],
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 1000, 'tax_ids': self.vat_in_13_s.ids}],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2025-01-12',
             ref='INV002',
             invoice_line_ids=[
                 {'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_in_22_s.ids},
-                {'name': 'PT4', 'price_unit': 100, 'tax_ids': self.vat_in_13_s.ids},
+                {'name': 'PT4', 'price_unit': 600, 'tax_ids': self.vat_in_13_s.ids},
             ],
         )
 
@@ -604,24 +603,24 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <noPurchases>false</noPurchases>
                     <sumPerPartnerSales>false</sumPerPartnerSales>
                     <sumPerPartnerPurchases>false</sumPerPartnerPurchases>
-                    <inputVatTotal>188.00</inputVatTotal>
+                    <inputVatTotal>318.00</inputVatTotal>
                 </declarationBody>
                 <purchasesAnnex>
                     <purchaseLine>
                         <sellerName>Partner EE 2</sellerName>
                         <invoiceNumber>INV002</invoiceNumber>
                         <invoiceDate>2025-01-12</invoiceDate>
-                        <invoiceSumVat>723.00</invoiceSumVat>
-                        <vatInPeriod>123.00</vatInPeriod>
+                        <invoiceSumVat>1288.00</invoiceSumVat>
+                        <vatInPeriod>188.00</vatInPeriod>
                         <comments>11</comments>
                     </purchaseLine>
                     <purchaseLine>
-                        <sellerRegCode>98765432</sellerRegCode>
+                        <sellerRegCode>98765438</sellerRegCode>
                         <sellerName>Partner EE 1</sellerName>
                         <invoiceNumber>INV001</invoiceNumber>
                         <invoiceDate>2025-01-11</invoiceDate>
-                        <invoiceSumVat>565.00</invoiceSumVat>
-                        <vatInPeriod>65.00</vatInPeriod>
+                        <invoiceSumVat>1130.00</invoiceSumVat>
+                        <vatInPeriod>130.00</vatInPeriod>
                     </purchaseLine>
                 </purchasesAnnex>
             </vatDeclaration>
@@ -637,19 +636,19 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
 
     @freeze_time('2025-02-01')
     def test_generate_xml_sale_13_tax(self):
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2025-01-11',
-            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_out_13_s.ids}]
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 1000, 'tax_ids': self.vat_out_13_s.ids}]
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2025-01-13',
             invoice_line_ids=[
                 {'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_out_22_g.ids},
-                {'name': 'PT2', 'price_unit': 300, 'tax_ids': self.vat_out_13_s.ids},
+                {'name': 'PT2', 'price_unit': 600, 'tax_ids': self.vat_out_13_s.ids},
             ],
         )
 
@@ -666,14 +665,14 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <sumPerPartnerSales>false</sumPerPartnerSales>
                     <sumPerPartnerPurchases>false</sumPerPartnerPurchases>
                     <transactions22>500.00</transactions22>
-                    <transactions13>800.00</transactions13>
+                    <transactions13>1600.00</transactions13>
                 </declarationBody>
                 <salesAnnex>
                     <saleLine>
                         <buyerName>Partner EE 2</buyerName>
                         <invoiceNumber>INV/2025/00002</invoiceNumber>
                         <invoiceDate>2025-01-13</invoiceDate>
-                        <invoiceSum>800.00</invoiceSum>
+                        <invoiceSum>1100.00</invoiceSum>
                         <taxRate>22</taxRate>
                         <sumForRateInPeriod>500.00</sumForRateInPeriod>
                         <comments>3</comments>
@@ -682,19 +681,19 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <buyerName>Partner EE 2</buyerName>
                         <invoiceNumber>INV/2025/00002</invoiceNumber>
                         <invoiceDate>2025-01-13</invoiceDate>
-                        <invoiceSum>800.00</invoiceSum>
+                        <invoiceSum>1100.00</invoiceSum>
                         <taxRate>13</taxRate>
-                        <sumForRateInPeriod>300.00</sumForRateInPeriod>
+                        <sumForRateInPeriod>600.00</sumForRateInPeriod>
                         <comments>3</comments>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2025/00001</invoiceNumber>
                         <invoiceDate>2025-01-11</invoiceDate>
-                        <invoiceSum>500.00</invoiceSum>
+                        <invoiceSum>1000.00</invoiceSum>
                         <taxRate>13</taxRate>
-                        <sumForRateInPeriod>500.00</sumForRateInPeriod>
+                        <sumForRateInPeriod>1000.00</sumForRateInPeriod>
                     </saleLine>
                 </salesAnnex>
             </vatDeclaration>
@@ -710,17 +709,17 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
 
     @freeze_time('2025-08-01')
     def test_generate_xml_mixed_all_kmd6(self):
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2025-07-11',
             ref='INV001',
             invoice_line_ids=[
                 {'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_in_24_g.ids},
-                {'name': 'PT2', 'price_unit': 400, 'tax_ids': self.vat_in_0_kms_41_3.ids},
+                {'name': 'PT2', 'price_unit': 600, 'tax_ids': self.vat_in_0_kms_41_3.ids},
             ]
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2025-07-13',
@@ -732,7 +731,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT4', 'price_unit': 150, 'tax_ids': self.vat_in_0_g.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='in_invoice',
             partner_id=self.partner_a.id,
             invoice_date='2025-07-20',
@@ -748,7 +747,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT8', 'price_unit': 100, 'tax_ids': self.vat_in_0_kms_41_3.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_1.id,
             invoice_date='2025-07-11',
@@ -758,7 +757,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT3', 'price_unit': 300, 'tax_ids': self.vat_out_24_erikord.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_ee_2.id,
             invoice_date='2025-07-13',
@@ -769,7 +768,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 {'name': 'PT4', 'price_unit': 150, 'tax_ids': self.vat_out_0_g.ids},
             ],
         )
-        self.create_invoice(
+        self._create_invoice_ee(
             move_type='out_invoice',
             partner_id=self.partner_a.id,
             invoice_date='2025-07-25',
@@ -801,9 +800,9 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                 ('VAT 9%',                                '',            'Partner EE 2',    'INV/2025/00002',    '07/13/2025',    1150,            '9',            300,              '3'),
                 ('VAT 5%',                                '',            'Partner EE 2',    'INV/2025/00002',    '07/13/2025',    1150,            '5',            200,              '3'),
                 ('INV/2025/00001',                        '',            '',                '',                  '',              '',              '',             '',               ''),
-                ('VAT 24%',                               '98765432',    'Partner EE 1',    'INV/2025/00001',    '07/11/2025',    1200,            '24',           500,              ''),
-                ('VAT 24% special procedure §41^1',       '98765432',    'Partner EE 1',    'INV/2025/00001',    '07/11/2025',    1200,            '24',           '',               '2'),
-                ('VAT 24% special procedure §41/42',      '98765432',    'Partner EE 1',    'INV/2025/00001',    '07/11/2025',    1200,            '24erikord',    300,              '1'),
+                ('VAT 24%',                               '98765438',    'Partner EE 1',    'INV/2025/00001',    '07/11/2025',    1200,            '24',           500,              ''),
+                ('VAT 24% special procedure §41^1',       '98765438',    'Partner EE 1',    'INV/2025/00001',    '07/11/2025',    1200,            '24',           '',               '2'),
+                ('VAT 24% special procedure §41/42',      '98765438',    'Partner EE 1',    'INV/2025/00001',    '07/11/2025',    1200,            '24erikord',    300,              '1'),
             ],
             options_kmd_inf_a,
             currency_map={
@@ -819,7 +818,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
             [
                 ('Part B - Invoices Received',    '',            '',                '',               '',              '',              '',     ''),
                 ('BILL/2025/07/0002 (INV002)',    '',            'Partner EE 2',    'INV002',         '07/13/2025',    1307,            157,    '11'),
-                ('BILL/2025/07/0001 (INV001)',    '98765432',    'Partner EE 1',    'INV001',         '07/11/2025',    1116,            216,    '12'),
+                ('BILL/2025/07/0001 (INV001)',    '98765438',    'Partner EE 1',    'INV001',         '07/11/2025',    1364,            264,    '12'),
             ],
             options_kmd_inf_b,
         )
@@ -836,7 +835,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <noPurchases>false</noPurchases>
                     <sumPerPartnerSales>false</sumPerPartnerSales>
                     <sumPerPartnerPurchases>false</sumPerPartnerPurchases>
-                    <transactions24>3300.00</transactions24>
+                    <transactions24>3500.00</transactions24>
                     <transactions9>300.00</transactions9>
                     <transactions5>200.00</transactions5>
                     <transactionsZeroVat>3150.00</transactionsZeroVat>
@@ -844,15 +843,15 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                     <euSupplyGoodsZeroVat>800.00</euSupplyGoodsZeroVat>
                     <exportZeroVat>1100.00</exportZeroVat>
                     <salePassengersWithReturnVat>500.00</salePassengersWithReturnVat>
-                    <inputVatTotal>1405.00</inputVatTotal>
+                    <inputVatTotal>1453.00</inputVatTotal>
                     <importVat>348.00</importVat>
                     <fixedAssetsVat>96.00</fixedAssetsVat>
                     <carsVat>144.00</carsVat>
                     <carsPartialVat>60.00</carsPartialVat>
                     <euAcquisitionsGoodsAndServicesTotal>1500.00</euAcquisitionsGoodsAndServicesTotal>
                     <euAcquisitionsGoods>800.00</euAcquisitionsGoods>
-                    <acquisitionOtherGoodsAndServicesTotal>500.00</acquisitionOtherGoodsAndServicesTotal>
-                    <acquisitionImmovablesAndScrapMetalAndGold>500.00</acquisitionImmovablesAndScrapMetalAndGold>
+                    <acquisitionOtherGoodsAndServicesTotal>700.00</acquisitionOtherGoodsAndServicesTotal>
+                    <acquisitionImmovablesAndScrapMetalAndGold>700.00</acquisitionImmovablesAndScrapMetalAndGold>
                     <supplyExemptFromTax>300.00</supplyExemptFromTax>
                     <supplySpecialArrangements>600.00</supplySpecialArrangements>
                 </declarationBody>
@@ -885,7 +884,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>3</comments>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2025/00001</invoiceNumber>
                         <invoiceDate>2025-07-11</invoiceDate>
@@ -894,7 +893,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <sumForRateInPeriod>500.00</sumForRateInPeriod>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2025/00001</invoiceNumber>
                         <invoiceDate>2025-07-11</invoiceDate>
@@ -903,7 +902,7 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>2</comments>
                     </saleLine>
                     <saleLine>
-                        <buyerRegCode>98765432</buyerRegCode>
+                        <buyerRegCode>98765438</buyerRegCode>
                         <buyerName>Partner EE 1</buyerName>
                         <invoiceNumber>INV/2025/00001</invoiceNumber>
                         <invoiceDate>2025-07-11</invoiceDate>
@@ -923,12 +922,12 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
                         <comments>11</comments>
                     </purchaseLine>
                     <purchaseLine>
-                        <sellerRegCode>98765432</sellerRegCode>
+                        <sellerRegCode>98765438</sellerRegCode>
                         <sellerName>Partner EE 1</sellerName>
                         <invoiceNumber>INV001</invoiceNumber>
                         <invoiceDate>2025-07-11</invoiceDate>
-                        <invoiceSumVat>1116.00</invoiceSumVat>
-                        <vatInPeriod>216.00</vatInPeriod>
+                        <invoiceSumVat>1364.00</invoiceSumVat>
+                        <vatInPeriod>264.00</vatInPeriod>
                         <comments>12</comments>
                     </purchaseLine>
                 </purchasesAnnex>
@@ -940,4 +939,168 @@ class EstonianTaxReportTest(AccountSalesReportCommon):
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(actual_xml),
             self.get_xml_tree_from_string(expected_xml)
+        )
+
+    @freeze_time('2025-11-04')
+    def test_kmd_inf_part_a_threshold_logic(self):
+        """ Partners should only appear if the total amount of invoices or credit notes for the taxation period is at least EUR 1,000 (excluding VAT). """
+
+        self._create_invoice_ee(
+            move_type='out_invoice',
+            partner_id=self.partner_ee_1.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_out_22_g.ids}],
+        )
+        self._create_invoice_ee(
+            move_type='out_invoice',
+            partner_id=self.partner_ee_1.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[{'name': 'PT2', 'price_unit': 300, 'tax_ids': self.vat_out_22_erikord.ids}],
+        )
+        self._create_invoice_ee(
+            move_type='out_invoice',
+            partner_id=self.partner_ee_2.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_out_22_g.ids}],
+        )
+        self._create_invoice_ee(
+            move_type='out_invoice',
+            partner_id=self.partner_ee_2.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[
+                {'name': 'PT2', 'price_unit': 300, 'tax_ids': self.vat_out_9_g.ids},
+                {'name': 'PT3', 'price_unit': 200, 'tax_ids': self.vat_out_5_g.ids},
+            ],
+        )
+
+        options_kmd_inf_a = self.kmd_inf_a_report.get_options({})
+
+        self.assertLinesValues(
+            self.kmd_inf_a_report._get_lines(options_kmd_inf_a),
+            #    Name                                     Buyer
+            [    0,                                       2],
+            [
+                ('Part A - Invoices Issued',              ''),
+                ('INV/2025/00004',                        ''),
+                ('VAT 9%',                                'Partner EE 2'),
+                ('VAT 5%',                                'Partner EE 2'),
+                ('INV/2025/00003',                        ''),
+                ('VAT 22%',                               'Partner EE 2'),
+            ],
+            options_kmd_inf_a,
+            currency_map={
+                5: {'currency': self.env.company.currency_id},
+                7: {'currency': self.env.company.currency_id},
+            },
+        )
+
+        self._create_invoice_ee(
+            move_type='out_refund',
+            partner_id=self.partner_ee_1.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[
+                {'name': 'PT1', 'price_unit': 1000, 'tax_ids': self.vat_out_22_g.ids},
+            ],
+        )
+
+        # Even if Partner 1's invoice total is <= 1000 EUR, but their credit note total is >= 1000 EUR, so all invoices and credit notes should appear in the report.
+        self.assertLinesValues(
+            self.kmd_inf_a_report._get_lines(options_kmd_inf_a),
+            #    Name                                     Buyer
+            [    0,                                       2],
+            [
+                ('Part A - Invoices Issued',              ''),
+                ('RINV/2025/00001',                       ''),
+                ('VAT 22%',                               'Partner EE 1'),
+                ('INV/2025/00004',                        ''),
+                ('VAT 9%',                                'Partner EE 2'),
+                ('VAT 5%',                                'Partner EE 2'),
+                ('INV/2025/00003',                        ''),
+                ('VAT 22%',                               'Partner EE 2'),
+                ('INV/2025/00002',                        ''),
+                ('VAT 22% special procedure §41/42',      'Partner EE 1'),
+                ('INV/2025/00001',                        ''),
+                ('VAT 22%',                               'Partner EE 1'),
+            ],
+            options_kmd_inf_a,
+            currency_map={
+                5: {'currency': self.env.company.currency_id},
+                7: {'currency': self.env.company.currency_id},
+            },
+        )
+
+    @freeze_time('2025-11-04')
+    def test_kmd_inf_part_b_threshold_logic(self):
+        """ Partners should only appear if the total amount of bills or refunds for the taxation period is at least EUR 1,000 (excluding VAT). """
+
+        self._create_invoice_ee(
+            move_type='in_invoice',
+            partner_id=self.partner_ee_1.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_in_22_g.ids}],
+        )
+        self._create_invoice_ee(
+            move_type='in_invoice',
+            partner_id=self.partner_ee_1.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[{'name': 'PT2', 'price_unit': 300, 'tax_ids': self.vat_in_22_g.ids}],
+        )
+        self._create_invoice_ee(
+            move_type='in_invoice',
+            partner_id=self.partner_ee_2.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[{'name': 'PT1', 'price_unit': 500, 'tax_ids': self.vat_in_22_g.ids}],
+        )
+        self._create_invoice_ee(
+            move_type='in_invoice',
+            partner_id=self.partner_ee_2.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[
+                {'name': 'PT2', 'price_unit': 300, 'tax_ids': self.vat_in_9_g.ids},
+                {'name': 'PT3', 'price_unit': 200, 'tax_ids': self.vat_in_5_g.ids},
+            ],
+        )
+
+        options_kmd_inf_b = self.kmd_inf_b_report.get_options({})
+
+        self.assertLinesValues(
+            self.kmd_inf_b_report._get_lines(options_kmd_inf_b),
+            #    Name                                     Buyer
+            [    0,                                       2],
+            [
+                ('Part B - Invoices Received',            ''),
+                ('BILL/2025/11/0004',                     'Partner EE 2'),
+                ('BILL/2025/11/0003',                     'Partner EE 2'),
+            ],
+            options_kmd_inf_b,
+            currency_map={
+                5: {'currency': self.env.company.currency_id},
+                7: {'currency': self.env.company.currency_id},
+            },
+        )
+
+        self._create_invoice_ee(
+            move_type='in_refund',
+            partner_id=self.partner_ee_1.id,
+            invoice_date='2025-11-04',
+            invoice_line_ids=[
+                {'name': 'PT1', 'price_unit': 1000},
+            ],
+        )
+
+        # Even if Partner 1's refund total is >= 1000 EUR, the partner will not appear because that refund does not have any VAT.
+        self.assertLinesValues(
+            self.kmd_inf_b_report._get_lines(options_kmd_inf_b),
+            #    Name                                     Buyer
+            [    0,                                       2],
+            [
+                ('Part B - Invoices Received',            ''),
+                ('BILL/2025/11/0004',                     'Partner EE 2'),
+                ('BILL/2025/11/0003',                     'Partner EE 2'),
+            ],
+            options_kmd_inf_b,
+            currency_map={
+                5: {'currency': self.env.company.currency_id},
+                7: {'currency': self.env.company.currency_id},
+            },
         )

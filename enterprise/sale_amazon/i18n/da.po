@@ -9,21 +9,45 @@
 # Mads Søndergaard, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 17:56+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:17+0000\n"
+"Last-Translator: \"Kira Petersen François (peti)\" <peti@odoo.com>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "sale_amazon/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -369,8 +393,8 @@ msgid ""
 "Add any new marketplace that this account has "
 "gained                                           access to."
 msgstr ""
-"Tilføj alle de nye markedpladser, som denne konto har "
-"fået                                           adgang til."
+"Tilføj alle de nye markedpladser, som denne konto har fået"
+"                                           adgang til."
 
 #. module: sale_amazon
 #: model:ir.ui.menu,name:sale_amazon.root_menu
@@ -391,6 +415,11 @@ msgstr "Amazon-konto"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.res_config_settings_view_form
 msgid "Amazon Accounts"
 msgstr "Amazon-konti"
+
+#. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
@@ -433,7 +462,7 @@ msgstr "Amazon-ordrenummer"
 #. module: sale_amazon
 #: model:ir.model,name:sale_amazon.model_amazon_recover_order_wizard
 msgid "Amazon Recover Order Wizard"
-msgstr "Guide til genoprettelse af Amazon-ordre"
+msgstr "Assistent til genoprettelse af Amazon-ordre"
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_sale_order__amazon_order_ref
@@ -489,28 +518,6 @@ msgstr ""
 "Amazon kræver specifikke oplysninger om leveringsstedet. Sørg for, at de "
 "følgende oplysninger er sat til '%(location_name)s' (%(location)s): gade, "
 "land og landekode."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon kræver, at hver levering er knyttet til et trackingnummer. Da det "
-"nuværende fragtfirma ikke automatisk tilføjer et sådant, skal du angive det "
-"manuelt."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon kræver, at hver levering er knyttet til et trackingnummer. Tildel et "
-"fragtfirma til denne levering."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -689,11 +696,6 @@ msgid "Back to my account"
 msgstr "Tilbage til min konto"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "Annullér"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 msgid "Company"
@@ -708,13 +710,13 @@ msgstr "Konfigurationsindstillinger"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 #: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
 msgid "Connect"
-msgstr "Forbind"
+msgstr "Opret forbindelse"
 
 #. module: sale_amazon
 #: model:ir.model.fields.selection,name:sale_amazon.selection__amazon_account__state__connected
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Connected"
-msgstr "Forbundet"
+msgstr "Forbindelse oprettet"
 
 #. module: sale_amazon
 #: model:ir.model,name:sale_amazon.model_res_partner
@@ -784,11 +786,6 @@ msgid "Default Products"
 msgstr "Standardprodukter"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "Kassér"
-
-#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Disconnect"
 msgstr "Afbryd forbindelsen"
@@ -813,7 +810,7 @@ msgstr "Afbrudt"
 #: model:ir.model.fields,field_description:sale_amazon.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_amazon.field_stock_picking__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: sale_amazon
 #: model:ir.model.fields.selection,name:sale_amazon.selection__amazon_offer__amazon_sync_status__done
@@ -951,8 +948,13 @@ msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
 msgstr ""
-"Når salget er låst, kan det ikke længere redigeres. Du kan dog stadig "
-"foretage levering og fakturering."
+"Hvis salget er låst, kan du ikke længere ændre i den. Du kan dog stadig "
+"levere og fakturere."
+
+#. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
@@ -1006,8 +1008,8 @@ msgid ""
 "Link your Amazon account with Odoo to start synchronizing your "
 "Amazon                               orders."
 msgstr ""
-"Link din Amazon-konto med Odoo for at starte synkroniseringen af dine "
-"Amazon-                               ordrer."
+"Link din Amazon-konto med Odoo for at starte synkroniseringen af dine Amazon-"
+"                               ordrer."
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_order_view_form
@@ -1029,6 +1031,12 @@ msgstr "Markedsplads"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__active_marketplace_ids
 msgid "Marketplaces"
 msgstr "Markedspladser"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1157,8 +1165,7 @@ msgstr "Registrér din Amazon-konto"
 #. module: sale_amazon
 #: model_terms:ir.actions.act_window,help:sale_amazon.list_amazon_account_action
 msgid "Register yours to start synchronizing your orders into Odoo."
-msgstr ""
-"Registrér dine for at påbegynde synkroniseringen af dine ordrer i Odoo."
+msgstr "Registrér dine for at påbegynde synkroniseringen af dine ordrer i Odoo."
 
 #. module: sale_amazon
 #: model:ir.model.fields.selection,name:sale_amazon.selection__amazon_offer__amazon_sync_status__reset
@@ -1367,11 +1374,9 @@ msgstr "Lagerbeholdningsenheden."
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
-"Kanalen opdateres enten ved modtagelse af nye ordrer eller ved næste "
-"synkronisering af lagerbeholdningen."
 
 #. module: sale_amazon
 #. odoo-python
@@ -1476,8 +1481,8 @@ msgstr "Det indtastede nummer stemmer ikke overens med nogen Amazon-ordrer."
 #: model:ir.model.fields,help:sale_amazon.field_amazon_recover_order_wizard__amazon_order_ref
 msgid "The reference to the Amazon order to recover, in 3-7-7 format"
 msgstr ""
-"Nummeret på den Amazon-ordre, der skal genoprettes, skal være i formatet "
-"3-7-7."
+"Nummeret på den Amazon-ordre, der skal genoprettes, skal være i formatet 3-7-"
+"7."
 
 #. module: sale_amazon
 #. odoo-python
@@ -1689,81 +1694,3 @@ msgstr "f.eks. Amerikanske marked"
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid "id"
 msgstr "ID"
-
-#~ msgid ""
-#~ "After validation of the credentials, the marketplaces\n"
-#~ "                                                to which this account has "
-#~ "access will be\n"
-#~ "                                                synchronized and "
-#~ "automatically made available."
-#~ msgstr ""
-#~ "Efter bekræftelse af legitimationsoplysninger, vil markedspladserne\n"
-#~ "                                              hvor til denne konto har "
-#~ "adgang, blive\n"
-#~ "                                              synkroniseret, og gjort "
-#~ "tilgængelig automatisk."
-
-#~ msgid "Amazon Email"
-#~ msgstr "Amazon email"
-
-#~ msgid ""
-#~ "If this account gained access to new "
-#~ "marketplaces,                                         synchronize and add "
-#~ "them to the current sync marketplaces"
-#~ msgstr ""
-#~ "Hvis denne konto får adgang til nye markedspladser. bedes du synkronisere "
-#~ "og tilføje dem til de nuværende synkroniserede markedspladser"
-
-#~ msgid "Inactive"
-#~ msgstr "Inaktiv"
-
-#~ msgid "Is Follow Up Displayed"
-#~ msgstr "Er opfølgning vist"
-
-#~ msgid "Order Follow-up"
-#~ msgstr "Ordre opfølgning"
-
-#~ msgid "SKU"
-#~ msgstr "SKU"
-
-#~ msgid "SKU must be unique for a given account and marketplace."
-#~ msgstr "SKU skal være unik for en given konto og markedsplads."
-
-#~ msgid ""
-#~ "Select the marketplace on which your seller account\n"
-#~ "                                                was originally created."
-#~ msgstr ""
-#~ "Vælg markedspladsen hvor din sælger konto \n"
-#~ "                                                blev oprettet oprindeligt."
-
-#~ msgid "Sign-up Marketplace"
-#~ msgstr "Registrer markedsplads"
-
-#~ msgid "Stock Location"
-#~ msgstr "Lager lokation"
-
-#~ msgid "Sync Marketplaces"
-#~ msgstr "Synkroniser markedspladser"
-
-#~ msgid ""
-#~ "The original sign-up marketplace of this account. Used for authentication "
-#~ "only."
-#~ msgstr ""
-#~ "Den originale registrerings markedsplads for denne konto. Bruges "
-#~ "udelukkende til godkendelse."
-
-#~ msgid "Update Available Marketplaces"
-#~ msgstr "Opdater tilgængelige markedspladser"
-
-#~ msgid ""
-#~ "[%s] %s\n"
-#~ "Condition: %s - %s"
-#~ msgstr ""
-#~ "[%s] %s\n"
-#~ "Betingelse: %s - %s"
-
-#~ msgid "[%s] Delivery Charges for %s"
-#~ msgstr "[%s] Leveringsomkostninger for %s"
-
-#~ msgid "[%s] Gift Wrapping Charges for %s"
-#~ msgstr "[%s] Gave indpaknings gebyrer for %s"

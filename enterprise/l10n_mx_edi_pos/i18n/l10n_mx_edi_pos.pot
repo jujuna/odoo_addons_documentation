@@ -4,16 +4,24 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-09-18 18:21+0000\n"
+"PO-Revision-Date: 2026-09-18 18:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_mx_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_mx_edi_pos/static/src/app/components/popups/add_info_popup/add_info_popup.js:0
+msgid ""
+"\"Invoice to public\" cannot set to \"No\" if the selected partner does not "
+"have a recognized country and ZIP code set."
+msgstr ""
 
 #. module: l10n_mx_edi_pos
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_pos.res_config_settings_view_form
@@ -43,6 +51,13 @@ msgid "CFDI status"
 msgstr ""
 
 #. module: l10n_mx_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_mx_edi_pos/static/src/app/components/popups/add_info_popup/add_info_popup.js:0
+#: code:addons/l10n_mx_edi_pos/static/src/app/screens/partner_list.js:0
+msgid "CFDI to Public"
+msgstr ""
+
+#. module: l10n_mx_edi_pos
 #: model:ir.model.fields,field_description:l10n_mx_edi_pos.field_pos_order__l10n_mx_edi_cfdi_to_public
 msgid "CFDI to public"
 msgstr ""
@@ -60,6 +75,22 @@ msgstr ""
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_cfdi_state__global_cancel
 msgid "Cancelled Global"
+msgstr ""
+
+#. module: l10n_mx_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_mx_edi_pos/static/src/app/screens/partner_list.js:0
+msgid ""
+"Cannot remove the selected partner if an invoice is requested and not set to"
+" public."
+msgstr ""
+
+#. module: l10n_mx_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_mx_edi_pos/static/src/app/screens/partner_list.js:0
+msgid ""
+"Cannot select a partner with no country and ZIP code if the invoice is not "
+"set to public."
 msgstr ""
 
 #. module: l10n_mx_edi_pos
@@ -152,8 +183,6 @@ msgid ""
 msgstr ""
 
 #. module: l10n_mx_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_mx_edi_pos/static/src/app/services/pos_store.js:0
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_cfdi_sat_state__error
 msgid "Error"
 msgstr ""
@@ -182,12 +211,6 @@ msgstr ""
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_usage__g03
 msgid "General expenses"
-msgstr ""
-
-#. module: l10n_mx_edi_pos
-#. odoo-python
-#: code:addons/l10n_mx_edi_pos/models/l10n_mx_edi_document.py:0
-msgid "Global Invoice"
 msgstr ""
 
 #. module: l10n_mx_edi_pos
@@ -264,6 +287,11 @@ msgid "Medical, dental and hospital expenses."
 msgstr ""
 
 #. module: l10n_mx_edi_pos
+#: model:ir.module.module,shortdesc:base.module_l10n_mx_edi_pos
+msgid "Mexican Localization for the Point of Sale"
+msgstr ""
+
+#. module: l10n_mx_edi_pos
 #: model:ir.model,name:l10n_mx_edi_pos.model_l10n_mx_edi_document
 msgid "Mexican documents that needs to transit outside of Odoo"
 msgstr ""
@@ -287,6 +315,12 @@ msgstr ""
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_usage__i02
 msgid "Office furniture and equipment investment"
+msgstr ""
+
+#. module: l10n_mx_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_mx_edi_pos/static/src/app/services/pos_store.js:0
+msgid "Oh snap !"
 msgstr ""
 
 #. module: l10n_mx_edi_pos
@@ -331,18 +365,18 @@ msgid "Point of Sale Configuration"
 msgstr ""
 
 #. module: l10n_mx_edi_pos
-#: model:ir.model,name:l10n_mx_edi_pos.model_pos_order_line
-msgid "Point of Sale Order Lines"
+#: model:ir.model,name:l10n_mx_edi_pos.model_pos_order
+msgid "Point of Sale Order"
 msgstr ""
 
 #. module: l10n_mx_edi_pos
-#: model:ir.model,name:l10n_mx_edi_pos.model_pos_order
-msgid "Point of Sale Orders"
+#: model:ir.model,name:l10n_mx_edi_pos.model_pos_order_line
+msgid "Point of Sale Order Line"
 msgstr ""
 
 #. module: l10n_mx_edi_pos
 #: model:ir.model,name:l10n_mx_edi_pos.model_pos_payment_method
-msgid "Point of Sale Payment Methods"
+msgid "Point of Sale Payment Method"
 msgstr ""
 
 #. module: l10n_mx_edi_pos
@@ -534,4 +568,10 @@ msgstr ""
 #: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
 msgid ""
 "You cannot invoice this refund since the related order is not invoiced yet."
+msgstr ""
+
+#. module: l10n_mx_edi_pos
+#. odoo-python
+#: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
+msgid "You need to select a customer to invoice this order."
 msgstr ""

@@ -3,6 +3,7 @@
     <record id="account_financial_report_ke_bs" model="account.report">
         <field name="name">Balance Sheet</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
@@ -43,36 +44,26 @@
                             <record id="account_financial_report_ke_bs_A_1_1" model="account.report.line">
                                 <field name="name">Property, plant and equipment</field>
                                 <field name="code">KE_BS_A_1_1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">007 + 005 + 006</field>
                             </record>
                             <record id="account_financial_report_ke_bs_A_1_2" model="account.report.line">
                                 <field name="name">Investment properties</field>
                                 <field name="code">KE_BS_A_1_2</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">003 + 004</field>
                             </record>
                             <record id="account_financial_report_ke_bs_A_1_3" model="account.report.line">
                                 <field name="name">Intangible assets</field>
                                 <field name="code">KE_BS_A_1_3</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">002 + 001</field>
                             </record>
                             <record id="account_financial_report_ke_bs_A_1_4" model="account.report.line">
                                 <field name="name">Financial assets</field>
                                 <field name="code">KE_BS_A_1_4</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">008</field>
                             </record>
                             <record id="account_financial_report_ke_bs_A_1_5" model="account.report.line">
                                 <field name="name">Biological assets</field>
                                 <field name="code">KE_BS_A_1_5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">009</field>
                             </record>
                         </field>
@@ -85,22 +76,16 @@
                             <record id="account_financial_report_ke_bs_A_2_1" model="account.report.line">
                                 <field name="name">Inventories</field>
                                 <field name="code">KE_BS_A_2_1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">100</field>
                             </record>
                             <record id="account_financial_report_ke_bs_A_2_2" model="account.report.line">
                                 <field name="name">Trade and other receivables</field>
                                 <field name="code">KE_BS_A_2_2</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">11</field>
                             </record>
                             <record id="account_financial_report_ke_bs_A_2_3" model="account.report.line">
                                 <field name="name">Cash and cash equivalents</field>
                                 <field name="code">KE_BS_A_2_3</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">12</field>
                             </record>
                         </field>
@@ -155,8 +140,6 @@
                             <record id="account_financial_report_ke_bs_B_1_1" model="account.report.line">
                                 <field name="name">Capital</field>
                                 <field name="code">KE_BS_B_1_1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-301 - 300 - 304</field>
                             </record>
                             <record id="account_financial_report_ke_bs_B_1_earnings" model="account.report.line">
@@ -175,8 +158,6 @@
                             <record id="account_financial_report_ke_bs_B_1_2" model="account.report.line">
                                 <field name="name">Reserves</field>
                                 <field name="code">KE_BS_B_1_2</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-303 - 302</field>
                             </record>
                         </field>
@@ -206,22 +187,16 @@
                                     <record id="account_financial_report_ke_bs_B_2_1_1" model="account.report.line">
                                         <field name="name">Trade and other payables</field>
                                         <field name="code">KE_BS_B_2_1_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-21</field>
                                     </record>
                                     <record id="account_financial_report_ke_bs_B_2_1_2" model="account.report.line">
                                         <field name="name">Deferred tax on liabilities and assets</field>
                                         <field name="code">KE_BS_B_2_1_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-22\(222,223)</field>
                                     </record>
                                     <record id="account_financial_report_ke_bs_B_2_1_3" model="account.report.line">
                                         <field name="name">Other financial liabilities</field>
                                         <field name="code">KE_BS_B_2_1_3</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-222 - 223</field>
                                     </record>
                                 </field>
@@ -229,8 +204,6 @@
                             <record id="account_financial_report_ke_bs_B_2_2" model="account.report.line">
                                 <field name="name">Non-current Liabilities</field>
                                 <field name="code">KE_BS_B_2_2</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-23</field>
                             </record>
                         </field>

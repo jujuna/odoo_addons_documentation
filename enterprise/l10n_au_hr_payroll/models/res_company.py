@@ -15,8 +15,10 @@ class ResCompany(models.Model):
     l10n_au_registered_for_whm = fields.Boolean("Registered for Working Holiday Maker")
     l10n_au_registered_for_palm = fields.Boolean("Registered for PALM Scheme")
 
-    l10n_au_previous_bms_id = fields.Char("Previous BMS ID")
-    l10n_au_bms_id = fields.Char("BMS ID", readonly=False)
+    l10n_au_previous_bms_id = fields.Char("Previous BMS ID",
+        help="The previous Business Management Software ID is a unique ID provided by your previous STP-compliant payroll software.")
+    l10n_au_bms_id = fields.Char("BMS ID", readonly=False,
+        help="Odoo's generated Business Management Software ID used as a unique ATO identifier for your company.")
 
     def _prepare_resource_calendar_values(self):
         """
@@ -26,25 +28,14 @@ class ResCompany(models.Model):
         vals = super()._prepare_resource_calendar_values()
         if self.country_id.code == 'AU':
             vals.update({
-                'name': _('Standard 38 hours/week - %s', self.name),
+                'name': _('38 hours/week - %s', self.name),
                 'full_time_required_hours': 38.0,
-                'tz': 'Australia/Sydney',
                 'attendance_ids': [
-                    (0, 0, {'name': _('Monday Morning'), 'dayofweek': '0', 'hour_from': 8.5, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': _('Monday Lunch'), 'dayofweek': '0', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': _('Monday Afternoon'), 'dayofweek': '0', 'hour_from': 13, 'hour_to': 17.1, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': _('Tuesday Morning'), 'dayofweek': '1', 'hour_from': 8.5, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': _('Tuesday Lunch'), 'dayofweek': '1', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': _('Tuesday Afternoon'), 'dayofweek': '1', 'hour_from': 13, 'hour_to': 17.1, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': _('Wednesday Morning'), 'dayofweek': '2', 'hour_from': 8.5, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': _('Wednesday Lunch'), 'dayofweek': '2', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': _('Wednesday Afternoon'), 'dayofweek': '2', 'hour_from': 13, 'hour_to': 17.1, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': _('Thursday Morning'), 'dayofweek': '3', 'hour_from': 8.5, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': _('Thursday Lunch'), 'dayofweek': '3', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': _('Thursday Afternoon'), 'dayofweek': '3', 'hour_from': 13, 'hour_to': 17.1, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': _('Friday Morning'), 'dayofweek': '4', 'hour_from': 8.5, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': _('Friday Lunch'), 'dayofweek': '4', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': _('Friday Afternoon'), 'dayofweek': '4', 'hour_from': 13, 'hour_to': 17.1, 'day_period': 'afternoon'})
+                    (0, 0, {'dayofweek': '0', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '1', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '2', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '3', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '4', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
                 ],
             })
         return vals

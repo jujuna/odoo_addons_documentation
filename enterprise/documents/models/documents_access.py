@@ -1,5 +1,5 @@
 from odoo import _, api, fields, models, tools
-from odoo.exceptions import AccessError, ValidationError, UserError
+from odoo.exceptions import AccessError, ValidationError
 from odoo.tools.misc import consteq
 
 
@@ -9,20 +9,28 @@ class DocumentsAccess(models.Model):
     _log_access = False
 
     document_id = fields.Many2one('documents.document', required=True, bypass_search_access=True, index=True, ondelete='cascade')
-    partner_id = fields.Many2one('res.partner', required=True, ondelete='cascade', index=True)
+    partner_id = fields.Many2one('res.partner', ondelete='cascade', index=True)
+    group_id = fields.Many2one('res.group.functional', ondelete='cascade')
     role = fields.Selection(
         [('view', 'Viewer'), ('edit', 'Editor')],
         string='Role', required=False, index=True)
     last_access_date = fields.Datetime('Last Accessed On', required=False)
     expiration_date = fields.Datetime('Expiration', index=True)
 
-    _unique_document_access_partner = models.Constraint(
-        'unique(document_id, partner_id)',
-        "This partner is already set on this document.",
+    _unique_document_access_by_partner_or_group = models.UniqueIndex(
+        '(document_id, partner_id, group_id) NULLS NOT DISTINCT',
+        "This partner/group is already set on this document.",
     )
     _role_or_last_access_date = models.Constraint(
-        'check (role IS NOT NULL or last_access_date IS NOT NULL)',
-        "NULL roles must have a set last_access_date",
+        """CHECK(
+            (partner_id IS NOT NULL AND (role IS NOT NULL or last_access_date IS NOT NULL)) OR
+            (group_id IS NOT NULL AND role IS NOT NULL AND last_access_date IS NULL))
+        """,
+        "partner must either have a role or have a set last_access_date, group must have a role",
+    )
+    _check_partner_or_group = models.Constraint(
+        'CHECK((partner_id IS NOT NULL AND group_id IS NULL) OR (partner_id IS NULL AND group_id IS NOT NULL))',
+        'Sharing Access must apply to either a partner or a group.',
     )
 
     @api.constrains("partner_id")
@@ -41,8 +49,8 @@ class DocumentsAccess(models.Model):
         return vals_list
 
     def write(self, vals):
-        if 'partner_id' in vals or 'document_id' in vals:
-            raise AccessError(_('Access documents and partners cannot be changed.'))
+        if 'partner_id' in vals or 'group_id' in vals or 'document_id' in vals:
+            raise AccessError(_('Access documents, partners, and groups cannot be changed.'))
 
         self.document_id.check_access('write')
         return super().write(vals)
@@ -61,6 +69,7 @@ class DocumentsAccess(models.Model):
             and self.role
             and (not self.expiration_date or self.expiration_date > fields.Datetime.now())
             and not self.partner_id.with_context(active_test=False).user_ids
+            and self.partner_id
         )
 
     def _get_member_signup_token(self):
@@ -71,9 +80,6 @@ class DocumentsAccess(models.Model):
         date.
         """
         self.ensure_one()
-        if not self._is_signup_available():
-            raise UserError(_('Cannot invite this member.'))
-
         return tools.hmac(
             self.env(su=True),
             'documents-member-signup-token',
@@ -83,30 +89,8 @@ class DocumentsAccess(models.Model):
     @api.model
     def _get_member_from_token(self, member_id, token):
         member_sudo = self.browse(member_id).sudo().exists()
-        if not member_sudo or not member_sudo._is_signup_available():
-            return False
-        if not consteq(member_sudo._get_member_signup_token(), token):
-            return False
-        return member_sudo
-
-    @api.model
-    def _get_signup_url(self, member_id, member_signup_token, access_token, redirect_url):
-        """Build the signup URL for the current public user.
-
-        :param member_id: ID of the `documents.access`
-        :param member_signup_token: Token of the `documents.access`
-        :param access_token: Token of the document (used to redirect
-            the user after he signed-up)
-        :param redirect_url: The URL where to redirect after the sign-up
-        """
-        if not member_id or not member_signup_token or not access_token:
-            return ''
-
-        # need to get the document from the member, because `_from_access_token`
-        # won't return the document if it's in `access_via_link == 'none'`
-        member_sudo = self._get_member_from_token(member_id, member_signup_token)
-        if not member_sudo:
-            return ''
-
-        member_sudo.partner_id.signup_get_auth_param()
-        return member_sudo.partner_id._get_signup_url_for_action(url=redirect_url)[member_sudo.partner_id.id]
+        return (
+            bool(member_sudo)
+            and consteq(member_sudo._get_member_signup_token(), token)
+            and member_sudo
+        )

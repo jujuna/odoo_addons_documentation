@@ -1,6 +1,5 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
-import { Deferred } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { onMounted } from "@odoo/owl";
 import {
@@ -134,7 +133,7 @@ test("open xml editor of graph component view and close it", async () => {
 
     // the XML editor lazy loads its libs and its templates so its start
     // method is monkey-patched to know when the widget has started
-    const xmlEditorDef = new Deferred();
+    const xmlEditorDef = Promise.withResolvers();
 
     patchWithCleanup(CodeEditor.prototype, {
         setup() {
@@ -180,9 +179,9 @@ test("open xml editor of graph component view and close it", async () => {
     });
 
     await contains(".o_web_studio_navbar_item").click();
-    await contains(".o_web_studio_editor .o_notebook_headers li:nth-child(2) a").click();
+    await contains(".o_web_studio_editor .o_notebook_headers li:nth-child(2) button").click();
     await contains(".o_web_studio_open_xml_editor").click();
-    await xmlEditorDef;
+    await xmlEditorDef.promise;
 
     expect(".o_web_studio_code_editor.ace_editor").toHaveCount(1);
     expect(".o_web_studio_xml_editor").toHaveCount(1);

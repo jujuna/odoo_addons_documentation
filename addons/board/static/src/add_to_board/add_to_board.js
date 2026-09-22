@@ -3,7 +3,7 @@ import { Dropdown } from "@web/core/dropdown/dropdown";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useAutofocus, useService } from "@web/core/utils/hooks";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, signal } from "@odoo/owl";
 
 const cogMenuRegistry = registry.category("cogMenu");
 
@@ -23,13 +23,14 @@ const cogMenuRegistry = registry.category("cogMenu");
 export class AddToBoard extends Component {
     static template = "board.AddToBoard";
     static components = { Dropdown };
-    static props = {};
+
+    autofocusRef = signal.ref();
 
     setup() {
         this.notification = useService("notification");
-        this.state = useState({ name: this.env.config.getDisplayName() });
+        this.state = proxy({ name: this.env.config.getDisplayName() });
 
-        useAutofocus();
+        useAutofocus({ ref: this.autofocusRef });
     }
 
     //---------------------------------------------------------------------
@@ -92,7 +93,7 @@ export class AddToBoard extends Component {
 
 export const addToBoardItem = {
     Component: AddToBoard,
-    groupNumber: 20,
+    groupNumber: 10,
     isDisplayed: ({ config }) => {
         const { actionType, actionId, viewType } = config;
         return actionType === "ir.actions.act_window" && actionId && viewType !== "form";

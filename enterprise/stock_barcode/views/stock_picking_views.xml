@@ -9,10 +9,6 @@
                 <field name="product_barcode" column_invisible="True"/>
                 <field name="location_processed" column_invisible="True"/>
             </xpath>
-            <xpath expr="//field[@name='quantity']" position="attributes">
-                <attribute name="options">{'barcode_events': True}</attribute>
-                <attribute name="widget">field_float_scannable</attribute>
-            </xpath>
         </field>
     </record>
 
@@ -40,11 +36,11 @@
                 <field name="company_id" invisible="1"/>
                 <field name="picking_type_code" invisible="1"/>
                 <group>
-                    <button name="action_view_reception_report" string="Allocation" type="object"
+                    <button name="action_view_allocation_report" string="Allocation" type="object"
                         context="{'default_picking_ids': [id]}"
-                        class="btn btn-primary o_reception_report" icon="fa-list"
-                        invisible="not show_allocation"
-                        groups="stock.group_reception_report"/>
+                        class="btn btn-primary o_reception_report" icon="format_list_bulleted"
+                        invisible="not show_allocation"/>
+                    <field name="display_name" invisible="1"/>
                     <field name="partner_id" readonly="state in ['cancel', 'done']"/>
                     <field name="scheduled_date" readonly="1" invisible="not scheduled_date"/>
                     <field name="origin" readonly="1" invisible="not origin"/>
@@ -68,8 +64,8 @@
                     </field>
                     <field name="note" readonly="1" invisible="not note"/>
                 </group>
-                <div class="o_barcode_control d-flex justify-content-between p-2 gap-2 fixed-bottom">
-                    <button string="Discard" class="btn btn-secondary o_discard" special="cancel"/>
+                <div class="o_barcode_control d-flex justify-content-between p-2 gap-2 fixed-bottom bg-view">
+                    <button class="btn btn-secondary o_discard" special="cancel"/>
                     <button string="Confirm" class="btn btn-primary o_save" special="save"/>
                 </div>
             </form>
@@ -83,7 +79,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_open_picking_client_action" type="object"
-                        class="oe_stat_button" icon="fa-barcode" string="Barcode"/>
+                        class="oe_stat_button" icon="barcode" string="Barcode"/>
             </xpath>
         </field>
     </record>
@@ -106,6 +102,9 @@
         <!--High priority to not be the standard view of pickings in inventory app-->
         <field name="priority">100</field>
         <field name="arch" type="xml">
+            <field name="picking_type_id" position="after">
+                <field name="batch_id"/>
+            </field>
             <xpath expr="//kanban[hasclass('o_kanban_mobile')]" position="attributes">
                 <attribute name="js_class">stock_barcode_list_kanban</attribute>
                 <attribute name="import">false</attribute>
@@ -119,10 +118,23 @@
             <xpath expr="//field[@name='activity_ids']" position="replace"></xpath>
             <!-- Use mobile view-->
             <xpath expr="//field[@name='name']" position="replace">
-                <button class="btn btn-link p-0 ms-1 text-black" name="action_open_picking_client_action"
-                  type="object">
-                  <field name="name"/>
+                <button class="btn btn-link p-0 ms-1 text-black text-truncate" name="action_open_picking_client_action" type="object">
+                    <field name="name"/>
+                    <span invisible="not origin"> - <field name="origin"/></span>
                 </button>
+            </xpath>
+            <!-- Add open in batch button -->
+            <xpath expr="//div" position="after">
+                <field name="display_batch_button" invisible="1"/>
+                <div invisible="not display_batch_button"
+                     groups="stock.group_stock_picking_batch"
+                     class="d-flex justify-content-end">
+                    <button name="action_open_batch_picking" type="object"
+                            class="btn btn-sm btn-primary">
+                        <field name="batch_id" readonly="state in ['cancel', 'done']"/>
+                        <span class="oi ms-1" data-icon="open_in_new" title="Open Batch Picking"/>
+                    </button>
+                </div>
             </xpath>
         </field>
     </record>

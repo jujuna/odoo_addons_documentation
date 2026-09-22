@@ -7,77 +7,45 @@
             <field name="inherit_id" ref="account.res_config_settings_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//block[@id='invoicing_settings']" position="after">
-                    <block title="Colombian Electronic Invoicing" id="l10n_mx_co_settings" invisible="country_code != 'CO'">
-                        <t id="l10n_co_edi_settings_content">
-                            <setting string="Carvajal Configuration" help="Configure your Carvajal credentials here" title="Configure your Carvajal credentials here.">
-                                <div class="content-group">
-                                    <div class="row mt16">
-                                        <label
-                                            string="Username"
-                                            for="l10n_co_edi_username"
-                                            class="col-lg-3 o_light_label"
-                                        />
-                                        <field name="l10n_co_edi_username"/>
-                                    </div>
-                                    <div class="row">
-                                        <label
-                                            string="Password"
-                                            for="l10n_co_edi_password"
-                                            class="col-lg-3 o_light_label"
-                                        />
-                                        <field name="l10n_co_edi_password" password="True"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_company" class="col-lg-3 o_light_label"/>
-                                        <field name="l10n_co_edi_company"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_account" class="col-lg-3 o_light_label"/>
-                                        <field name="l10n_co_edi_account"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_test_mode" class="col-lg-3 o_light_label"/>
-                                        <field name="l10n_co_edi_test_mode"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_template_code" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_template_code"/>
-                                    </div>
+                    <block title="Colombian Electronic Invoicing" id="l10n_co_edi_settings" invisible="country_code != 'CO'">
+                        <setting class="w-100" help="Configure the operations modes for the different types of documents to be generated from Odoo">
+                            <field name="l10n_co_edi_operation_mode_ids" class="w-100" string="Operation Modes"/>
+                        </setting>
+                        <setting class="w-100" help="Add your certificates to sign your documents.">
+                            <field name="l10n_co_edi_certificate_ids" class="w-100" string="Certificates"/>
+                        </setting>
+                        <setting class="col-lg-12" help="Tick if you are testing workflows for electronic invoicing or if you need to activate the certification process environment">
+                            <field name="l10n_co_edi_test_environment"/>
+                        </setting>
+                        <setting class="col-lg-12" invisible="not l10n_co_edi_test_environment"
+                                 help="Send test electronic documents with your certificate to achieve the 'Enabled' status in the DIAN portal for 'in house software' operation mode. In the fields below, define the number of 'Total Required Accepted Documents' specified in the Test Set assigned by the DIAN.">
+                            <field name="l10n_co_edi_certification_process"/>
+                            <t invisible="not l10n_co_edi_certification_process">
+                                <div class="mt16">
+                                    <label for="l10n_co_edi_cert_invoice_count" class="col-3 o_light_label"/>
+                                    <field name="l10n_co_edi_cert_invoice_count"/>
                                 </div>
-                            </setting>
-                            <setting string="Report Configuration" help="Configure header information here" title="Configure electronic invoice headers here.">
-                                <div class="content-group">
-                                    <div class="row mt16">
-                                        <label for="l10n_co_edi_header_gran_contribuyente" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_header_gran_contribuyente"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_header_tipo_de_regimen" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_header_tipo_de_regimen"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_header_retenedores_de_iva" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_header_retenedores_de_iva"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_header_autorretenedores" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_header_autorretenedores"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_header_resolucion_aplicable" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_header_resolucion_aplicable"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_header_actividad_economica" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_header_actividad_economica"/>
-                                    </div>
-                                    <div class="row">
-                                        <label for="l10n_co_edi_header_bank_information" class="col-lg-4 o_light_label"/>
-                                        <field name="l10n_co_edi_header_bank_information"/>
-                                    </div>
+                                <div class="mt16">
+                                    <label for="l10n_co_edi_cert_credit_count" class="col-3 o_light_label"/>
+                                    <field name="l10n_co_edi_cert_credit_count"/>
                                 </div>
-                            </setting>
-                        </t>
+                                <div class="mt16">
+                                    <label for="l10n_co_edi_cert_debit_count" class="col-3 o_light_label"/>
+                                    <field name="l10n_co_edi_cert_debit_count"/>
+                                </div>
+                                <div class="mt16">
+                                    <button name="action_l10n_co_certify_with_dian" type="object"
+                                            string="Begin Certification Process"
+                                            class="btn-primary"
+                                            noSaveDialog="1"
+                                            confirm="Warning! This action will perform irreversible changes to your database to best guarantee certification with DIAN. Please make sure you are only running this on a testing database."/>
+                                </div>
+                            </t>
+                        </setting>
+                        <setting class="col-lg-12" invisible="l10n_co_edi_test_environment"
+                                 help="Activate this mode to be able to test electronic invoicing only with internal validations, but no responce from the DIAN environment.">
+                            <field name="l10n_co_edi_demo_mode"/>
+                        </setting>
                     </block>
                 </xpath>
             </field>

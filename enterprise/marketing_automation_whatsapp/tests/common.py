@@ -8,6 +8,7 @@ class MarketingAutomationWACase(common.TransactionCase):
         cls.wa_tracked_btn_url = 'https://www.tracked.button.com'
         cls.wa_tracked_body_url = 'https://www.tracked.body.com'
         cls.wa_dynamic_btn_url = 'https://www.dynamic.com'
+        cls.wa_static_btn_url = 'https://www.static.com'
 
     @classmethod
     def _create_wa_template(cls, model, user=None, **template_values):

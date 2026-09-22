@@ -7,10 +7,10 @@
 
         <xpath expr="//td[@name='td_mrp_bom']" position="after">
             <td t-if="data['has_ecos']">
-                <span t-esc="data['version']"/>
+                <span t-out="data['version']"/>
             </td>
             <td t-if="data['has_ecos']">
-                <span t-esc="data['ecos']"/>
+                <span t-out="data['ecos']"/>
             </td>
         </xpath>
 
@@ -28,10 +28,10 @@
     <template id="report_mrp_bom_pdf_line_inherit_mrp_plm" inherit_id="mrp.report_mrp_bom_pdf_line">
         <xpath expr="//td[@name='td_mrp_code']" position="after">
             <td t-if="data['has_ecos']">
-                <span t-if="l.get('version')" t-esc="l['version']"/>
+                <span t-if="l.get('version')" t-out="l['version']"/>
             </td>
             <td t-if="data['has_ecos']">
-                <span t-if="l.get('ecos')" t-esc="l['ecos']"/>
+                <span t-if="l.get('ecos')" t-out="l['ecos']"/>
             </td>
         </xpath>
     </template>

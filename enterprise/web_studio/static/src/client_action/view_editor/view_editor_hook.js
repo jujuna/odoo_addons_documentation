@@ -1,18 +1,11 @@
-import {
-    onWillDestroy,
-    onWillStart,
-    status,
-    useComponent,
-    useEnv,
-    useState,
-    useSubEnv,
-} from "@odoo/owl";
+import { onWillDestroy, onWillStart, proxy, useScope } from "@odoo/owl";
 import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
-import { viewTypeToString } from "@web_studio/studio_service";
+import { useEnv, useSubEnv } from "@web/owl2/utils";
 import {
     useEditorBreadcrumbs,
     useEditorMenuItem,
 } from "@web_studio/client_action/editor/edition_flow";
+import { viewTypeToString } from "@web_studio/studio_service";
 import { ViewEditorModel } from "./view_editor_model";
 import { ViewEditorSnackbar } from "./view_editor_snackbar";
 
@@ -21,9 +14,7 @@ export function useViewEditorModel(viewRef, { initialState }) {
 
     /* Services */
     const services = Object.fromEntries(
-        ["orm", "ui", "notification"].map((sName) => {
-            return [sName, useService(sName)];
-        })
+        ["orm", "ui", "notification"].map((sName) => [sName, useService(sName)])
     );
     // Capture studio's state as a new Object. This is due to concurrency
     // issues because we are an action, and rendering may be caused by other things (reactives)
@@ -32,7 +23,7 @@ export function useViewEditorModel(viewRef, { initialState }) {
 
     /* Coordination */
     // Communicates with editorMenu, provides standard server calls
-    const editionFlow = useState(env.editionFlow);
+    const editionFlow = proxy(env.editionFlow);
     useEditorBreadcrumbs({ name: viewTypeToString(services.studio.editedViewType) });
 
     const viewEditorModel = new ViewEditorModel({
@@ -50,24 +41,25 @@ export function useViewEditorModel(viewRef, { initialState }) {
         props: { operations: _operations, saveIndicator: _snackBar },
     });
 
-    const component = useComponent();
-    onWillStart(async () => {
-        return new Promise((resolve, reject) => {
-            viewEditorModel
-                .load()
-                .then(resolve)
-                .catch((error) => {
-                    if (status(component) !== "destroyed") {
-                        reject(error);
-                    }
-                });
-        });
-    });
+    const scope = useScope();
+    onWillStart(
+        async () =>
+            new Promise((resolve, reject) => {
+                viewEditorModel
+                    .load()
+                    .then(resolve)
+                    .catch((error) => {
+                        if (scope.status !== 3 /* destroyed */) {
+                            reject(error);
+                        }
+                    });
+            })
+    );
 
     onWillDestroy(() => {
         viewEditorModel.isInEdition = false;
     });
-    return useState(viewEditorModel);
+    return proxy(viewEditorModel);
 }
 
 export function useSnackbarWrapper(fn) {

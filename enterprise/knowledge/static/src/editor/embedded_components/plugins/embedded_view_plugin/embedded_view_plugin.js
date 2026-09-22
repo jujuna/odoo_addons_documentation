@@ -19,7 +19,7 @@ export class EmbeddedViewPlugin extends Plugin {
                 id: "insertEmbeddedViewKanban",
                 title: _t("Item Kanban"),
                 description: _t("Insert a Kanban view of article items"),
-                icon: "fa-th-large",
+                icon: "view_module",
                 run: () => {
                     this.promptInsertEmbeddedView("kanban", true);
                 },
@@ -29,7 +29,8 @@ export class EmbeddedViewPlugin extends Plugin {
                 id: "insertEmbeddedViewCards",
                 title: _t("Item Cards"),
                 description: _t("Insert a Card view of article items"),
-                icon: "fa-address-card",
+                icon: "contact_mail",
+                iconClass: "oi-filled",
                 run: () => {
                     this.promptInsertEmbeddedView("kanban");
                 },
@@ -39,7 +40,7 @@ export class EmbeddedViewPlugin extends Plugin {
                 id: "insertEmbeddedViewList",
                 title: _t("Item List"),
                 description: _t("Insert a List view of article items"),
-                icon: "fa-th-list",
+                icon: "view_list",
                 run: () => {
                     this.promptInsertEmbeddedView("list");
                 },
@@ -49,7 +50,7 @@ export class EmbeddedViewPlugin extends Plugin {
                 id: "insertEmbeddedViewCalendar",
                 title: _t("Item Calendar"),
                 description: _t("Insert a Calendar view of article items"),
-                icon: "fa-calendar-plus-o",
+                icon: "calendar_add_on",
                 run: () => {
                     this.promptInsertEmbeddedCalendarView();
                 },
@@ -98,7 +99,7 @@ export class EmbeddedViewPlugin extends Plugin {
             }),
         });
         this.dependencies.dom.insert(embeddedViewBlueprint);
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 
     promptInsertEmbeddedCalendarView() {

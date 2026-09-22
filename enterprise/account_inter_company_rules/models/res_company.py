@@ -1,10 +1,13 @@
-from odoo import api, fields, models, SUPERUSER_ID
+from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    intercompany_generate_bills_refund = fields.Boolean(string="Generate Bills and Refunds")
+    intercompany_generate_bills_refund = fields.Boolean(
+        string="Generate Bills and Refunds",
+        help="If another company confirms an invoice with this company, a bill will be created in the chosen Purchase journal."
+    )
     intercompany_document_state = fields.Selection(
         selection=[
             ('draft', "Draft"),
@@ -18,13 +21,6 @@ class ResCompany(models.Model):
         string="Purchase Journal",
         domain='[("type", "=", "purchase")]',
         compute='_compute_intercompany_purchase_journal_id', store=True, readonly=False,
-    )
-    intercompany_user_id = fields.Many2one(
-        comodel_name='res.users',
-        string="Create as",
-        default=SUPERUSER_ID,
-        domain=['|', ['active', '=', True], ['id', '=', SUPERUSER_ID]],
-        help="Responsible user for creation of documents triggered by intercompany rules.",
     )
 
     @api.model

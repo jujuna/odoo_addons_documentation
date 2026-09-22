@@ -15,7 +15,7 @@ export class AccountBankStatementFormRenderer extends ExtractMixinFormRenderer(F
     /**
      * @override ExtractMixinFormRenderer
      */
-    async getNewRecordValues(record, line, field) {
+    async getNewRecordValues(record, line, field, boxType) {
         const createValues = await super.getNewRecordValues(...arguments);
         if (field != 'date') {
             // If the field used to create the record isn't the date, try to guess it.

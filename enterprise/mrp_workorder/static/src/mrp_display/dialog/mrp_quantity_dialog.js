@@ -1,12 +1,16 @@
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { useProps, t } from "@odoo/owl";
+import {
+    ConfirmationDialog,
+    confirmationDialogProps,
+} from "@web/core/confirmation_dialog/confirmation_dialog";
 import { FloatField } from "@web/views/fields/float/float_field";
 
 export class MrpQuantityDialog extends ConfirmationDialog {
     static template = "mrp_workorder.MrpQuantityDialog";
-    static props = {
-        ...ConfirmationDialog.props,
-        record: Object,
-    };
+    props = useProps({
+        ...confirmationDialogProps,
+        record: t.object(),
+    });
     static components = {
         ...ConfirmationDialog.components,
         FloatField,

@@ -3,7 +3,6 @@
 {
     'name': 'Australia - Payroll with API',
     'category': 'Human Resources',
-    'version': '1.0',
     'depends': [
         'l10n_au_hr_payroll_account',
         'account_edi_proxy_client',
@@ -27,8 +26,6 @@ requirements for payroll data handling.
     """,
     'auto_install': ['l10n_au_hr_payroll_account'],
     'data': [
-        "security/ir.model.access.csv",
-        "security/ir_rule.xml",
         "data/ir_cron_data.xml",
         "data/ir_config_parameter_data.xml",
         "data/ir_attachments_data.xml",
@@ -40,6 +37,7 @@ requirements for payroll data handling.
         "views/l10n_au_super_fund_views.xml",
         "views/l10n_au_super_stream_views.xml",
         "views/l10n_au_employer_registration_views.xml",
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -1,6 +1,5 @@
 
 from odoo import models
-from odoo.tools import float_compare
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
@@ -9,8 +8,12 @@ class StockMove(models.Model):
         return [
             'product_id',
             'location_id',
+            'location_dest_id',
+            'has_tracking',
+            'uom_id',
             'product_uom_qty',
             'move_line_ids',
+            'picking_type_id',
             'packaging_uom_id',
             'packaging_uom_qty'
         ]
@@ -50,7 +53,7 @@ class StockMove(models.Model):
             move_qties = barcode_quantities.get(str(move.id), False)
             if move_qties:
                 max_reserved_qty = max(move_qties['quantity_done'], move_qties['reserved_uom_qty'])
-                if float_compare(move.quantity, max_reserved_qty, precision_rounding=move.product_id.uom_id.rounding) > 0:
+                if move.uom_id.compare(move.quantity, max_reserved_qty) > 0:
                     move.with_context({'unreserve_unpicked_only': True}).quantity = max_reserved_qty
 
     def post_barcode_process(self, barcode_quantities):

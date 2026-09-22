@@ -3,7 +3,6 @@
     'summary': 'Send whatsapp messages when final stock move',
     'description': 'Send WhatsApp messages when a stock transfer is validated',
     'category': 'WhatsApp',
-    'version': '1.0',
     'depends': ['stock_enterprise', 'whatsapp'],
     'data': [
         'data/whatsapp_template_data.xml',

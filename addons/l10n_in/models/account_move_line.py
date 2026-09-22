@@ -31,37 +31,25 @@ class AccountMoveLine(models.Model):
             ("sale_exempt", "Exempt"),
             ("sale_non_gst_supplies", "Non-GST Supplies"),
             ("sale_eco_9_5", "ECO 9(5)"),
+            ("sale_composition_supplies", "Composition Supplies"),
             ("sale_out_of_scope", "Out of Scope"),
             ("purchase_b2b_regular", "B2B Regular"),
-            ("purchase_b2c_regular", "B2C Regular"),  # will be removed in master
             ("purchase_b2b_rcm", "B2B RCM"),
             ("purchase_b2c_rcm", "B2C RCM"),
-            ("purchase_imp_services", "IMP(service)"),
+            ("purchase_imp_services", "IMP(services-RCM)"),
             ("purchase_imp_goods", "IMP(goods)"),
             ("purchase_cdnr_regular", "CDNR Regular"),
-            ("purchase_cdnur_regular", "CDNUR Regular"),
             ("purchase_cdnr_rcm", "CDNR RCM"),
             ("purchase_cdnur_rcm", "CDNUR RCM"),
             ("purchase_nil_rated", "Nil Rated"),
             ("purchase_exempt", "Exempt"),
             ("purchase_non_gst_supplies", "Non-GST Supplies"),
+            ("purchase_composition_supplies", "Composition Supplies"),
             ("purchase_out_of_scope", "Out of Scope"),
             ],
         string="GSTR Section",
         index="btree_not_null",
     )
-
-    # withholding related fields
-    l10n_in_withhold_tax_amount = fields.Monetary(string="TDS Tax Amount", compute='_compute_l10n_in_withhold_tax_amount')
-    l10n_in_tds_tcs_section_id = fields.Many2one(related="account_id.l10n_in_tds_tcs_section_id")
-
-    @api.depends('tax_ids')
-    def _compute_l10n_in_withhold_tax_amount(self):
-        # Compute the withhold tax amount for the withholding lines
-        withholding_lines = self.filtered('move_id.l10n_in_is_withholding')
-        (self - withholding_lines).l10n_in_withhold_tax_amount = False
-        for line in withholding_lines:
-            line.l10n_in_withhold_tax_amount = line.currency_id.round(abs(line.price_total - line.price_subtotal))
 
     @api.depends('product_id', 'product_id.l10n_in_hsn_code')
     def _compute_l10n_in_hsn_code(self):
@@ -83,16 +71,17 @@ class AccountMoveLine(models.Model):
         return False
 
     def _get_l10n_in_tax_tag_ids(self):
-
-        def get_tag_ids(*refs):
-            return [self.env.ref(ref).id for ref in refs]
-
+        xmlid_to_res_id = self.env['ir.model.data']._xmlid_to_res_id
+        tag_refs = {
+            'sgst': ['l10n_in.tax_tag_base_sgst', 'l10n_in.tax_tag_sgst'],
+            'cgst': ['l10n_in.tax_tag_base_cgst', 'l10n_in.tax_tag_cgst'],
+            'igst': ['l10n_in.tax_tag_base_igst', 'l10n_in.tax_tag_igst'],
+            'cess': ['l10n_in.tax_tag_base_cess', 'l10n_in.tax_tag_cess'],
+            'eco_9_5': ['l10n_in.tax_tag_eco_9_5'],
+        }
         return {
-            'sgst': get_tag_ids('l10n_in.tax_tag_base_sgst', 'l10n_in.tax_tag_sgst'),
-            'cgst': get_tag_ids('l10n_in.tax_tag_base_cgst', 'l10n_in.tax_tag_cgst'),
-            'igst': get_tag_ids('l10n_in.tax_tag_base_igst', 'l10n_in.tax_tag_igst'),
-            'cess': get_tag_ids('l10n_in.tax_tag_base_cess', 'l10n_in.tax_tag_cess'),
-            'eco_9_5': get_tag_ids('l10n_in.tax_tag_eco_9_5'),
+            categ: [xmlid_to_res_id(xml_id) for xml_id in ref]
+            for categ, ref in tag_refs.items()
         }
 
     def _get_l10n_in_gstr_section(self, tax_tags_dict):
@@ -107,7 +96,8 @@ class AccountMoveLine(models.Model):
             return move.is_outbound() and not move.debit_origin_id
 
         def get_transaction_type(move):
-            return 'intra_state' if move.l10n_in_state_id == move.company_id.state_id else 'inter_state'
+            state = move.company_id.state_id if move.is_sale_document() else move.commercial_partner_id.state_id
+            return 'intra_state' if move.l10n_in_state_id == state else 'inter_state'
 
         def is_reverse_charge_tax(line):
             return any(tax.l10n_in_reverse_charge for tax in line.tax_ids | line.tax_line_id)
@@ -135,6 +125,12 @@ class AccountMoveLine(models.Model):
                     return 'sale_exempt'
                 elif any(tax.l10n_in_tax_type == 'non_gst' for tax in line.tax_ids):
                     return 'sale_non_gst_supplies'
+
+            if move.company_id.l10n_in_gst_registration_type == 'composition':
+                if gst_treatment != 'overseas' and transaction_type == 'intra_state' and not any(tax.l10n_in_tax_type == 'gst' for tax in line.tax_ids.flatten_taxes_hierarchy()):
+                    return 'sale_composition_supplies'
+                else:
+                    return 'sale_out_of_scope'
 
             # B2CS: Unregistered or Consumer sales with gst tags
             if gst_treatment in ('unregistered', 'consumer') and not is_reverse_charge_tax(line):
@@ -238,13 +234,23 @@ class AccountMoveLine(models.Model):
                 elif any(tax.l10n_in_tax_type == 'non_gst' for tax in line.tax_ids):
                     return 'purchase_non_gst_supplies'
 
+            # Composition scheme purchases without gst taxes
+            if gst_treatment == 'composition' and not line.tax_ids and not line.tax_line_id and get_transaction_type(move) == 'intra_state':
+                return 'purchase_composition_supplies'
+
+            # export service type products purchases
+            if gst_treatment == 'overseas' and any(tax.tax_scope == 'service' for tax in line.tax_ids | line.tax_line_id) and tags_have_categ(line_tags, ['igst', 'cess']):
+                if is_reverse_charge_tax(line):
+                    return 'purchase_imp_services'
+                return 'purchase_out_of_scope'
+
             # If no relevant tags are found, or the tags do not match any category, mark as out of scope
             if not line_tags or not tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess']):
                 return 'purchase_out_of_scope'
 
             if is_bill:
                 # B2B Regular and Reverse Charge purchases
-                if (gst_treatment in ('regular', 'composition', 'uin_holders') and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess'])):
+                if (gst_treatment in ('regular', 'uin_holders') and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess'])):
                     if is_reverse_charge_tax(line):
                         return 'purchase_b2b_rcm'
                     return 'purchase_b2b_regular'
@@ -259,17 +265,13 @@ class AccountMoveLine(models.Model):
                 if gst_treatment in ('unregistered', 'consumer') and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess']) and is_reverse_charge_tax(line):
                     return 'purchase_b2c_rcm'
 
-                # export service type products purchases
-                if gst_treatment == 'overseas' and any(tax.tax_scope == 'service' for tax in line.tax_ids | line.tax_line_id) and tags_have_categ(line_tags, ['igst', 'cess']):
-                    return 'purchase_imp_services'
-
                 # export goods type products purchases
                 if gst_treatment == 'overseas' and tags_have_categ(line_tags, ['igst', 'cess']) and not is_reverse_charge_tax(line):
                     return 'purchase_imp_goods'
 
             if not is_bill:
                 # credit notes for b2b purchases
-                if gst_treatment in ('regular', 'composition', 'uin_holders') and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess']):
+                if gst_treatment in ('regular', 'uin_holders') and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess']):
                     if is_reverse_charge_tax(line):
                         return 'purchase_cdnr_rcm'
                     return 'purchase_cdnr_regular'
@@ -278,13 +280,11 @@ class AccountMoveLine(models.Model):
                 if gst_treatment in ('unregistered', 'consumer') and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess']) and is_reverse_charge_tax(line):
                     return 'purchase_cdnur_rcm'
 
-                if not is_reverse_charge_tax(line):
-                    if gst_treatment == 'deemed_export' and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess'])\
-                        or gst_treatment == 'special_economic_zone' and tags_have_categ(line_tags, ['igst', 'cess']):
-                        return 'purchase_cdnr_regular'
-
-                    if gst_treatment == 'overseas' and tags_have_categ(line_tags, ['igst', 'cess']):
-                        return 'purchase_cdnur_regular'
+                if not is_reverse_charge_tax(line) and (
+                    gst_treatment == 'deemed_export' and tags_have_categ(line_tags, ['sgst', 'cgst', 'igst', 'cess'])
+                    or gst_treatment == 'special_economic_zone' and tags_have_categ(line_tags, ['igst', 'cess'])
+                ):
+                    return 'purchase_cdnr_regular'
 
             # If none of the above match, default to out of scope
             return 'purchase_out_of_scope'

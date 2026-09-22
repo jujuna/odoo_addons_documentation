@@ -201,7 +201,7 @@ class DeliveryCarrier(models.Model):
                 price = float(shipping_charge)
             else:
                 quote_currency = self.env['res.currency'].search([('name', '=', shipping_currency)], limit=1)
-                price = quote_currency._convert(float(shipping_charge), order_currency, (order or picking).company_id, order.date_order if order else fields.Date.today())
+                price = quote_currency._convert(float(shipping_charge), order_currency, (order or picking).company_id, order and order.date_order)
             return {'success': True,
                     'price': price,
                     'error_message': False,

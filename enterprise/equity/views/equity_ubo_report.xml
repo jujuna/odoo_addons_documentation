@@ -60,8 +60,8 @@
                                                 <t t-out="ubo.holder_id.name"/>
                                             </strong>
                                             <t t-if="ubo.holder_id.ubo_national_identifier"> (ID <t t-out="ubo.holder_id.ubo_national_identifier"/>) </t>
-                                            <t t-if="ubo.holder_id.ubo_birth_date or ubo.holder_id.ubo_birth_place">born</t>
-                                            <t t-if="ubo.holder_id.ubo_birth_date"> on <t t-out="ubo.holder_id.ubo_birth_date"/>
+                                            <t t-if="ubo.holder_id.birth_date or ubo.holder_id.ubo_birth_place">born</t>
+                                            <t t-if="ubo.holder_id.birth_date"> on <t t-out="ubo.holder_id.birth_date"/>
                                             </t>
                                             <t t-if="ubo.holder_id.ubo_birth_place"> in <t t-out="ubo.holder_id.ubo_birth_place"/> </t>
                                             <br/> Nationality: <t t-out="ubo.holder_id.country_id.name"/>

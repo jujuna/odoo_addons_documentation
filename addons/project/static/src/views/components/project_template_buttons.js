@@ -1,22 +1,18 @@
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { user } from "@web/core/user";
 import { ConfirmationDialog, deleteConfirmationMessage } from "@web/core/confirmation_dialog/confirmation_dialog";
 
 export class ProjectTemplateButtons extends Component {
     static template = "project.ProjectTemplateButtons";
-    static props = {
-        resModel: String,
-        resId: Number,
-    };
+    props = useProps({
+        resModel: t.string(),
+        resId: t.number(),
+    });
 
     setup() {
         this.orm = useService("orm");
         this.dialogService = useService("dialog");
         this.action = useService("action");
-        onWillStart(async () => {
-            this.isProjectManager = await user.hasGroup('project.group_project_manager');
-        });
     }
 
     onEditClick() {

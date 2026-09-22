@@ -1,13 +1,14 @@
-import { binaryField, BinaryField } from "@web/views/fields/binary/binary_field";
+import { useProps, t } from "@odoo/owl";
+import { binaryField, BinaryField, binaryFieldProps } from "@web/views/fields/binary/binary_field";
 import { registry } from "@web/core/registry";
 
 
 export class PayRunBinaryField extends BinaryField {
     static template = "hr_payroll.PayRunBinaryField";
-    static props = {
-        ...BinaryField.props,
-        formatField: { type: String, optional: true },
-    };
+    props = useProps({
+        ...binaryFieldProps,
+        formatField: t.string().optional(),
+    });
 
     get format() {
         return this.props.record.data[this.props.formatField] || "";

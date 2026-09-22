@@ -15,10 +15,10 @@ class HrJobPost(models.Model):
     job_id = fields.Many2one(
         'hr.job', string="Job", required=True, readonly=True, index=True)
     recruiter_id = fields.Many2one(
-        'res.users', string="Recruiter", related='job_id.user_id', readonly=True)
+        'hr.employee', string="Recruiter", related='job_id.recruiter_id', readonly=True)
     platform_id = fields.Many2one(
         'hr.recruitment.platform', string="Platform",
-        required=True, readonly=True)
+        required=True, index=True, readonly=True)
     platform_icon = fields.Binary(related="platform_id.avatar_128", export_string_translation=False)
     apply_method = fields.Selection([
         ('email', 'Email'),
@@ -41,7 +41,7 @@ class HrJobPost(models.Model):
         string="Status Message", prefetch=False, readonly=True)
     api_data = fields.Json(string="API Data", prefetch=False, readonly=True)
     campaign_start_date = fields.Date(
-        string="Campaign Start Date", default=fields.Date.today(),
+        string="Campaign Start Date", default=fields.Date.context_today,
         help='The date when the campaign will start.')
     campaign_end_date = fields.Date(
         string="Campaign End Date",
@@ -57,7 +57,7 @@ class HrJobPost(models.Model):
                 platform=record.platform_id.name
             )
 
-    @api.depends('apply_method', 'job_id.alias_id.alias_full_name', 'job_id.user_id.employee_id', 'job_id.user_id.employee_id.work_email')
+    @api.depends('apply_method', 'job_id.alias_id.alias_full_name', 'job_id.recruiter_id', 'job_id.recruiter_id.work_email')
     def _compute_apply_vector(self):
         for record in self:
             if record.apply_method != 'email':
@@ -65,8 +65,8 @@ class HrJobPost(models.Model):
             job = record.job_id
             if job and job.alias_id.alias_full_name:
                 record.apply_vector = job.alias_id.alias_full_name
-            elif job and job.user_id and job.user_id.employee_id:
-                record.apply_vector = job.user_id.employee_id.work_email
+            elif job and job.recruiter_id and job.recruiter_id.work_email:
+                record.apply_vector = job.recruiter_id.work_email
             else:
                 record.apply_vector = False
 
@@ -76,11 +76,12 @@ class HrJobPost(models.Model):
         return super().unlink()
 
     def _start_new_campaign(self):
+        today = fields.Date.context_today(self)
         posts_to_start = self.env['hr.job.post'].search([
             ('status', '=', 'pending'),
-            ('campaign_start_date', '<=', fields.Date.today()),
+            ('campaign_start_date', '<=', today),
             '|',
-                ('campaign_end_date', '>=', fields.Date.today()),
+                ('campaign_end_date', '>=', today),
                 ('campaign_end_date', '=', False),
         ], order='campaign_start_date', limit=5)
         wizards = self.env['hr.recruitment.post.job.wizard'].create([
@@ -103,7 +104,7 @@ class HrJobPost(models.Model):
     def _stop_finished_campaign(self):
         posts_to_end = self.env['hr.job.post'].search([
             ('status', 'not in', ['deleted', 'expired']),
-            ('campaign_end_date', '<=', fields.Date.today()),
+            ('campaign_end_date', '<=', 'today'),
         ], order='campaign_end_date', limit=5)
         for post in posts_to_end:
             post._delete_post()
@@ -181,14 +182,14 @@ class HrJobPost(models.Model):
     def action_post_now(self):
         self.ensure_one()
         self.sudo().write({
-            'campaign_start_date': fields.Date.today(),
+            'campaign_start_date': fields.Date.context_today(self),
         })
         self._start_new_campaign()
 
     def action_stop_campaign(self):
         self.ensure_one()
         self.sudo().write({
-            'campaign_end_date': fields.Date.today(),
+            'campaign_end_date': fields.Date.context_today(self),
         })
         self._stop_finished_campaign()
 
@@ -229,9 +230,9 @@ class HrJobPost(models.Model):
                         'line_8': _("Campaign End Date:"),
                         'line_9': _("Company:"),
                         'job': post.job_id.name,
-                        'status': dict(post._fields['status'].selection).get(post.status),
+                        'status': dict(post._fields['status']._description_selection(self.env)).get(post.status),
                         'status_message': post.status_message,
-                        'method': dict(post._fields['apply_method'].selection).get(post.apply_method),
+                        'method': dict(post._fields['apply_method']._description_selection(self.env)).get(post.apply_method),
                         'vector': post.apply_vector,
                         'start_date': post.campaign_start_date,
                         'end_date': post.campaign_end_date or _('No Limit'),

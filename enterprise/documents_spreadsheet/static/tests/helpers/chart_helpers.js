@@ -15,7 +15,6 @@ import {
     mountWithCleanup,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
-import { Deferred } from "@web/core/utils/concurrency";
 import { WebClient } from "@web/webclient/webclient";
 
 /** @typedef {import("@spreadsheet/o_spreadsheet/o_spreadsheet").Model} Model */
@@ -74,7 +73,7 @@ export async function spawnGraphViewForSpreadsheet(params = {}) {
  */
 export async function createSpreadsheetFromGraphView(params = {}) {
     let spreadsheetAction = {};
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     patchWithCleanup(SpreadsheetAction.prototype, {
         setup() {
             super.setup();
@@ -101,7 +100,7 @@ export async function createSpreadsheetFromGraphView(params = {}) {
         await contains(`.o-spreadsheet-grid div[data-id='${params.documentId}']`).focus();
     }
     await contains(document.querySelector(".modal-content > .modal-footer > .btn-primary")).click();
-    await def;
+    await def.promise;
     await animationFrame();
     const model = getSpreadsheetActionModel(spreadsheetAction);
     await waitForDataLoaded(model);

@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import re
-
 from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.tools import is_html_empty
+from odoo.tools.image import image_process
+from odoo.tools.mimetypes import guess_mimetype
 
 
 class ProposeChange(models.TransientModel):
     _name = 'propose.change'
     _description = 'Propose a change in the production'
-
-    IMG_REGEX = re.compile(r'(<img .*?">)')
 
     workorder_id = fields.Many2one(
         'mrp.workorder', 'Workorder', required=True, ondelete='cascade')
@@ -25,7 +23,7 @@ class ProposeChange(models.TransientModel):
     change_type = fields.Selection([
         ('update_step', 'Update Current Step'),
         ('remove_step', 'Remove Current Step'),
-        ('set_picture', 'Set Picture')], 'Type of Change')
+        ('set_picture', 'Add Picture')], 'Type of Change')
 
     @api.model
     def default_get(self, fields):
@@ -33,6 +31,8 @@ class ProposeChange(models.TransientModel):
         if 'step_id' in defaults:
             step = self.env['quality.check'].browse(defaults.get('step_id'))
             defaults['title'] = step.title
+            if defaults.get('change_type') == 'update_step':
+                defaults['note'] = step.note
         return defaults
 
     def process(self):
@@ -62,21 +62,11 @@ class ProposeChange(models.TransientModel):
 
     def _do_update_step(self, notify_bom=True):
         self.ensure_one()
-        existing_imgs = []
-        is_blank = is_html_empty(self.note)
-        if not is_html_empty(self.step_id.note) and (is_blank or re.sub(self.IMG_REGEX, '', self.note) == self.note):
-            # blank suggestion or only text => keep existing images if they exist
-            existing_imgs = re.findall(self.IMG_REGEX, self.step_id.note)
-        if existing_imgs:
-            self.step_id.note = Markup('<p>%s</p>') % Markup('<br>').join(map(Markup, existing_imgs))
-            if not is_blank:
-                self.step_id.note = self.note + self.step_id.note
-        else:
-            self.step_id.note = self.note
+        self.step_id.note = self.note
         if notify_bom and self.workorder_id.production_id.bom_id:
             body = _('BoM feedback %(step)s (%(production)s - %(operation)s)', step=self.step_id.title, production=self.workorder_id.production_id.name, operation=self.workorder_id.operation_id.name)
             body += Markup("<br/>%s") % self._get_update_step_note(self.step_id.title)
-            self.workorder_id.production_id.bom_id.message_post(body=body)
+            self.workorder_id.production_id.bom_id.sudo().message_post(body=body)
         if self.title and self.title != self.step_id.title:
             self.step_id.title = self.title
 
@@ -93,35 +83,32 @@ class ProposeChange(models.TransientModel):
             # remove additionmal step
             self.step_id.workorder_id._change_quality_check('next')
             self.step_id.unlink()
-        self.step_id.is_deleted = True  # TODO remove in master with field definition
         bom = self.step_id.workorder_id.production_id.bom_id
         if notify_bom and bom:
             body = _('BoM feedback %(step)s (%(production)s - %(operation)s)', step=self.step_id.title, production=self.workorder_id.production_id.name, operation=self.workorder_id.operation_id.name)
             body += Markup("<br/>%s") % self._get_remove_step_note()
             bom.message_post(body=body)
 
-    @api.model
-    def image_url(self, record, field):
-        """ Returns a local url that points to the image field of a given browse record. """
-        return '/web/image/%s/%s/%s' % (record._name, record.id, field)
-
     def _get_set_picture_note(self):
-        lt_text = _("%(user_name)s suggests to use this document as instruction", user_name=self._workorder_name())
-        return Markup('<b>%s</b><br/><img style="max-width: 75%%" class="img-fluid" src="%s"/>')\
-            % (lt_text, self.image_url(self, 'picture'))
+        lt_text = _("%(user_name)s suggests to add this picture to the instruction", user_name=self._workorder_name())
+        return Markup('<b>%s</b>') % lt_text
+
+    def _create_picture_markup(self, record):
+        picture = image_process(self.picture.content, verify_resolution=True)
+        attachment = self.env['ir.attachment'].create({
+            'name': self.picture.filename or 'instruction_picture',
+            'raw': picture,
+            'mimetype': guess_mimetype(picture),
+            'res_model': record._name,
+            'res_id': record.id,
+        })
+        return Markup('<p><img class="img-fluid" src="%s"/></p>') % attachment.image_src
 
     def _do_set_picture(self, notify_bom=True):
         self.ensure_one()
-        # remove html existing images, but keep existing text
-        existing_text = False
-        if not is_html_empty(self.step_id.note):
-            existing_text = Markup(re.sub(self.IMG_REGEX, '', self.step_id.note))
-        if existing_text and not is_html_empty(existing_text):
-            self.step_id.note = existing_text
-            existing_text = True
-        self.step_id.worksheet_document = self.picture
+        self.step_id.note = (self.step_id.note or Markup()) + self._create_picture_markup(self.step_id)
         bom = self.step_id.workorder_id.production_id.bom_id
         if notify_bom and bom:
             body = _('BoM feedback %(step)s (%(production)s - %(operation)s)', step=self.step_id.title, production=self.workorder_id.production_id.name, operation=self.workorder_id.operation_id.name)
             body += Markup("<br/>%s") % self._get_set_picture_note()
-            bom.message_post(body=body)
+            bom.message_post(body=body, attachments=[(self.picture.filename or 'instruction_picture', self.picture)])

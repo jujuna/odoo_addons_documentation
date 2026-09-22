@@ -1,30 +1,32 @@
 import { _t } from "@web/core/l10n/translation";
 import { useActiveActions, useOpenMany2XRecord } from "@web/views/fields/relational_utils";
 import { useService } from "@web/core/utils/hooks";
+import { formatFloat } from "@web/core/utils/numbers";
 import { QualityCheck } from "./quality_check";
 import { MrpQuantityDialog } from "../dialog/mrp_quantity_dialog";
-import { MrpSelectQuantDialog } from "../dialog/mrp_select_quant_dialog"; // TODO remove in master
+import { MrpSelectQuantDialog } from "../dialog/mrp_select_quant_dialog";
+import { t, useProps } from "@odoo/owl";
 
 export class StockMove extends QualityCheck {
-    static props = {
-        ...QualityCheck.props,
-        displayUOM: Boolean,
-        check: { optional: true, type: Object },
-        label: { optional: true, type: String },
-        production: Object,
-    };
     static template = "mrp_workorder.StockMove";
+
+    stockMoveProps = useProps({
+        displayUOM: t.boolean(),
+        check: t.object().optional(),
+        label: t.string().optional(),
+        production: t.object(),
+    });
 
     setup() {
         this.dialog = useService("dialog");
         this.props.record.component = this;
-        if (this.props.check) {
-            this.props.check.component = this;
+        if (this.stockMoveProps.check) {
+            this.stockMoveProps.check.component = this;
         }
         const activeActions = useActiveActions({
             fieldType: "one2many",
             getEvalParams: (props) => ({
-                readonly: props.record.data.has_tracking === "none",
+                readonly: !["lot", "serial"].includes(props.record.data.has_tracking),
             }),
         });
         this.openQuantRecord = useOpenMany2XRecord({
@@ -46,9 +48,9 @@ export class StockMove extends QualityCheck {
 
     get icon() {
         if (this.isTracked) {
-            return this.displayCheck ? "check" : "plus"; // Make sure to display check for prefilled quality check moves
+            return this.displayCheck ? "check" : "add"; // Make sure to display check for prefilled quality check moves
         }
-        return this.isComplete ? "undo" : "pencil"; // No move lines for untracked moves, work directly on the move
+        return this.isComplete ? "undo" : "edit"; // No move lines for untracked moves, work directly on the move
     }
 
     get isComplete() {
@@ -64,18 +66,23 @@ export class StockMove extends QualityCheck {
         const moveLines = this.props.record.data.move_line_ids.records.filter(
             (ml) => (this.isTracked ? ml.data.lot_id : true) && ml.data.picked
         );
-        return moveLines.reduce((total, ml) => total + ml.data.quantity, 0);
+        return parseFloat(
+            formatFloat(
+                moveLines.reduce((total, ml) => total + ml.data.quantity, 0),
+                { digits: this.props.record.fields?.quantity?.digits }
+            )
+        );
     }
 
     get uom() {
-        if (this.props.displayUOM) {
-            return this.props.record.data.product_uom.display_name;
+        if (this.stockMoveProps.displayUOM) {
+            return this.props.record.data.uom_id.display_name;
         }
         return this.toConsumeQuantity === 1 ? _t("Unit") : _t("Units");
     }
 
     get check() {
-        return this.props.check ? this.props.check.data : false;
+        return this.stockMoveProps.check ? this.stockMoveProps.check.data : false;
     }
 
     get hasInstruction() {
@@ -87,7 +94,7 @@ export class StockMove extends QualityCheck {
             return [];
         }
         const { move_line_ids, picking_type_prefill_shop_floor_lots } = this.props.record.data;
-        return picking_type_prefill_shop_floor_lots
+        return picking_type_prefill_shop_floor_lots && !this.byproduct
             ? move_line_ids.records
             : move_line_ids.records.filter((ml) => ml.data.picked);
     }
@@ -102,17 +109,23 @@ export class StockMove extends QualityCheck {
     }
 
     get isTracked() {
-        return this.props.record.data.has_tracking !== "none";
+        return ["lot", "serial"].includes(this.props.record.data.has_tracking);
     }
 
     get byproduct() {
-        return this.props.record.data.byproduct_id;
+        if (
+            this.stockMoveProps.production.data.move_byproduct_ids.records.includes(
+                this.props.record
+            )
+        ) {
+            return this.props.record;
+        }
+        return false;
     }
 
-    //TODO remove in master
     addMoveLine() {
         const product = this.props.record.data.product_id;
-        const locationSrc = this.props.production.data.location_src_id;
+        const locationSrc = this.stockMoveProps.production.data.location_src_id;
         this.dialog.add(MrpSelectQuantDialog, {
             resModel: "stock.quant",
             noCreate: !this.isTracked,
@@ -137,7 +150,7 @@ export class StockMove extends QualityCheck {
     }
 
     async markAsDone() {
-        const { model, resModel, resId, _parentRecord } = this.props.check;
+        const { model, resModel, resId, _parentRecord } = this.stockMoveProps.check;
         const result = await model.orm.call(resModel, "action_next", [resId]);
         if ("next_check_id" in result) {
             this.check.quality_state = "pass";
@@ -165,7 +178,7 @@ export class StockMove extends QualityCheck {
                 await this.markAsDone(); // check button: accept prefilled values and confirm QC
             } else {
                 if (this.byproduct) {
-                    this.createQuant(); // plus button: create a new move line. Create a new quant for the byproduct.
+                    return this.createQuant(); // plus button: create a new move line. Create a new quant for the byproduct.
                 } else {
                     this.addMoveLine(); // plus button: create a new move line. Show a list of quants  to take from.
                 }
@@ -177,7 +190,7 @@ export class StockMove extends QualityCheck {
                 this.editUntrackedMove(); // pencil button: edit untracked move quantity
             }
         }
-        return this.props.startWorking();
+        return this.qualityCheckProps.startWorking();
     }
 
     async selectQuant(quantIds) {
@@ -188,13 +201,15 @@ export class StockMove extends QualityCheck {
 
     createQuant() {
         const defaultLocationId = this.byproduct
-            ? this.props.production.data.production_location_id.id
-            : this.props.production.data.location_src_id.id;
+            ? this.stockMoveProps.production.data.production_location_id.id
+            : this.stockMoveProps.production.data.location_src_id.id;
         return this.openQuantRecord({
             context: {
                 form_view_ref: "stock.view_stock_quant_form",
                 default_product_id: this.props.record.data.product_id.id,
                 default_location_id: defaultLocationId,
+                from_shopfloor: true,
+                active_mo_id: this.props.record.data.raw_material_production_id.id,
             },
             immediate: true,
             title: _t("Create Move Line for %(product)s", {

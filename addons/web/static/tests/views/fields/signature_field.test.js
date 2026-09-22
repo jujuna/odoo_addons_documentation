@@ -1,6 +1,6 @@
 import { NameAndSignature } from "@web/core/signature/name_and_signature";
 
-import { expect, test } from "@odoo/hoot";
+import { expect, queryOne, test } from "@odoo/hoot";
 import { animationFrame, runAllTimers } from "@odoo/hoot-mock";
 import { click, drag, edit, queryFirst, waitFor } from "@odoo/hoot-dom";
 import {
@@ -249,7 +249,7 @@ test("clicking save manually after changing signature should change the unique o
                 <field name="sign" widget="signature" />
             </form>`,
     });
-    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("1659688620000");
+    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("0017b464");
 
     await fillSignatureField(0, 2);
     await click(".o_field_widget[name='foo'] input");
@@ -258,12 +258,12 @@ test("clicking save manually after changing signature should change the unique o
     await animationFrame();
     await clickSave();
     expect.verifySteps(["web_save"]);
-    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("1659692220000");
+    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("001828c3");
 
     await fillSignatureField(2, 0);
     await clickSave();
     expect.verifySteps(["web_save"]);
-    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("1659695820000");
+    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("001828c3");
 });
 
 test("save record with signature field modified by onchange", async () => {
@@ -271,7 +271,7 @@ test("save record with signature field modified by onchange", async () => {
 
     Partner._fields.foo = fields.Char({
         onChange(data) {
-            data.sign = MYB64;
+            data.sign = {filename: "", content: MYB64};
         },
     });
 
@@ -298,7 +298,7 @@ test("save record with signature field modified by onchange", async () => {
                 <field name="sign" widget="signature" />
             </form>`,
     });
-    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("1659688620000");
+    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("0017b464");
     await click("[name='foo'] input");
     await edit("grrr", { confirm: "Enter" });
     await runAllTimers();
@@ -306,7 +306,7 @@ test("save record with signature field modified by onchange", async () => {
     expect(queryFirst("div[name=sign] img").dataset.src).toBe(`data:image/png;base64,${MYB64}`);
 
     await clickSave();
-    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("1659692220000");
+    expect(getUnique(queryFirst(".o_field_signature img"))).toBe("001828c3");
     expect.verifySteps(["web_save"]);
 });
 
@@ -341,4 +341,23 @@ test("signature field should render initials", async () => {
         message: 'should open a modal with "Auto" button',
     });
     expect.verifySteps(["V.B."]);
+});
+
+test("error loading url", async () => {
+    Partner._records = [{
+        id: 1,
+        sign: "1 kb",
+    }]
+    await mountView({
+        type: "form",
+        resModel: "partner",
+        resId: 1,
+        arch: /* xml */ `
+            <form>
+                <field name="sign" widget="signature" />
+            </form>`,
+    });
+    const img = queryOne(".o_field_widget img");
+    img.dispatchEvent(new Event("error"));
+    await waitFor(".o_notification:has(.bg-danger):contains(Could not display the selected image)");
 });

@@ -277,7 +277,7 @@
         <field name="start_datetime" eval="datetime.now() - timedelta(days=0, hours=3, minutes=50)"/>
     </record>
     <record id="hr_appraisal.hr_appraisal_4bis" model="hr.appraisal">
-        <field name="employee_feedback_ids" eval="[(4, ref('hr.employee_mit'))]"/>
+        <field name="partner_feedback_ids" eval="[Command.link(ref('hr.work_contact_mit'))]"/>
     </record>
 
     <!-- Appraisal 365 Feedback -->
@@ -403,6 +403,6 @@ I'm sure you're aware of it and already work on that.
         <field name="answer_type">text_box</field>
     </record>
     <record id="hr_appraisal.hr_appraisal_4bis" model="hr.appraisal">
-        <field name="employee_feedback_ids" eval="[(4, ref('hr.employee_qdp'))]"/>
+        <field name="partner_feedback_ids" eval="[Command.link(ref('base.partner_demo'))]"/>
     </record>
 </odoo>

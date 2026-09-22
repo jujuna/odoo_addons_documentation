@@ -1,39 +1,60 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, useProps, signal, validateType, computed, types as t } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { Many2XAutocomplete } from "@web/views/fields/relational_utils";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-import { FontAwesomeIconSelector } from "@web_studio/client_action/components/font_awesome_icon_selector/font_awesome_icon_selector";
+import { StudioIconSelector } from "@web_studio/client_action/components/icon_selector/icon_selector";
+import { ViewEditorModel } from "@web_studio/client_action/view_editor/view_editor_model";
+
+function buildField(params = {}) {
+    const field = signal(params.value ?? null);
+    if (params.validation) {
+        field.required = params.required ?? true;
+        field.isValid = computed(() => validateType(field(), params.validation).length === 0);
+    } else {
+        field.isValid = () => true;
+    }
+    return field;
+}
 
 export class NewButtonBoxDialog extends Component {
     static template = "web_studio.NewButtonBoxDialog";
     static components = {
         Dialog,
-        FontAwesomeIconSelector,
+        StudioIconSelector,
         Many2XAutocomplete,
     };
-    static props = {
-        isAddingButtonBox: { type: Boolean },
-        model: { type: Object },
-        close: { type: Function },
+    props = useProps({
+        isAddingButtonBox: t.boolean(),
+        model: t.instanceOf(ViewEditorModel),
+        close: t.function(),
+    });
+
+    fields = {
+        icon: buildField({ validation: t.string().optional(), required: false, value: "diamond" }),
+        field_id: buildField({
+            validation: t.object({
+                id: t.number(),
+            }),
+        }),
+        label: buildField({ validation: t.string() }),
     };
+
+    canConfirm = computed(() => Object.values(this.fields).every((f) => f.isValid()));
+    showInvalid = signal(false);
+
     setup() {
         this.orm = useService("orm");
-        this.notification = useService("notification");
-        this.state = useState({
-            icon: "fa fa-diamond",
-            field: undefined,
-        });
-        this.text = undefined;
     }
+
     async update(selection) {
-        if (!selection[0].display_name) {
+        if (selection && !selection[0].display_name) {
             const resId = selection[0].id;
             const fields = ["display_name"];
             const record = await this.orm.read("ir.model.fields", [resId], fields);
             selection[0].display_name = record[0].display_name;
         }
-        this.state.field = selection[0];
+        this.fields.field_id.set(selection[0]);
     }
     getDomain() {
         return [
@@ -42,10 +63,21 @@ export class NewButtonBoxDialog extends Component {
             ["store", "=", true],
         ];
     }
+
+    isInvalid(fname) {
+        return this.showInvalid() && !this.fields[fname].isValid();
+    }
+
+    invalidClass(fname) {
+        return this.isInvalid(fname) && "o_field_invalid";
+    }
+
     onConfirm() {
-        if (!this.state.field?.id) {
-            return this.notification.add(_t("Select a related field."));
+        if (!this.canConfirm()) {
+            this.showInvalid.set(true);
+            return;
         }
+
         if (this.props.isAddingButtonBox) {
             this.props.model.pushOperation({ type: "buttonbox" });
         }
@@ -60,12 +92,11 @@ export class NewButtonBoxDialog extends Component {
             position: "inside",
             node: {
                 tag: "button",
-                field: this.state.field.id,
-                string: this.text || _t("New button"),
+                field: this.fields.field_id().id,
+                string: this.fields.label() || _t("New button"),
                 attrs: {
                     class: "oe_stat_button",
-                    // we don't need the 'fa' class here, but only the icon class
-                    icon: this.state.icon.slice(3),
+                    icon: this.fields.icon(),
                 },
             },
         });

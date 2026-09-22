@@ -2,9 +2,7 @@
 
 {
     'name': 'United States - Payroll with Accounting',
-    'author': 'Odoo',
-    'version': '1.0',
-    'countries': ['us'],
+    'author': 'Odoo S.A.',
     'category': 'Human Resources',
     'description': """
 Accounting Data for United States Payroll Rules
@@ -15,17 +13,12 @@ Accounting Data for United States Payroll Rules
         'data/account_chart_template_data.xml',
         'data/hr_salary_rule_data.xml',
         'views/hr_payslip_run_views.xml',
-        'views/hr_payslip_views.xml',
         'wizard/hr_payroll_payment_report_wizard.xml',
     ],
     'demo': [
         'data/l10n_us_hr_payroll_account_demo.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'l10n_us_hr_payroll_account/static/src/**/*',
-        ],
-    },
     'license': 'OEEL-1',
-    'auto_install': True,
+    'uninstall_hook': '_l10n_us_hr_payroll_uninstall_hook',
+    'auto_install': ['l10n_us_hr_payroll', 'hr_payroll_account'],
 }

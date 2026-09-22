@@ -8,22 +8,31 @@
 # karolína schusterová <karolina.schusterova@vdp.sk>, 2022
 # Jiří Podhorecký, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-09-16 10:02+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/auth_oauth/"
-"cs/>\n"
+"POT-Creation-Date: 2026-08-28 17:41+0000\n"
+"PO-Revision-Date: 2026-09-09 13:52+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
+"auth_oauth/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: auth_oauth
+#: model:ir.module.module,description:base.module_auth_oauth
+msgid ""
+"\n"
+"Allow users to login through OAuth2 Provider.\n"
+"=============================================\n"
+msgstr ""
 
 #. module: auth_oauth
 #. odoo-python
@@ -59,13 +68,9 @@ msgstr "CSS třída"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__client_id
 #: model:ir.model.fields,field_description:auth_oauth.field_res_config_settings__auth_oauth_google_client_id
-msgid "Client ID"
-msgstr "Klientské ID"
-
-#. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
-msgid "Client ID:"
-msgstr "ID klienta:"
+msgid "Client ID"
+msgstr "ID klienta"
 
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_res_config_settings
@@ -83,9 +88,14 @@ msgid "Created on"
 msgstr "Vytvořeno dne"
 
 #. module: auth_oauth
+#: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__icon
+msgid "Custom Material Symbols Icon"
+msgstr ""
+
+#. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__data_endpoint
 msgid "Data Endpoint"
-msgstr "Datový endpoint"
+msgstr "Datový koncový bod"
 
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__display_name
@@ -93,7 +103,7 @@ msgstr "Datový endpoint"
 #: model:ir.model.fields,field_description:auth_oauth.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
@@ -103,7 +113,7 @@ msgstr "Ověření Google"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__has_oauth_access_token
 msgid "Has OAuth Access Token"
-msgstr ""
+msgstr "Má přístupový token OAuth"
 
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__id
@@ -137,12 +147,12 @@ msgstr "Popis přihlašovacího tlačítka"
 #. odoo-python
 #: code:addons/auth_oauth/models/res_users.py:0
 msgid "Missing subject identity"
-msgstr ""
+msgstr "Chybí identita subjektu"
 
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__oauth_access_token
 msgid "OAuth Access Token Store"
-msgstr ""
+msgstr "Úložiště přístupových tokenů OAuth"
 
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__oauth_provider_id
@@ -164,6 +174,11 @@ msgstr "OAuth UID musí být pro každého poskytovatele unikátní"
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__oauth_uid
 msgid "OAuth User ID"
 msgstr "OAuth ID uživatele"
+
+#. module: auth_oauth
+#: model:ir.module.module,shortdesc:base.module_auth_oauth
+msgid "OAuth2 Authentication"
+msgstr ""
 
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_auth_oauth_provider
@@ -203,17 +218,17 @@ msgstr "URI serveru"
 #. module: auth_oauth
 #: model:auth.oauth.provider,body:auth_oauth.provider_facebook
 msgid "Sign in with Facebook"
-msgstr ""
+msgstr "Přihlásit se přes Facebook"
 
 #. module: auth_oauth
 #: model:auth.oauth.provider,body:auth_oauth.provider_google
 msgid "Sign in with Google"
-msgstr ""
+msgstr "Přihlásit se přes Google"
 
 #. module: auth_oauth
 #: model:auth.oauth.provider,body:auth_oauth.provider_openerp
 msgid "Sign in with Odoo.com"
-msgstr ""
+msgstr "Přihlásit se přes Odoo.com"
 
 #. module: auth_oauth
 #. odoo-python
@@ -225,11 +240,6 @@ msgstr "Registrace není v této databázi povolena."
 #: model:ir.model,name:auth_oauth.model_ir_config_parameter
 msgid "System Parameter"
 msgstr "Systémový parametr"
-
-#. module: auth_oauth
-#: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
-msgid "Tutorial"
-msgstr ""
 
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_res_users
@@ -256,7 +266,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/auth_oauth/models/res_users.py:0
 msgid "You do not have permissions to remove the access token"
-msgstr ""
+msgstr "Nemáte oprávnění k odstranění přístupového tokenu"
 
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.view_oauth_provider_form
@@ -268,21 +278,3 @@ msgstr "oblouk"
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "e.g. 1234-xyz.apps.googleusercontent.com"
 msgstr "např. 1234-xyz.apps.googleusercontent.com"
-
-#~ msgid "- or -"
-#~ msgstr "- nebo -"
-
-#~ msgid "Log in with Facebook"
-#~ msgstr "Přihlásit se pomocí Facebooku"
-
-#~ msgid "Log in with Google"
-#~ msgstr "Přihlaste se pomocí Google"
-
-#~ msgid "Log in with Odoo.com"
-#~ msgstr "Přihlaste se pomocí Odoo.com"
-
-#~ msgid "OAuth Access Token"
-#~ msgstr "Přístupový token OAuth"
-
-#~ msgid "Oauth"
-#~ msgstr "Oauth"

@@ -11,13 +11,25 @@
         <field name="date_from" eval="datetime(2009, 1, 1).date()"/>
     </record>
 
+    <record id="l10n_id_hr_rule_parameter_bpjs_kesehatan_cutoff_day" model="hr.rule.parameter">
+        <field name="name">BPJS Billing Cut-off date</field>
+        <field name="code">l10n_id_bpjs_kesehatan_cutoff_day</field>
+        <field name="description">Joining after this day defers the first BPJS Kesehatan contributions to the next payroll cycle.</field>
+        <field name="country_id" ref="base.id"/>
+    </record>
+    <record id="l10n_id_hr_rule_parameter_bpjs_kesehatan_cutoff_day_2020" model="hr.rule.parameter.value">
+        <field name="parameter_value">7</field>
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_bpjs_kesehatan_cutoff_day"/>
+        <field name="date_from" eval="datetime(2020, 1, 1).date()"/>
+    </record>
+
     <record id="l10n_id_hr_rule_parameter_biaya_jabatan" model="hr.rule.parameter">
         <field name="name">Biaya Jabatan Threshold</field>
         <field name="code">l10n_id_biaya_jabatan_salary_threshold</field>
         <field name="country_id" ref="base.id"/>
     </record>
     <record id="l10n_id_hr_rule_parameter_biaya_jabatan_2009" model="hr.rule.parameter.value">
-        <field name="parameter_value">10000000</field>
+        <field name="parameter_value">6000000</field>
         <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_biaya_jabatan"/>
         <field name="date_from" eval="datetime(2009, 1, 1).date()"/>
     </record>
@@ -42,6 +54,11 @@
         <field name="parameter_value">10042300</field>
         <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_jp"/>
         <field name="date_from" eval="datetime(2015, 1, 1).date()"/>
+    </record>
+    <record id="l10n_id_hr_rule_parameter_jp_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">10547400</field>
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_jp"/>
+        <field name="date_from" eval="datetime(2025, 3, 1).date()"/>
     </record>
 
     <record id="l10n_id_hr_rule_parameter_bpjs_jkm_percentage" model="hr.rule.parameter">
@@ -88,6 +105,17 @@
         <field name="date_from" eval="datetime(2013, 1, 1).date()"/>
     </record>
 
+    <record id="l10n_id_hr_rule_parameter_jht_company_percent" model="hr.rule.parameter">
+        <field name="name">JHT (Company) Percentage</field>
+        <field name="code">l10n_id_jht_company_percent</field>
+        <field name="country_id" ref="base.id"/>
+    </record>
+    <record id="l10n_id_hr_rule_parameter_jht_company_percent_2013" model="hr.rule.parameter.value">
+        <field name="parameter_value">3.7</field>
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_jht_company_percent"/>
+        <field name="date_from" eval="datetime(2013, 1, 1).date()"/>
+    </record>
+
     <record id="l10n_id_hr_rule_parameter_ded_bpjs_kesehatan_percent" model="hr.rule.parameter">
         <field name="name">DED BPJS Kesehatan Percentage</field>
         <field name="code">l10n_id_ded_bpjs_kesehatan_percent</field>
@@ -107,6 +135,16 @@
     <record id="l10n_id_hr_rule_parameter_jp_percent_2015" model="hr.rule.parameter.value">
         <field name="parameter_value">1</field>
         <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_jp_percent"/>
+        <field name="date_from" eval="datetime(2015, 1, 1).date()"/>
+    </record>
+    <record id="l10n_id_hr_rule_parameter_jp_company_percent" model="hr.rule.parameter">
+        <field name="name">JP (Company) Percentage</field>
+        <field name="code">l10n_id_jp_company_percent</field>
+        <field name="country_id" ref="base.id"/>
+    </record>
+    <record id="l10n_id_hr_rule_parameter_jp_company_percent_2015" model="hr.rule.parameter.value">
+        <field name="parameter_value">2</field>
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_jp_company_percent"/>
         <field name="date_from" eval="datetime(2015, 1, 1).date()"/>
     </record>
 
@@ -277,5 +315,197 @@
             (1419000000,9999999999,34)
             ]
         </field>
+    </record>
+
+    <!-- PPH percentage range for gross up
+    forma: of parameter value: (lower_bound, upper_bound, percentage applied) -->
+    <record id="l10n_id_hr_rule_parameter_tax_percentage_pph21_gross_up_a" model="hr.rule.parameter">
+        <field name="name">PPH21 Gross Up Rate: Category A</field>
+        <field name="code">l10n_id_pph21_gross_up_percentage_a</field>
+        <field name="country_id" ref="base.id" />
+    </record>
+    <record id="l10n_id_hr_rule_parameter_tax_percentage_gross_up_a_2024" model="hr.rule.parameter.value">
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_tax_percentage_pph21_gross_up_a"/>
+        <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        <field name="parameter_value">
+            [
+            (0, 5386500, 0.0),
+            (5386500, 5635875, 0.25),
+            (5635875, 5920250, 0.5),
+            (5920250, 6252750, 0.75),
+            (6252750, 6682500, 1.0),
+            (6682500, 7406250, 1.25),
+            (7406250, 8421750, 1.5),
+            (8421750, 9481125, 1.75),
+            (9481125, 9849000, 2.0),
+            (9849000, 10117125, 2.25),
+            (10117125, 10432500, 2.5),
+            (10432500, 10718500, 3.0),
+            (10718500, 11194000, 3.5),
+            (11194000, 12000000, 4.0),
+            (12000000, 13062500, 5.0),
+            (13062500, 14194000, 6.0),
+            (14194000, 15763500, 7.0),
+            (15763500, 18170000, 8.0),
+            (18170000, 21976500, 9.0),
+            (21976500, 23805000, 10.0),
+            (23805000, 24920000, 11.0),
+            (24920000, 26444000, 12.0),
+            (26444000, 28188000, 13.0),
+            (28188000, 30444000, 14.0),
+            (30444000, 33235000, 15.0),
+            (33235000, 36834000, 16.0),
+            (36834000, 39674000, 17.0),
+            (39674000, 42148000, 18.0),
+            (42148000, 45603000, 19.0),
+            (45603000, 49760000, 20.0),
+            (49760000, 54194000, 21.0),
+            (54194000, 60450000, 22.0),
+            (60450000, 68530000, 23.0),
+            (68530000, 78280000, 24.0),
+            (78280000, 93750000, 25.0),
+            (93750000, 116180000, 26.0),
+            (116180000, 150380000, 27.0),
+            (150380000, 242640000, 28.0),
+            (242640000, 322340000, 29.0),
+            (322340000, 385000000, 30.0),
+            (385000000, 479550000, 31.0),
+            (479550000, 618800000, 32.0),
+            (618800000, 938000000, 33.0),
+            (938000000, 9999999999, 34.0)
+            ]
+        </field>
+    </record>
+
+    <record id="l10n_id_hr_rule_parameter_tax_percentage_pph21_gross_up_b" model="hr.rule.parameter">
+        <field name="name">PPH21 Gross Up Rate: Category B</field>
+        <field name="code">l10n_id_pph21_gross_up_percentage_b</field>
+        <field name="country_id" ref="base.id" />
+    </record>
+    <record id="l10n_id_hr_rule_parameter_tax_percentage_gross_up_b_2024" model="hr.rule.parameter.value">
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_tax_percentage_pph21_gross_up_b"/>
+        <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        <field name="parameter_value">
+            [
+            (0, 6200000, 0.0),
+            (6200000, 6483750, 0.25),
+            (6483750, 6815750, 0.5),
+            (6815750, 7245250, 0.75),
+            (7245250, 9108000, 1.0),
+            (9108000, 10588750, 1.5),
+            (10588750, 11025000, 2.0),
+            (11025000, 11310000, 2.5),
+            (11310000, 12222000, 3.0),
+            (12222000, 13056000, 4.0),
+            (13056000, 14202500, 5.0),
+            (14202500, 15416000, 6.0),
+            (15416000, 17158500, 7.0),
+            (17158500, 20102000, 8.0),
+            (20102000, 23660000, 9.0),
+            (23660000, 24930000, 10.0),
+            (24930000, 26121500, 11.0),
+            (26121500, 27676000, 12.0),
+            (27676000, 29536500, 13.0),
+            (29536500, 31906000, 14.0),
+            (31906000, 34935000, 15.0),
+            (34935000, 38472000, 16.0),
+            (38472000, 41085000, 17.0),
+            (41085000, 44116000, 18.0),
+            (44116000, 47385000, 19.0),
+            (47385000, 51200000, 20.0),
+            (51200000, 56090000, 21.0),
+            (56090000, 62400000, 22.0),
+            (62400000, 71610000, 23.0),
+            (71610000, 82840000, 24.0),
+            (82840000, 96750000, 25.0),
+            (96750000, 120620000, 26.0),
+            (120620000, 154030000, 27.0),
+            (154030000, 269280000, 28.0),
+            (269280000, 325890000, 29.0),
+            (325890000, 388500000, 30.0),
+            (388500000, 485760000, 31.0),
+            (485760000, 650760000, 32.0),
+            (650760000, 941350000, 33.0),
+            (941350000, 9999999999, 34.0)
+            ]
+        </field>
+    </record>
+
+    <record id="l10n_id_hr_rule_parameter_tax_percentage_pph21_gross_up_c" model="hr.rule.parameter">
+        <field name="name">PPH21 Gross Up Rate: Category C</field>
+        <field name="code">l10n_id_pph21_gross_up_percentage_c</field>
+        <field name="country_id" ref="base.id" />
+    </record>
+    <record id="l10n_id_hr_rule_parameter_tax_percentage_c_gross_up_2024" model="hr.rule.parameter.value">
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_tax_percentage_pph21_gross_up_c"/>
+        <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        <field name="parameter_value">
+            [
+            (0, 6600000, 0.0),
+            (6600000, 6932625, 0.25),
+            (6932625, 7313250, 0.5),
+            (7313250, 7741500, 0.75),
+            (7741500, 8761500, 1.0),
+            (8761500, 9677500, 1.25),
+            (9677500, 10785750, 1.5),
+            (10785750, 11004000, 1.75),
+            (11004000, 11809000, 2.0),
+            (11809000, 12561500, 3.0),
+            (12561500, 13584000, 4.0),
+            (13584000, 14772500, 5.0),
+            (14772500, 16027000, 6.0),
+            (16027000, 18135000, 7.0),
+            (18135000, 20884000, 8.0),
+            (20884000, 24206000, 9.0),
+            (24206000, 25290000, 10.0),
+            (25290000, 26789000, 11.0),
+            (26789000, 28688000, 12.0),
+            (28688000, 30798000, 13.0),
+            (30798000, 33454000, 14.0),
+            (33454000, 36550000, 15.0),
+            (36550000, 39816000, 16.0),
+            (39816000, 42496000, 17.0),
+            (42496000, 45756000, 18.0),
+            (45756000, 48924000, 19.0),
+            (48924000, 53360000, 20.0),
+            (53360000, 58855000, 21.0),
+            (58855000, 64896000, 22.0),
+            (64896000, 73612000, 23.0),
+            (73612000, 83600000, 24.0),
+            (83600000, 100500000, 25.0),
+            (100500000, 125060000, 26.0),
+            (125060000, 161330000, 27.0),
+            (161330000, 280800000, 28.0),
+            (280800000, 328730000, 29.0),
+            (328730000, 392700000, 30.0),
+            (392700000, 489210000, 31.0),
+            (489210000, 656200000, 32.0),
+            (656200000, 950730000, 33.0),
+            (950730000, 9999999999, 34.0)
+            ]
+        </field>
+    </record>
+
+    <record id="l10n_id_hr_rule_parameter_natura_bik_house_rent_allowance" model="hr.rule.parameter">
+        <field name="name">BIK/Natura: House Rent Allowance</field>
+        <field name="code">l10n_id_natura_bik_house_rent_allowance</field>
+        <field name="country_id" ref="base.id"/>
+    </record>
+    <record id="l10n_id_hr_rule_parameter_natura_bik_house_rent_allowance_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">2000000</field>
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_natura_bik_house_rent_allowance"/>
+        <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+    </record>
+
+    <record id="l10n_id_hr_rule_parameter_overtime" model="hr.rule.parameter">
+        <field name="name">Monthly Statutory Working Hours</field>
+        <field name="code">l10n_id_statutory_working_hours</field>
+        <field name="description">Statutory divisor to calculate hourly overtime wage</field>
+        <field name="country_id" ref="base.id" />
+    </record>
+    <record id="l10n_id_hr_rule_parameter_overtime_2021" model="hr.rule.parameter.value">
+        <field name="parameter_value">173</field>
+        <field name="rule_parameter_id" ref="l10n_id_hr_rule_parameter_overtime" />
+        <field name="date_from" eval="datetime(2021, 2, 2).date()" />
     </record>
 </odoo>

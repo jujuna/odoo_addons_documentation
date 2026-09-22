@@ -2,9 +2,12 @@ import { BuilderAction } from "@html_builder/core/builder_action";
 import { Plugin } from "@html_editor/plugin";
 import { registry } from "@web/core/registry";
 import { memoize } from "@web/core/utils/functions";
-import { CUSTOMIZE_MAILING_VARIABLES } from "@mass_mailing/builder/plugins/customize_mailing_variables";
-import { CUSTOMIZE_MAILING_VARIABLES_DEFAULTS } from "./customize_mailing_variables";
+import {
+    CUSTOMIZE_MAILING_VARIABLES,
+    CUSTOMIZE_MAILING_VARIABLES_DEFAULTS,
+} from "@mass_mailing/builder/plugins/customize_mailing_variables";
 import { splitSelectorAroundCommasOutsideParentheses } from "@mail/views/web/fields/html_mail_field/convert_inline";
+import { getCSSVariableValue } from "@html_editor/utils/formatting";
 
 const RE_SELECTOR_ENDS_WITH_GT_STAR = />\s*\*\s*$/;
 export const PRIORITY_STYLES = {
@@ -24,10 +27,12 @@ export class CustomizeMailingPlugin extends Plugin {
         builder_actions: {
             CustomizeMailingVariable,
         },
-        clean_for_save_handlers: ({ root }) => this.cleanForSave(root),
-        snippet_preview_dialog_stylesheets_handlers: ({ iframe }) => {
+        clean_for_save_processors: (root) => this.cleanForSave(root),
+        snippet_preview_dialog_stylesheets_processors: (params) => {
+            const { iframe } = params;
             const styleSheet = this.extractStylesheetForPreview(iframe.contentDocument);
             iframe.contentDocument.adoptedStyleSheets.push(styleSheet);
+            return params;
         },
     };
     getRule = memoize((selector) => this._getRule(selector));
@@ -45,12 +50,17 @@ export class CustomizeMailingPlugin extends Plugin {
         }
         this.setupMailingVariables();
         this.document.adoptedStyleSheets = [...this.document.adoptedStyleSheets, this.styleSheet];
+        this._cleanups.push(() => {
+            this.document.adoptedStyleSheets = this.document.adoptedStyleSheets.filter(
+                (styleSheet) => this.styleSheet !== styleSheet
+            );
+        });
     }
 
     cleanForSave(clone) {
         const layoutEl = clone.querySelector(".o_layout");
         if (!layoutEl) {
-            return;
+            return clone;
         }
         const styleEl = this.document.createElement("STYLE");
         styleEl.id = "design-element";
@@ -63,6 +73,7 @@ export class CustomizeMailingPlugin extends Plugin {
         }
         styleEl.textContent = cssTextArray.join("\n");
         layoutEl.prepend(styleEl);
+        return clone;
     }
 
     extractStylesheetForPreview(contentDocument) {
@@ -70,10 +81,11 @@ export class CustomizeMailingPlugin extends Plugin {
         const newStyleSheet = new contentDocument.defaultView.CSSStyleSheet();
         for (const cssRule of cssRules) {
             let previewRule = cssRule.cssText.replace(this.cssPrefix, ".o_add_snippets_preview");
+            // Prevent nested `[data-snippet]` nodes (e.g. s_rating) from getting wrapper styles.
             if (previewRule.includes("> [data-snippet]")) {
                 previewRule = previewRule.replace(
                     "> [data-snippet]",
-                    ".o_snippet_preview_wrap > [data-snippet]"
+                    ".o_snippet_preview_wrap > div > [data-snippet]"
                 );
             }
             newStyleSheet.insertRule(previewRule);
@@ -157,16 +169,16 @@ export class CustomizeMailingPlugin extends Plugin {
     }
 
     /**
-     * Ensure that FontAwesome icons are not impacted by font-family selectors
+     * Ensure that font icons are not impacted by font-family selectors
      */
     transformFontFamilySelector(selector) {
-        if (selector.trim().endsWith(":not(.fa)")) {
+        if (selector.trim().endsWith(":not(.oi)")) {
             return [selector];
         }
         if (!selector.endsWith("*")) {
-            return [`${selector.trim()}:not(.fa)`, `${selector.trim()} :not(.fa)`];
+            return [`${selector.trim()}:not(.oi)`, `${selector.trim()} :not(.oi)`];
         } else if (RE_SELECTOR_ENDS_WITH_GT_STAR.test(selector)) {
-            return [`${selector.replace(RE_SELECTOR_ENDS_WITH_GT_STAR, "").trim()} :not(.fa)`];
+            return [`${selector.replace(RE_SELECTOR_ENDS_WITH_GT_STAR, "").trim()} :not(.oi)`];
         }
     }
 
@@ -188,7 +200,7 @@ export class CustomizeMailingPlugin extends Plugin {
 
 export class CustomizeMailingVariable extends BuilderAction {
     static id = "mass_mailing.CustomizeMailingVariable";
-    static dependencies = ["builderActions", "mass_mailing.CustomizeMailingPlugin", "history"];
+    static dependencies = ["builderActions", "color", "mass_mailing.CustomizeMailingPlugin", "domObserver"];
     isApplied({ value }) {
         return this.getValue(...arguments) === value;
     }
@@ -198,13 +210,21 @@ export class CustomizeMailingVariable extends BuilderAction {
      * @param { string } params.property
      */
     getValue({ params }) {
-        return this.dependencies["mass_mailing.CustomizeMailingPlugin"].getVariableValue(
+        const variable = this.dependencies["mass_mailing.CustomizeMailingPlugin"].getVariableValue(
             params.variable
+        );
+        if (!params.variable.includes("color") || !/var\(/g.test(variable)) {
+            return variable;
+        }
+        const match = variable.match(/var\(--([\w-]+)\)/)[1];
+        return getCSSVariableValue(
+            match,
+            this.window.getComputedStyle(this.document.documentElement)
         );
     }
     apply({ params, value }) {
         const oldValue = this.getValue(...arguments);
-        this.dependencies.history.applyCustomMutation({
+        this.dependencies.domObserver.applyCustomMutation({
             apply: () => {
                 this.dependencies["mass_mailing.CustomizeMailingPlugin"].setVariable(
                     params.variable,
@@ -221,7 +241,7 @@ export class CustomizeMailingVariable extends BuilderAction {
     }
     clean({ params }) {
         const oldValue = this.getValue(...arguments);
-        this.dependencies.history.applyCustomMutation({
+        this.dependencies.domObserver.applyCustomMutation({
             apply: () => {
                 this.dependencies["mass_mailing.CustomizeMailingPlugin"].setVariable(
                     params.variable,

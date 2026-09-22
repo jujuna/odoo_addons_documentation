@@ -1,5 +1,3 @@
-import base64
-
 from odoo.addons.documents.tests.test_documents_common import TransactionCaseDocuments
 from odoo.exceptions import AccessError
 from odoo.tools import mute_logger
@@ -10,7 +8,7 @@ class TransactionCaseDocumentsHr(TransactionCaseDocuments):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.TEXT = base64.b64encode(bytes("documents_hr", 'utf-8'))
+        cls.TEXT_RAW = b"documents_hr"
         cls.doc_user_2, cls.hr_manager, cls.hr_user = cls.env['res.users'].create([{
             'name': "documents test basic user",
             'login': "dtbu",
@@ -34,7 +32,6 @@ class TransactionCaseDocumentsHr(TransactionCaseDocuments):
         })
         cls.hr_employee_folder.action_update_access_rights(partners={cls.hr_manager.partner_id: ('edit', False)})
         company = cls.env.user.company_id
-        company.documents_hr_settings = True
         company.documents_employee_folder_id = cls.hr_employee_folder.id
         cls.employees_folder = company.documents_employee_folder_id
 
@@ -44,6 +41,7 @@ class TransactionCaseDocumentsHr(TransactionCaseDocuments):
                 'res_model': related_record._name,
                 'name': f'Create document of {related_record.display_name}',
                 'folder_id': folder.id,
+                'raw': 'test',
             }
             for _ in range(n)])
 
@@ -71,7 +69,7 @@ class TransactionCaseDocumentsHr(TransactionCaseDocuments):
 
     def check_document_no_access(self, document, doc_user):
         document.ensure_one()
-        with mute_logger('odoo.addons.base.models.ir_rule'), self.assertRaises(
+        with mute_logger('odoo.addons.base.models.ir_access'), self.assertRaises(
                 AccessError, msg=f"{doc_user.name} cannot see document {document.name}"):
             document.with_user(doc_user).mapped('name')
 
@@ -101,8 +99,13 @@ class TransactionCaseDocumentsHr(TransactionCaseDocuments):
                 for doc_idx in (0, 1):
                     self.check_document_no_access(documents[doc_idx], self.doc_user_2)
                     self.check_document_no_access(documents[doc_idx], self.document_manager)
-                    self.assertEqual(len(documents[doc_idx].access_ids), 2,
-                                     "Only the employee and the manager have access")
+                    self.assertTrue(
+                        all(
+                            user in documents[doc_idx].access_ids.partner_id.user_ids
+                            for user in [self.doc_user, folder_manager]
+                        ),
+                        "The employee and the manager have access",
+                    )
 
         folder.action_update_access_rights(partners={self.doc_user.partner_id: ('edit', False)})
         documents = self.create_hr_related_document(related_record, folder)

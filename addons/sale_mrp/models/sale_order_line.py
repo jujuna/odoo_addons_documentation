@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, models
-from odoo.tools import float_compare
+from odoo import api, models, fields
 
 
 class SaleOrderLine(models.Model):
@@ -35,7 +34,6 @@ class SaleOrderLine(models.Model):
         for order_line in self:
             if order_line.qty_delivered_method == 'stock_move':
                 boms = order_line.move_ids.filtered(lambda m: m.state != 'cancel').bom_line_id.bom_id
-                dropship = any(m._is_dropshipped() for m in order_line.move_ids)
                 # We fetch the BoMs of type kits linked to the order_line,
                 # the we keep only the one related to the finished produst.
                 # This bom should be the only one since bom_line_id was written on the moves
@@ -45,26 +43,10 @@ class SaleOrderLine(models.Model):
                 if not relevant_bom:
                     relevant_bom = boms._bom_find(order_line.product_id, company_id=order_line.company_id.id, bom_type='phantom')[order_line.product_id]
                 if relevant_bom:
-                    # not written on a move coming from a PO: all moves (to customer) must be done
-                    # and the returns must be delivered back to the customer
-                    # FIXME: if the components of a kit have different suppliers, multiple PO
-                    # are generated. If one PO is confirmed and all the others are in draft, receiving
-                    # the products for this PO will set the qty_delivered. We might need to check the
-                    # state of all PO as well... but sale_mrp doesn't depend on purchase.
-                    if dropship:
-                        moves = order_line.move_ids.filtered(lambda m: m.state != 'cancel')
-                        if any((m.location_dest_id.usage == 'customer' and m.state != 'done')
-                               or (m.location_dest_id.usage != 'customer'
-                               and m.state == 'done'
-                               and float_compare(m.quantity,
-                                                 sum(sub_m.product_uom._compute_quantity(sub_m.quantity, m.product_uom) for sub_m in m.returned_move_ids if sub_m.state == 'done'),
-                                                 precision_rounding=m.product_uom.rounding) > 0)
-                               for m in moves) or not moves:
-                            delivered_qties[order_line] = 0
-                        else:
-                            delivered_qties[order_line] = order_line.product_uom_qty
-                        continue
                     moves = order_line.move_ids.filtered(lambda m: m.state == 'done' and m.location_dest_usage != 'inventory')
+                    if self.env.context.get('accrual_entry_date'):
+                        accrual_date = fields.Date.from_string(self.env.context['accrual_entry_date'])
+                        moves = moves.filtered(lambda r: fields.Date.context_today(r, r.date) <= accrual_date)
                     filters = {
                         # in/out perspective w/ respect to moves is flipped for sale order document
                         'incoming_moves': lambda m:
@@ -73,9 +55,9 @@ class SaleOrderLine(models.Model):
                         'outgoing_moves': lambda m:
                             m._is_incoming() and m.to_refund,
                     }
-                    order_qty = order_line.product_uom_id._compute_quantity(order_line.product_uom_qty, relevant_bom.product_uom_id)
+                    order_qty = order_line.product_uom_id._compute_quantity(order_line.product_uom_qty, relevant_bom.uom_id)
                     qty_delivered = moves._compute_kit_quantities(order_line.product_id, order_qty, relevant_bom, filters)
-                    delivered_qties[order_line] += relevant_bom.product_uom_id._compute_quantity(qty_delivered, order_line.product_uom_id)
+                    delivered_qties[order_line] += relevant_bom.uom_id._compute_quantity(qty_delivered, order_line.product_uom_id)
 
                 # If no relevant BOM is found, fall back on the all-or-nothing policy. This happens
                 # when the product sold is made only of kits. In this case, the BOM of the stock moves
@@ -95,12 +77,12 @@ class SaleOrderLine(models.Model):
         return super(SaleOrderLine, self).compute_uom_qty(new_qty, stock_move, rounding)
 
     def _get_bom_component_qty(self, bom):
-        bom_quantity = self.product_id.uom_id._compute_quantity(1, bom.product_uom_id, rounding_method='HALF-UP')
+        bom_quantity = self.product_id.uom_id._compute_quantity(1, bom.uom_id, rounding_method='HALF-UP')
         boms, lines = bom.explode(self.product_id, bom_quantity)
         components = {}
         for line, line_data in lines:
             product = line.product_id.id
-            uom = line.product_uom_id
+            uom = line.uom_id
             qty = line_data['qty']
             if components.get(product, False):
                 if uom.id != components[product]['uom']:
@@ -142,7 +124,7 @@ class SaleOrderLine(models.Model):
             'incoming_moves': lambda m: (
                 m.state != 'cancel' and m.location_dest_usage != 'inventory'
                 and m.rule_id.id in triggering_rule_ids
-                and m.location_final_id.usage == 'customer'
+                and m.forecasted_location_id.usage == 'customer'
                 and (not m.origin_returned_move_id or (m.origin_returned_move_id and m.to_refund)
             )),
             'outgoing_moves': lambda m: (
@@ -161,9 +143,9 @@ class SaleOrderLine(models.Model):
             moves = self.move_ids.filtered(lambda r: r.state != 'cancel' and r.location_dest_usage != 'inventory')
             filters = self._get_incoming_outgoing_moves_filter()
             order_qty = previous_product_uom_qty.get(self.id, 0) if previous_product_uom_qty else self.product_uom_qty
-            order_qty = self.product_uom_id._compute_quantity(order_qty, bom.product_uom_id)
+            order_qty = self.product_uom_id._compute_quantity(order_qty, bom.uom_id)
             qty = moves._compute_kit_quantities(self.product_id, order_qty, bom, filters)
-            return bom.product_uom_id._compute_quantity(qty, self.product_uom_id)
+            return bom.uom_id._compute_quantity(qty, self.product_uom_id)
         elif bom and previous_product_uom_qty:
             return previous_product_uom_qty.get(self.id)
         return super()._get_qty_procurement(previous_product_uom_qty=previous_product_uom_qty)

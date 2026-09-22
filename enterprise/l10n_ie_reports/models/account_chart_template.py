@@ -15,3 +15,12 @@ class AccountChartTemplate(models.AbstractModel):
             default_accounts['deferred_revenue_account_id'] = 'l10n_ie_account_39'
 
         return {self.env.company.id: default_accounts}
+
+    @template('ie', 'account.return.type')
+    def _get_ie_account_return_type(self):
+        return {
+            'l10n_ie_reports.ie_tax_return_type': {
+                'tax_payable_account_id': 'l10n_ie_account_3804',
+                'tax_receivable_account_id': 'l10n_ie_account_2131',
+            },
+        }

@@ -27,9 +27,14 @@ class TestVoipHrRecruitmentMailActivity(common.TransactionCase):
         )
         applicant.activity_schedule("mail.mail_activity_data_call", user_id=not_an_interviewer.id)
         activity = applicant.activity_schedule("mail.mail_activity_data_call", user_id=interviewer.id)
-        activities_of_interviewer = self.env["mail.activity"].with_user(interviewer).get_today_call_activities()
+        activities_of_interviewer = (
+            self.env["mail.activity"]
+            .with_user(interviewer)
+            .get_today_call_activities()
+            ._build_result()
+        )
         activities_of_not_an_interviewer = (
-            self.env["mail.activity"].with_user(not_an_interviewer).get_today_call_activities()
+            self.env["mail.activity"].with_user(not_an_interviewer).get_today_call_activities()._build_result()
         )
         self.assertEqual(activities_of_not_an_interviewer, {})
         self.assertEqual(len(activities_of_interviewer["mail.activity"]), 1)

@@ -5,7 +5,6 @@ from datetime import datetime
 
 from odoo import api, exceptions, models, _
 from odoo.tools import format_datetime
-from odoo.addons.whatsapp.models.whatsapp_template import COMMON_WHATSAPP_PHONE_SAFE_FIELDS
 from odoo.addons.whatsapp.tools import phone_validation as wa_phone_validation
 
 
@@ -105,4 +104,14 @@ class Base(models.AbstractModel):
 
     def _wa_get_safe_phone_fields(self):
         """Return a list of fields that may be used as fallback when sending whatsapp messages."""
-        return list(COMMON_WHATSAPP_PHONE_SAFE_FIELDS)
+        return [
+            'mobile',
+            'phone',
+            'phone_sanitized',
+            'partner_id.phone',
+            'phone_sanitized.phone',
+            'x_studio_mobile',
+            'x_studio_phone',
+            'x_studio_partner_id.phone',
+            'x_studio_partner_id.phone_sanitized',
+        ]

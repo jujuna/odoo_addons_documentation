@@ -1,32 +1,54 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
-
-TEMPLATE_CODE = [
-    ('01', 'CGEN03'),
-    ('02', 'CGEN04'),
-]
+from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    l10n_co_edi_username = fields.Char(string="Carvajal Username", groups='base.group_system')
-    l10n_co_edi_password = fields.Char(string="Carvajal Password", groups='base.group_system')
-    l10n_co_edi_company = fields.Char(string='Company Registry')
-    l10n_co_edi_account = fields.Char(string='Account ID', groups='base.group_system')
-    l10n_co_edi_test_mode = fields.Boolean(string='Test mode', default=True)
-    l10n_co_edi_header_gran_contribuyente = fields.Char(string='Great contributor')
-    l10n_co_edi_header_tipo_de_regimen = fields.Char(string=u'Regime type')
-    l10n_co_edi_header_retenedores_de_iva = fields.Char(string='TVA retainers')
-    l10n_co_edi_header_autorretenedores = fields.Char(string='Self-retainers')
-    l10n_co_edi_header_resolucion_aplicable = fields.Char(string='Applicable Resolution')
     l10n_co_edi_header_actividad_economica = fields.Char(string='Economic Activity')
-    l10n_co_edi_header_bank_information = fields.Text(string='Bank Information')
-    l10n_co_edi_template_code = fields.Selection(TEMPLATE_CODE, string="Colombia Template Code")
+    l10n_co_edi_operation_mode_ids = fields.One2many(
+        string="DIAN Operation Modes",
+        comodel_name="l10n_co_edi.operation_mode",
+        inverse_name="company_id",
+    )
+    l10n_co_edi_certificate_ids = fields.One2many(comodel_name='certificate.certificate', inverse_name='company_id')
+    l10n_co_edi_test_environment = fields.Boolean(
+        string="Test environment",
+        inverse='_inverse_l10n_co_edi_test_environment',
+        default=True,
+    )
+    l10n_co_edi_certification_process = fields.Boolean(
+        compute='_compute_l10n_co_edi_certification_process',
+        inverse='_inverse_l10n_co_edi_certification_process',
+        store=True,
+        readonly=False,
+    )
+    l10n_co_edi_demo_mode = fields.Boolean(
+        compute='_compute_l10n_co_edi_demo_mode',
+        inverse='_inverse_l10n_co_edi_demo_mode',
+    )
 
-    def _get_l10n_co_edi_template_code_description(self):
-        return dict(TEMPLATE_CODE).get(self.l10n_co_edi_template_code)
+    @api.depends('l10n_co_edi_test_environment')
+    def _compute_l10n_co_edi_certification_process(self):
+        for company in self:
+            if not company.l10n_co_edi_test_environment:
+                company.l10n_co_edi_certification_process = False
 
-    def _is_latam(self):
-        return super()._is_latam() or self.country_code == 'CO'
+    def _inverse_l10n_co_edi_certification_process(self):
+        for company in self:
+            if company.l10n_co_edi_certification_process and not company.l10n_co_edi_test_environment:
+                company.l10n_co_edi_certification_process = False
+
+    def _compute_l10n_co_edi_demo_mode(self):
+        for company in self:
+            company.l10n_co_edi_demo_mode = self.env['ir.config_parameter'].sudo().get_bool(f"l10n_co_edi_demo_mode_{company.id}")
+
+    def _inverse_l10n_co_edi_demo_mode(self):
+        for company in self:
+            self.env['ir.config_parameter'].sudo().set_bool(f"l10n_co_edi_demo_mode_{company.id}", company.l10n_co_edi_demo_mode)
+
+    def _inverse_l10n_co_edi_test_environment(self):
+        for company in self:
+            if company.l10n_co_edi_test_environment:
+                company.l10n_co_edi_demo_mode = False

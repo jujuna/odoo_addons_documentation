@@ -9,6 +9,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestIrnProcess(L10nInTestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def convert_json_in_encoded_format(self, json_data):
         new_json_data = {'data': json.dumps(json_data)}
         encoded_json = jwt.encode(new_json_data, key='', algorithm='none')
@@ -41,7 +43,7 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
             {
                 'name': 'file_for_list_of_irn.json',
                 'mimetype': 'application/json',
-                'raw': json.dumps(irn_list),
+                'raw': json.dumps(irn_list).encode(),
             }
         ])
 
@@ -57,7 +59,7 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
         attachment = self.env['ir.attachment'].create({
             'name': f'{move.l10n_in_irn_number}.json',
             'mimetype': 'application/json',
-            'raw': json.dumps(detail_json),
+            'raw': json.dumps(detail_json).encode(),
             'res_model': 'account.move',
             'res_id': move.id,
         })
@@ -69,8 +71,8 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
             {'name': 'Whiteboard Pen', 'quantity': 5.0, 'tax_ids': self.purchase_igst_1.ids, 'credit': 0.0, 'debit': 500.0, 'amount_currency': 500.0},
             {'name': '1% IGST P', 'quantity': 0.0, 'tax_ids': [], 'credit': 0.0, 'debit': 5.0, 'amount_currency': 5.0},
             {'name': '18% IGST P', 'quantity': 0.0, 'tax_ids': [], 'credit': 0.0, 'debit': 90.0, 'amount_currency': 90.0},
-            {'name': 'installment #1', 'quantity': 0.0, 'tax_ids': [], 'credit': 327.0, 'debit': 0.0, 'amount_currency': -327.0},
-            {'name': 'installment #2', 'quantity': 0.0, 'tax_ids': [], 'credit': 763.0, 'debit': 0.0, 'amount_currency': -763.0}
+            {'name': 'TEST/0001 installment #1', 'quantity': 0.0, 'tax_ids': [], 'credit': 327.0, 'debit': 0.0, 'amount_currency': -327.0},
+            {'name': 'TEST/0001 installment #2', 'quantity': 0.0, 'tax_ids': [], 'credit': 763.0, 'debit': 0.0, 'amount_currency': -763.0}
         ], {'ref': "TEST/0001", 'invoice_date': self.test_date, 'partner_id': self.partner_b.id})
 
     def test_irn_process_with_reverse_charge_taxes(self):
@@ -80,7 +82,7 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
             {
                 'name': 'file_for_list_of_irn.json',
                 'mimetype': 'application/json',
-                'raw': json.dumps(irn_list),
+                'raw': json.dumps(irn_list).encode(),
             }
         ])
 
@@ -96,7 +98,7 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
         attachment = self.env['ir.attachment'].create({
             'name': f'{move.l10n_in_irn_number}.json',
             'mimetype': 'application/json',
-            'raw': json.dumps(detail_json),
+            'raw': json.dumps(detail_json).encode(),
             'res_model': 'account.move',
             'res_id': move.id,
         })
@@ -109,8 +111,8 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
             {'name': '1% IGST RC', 'quantity': 0.0, 'tax_ids': [], 'credit': 0.0, 'debit': 5.0, 'amount_currency': 5.0},
             {'name': '18% IGST RC', 'quantity': 0.0, 'tax_ids': [], 'credit': 90.0, 'debit': 0.0, 'amount_currency': -90.0},
             {'name': '18% IGST RC', 'quantity': 0.0, 'tax_ids': [], 'credit': 0.0, 'debit': 90.0, 'amount_currency': 90.0},
-            {'name': 'installment #1', 'quantity': 0.0, 'tax_ids': [], 'credit': 300.0, 'debit': 0.0, 'amount_currency': -300.0},
-            {'name': 'installment #2', 'quantity': 0.0, 'tax_ids': [], 'credit': 700.0, 'debit': 0.0, 'amount_currency': -700.0},
+            {'name': 'TEST/0001 installment #1', 'quantity': 0.0, 'tax_ids': [], 'credit': 300.0, 'debit': 0.0, 'amount_currency': -300.0},
+            {'name': 'TEST/0001 installment #2', 'quantity': 0.0, 'tax_ids': [], 'credit': 700.0, 'debit': 0.0, 'amount_currency': -700.0},
         ], {'ref': "TEST/0001", 'invoice_date': self.test_date, 'partner_id': self.partner_b.id})
 
     def test_irn_process_with_unknown_taxes(self):
@@ -120,7 +122,7 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
             {
                 'name': 'file_for_list_of_irn.json',
                 'mimetype': 'application/json',
-                'raw': json.dumps(irn_list),
+                'raw': json.dumps(irn_list).encode(),
             }
         ])
 
@@ -136,7 +138,7 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
         attachment = self.env['ir.attachment'].create({
             'name': f'{move.l10n_in_irn_number}.json',
             'mimetype': 'application/json',
-            'raw': json.dumps(detail_json),
+            'raw': json.dumps(detail_json).encode(),
             'res_model': 'account.move',
             'res_id': move.id,
         })
@@ -147,6 +149,6 @@ class TestIrnProcess(L10nInTestAccountReportsCommon):
             {'name': 'Customizable Desk', 'quantity': 1.0, 'tax_ids': [], 'credit': 0.0, 'debit': 500.0, 'amount_currency': 500.0},
             {'name': 'Whiteboard Pen', 'quantity': 5.0, 'tax_ids': self.purchase_igst_1.ids, 'credit': 0.0, 'debit': 500.0, 'amount_currency': 500.0},
             {'name': '1% IGST P', 'quantity': 0.0, 'tax_ids': [], 'credit': 0.0, 'debit': 5.0, 'amount_currency': 5.0},
-            {'name': 'installment #1', 'quantity': 0.0, 'tax_ids': [], 'credit': 316.5, 'debit': 0.0, 'amount_currency': -316.5},
-            {'name': 'installment #2', 'quantity': 0.0, 'tax_ids': [], 'credit': 738.5, 'debit': 0.0, 'amount_currency': -738.5}
+            {'name': 'TEST/0001 installment #1', 'quantity': 0.0, 'tax_ids': [], 'credit': 316.5, 'debit': 0.0, 'amount_currency': -316.5},
+            {'name': 'TEST/0001 installment #2', 'quantity': 0.0, 'tax_ids': [], 'credit': 738.5, 'debit': 0.0, 'amount_currency': -738.5}
         ], {'ref': "TEST/0001", 'invoice_date': self.test_date, 'partner_id': self.partner_b.id})

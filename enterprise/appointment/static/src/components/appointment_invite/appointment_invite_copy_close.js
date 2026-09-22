@@ -3,12 +3,10 @@ import { browser } from "@web/core/browser/browser";
 import { registry } from '@web/core/registry';
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 
 export class AppointmentInviteCopyClose extends Component {
-    static props = {
-        ...standardWidgetProps,
-    };
+    props = useProps(standardWidgetProps);
     static template = "appointment.AppointmentInviteCopyClose";
     /**
      * We want to disable the "Save & Copy" button if there is a warning that could

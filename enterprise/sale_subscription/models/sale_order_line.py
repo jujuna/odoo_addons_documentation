@@ -21,10 +21,10 @@ INTERVAL_FACTOR = {
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
-    recurring_invoice = fields.Boolean(related="product_template_id.recurring_invoice")
+    recurring_invoice = fields.Boolean(compute="_compute_recurring_invoice", search="_search_recurring_invoice")
     recurring_monthly = fields.Monetary(compute='_compute_recurring_monthly', string="Monthly Recurring Revenue")
-    parent_line_id = fields.Many2one('sale.order.line', compute='_compute_parent_line_id', store=True, precompute=True, index='btree_not_null')
-    last_invoiced_date = fields.Date(compute='_compute_last_invoiced_date', index=True, store=True)
+    parent_line_id = fields.Many2one('sale.order.line', compute='_compute_parent_line_id', store=True, precompute=True, index='btree_not_null', init_storage=lambda model: None)
+    last_invoiced_date = fields.Date(compute='_compute_last_invoiced_date', index=True, store=True, init_storage=lambda model: None)
     pricelist_id = fields.Many2one(related="order_id.pricelist_id")
     subscription_start_date = fields.Date(related="order_id.start_date")
     subscription_end_date = fields.Date(related="order_id.end_date")
@@ -53,23 +53,54 @@ class SaleOrderLine(models.Model):
         not_subscription_lines = self.filtered(lambda line: not (line.order_id.is_subscription and line.recurring_invoice))
         return not_subscription_lines and undeletable_lines
 
-    @api.depends('order_id.next_invoice_date', 'recurring_invoice')
+    @api.depends('display_type', 'is_downpayment', 'product_id.recurring_invoice', 'order_id.plan_id')
+    def _compute_recurring_invoice(self):
+        for line in self:
+            if line.product_id:
+                line.recurring_invoice = line.product_id.recurring_invoice
+            else:
+                line.recurring_invoice = (
+                    not line.display_type
+                    and not line.is_downpayment
+                    and line.order_id.plan_id
+                )
+
+    def _search_recurring_invoice(self, operator, value):
+        if operator not in ('in', 'not in'):
+            return NotImplemented
+
+        domain = Domain('product_id.recurring_invoice', '=', True) | (
+            Domain('product_id', '=', False)
+            & Domain('display_type', '=', False)
+            & Domain('is_downpayment', '=', False)
+            & Domain('order_id.plan_id', '!=', False)
+        )
+        # Invert the domain for non-recurring lines ('= False' / 'not in [True]')
+        if (operator == 'in') != (True in value):
+            domain = ~domain
+        return domain
+
+    @api.depends('order_id.next_invoice_date', 'order_id.subscription_state', 'recurring_invoice')
     def _compute_invoice_status(self):
         skip_line_status_compute = self.env.context.get('skip_line_status_compute')
         if skip_line_status_compute:
             return
         super(SaleOrderLine, self)._compute_invoice_status()
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         for line in self:
             currency_id = line.order_id.currency_id or self.env.company.currency_id
             next_invoice_date = line.order_id.next_invoice_date
             last_invoiced_date = line.last_invoiced_date
-            if not line.order_id.is_subscription or not line.recurring_invoice:
+            if (not line.order_id.is_subscription and line.order_id.subscription_state != '7_upsell') or not line.recurring_invoice:
                 continue
             # Subscriptions and upsells
             recurring_free = currency_id.compare_amounts(line.order_id.recurring_monthly, 0) < 1
-            if recurring_free:
-                # free subscription lines are never to invoice whatever the dates
+            closed_prepaid = (line.invoice_status == 'to invoice'
+                              and line.order_id.subscription_state in SUBSCRIPTION_CLOSED_STATE
+                              and not line._is_postpaid_line())
+            if recurring_free or closed_prepaid:
+                # free subscription lines are never to invoice whatever the dates.
+                # The subscription will no longer generate future bills, but pending postpaid charges may still be due
                 line.invoice_status = 'no'
                 continue
             to_invoice_check = next_invoice_date and line.state == 'sale' and next_invoice_date >= today
@@ -80,7 +111,7 @@ class SaleOrderLine(models.Model):
                 future_line = line.order_id.start_date and line.order_id.start_date > today or (currency_id.is_zero(line.price_subtotal))
                 if future_line:
                     line.invoice_status = 'no'
-                elif last_invoiced_date and last_invoiced_date <= today and next_invoice_date:
+                elif last_invoiced_date and next_invoice_date and next_invoice_date > today:
                     line.invoice_status = 'invoiced'
 
     @api.depends(
@@ -172,6 +203,7 @@ class SaleOrderLine(models.Model):
 
             is_order_active = (
                 order.subscription_state in ('3_progress', '4_paused')
+                and order.next_invoice_date
                 and (not order.end_date or order.next_invoice_date < order.end_date)
             )
             if line.recurring_invoice and is_order_active and not float_is_zero(line.price_subtotal, precision_rounding=line.currency_id.rounding):
@@ -186,7 +218,8 @@ class SaleOrderLine(models.Model):
                 ('subscription_id', 'in', self.order_id.ids),
                 ('move_id.state', '=', 'posted'),
                 ('move_id.move_type', 'in', ['out_invoice', 'out_refund']),
-                ('deferred_end_date', '!=', False)
+                ('deferred_end_date', '!=', False),
+                ('sale_line_ids.order_id.subscription_state', '!=', '7_upsell'),
             ],
             aggregates=['id:recordset'],
             groupby=['subscription_id']
@@ -275,6 +308,7 @@ class SaleOrderLine(models.Model):
             period = period_end if line._is_postpaid_line() else period_start
             related_invoice_lines = line.invoice_lines.filtered(
                 lambda l: l.move_id.state != 'cancel' and
+                          line._affects_qty_invoiced(l) and
                           l.deferred_start_date and l.deferred_end_date and
                           period == l.deferred_end_date
             )
@@ -318,25 +352,44 @@ class SaleOrderLine(models.Model):
         when we added these dependencies.
         """
         for order, lines in self.grouped('order_id').items():
-            parent_line_ids = self.order_id.subscription_id.order_line
+            parent_line_ids = order.subscription_id.order_line
+            if not parent_line_ids:
+                lines.parent_line_id = False
+                continue
+
+            # Pre-compute parent line attributes, using a hashable key.
+            parent_lines_by_key = defaultdict(list)
+            for parent_line in parent_line_ids:
+                key = (
+                    parent_line.order_id,
+                    parent_line.product_id,
+                    parent_line.name if not parent_line.product_id else None,
+                    parent_line.product_uom_id,
+                    parent_line.order_id.currency_id,
+                    parent_line.order_id.plan_id,
+                    parent_line.order_id.currency_id.round(parent_line.price_unit) if parent_line.order_id.currency_id else round(parent_line.price_unit, 2)
+                )
+                parent_lines_by_key[key].append(parent_line._origin)
+
             for line in lines:
-                if not line.order_id.subscription_id or not line.product_id.recurring_invoice:
+                if not line.order_id.subscription_id or not line.recurring_invoice:
                     line.parent_line_id = False
                     continue
-                # We use a rounding to avoid -326.40000000000003 != -326.4 for new records.
-                matching_line_ids = parent_line_ids.filtered(
-                    lambda l:
-                    (l.order_id, l.product_id, l.product_uom_id, l.order_id.currency_id, l.order_id.plan_id,
-                    l.order_id.currency_id.round(l.price_unit) if l.order_id.currency_id else round(l.price_unit, 2)) ==
-                    (line.order_id.subscription_id, line.product_id, line.product_uom_id, line.order_id.currency_id, line.order_id.plan_id,
-                    line.order_id.currency_id.round(line.price_unit) if line.order_id.currency_id else round(line.price_unit, 2)
-                    ) and l.id in parent_line_ids.ids
+
+                # Build the line's lookup key.
+                line_currency = line.order_id.currency_id
+                line_key = (
+                    line.order_id.subscription_id,
+                    line.product_id,
+                    line.name.removesuffix('(*)') if not line.product_id else None,
+                    line.product_uom_id,
+                    line_currency,
+                    line.order_id.plan_id,
+                    line_currency.round(line.price_unit) if line_currency else round(line.price_unit, 2)
                 )
-                if matching_line_ids:
-                    line.parent_line_id = matching_line_ids._origin[-1]
-                    parent_line_ids -= matching_line_ids._origin[-1]
-                else:
-                    line.parent_line_id = False
+                # We use FIFO so identical lines do not get linked with the wrong parent line
+                matching_parents = parent_lines_by_key.get(line_key)
+                line.parent_line_id = matching_parents.pop(0) if matching_parents else False
 
     def _get_invoice_line_parameters(self):
         """ Util to compute the relevant next period to invoice for a line dependent on his pre-paid or post-paid status
@@ -347,7 +400,7 @@ class SaleOrderLine(models.Model):
         :return: (new_period_start, new_period_stop, ratio, number_of_days)
         """
         self.ensure_one()
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         start_date = self.order_id.start_date or today
         first_contract_date = self.order_id.first_contract_date or start_date
         is_upsell = self.order_id.subscription_state == '7_upsell'
@@ -370,19 +423,26 @@ class SaleOrderLine(models.Model):
                 new_period_start = self.order_id.next_invoice_date or max(start_date, first_contract_date)
                 new_period_stop = new_period_start + self.order_id.plan_id.billing_period
 
-        if not self.order_id.plan_id.billing_first_day or self.order_id.plan_id.billing_period_unit == 'week':
+        is_prorated_price = self._subscription_allow_prorated_price()
+        if (
+            self.order_id.subscription_state not in SUBSCRIPTION_CLOSED_STATE
+            and self.order_id.end_date and new_period_stop > self.order_id.end_date and is_prorated_price
+        ):
+            next_date_1st = self.order_id.end_date + relativedelta(days=1)
+        elif is_upsell or not self.order_id.plan_id.billing_first_day or self.order_id.plan_id.billing_period_unit == 'week':
+            # For upsells, new_period_stop is already the parent's next_invoice_date (correct boundary)
             # Never apply billing_first_day for weekly plan.
-            return new_period_start, new_period_stop - relativedelta(days=1), 1, None
+            return new_period_start, new_period_stop - relativedelta(days=1), 1, (new_period_stop - new_period_start).days
         elif self.order_id.plan_id.billing_period_unit == 'month':
-            reference_date = new_period_stop if new_period_stop >= today else new_period_stop + relativedelta(months=1)
-            next_date_1st = reference_date + relativedelta(day=1)
+            # Align billing to calendar month: increment by `billing_period_value` months, then set day to 1st day of the month
+            next_date_1st = new_period_start + relativedelta(months=self.order_id.plan_id.billing_period_value, day=1)
         elif self.order_id.plan_id.billing_period_unit == 'year':
-            reference_date = new_period_stop if new_period_stop >= today else new_period_stop + relativedelta(years=1)
-            next_date_1st = reference_date + relativedelta(day=1, month=1)
+            # Align billing to calendar year: increment by `billing_period_value` years, then set month and day to January 1.
+            next_date_1st = new_period_start + relativedelta(years=self.order_id.plan_id.billing_period_value, month=1, day=1)
 
         number_of_days = (next_date_1st - new_period_start).days
         ratio = number_of_days / (new_period_stop - new_period_start).days
-        if self._is_delivery() or not self.product_id.allow_prorated_price:
+        if self._is_delivery() or not is_prorated_price:
             ratio = 1
         return new_period_start, next_date_1st - relativedelta(days=1), ratio, number_of_days
 
@@ -416,7 +476,7 @@ class SaleOrderLine(models.Model):
                 format_start = format_date(self.env, new_period_start, lang_code=lang_code)
                 format_next = format_date(self.env, new_period_stop, lang_code=lang_code)
                 start_to_next = _("%(start)s to %(next)s", start=format_start, next=format_next)
-                description += f"\n{duration} {start_to_next}"
+                description += f"{'\n' if description else ''}{duration} {start_to_next}"
 
             if self.order_id.subscription_state != '7_upsell':
                 line_to_invoice = self._is_subscription_line_to_invoice()
@@ -442,13 +502,21 @@ class SaleOrderLine(models.Model):
             res.update({
                 'subscription_id': self.order_id.id,
             })
+            # Updates qty for special lines being re-invoiced.
+            if self._matches_additional_invoicing_conditions():
+                if self._matches_extra_qty_update_conditions():
+                    # Repeat the previous invoiced quantity.
+                    res['quantity'] = self.product_uom_qty
+                else:
+                    # Cap quantity to be zero for avoiding negative recurring quantities.
+                    res['quantity'] = max(res.get('quantity', 0), 0)
         return res
 
     def _reset_subscription_qty_to_invoice(self):
         """ Define the qty to invoice on subscription lines equal to product_uom_qty for recurring lines
             It allows avoiding using the _compute_qty_to_invoice with a context_today
         """
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         # TODO add under-delivered message
         for line in self:
             if not line.recurring_invoice or line._is_postpaid_line() or line.order_id.start_date and line.order_id.start_date > today:
@@ -475,11 +543,23 @@ class SaleOrderLine(models.Model):
             # We don't invoice line past their SO's end_date
             return not self.order_id.end_date or (self.order_id.next_invoice_date and self.order_id.next_invoice_date < self.order_id.end_date)
 
+    def _matches_additional_invoicing_conditions(self):
+        """ Overridable method to check additional conditions on lines invoicing.
+        :returns bool: True if the line matches the invoicing conditions, or False otherwise. """
+        self.ensure_one()
+        return False
+
+    def _matches_extra_qty_update_conditions(self):
+        """ Overridable method to check conditions for quantity updates on lines invoicing.
+        :returns bool: True if the line matches the quantity update conditions, or False otherwise. """
+        self.ensure_one()
+        return False
+
     def _is_subscription_line_to_invoice(self):
         """ Should this line be invoiced ?
         """
         self.ensure_one()
-        date_from = self.env.context.get('invoiceable_date_from', fields.Date.today())
+        date_from = self.env.context.get('invoiceable_date_from', fields.Date.context_today(self))
         automatic_invoice = self.env.context.get('recurring_automatic')
         line_to_invoice = False
         line_condition = self._get_recurring_invoiceable_condition(automatic_invoice, date_from)
@@ -489,22 +569,22 @@ class SaleOrderLine(models.Model):
         elif self.display_type or not self.recurring_invoice:
             # Avoid invoicing section/notes or lines starting in the future or not starting at all
             line_to_invoice = False
+            if self._matches_additional_invoicing_conditions():
+                line_to_invoice = True
         elif line_condition:
             if(
-                self.product_id.invoice_policy == 'order'
+                self.invoice_policy == 'order'
                 and self.order_id.subscription_state != '5_renewed'
-                and not float_is_zero(
+                and not self.product_uom_id.is_zero(
                     self.product_uom_qty,
-                    precision_rounding=self.product_id.uom_id.rounding,
                 )
             ):
                 # Invoice due lines
                 line_to_invoice = True
             elif (
                 self._is_postpaid_line()
-                and not float_is_zero(
+                and not self.product_uom_id.is_zero(
                     self.qty_delivered,
-                    precision_rounding=self.product_id.uom_id.rounding,
                 )
             ):
                 line_to_invoice = True
@@ -527,7 +607,7 @@ class SaleOrderLine(models.Model):
         order = self.order_id
         if len(order) != 1:
             return self.env['sale.order.line'], ""
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         start_date = start_date or order.start_date or today
         next_invoice_date = order.next_invoice_date or order.subscription_id.next_invoice_date
         end_date = next_invoice_date - relativedelta(days=1)
@@ -571,7 +651,13 @@ class SaleOrderLine(models.Model):
             })]
 
     def _need_renew_discount_domain(self):
-        domain = [('recurring_invoice', '=', True), ('product_id.allow_prorated_price', '=', True)]
+        domain = Domain('recurring_invoice', '=', True) & (
+            Domain('product_id.allow_prorated_price', '=', True)
+            | (
+                Domain('product_id', '=', False)
+                & Domain('invoice_policy', '!=', 'delivery')
+            )
+        )
         if 'is_delivery' in self:
             # excluding delivery products when the delivery module is installed
             domain = Domain.AND([domain, [(('is_delivery', '=', False))]])
@@ -696,9 +782,21 @@ class SaleOrderLine(models.Model):
 
     # === UTILS === #
 
+    def _is_collapsed(self):
+        if not self:
+            return False
+        self.ensure_one()
+        return self.display_type in ('line_section', 'line_subsection') and self.collapse_composition
+
+    def _subscription_allow_prorated_price(self):
+        self.ensure_one()
+        if self.product_id:
+            return self.product_id.allow_prorated_price
+        return self.recurring_invoice and self.invoice_policy != 'delivery'
+
     def _is_postpaid_line(self):
         self.ensure_one()
-        return self.product_id.invoice_policy == 'delivery'
+        return self.invoice_policy == 'delivery'
 
     def _is_all_postpaid(self):
         """ Helper to know if all lines are postpaid.

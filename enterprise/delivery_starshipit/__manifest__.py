@@ -3,7 +3,7 @@
     'name': "Starshipit Shipping",
     'description': """
 Send your shippings through Starshipit and track them online
-=======================================================
+============================================================
 
 Starshipit is the leading provider of integrated shipping and tracking solutions for growing e-commerce businesses.
 Seamlessly integrating with a large range of couriers and platforms,
@@ -11,17 +11,15 @@ you can streamline every step of your fulfilment process,
 reduce handling time and improve customer experience.
     """,
     'category': 'Shipping Connectors',
-    'version': '1.0',
     'application': True,
     'depends': ['stock_delivery'],
     'data': [
         'data/ir_cron_data.xml',
-        'security/ir.model.access.csv',
         'views/delivery_carrier_views.xml',
-        'views/res_config_settings_views.xml',
         'views/stock_picking_views.xml',
         'wizard/starshipit_shipping_wizard.xml',
         'wizard/choose_delivery_carrier_views.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [

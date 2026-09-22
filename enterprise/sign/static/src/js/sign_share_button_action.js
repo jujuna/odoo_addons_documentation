@@ -1,11 +1,12 @@
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
 
 async function copyShareLinkAndCloseWizard(env, action) {
+    const notificationService = useService("notification");
     const shareLink = action.params.share_link;
     await browser.navigator.clipboard.writeText(shareLink);
-    const notificationService = env.services["notification"];
     notificationService.add(_t("Share link copied to clipboard"), {
         type: "success",
     });

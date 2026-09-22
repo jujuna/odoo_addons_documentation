@@ -3,21 +3,22 @@
 # * l10n_pe_edi
 #
 # "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
+# Fernando Vazquez <fvz@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.3alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-15 19:06+0000\n"
-"PO-Revision-Date: 2026-01-31 09:36+0000\n"
-"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"POT-Creation-Date: 2026-09-11 18:14+0000\n"
+"PO-Revision-Date: 2026-09-18 05:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19-l10n/l10n_pe_edi/es_419/>\n"
+"odoo-master/l10n_pe_edi/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,help:l10n_pe_edi.field_res_config_settings__l10n_pe_edi_provider
@@ -54,19 +55,28 @@ msgstr ""
 "        "
 
 #. module: l10n_pe_edi
+#: model:ir.module.module,description:base.module_l10n_pe_edi
+msgid ""
+"\n"
+"EDI Peru Localization\n"
+"======================\n"
+"Allow the user to generate the EDI document for Peruvian invoicing.\n"
+"\n"
+"By default, the system uses the IAP proxy.  This has the advantage that you\n"
+"can use the system immediately the moment you choose Digiflow as your OSE\n"
+"in the SUNAT portal.\n"
+"\n"
+"You can also directly send it to Digiflow if you bought an account from "
+"them\n"
+"and even to SUNAT in case of contingency.\n"
+"\n"
+"We support sending and cancelling of customer invoices.\n"
+msgstr ""
+
+#. module: l10n_pe_edi
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi.ubl_pe_21_voided_documents
 msgid "#SignVX"
 msgstr "#SignVX"
-
-#. module: l10n_pe_edi
-#: model_terms:ir.ui.view,arch_db:l10n_pe_edi.ubl_pe_21_voided_documents
-msgid "1.0"
-msgstr "1.0"
-
-#. module: l10n_pe_edi
-#: model_terms:ir.ui.view,arch_db:l10n_pe_edi.ubl_pe_21_voided_documents
-msgid "2.0"
-msgstr "2.0"
 
 #. module: l10n_pe_edi
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi.report_invoice_document
@@ -122,11 +132,6 @@ msgid "Account Chart Template"
 msgstr "Plantilla del plan de cuentas"
 
 #. module: l10n_pe_edi
-#: model:ir.model,name:l10n_pe_edi.model_account_move_reversal
-msgid "Account Move Reversal"
-msgstr "Revocación de movimiento en cuenta"
-
-#. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__016
 msgid "Aceite de pescado"
 msgstr "Aceite de pescado"
@@ -140,7 +145,7 @@ msgstr "Asistente para agregar nota de débito"
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_res_company__l10n_pe_edi_address_type_code
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi.res_company_form_inherit_l10n_pe_edi
 msgid "Address Type Code"
-msgstr "Código para establecimiento anexo"
+msgstr "Código de Establecimiento Emisor"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_refund_reason__11
@@ -169,7 +174,7 @@ msgstr "Ajustes de operaciones de exportación"
 #. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_tax__l10n_pe_edi_affectation_reason
 msgid "Affectation Reason"
-msgstr "EDI Razón de afectación"
+msgstr "Motivo de afectación"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_legend__2004
@@ -193,7 +198,7 @@ msgstr "Algodón en rama sin desmontar (Obsoleto)"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "All invoice lines must have the same withholding setting when the customer "
 "is a withholding agent. You cannot mix lines with withholding and lines "
@@ -204,17 +209,15 @@ msgstr ""
 "líneas con retención y líneas sin retención en la misma factura."
 
 #. module: l10n_pe_edi
-#. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
-msgid "All invoices sharing the same CDR number (%s) must be processed at once"
-msgstr ""
-"Todas las facturas que compartan el mismo numero de CDR (%s) deben ser "
-"procesadas juntas"
-
-#. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_line__l10n_pe_edi_allowance_charge_reason_code
 msgid "Allowance or Charge reason"
 msgstr "Motivo de subsidio o cargo"
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move.py:0
+msgid "An identification number is missing on partner %s"
+msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
@@ -249,24 +252,24 @@ msgstr "Arroz"
 #. module: l10n_pe_edi
 #: model:product.template,name:l10n_pe_edi.product_product_IVAP_1_product_template
 msgid "Arroz descascarillado (arroz cargo o arroz pardo)"
-msgstr ""
+msgstr "Arroz descascarillado (arroz cargo o arroz pardo)"
 
 #. module: l10n_pe_edi
 #: model:product.template,name:l10n_pe_edi.product_product_IVAP_2_product_template
 msgid "Arroz semiblanqueado o blanqueado , incluso pulido o glaseado"
-msgstr ""
+msgstr "Arroz semiblanqueado o blanqueado, incluso pulido o glaseado"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "As you have a document that must be detracted (withheld) which mean a "
 "document over 700 Soles With services you must select on the 'Operation Type "
 "field the correct code 1001 for example"
 msgstr ""
-"Tiene un documento que debe ser retenido (es decir, un documento por más de "
-"700 soles con servicios). Seleccione el código correcto, por ejemplo, 1001, "
-"en el campo “Tipo de operación”."
+"Tienes un documento sujeto a detracción (es decir, un comprobante por un "
+"importe superior a 700 soles por servicios), así que debes seleccionar el "
+"código correcto en el campo Tipo de operación, por ejemplo, 1001"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__001
@@ -281,6 +284,11 @@ msgid ""
 msgstr ""
 "BIENES TRANSFERIDOS EN LA AMAZONÍA REGIÓN SELVA PARA SER CONSUMIDOS EN LA "
 "MISMA"
+
+#. module: l10n_pe_edi
+#: model:ir.model,name:l10n_pe_edi.model_res_partner_bank
+msgid "Bank Account"
+msgstr "Cuenta bancaria"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__040
@@ -304,6 +312,12 @@ msgid "Bonus"
 msgstr "Bono"
 
 #. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move.py:0
+msgid "Buy Credits"
+msgstr "Comprar créditos"
+
+#. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_legend__2000
 msgid "COMPROBANTE DE PERCEPCIÓN"
 msgstr "COMPROBANTE DE PERCEPCIÓN"
@@ -312,11 +326,6 @@ msgstr "COMPROBANTE DE PERCEPCIÓN"
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_legend__2003
 msgid "CONTRATOS DE CONSTRUCCIÓN EJECUTADOS EN LA AMAZONÍA REGIÓN SELVA"
 msgstr "CONTRATOS DE CONSTRUCCIÓN EJECUTADOS EN LA AMAZONÍA REGIÓN SELVA"
-
-#. module: l10n_pe_edi
-#: model_terms:ir.ui.view,arch_db:l10n_pe_edi.invoice_cancel_wizard_view
-msgid "Cancel"
-msgstr "Cancelar"
 
 #. module: l10n_pe_edi
 #: model:ir.actions.act_window,name:l10n_pe_edi.action_l10n_pe_edi_cancel
@@ -343,7 +352,7 @@ msgstr "Cancelación por error en el RUC"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "Cancellation is in progress in the government side (CDR number: %s)."
 msgstr "La cancelación esta en proceso del lado del gobierno (CDR número: %s)"
 
@@ -352,6 +361,11 @@ msgstr "La cancelación esta en proceso del lado del gobierno (CDR número: %s)"
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move_reversal__l10n_pe_edi_refund_reason__01
 msgid "Cancellation of the operation"
 msgstr "Cancelación de la operación"
+
+#. module: l10n_pe_edi
+#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_status__cancelled
+msgid "Cancelled"
+msgstr "Cancelado"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__014
@@ -381,28 +395,34 @@ msgstr "Certificados"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move_send.py:0
+msgid "Check Invoice(s)"
+msgstr "Revisar factura(s)"
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "Check that the VAT set in the company is correct, this error generally "
 "happen when you did not set a proper VAT in the company, go to company form "
 "and set it properly.."
 msgstr ""
-"Verifique que el RUC de la empresa sea correcto. Este error suele ocurrir "
-"cuando el RUC de la empresa no está configurado de forma correcta. Vaya al "
-"formulario de la empresa y configúrelo."
+"Verifica que el RUC configurado en la empresa sea correcto. Este error suele "
+"ocurrir cuando la empresa no tiene un RUC válido. Ve al formulario de la "
+"empresa y configúralo de forma correcta."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "Check your tax configuration, go to Configuration -> Taxes and set the field "
 "'Affectation reason' to set it by default or set the proper value in the "
 "field Affect. Reason in the line"
 msgstr ""
-"Revise la configuración de los impuestos. Vaya a Configuración -> Impuestos "
-"y configure el campo “Motivo de afectación” para establecerlo como "
-"predeterminado o ingrese el valor correcto en el campo “Motivo de "
-"afectación” en la línea."
+"Verifica la configuración de tus impuestos. Ve a Configuración -> Impuestos "
+"y configura el campo Motivo de afectación para usarlo como valor "
+"predeterminado, o asigna el valor correcto en el campo Motivo de afectación "
+"de la línea"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,help:l10n_pe_edi.field_res_company__l10n_pe_edi_address_type_code
@@ -416,8 +436,8 @@ msgstr "Comisión mercantil"
 
 #. module: l10n_pe_edi
 #: model:ir.model,name:l10n_pe_edi.model_res_company
-msgid "Companies"
-msgstr "Empresas"
+msgid "Company"
+msgstr "Empresa"
 
 #. module: l10n_pe_edi
 #: model:ir.model,name:l10n_pe_edi.model_res_config_settings
@@ -459,6 +479,8 @@ msgid ""
 "Credit and Debit notes with discounts are not allowed in SUNAT. Please "
 "adjust the lines to confirm the document."
 msgstr ""
+"Las notas de crédito y débito con descuentos no están permitidas en la "
+"SUNAT. Adapta las líneas para confirmar el documento."
 
 #. module: l10n_pe_edi
 #: model:iap.service,unit_name:l10n_pe_edi.iap_service_l10n_pe_edi
@@ -503,22 +525,39 @@ msgstr "Descuento por artículo"
 #. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_debit_note__display_name
-#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_edi_document__display_name
-#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_edi_format__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_edi_xml_ubl_pe__display_name
-#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_journal__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_line__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_reversal__display_name
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_send__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_tax__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_tax_group__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_l10n_pe_edi_cancel__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_product_template__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_res_partner_bank__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_uom_uom__display_name
 msgid "Display Name"
 msgstr "Nombre Mostrado"
+
+#. module: l10n_pe_edi
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_bank_statement_line__l10n_pe_edi_attachment_id
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__l10n_pe_edi_attachment_id
+msgid "E-Invoice(PE) Attachment"
+msgstr "Documento adjunto de la factura electrónica"
+
+#. module: l10n_pe_edi
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_bank_statement_line__l10n_pe_edi_content
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__l10n_pe_edi_content
+msgid "E-Invoice(PE) Content"
+msgstr "Contenido de la factura electrónica"
+
+#. module: l10n_pe_edi
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_bank_statement_line__l10n_pe_edi_attachment_file
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__l10n_pe_edi_attachment_file
+msgid "E-Invoice(PE) File"
+msgstr "Archivo de la factura electrónica"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_line__l10n_pe_edi_affectation_reason
@@ -536,14 +575,14 @@ msgid "EDI International Code"
 msgstr "Código internacional EDI"
 
 #. module: l10n_pe_edi
-#: model:ir.model,name:l10n_pe_edi.model_account_edi_format
-msgid "EDI format"
-msgstr "Formato EDI"
+#: model:ir.module.module,shortdesc:base.module_l10n_pe_edi
+msgid "EDI for Peru"
+msgstr ""
 
 #. module: l10n_pe_edi
 #: model:ir.model,name:l10n_pe_edi.model_account_tax
 msgid "ETA tax codes mixin"
-msgstr ""
+msgstr "Mixin de códigos fiscales ETA"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_legend__2011
@@ -551,9 +590,9 @@ msgid "EXPORTACION DE SERVICIOS - DECRETO LEGISLATIVO Nº 919"
 msgstr "EXPORTACIÓN DE SERVICIOS - DECRETO LEGISLATIVO Nº 919"
 
 #. module: l10n_pe_edi
-#: model:ir.model,name:l10n_pe_edi.model_account_edi_document
-msgid "Electronic Document for an account.move"
-msgstr "Documento electrónico para una cuenta.move"
+#: model:ir.module.module,summary:base.module_l10n_pe_edi
+msgid "Electronic Invoicing for Peru (OSE method) and UBL 2.1"
+msgstr ""
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_res_company__l10n_pe_edi_provider
@@ -567,15 +606,21 @@ msgstr "Embarcaciones pesqueras (Obsoleto)"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "Error when requesting CDR status:"
 msgstr "Error al solicitar el estado del CDR:"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
-msgid "Errors occured while creating the EDI document (format: %s):"
-msgstr "Ocurrieron errores al crear el documento EDI (formato: %s):"
+#: code:addons/l10n_pe_edi/models/account_move.py:0
+msgid "Errors occurred while creating the EDI document:"
+msgstr ""
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move_send.py:0
+msgid "Errors when submitting to SUNAT:"
+msgstr "Errores al enviar a la SUNAT:"
 
 #. module: l10n_pe_edi
 #: model_terms:product.template,description:l10n_pe_edi.product_product_IVAP_1_product_template
@@ -608,7 +653,7 @@ msgstr "Espárragos (Obsoleto)"
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__res_company__l10n_pe_edi_provider__digiflow
 msgid "Estela (formerly Digiflow)"
-msgstr ""
+msgstr "Estela (antes Digiflow)"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move_line__l10n_pe_edi_affectation_reason__21
@@ -635,13 +680,14 @@ msgstr "Fabricación de bienes por encargo"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "For invoices, the customer's identity document must be RUC. Check that the "
 "client has a valid RUC and the type of document is RUC."
 msgstr ""
 "Para las facturas, el tipo de identificación del cliente debe ser RUC. "
-"Verifique que cliente tenga un RUC válido y que el tipo de documento sea RUC."
+"Verifica que el cliente tenga un RUC válido y que el tipo de documento sea "
+"RUC."
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_refund_reason__04
@@ -666,19 +712,18 @@ msgstr "IAP"
 #. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_chart_template__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_debit_note__id
-#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_edi_document__id
-#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_edi_format__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_edi_xml_ubl_pe__id
-#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_journal__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_line__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_reversal__id
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move_send__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_tax__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_tax_group__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_l10n_pe_edi_cancel__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_product_template__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_res_config_settings__id
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_res_partner_bank__id
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_uom_uom__id
 msgid "ID"
 msgstr "ID"
@@ -696,10 +741,10 @@ msgid ""
 "several attempts to avoid abuse, please ensure just use it for testing "
 "purposes)."
 msgstr ""
-"Para evitar la firma de facturas en su entorno de prueba, configure como "
-"verdadero cuando no sea necesario que las facturas sean firmadas (se bloquea "
-"después de varios intentos para evitar abusos, asegúrese de usarlo solo con "
-"fines de prueba)."
+"Para evitar firmar facturas en tu entorno de prueba, activa esta opción "
+"cuando no necesites firmar las facturas de verdad (el proceso se bloquea "
+"después de varios intentos para evitar abusos; úsalo solo para realizar "
+"pruebas)."
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_debit_note__l10n_pe_edi_charge_reason__02
@@ -759,14 +804,14 @@ msgstr ""
 "Catálogo No. 10"
 
 #. module: l10n_pe_edi
-#: model:ir.model,name:l10n_pe_edi.model_account_journal
-msgid "Journal"
-msgstr "Diario"
-
-#. module: l10n_pe_edi
 #: model:ir.model,name:l10n_pe_edi.model_account_move
 msgid "Journal Entry"
 msgstr "Asiento contable"
+
+#. module: l10n_pe_edi
+#: model:ir.model,name:l10n_pe_edi.model_account_move_reversal
+msgid "Journal Entry Reversal"
+msgstr "Reversión del asiento contable"
 
 #. module: l10n_pe_edi
 #: model:ir.model,name:l10n_pe_edi.model_account_move_line
@@ -778,6 +823,12 @@ msgstr "Apunte contable"
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__l10n_pe_edi_cancel_cdr_number
 msgid "L10N Pe Edi Cancel Cdr Number"
 msgstr "L10N Pe Edi Cancelar Cdr Número"
+
+#. module: l10n_pe_edi
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_bank_statement_line__l10n_pe_edi_warnings
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__l10n_pe_edi_warnings
+msgid "L10N Pe Edi Warnings"
+msgstr "Advertencias de EDI"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_l10n_pe_edi_cancel__write_uid
@@ -834,7 +885,7 @@ msgstr "Código de unidad de medida"
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__045
 msgid "Minerales de oro y sus concentrados gravados con el IGV"
-msgstr ""
+msgstr "Minerales de oro y sus concentrados gravados con el IGV"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__034
@@ -848,7 +899,7 @@ msgstr "Minerales no metálicos"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "Missing LATAM document code."
 msgstr "El tipo de documento LATAM no ha sido configurado."
 
@@ -859,33 +910,33 @@ msgstr "Movimiento de carga"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "No valid certificate found for %s company."
-msgstr "Ningún certificado valido ha sido encontrado para la empresa %s."
+msgstr "No encontramos ningún certificado válido para la empresa %s."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "One or more lines of this document do not have taxes assigned, to solve this "
 "you must return the document to the Draft state and place taxes on the lines "
 "that do not have them."
 msgstr ""
 "Una o más líneas de este documento no tienen impuestos asignados. Para "
-"solucionarlo, regrese el documento al estado de borrador e incluya los "
-"impuestos en las líneas que no los tienen."
+"resolverlo, regresa el documento a estado de borrador y asigna impuestos a "
+"las líneas que no los tienen."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "One or more products do not have the UNSPSC code configured, to avoid this "
 "warning you must configure a code for this product. This warning does not "
 "invalidate the document."
 msgstr ""
-"Uno o más productos no tienen configurado el código UNSPSC. Para evitar esta "
-"advertencia, debe configurar un código para este producto. Esta advertencia "
-"no invalida el documento."
+"Uno o más productos no tienen un código UNSPSC configurado. Para evitar esta "
+"advertencia, configura un código para esos productos. Esta advertencia no "
+"invalida el documento."
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_legend__2006
@@ -921,7 +972,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "Original message:"
 msgstr "Mensaje original:"
 
@@ -956,6 +1007,8 @@ msgid "Other Discounts"
 msgstr "Descuentos que afectan la base imponible del IGV/IVAP"
 
 #. module: l10n_pe_edi
+#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_debit_note__l10n_pe_edi_charge_reason__03
+#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_charge_reason__03
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_refund_reason__10
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move_reversal__l10n_pe_edi_refund_reason__10
 msgid "Other concepts"
@@ -979,10 +1032,10 @@ msgstr ""
 "PRIMERA VENTA DE MERCANCÍA IDENTIFICABLE ENTRE USUARIOS DE LA ZONA COMERCIAL"
 
 #. module: l10n_pe_edi
-#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_debit_note__l10n_pe_edi_charge_reason__03
-#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_charge_reason__03
-msgid "Penalties / other concepts"
-msgstr "Penalidades / otros conceptos"
+#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_debit_note__l10n_pe_edi_charge_reason__13
+#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_charge_reason__13
+msgid "Penalties"
+msgstr "Sanciones"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move_line__l10n_pe_edi_allowance_charge_reason_code__53
@@ -1005,15 +1058,20 @@ msgid "Peru"
 msgstr "Perú"
 
 #. module: l10n_pe_edi
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_bank_statement_line__l10n_pe_edi_status
+#: model:ir.model.fields,field_description:l10n_pe_edi.field_account_move__l10n_pe_edi_status
+msgid "Peru E-Invoice Status"
+msgstr "Estado de la factura electrónica de Perú"
+
+#. module: l10n_pe_edi
 #: model:ir.model.fields,help:l10n_pe_edi.field_product_product__l10n_pe_withhold_code
 #: model:ir.model.fields,help:l10n_pe_edi.field_product_template__l10n_pe_withhold_code
 msgid ""
 "Peru: Catalog No. 54 SUNAT, used functionally to show in the printed "
 "document on invoices that need to have the proper SPOT text."
 msgstr ""
-"Catalogo No. 54 SUNAT, Catálogo No. 54 SUNAT, utilizado funcionalmente para "
-"documentar en el documento impreso en facturas que deben tener el texto SPOT "
-"adecuado."
+"Catálogo No. 54 SUNAT, utilizado funcionalmente para mostrar en el documento "
+"impreso el texto SPOT correspondiente en las facturas que lo requieren."
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,help:l10n_pe_edi.field_account_bank_statement_line__l10n_pe_edi_operation_type
@@ -1054,8 +1112,8 @@ msgid ""
 "Peru: Percentages of detraction informed in the Annex I Resolution 183-2004/"
 "SUNAT, it depends on the withhold code but you need to read the resolution."
 msgstr ""
-"Porcentajes de detracción informados en el Anexo I de la Resolución 183-2004/"
-"SUNAT. Depende del código de detracción, pero es necesario leer la "
+"Porcentajes de detracción establecidos en el Anexo I de la Resolución 183-"
+"2004/SUNAT. Dependen del código de detracción, por lo que debes consultar la "
 "resolución."
 
 #. module: l10n_pe_edi
@@ -1086,6 +1144,12 @@ msgid "Peru: Type of Affectation to the IGV, Catalog No. 07."
 msgstr "Tipo de afectación al IGV, Catálogo No. 07."
 
 #. module: l10n_pe_edi
+#: model:ir.model.fields,help:l10n_pe_edi.field_account_bank_statement_line__l10n_pe_edi_status
+#: model:ir.model.fields,help:l10n_pe_edi.field_account_move__l10n_pe_edi_status
+msgid "Peru: the state of the most recent e-invoicing attempt."
+msgstr "Perú: El estado del intento de facturación electrónica más reciente."
+
+#. module: l10n_pe_edi
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi.view_move_form
 msgid "Peruvian EDI"
 msgstr "Facturación electrónica peruana"
@@ -1097,19 +1161,14 @@ msgstr ""
 "Código del catálogo 05 para complementar la facturación electronica peruana"
 
 #. module: l10n_pe_edi
+#: model:iap.service,name:l10n_pe_edi.iap_service_l10n_pe_edi
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi.res_config_settings_form_inherit_l10n_pe_edi
 msgid "Peruvian Electronic Invoicing"
 msgstr "Facturación electrónica peruana"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
-msgid "Please put a cancel reason"
-msgstr "Indique un motivo de cancelación"
-
-#. module: l10n_pe_edi
-#. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "Please resequence the invoice to a number not yet sent to SUNAT."
 msgstr "Vuelva a secuenciar la factura a un número aún no enviado a la SUNAT."
 
@@ -1148,7 +1207,7 @@ msgstr "Recursos hidrobiológicos"
 #: model:ir.model.fields,help:l10n_pe_edi.field_account_move__l10n_pe_edi_cancel_cdr_number
 msgid "Reference from webservice to consult afterwards."
 msgstr ""
-"Numero de Referencia de la cancelación, se usara para consultar el estado de "
+"Número de referencia de la cancelación. Se usará para consultar el estado de "
 "la cancelación en el servicio web."
 
 #. module: l10n_pe_edi
@@ -1169,9 +1228,15 @@ msgstr "Restitucion Simplificado de Derechos Arancelarios"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "Retrieved CDR status:"
 msgstr "Estado obtenido de la CDR:"
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move.py:0
+msgid "Retry cancellation"
+msgstr "Reintentar cancelación"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_legend__2002
@@ -1184,13 +1249,13 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "SOAP response status when retrieving CDR:"
 msgstr "Estado de la respuesta SOAP al recuperar CDR:"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "SOAP status code: "
 msgstr "Código de estado SOAP:"
 
@@ -1229,6 +1294,9 @@ msgid ""
 "tratamientos de los cereales o de las leguminosas, incluso en \"pellets\" de "
 "arroz"
 msgstr ""
+"Salvados, moyuelos y demás residuos del cernido, de la molienda o de otros "
+"tratamientos de los cereales o de las leguminosas, incluso en \"pellets\" de "
+"arroz"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,help:l10n_pe_edi.field_res_company__l10n_pe_edi_provider
@@ -1248,6 +1316,23 @@ msgstr ""
 "enviará los documentos sin firmar al PSE y procesara la respuesta de este."
 
 #. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move_send.py:0
+msgid "Send the e-invoice data to SUNAT."
+msgstr "Envía los datos de la factura electrónica a la SUNAT."
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move_send.py:0
+msgid "Send to SUNAT"
+msgstr "Enviar a la SUNAT"
+
+#. module: l10n_pe_edi
+#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_status__sent
+msgid "Sent"
+msgstr "Enviado"
+
+#. module: l10n_pe_edi
 #: model:iap.service,description:l10n_pe_edi.iap_service_l10n_pe_edi
 msgid ""
 "Service that allows sending electronic documents to the SUNAT. The credits "
@@ -1265,7 +1350,7 @@ msgstr ""
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__044
 msgid "Servicio de beneficio de minerales metálicos gravado con el IGV"
-msgstr ""
+msgstr "Servicio de beneficio de minerales metálicos gravado con el IGV"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__027
@@ -1276,6 +1361,11 @@ msgstr "Servicio de transporte de carga"
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__product_template__l10n_pe_withhold_code__026
 msgid "Servicio de transporte de personas"
 msgstr "Servicio de transporte de personas"
+
+#. module: l10n_pe_edi
+#: model:ir.model,name:l10n_pe_edi.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr "Funciones compartidas del asistente para enviar facturas"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields,field_description:l10n_pe_edi.field_res_config_settings__l10n_pe_edi_provider
@@ -1342,7 +1432,7 @@ msgstr "Gravado – Retiro por entrega a trabajadores"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "Taxes need to be assigned on all invoice lines"
 msgstr "Todas las lineas deben tener impuestos asignados"
 
@@ -1358,7 +1448,7 @@ msgstr "Entorno de prueba"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "Testing environment is active, care that those documents are not synced with "
 "SUNAT!"
@@ -1368,17 +1458,16 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The EDI document failed to be cancelled because the cancellation CDR number "
 "is missing."
 msgstr ""
-"Los documentos electrónicos fallaron al ser cancelados ya que no se "
-"encuentra un número de CDR."
+"No se pudo cancelar el documento electrónico porque falta el número de CDR."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "The EDI document failed to be cancelled for unknown reason."
 msgstr ""
 "El documento de facturación peruano falló el proceso de cancelación debido a "
@@ -1386,7 +1475,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The EDI document was successfully cancelled by the government (CDR number: "
 "%s)."
@@ -1396,7 +1485,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "The EDI document was successfully created and signed by the government."
 msgstr ""
 "El documento de facturación peruano fue creado y firmado correctamente por "
@@ -1404,7 +1493,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The URL provided for the IAP server is wrong, please go to  Settings --> "
 "System Parameters and add the right URL to parameter l10n_pe_edi.endpoint."
@@ -1415,7 +1504,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The VAT you use for the customer is a DNI type, to be a valid DNI it must be "
 "the exact length of 8 digits."
@@ -1425,7 +1514,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The cancellation reason field should not be empty when cancelling the "
 "invoice, you must return this invoice to Draft, edit the document and enter "
@@ -1437,17 +1526,17 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The cancellation request has not yet finished processing by SUNAT. Please "
 "retry in a few minutes."
 msgstr ""
-"La solicitud de cancelación aún no ha terminado de ser procesada por la "
-"SUNAT. Por favor vuelva a intentarlo en unos minutos."
+"La solicitud de cancelación no ha terminado de ser procesada por la SUNAT. "
+"Inténtalo otra vez en unos minutos."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "The credit note cannot have negative quantities or amounts on any line"
 msgstr ""
 "La nota de crédito no puede tener cantidades o importes negativos en ninguna "
@@ -1455,7 +1544,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The document type of the invoice related is not the same of this document. "
 "Check the document type of the invoice related and set this document with "
@@ -1463,50 +1552,57 @@ msgid ""
 "number already, reset to draft and cancel it, this document will be "
 "cancelled locally and not reported."
 msgstr ""
-"El tipo de documento modificado no esta relacionado al tipo de documento de "
-"esta factura.En caso de que este documento haya sido publicado o tenga un "
-"numero asignado  regresa a Borrador esta factura y cancela, este documento "
-"sera cancelado localmente y no sera reportado."
+"El tipo de documento de la factura relacionada no coincide con el tipo de "
+"documento de esta factura. Revisa el tipo de documento de la factura "
+"relacionada y asigna ese tipo de documento a esta factura. Si este documento "
+"está registrado y ya tiene un número asignado, regrésalo a borrador y "
+"cancélalo. Este documento se cancelará de forma local y no se reportará."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move_send.py:0
+msgid "The following invoice(s) are not ready to be sent to SUNAT:%s"
+msgstr "Las siguientes facturas no están listas para su envío a la SUNAT:%s"
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "The invoice already exists on SUNAT. CDR successfully retrieved."
 msgstr "La factura ya existe en la SUNAT. CDR recuperado correctamente."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The invoice related to this Credit Note has been cancelled, set this "
 "document to draft and cancel it."
 msgstr ""
-"La factura relacionada con esta nota de crédito ha sido cancelada. Regrese "
-"este documento a borrador y cancélela."
+"La factura relacionada con esta nota de crédito ha sido cancelada. Regresa "
+"este documento a estado de borrador y cancélalo."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The invoice related to this Credit Note has not been reported, go to the "
 "invoice related and sign it in order to generate this Credit Note."
 msgstr ""
-"La factura relacionada con esta nota de crédito no ha sido reportada. Vaya a "
-"la factura relacionada y fírmela para generar esta nota de crédito."
+"La factura relacionada con esta nota de crédito no ha sido reportada. Ve a "
+"la factura relacionada y fírmala para generar esta nota de crédito."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The invoice related to this Debit Note has been cancelled, set this document "
 "to draft and cancel it."
 msgstr ""
-"La factura relacionada con esta nota de débito ha sido cancelada. Regrese "
-"este documento a borrador y cancélela."
+"La factura relacionada con esta nota de débito ha sido cancelada. Regresa "
+"este documento a estado de borrador y cancélalo."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The invoice related to this Debit Note has not been reported, go to the "
 "invoice related and sign it in order to generate this Debit Note"
@@ -1516,7 +1612,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The name of the Partner must contain at least 2 characters and must not "
 "contain special characters."
@@ -1526,7 +1622,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The name of the file depends on the sequence in the journal, please go to "
 "the journal and configure the shortcode as LLL- (three (3) letters plus a "
@@ -1543,26 +1639,26 @@ msgstr "Contraseña usada para ingresar con SUNAT SOL"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "The tax application is incorrect for free invoice."
 msgstr "La afectación del impuesto es incorrecta para la factura gratuita."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The type of identity document used for the client is not valid. Review the "
 "type of document used in the client and change it according to the case of "
 "the document to be created. For invoices it's only valid to use RUC as "
 "identity document."
 msgstr ""
-"El tipo de identificación utilizado para el cliente no es válido. Revíselo y "
-"cámbielo según el documento a crear. Para facturas, solo es válido utilizar "
-"el RUC como documento de identidad."
+"El tipo de identificación que usa el cliente no es válido. Revisa el tipo de "
+"documento usado en el cliente y cámbialo de acuerdo al documento que "
+"necesitas crear. Para facturas solo puedes usar RUC."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The type of operation is not valid for the type of document you are trying "
 "to create. The document must return to Draft state and change the type of "
@@ -1584,17 +1680,17 @@ msgstr "La detracción debe pagarse en la primera cuota."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "The zip file is corrupted, check again if the file trying to access is not "
 "damaged."
 msgstr ""
-"El archivo zip está dañado. Verifique nuevamente si el archivo al que está "
-"intentando acceder no está dañado."
+"El archivo .zip está dañado. Vuelve a revisar si el archivo al que intentas "
+"acceder no ha sido dañado."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "There are problems with the connection to the IAP server. Please try again "
 "in a few minutes."
@@ -1604,7 +1700,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "There was an error in the connection or the response from the OSE server. "
 "Please try again later."
@@ -1614,7 +1710,13 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
+msgid "There was an error while sending the document to SUNAT."
+msgstr "Ocurrió un error al enviar el documento a la SUNAT."
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "This document already exists on the OSE side.  Check if you gave a proper "
 "unique name to your document. "
@@ -1624,22 +1726,22 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "This document number is now registered by SUNAT as invalid."
 msgstr ""
 "Este número de documento ahora está registrado por la SUNAT como inválido."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "This invoice has been validated by the OSE and we can not allow set it to "
 "draft, please try to revert it with a credit not or cancel it and create a "
 "new one instead."
 msgstr ""
-"Esta factura ha sido validada por la OSE y no es posible revertirla al "
-"estado de borrador. Intente revertirla con una nota de crédito o cancélela y "
-"cree una nuevamente."
+"Esta factura ha sido validada por el OSE y no es posible restablecerla al "
+"estado de borrador. Intenta revertirla con una nota de crédito o cancélala y "
+"crea una nueva."
 
 #. module: l10n_pe_edi
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi.res_config_settings_form_inherit_l10n_pe_edi
@@ -1651,13 +1753,18 @@ msgid ""
 "                            Official definition is:"
 msgstr ""
 "La SUNAT proporciona el nombre de usuario y la contraseña.\n"
-"                            <b>\"SUNAT Operaciones en Línea - SOL\"</b><br/"
-">\n"
+"                            <b>\"SUNAT Operaciones en Línea - SOL\"</b><br/>"
+"\n"
 "                            La definición oficial es:"
 
 #. module: l10n_pe_edi
+#: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_status__to_send
+msgid "To Send"
+msgstr "Por enviar"
+
+#. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "To generate the electronic document with this invoice, the bank account at "
 "the national bank will be needed.\n"
@@ -1743,15 +1850,9 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "VAT number is missing on company %s"
 msgstr "Falta el número de RUC de la empresa %s"
-
-#. module: l10n_pe_edi
-#. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
-msgid "VAT number is missing on partner %s"
-msgstr "Falta el número de RUC del contacto %s"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_legend__2008
@@ -1769,20 +1870,32 @@ msgstr "Venta realizada por emisor itinerante"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "Verify that the taxes are configured correctly: for free invoice, make sure "
 "to include only the taxes applicable to free operations and the free billing "
 "legend in the Peruvian EDI tab."
 msgstr ""
-"Verifique que los impuestos estén configurados de forma correcta: para una "
-"factura gratuita, asegúrese de incluir solo los impuestos aplicables a "
-"operaciones gratuitas y la leyenda de facturación gratuita en la pestaña EDI "
-"peruana."
+"Revisa que los impuestos estén configurados correctamente: para la factura "
+"gratuita, asegúrate de solo incluir los impuestos aplicables a operaciones "
+"gratuitas y la leyenda de facturación gratuita en la pestaña de la "
+"facturación electrónica peruana."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
+msgid "View Document"
+msgstr "Ver documento"
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move_send.py:0
+msgid "View Invoice(s)"
+msgstr "Ver factura(s)"
+
+#. module: l10n_pe_edi
+#. odoo-python
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid "We got an error response from the OSE. "
 msgstr "Obtuvimos un error en la respuesta del OSE. "
 
@@ -1810,7 +1923,7 @@ msgstr "Asistente para cancelar facturas"
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "You can't have more than one IGV tax per line to generate a legal invoice in "
 "Peru"
@@ -1820,17 +1933,17 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
-"You have insufficient credits to sign or verify this document!{line_break}"
-"Please proceed to buy more credits {left}here.{right}"
+"You have insufficient credits to sign or verify this document!\n"
+"Please proceed to buy more credits."
 msgstr ""
-"No tiene suficientes créditos para firmar o verificar este documento."
-"{line_break}Compre más créditos {left}aquí.{right}"
+"No tienes suficientes créditos para firmar o verificar este documento.\n"
+"Compra más créditos para continuar."
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "You need to configure the account for 'Banco de la Nación'. go to the Other "
 "Info setting on this invoice and select the Recipient Bank field, If you "
@@ -1857,7 +1970,7 @@ msgstr ""
 
 #. module: l10n_pe_edi
 #. odoo-python
-#: code:addons/l10n_pe_edi/models/account_edi_format.py:0
+#: code:addons/l10n_pe_edi/models/account_move.py:0
 msgid ""
 "Your RUC is not linked to Estela (formerly Digiflow) as OSE, please make "
 "sure you have followed this process in the SUNAT portal:\n"
@@ -1867,6 +1980,13 @@ msgid ""
 "https://www.odoo.com/documentation/latest/applications/finance/accounting/"
 "fiscal_localizations/localizations/peru.html#what-do-you-need-to-do"
 msgstr ""
+"Tu RUC no está vinculado a Estela (antes Digiflow) como OSE. Asegúrate de "
+"haber seguido este proceso en el portal de la SUNAT:\n"
+"1. Relaciona Estela (antes Digiflow) como tu OSE.\n"
+"2. Autoriza Estela (antes Digiflow) como tu PSE. \n"
+"Referencia: \n"
+"https://www.odoo.com/documentation/19.0/es_419/applications/finance/"
+"fiscal_localizations/peru.html"
 
 #. module: l10n_pe_edi
 #: model:ir.model.fields.selection,name:l10n_pe_edi.selection__account_move__l10n_pe_edi_operation_type__0101
@@ -2009,3 +2129,6 @@ msgstr "aquí"
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi.res_config_settings_form_inherit_l10n_pe_edi
 msgid "here."
 msgstr "aquí."
+
+#~ msgid "VAT number is missing on partner %s"
+#~ msgstr "Falta el número de RUC del contacto %s"

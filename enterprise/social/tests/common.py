@@ -1,8 +1,10 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo import api
+from odoo.addons.base.tests.files import PNG_RAW
 from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.addons.social.tests.tools import mock_void_external_calls
+from odoo.addons.social.models.social_post import SocialPost
 from odoo.tests import common
 
 
@@ -11,25 +13,34 @@ class SocialCase(common.TransactionCase):
     def setUpClass(cls):
         super(SocialCase, cls).setUpClass()
 
+        # The media type created for testing in `social` does not have a custom scheduled date
+        # fields, fallback to `scheduled_date`
+        scheduled_date_fields = SocialPost._scheduled_date_fields
+        cls.classPatch(
+            SocialPost,
+            '_scheduled_date_fields',
+            api.model(lambda model: {**scheduled_date_fields(model), False: 'scheduled_date'}),
+        )
+
         with mock_void_external_calls():
             cls.social_media = cls._get_social_media()
             cls.social_account = cls._get_social_account()
 
-            attachments = [{
+            attachments = cls.env["ir.attachment"].create([{
                 'name': 'first.png',
-                'datas': 'ABCDEFG='
+                'raw': PNG_RAW,
             }, {
                 'name': 'second.png',
-                'datas': 'GFEDCBA='
-            }]
+                'raw': PNG_RAW,
+            }])
 
             cls.social_accounts = cls._get_post_social_accounts()
 
             cls.social_post = cls.env['social.post'].create({
                 'message': 'A message',
-                'image_ids': [(0, 0, attachment) for attachment in attachments],
-                'post_method': 'now',
-                'account_ids': [(4, account.id) for account in cls.social_accounts]
+                'image_ids': [(0, 0, {'attachment_id': attachment.id}) for attachment in attachments],
+                'account_ids': [(4, account.id) for account in cls.social_accounts],
+                'is_split_per_media': False,
             })
 
             cls.social_manager = mail_new_test_user(

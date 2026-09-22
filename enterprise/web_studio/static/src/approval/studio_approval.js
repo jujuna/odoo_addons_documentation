@@ -1,7 +1,7 @@
 import { usePopover } from "@web/core/popover/popover_hook";
 import { useService } from "@web/core/utils/hooks";
 import { StudioApprovalInfos } from "@web_studio/approval/approval_infos";
-import { Component, onWillUnmount, useRef } from "@odoo/owl";
+import { Component, onWillUnmount, signal, t, useProps } from "@odoo/owl";
 
 function useOpenExternal() {
     const closeFns = [];
@@ -18,15 +18,17 @@ function useOpenExternal() {
 }
 
 export class StudioApproval extends Component {
-    static props = {
-        approval: Object,
-    };
     static template = "StudioApproval";
+    props = useProps({
+        approval: t.object(),
+    });
+
+    rootRef = signal.ref();
 
     setup() {
         this.dialog = useService("dialog");
+        this.uiService = useService("ui");
         this.popover = usePopover(StudioApprovalInfos);
-        this.rootRef = useRef("root");
         this.openExternal = useOpenExternal();
     }
 
@@ -39,7 +41,10 @@ export class StudioApproval extends Component {
     }
 
     toggleApprovalInfo() {
-        if (this.env.isSmall) {
+        if (this.approval.isAppovalBlockedByParentRule()) {
+            return;
+        }
+        if (this.uiService.isSmall) {
             if (this.isOpened) {
                 this.closeInfos();
                 this.closeInfos = null;
@@ -56,7 +61,7 @@ export class StudioApproval extends Component {
                 )
             );
         } else {
-            this.popover.open(this.rootRef.el, { approval: this.approval, isPopover: true });
+            this.popover.open(this.rootRef(), { approval: this.approval, isPopover: true });
         }
     }
 

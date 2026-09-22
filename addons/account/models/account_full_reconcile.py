@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from psycopg2 import sql
+
 from odoo import api, fields, models, Command
 
 
@@ -21,25 +23,40 @@ class AccountFullReconcile(models.Model):
                     raise ValueError("Unexpected command: %s" % command)
         move_line_ids = [list(get_ids(vals.pop('reconciled_line_ids'))) for vals in vals_list]
         partial_ids = [list(get_ids(vals.pop('partial_reconcile_ids'))) for vals in vals_list]
-        fulls = super(AccountFullReconcile, self.with_context(tracking_disable=True)).create(vals_list)
+        fulls = super().create(vals_list)
 
-        self.env.cr.execute_values("""
+        self.env['account.move.line'].invalidate_model(['full_reconcile_id'])
+        fulls.invalidate_recordset(['reconciled_line_ids'], flush=False)
+        self.env.cr.execute_values(sql.SQL("""
             UPDATE account_move_line line
                SET full_reconcile_id = source.full_id
               FROM (VALUES %s) AS source(full_id, line_ids)
              WHERE line.id = ANY(source.line_ids)
-        """, [(full.id, line_ids) for full, line_ids in zip(fulls, move_line_ids)], page_size=1000)
-        fulls.reconciled_line_ids.invalidate_recordset(['full_reconcile_id'], flush=False)
-        fulls.invalidate_recordset(['reconciled_line_ids'], flush=False)
+        """), [(full.id, line_ids) for full, line_ids in zip(fulls, move_line_ids)], page_size=1000)
 
-        self.env.cr.execute_values("""
+        self.env['account.partial.reconcile'].invalidate_model(['full_reconcile_id'])
+        fulls.invalidate_recordset(['partial_reconcile_ids'], flush=False)
+        self.env.cr.execute_values(sql.SQL("""
             UPDATE account_partial_reconcile partial
                SET full_reconcile_id = source.full_id
               FROM (VALUES %s) AS source(full_id, partial_ids)
              WHERE partial.id = ANY(source.partial_ids)
-        """, [(full.id, line_ids) for full, line_ids in zip(fulls, partial_ids)], page_size=1000)
-        fulls.partial_reconcile_ids.invalidate_recordset(['full_reconcile_id'], flush=False)
-        fulls.invalidate_recordset(['partial_reconcile_ids'], flush=False)
+        """), [(full.id, line_ids) for full, line_ids in zip(fulls, partial_ids)], page_size=1000)
 
         self.env['account.partial.reconcile']._update_matching_number(fulls.reconciled_line_ids)
         return fulls
+
+    def unlink(self):
+        # The default `ondelete='set null'` on `account_move_line.full_reconcile_id`
+        # nulls the FK in PostgreSQL when the full reconcile is removed, but
+        # `account_move_line.matching_number` is a plain Char that nobody
+        # recomputes. Mirror the contract of `create()` (see the
+        # `_update_matching_number` call right after the UPDATE above) on the
+        # unlink path so each previously-linked line ends up with the correct
+        # value (False, or 'P<n>' when partial reconciles survive as zombies).
+        amls = self.reconciled_line_ids
+        res = super().unlink()
+        amls = amls.exists()
+        if amls:
+            self.env['account.partial.reconcile']._update_matching_number(amls)
+        return res

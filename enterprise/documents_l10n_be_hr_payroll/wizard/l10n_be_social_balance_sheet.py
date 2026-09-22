@@ -8,12 +8,5 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
     _inherit = 'l10n.be.social.balance.sheet'
 
     def _post_process_generated_file(self, data, filename):
-        if self.company_id.documents_employee_folder_id and self.company_id.documents_hr_settings:
-            self.env['documents.document'].create({
-                'owner_id': False,
-                'datas': data,
-                'name': filename,
-                'folder_id': self.company_id.documents_employee_folder_id.id,
-                'res_model': 'hr.payslip',  # Security Restriction to payroll managers
-            })
+        self.company_id._create_payroll_managers_document(data, filename)
         return super()._post_process_generated_file(data, filename)

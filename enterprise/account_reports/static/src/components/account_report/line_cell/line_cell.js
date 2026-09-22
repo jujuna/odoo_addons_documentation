@@ -1,73 +1,108 @@
 import { localization } from "@web/core/l10n/localization";
-import { useService } from "@web/core/utils/hooks";
+
+import { registry } from "@web/core/registry";
+import { ORM } from "@web/core/orm_plugin";
+import { PopoverPlugin } from "@web/core/popover/popover_plugin";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
+
+import { Component, computed, markup, signal, t, useEffect, usePlugin, useProps } from "@odoo/owl";
 
 import { AccountReportCarryoverPopover } from "@account_reports/components/account_report/line_cell/popover/carryover_popover";
-import { AccountReportEditPopover } from "@account_reports/components/account_report/line_cell/popover/edit_popover";
+import { AccountReportController } from "@account_reports/components/account_report/controller";
 
-import { Component, markup, useState } from "@odoo/owl";
 
 export class AccountReportLineCell extends Component {
     static template = "account_reports.AccountReportLineCell";
-    static props = {
-        line: {
-            type: Object,
-            optional: true,
-        },
-        cell: Object,
-    };
+    props = useProps({
+        line: t.object().optional(),
+        cell: t.object(),
+        cellIndex: t.number(),
+    });
+
+    action = usePlugin(ActionPlugin);
+    controller = usePlugin(AccountReportController);
+    popover = usePlugin(PopoverPlugin);
+    orm = usePlugin(ORM);
+
+    noFormatSign = computed(() => {
+        const sign = Math.sign(this.props.cell.no_format?.());
+        // Slight optimization to prevent invalidating getCellClasses when the switch branch wont change afterward.
+        if (isNaN(sign)) return 1;
+        if (Object.is(sign, -0)) return 0;
+        return sign;
+    });
+    hasCellLabel = computed(() => Boolean(this.props.cell.cell_label?.()));
+    hasInfoPopupData = computed(() => Boolean(this.props.cell.info_popup_data?.()));
+
+    cellRef = signal.ref();
+    cellClasses = "";
 
     setup() {
-        this.action = useService("action");
-        this.orm = useService("orm");
-        this.popover = useService("popover");
-        this.controller = useState(this.env.controller);
-    }
+        useEffect(() => {
+            const classes = this.getCellClasses();
+            if (classes === this.cellClasses) return;
 
-    // -----------------------------------------------------------------------------------------------------------------
-    // Helpers
-    // -----------------------------------------------------------------------------------------------------------------
-    isNumeric(type) {
-        return ['float', 'integer', 'monetary', 'percentage'].includes(type);
+            const prevCellClasses = this.cellClasses;
+            this.cellClasses = classes;
+            const prev = prevCellClasses ? prevCellClasses.trim().split(/\s+/).filter(Boolean) : [];
+            const next = classes ? classes.trim().split(/\s+/).filter(Boolean) : [];
+            this.controller.scheduleClassUpdate(this.cellRef, prev, next);
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Attributes
     // -----------------------------------------------------------------------------------------------------------------
-    get cellClasses() {
-        if (this.props.cell.comparison_mode) {
-            return this.comparisonClasses;
+    getCellClasses() {
+        switch (this.props.cell.comparison_mode?.()) {
+            case "green":
+                return "text-end text-success";
+            case "muted":
+                return "text-end muted";
+            case "red":
+                return "text-end text-danger";
         }
 
         let classes = "";
-
-        if (this.props.cell.auditable)
+        if (this.props.cell.auditable?.()) {
             classes += " auditable";
-
-        if (this.props.cell.figure_type === 'date')
-            classes += " date";
-
-        if (this.props.cell.figure_type === 'string')
-            classes += " text";
-
-        if (this.isNumeric(this.props.cell.figure_type)) {
-            classes += " numeric text-end";
-
-            if (this.props.cell.no_format !== undefined)
-                switch (Math.sign(this.props.cell.no_format)) {
-                    case 1:
-                        break;
-                    case 0:
-                    case -0:
-                        classes += " muted";
-                        break;
-                    case -1:
-                        classes += " text-danger";
-                        break;
-                }
         }
 
-        if (this.props.cell.class)
-            classes += ` ${this.props.cell.class}`;
+        const css_class = this.props.cell.css_class?.();
+        switch(this.props.cell.figure_type()) {
+            case "date":
+                classes += " date";
+                break;
+            case "string":
+                classes += " text";
+                break;
+            case "float":
+            case "integer":
+            case "monetary":
+            case "percentage":
+                classes += " numeric";
+
+                if (!css_class)
+                    switch (this.noFormatSign()) {
+                        case 1:
+                            break;
+                        case 0:
+                            classes += " muted";
+                            break;
+                        case -1:
+                            classes += " text-danger";
+                            break;
+                    }
+                break;
+        }
+
+        if (this.props.cellIndex % 2) {
+            classes += " line_cell_odd";
+        }
+
+        if (css_class) {
+            classes += ` ${css_class}`;
+        }
 
         return classes;
     }
@@ -80,14 +115,14 @@ export class AccountReportLineCell extends Component {
             "account.report",
             "dispatch_report_action",
             [
-                this.controller.options.report_id,
-                this.controller.options,
+                this.controller.options().report_id,
+                this.controller.options(),
                 "action_audit_cell",
                 {
-                    report_line_id: this.props.cell.report_line_id,
-                    expression_label: this.props.cell.expression_label,
-                    calling_line_dict_id: this.props.line.id,
-                    column_group_key: this.props.cell.column_group_key,
+                    report_line_id: this.props.cell.report_line_id?.(),
+                    expression_label: this.props.cell.expression_label(),
+                    calling_line_dict_id: this.props.line.id(),
+                    column_group_index: this.props.cell.column_group_index(),
                 },
             ],
             {
@@ -99,34 +134,6 @@ export class AccountReportLineCell extends Component {
         }
 
         return this.action.doAction(auditAction);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // Edit Popover
-    // -----------------------------------------------------------------------------------------------------------------
-    editPopover(ev) {
-        const close = () => {
-            this.popoverCloseFn();
-            this.popoverCloseFn = null;
-        }
-
-        if (this.popoverCloseFn)
-            close();
-
-        this.popoverCloseFn = this.popover.add(
-            ev.currentTarget,
-            AccountReportEditPopover,
-            {
-                line_id: this.props.line.id,
-                cell: this.props.cell,
-                controller: this.controller,
-                onClose: close,
-            },
-            {
-                closeOnClickAway: true,
-                position: localization.direction === "rtl" ? "bottom" : "left",
-            },
-        );
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -142,8 +149,8 @@ export class AccountReportLineCell extends Component {
             ev.currentTarget,
             AccountReportCarryoverPopover,
             {
-                carryoverData: JSON.parse(this.props.cell.info_popup_data),
-                options: this.controller.options,
+                carryoverData: JSON.parse(this.props.cell.info_popup_data()),
+                options: this.controller.options(),
                 context: this.controller.context,
             },
             {
@@ -152,25 +159,6 @@ export class AccountReportLineCell extends Component {
             },
         );
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // Comparison cell
-    // -----------------------------------------------------------------------------------------------------------------
-    get comparisonClasses() {
-        let classes = "text-end";
-
-        switch (this.props.cell.comparison_mode) {
-            case "green":
-                classes += " text-success";
-                break;
-            case "muted":
-                classes += " muted";
-                break;
-            case "red":
-                classes += " text-danger";
-                break;
-        }
-
-        return classes;
-    }
 }
+
+registry.category("account_reports.default_components").add("AccountReportLineCell", AccountReportLineCell);

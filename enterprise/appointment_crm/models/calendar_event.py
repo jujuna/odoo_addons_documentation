@@ -3,7 +3,7 @@
 
 from markupsafe import Markup
 
-from odoo import api, fields, models, Command, _
+from odoo import api, fields, models, _
 
 
 class CalendarEvent(models.Model):
@@ -24,25 +24,23 @@ class CalendarEvent(models.Model):
         events.filtered(
             lambda e: e.appointment_type_id.lead_create and e.partner_ids - e.user_id.partner_id and not e.opportunity_id
         ).sudo()._create_lead_from_appointment()
-        opportunity_field = self.env['ir.model.fields']._get("calendar.event", "opportunity_id")
         for meeting in events.filtered('opportunity_id'):
-            if not meeting.activity_ids:
+            if not meeting.meeting_activity_ids:
                 meeting.opportunity_id.sudo().activity_schedule(
                     act_type_xmlid='mail.mail_activity_data_meeting',
-                    date_deadline=meeting.start_date,
+                    date_deadline=meeting._get_activity_deadline_from_start(meeting.start, meeting.allday),
                     summary=meeting.name,
                     user_id=meeting.user_id.id,
                     calendar_event_id=meeting.id,
                 )
-            meeting._message_log(
+            meeting._track_add(
+                {meeting.id: {'opportunity_id': meeting.env['crm.lead']}},
+                end_values={meeting.id: {'opportunity_id': meeting.opportunity_id}},
                 body=Markup("<p>%s</p>") % _(
                     "Meeting linked to Lead/Opportunity %s",
-                    meeting.opportunity_id._get_html_link()),
-                tracking_value_ids=[Command.create({
-                    'field_id': opportunity_field.id,
-                    'old_value_char': False,
-                    'new_value_char': meeting.opportunity_id.name,
-                })])
+                    meeting.opportunity_id._get_html_link()
+                ),
+            )
         return events
 
     def _create_lead_from_appointment(self):
@@ -54,7 +52,7 @@ class CalendarEvent(models.Model):
         # Create leads within the event organizer's company
         leads = self.env['crm.lead'].with_context(mail_create_nosubscribe=True) \
             .with_company(self.user_id.company_id).create(lead_values)
-        for event, lead in zip(self, leads):
+        for event, lead in zip(self, leads, strict=True):
             event._link_with_lead(lead)
         return leads
 

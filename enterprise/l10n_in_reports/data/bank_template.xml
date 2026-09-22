@@ -1,7 +1,7 @@
 <odoo>
     <record id="hdfc_bank_selection" model="enet.bank.template">
         <field name="name">HDFC</field>
-        <field name="image_1920" type="base64" file="l10n_in_reports/static/img/hdfc_logo.png"/>
+        <field name="image_1920" type="bytes" file="l10n_in_reports/static/img/hdfc_logo.png"/>
         <field name="include_header" eval="False"/>
         <field name="bank_configuration" eval="[
             {'field_name': 'payment_method_line_id.code', 'label': 'Transaction Type',
@@ -13,7 +13,7 @@
                 }
             },
             {'label': 'Beneficiary Code'},
-            {'field_name': 'partner_bank_id.acc_number', 'label': 'Beneficiary Account Number'},
+            {'field_name': 'partner_bank_id.account_number', 'label': 'Beneficiary Account Number'},
             {'field_name': 'amount', 'label': 'Amount'},
             {'field_name': 'partner_id.name', 'label': 'Beneficiary Name'},
             {'label': 'Drawee Location'},

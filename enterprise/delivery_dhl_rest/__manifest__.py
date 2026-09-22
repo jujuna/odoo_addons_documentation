@@ -5,7 +5,6 @@
                    "compatible with the DHL REST API available at https://developer.dhl.com/. It is no longer"
                    "compatible with the older DHL SOAP APIs (which have their own credentials).",
     'category': 'Shipping Connectors',
-    'version': '1.0',
     'application': True,
     'depends': ['stock_delivery', 'mail'],
     'data': [

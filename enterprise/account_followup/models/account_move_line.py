@@ -1,28 +1,22 @@
 from odoo import fields, models
-from odoo.tools import SQL, Query
+from odoo.tools import SQL
 
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    followup_line_id = fields.Many2one('account_followup.followup.line', 'Follow-up Level', copy=False)
+    followup_line_id = fields.Many2one(comodel_name='account_followup.followup.line', string='Reminder Level', copy=False)
+    followup_overdue = fields.Boolean(compute='_compute_followup_overdue', compute_sql='_compute_sql_followup_overdue', compute_sudo=True)
     invoice_origin = fields.Char(related='move_id.invoice_origin')
 
-    def _read_group_groupby(self, alias: str, groupby_spec: str, query: Query) -> SQL:
-        if groupby_spec != 'followup_overdue':
-            return super()._read_group_groupby(alias, groupby_spec, query)
+    def _compute_followup_overdue(self):
+        now = fields.Date.context_today(self)
+        for aml in self:
+            aml.followup_overdue = aml.date_maturity and aml.date_maturity < now
+
+    def _compute_sql_followup_overdue(self, table):
         return SQL(
             "%(date_maturity)s IS NOT NULL AND %(date_maturity)s < %(current_date)s",
-            date_maturity=self._field_to_sql(self._table, 'date_maturity', query),
+            date_maturity=table.date_maturity,
             current_date=fields.Date.context_today(self),
         )
-
-    def _read_group_empty_value(self, spec):
-        if spec != 'followup_overdue':
-            return super()._read_group_empty_value(spec)
-        return False
-
-    def _read_group_postprocess_groupby(self, groupby_spec, raw_values):
-        if groupby_spec != 'followup_overdue':
-            return super()._read_group_postprocess_groupby(groupby_spec, raw_values)
-        return ((value or False) for value in raw_values)

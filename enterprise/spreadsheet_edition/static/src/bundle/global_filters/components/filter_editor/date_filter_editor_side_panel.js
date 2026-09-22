@@ -23,6 +23,10 @@ export class DateFilterEditorSidePanel extends AbstractFilterEditorSidePanel {
         return "date";
     }
 
+    updateDefaultValue(value) {
+        this.store.update({ defaultValue: value });
+    }
+
     /**
      * @param {number} id
      * @param {string|undefined} chain

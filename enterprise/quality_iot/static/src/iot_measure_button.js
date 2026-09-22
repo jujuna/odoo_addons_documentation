@@ -50,7 +50,7 @@ export class IotMeasureWidget extends IotActionButton {
     }
 
     async onSuccess(data) {
-        const measure = data.result ? data.result : data.value; // compatibility w/ newer IoT Boxes
+        const measure = data.result ? data.result : data.value; // calipers still send in `value` key
         if (!measure) {
             return this.notifyFailure();
         }

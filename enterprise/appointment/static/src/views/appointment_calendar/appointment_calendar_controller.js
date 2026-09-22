@@ -1,109 +1,86 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
 import { AttendeeCalendarController } from "@calendar/views/attendee_calendar/attendee_calendar_controller";
 import { patch } from "@web/core/utils/patch";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { rpc } from "@web/core/network/rpc";
 import { Tooltip } from "@web/core/tooltip/tooltip";
-import { browser } from "@web/core/browser/browser";
-import { serializeDateTime } from "@web/core/l10n/dates";
 import { useService } from "@web/core/utils/hooks";
-import { useRef, useState, useSubEnv, onWillStart } from "@odoo/owl";
+import { onWillStart, proxy, signal } from "@odoo/owl";
+import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 import { Dropdown } from "@web/core/dropdown/dropdown";
+import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { user } from "@web/core/user";
-import { CustomAppointmentFormViewDialog } from "../custom_appointment_form_dialog/custom_appointment_form_dialog";
+
 
 patch(AttendeeCalendarController, {
-    components: { ...AttendeeCalendarController.components, Dropdown },
+    components: {
+        ...AttendeeCalendarController.components,
+        Dropdown,
+        DropdownItem,
+    },
 });
 
 patch(AttendeeCalendarController.prototype, {
     setup() {
         super.setup(...arguments);
         this.popover = usePopover(Tooltip, { position: "bottom" });
-        this.copyLinkRef = useRef("copyLinkRef");
+        this.copyLinkRef = signal.ref();
         this.orm = useService("orm");
-
-        this.appointmentState = useState({
-            data: {},
-            lastAppointment: false,
-        });
+        this.notification = useService("notification");
+        this.uiService = useService("ui");
 
         useSubEnv({
-            calendarState: useState({
+            calendarState: proxy({
+                // default: regular calendar event edition, should behave mostly as if no patching had been done
+                // slots-creation: enables editing slots of the "editing appointment" selected by a user
+                // slots-deletion: enables deleting slots when they are clicked for the "editing appointment"
                 mode: "default",
             }),
         });
 
         onWillStart(async () => {
-            [this.appointmentState.data, this.isAppointmentManager, this.isAppointmentUser] = await Promise.all([
-                rpc("/appointment/appointment_type/get_staff_user_appointment_types"),
+            // if the appointment type being edited was set via context, enable slot creation mode
+            if (
+                this.model.slotsAppointmentData() ||
+                this.props.context.calendar_editing_custom_appointment_id
+            ) {
+                this.env.calendarState.mode = "slots-creation";
+            }
+            [this.isAppointmentManager, this.isAppointmentUser] =
+await Promise.all([
                 user.hasGroup("appointment.group_appointment_manager"),
                 user.hasGroup("appointment.group_appointment_user"),
             ]);
-            // Using this context key is a stable workaround, to be improved in master
-            this.isResourceView = this.props.context.appointment_default_assign_user_attendees === false;
         });
     },
 
-    async _createCustomAppointmentType() {
-        const customAppointment = await rpc(
-            "/appointment/appointment_type/create_custom",
-            {
-                slots: this._getSlots(),
-                context: this.props.context, // This allows to propagate keys like default_opportunity_id / default_applicant_id
-            },
-        );
-        if (customAppointment.appointment_type_id) {
-            this.appointmentState.lastAppointment = {
-                'id': customAppointment.appointment_type_id,
-                'isCustom': true,
-                'url': customAppointment.invite_url,
-                'viewId': customAppointment.view_id,
-            }
-        }
+    get showAddClosingDayBtn() {
+        return this.isAppointmentManager && this.className.includes('o_appointment_calendar_view');
     },
-
-    /**
-     * Returns whether we have slot events.
-     */
-    hasSlotEvents() {
-        return Object.keys(this.model.data.slots).length;
-    },
-
-    _getSlots() {
-        return Object.values(this.model.data.slots).map(slot => ({
-            start: serializeDateTime(slot.start),
-            end: serializeDateTime(slot.end),
-            allday: slot.isAllDay,
-        }));
-    },
-
-    async _updateCustomAppointmentSlots() {
-        await rpc(
-            "/appointment/appointment_type/update_custom",
-            {
-                appointment_type_id: this.appointmentState.lastAppointment.id,
-                slots: this._getSlots(),
-            },
-        );
-    },
-
-    _writeUrlToClipboard() {
-        if (!this.appointmentState.lastAppointment) {
+    _writeUrlToClipboard(url) {
+        url ??= this.model.slotsAppointmentData()?.url;
+        if (!url) {
             return;
         }
-        setTimeout(async () => await navigator.clipboard.writeText(this.appointmentState.lastAppointment.url));
+        setTimeout(async () => await navigator.clipboard.writeText(url));
+        this.notification.add(_t("Link copied to clipboard!"), { type: "success" });
     },
 
-    async onClickAddLeave() {
-        this.env.services.action.doAction({
-            name: _t("Add Closing Day(s)"),
+    async onAddClosingDay() {
+        const defaultAppointmentTypeId = this.props.context.default_appointment_type_id;
+        const scheduleBasedOn = this.props.context.appointment_schedule_based_on;
+        this.actionService.doAction({
+            name: _t("New Closing Day"),
             type: "ir.actions.act_window",
-            res_model: "appointment.manage.leaves",
+            res_model: "appointment.leave",
             view_mode: "form",
             views: [[false, "form"]],
             target: "new",
-            context: {},
+            context: {
+                ...(defaultAppointmentTypeId && { default_appointment_type_ids: [defaultAppointmentTypeId] }),
+                ...(scheduleBasedOn && { appointment_schedule_based_on: scheduleBasedOn }),
+            },
         });
     },
 
@@ -121,96 +98,94 @@ patch(AttendeeCalendarController.prototype, {
         })
     },
 
-    onClickSelectAvailabilities() {
-        this.env.calendarState.mode = "slots-creation";
+    _getSelectAvailabilityNotificationMessage() {
+        return _t("Pick your availabilities.");
     },
 
-    async onClickGetShareLink() {
-        if (!this.appointmentState.lastAppointment) {
-            await this._createCustomAppointmentType();
-        } else if (this.appointmentState.lastAppointment.isCustom && this.env.calendarState.mode === "slots-creation") {
-            await this._updateCustomAppointmentSlots();
-        }
-        this._writeUrlToClipboard();
-        if (!this.copyLinkRef.el) {
+    async setEditingAppointmentId(appointmentTypeId) {
+        // slot edition relies on drag interactions, it is desktop only
+        if (this.uiService.isSmall && appointmentTypeId) {
             return;
         }
-        if (this.appointmentState.lastAppointment.isCustom) {
-            this.env.calendarState.mode = "default";
-            this.model.clearSlots();
-        }
-        this.appointmentState.lastAppointment.waitingCopyLinkCustomType = false;
-        this.popover.open(this.copyLinkRef.el, { tooltip: _t("Copied!") });
-        browser.setTimeout(this.popover.close, 800);
-    },
-
-    async onClickOpenForm() {
-        if (!this.appointmentState.lastAppointment) {
-            await this._createCustomAppointmentType();
-        } else if (this.appointmentState.lastAppointment.isCustom && this.env.calendarState.mode === "slots-creation") {
-            await this._updateCustomAppointmentSlots();
-        }
-
-        if (this.appointmentState.lastAppointment.isCustom) {
-            // The url copy paste may be done in the configuration dialog.
-            // This is used in order to not display the "Link Copied" message too early.
-            this.appointmentState.lastAppointment.waitingCopyLinkCustomType = this.env.calendarState.mode === "slots-creation";
-            this.displayDialog(CustomAppointmentFormViewDialog, {
-                context: this.props.context,
-                inviteUrl: this.appointmentState.lastAppointment.url,
-                resId: this.appointmentState.lastAppointment.id,
-                resModel: 'appointment.type',
-                size: 'md',
-                title: _t('Share Availabilities'),
-                viewId: this.appointmentState.lastAppointment.viewId,
-                onLinkCopied: () => {;
-                    this.appointmentState.lastAppointment.waitingCopyLinkCustomType = false;
-                    this.env.calendarState.mode = "default";
-                    this.model.clearSlots();
-                },
-            });
-        }
-        else {
-            this.actionService.doAction({
-                name: _t('Open Appointment Type Form'),
-                type: 'ir.actions.act_window',
-                res_model: 'appointment.type',
-                views: [[false, 'form']],
-                res_id: this.appointmentState.lastAppointment.id,
+        await this.model.setEditingAppointmentId(appointmentTypeId);
+        this.env.calendarState.mode = appointmentTypeId ? "slots-creation" : "default";
+        if (appointmentTypeId) {
+            this.notification.add(this._getSelectAvailabilityNotificationMessage(), {
+                type: "info",
             });
         }
     },
 
-    onClickDiscard() {
-        if (this.env.calendarState.mode === "slots-creation") {
-            this.model.clearSlots();
+    get sidePanelProps() {
+        return {
+            ...super.sidePanelProps,
+            copyAppointmentURL: this.onClickGetAppointmentUrl.bind(this),
+            openAppointmentForm: this.onClickOpenForm.bind(this),
+            openAppointmentEditWizard: this.openAppointmentEditSlotsForm.bind(this),
+            setEditingAppointmentId: this.setEditingAppointmentId.bind(this),
+        };
+    },
+
+    async onClickOpenForm(appointmentId) {
+        if (!appointmentId) {
+            appointmentId = this.model.slotsAppointmentData()?.id;
         }
-        this.env.calendarState.mode = "default";
-        this.appointmentState.lastAppointment = false;
+        this.openAppointmentEditSlotsForm(appointmentId);
     },
 
     async onClickSearchCreateAnytimeAppointment() {
-        const anytimeAppointment = await rpc("/appointment/appointment_type/search_create_anytime", {
-            context: this.props.context,
-        });
-        if (anytimeAppointment.appointment_type_id) {
-            this.appointmentState.lastAppointment = {
-                'id': anytimeAppointment.appointment_type_id,
-                'url': anytimeAppointment.invite_url,
-            }
-            this._writeUrlToClipboard();
-        }
+        const anytimeAppointmentInfo = await rpc(
+            "/appointment/appointment_type/search_create_anytime",
+            this.model._getInviteParams()
+        );
+        this._writeUrlToClipboard(anytimeAppointmentInfo.invite_url);
     },
 
     async onClickGetAppointmentUrl(appointmentTypeId) {
-        const appointment = await rpc("/appointment/appointment_type/get_book_url", {
-            appointment_type_id: appointmentTypeId,
-            context: this.props.context,
+        const appointmentInfo = await rpc(
+            "/appointment/appointment_type/get_calendar_slot_editor_info",
+            {
+                appointment_type_id: appointmentTypeId,
+                ...this.model._getInviteParams(),
+            }
+        );
+        this._writeUrlToClipboard(appointmentInfo.invite_url);
+    },
+
+    async openAppointmentEditSlotsForm(appointmentTypeId, defaultName) {
+        const action = await this.actionService.loadAction(
+            "appointment.appointment_edit_slots_action"
+        );
+        const context = action.context;
+        context.default_name =
+            defaultName || _t("%(user_name)s - Free Time Slots", { user_name: user.name });
+        context.default_slot_duration = this.model.getLocalStorageDuration(appointmentTypeId);
+        this.displayDialog(FormViewDialog, {
+            canExpand: false,
+            context: context,
+            size: "sm",
+            title: action.name,
+            viewId: action.view_id?.[0],
+            resId: appointmentTypeId || false,
+            resModel: action.res_model,
+            onRecordSaved: async (record) => {
+                const appointmentSlotDurationVals = {
+                    appointmentDuration: record.data.slot_duration,
+                };
+                const savedAppointmentTypeId = record.resId;
+                localStorage.setItem(
+                    `appointment.slot.editor.data.${savedAppointmentTypeId}`,
+                    JSON.stringify(appointmentSlotDurationVals)
+                );
+                const promises = [];
+                // include new appointments in the sidebar
+                if (!appointmentTypeId) {
+                    promises.push(this.model.toggleAppointmentInList(savedAppointmentTypeId));
+                }
+                promises.push(this.setEditingAppointmentId(savedAppointmentTypeId));
+                await Promise.all(promises);
+                this._writeUrlToClipboard();
+            },
         });
-        this.appointmentState.lastAppointment = {
-            'id': appointment.appointment_type_id,
-            'url': appointment.invite_url,
-        }
-        this._writeUrlToClipboard();
     },
 });

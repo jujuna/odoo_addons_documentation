@@ -9,6 +9,12 @@
             <field name="implied_ids" eval="[(4, ref('documents.group_documents_manager'))]"/>
         </record>
 
+        <record id="document_functional_group" model="res.group.functional">
+            <field name="name">Finance Managers</field>
+            <field name="user_ids" eval="[Command.link(ref('base.user_demo')), Command.link(ref('base.user_admin'))]"/>
+            <field name="responsible_ids" eval="[Command.link(ref('base.user_admin'))]"/>
+        </record>
+
         <!-- folders -->
         <record id="document_marketing_brand1_folder" model="documents.document" forcecreate="0">
             <field name="type">folder</field>
@@ -36,76 +42,67 @@
 
         <record id="documents_image_city_document" model="documents.document" forcecreate="0">
             <field name="name">city.jpg</field>
-            <field name="datas" type="base64" file="documents/demo/files/city.jpg"/>
+            <field name="raw" type="bytes" file="documents/demo/files/city.jpg"/>
             <field name="folder_id" ref="documents.document_internal_folder"/>
             <field name="access_internal">view</field>
         </record>
 
         <record id="documents_image_people_document" model="documents.document" forcecreate="0">
             <field name="name">people.jpg</field>
-            <field name="datas" type="base64" file="documents/demo/files/people.jpg"/>
+            <field name="raw" type="bytes" file="documents/demo/files/people.jpg"/>
             <field name="folder_id" ref="documents.document_internal_folder"/>
             <field name="access_internal">view</field>
-        </record>
-
-
-        <!-- finance -->
-
-        <record id="documents_vendor_bill_inv_007" model="documents.document" forcecreate="0">
-            <field name="name">Invoice-INV_2018_0007.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/Invoice2018_0007.pdf"/>
-            <field name="folder_id" ref="documents.document_finance_taxes_folder"/>
-            <field name="access_internal">edit</field>
-        </record>
-
-        <record id="documents_vendor_bill_extract_azure_interior_document" model="documents.document" forcecreate="0">
-            <field name="name">invoice Azure Interior.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/invoice_azure_interior.pdf"/>
-            <field name="folder_id" ref="documents.document_finance_taxes_folder"/>
-            <field name="access_internal">edit</field>
         </record>
 
         <!-- inbox -->
 
         <record id="documents_data_multi_pdf_document" model="documents.document" forcecreate="0">
             <field name="name">Mails_inbox.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/Mails_inbox.pdf"/>
-            <field name="folder_id" ref="documents.document_inbox_folder"/>
+            <field name="raw" type="bytes" file="documents/demo/files/Mails_inbox.pdf"/>
+            <field name="folder_id" ref="documents.document_finance_folder"/>
             <field name="access_internal">view</field>
         </record>
 
-        <record id="documents_vendor_bill_extract_open_value_document" model="documents.document" forcecreate="0">
-            <field name="name">invoice OpenValue.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/invoice_openvalue.pdf"/>
+        <record id="documents_vendor_bill_extract_gemini_furniture_document" model="documents.document" forcecreate="0">
+            <field name="name">invoice_gemini_furniture.pdf</field>
+            <field name="raw" type="bytes" file="documents/demo/files/invoice_gemini_furniture.pdf"/>
             <field name="folder_id" ref="documents.document_inbox_folder"/>
             <field name="access_internal">edit</field>
         </record>
 
         <record id="documents_data_comercial_tenancy_agreement" model="documents.document" forcecreate="0">
             <field name="name">Commercial-Tenancy-Agreement.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/Commercial-Tenancy-Agreement.pdf"/>
+            <field name="raw" type="bytes" file="documents/demo/files/Commercial-Tenancy-Agreement.pdf"/>
             <field name="folder_id" ref="documents.document_inbox_folder"/>
             <field name="access_internal">edit</field>
         </record>
 
+        <record id="document_finance_invoices_email_folder" model="documents.document" forcecreate="0">
+            <field name="type">folder</field>
+            <field name="access_internal">edit</field>
+            <field name="folder_id" ref="document_finance_folder"/>
+            <field name="name">Invoice Email</field>
+            <field name="sequence">125</field>
+        </record>
+
         <record id="documents_email_as_vendor_bill" model="documents.document" forcecreate="0">
             <field name="name">Invoice #INV-2025-001 - Payment Due April 24, 2025</field>
-            <field name="datas" type="base64" file="documents/demo/files/email-as-invoice.html"/>
+            <field name="raw" type="bytes" file="documents/demo/files/email-as-invoice.html"/>
             <field name="mimetype">application/documents-email</field>
-            <field name="folder_id" ref="documents.document_inbox_folder"/>
+            <field name="folder_id" ref="documents.document_finance_invoices_email_folder"/>
             <field name="access_internal">edit</field>
         </record>
 
         <record id="documents_insurance_contract" model="documents.document" forcecreate="0">
             <field name="name">Acme_Insurance_Contract_Structured.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/Acme_Insurance_Contract_Structured.pdf"/>
+            <field name="raw" type="bytes" file="documents/demo/files/Acme_Insurance_Contract_Structured.pdf"/>
             <field name="folder_id" ref="documents.document_inbox_folder"/>
             <field name="access_internal">edit</field>
         </record>
 
-        <record id="documents_nda" model="documents.document" forcecreate="0">
-            <field name="name">Acme_NDA.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/Acme_NDA.pdf"/>
+        <record id="documents_lumber" model="documents.document" forcecreate="0">
+            <field name="name">lumber-invoice.pdf</field>
+            <field name="raw" type="bytes" file="documents/demo/files/lumber-invoice.pdf"/>
             <field name="folder_id" ref="documents.document_inbox_folder"/>
             <field name="access_internal">edit</field>
         </record>
@@ -114,14 +111,14 @@
 
         <record id="documents_image_La_landscape_document" model="documents.document" forcecreate="0">
             <field name="name">LA landscape.jpg</field>
-            <field name="datas" type="base64" file="documents/demo/files/la.jpg"/>
+            <field name="raw" type="bytes" file="documents/demo/files/la.jpg"/>
             <field name="folder_id" ref="documents.document_marketing_brand1_folder"/>
             <field name="access_internal">edit</field>
         </record>
 
         <record id="documents_attachment_sorry_netsuite_document" model="documents.document" forcecreate="0">
             <field name="name">Sorry Netsuite.jpg</field>
-            <field name="datas" type="base64" file="documents/demo/files/sorry_netsuite.jpg"/>
+            <field name="raw" type="bytes" file="documents/demo/files/sorry_netsuite.jpg"/>
             <field name="folder_id" ref="documents.document_marketing_brand1_shared_folder"/>
             <field name="access_internal">edit</field>
             <field name="access_via_link">view</field>

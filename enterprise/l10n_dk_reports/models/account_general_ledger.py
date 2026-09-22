@@ -4,7 +4,7 @@ import csv
 import io
 
 from odoo.exceptions import UserError
-from odoo.tools import street_split
+from odoo.tools.business_data import street_split
 
 from odoo import api, models, _
 from odoo.addons.account_reports.models.account_report import AccountReportFileDownloadException
@@ -113,9 +113,9 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
         balance_index = [c['expression_label'] for c in options['columns']].index('balance')
         lines = report._get_lines(new_options)
-        for line in filter(lambda line: self.env['account.report']._get_markup(line['id']) != 'total', lines):
-            account_balance = int(line['columns'][balance_index]['no_format'])  # balance value must be a whole number
-            if report._get_markup(line['id']) == 'undistributed_profits_losses':
+        for line in filter(lambda line: self.env['account.report']._get_markup(line.id) != 'total', lines):
+            account_balance = int(line.columns[balance_index].no_format)  # balance value must be a whole number
+            if report._get_markup(line.id) == 'undistributed_profits_losses':
                 if account_balance != 0:
                     errors = {
                         'undistributed_earnings': {
@@ -124,7 +124,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                         }
                     }
                 continue
-            account_number, account_name = line['name'].split(maxsplit=1)
+            account_number, account_name = line.name.split(maxsplit=1)
 
             csv_lines.append((account_number, account_name, account_balance))
 

@@ -8,6 +8,8 @@ from .l10n_cz_reports_common import CzechReportsCommon
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class CzechTaxReportTest(CzechReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time('2019-12-31')
     def setUp(self):
         super().setUp()
@@ -28,7 +30,7 @@ class CzechTaxReportTest(CzechReportsCommon):
                     'product_id': self.product_a.id,
                     'quantity': 1.0,
                     'name': 'product test 1',
-                    'price_unit': 100,
+                    'price_unit': 100.10,
                     'tax_ids': first_tax.ids,
                 }),
             ]
@@ -44,7 +46,7 @@ class CzechTaxReportTest(CzechReportsCommon):
                     'product_id': self.product_b.id,
                     'quantity': 1.0,
                     'name': 'product test 2',
-                    'price_unit': 50,
+                    'price_unit': 50.10,
                     'tax_ids': second_tax.ids,
                 }),
             ]
@@ -56,19 +58,26 @@ class CzechTaxReportTest(CzechReportsCommon):
     def test_generate_xml_default_options(self):
         report = self.env.ref('l10n_cz.l10n_cz_vat_declaration')
         options = report.get_options({})
+        self.company.write({
+            'l10n_cz_person_authorized': self.company.partner_id,
+            'l10n_cz_relationship_person_authorized': 'Representative',
+        })
 
         generated_xml = self.env['l10n_cz.tax.report.handler'].export_to_xml(options)['file_content']
         expected_xml = f"""
             <Pisemnost nazevSW="Odoo SA" verzeSW="{release.version}">
             <DPHDP3 verzePis="02.01">
-                <VetaD dapdph_forma="B" dokument="DP3" k_uladis="DPH" typ_platce="P" mesic="11" rok="2019"/>
-                <VetaP zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679" typ_ds="P" email="info@company.czexample.com"/>
-                <Veta1 dan23="21.0" obrat23="100.0"/>
+                <VetaD dapdph_forma="B" dokument="DP3" k_uladis="DPH" typ_platce="P" mesic="11" rok="2019" d_poddp="31.12.2019" c_okec="10000"/>
+                <VetaP zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679" typ_ds="P"
+                       email="info@company.czexample.com" ulice="Pařížská Street" c_orient="25" naz_obce="PRAGUE 1"
+                       stat="ČESKÁ REPUBLIKA" opr_jmeno="company_1_data" opr_prijmeni="" opr_postaveni="Representative"
+                       sest_jmeno="Because" sest_prijmeni="I am accountman!"/>
+                <Veta1 dan23="22" obrat23="100.1"/>
                 <Veta2/>
                 <Veta3/>
-                <Veta4 dov_cu="50.0" odp_cu_nar="50.0" odp_sum_nar="50.0"/>
+                <Veta4 dov_cu="50.1" odp_cu_nar="51" odp_sum_nar="51.0"/>
                 <Veta5 koef_p20_nov="35.0" odp_uprav_kf="83.0"/>
-                <Veta6 dan_zocelk="21.0" dano_no="112.0" odp_zocelk="133.0"/>
+                <Veta6 dan_zocelk="22.0" dano_no="112.0" odp_zocelk="134.0"/>
             </DPHDP3>
             </Pisemnost>
         """
@@ -81,14 +90,15 @@ class CzechTaxReportTest(CzechReportsCommon):
     def test_generate_xml_custom_options(self):
         report = self.env.ref('l10n_cz.l10n_cz_vat_declaration')
         options = self._generate_options(report, date_from='2017-04-01', date_to='2017-06-30')
-        self.env.company.partner_id.company_type = 'person'
 
         generated_xml = self.env['l10n_cz.tax.report.handler'].export_to_xml(options)['file_content']
         expected_xml = f"""
             <Pisemnost nazevSW="Odoo SA" verzeSW="{release.version}">
             <DPHDP3 verzePis="02.01">
-                <VetaD dapdph_forma="B" dokument="DP3" k_uladis="DPH" typ_platce="P" ctvrt="2" rok="2017"/>
-                <VetaP zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679" typ_ds="F" email="info@company.czexample.com"/>
+                <VetaD dapdph_forma="B" dokument="DP3" k_uladis="DPH" typ_platce="P" ctvrt="2" rok="2017"  d_poddp="31.12.2019" c_okec="10000"/>
+                <VetaP zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679" typ_ds="P"
+                       email="info@company.czexample.com" ulice="Pařížská Street" c_orient="25" naz_obce="PRAGUE 1"
+                       stat="ČESKÁ REPUBLIKA" sest_jmeno="Because" sest_prijmeni="I am accountman!"/>
                 <Veta1/>
                 <Veta2/>
                 <Veta3/>

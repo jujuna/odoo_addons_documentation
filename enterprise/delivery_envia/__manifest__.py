@@ -11,15 +11,13 @@ you can streamline every step of your fulfilment process,
 reduce handling time and improve customer experience.
     """,
     'category': 'Shipping Connectors',
-    'version': '1.0',
     'application': True,
     'depends': ['stock_delivery', 'base_address_extended', 'phone_validation'],
     'data': [
-        'security/ir.model.access.csv',
         'data/delivery_envia.xml',
         'views/delivery_carrier_views.xml',
-        'views/res_config_settings_views.xml',
         'wizard/envia_shipping_wizard.xml',
+        'security/ir.access.csv',
 
     ],
     'assets': {

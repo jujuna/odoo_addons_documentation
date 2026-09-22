@@ -34,15 +34,18 @@ class HelpdeskTicketConvertWizard(models.TransientModel):
         )
 
         for ticket, task in zip(tickets_to_convert, created_tasks):
+            # Move the mail thread and attachments
+            ticket.message_change_thread(task)
+            attachments = self.env['ir.attachment'].search([
+                ('res_model', '=', 'helpdesk.ticket'),
+                ('res_id', '=', ticket.id),
+            ])
+            attachments.write({'res_model': 'project.task', 'res_id': task.id})
+
             ticket.active = False
 
             ticket_sudo, task_sudo = ticket.sudo(), task.sudo()
             ticket_sudo.message_post(body=_("Ticket converted into task %s", task_sudo._get_html_link()))
-            task_sudo.message_post_with_source(
-                'mail.message_origin_link',
-                render_values={'self': task_sudo, 'origin': ticket_sudo},
-                subtype_xmlid='mail.mt_note',
-            )
 
         if len(created_tasks) == 1:
             return {

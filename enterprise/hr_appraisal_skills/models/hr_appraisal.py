@@ -7,7 +7,7 @@ from odoo.tools import convert
 class HrAppraisal(models.Model):
     _inherit = 'hr.appraisal'
 
-    target_job_id = fields.Many2one('hr.job')
+    target_job_id = fields.Many2one('hr.job', index=True)
     appraisal_skill_ids = fields.One2many('hr.appraisal.skill', 'appraisal_id', string="Skills",
         domain=['|', ('skill_type_id.active', '=', True), ('appraisal_id.state', '=', '3_done')],
         compute="_compute_appraisal_skill_ids", store=True, readonly=False)
@@ -15,14 +15,15 @@ class HrAppraisal(models.Model):
 
     @api.depends('appraisal_skill_ids')
     def _compute_current_appraisal_skill_ids(self):
+        today = fields.Date.context_today(self)
         for appraisal in self:
             appraisal.current_appraisal_skill_ids = appraisal.appraisal_skill_ids.filtered(
-                lambda appraisal_skill: appraisal_skill.is_certification or
-                    not appraisal_skill.valid_to or appraisal_skill.valid_to >= fields.Date.today()
+                lambda appraisal_skill: appraisal_skill.is_certification or not appraisal_skill.valid_to or appraisal_skill.valid_to >= today
             )
 
     @api.depends('target_job_id')
     def _compute_appraisal_skill_ids(self):
+        today = fields.Date.context_today(self)
         for appraisal in self:
             values = [
                 Command.unlink(appraisal_skill.id)
@@ -33,7 +34,7 @@ class HrAppraisal(models.Model):
             target_job_current_skills = appraisal.target_job_id.current_job_skill_ids
             current_skills = appraisal.appraisal_skill_ids.filtered(
                 lambda appraisal_skill: (appraisal_skill.is_certification or
-                    not appraisal_skill.valid_to or appraisal_skill.valid_to >= fields.Date.today())
+                    not appraisal_skill.valid_to or appraisal_skill.valid_to >= today)
                     and appraisal_skill.skill_level_id
             )
             new_skills_ids = (target_job_current_skills.skill_id - current_skills.skill_id).ids
@@ -42,7 +43,7 @@ class HrAppraisal(models.Model):
                     'skill_id': job_skill.skill_id.id,
                     'skill_type_id': job_skill.skill_type_id.id,
                     'skill_level_id': False,
-                    'valid_from': fields.Date.today(),
+                    'valid_from': today,
                     'valid_to': False,
                     'appraisal_id': appraisal._origin.id,  # need to understand why .id was a newId
                 }) for job_skill in target_job_current_skills.filtered(lambda skill: skill.skill_id.id in new_skills_ids)]
@@ -55,8 +56,10 @@ class HrAppraisal(models.Model):
             if "current_appraisal_skill_ids" in vals:
                 vals_app_skill = vals.pop('current_appraisal_skill_ids')
                 vals['appraisal_skill_ids'] = self.env['hr.appraisal.skill']._get_transformed_commands(vals_app_skill, self)
-        res = super().create(vals_list)
-        return res
+        appraisals = super().create(vals_list)
+        if pending_appraisals := appraisals.filtered(lambda a: a.state == '2_pending'):
+            pending_appraisals._copy_skills_when_confirmed()
+        return appraisals
 
     def write(self, vals):
         if "current_appraisal_skill_ids" in vals:
@@ -68,6 +71,7 @@ class HrAppraisal(models.Model):
             new_appraisals._copy_skills_when_confirmed()
 
         if 'state' in vals and (vals['state'] == '3_done'):
+            today = fields.Date.context_today(self)
             for appraisal in self:
                 employee_skills = appraisal.employee_id.current_employee_skill_ids
                 # Remove skills created by target without any changes
@@ -95,7 +99,7 @@ class HrAppraisal(models.Model):
                         'skill_id': skill.skill_id.id,
                         'skill_level_id': skill.skill_level_id.id,
                         'skill_type_id': skill.skill_type_id.id,
-                        'valid_from': skill.valid_from if skill.is_certification else fields.Date.today(),
+                        'valid_from': skill.valid_from if skill.is_certification else today,
                         'valid_to': skill.valid_to if skill.is_certification else False,
                     }] for skill in appraisal_skills] + [[2, skill.id] for skill in deleted_skills]
                 })

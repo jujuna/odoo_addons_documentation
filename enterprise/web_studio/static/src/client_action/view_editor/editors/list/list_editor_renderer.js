@@ -1,6 +1,7 @@
+import { render } from "@web/owl2/utils";
+import { onMounted, proxy, signal, useEffect } from "@odoo/owl";
 import { listView } from "@web/views/list/list_view";
 import { useThrottleForAnimation } from "@web/core/utils/timing";
-import { reactive, useEffect, useState } from "@odoo/owl";
 import { SelectionHeaderButtons } from "../../interactive_editor/action_button/action_button";
 
 const colSelectedClass = "o-web-studio-editor--element-clicked";
@@ -34,23 +35,27 @@ export class ListEditorRenderer extends listView.Renderer {
         SelectionHeaderButtons,
     };
 
+    tableHeadRef = signal.ref();
+
     setup() {
-        const viewEditorModel = useState(this.env.viewEditorModel);
-        this.viewEditorModel = reactive(viewEditorModel, () => {
+        const viewEditorModel = proxy(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(viewEditorModel);
+        let firstTime = true;
+        useEffect(() => {
+            this.viewEditorModel.showInvisible; // consume signal
+            if (firstTime) {
+                firstTime = false;
+                return;
+            }
             // Little trick to update our columns when showInvisible changes on the viewEditorModel
             // getActiveColumns reads that value
             this.columns = this.getActiveColumns();
-            this.render();
+            render(this);
         });
         super.setup();
-        this.onTableHover = useThrottleForAnimation(this.onTableHover);
+        this.onTableHover = useThrottleForAnimation(this.onTableHover.bind(this));
 
-        useEffect(
-            (rootEl) => {
-                rootEl.classList.add("o_web_studio_list_view_editor");
-            },
-            () => [this.rootRef.el]
-        );
+        onMounted(() => this.rootRef().classList.add("o_web_studio_list_view_editor"));
     }
 
     get canResequenceRows() {
@@ -160,7 +165,7 @@ export class ListEditorRenderer extends listView.Renderer {
     }
 
     onTableHover(ev) {
-        const table = this.tableRef.el;
+        const table = this.tableRef();
         cleanStyling(table, [colHoverClass]);
         if (ev.type !== "mouseover") {
             return;

@@ -1,30 +1,30 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import {Component, onWillUpdateProps, useState} from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { SwissdecNotification } from "@l10n_ch_hr_payroll/components/swissdec_notification";
 import { AccordionItem } from "@web/core/dropdown/accordion_item";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 class SalaryResultWidget extends Component {
-    static props = {
-        ...standardFieldProps
-    };
     static template = "l10n_ch_hr_payroll.SalaryResultWidgetTemplate";
     static components = {
         SwissdecNotification,
-        AccordionItem
+        AccordionItem,
     };
-    setup() {
 
-        this.state = useState({
-            parsedData: this.props.record.data[this.props.name],
-            institution_domain: this.props.record.data["domain"]
-        });
-        onWillUpdateProps((nextProps) => {
-            this.state.parsedData = nextProps.record.data[this.props.name];
-            this.state.institution_domain = nextProps.record.data["domain"];
-        })
+    props = useProps(standardFieldProps);
+
+    get parsedData() {
+        const { SalaryResult, Dialog } = this.props.record.data[this.props.name];
+        const institution_domain = this.props.record.data["domain"];
+
+        if (SalaryResult) {
+            return SalaryResult[institution_domain];
+        } else if (Dialog) {
+            return Dialog[institution_domain];
+        }
+        return null;
     }
 }
 

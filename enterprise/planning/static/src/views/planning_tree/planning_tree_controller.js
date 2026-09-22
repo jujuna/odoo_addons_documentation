@@ -1,6 +1,6 @@
+import { proxy } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { ListController } from "@web/views/list/list_controller";
-import { useState } from "@odoo/owl";
 import { AddressRecurrencyConfirmationDialog } from "@planning/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog";
 import { usePlanningRecurringDeleteAction } from "../planning_hooks";
 
@@ -9,7 +9,7 @@ export class PlanningTreeController extends ListController {
         super.setup();
         this.dialogService = useService("dialog");
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             recurrenceUpdate: "this",
         });
         this.planningRecurrenceDeletion = usePlanningRecurringDeleteAction();

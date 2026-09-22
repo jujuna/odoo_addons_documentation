@@ -1,9 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
+from itertools import chain
 from random import randint
 
 import ast
+
+from markupsafe import Markup
 
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError, ValidationError
@@ -205,17 +208,12 @@ class MrpEcoStage(models.Model):
 class MrpEco(models.Model):
     _name = 'mrp.eco'
     _description = 'Engineering Change Order (ECO)'
-    _inherit = ['mail.thread.cc', 'mail.activity.mixin']
-
-    @api.model
-    def _get_type_selection(self):
-        return [
-            ('bom', _('Bill of Materials')),
-            ('product', _('Product Only'))]
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _priority_field = 'priority'
 
     name = fields.Char('Reference', copy=False, required=True)
     user_id = fields.Many2one('res.users', 'Responsible', default=lambda self: self.env.user, tracking=True, check_company=True)
-    type_id = fields.Many2one('mrp.eco.type', 'Type', required=True)
+    type_id = fields.Many2one('mrp.eco.type', 'ECO Type', required=True, default=lambda self: self.env['mrp.eco.type'].search([], limit=1))
     stage_id = fields.Many2one(
         'mrp.eco.stage', 'Stage', ondelete='restrict', copy=False, domain="[('type_ids', 'in', type_id)]",
         group_expand='_read_group_stage_ids', tracking=True,
@@ -227,11 +225,6 @@ class MrpEco(models.Model):
         ('1', 'High')], string='Priority', tracking=True,
         index=True)
     note = fields.Html('Note')
-    effectivity = fields.Selection([
-        ('asap', 'As soon as possible'),
-        ('date', 'At Date')], string='Effective',  # Is this English ?
-        compute='_compute_effectivity', inverse='_set_effectivity', store=True,
-        help='Date on which the changes should be applied. For reference only.')
     effectivity_date = fields.Datetime('Effective Date', tracking=True, help="For reference only.")
     approval_ids = fields.One2many('mrp.eco.approval', 'eco_id', 'Approvals', help='Approvals by stage')
 
@@ -263,22 +256,19 @@ class MrpEco(models.Model):
         'Allow Change Stage', compute='_compute_allow_change_stage')
     allow_apply_change = fields.Boolean(
         'Show Apply Change', compute='_compute_allow_apply_change')
+    show_eco_type = fields.Boolean(
+        compute='_compute_show_eco_type')
 
     product_tmpl_id = fields.Many2one('product.template', "Product", check_company=True, index='btree_not_null')
     production_id = fields.Many2one(
         'mrp.production', string='Manufacturing Orders', readonly=True, copy=False, index='btree_not_null')
-    type = fields.Selection(selection=_get_type_selection, string='Apply on',
-        default='bom', required=True)
     bom_id = fields.Many2one(
-        'mrp.bom', "Bill of Materials",
-        domain="[('product_tmpl_id', '=', product_tmpl_id)]", check_company=True)  # Should at least have bom or routing on which it is applied?
+        'mrp.bom', "Bill of Materials", check_company=True)  # Should at least have bom or routing on which it is applied?
+    bom_id_domain = fields.Char(compute='_compute_bom_id_domain', export_string_translation=False)
     new_bom_id = fields.Many2one(
         'mrp.bom', 'New Bill of Materials',
         copy=False, index='btree_not_null')
     new_bom_revision = fields.Integer('BoM Revision', related='new_bom_id.version', readonly=False)
-    will_update_version = fields.Boolean(
-        "Update Version", default=True,
-        help="If unchecked, the version of the product/BoM will remain unchanged once the ECO is applied")
     bom_change_ids = fields.One2many(
         'mrp.eco.bom.change', 'eco_id', string="ECO BoM Changes",
         compute='_compute_bom_change_ids', help='Difference between old BoM and new BoM revision', store=True)
@@ -292,6 +282,9 @@ class MrpEco(models.Model):
     routing_change_ids = fields.One2many(
         'mrp.eco.routing.change', 'eco_id', string="ECO Routing Changes",
         compute='_compute_routing_change_ids', help='Difference between old operation and new operation revision', store=True)
+    currency_id = fields.Many2one(related='company_id.currency_id')
+    total_cost = fields.Monetary(compute='_compute_total_cost', currency_field='currency_id')
+    used_in_count = fields.Integer('# Used In', compute='_compute_used_in_count')
     document_count = fields.Integer('# Attachments', compute='_compute_attachments')
     document_ids = fields.One2many(
         'product.document', 'res_id', string='Attachments',
@@ -309,22 +302,45 @@ class MrpEco(models.Model):
         for p in self:
             p.document_count = len(p.document_ids)
 
-    @api.depends('effectivity_date')
-    def _compute_effectivity(self):
+    def _compute_used_in_count(self):
         for eco in self:
-            eco.effectivity = 'date' if eco.effectivity_date else 'asap'
+            eco.used_in_count = len(eco._get_used_in_boms().product_tmpl_id)
 
-    def _set_effectivity(self):
+    def _get_used_in_boms(self):
+        self.ensure_one()
+        used_in_boms = self.env['mrp.bom']
+        templates_to_check = self.product_tmpl_id
+        checked_templates = self.env['product.template']
+        while templates_to_check:
+            checked_templates |= templates_to_check
+            bom_lines = self.env['mrp.bom.line'].search([
+                ('bom_id.active', '=', True),
+                ('product_tmpl_id', 'in', templates_to_check.ids),
+            ])
+            parent_boms = bom_lines.bom_id
+            parent_product_templates = parent_boms.product_tmpl_id - checked_templates
+            used_in_boms |= parent_boms
+            templates_to_check = parent_product_templates
+        return used_in_boms
+
+    @api.depends('product_tmpl_id', 'product_tmpl_id.bom_ids', 'product_tmpl_id.bom_ids.active')
+    def _compute_bom_id_domain(self):
         for eco in self:
-            if eco.effectivity == 'asap':
-                eco.effectivity_date = False
+            boms = eco.product_tmpl_id.bom_ids
+            eco.bom_id_domain = [('id', 'in', boms.ids)] if boms else []
+
+    def _compute_total_cost(self):
+        for eco in self:
+            total_component_cost = sum(eco.bom_change_ids_on_line.mapped('cost_computed'))
+            total_operation_cost = sum(eco.routing_change_ids.mapped('cost_computed'))
+            eco.total_cost = total_component_cost + total_operation_cost
 
     def _is_conflict(self, new_bom_lines, changes=None):
         # Find rebase lines having conflict or not.
         reb_conflicts = self.env['mrp.eco.bom.change']
         for reb_line in changes:
             new_line = new_bom_lines.get(reb_line.product_id, None)
-            if new_line and (reb_line.old_operation_id, reb_line.old_uom_id, reb_line.old_product_qty) != (new_line.operation_id, new_line.product_uom_id, new_line.product_qty):
+            if new_line and (reb_line.old_operation_id, reb_line.old_uom_id, reb_line.old_product_qty) != (new_line.operation_id, new_line.uom_id, new_line.product_qty):
                 reb_conflicts |= reb_line
         reb_conflicts.write({'conflict': True})
         return reb_conflicts
@@ -332,79 +348,91 @@ class MrpEco(models.Model):
     def _get_difference_bom_lines(self, old_bom, new_bom):
         # Return difference lines from two bill of material.
         new_bom_commands = [Command.clear()]
-        old_bom_lines = {line._get_sync_values(): line for line in old_bom.bom_line_ids}
-        if new_bom:
-            for new_line in new_bom.bom_line_ids:
-                old_line = old_bom_lines.get(new_line._get_sync_values())
-                if old_line:
-                    old_bom_lines.pop(old_line._get_sync_values())
-                    if new_line.product_uom_id != old_line.product_uom_id or tools.float_compare(new_line.product_qty, old_line.product_qty, precision_rounding=new_line.product_uom_id.rounding):
-                        new_bom_commands += [(0, 0, {
-                            'change_type': 'update',
-                            'product_id': new_line.product_id.id,
-                            'old_product_qty': old_line.product_qty,
-                            'new_product_qty': new_line.product_qty,
-                            'old_uom_id': old_line.product_uom_id.id,
-                            'new_uom_id': new_line.product_uom_id.id,
-                            'old_operation_id': old_line.operation_id.id,
-                            'new_operation_id': new_line.operation_id.id,
-                            'bom_line_id': new_line.id
-                        })]
-                else:
-                    new_bom_commands += [(0, 0, {
-                        'change_type': 'add',
-                        'product_id': new_line.product_id.id,
-                        'new_product_qty': new_line.product_qty,
-                        'new_uom_id': new_line.product_uom_id.id,
-                        'new_operation_id': new_line.operation_id.id,
-                        'bom_line_id': new_line.id,
-                    })]
-            for old_line in old_bom_lines.values():
-                new_bom_commands += [(0, 0, {
-                    'change_type': 'remove',
-                    'product_id': old_line.product_id.id,
-                    'old_product_qty': old_line.product_qty,
-                    'old_uom_id': old_line.product_uom_id.id,
-                    'old_operation_id': old_line.operation_id.id,
-                    'bom_line_id': old_line.id,
-                })]
+        if not new_bom:
+            return new_bom_commands
 
-        old_byproducts = {byproduct._get_sync_values(): byproduct for byproduct in old_bom.byproduct_ids}
-        if new_bom:
-            for new_byproduct in new_bom.byproduct_ids:
-                old_byproduct = old_byproducts.get(new_byproduct._get_sync_values())
-                if old_byproduct:
-                    old_byproducts.pop(old_byproduct._get_sync_values())
-                    if new_byproduct.product_uom_id != old_byproduct.product_uom_id or tools.float_compare(new_byproduct.product_qty, old_byproduct.product_qty, precision_rounding=new_byproduct.product_uom_id.rounding):
-                        new_bom_commands += [Command.create({
-                            'change_type': 'update',
-                            'product_id': new_byproduct.product_id.id,
-                            'old_product_qty': old_byproduct.product_qty,
-                            'new_product_qty': new_byproduct.product_qty,
-                            'old_uom_id': old_byproduct.product_uom_id.id,
-                            'new_uom_id': new_byproduct.product_uom_id.id,
-                            'old_operation_id': old_byproduct.operation_id.id,
-                            'new_operation_id': new_byproduct.operation_id.id,
-                            'byproduct_id': new_byproduct.id
-                        })]
-                else:
-                    new_bom_commands += [Command.create({
-                        'change_type': 'add',
-                        'product_id': new_byproduct.product_id.id,
-                        'new_product_qty': new_byproduct.product_qty,
-                        'new_uom_id': new_byproduct.product_uom_id.id,
-                        'new_operation_id': new_byproduct.operation_id.id,
-                        'byproduct_id': new_byproduct.id,
-                    })]
-            for old_byproduct in old_byproducts.values():
+        old_bom_lines = defaultdict(list)
+        for line in old_bom.bom_line_ids:
+            old_bom_lines[line._get_sync_values()].append(line)
+        for new_line in new_bom.bom_line_ids:
+            # lines for a same product are matched by sequence. Magic matching with operation is not wanted nor supported
+            old_lines = old_bom_lines.get(new_line._get_sync_values())
+            old_line = old_lines.pop(0) if old_lines else False
+            if old_line and (
+                    new_line.uom_id != old_line.uom_id
+                    or new_line.uom_id.compare(new_line.product_qty, old_line.product_qty)
+                    or new_line.operation_id.name != old_line.operation_id.name
+            ):
                 new_bom_commands += [Command.create({
-                    'change_type': 'remove',
-                    'product_id': old_byproduct.product_id.id,
-                    'old_product_qty': old_byproduct.product_qty,
-                    'old_uom_id': old_byproduct.product_uom_id.id,
-                    'old_operation_id': old_byproduct.operation_id.id,
-                    'byproduct_id': old_byproduct.id,
+                    'change_type': 'update',
+                    'product_id': new_line.product_id.id,
+                    'old_product_qty': old_line.product_qty,
+                    'new_product_qty': new_line.product_qty,
+                    'old_uom_id': old_line.uom_id.id,
+                    'new_uom_id': new_line.uom_id.id,
+                    'old_operation_id': old_line.operation_id.id,
+                    'new_operation_id': new_line.operation_id.id,
+                    'bom_line_id': new_line.id,
                 })]
+            elif not old_line:
+                new_bom_commands += [Command.create({
+                    'change_type': 'add',
+                    'product_id': new_line.product_id.id,
+                    'new_product_qty': new_line.product_qty,
+                    'new_uom_id': new_line.uom_id.id,
+                    'new_operation_id': new_line.operation_id.id,
+                    'bom_line_id': new_line.id,
+                })]
+        for old_line in chain.from_iterable(old_bom_lines.values()):
+            new_bom_commands += [Command.create({
+                'change_type': 'remove',
+                'product_id': old_line.product_id.id,
+                'old_product_qty': old_line.product_qty,
+                'old_uom_id': old_line.uom_id.id,
+                'old_operation_id': old_line.operation_id.id,
+                'bom_line_id': old_line.id,
+            })]
+
+        old_byproducts = defaultdict(list)
+        for byproduct in old_bom.byproduct_ids:
+            old_byproducts[byproduct._get_sync_values()].append(byproduct)
+        for new_byproduct in new_bom.byproduct_ids:
+            old_byproducts_list = old_byproducts.get(new_byproduct._get_sync_values())
+            old_byproduct = old_byproducts_list.pop(0) if old_byproducts_list else False
+            if old_byproduct and (
+                    new_byproduct.uom_id != old_byproduct.uom_id
+                    or new_byproduct.uom_id.compare(new_byproduct.product_qty, old_byproduct.product_qty)
+                    or new_byproduct.operation_id.name != old_byproduct.operation_id.name
+            ):
+                new_bom_commands += [Command.create({
+                    'change_type': 'update',
+                    'product_id': new_byproduct.product_id.id,
+                    'old_product_qty': old_byproduct.product_qty,
+                    'new_product_qty': new_byproduct.product_qty,
+                    'old_uom_id': old_byproduct.uom_id.id,
+                    'new_uom_id': new_byproduct.uom_id.id,
+                    'old_operation_id': old_byproduct.operation_id.id,
+                    'new_operation_id': new_byproduct.operation_id.id,
+                    'byproduct_id': new_byproduct.id
+                })]
+            elif not old_byproduct:
+                new_bom_commands += [Command.create({
+                    'change_type': 'add',
+                    'product_id': new_byproduct.product_id.id,
+                    'new_product_qty': new_byproduct.product_qty,
+                    'new_uom_id': new_byproduct.uom_id.id,
+                    'new_operation_id': new_byproduct.operation_id.id,
+                    'byproduct_id': new_byproduct.id,
+                })]
+        for old_byproduct in chain.from_iterable(old_byproducts.values()):
+            new_bom_commands += [Command.create({
+                'change_type': 'remove',
+                'product_id': old_byproduct.product_id.id,
+                'old_product_qty': old_byproduct.product_qty,
+                'old_uom_id': old_byproduct.uom_id.id,
+                'old_operation_id': old_byproduct.operation_id.id,
+                'byproduct_id': old_byproduct.id,
+            })]
 
         return new_bom_commands
 
@@ -422,7 +450,7 @@ class MrpEco(models.Model):
                     # Update line if it exist in new bom.
                     new_bom_line.write({
                         'product_qty': new_bom_line.product_qty + reb_line.upd_product_qty,
-                        'product_uom_id': reb_line.new_uom_id.id,
+                        'uom_id': reb_line.new_uom_id.id,
                         'operation_id': reb_line.new_operation_id.id,
                     })
                 else:
@@ -459,21 +487,21 @@ class MrpEco(models.Model):
                 # Remove all rebase line of current eco.
                 self.previous_change_ids.unlink()
         if self.current_bom_id:
-            self.new_bom_id.write({'version': self.will_update_version and self.current_bom_id.version + 1 or self.current_bom_id.version, 'previous_bom_id': self.current_bom_id.id})
+            self.new_bom_id.write({'version': self.current_bom_id.version, 'previous_bom_id': self.current_bom_id.id})
             vals.update({'bom_id': self.current_bom_id.id, 'current_bom_id': False})
         self.message_post(body=_('Successfully Rebased!'))
         return self.write(vals)
 
     @api.depends('bom_id.bom_line_ids',
-                 'new_bom_id.bom_line_ids', 'new_bom_id.bom_line_ids.product_qty', 'new_bom_id.bom_line_ids.product_uom_id', 'new_bom_id.bom_line_ids.operation_id',
+                 'new_bom_id.bom_line_ids', 'new_bom_id.bom_line_ids.product_qty', 'new_bom_id.bom_line_ids.uom_id', 'new_bom_id.bom_line_ids.operation_id', 'new_bom_id.bom_line_ids.product_id',
                  'bom_id.byproduct_ids',
-                 'new_bom_id.byproduct_ids', 'new_bom_id.byproduct_ids.product_qty', 'new_bom_id.bom_line_ids.operation_id')
+                 'new_bom_id.byproduct_ids', 'new_bom_id.byproduct_ids.product_qty', 'new_bom_id.byproduct_ids.operation_id', 'new_bom_id.byproduct_ids.product_id', 'new_bom_id.byproduct_ids.uom_id')
     def _compute_bom_change_ids(self):
         # Compute difference between old bom and new bom revision.
         for eco in self:
             eco.bom_change_ids = eco._get_difference_bom_lines(eco.bom_id, eco.new_bom_id)
 
-    @api.depends('bom_id.bom_line_ids', 'current_bom_id.bom_line_ids', 'current_bom_id.bom_line_ids.product_qty', 'current_bom_id.bom_line_ids.product_uom_id', 'current_bom_id.bom_line_ids.operation_id')
+    @api.depends('bom_id.bom_line_ids', 'current_bom_id.bom_line_ids', 'current_bom_id.bom_line_ids.product_qty', 'current_bom_id.bom_line_ids.uom_id', 'current_bom_id.bom_line_ids.operation_id')
     def _compute_previous_bom_change(self):
         for eco in self:
             if eco.current_bom_id:
@@ -486,7 +514,7 @@ class MrpEco(models.Model):
                  'new_bom_id.operation_ids', 'new_bom_id.operation_ids.active', 'new_bom_id.operation_ids.time_mode', 'new_bom_id.operation_ids.time_mode_batch', 'new_bom_id.operation_ids.time_cycle_manual')
     def _compute_routing_change_ids(self):
         for rec in self:
-            if rec.state == 'confirmed' or rec.type == 'product':
+            if rec.state == 'confirmed' or not rec.new_bom_id:
                 continue
             new_routing_commands = [Command.clear()]
             old_routing_lines = defaultdict(lambda: self.env['mrp.routing.workcenter'])
@@ -501,7 +529,8 @@ class MrpEco(models.Model):
                         old_routing_lines[key] -= old_op
                         if old_op.time_mode != operation.time_mode or \
                                 old_op.time_mode_batch != operation.time_mode_batch or \
-                                tools.float_compare(old_op.time_cycle_manual, operation.time_cycle_manual, 2) != 0:
+                                tools.float_compare(old_op.time_cycle_manual, operation.time_cycle_manual, 2) != 0 or \
+                                old_op.workcenter_id != operation.workcenter_id:
                             new_routing_commands += [Command.create({
                                 'change_type': 'update',
                                 'workcenter_id': operation.workcenter_id.id,
@@ -509,6 +538,7 @@ class MrpEco(models.Model):
                                 'upd_time_mode_batch': operation.time_mode_batch - old_op.time_mode_batch if operation.time_mode == 'auto' else 0,
                                 'upd_time_cycle_manual': operation.time_cycle_manual - old_op.time_cycle_manual if operation.time_mode == 'manual' else 0,
                                 'operation_id': operation.id,
+                                'old_operation_id': old_op.id,
                             })]
                         new_routing_commands += self._prepare_detailed_change_commands(operation, old_op)
                     else:
@@ -571,6 +601,11 @@ class MrpEco(models.Model):
         for rec in self:
             rec.allow_apply_change = rec.stage_id.allow_apply_change and rec.state in ('confirmed', 'progress')
 
+    def _compute_show_eco_type(self):
+        show_eco_type = self.env['mrp.eco.type'].search_count([], limit=2) > 1
+        for rec in self:
+            rec.show_eco_type = show_eco_type
+
     @api.depends('stage_id.approval_template_ids')
     def _compute_allow_change_kanban_state(self):
         for rec in self:
@@ -588,10 +623,13 @@ class MrpEco(models.Model):
 
     @api.onchange('product_tmpl_id')
     def onchange_product_tmpl_id(self):
-        if self.product_tmpl_id.bom_ids:
-            bom_product_tmpl = self.bom_id.product_tmpl_id or self.bom_id.product_id.product_tmpl_id
-            if bom_product_tmpl != self.product_tmpl_id:
-                self.bom_id = self.product_tmpl_id.bom_ids.ids[0]
+        if self.product_tmpl_id.bom_ids and not self.bom_id:
+            self.bom_id = self.product_tmpl_id.bom_ids.ids[0]
+
+    @api.onchange('bom_id')
+    def onchange_bom_id(self):
+        if self.bom_id and not self.product_tmpl_id:
+            self.product_tmpl_id = self.bom_id.product_tmpl_id
 
     @api.onchange('type_id')
     def onchange_type_id(self):
@@ -601,12 +639,15 @@ class MrpEco(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             prefix = self.env['ir.sequence'].next_by_code('mrp.eco') or ''
-            vals['name'] = '%s%s' % (prefix and '%s: ' % prefix or '', vals.get('name', ''))
+            name = vals['name'].strip() if vals.get('name') else ''
+            vals['name'] = prefix + (f": {name}" if name else '')
         ecos = super().create(vals_list)
         ecos._create_approvals()
         return ecos
 
     def write(self, vals):
+        if 'name' in vals and not vals['name']:
+            del vals['name']
         if vals.get('stage_id'):
             newstage = self.env['mrp.eco.stage'].browse(vals['stage_id'])
             # raise exception only if we increase the stage, not on decrease
@@ -633,12 +674,6 @@ class MrpEco(models.Model):
                     doc = self.env['product.document'].create([{'ir_attachment_id': vals['displayed_image_attachment_id']}])
             vals.pop('displayed_image_attachment_id')
             vals['displayed_image_id'] = doc
-        if 'will_update_version' in vals:
-            for eco in self:
-                if eco.new_bom_id and eco.state != 'done' and eco.will_update_version != vals['will_update_version']:
-                    eco.new_bom_id.version += 1 if vals['will_update_version'] else -1
-        if vals.get('type') == 'product':
-            vals['bom_id'] = False
         res = super(MrpEco, self).write(vals)
         if vals.get('stage_id'):
             self._create_approvals()
@@ -732,7 +767,7 @@ class MrpEco(models.Model):
         self.write(vals)
         # Set previous BoM on new revision and change version of BoM.
         self.new_bom_id.write({
-            'version': self.will_update_version and self.bom_id.version + 1 or self.bom_id.version,
+            'version': self.bom_id.version,
             'previous_bom_id': self.bom_id.id
             })
         # Remove all rebase lines.
@@ -740,30 +775,73 @@ class MrpEco(models.Model):
         rebase_lines.unlink()
         return True
 
+    def _prepare_new_bom_copy_values(self):
+        self.ensure_one()
+        values = {
+            'version': self.bom_id.version,
+            'active': False,
+            'previous_bom_id': self.bom_id.id,
+        }
+        if self.product_tmpl_id and self.bom_id.product_tmpl_id != self.product_tmpl_id:
+            values['product_tmpl_id'] = self.product_tmpl_id.id
+            if self.bom_id.product_id:
+                values['product_id'] = self.product_tmpl_id.product_variant_id.id
+        return values
+
+    def _ensure_new_bom(self):
+        self.ensure_one()
+        if self.new_bom_id or not self.bom_id:
+            return
+        if self.production_id:
+            # This ECO was generated from a MO. Uses its MO as base for the revision.
+            self.new_bom_id = self.production_id._create_revision_bom()
+        else:
+            self.new_bom_id = self.bom_id.sudo().copy(default=self._prepare_new_bom_copy_values())
+
     def action_new_revision(self):
         for eco in self:
-            domain = Domain([('res_model', '=', 'product.template'), ('res_id', '=', eco.product_tmpl_id.id)])
-            if eco.type == 'bom':
-                if eco.production_id:
-                    # This ECO was generated from a MO. Uses it MO as base for the revision.
-                    eco.new_bom_id = eco.production_id._create_revision_bom(eco.will_update_version)
-                if not eco.new_bom_id:
-                    eco.new_bom_id = eco.bom_id.sudo().copy(default={
-                        'version': eco.bom_id.version + eco.will_update_version,
-                        'active': False,
-                        'previous_bom_id': eco.bom_id.id,
-                    })
-                if eco.bom_id.product_id:
-                    domain |= Domain(['&', ('res_model', '=', 'product.product'), ('res_id', 'in', eco.bom_id.product_id.ids)])
-                else:
-                    domain |= Domain(['&', ('res_model', '=', 'product.product'), ('res_id', 'in', self.env["product.product"].search([('product_tmpl_id', 'in', eco.product_tmpl_id.ids)]).ids)])
-                domain &= Domain('attached_on_mrp', '=', 'bom')
-            else:
-                domain |= Domain(['&', ('res_model', '=', 'product.product'), ('res_id', 'in', self.env["product.product"].search([('product_tmpl_id', 'in', eco.product_tmpl_id.ids)]).ids)])
-            docs = self.env['product.document'].search(domain)
-            for doc in docs:
-                doc.copy({'res_model': 'mrp.eco', 'res_id': eco.id, 'origin_attachment_id': doc.ir_attachment_id.id})
+            if not eco.product_tmpl_id:
+                raise UserError(_('You need to select a product before starting the revision.'))
+            eco._ensure_new_bom()
+            product_ids = eco.product_tmpl_id.product_variant_ids.ids
+            docs = self.env['product.document'].search([
+                '|',
+                '&',
+                ('res_model', '=', 'product.template'),
+                ('res_id', '=', eco.product_tmpl_id.id),
+                '&',
+                ('res_model', '=', 'product.product'),
+                ('res_id', 'in', product_ids),
+            ])
+            docs_vals = docs.copy_data({
+                'res_model': 'mrp.eco',
+                'res_id': eco.id,
+            })
+            for doc, vals in zip(docs, docs_vals):
+                vals['origin_attachment_id'] = doc.ir_attachment_id.id
+            self.env['product.document'].create(docs_vals)
         self.write({'state': 'progress'})
+
+    def _set_cost(self):
+        """Snapshot costs on change records so the report stays stable after validation."""
+        for eco in self:
+            for change in eco.bom_change_ids:
+                change.cost = change.cost_computed
+            for change in eco.routing_change_ids:
+                change.cost = change.cost_computed
+
+    def _log_version_update(self, types_updated):
+        self.ensure_one()
+        messages = [
+            _('%s updated to new version.', _(' and ').join(type_updated))
+            for type_updated in types_updated
+            if type_updated
+        ]
+        body = Markup('<p><b>%s</b></p>') % Markup('<br/>').join(
+            Markup('%s') % message
+            for message in messages
+        )
+        self.message_post(body=body)
 
     def action_apply(self):
         self._check_company()
@@ -774,10 +852,8 @@ class MrpEco(models.Model):
             if eco.state == 'rebase':
                 eco.apply_rebase()
             if eco.allow_apply_change:
-                if eco.type == 'product':
-                    eco.product_tmpl_id.version = eco.will_update_version and eco.product_tmpl_id.version + 1 or eco.product_tmpl_id.version
-                else:
-                    eco.mapped('new_bom_id').apply_new_version()
+                if eco.new_bom_id:
+                    eco.new_bom_id.apply_new_version()
 
                 for attach in eco.with_context(active_test=False).document_ids:
                     origin = attach.origin_attachment_id
@@ -793,9 +869,11 @@ class MrpEco(models.Model):
                     new_doc = attach.copy({
                         'res_model': 'product.template',
                         'res_id': eco.product_tmpl_id.id,
+                        'origin_attachment_id': attach.ir_attachment_id.id,
                     })
                     attach.origin_attachment_id = new_doc.ir_attachment_id.id
 
+                eco._set_cost()
                 vals = {'state': 'done'}
                 stage_id = eco.env['mrp.eco.stage'].search([
                     ('final_stage', '=', True),
@@ -817,6 +895,28 @@ class MrpEco(models.Model):
                 'context': {'search_default_changetoapply': False},
             }
 
+    def open_wizard(self):
+        self.ensure_one()
+        Wizard = self.env['mrp.eco.update.product.version']
+        used_in_boms = self._get_used_in_boms()
+        used_in_products = used_in_boms.product_tmpl_id
+        bom = self.new_bom_id
+        wizard = Wizard.create({
+            'eco_id': self.id,
+            'product_tmpl_id': self.product_tmpl_id.id,
+            'bom_id': bom.id,
+            'used_in_product_tmpl_ids': [Command.set(used_in_products.ids)],
+            'used_in_bom_ids': [Command.set(used_in_boms.ids)],
+        })
+        return {
+            'name': _('Update Versions'),
+            'type': 'ir.actions.act_window',
+            'res_model': Wizard._name,
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+
     def action_see_attachments(self):
         self.ensure_one()
         attachment_view = self.env.ref('mrp_plm.view_document_file_kanban_mrp_plm')
@@ -825,13 +925,11 @@ class MrpEco(models.Model):
             'default_res_id': self.id,
             'default_company_id': self.company_id.id,
             'search_default_all': 1,
+            'hide_upload_button': self.state == 'done',
             'create': self.state != 'done',
             'edit': self.state != 'done',
             'delete': self.state != 'done',
         }
-
-        if self.type == 'bom':
-            context['eco_bom'] = True
 
         return {
             'name': _('Attachments'),
@@ -855,6 +953,29 @@ class MrpEco(models.Model):
         action = self.env['ir.actions.act_window']._for_xml_id('mrp.action_mrp_production_form')
         action["res_id"] = self.production_id.id
         return action
+
+    def action_open_used_in_products(self):
+        self.ensure_one()
+        records = self._get_used_in_boms().product_tmpl_id
+        action = self.env['ir.actions.act_window']._for_xml_id('product.product_template_action_all')
+        action['name'] = self.env._('Used In')
+        action['domain'] = [('id', 'in', records.ids)]
+        action['context'] = {}
+        action['view_mode'] = 'list,form'
+        action['views'] = [(self.env.ref('mrp_plm.product_template_used_in_list_view').id, 'list'), (False, 'form')]
+        return action
+
+    def action_compare_boms(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('BoM Lines'),
+            'res_model': 'mrp.bom.line',
+            'views': [
+                (self.env.ref('mrp.mrp_bom_line_view_pivot').id, 'pivot'),
+            ],
+            'domain': [('bom_id', 'in', (self.bom_id | self.new_bom_id).ids)],
+        }
 
     def open_new_bom(self):
         self.ensure_one()
@@ -892,46 +1013,61 @@ class MrpEcoBomChange(models.Model):
     old_operation_id = fields.Many2one('mrp.routing.workcenter', 'Previous Consumed in Operation')
     new_operation_id = fields.Many2one('mrp.routing.workcenter', 'New Consumed in Operation')
     upd_product_qty = fields.Float('Quantity', compute='_compute_upd_product_qty', store=True, digits='Product Unit')
-    uom_change = fields.Char('Unit', compute='_compute_change', compute_sudo=True)
-    operation_change = fields.Char(compute='_compute_change', string='Consumed in Operation', compute_sudo=True)
+    cost = fields.Monetary(currency_field='currency_id')
+    cost_computed = fields.Monetary(compute='_compute_cost', currency_field='currency_id')
+    description = fields.Text('Description', compute='_compute_description', compute_sudo=True)
+    currency_id = fields.Many2one(related='eco_id.company_id.currency_id')
     conflict = fields.Boolean()
     bom_line_id = fields.Many2one('mrp.bom.line', 'BoM Line', check_company=True)
     byproduct_id = fields.Many2one('mrp.bom.byproduct', 'BoM By-Product', check_company=True)
+
+    def _compute_cost(self):
+        for line_change in self:
+            if line_change.eco_id.state == 'done':
+                line_change.cost_computed = line_change.cost
+                continue
+
+            product = line_change.product_id.with_company(line_change.eco_id.company_id or self.env.company)
+            new_qty = line_change.new_uom_id._compute_quantity(line_change.new_product_qty, product.uom_id) if line_change.new_uom_id else 0
+            old_qty = line_change.old_uom_id._compute_quantity(line_change.old_product_qty, product.uom_id) if line_change.old_uom_id else 0
+            line_change.cost_computed = (new_qty - old_qty) * product.standard_price
 
     @api.depends('new_product_qty', 'old_product_qty')
     def _compute_upd_product_qty(self):
         for rec in self:
             rec.upd_product_qty = rec.new_product_qty - rec.old_product_qty
 
-    @api.depends('old_operation_id', 'new_operation_id', 'old_uom_id', 'new_uom_id')
-    def _compute_change(self):
+    @api.depends('change_type', 'old_operation_id', 'new_operation_id', 'old_uom_id', 'new_uom_id')
+    def _compute_description(self):
+        self.description = False
         for rec in self:
-            rec.operation_change = rec.new_operation_id.name if rec.change_type == 'add' else rec.old_operation_id.name
-            rec.uom_change = False
+            parts = []
+            if rec.change_type != 'update':
+                continue
+
+            # Operation change
+            if rec.old_operation_id.name != rec.new_operation_id.name:
+                if rec.byproduct_id:
+                    parts.append(self.env._(
+                        "Produced in Operation: %(old)s -> %(new)s",
+                        old=rec.old_operation_id.name or '',
+                        new=rec.new_operation_id.name or '',
+                    ))
+                else:
+                    parts.append(self.env._(
+                        "Consumed in Operation: %(old)s -> %(new)s",
+                        old=rec.old_operation_id.name or '',
+                        new=rec.new_operation_id.name or '',
+                    ))
+
+            # UoM change
             if (rec.old_uom_id and rec.new_uom_id) and rec.old_uom_id != rec.new_uom_id:
-                rec.uom_change = rec.old_uom_id.name + ' -> ' + rec.new_uom_id.name
-            if (rec.old_operation_id._get_sync_values() != rec.new_operation_id._get_sync_values()) and rec.change_type == 'update':
-                rec.operation_change = (rec.old_operation_id.name or '') + ' -> ' + (rec.new_operation_id.name or '')
-
-    def action_open_component_change(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'mrp.bom',
-            'res_id': self.bom_line_id.bom_id.id,
-            'view_mode': 'form',
-            'view_id': self.env.ref('mrp_plm.mrp_bom_view_form_inherit_plm_components').id,
-        }
-
-    def action_open_byproduct_change(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'mrp.bom',
-            'res_id': self.byproduct_id.bom_id.id,
-            'view_mode': 'form',
-            'view_id': self.env.ref('mrp_plm.mrp_bom_view_form_inherit_plm_byproducts').id,
-        }
+                parts.append(self.env._(
+                    "Unit: %(old)s -> %(new)s",
+                    old=rec.old_uom_id.name,
+                    new=rec.new_uom_id.name,
+                ))
+            rec.description = '\n'.join(parts) if parts else False
 
 
 class MrpEcoRoutingChange(models.Model):
@@ -944,18 +1080,60 @@ class MrpEcoRoutingChange(models.Model):
     upd_time_mode = fields.Char('Mode Change')
     upd_time_mode_batch = fields.Integer('Batch count Change')
     upd_time_cycle_manual = fields.Float('Manual Duration Change')
+    description = fields.Text('Description', compute='_compute_description')
+    description_reference = fields.Reference(
+        string='Reference', selection=[],
+        compute='_compute_description_reference')
+    cost = fields.Monetary(currency_field='currency_id')
+    cost_computed = fields.Monetary(compute='_compute_cost', currency_field='currency_id')
+    currency_id = fields.Many2one(related='eco_id.company_id.currency_id')
 
-    operation_id = fields.Many2one('mrp.routing.workcenter', 'Operation Id')
+    operation_id = fields.Many2one('mrp.routing.workcenter', 'Operation Id', ondelete='cascade')
+    old_operation_id = fields.Many2one('mrp.routing.workcenter', 'Previous Operation')
     operation_name = fields.Char(related='operation_id.name', string='Operation')
 
-    def action_open_routing_change_operation(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'mrp.routing.workcenter',
-            'res_id': self.operation_id.id,
-            'view_mode': 'form',
-        }
+    def _compute_cost(self):
+        for op_change in self:
+            if op_change.eco_id.state == 'done':
+                op_change.cost_computed = op_change.cost
+                continue
+
+            if op_change.change_type == 'add':
+                cost = op_change.operation_id.cost
+            elif op_change.change_type == 'remove':
+                cost = -op_change.operation_id.cost
+            else:
+                cost = op_change.operation_id.cost - op_change.old_operation_id.cost
+            op_change.cost_computed = cost
+
+    @api.depends('change_type', 'upd_time_mode', 'upd_time_mode_batch', 'upd_time_cycle_manual')
+    def _compute_description(self):
+        self.description = False
+        for op_change in self:
+            parts = []
+            if op_change.change_type != 'update':
+                continue
+            if op_change.old_operation_id.workcenter_id != op_change.operation_id.workcenter_id:
+                parts.append(self.env._(
+                    "Work center: %(old)s -> %(new)s",
+                    old=op_change.old_operation_id.workcenter_id.name or '',
+                    new=op_change.operation_id.workcenter_id.name or '',
+                ))
+            if op_change.upd_time_mode:
+                parts.append(self.env._(
+                    "Mode: %(mode)s",
+                    mode=op_change.upd_time_mode,
+                ))
+            if op_change.upd_time_mode_batch:
+                parts.append(self.env._(
+                    "Batch Count: %(count)s",
+                    count=f"{op_change.upd_time_mode_batch:+d}",
+                ))
+            op_change.description = '\n'.join(parts) if parts else False
+
+    def _compute_description_reference(self):
+        for op_change in self:
+            op_change.description_reference = False
 
 
 class MrpEcoTag(models.Model):

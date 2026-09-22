@@ -4,7 +4,8 @@ import re
 
 import psycopg2.errors
 
-from odoo import api, fields, models, _
+from odoo import api, models
+from odoo.tools import SQL
 
 
 class HrExpense(models.Model):
@@ -14,32 +15,13 @@ class HrExpense(models.Model):
         lang = self.env.context.get('lang') and self.env.context.get('lang')[:2]
         return {'fr': 'french'}.get(lang, 'english')
 
-    def _predict_field(self, sql_query, description):
-        psql_lang = self._get_predict_postgres_dictionary()
-        parsed_description = re.sub("[*&()|!':<]+", " ", description)
-        parsed_description = ' | '.join(parsed_description.split())
-        limit_parameter = self.env["ir.config_parameter"].sudo().get_param("expense.predict.history.limit", '10000')
-        params = {
-            'lang': psql_lang,
-            'description': parsed_description,
-            'company_id': self.company_id.id or self.env.company.id,
-            'limit_parameter': int(limit_parameter),
-        }
-        # In case there is an error while parsing the to_tsquery (wrong character for example)
-        # We don't want to have a traceback, instead return False
-        with contextlib.suppress(psycopg2.errors.SyntaxError):
-            with self.env.cr.savepoint():
-                self.env.cr.execute(sql_query, params)
-                result = self.env.cr.fetchone()
-            if result:
-                return result[1]
-
-        return False
-
     def _predict_product(self, description):
         if not description:
             return False
-        sql_query = """
+        parsed_description = re.sub(r"[*&()|!':<]+", " ", description)
+        parsed_description = ' | '.join(parsed_description.split())
+        limit_parameter = self.env["ir.config_parameter"].sudo().get_int("expense.predict.history.limit") or 10000
+        sql_query = SQL("""
             SELECT
                 max(f.rel) AS ranking,
                 f.product_id,
@@ -65,8 +47,22 @@ class HrExpense(models.Model):
             JOIN product_product p ON p.id = f.product_id AND p.active
             GROUP BY f.product_id
             ORDER BY ranking desc, count desc
-        """
-        return self._predict_field(sql_query, description)
+            """,
+            lang=self._get_predict_postgres_dictionary(),
+            company_id=self.company_id.id or self.env.company.id,
+            limit_parameter=int(limit_parameter),
+            description=parsed_description,
+        )
+        # In case there is an error while parsing the to_tsquery (wrong character for example)
+        # We don't want to have a traceback, instead return False
+        with contextlib.suppress(psycopg2.errors.SyntaxError):
+            with self.env.cr.savepoint():
+                self.env.cr.execute(sql_query)
+                result = self.env.cr.fetchone()
+            if result:
+                return result[1]
+
+        return False
 
     @api.onchange('name')
     def _onchange_predict_product(self):

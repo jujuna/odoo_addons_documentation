@@ -7,7 +7,8 @@ from lxml import etree
 from odoo import Command, _, api, fields, models
 from odoo.addons.l10n_se_sie_import.xml_utils import validate_xmldsig_signature
 from odoo.exceptions import RedirectWarning, UserError
-from odoo.tools import date_utils, file_open, mimetypes, float_is_zero, Query, SQL
+from odoo.models import Query
+from odoo.tools import date_utils, file_open, mimetypes, float_is_zero, SQL
 from odoo.tools.safe_eval import datetime
 
 _logger = logging.getLogger(__name__)
@@ -89,10 +90,14 @@ class L10n_SeSieImportWizard(models.TransientModel):
             currency = company.currency_id
             currency_name = currency.name
 
-        if not company.company_registry:
-            raise UserError(_("The company's Company ID must be set with the company's organisation ID (10/12 digits in XXXXXXXXXXxx-YYYYY format"))
-        if company.company_registry != file_info_company_id:
-            raise UserError(_("Company ID '%(company_id)s' does not match the file organisation ID '%(organisation_id)s'", company_id=company.company_registry, organisation_id=file_info_company_id))
+        se_en = company.partner_id._get_additional_identifier('SE_EN')
+        ResPartner = self.env['res.partner']
+        formatted_se_en = ResPartner._format_identifier('SE_EN', se_en)
+        identifier_label = ResPartner._get_identifier_label('SE_EN')
+        if not formatted_se_en:
+            raise UserError(_("The company's %(identifier_label)s must be set with the company's organisation ID (10/12 digits in XXXXXXXXXXxx-YYYYY format)", identifier_label=identifier_label))
+        if formatted_se_en != file_info_company_id:
+            raise UserError(_("%(identifier_label)s '%(company_id)s' does not match the file organisation ID '%(organisation_id)s'", identifier_label=identifier_label, company_id=formatted_se_en, organisation_id=file_info_company_id))
         if company.currency_id.name != currency_name:
             raise UserError(_("Company currency '%(company_currency)s' doesn't match the file's main currency '%(main_currency)s'", company_currency=company.currency_id.name, main_currency=currency_name))
 
@@ -500,9 +505,10 @@ class L10n_SeSieImportWizard(models.TransientModel):
             country_id = self.env.ref(f"base.{sie_partner['country']}").id if sie_partner.get('country') else None
             partner_id = _get_partner_id(partners_map, sie_partner.get('name'), sie_partner.get('vatNo'))
             if not partner_id:
+                org_id = sie_partner.get('organizationId')
                 partners_creation.append({
                     'name': sie_partner.get('name'),
-                    'company_registry': sie_partner.get('organizationId'),
+                    'additional_identifiers': {'SE_EN': org_id} if org_id else None,
                     'vat': sie_partner.get('vatNo'),
                     'street': sie_partner.get('address1'),
                     'street2': sie_partner.get('address2'),
@@ -667,7 +673,7 @@ class L10n_SeSieImportWizard(models.TransientModel):
         new_balance_moves = {}
 
         self.env['account.move.line'].flush_model(['account_id', 'date', 'balance', 'ref', 'parent_state', 'company_id'])
-        query = Query(self.env, alias='aml', table=SQL.identifier('account_move_line'))
+        query = Query(self.env['account.move.line'], alias='aml')
         query.add_join('JOIN', alias='account', table='account_account', condition=SQL('aml.account_id = account.id'))
         account_code = self.env['account.account']._field_to_sql('account', 'code', query)
 
@@ -811,7 +817,7 @@ class L10n_SeSieImportWizard(models.TransientModel):
 
             lines_per_accounts = defaultdict(list)
             for line_id in all_moves.line_ids:
-                if line_id.is_account_reconcile and line_id.move_id.ref != _('SIE opening/closing balance move'):
+                if line_id.move_id.ref != _('SIE opening/closing balance move'):
                     lines_per_accounts[line_id.account_id.id].append(line_id.id)
 
             for line_ids in lines_per_accounts.values():
@@ -829,7 +835,7 @@ class L10n_SeSieImportWizard(models.TransientModel):
                 action = record.env.ref('account.action_account_config')
                 raise RedirectWarning(_('You should install a Fiscal Localization first.'), action.id, _('Accounting Settings'))
 
-            data = base64.b64decode(record.attachment_id)
+            data = record.attachment_id.content
             try:
                 self._import_sie_file(etree.fromstring(data))
             except etree.XMLSyntaxError:

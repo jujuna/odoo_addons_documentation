@@ -10,7 +10,7 @@ class IrUiView(models.Model):
     type = fields.Selection(selection_add=[('grid', "Grid")])
 
     def _get_view_info(self):
-        return {'grid': {'icon': 'fa fa-th'}} | super()._get_view_info()
+        return {'grid': {'icon': 'grid_view'}} | super()._get_view_info()
 
     def unlink(self):
         if not any(v.type == "grid" for v in self):

@@ -13,7 +13,7 @@ export class ArticleIndexPlugin extends Plugin {
                 id: "insertArticleIndex",
                 title: _t("Index"),
                 description: _t("Show nested articles"),
-                icon: "fa-list",
+                icon: "format_list_bulleted",
                 run: this.insertArticleIndex.bind(this),
                 isAvailable: isHtmlContentSupported,
             },
@@ -35,6 +35,6 @@ export class ArticleIndexPlugin extends Plugin {
     insertArticleIndex() {
         const articleIndexBlueprint = renderToElement("knowledge.ArticleIndexBlueprint");
         this.dependencies.dom.insert(articleIndexBlueprint);
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 }

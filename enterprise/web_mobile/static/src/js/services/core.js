@@ -1,15 +1,18 @@
 /* global OdooDeviceUtility */
+/* global OdooDevicePolyfill */
 
 import { uniqueId } from "@web/core/utils/functions";
-import { browser } from "@web/core/browser/browser";
+import { location, browser } from "@web/core/browser/browser";
 import { parseSearchQuery } from "@web/core/browser/router";
+import { patch } from "@web/core/utils/patch";
+import { BackButtonManager } from "@web/core/utils/hooks";
 
-var available = typeof OdooDeviceUtility !== 'undefined';
-var DeviceUtility;
-var deferreds = {};
-export var methods = {};
+const available = typeof OdooDeviceUtility !== "undefined";
+let DeviceUtility;
+const deferreds = {};
+export const methods = {};
 
-if (available){
+if (available) {
     DeviceUtility = OdooDeviceUtility;
     delete window.OdooDeviceUtility;
 }
@@ -26,13 +29,13 @@ function native_invoke(name, args) {
     if (args === undefined) {
         args = {};
     }
-    var id = uniqueId();
+    const id = uniqueId();
     args = JSON.stringify(args);
     DeviceUtility.execute(name, args, id);
     return new Promise(function (resolve, reject) {
         deferreds[id] = {
             successCallback: resolve,
-            errorCallback: reject
+            errorCallback: reject,
         };
     });
 }
@@ -44,7 +47,7 @@ function native_invoke(name, args) {
  * @param {Object} result
  */
 window.odoo.native_notify = function (id, result) {
-    if (deferreds.hasOwnProperty(id)) {
+    if (Object.prototype.hasOwnProperty.call(deferreds, id)) {
         if (result.success) {
             deferreds[id].successCallback(result);
         } else {
@@ -53,20 +56,26 @@ window.odoo.native_notify = function (id, result) {
     }
 };
 
-var plugins = available ? JSON.parse(DeviceUtility.list_plugins()) : [];
+const plugins = available ? JSON.parse(DeviceUtility.list_plugins()) : [];
 plugins.forEach((plugin) => {
     methods[plugin.name] = function (args) {
         return native_invoke(plugin.action, args);
     };
 });
 
+let polyfills = {};
+
+if (window.OdooDevicePolyfill) {
+    polyfills = OdooDevicePolyfill;
+}
+
 /**
  * Use to notify an uri hash change on native devices (ios / android)
  */
 if (methods.hashChange) {
-    var currentSearch;
+    let currentSearch;
     browser.addEventListener("popstate", function () {
-        const search = parseSearchQuery(browser.location.search);
+        const search = parseSearchQuery(location.search);
         if (JSON.stringify(currentSearch) !== JSON.stringify(search)) {
             methods.hashChange(search);
         }
@@ -74,85 +83,26 @@ if (methods.hashChange) {
     });
 }
 
-/**
- * Error related to the registration of a listener to the backbutton event
- */
-class BackButtonListenerError extends Error {}
-
-/**
- * By using the back button feature the default back button behavior from the
- * app is actually overridden so it is important to keep count to restore the
- * default when no custom listener are remaining.
- */
-class BackButtonManager {
-
-    constructor() {
-        this._listeners = new Map();
-        this._onGlobalBackButton = this._onGlobalBackButton.bind(this);
-    }
-
-    //--------------------------------------------------------------------------
-    // Public
-    //--------------------------------------------------------------------------
-
-    /**
-     * Enables the func listener, overriding default back button behavior.
-     *
-     * @param {Component} listener
-     * @param {function} func
-     * @throws {BackButtonListenerError} if the listener has already been registered
-     */
-    addListener(listener, func) {
-        if (!methods.overrideBackButton) {
-            return;
-        }
-        if (this._listeners.has(listener)) {
-            throw new BackButtonListenerError("This listener was already registered.");
-        }
-        this._listeners.set(listener, func);
-        if (this._listeners.size === 1) {
-            document.addEventListener('backbutton', this._onGlobalBackButton);
+patch(BackButtonManager.prototype, {
+    _activate() {
+        if (methods.overrideBackButton) {
+            document.addEventListener("backbutton", this._boundPerformLatestBackAction);
             methods.overrideBackButton({ enabled: true });
+        } else {
+            super._activate();
         }
-    }
-    /**
-     * Disables the func listener, restoring the default back button behavior if
-     * no other listeners are present.
-     *
-     * @param {Component} listener
-     * @throws {BackButtonListenerError} if the listener has already been unregistered
-     */
-    removeListener(listener) {
-        if (!methods.overrideBackButton) {
-            return;
-        }
-        if (!this._listeners.has(listener)) {
-            throw new BackButtonListenerError("This listener has already been unregistered.");
-        }
-        this._listeners.delete(listener);
-        if (this._listeners.size === 0) {
-            document.removeEventListener('backbutton', this._onGlobalBackButton);
+    },
+    _deactivate() {
+        if (methods.overrideBackButton) {
+            document.removeEventListener("backbutton", this._boundPerformLatestBackAction);
             methods.overrideBackButton({ enabled: false });
+        } else {
+            super._deactivate();
         }
-    }
-
-    //--------------------------------------------------------------------------
-    // Private
-    //--------------------------------------------------------------------------
-
-    _onGlobalBackButton() {
-        const [listener, func] = [...this._listeners].pop();
-        if (listener) {
-            func.apply(listener, arguments);
-        }
-    }
-}
-
-const backButtonManager = new BackButtonManager();
+    },
+});
 
 export default {
-    BackButtonManager,
-    BackButtonListenerError,
-    backButtonManager,
     methods,
+    polyfills,
 };

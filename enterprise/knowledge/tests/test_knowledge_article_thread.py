@@ -76,6 +76,7 @@ class TestKnowledgeArticleTours(HttpCaseWithUserDemo):
         self.assertIn("My Knowledge Comment", new_thread.message_ids[0].body)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleThreadCrud(KnowledgeCommonBusinessCase):
 
     def test_knowledge_article_thread_create_w_unsafe_anchors(self):
@@ -99,6 +100,7 @@ class TestKnowledgeArticleThreadCrud(KnowledgeCommonBusinessCase):
         self.assertEqual("Should be Purified", new_thread.article_anchor_text)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleThreadMail(KnowledgeCommonBusinessCase):
 
     def test_knowledge_article_thread_message_post_filtered_partners(self):

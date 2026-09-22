@@ -1,8 +1,12 @@
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+
+from odoo.tests import tagged
 
 from odoo.addons.equity.tests.common import TestEquityCommon
+from odoo.tests.form import Form
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestEquity(TestEquityCommon):
     def test_no_transaction(self):
         self.assertFalse(self.env['equity.cap.table'].search([('partner_id', '=', self.company.id)]))
@@ -245,3 +249,73 @@ class TestEquity(TestEquityCommon):
                 'valuation': 1000,
             }],
         )
+
+    def test_equity_currency_on_transactions(self):
+        """
+        Ensure the equity currency can be defined for the first transaction
+        but cannot be modified once transactions exist for the partner.
+
+        The default value for the first transaction should be the company's
+        currency when the equity module is added or at the time of partner creation.
+        """
+        usd_currency = self.env.ref('base.USD')
+        eur_currency = self.env.ref('base.EUR')
+        eur_currency.active = True
+        self.env.company.currency_id = eur_currency
+        self.env.company.partner_id.equity_currency_id = eur_currency
+
+        test_company = self.env['res.partner'].create({
+            'name': 'Currency Test Company',
+            'is_company': True,
+        })
+
+        with self.assertRaisesRegex(ValidationError, "different currencies"):
+            self.env['equity.transaction'].create([
+                {
+                    'partner_id': test_company.id,
+                    'subscriber_id': self.contact_1.id,
+                    'securities': 100,
+                    'security_price': 10,
+                    'security_class_id': self.option_class_2.id,
+                    'equity_currency_id': currency.id,
+                } for currency in (usd_currency, eur_currency)
+            ])
+
+        transaction = self.env['equity.transaction']
+        with Form(transaction) as transaction_form:
+            transaction_form.partner_id = test_company
+            transaction_form.subscriber_id = self.contact_1
+            transaction_form.securities = 100
+            transaction_form.security_price = 10
+            transaction_form.security_class_id = self.option_class_2
+
+            self.assertEqual(transaction_form.equity_currency_id, eur_currency)
+            transaction_form.equity_currency_id = usd_currency
+            transaction = transaction_form.save()
+
+        self.assertRecordValues(transaction, [
+            {'equity_currency_id': usd_currency.id, 'can_change_currency': True},
+        ])
+        transaction.equity_currency_id = eur_currency
+
+        with Form(transaction.copy()) as other_transaction_form:
+            with self.assertRaisesRegex(AssertionError, "can't write on invisible field 'equity_currency_id'"):
+                other_transaction_form.equity_currency_id = usd_currency.id
+
+        with self.assertRaisesRegex(ValidationError, "has existing transactions"):
+            transaction.equity_currency_id = usd_currency
+
+    def test_compute_security_price(self):
+        transactions = self.env['equity.transaction'].create([{
+            'partner_id': self.company.id,
+            'subscriber_id': self.contact_1.id,
+            'date': '2026-01-01',
+            'transaction_type': 'issuance',
+            'securities': 10,
+            'security_class_id': self.share_class_ord.id,
+        } for _ in range(2)])
+
+        self.assertRecordValues(transactions, [
+            {'security_price': 0},
+            {'security_price': 0},
+        ])

@@ -2,19 +2,13 @@
 <templates xml:space="preserve">
 
     <t t-name="discuss.CallDropdown">
-        <div class="o-discuss-CallDropdown" t-att-class="props.class">
-            <div class="d-flex h-100" t-ref="trigger" t-on-click="handleClick">
-                <t t-slot="default"/>
-            </div>
-
-            <div t-if="isOpen"
-                 t-ref="menu"
-                 t-on-click="onClickMenu"
-                 class="o-discuss-CallDropdown-content o-dropdown--menu dropdown-menu"
-                 t-att-class="props.menuClass">
-                <t t-slot="content"/>
+        <t t-call-slot="default"/>
+        <div t-if="this.isOpen()" class="o-discuss-CallDropdown" t-att-class="this.props.class">
+            <div t-ref="this.menuRef" t-on-click="this.onClickMenu" class="o-discuss-CallDropdown-content o-dropdown--menu dropdown-menu d-block" t-att-class="this.props.menuClass">
+                <t t-call-slot="content"/>
             </div>
         </div>
     </t>
 
 </templates>
+

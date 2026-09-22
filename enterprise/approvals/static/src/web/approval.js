@@ -1,36 +1,36 @@
-import { Component } from "@odoo/owl";
+import { propSignal } from "@mail/utils/common/hooks";
 
+import { Component, computed, useProps, t } from "@odoo/owl";
+
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
-/**
- * @typedef {Object} Props
- * @property {import("models").Activity} activity
- * @extends {Component<Props, Env>}
- */
 export class Approval extends Component {
     static template = "approvals.Approval";
-    static props = {
-        activity: Object,
-        onChange: Function,
-    };
 
     setup() {
+        super.setup(...arguments);
         this.store = useService("mail.store");
+        this.activity = propSignal("activity", t.instanceOf(this.store["mail.activity"]));
+        this.onChange = useProps.static("onChange", t.function([]));
+        this.isApprover = computed(() => user.userId == this.activity().approver_id.user_id);
     }
 
     async onClickApprove() {
+        const activity = this.activity();
         await this.env.services.orm.call("approval.approver", "action_approve", [
-            this.props.activity.approver_id.id,
+            activity.approver_id.id,
         ]);
-        this.props.activity.remove();
-        this.props.onChange();
+        activity.remove();
+        this.onChange();
     }
 
     async onClickRefuse() {
+        const activity = this.activity();
         await this.env.services.orm.call("approval.approver", "action_refuse", [
-            this.props.activity.approver_id.id,
+            activity.approver_id.id,
         ]);
-        this.props.activity.remove();
-        this.props.onChange();
+        activity.remove();
+        this.onChange();
     }
 }

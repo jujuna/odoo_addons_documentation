@@ -2,10 +2,15 @@
 
 from dateutil.relativedelta import relativedelta
 
+from odoo.tests import tagged
+
 from .common import SubscriptionsPartnershipCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSubscriptionsPartnership(SubscriptionsPartnershipCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_basic_subscriptions_flow_with_partnership(self):
         self.sale_order_partnership.action_confirm()
@@ -79,3 +84,27 @@ class TestSubscriptionsPartnership(SubscriptionsPartnershipCommon):
             self.env.ref('partnership.res_partner_grade_data_silver'),
             "Grade of partner should not be affected by partnership cancellation if changed.",
         )
+
+    def test_salesmanager_order_cancelation_for_internal_user(self):
+        """ Test that a sales manager can cancel an order for an internal user
+        """
+        salesperson_partner = self.env['res.partner'].create({'name': 'Sales manager Partner'})
+        self.salesperson_user = self.env['res.users'].create({
+            'name': 'Sales manager User',
+            'login': 'salesmanager_user',
+            'partner_id': salesperson_partner.id,
+        })
+        sales_manager_group = self.env.ref('sales_team.group_sale_manager')
+        self.salesperson_user.write({'group_ids': [(4, sales_manager_group.id)]})
+
+        internal_partner = self.env['res.partner'].create({'name': 'Internal Partner'})
+        self.env['res.users'].create({
+            'name': 'Internal User',
+            'login': 'internal_user',
+            'partner_id': internal_partner.id,
+        })
+
+        self.sale_order_partnership.partner_id = internal_partner
+        self.sale_order_partnership.action_confirm()
+        self.sale_order_partnership.with_user(self.salesperson_user).action_cancel()
+        self.assertFalse(self.sale_order_partnership.subscription_state)

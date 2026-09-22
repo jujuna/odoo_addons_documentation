@@ -1,4 +1,4 @@
-import { Component, onWillUnmount } from "@odoo/owl";
+import { Component, onWillUnmount, t, useProps } from "@odoo/owl";
 import {
     registries,
     stores,
@@ -6,6 +6,7 @@ import {
 } from "@spreadsheet/o_spreadsheet/o_spreadsheet";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 
 const { useStore, ClientFocusStore } = stores;
 const { topbarComponentRegistry } = registries;
@@ -14,13 +15,14 @@ const SHOWN_USER_THUMBNAIL = 10;
 
 class SpreadsheetUsersTooltip extends Component {
     static template = "spreadsheet_edition.SpreadsheetUsersTooltip";
-    static props = {
-        users: Object,
-        onMouseLeave: Function,
-        onMouseEnter: Function,
-        onClick: Function,
-        close: { optional: true, type: Function },
-    };
+
+    props = useProps({
+        users: t.array(t.object()),
+        onMouseLeave: t.function(),
+        onMouseEnter: t.function(),
+        onClick: t.function(),
+        close: t.function().optional(),
+    });
 
     getDataTooltip(userName) {
         return _t("Go to %(userName)s", { userName });
@@ -29,7 +31,6 @@ class SpreadsheetUsersTooltip extends Component {
 
 export class CollaborativeStatus extends Component {
     static template = "spreadsheet_edition.CollaborativeStatus";
-    static props = {};
 
     setup() {
         super.setup();
@@ -60,14 +61,18 @@ export class CollaborativeStatus extends Component {
             throw error;
         }
         for (const client of this.env.model.getters.getConnectedClients()) {
+            const clientIsPublic = client.userId === null;
             if (
                 client.id !== currentClientId &&
-                !connectedUsers.some((user) => user.id === client.userId)
+                (clientIsPublic || !connectedUsers.some((user) => user.id === client.userId))
             ) {
                 connectedUsers.push({
                     id: client.userId,
                     name: client.name,
-                    avatar: `/web/image?model=res.users&field=avatar_128&id=${client.userId}`,
+                    avatar:
+                        user.isInternalUser && !clientIsPublic
+                            ? `/web/image?model=res.users&field=avatar_128&id=${client.userId}`
+                            : null,
                     clientId: client.id,
                     color: client.color,
                 });

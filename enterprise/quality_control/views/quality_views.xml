@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="replace">
                 <field name="title" string="Quality Alert" filter_domain="[
-                    '|', '|', '|', ('title', 'ilike', self), ('product_id', 'ilike', self), ('product_tmpl_id', 'ilike', self), ('lot_ids', 'ilike', self)]"/>
+                    '|', '|', ('title', 'ilike', self), ('product_id', 'ilike', self), ('lot_ids', 'ilike', self)]"/>
             </xpath>
         </field>
     </record>
@@ -21,7 +21,7 @@
                 <templates>
                     <t t-name="card">
                         <field name="tag_ids"/>
-                        <field name="product_tmpl_id" class="fw-bolder"/>
+                        <field name="product_id" class="fw-bolder"/>
                         <field name="display_name"/>
                         <footer>
                             <div class="d-flex">
@@ -47,29 +47,35 @@
                 <sheet>
                     <field name="company_id" invisible="1"/>
                     <field name="product_id" invisible="1"/>
+                    <field name="product_tracking" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_see_check" type="object" invisible="not check_id" class="oe_stat_button" icon="fa-check-square-o">
+                        <button name="action_see_check" type="object" invisible="not check_id" class="oe_stat_button" icon="check_box">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value"><field name="check_id" readonly="1"/></span>
                                 <span class="o_stat_text">Quality Check</span>
                             </div>
                         </button>
                     </div>
-                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <div class="d-flex">
+                        <div class="oe_title flex-grow-1">
+                            <label for="title" string="Quality Alert"/>
+                            <h1><field name="title" placeholder="Title..."/></h1>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center flex-shrink-0 ms-auto">
+                            <field name="priority" widget="priority" class="me-3"/>
+                        </div>
+                    </div>
                     <group>
                         <group>
-                            <field name="title"/>
-                            <field name="product_tmpl_id"/>
-                            <field name="product_id" groups="product.group_product_variant"/>
-                            <field name="lot_ids" context="{'default_product_id': product_id}" groups="stock.group_production_lot" widget="many2many_tags" options="{'edit_tags': True}"/>
+                            <field name="product_id"/>
+                            <field name="lot_ids" context="{'default_product_id': product_id}" groups="stock.group_production_lot" widget="many2many_tags" options="{'on_tag_click': 'open_form'}" invisible="product_tracking not in ['lot', 'serial']" domain="product_id and [('product_id', '=', product_id)] or []"/>
                             <field name="picking_id"/>
                         </group>
                         <group>
                             <field name="team_id"/>
                             <field name="user_id" domain="[('share', '=', False)]"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                             <field name="reason_id"/>
-                            <field name="priority" widget="priority"/>
                         </group>
                     </group>
                     <notebook>
@@ -87,7 +93,6 @@
                                 <group>
                                     <field name="partner_id"/>
                                     <field name="company_id" groups="base.group_multi_company"/>
-                                    <field name="email_cc" groups="base.group_no_one"/>
                                 </group>
                                 <group>
                                     <field name="date_assign"/>
@@ -210,14 +215,14 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_see_alerts" icon="fa-bell" type="object" class="oe_stat_button" invisible="alert_count == 0">
+                        <button name="action_see_alerts" icon="notifications" icon_class="oi-filled" type="object" class="oe_stat_button" invisible="alert_count == 0">
                             <field name="alert_count" string="Alerts" widget="statinfo"/>
                         </button>
                         <button
                             string="Spreadsheet"
                             class="oe_stat_button"
                             name="action_open_spreadsheet"
-                            icon="fa-th" type="object"
+                            icon="grid_view" type="object"
                             groups="quality.group_quality_user"
                             invisible="test_type != 'spreadsheet'">
                         </button>
@@ -232,23 +237,23 @@
                             <field name="move_line_id" invisible="1"/>
                             <field name="product_tracking" invisible="1"/>
                             <field name="is_lot_tested_fractionally" invisible="1"/>
-                            <field name="lot_name" invisible="product_tracking == 'none' or not show_lot_text or not move_line_id"/>
-                            <field name="lot_ids" invisible="product_tracking == 'none' or show_lot_text or not product_id or measure_on == 'operation'" widget="many2many_tags" options="{'edit_tags': True} or not product_id or measure_on == 'operation'" context="{'default_product_id': product_id}"/>
+                            <field name="lot_name" invisible="product_tracking not in ['lot', 'serial'] or not show_lot_text or not move_line_id"/>
+                            <field name="lot_ids" invisible="product_tracking not in ['lot', 'serial'] or show_lot_text or not product_id or measure_on == 'operation'" widget="many2many_tags" options="{'on_tag_click': 'open_form'}" context="{'default_product_id': product_id}"/>
                             <label for="qty_line" invisible="not move_line_id or quality_state == 'fail'"/>
                             <label for="qty_line" invisible="not move_line_id or quality_state != 'fail'" string="Failed Quantity"/>
                             <div class="o_row" invisible="not move_line_id">
-                                <field name="qty_line"/> 
+                                <field name="qty_line"/>
                                 <field name="uom_id" widget="many2one_uom" groups="uom.group_uom"/>
                             </div>
                             <field name="failure_location_id" invisible="not failure_location_id" readonly="True"/>
                             <label for="qty_to_test" invisible="not move_line_id or measure_on != 'move_line' or not is_lot_tested_fractionally"/>
                             <div class="o_row" invisible="not move_line_id or measure_on != 'move_line' or not is_lot_tested_fractionally">
-                                <field name="qty_to_test"/> 
+                                <field name="qty_to_test"/>
                                 <field name="uom_id" widget="many2one_uom" groups="uom.group_uom"/>
                             </div>
                             <label for="qty_tested" invisible="measure_on != 'move_line' or not is_lot_tested_fractionally"/>
                             <div class="o_row" invisible="measure_on != 'move_line' or not is_lot_tested_fractionally">
-                                <field name="qty_tested" readonly="quality_state != 'none'"/> 
+                                <field name="qty_tested" readonly="quality_state != 'none'"/>
                                 <field name="uom_id" widget="many2one_uom" groups="uom.group_uom"/>
                             </div>
                             <field name="test_type" invisible="1"/>
@@ -256,9 +261,9 @@
                             <field name="alert_ids" invisible="1"/>
                         </group>
                         <group>
-                            <field name="picking_id" invisible="(quality_state in ('pass', 'fail') and not picking_id) or context.get('from_barcode') or hide_picking_id > 0"/>
-                            <field name="point_id"/>
-                            <field string="Type" name="test_type_id" options="{'no_open': True, 'no_create': True}" readonly="point_id" domain="[('technical_name', 'not in', ['register_consumed_materials', 'register_production', 'print_label', 'register_byproducts'])]"/>
+                            <field name="picking_id" invisible="(quality_state in ('pass', 'fail') and not picking_id) or context.get('barcode_view') or hide_picking_id > 0"/>
+                            <field name="point_id" options="{'create_name_field': 'title'}"/>
+                            <field string="Type" name="test_type_id" options="{'no_open': True, 'no_create': True}" readonly="point_id" domain="[('technical_name', 'not in', ['register_consumed_materials', 'register_production', 'print_product_label', 'print_lot_label', 'register_byproducts'])]"/>
                             <field
                                 name="spreadsheet_template_id"
                                 invisible="test_type != 'spreadsheet'"
@@ -366,18 +371,22 @@
             <search>
                 <field name="product_id" string="Product" filter_domain="['|', ('product_id', 'ilike', self), ('lot_ids', 'ilike', self)]"/>
                 <field name="picking_id"/>
+                <field name="partner_id"/>
                 <field name="lot_ids" groups="stock.group_production_lot" widget="many2many_tags"/>
                 <field name="team_id"/>
                 <filter string="In Progress" name="progress" domain="[('quality_state', '=', 'none')]"/>
                 <filter string="Passed" name="passed" domain="[('quality_state', '=', 'pass')]"/>
                 <filter string="Failed" name="failed" domain="[('quality_state', '=', 'fail')]"/>
                 <separator/>
+                <filter string="Effective Date Last Year" name="control_date_last_year"
+                    domain="[('control_date', '&gt;=', 'today -1y')]"/>
                 <filter string="Checked Date" name="control_date" date="control_date"/>
                 <group>
                     <filter string="Status" name="state" context="{'group_by': 'quality_state'}"/>
                     <filter string="Product" name="by_product" context="{'group_by': 'product_id'}"/>
                     <filter string="Control Point" name="groupby_point_id" context="{'group_by': 'point_id'}"/>
                     <filter string="Team" name="groupby_team_id" context="{'group_by': 'team_id'}"/>
+                    <filter string="Partner" name="groupby_partner_id" context="{'group_by': 'partner_id'}"/>
                 </group>
                 <filter invisible="1" string="Late Activities" name="activities_overdue"
                     domain="[('my_activity_date_deadline', '&lt;', 'today')]"/>
@@ -405,12 +414,6 @@
         <field name="name">Quality Checks</field>
         <field name="res_model">quality.check</field>
         <field name="view_mode">list,form</field>
-        <field name="domain">[('team_id', '=', active_id)]</field>
-        <field name="context">{
-            'default_team_id': active_id,
-            'search_default_team_id': [active_id],
-            'search_default_progress': "1"}
-        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
               No quality check found
@@ -472,10 +475,10 @@
         <field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_view_related_putaway_rules']" position="after">
-                <button name="action_see_quality_control_points" type="object" class="oe_stat_button" icon="fa-list" invisible="type != 'consu'" groups="quality.group_quality_user">
+                <button name="action_see_quality_control_points" type="object" class="oe_stat_button" icon="format_list_bulleted" invisible="type != 'consu'" groups="quality.group_quality_user">
                     <field string="Quality Points" name="quality_control_point_qty" widget="statinfo"/>
                 </button>
-                <button name="action_see_quality_checks" type="object" class="oe_stat_button" icon="fa-check" invisible="(type != 'consu' or quality_pass_qty == 0) and quality_fail_qty == 0" groups="quality.group_quality_user">
+                <button name="action_see_quality_checks" type="object" class="oe_stat_button" icon="check" invisible="(type != 'consu' or quality_pass_qty == 0) and quality_fail_qty == 0" groups="quality.group_quality_user">
                     <div class="o_field_widget o_stat_info mr4">
                         <span class="o_stat_text">Pass:</span>
                         <span class="o_stat_text">Fail:</span>
@@ -496,10 +499,10 @@
         <field name="inherit_id" ref="stock.product_form_view_procurement_button"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_view_related_putaway_rules']" position="after">
-                <button name="action_see_quality_control_points" type="object" icon="fa-list" class="oe_stat_button" invisible="type != 'consu'" groups="quality.group_quality_user">
+                <button name="action_see_quality_control_points" type="object" icon="format_list_bulleted" class="oe_stat_button" invisible="type != 'consu'" groups="quality.group_quality_user">
                     <field string="Quality Points" name="quality_control_point_qty" widget="statinfo"/>
                 </button>
-                <button name="action_see_quality_checks" type="object" class="oe_stat_button" icon="fa-check" groups="quality.group_quality_user" invisible="quality_pass_qty == 0 and quality_fail_qty == 0" >
+                <button name="action_see_quality_checks" type="object" class="oe_stat_button" icon="check" groups="quality.group_quality_user" invisible="quality_pass_qty == 0 and quality_fail_qty == 0" >
                     <div class="o_field_widget o_stat_info mr4">
                         <span class="o_stat_text">Pass:</span>
                         <span class="o_stat_text">Fail:</span>
@@ -532,7 +535,7 @@
                     <t t-name="card">
                         <field name="name" class="fw-bold fs-4 ms-2"/>
                         <div t-if="record.alias_email.value" class="small ms-2">
-                            <i class="fa fa-envelope-o" role="img" aria-label="Domain alias" title="Domain alias"></i>&amp;nbsp; <field name="alias_id"/>
+                            <i class="oi" data-icon="mail" role="img" aria-label="Domain alias" title="Domain alias"></i>&amp;nbsp; <field name="alias_id"/>
                         </div>
                         <div class="row mt-3">
                             <div class="col-6">
@@ -540,7 +543,7 @@
                                     <span><field name="alert_count"/> Quality Alerts</span>
                                 </button>
                             </div>
-                            <a name="%(quality_check_action_team)d" type="action" class="col-6">
+                            <a name="action_open_quality_check_team" type="object" class="col-6">
                                 <field name="check_count"/>
                                 Checks In Progress
                             </a>
@@ -569,10 +572,16 @@
                             <div name="alias_def">
                                 <field name="alias_id" class="oe_read_only oe_inline"
                                         string="Email Alias" required="0"/>
-                                <div class="oe_edit_only oe_inline" name="edit_alias" style="display: inline;" dir="ltr">
-                                    <field name="alias_name" placeholder="alias" class="oe_inline"/>@
-                                    <field name="alias_domain_id" class="oe_inline" placeholder="e.g. mycompany.com"
-                                           options="{'no_create': True, 'no_open': True}"/>
+                                <div class="oe_edit_only row" name="edit_alias" dir="ltr">
+                                    <div class="d-flex col-10 p-0">
+                                        <field name="alias_name" placeholder="alias" class="o_field_highlight"/>@
+                                        <field name="alias_domain_id" class="o_field_highlight" placeholder="e.g. mycompany.com"
+                                            options="{'no_create': True, 'no_open': True}"/>
+                                    </div>
+                                    <div class="col-2 p-0" invisible="not alias_email">
+                                        <field name="alias_email" widget="CopyClipboardButton"
+                                            class="copy_alias_email" options="{'btn_class': 'link'}" string=""/>
+                                    </div>
                                 </div>
                             </div>
                             <field name="alias_contact" class="oe_inline" groups="base.group_no_one"
@@ -657,7 +666,7 @@
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" placeholder="Visible to all"/>
                 <field name="spreadsheet_file_name" column_invisible="True"/>
                 <field name="spreadsheet_binary_data" groups="base.group_no_one" widget="binary_spreadsheet" filename="spreadsheet_file_name" string="Data" />
-                <button string="Edit" class="float-end" icon="fa-pencil" type="object" name="action_open_spreadsheet"/>
+                <button string="Edit" class="float-end" icon="edit" icon_class="oi-filled" type="object" name="action_open_spreadsheet"/>
             </list>
         </field>
     </record>
@@ -803,12 +812,12 @@
         <field name="inherit_id" ref="quality.quality_point_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_see_quality_checks" type="object" icon="fa-check" class="oe_stat_button">
+                <button name="action_see_quality_checks" type="object" icon="check" class="oe_stat_button">
                     <field string="Quality Checks" name="check_count" widget="statinfo"/>
                 </button>
                 <button name="action_see_spc_control" type="object" class="oe_stat_button"
                     invisible="check_count == 0 or test_type != 'measure'">
-                    <span class="fa fa-2x" data-icon="&#x2211;" style="padding-left: 10px;" role="img" aria-label="Statistics" title="Statistics"/>
+                    <span class="oi o_button_icon" data-icon="troubleshoot" style="padding-left: 10px;" role="img" aria-label="Statistics" title="Statistics"/>
                     <div class="o_field_widget o_stat_info mr4">
                         <span class="o_stat_text">AVG:</span>
                         <span class="o_stat_text">STD:</span>
@@ -818,10 +827,14 @@
                         <span class="o_stat_value"><field name="standard_deviation"/></span>
                     </div>
                 </button>
+                <button name="action_see_supplier_quality_rate" type="object"
+                    icon="person" class="oe_stat_button" invisible="supplier_count == 0">
+                    <field string="Suppliers" name="supplier_count" widget="statinfo"/>
+                </button>
             </xpath>
             <xpath expr="//page[@name='Notes']" position="before">
                 <page string="Message If Failure" name="message_if_failure"
-                    invisible="test_type in ['picture', 'instructions', 'register_consumed_materials', 'print_label']">
+                    invisible="test_type in ['picture', 'instructions', 'register_consumed_materials', 'print_product_label', 'print_lot_label']">
                     <field name="failure_message"/>
                 </page>
             </xpath>
@@ -860,6 +873,24 @@
                     widget="many2one_spreadsheet"
                 />
                 <field name="spreadsheet_check_cell" invisible="test_type != 'spreadsheet'" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_view_form_inherit_quality_control" model="ir.ui.view">
+        <field name="name">res.partner.view.form.inherit.quality.control</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_see_quality_rate" type="object" class="oe_stat_button"
+                    icon="check" groups="quality.group_quality_user"
+                    invisible="quality_check_count == 0">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value"><field name="quality_rate" digits="[16, 0]"/>%</span>
+                        <span class="o_stat_text">Quality Rate</span>
+                    </div>
+                </button>
             </xpath>
         </field>
     </record>

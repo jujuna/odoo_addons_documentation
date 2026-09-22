@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { Property } from "@web_studio/client_action/view_editor/property/property";
 import { LimitGroupVisibility } from "@web_studio/client_action/view_editor/interactive_editor/properties/limit_group_visibility/limit_group_visibility";
 import { SidebarPropertiesToolbox } from "@web_studio/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox";
@@ -26,15 +26,15 @@ export class PageProperties extends Component {
         ModifiersProperties,
     };
 
+    props = useProps({
+        node: t.object(),
+    });
+
     setup() {
         this.editNodeAttributes = useEditNodeAttributes();
     }
 
     onChangeAttribute(value, name) {
         return this.editNodeAttributes({ [name]: value });
-    }
-
-    static props = {
-        node: { type: Object },
     }
 }

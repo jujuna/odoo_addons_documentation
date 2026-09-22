@@ -6,13 +6,25 @@ import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_d
 import { Dialog } from "@web/core/dialog/dialog";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { _t } from "@web/core/l10n/translation";
-import { useActiveElement } from "@web/core/ui/ui_service";
+import { useActiveElement } from "@web/core/ui/ui_plugin";
 import { uniqueId } from "@web/core/utils/functions";
 import { useService } from "@web/core/utils/hooks";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 import { ExitSplitToolsDialog } from "@documents/owl/components/pdf_exit_dialog/pdf_exit_dialog";
 
-import { Component, onWillStart, toRaw, useRef, useState, useEffect } from "@odoo/owl";
+import {
+    Component,
+    onMounted,
+    onWillStart,
+    onWillUnmount,
+    props,
+    signal,
+    toRaw,
+    proxy,
+    t,
+    usePlugin,
+} from "@odoo/owl";
 
 const BLANK_PAGE_THRESHOLD = 2500;
 const BLANK_PIXEL_FILTER_VALUE = 220;
@@ -23,29 +35,30 @@ export class PdfManager extends Component {
         PdfPage,
         PdfGroupName,
     };
-    static defaultProps = {
-        embeddedActions: [],
-    };
-    static props = {
-        documents: Array,
-        embeddedActions: { type: Array, optional: true },
-        onProcessDocuments: { type: Function },
-        close: { type: Function },
-    };
+    props = props({
+        documents: t.array(),
+        embeddedActions: t.array().optional([]),
+        onProcessDocuments: t.function(),
+        close: t.function(),
+    });
     static template = "documents.component.PdfManager";
 
+    rootRef = signal.ref();
+    pageViewerRef = signal.ref();
+    selectionBoxRef = signal.ref();
+    addFileInputRef = signal.ref();
+
+    debugMode = usePlugin(DebugModePlugin);
+
     setup() {
-        this.root = useRef("root");
         //setting the active element allows restricting the command palette to the context of this Component
         //this is necessary because this Component is a modal in disguise but does not properly override "Dialog"
-        useActiveElement("root");
-        this.pageViewer = useRef("pageViewer");
-        this.selectionBox = useRef("selectionBox");
-        this.addFileInput = useRef("addFileInput");
+        useActiveElement(this.rootRef);
+        this.uiService = useService("ui");
         this.notification = useService("notification");
         this.dialog = useService("dialog");
         this.commandService = useService("command");
-        this.state = useState({
+        this.state = proxy({
             // Disables upload button if currently uploading.
             uploadingLock: false,
             /*
@@ -106,33 +119,31 @@ export class PdfManager extends Component {
             await this._loadAssets();
         });
 
-        useEffect(
-            () => {
-                const _onOutsideClick = this._onOutsideClick.bind(this);
-                if (this.props.documents.length === 1) {
-                    this.state.fileName = this._removePdfExtension(this.props.documents[0].name);
-                }
-                for (const pdf_document of this.props.documents) {
-                    this._addFile(pdf_document.name, {
-                        url: `/documents/content/${encodeURIComponent(pdf_document.access_token)}`,
-                        documentId: pdf_document.id,
-                    });
-                }
-                document.addEventListener("click", _onOutsideClick, true);
-                document.addEventListener("mousedown", this._onMouseDown, true);
-                document.addEventListener("mouseup", this._onMouseUp, true);
-                document.addEventListener("mousemove", this._onMouseMove, true);
-                document.addEventListener("keydown", this._onShiftDown, true);
-                return () => {
-                    document.removeEventListener("click", _onOutsideClick, true);
-                    document.removeEventListener("mousedown", this._onMouseDown, true);
-                    document.removeEventListener("mouseup", this._onMouseUp, true);
-                    document.removeEventListener("mousemove", this._onMouseMove, true);
-                    document.removeEventListener("keydown", this._onShiftDown, true);
-                };
-            },
-            () => []
-        );
+        let _onOutsideClick;
+        onMounted(() => {
+            _onOutsideClick = this._onOutsideClick.bind(this);
+            if (this.props.documents.length === 1) {
+                this.state.fileName = this._removePdfExtension(this.props.documents[0].name);
+            }
+            for (const pdf_document of this.props.documents) {
+                this._addFile(pdf_document.name, {
+                    url: `/documents/content/${encodeURIComponent(pdf_document.access_token)}`,
+                    documentId: pdf_document.id,
+                });
+            }
+            document.addEventListener("click", _onOutsideClick, true);
+            document.addEventListener("mousedown", this._onMouseDown, true);
+            document.addEventListener("mouseup", this._onMouseUp, true);
+            document.addEventListener("mousemove", this._onMouseMove, true);
+            document.addEventListener("keydown", this._onShiftDown, true);
+        });
+        onWillUnmount(() => {
+            document.removeEventListener("click", _onOutsideClick, true);
+            document.removeEventListener("mousedown", this._onMouseDown, true);
+            document.removeEventListener("mouseup", this._onMouseUp, true);
+            document.removeEventListener("mousemove", this._onMouseMove, true);
+            document.removeEventListener("keydown", this._onShiftDown, true);
+        });
 
         // Shortcuts and navigation
         this._setUseCommand(
@@ -161,9 +172,14 @@ export class PdfManager extends Component {
             this._focusNextGroup.bind(this, "right"),
             "control+ArrowRight"
         );
-        this._setUseCommand(_t("Select focused page"), this._spaceKeySelect.bind(this), "control+space", {
-            allowRepeat: true,
-        });
+        this._setUseCommand(
+            _t("Select focused page"),
+            this._spaceKeySelect.bind(this),
+            "control+space",
+            {
+                allowRepeat: true,
+            }
+        );
         this._setUseCommand(
             _t("Select/Deselect all pages"),
             this._selectAll.bind(this),
@@ -211,7 +227,7 @@ export class PdfManager extends Component {
         this._setUseCommand(
             _t("Split all white pages"),
             this._splitWhitePagesHandler.bind(this),
-            "shift+s",
+            "shift+s"
         );
         this._setUseCommand(
             _t("Delete focused or selected pages"),
@@ -269,12 +285,6 @@ export class PdfManager extends Component {
         return Object.keys(this.state.pages).filter(
             (key) => this.state.pages[key].isSelected && this.state.pages[key].groupId
         );
-    }
-    /**
-     * @return {Boolean}
-     */
-    get isDebugMode() {
-        return Boolean(odoo.debug);
     }
     /**
      * @return {String[]}
@@ -708,7 +718,7 @@ export class PdfManager extends Component {
      */
     async _loadCanvases({ newPages, pageCount, pdf }) {
         for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
-            if (!this.root.el) {
+            if (!this.rootRef()) {
                 break;
             }
             const pageId = newPages[pageNumber];
@@ -910,9 +920,11 @@ export class PdfManager extends Component {
         this.state.groupData = {};
         this.state.groupIds = [];
         this._createGroup({
-            name: this.state.fileName ? _t("%s (remaining pages)", this.state.fileName) : _t("Remaining Pages"),
+            name: this.state.fileName
+                ? _t("%s (remaining pages)", this.state.fileName)
+                : _t("Remaining Pages"),
             pageIds: allPages,
-            isSelected: true
+            isSelected: true,
         });
         await this._applyChanges();
     }
@@ -923,15 +935,15 @@ export class PdfManager extends Component {
     _keepFocusedPageInScreen() {
         const card = document.querySelector(`[data-id=${this.state.focusedPage}]`);
         const focusedCardCoordinates = card.getBoundingClientRect();
-        const pageViewerCoordinates = this.pageViewer.el.getBoundingClientRect();
+        const pageViewerCoordinates = this.pageViewerRef().getBoundingClientRect();
         const bottomDifference = focusedCardCoordinates.bottom - pageViewerCoordinates.bottom;
         const topDifference = focusedCardCoordinates.top - pageViewerCoordinates.top;
         // 60 and 10 are harcoded values to improve the UI when scrolling.
         if (bottomDifference > 0) {
-            this.pageViewer.el.scrollBy(0, bottomDifference + 60);
+            this.pageViewerRef().scrollBy(0, bottomDifference + 60);
         }
         if (topDifference < 0) {
-            this.pageViewer.el.scrollBy(0, topDifference - 10);
+            this.pageViewerRef().scrollBy(0, topDifference - 10);
         }
     }
 
@@ -985,7 +997,9 @@ export class PdfManager extends Component {
             } else {
                 const indexFocusedPage = sortedPagesIds.indexOf(this.state.focusedPage);
                 const numberPerLine = this._computeCardsPerLine();
-                const shift = { right: 1, left: -1, down: numberPerLine, up: -numberPerLine }[direction];
+                const shift = { right: 1, left: -1, down: numberPerLine, up: -numberPerLine }[
+                    direction
+                ];
                 nextFocusedPageId = sortedPagesIds[indexFocusedPage + shift];
             }
             if (nextFocusedPageId) {
@@ -1150,8 +1164,8 @@ export class PdfManager extends Component {
         }
         this._selectionX = ev.pageX;
         this._selectionY = ev.pageY - 40;
-        this._selectionScrollTop = this.pageViewer.el.scrollTop;
-        this._selectionScrollLeft = this.pageViewer.el.scrollLeft;
+        this._selectionScrollTop = this.pageViewerRef().scrollTop;
+        this._selectionScrollLeft = this.pageViewerRef().scrollLeft;
         this.state.selectionBoxArgs["left"] = this._selectionX + "px";
         this.state.selectionBoxArgs["top"] = this._selectionY + "px";
         this.state.selectionBoxArgs["width"] = 0 + "px";
@@ -1179,8 +1193,8 @@ export class PdfManager extends Component {
         this.state.focusedPage = false;
         const x = ev.pageX;
         const y = ev.pageY - 40;
-        const scrollTopDiff = this.pageViewer.el.scrollTop - this._selectionScrollTop;
-        const scrollLeftDiff = this.pageViewer.el.scrollLeft - this._selectionScrollLeft;
+        const scrollTopDiff = this.pageViewerRef().scrollTop - this._selectionScrollTop;
+        const scrollLeftDiff = this.pageViewerRef().scrollLeft - this._selectionScrollLeft;
         this.state.selectionBoxArgs["left"] =
             x - this._selectionX + scrollLeftDiff < 0
                 ? x + "px"
@@ -1194,7 +1208,7 @@ export class PdfManager extends Component {
         this.state.selectionBoxArgs["height"] =
             Math.abs(y - (this._selectionY - scrollTopDiff)) + "px";
 
-        const boxCoordinates = this.selectionBox.el.getBoundingClientRect();
+        const boxCoordinates = this.selectionBoxRef().getBoundingClientRect();
         const boxTop = boxCoordinates.top;
         const boxBottom = boxTop + boxCoordinates.height;
         const boxLeft = boxCoordinates.left;
@@ -1253,7 +1267,7 @@ export class PdfManager extends Component {
      * @public
      */
     onClickGlobalAdd() {
-        this.addFileInput.el.click();
+        this.addFileInputRef().click();
     }
     /**
      * @public

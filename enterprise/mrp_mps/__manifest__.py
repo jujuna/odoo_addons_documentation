@@ -1,9 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Master Production Schedule',
-    'version': '1.0',
     'category': 'Supply Chain/Manufacturing',
     'sequence': 50,
     'summary': 'Master Production Schedule',
@@ -25,8 +23,6 @@ procure.
 """,
     'data': [
         'data/ir_cron_data.xml',
-        'security/ir.model.access.csv',
-        'security/mrp_mps_security.xml',
         'views/mrp_mps_views.xml',
         'views/mrp_mps_menu_views.xml',
         'views/mrp_bom_views.xml',
@@ -34,7 +30,8 @@ procure.
         'views/product_template_views.xml',
         'views/res_config_settings_views.xml',
         'wizard/mrp_mps_forecast_details_views.xml',
-        'wizard/mrp_mps_forecast_suggestion_views.xml'
+        'wizard/mrp_mps_forecast_suggestion_views.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/mps_demo.xml',
@@ -45,5 +42,5 @@ procure.
         'web.assets_backend': [
             'mrp_mps/static/src/**/*',
         ],
-    }
+    },
 }

@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { SelectMenu } from "@web/core/select_menu/select_menu";
@@ -8,8 +8,9 @@ export class MpsSelection extends Component {
     static components = {
         SelectMenu,
     };
-    static props = standardFieldProps;
     static template = "mrp_mps.MpsSelection";
+
+    props = useProps(standardFieldProps);
 
     setup() {
         this.type = this.props.record.fields[this.props.name].type;
@@ -26,7 +27,7 @@ export class MpsSelection extends Component {
     }
 
     get placeholder(){
-        return "All Periods";
+        return _t("All Periods");
     }
 
     onChange(value) {

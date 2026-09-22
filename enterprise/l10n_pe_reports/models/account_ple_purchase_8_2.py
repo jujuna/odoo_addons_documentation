@@ -82,13 +82,3 @@ class L10n_PeTaxPle82ReportHandler(models.AbstractModel):
             ("move_id.l10n_latam_document_type_id.code", "in", ("91", "97", "98")),
             ("move_id.partner_id.country_id.code", "!=", "PE"),
         ]
-
-    def _report_custom_engine_ple_82(
-        self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None
-    ):
-        report = self.env["account.report"].browse(options["report_id"])
-        report._check_groupby_fields(
-            (next_groupby.split(",") if next_groupby else []) + ([current_groupby] if current_groupby else [])
-        )
-
-        return self._get_ple_report_data(options, current_groupby)

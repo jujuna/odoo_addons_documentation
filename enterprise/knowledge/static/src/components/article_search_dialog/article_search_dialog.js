@@ -3,30 +3,41 @@ import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { closestScrollableY } from "@web/core/utils/scrolling";
 import { highlightText } from "@web/core/utils/html";
 import { debounce } from "@web/core/utils/timing";
-import { Component, markup, onWillStart, useExternalListener, useRef, useState } from "@odoo/owl";
+import {
+    Component,
+    markup,
+    onWillStart,
+    proxy,
+    signal,
+    t,
+    useListener,
+    useProps,
+} from "@odoo/owl";
 
 export class ArticleSearchDialog extends Component {
     static template = "knowledge.ArticleSearchDialog";
     static components = { Dialog };
-    static props = {
-        close: Function,
-        select: Function,
-        search: Function,
-        create: { type: Function, optional: true },
-        searchEmptyQuery: { type: Boolean, optional: true },
-    };
+
+    props = useProps({
+        close: t.function(),
+        select: t.function(),
+        search: t.function(),
+        create: t.function().optional(),
+        searchEmptyQuery: t.boolean().optional(),
+    });
+
+    rootRef = signal.ref();
+    searchInputRef = signal.ref();
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             articles: [],
             searchValue: "",
             selectedIdx: 0,
             displayEmptySearch: false,
         });
-        this.root = useRef("root");
-        this.searchInput = useRef("searchInput");
         this.debouncedSearch = debounce(this.search, 500);
-        useExternalListener(window, "pointerup", this.onWindowPointerUp);
+        useListener(window, "pointerup", this.onWindowPointerUp.bind(this));
         useHotkey("ArrowDown", () => this.onArrowDown(), {
             allowRepeat: true,
             bypassEditableProtection: true,
@@ -68,7 +79,7 @@ export class ArticleSearchDialog extends Component {
     }
 
     onCreateClick() {
-        this.props.create(this.searchInput.el.value);
+        this.props.create(this.searchInputRef().value);
         this.props.close();
     }
 
@@ -78,7 +89,10 @@ export class ArticleSearchDialog extends Component {
     }
 
     onWindowPointerUp(ev) {
-        const container = closestScrollableY(this.root.el) ?? this.root.el;
+        if (!this.rootRef()) {
+            return;
+        }
+        const container = closestScrollableY(this.rootRef()) ?? this.rootRef();
         if (!container.contains(ev.target)) {
             this.props.close();
         }
@@ -96,10 +110,10 @@ export class ArticleSearchDialog extends Component {
             this.state.articles = [];
         } else {
             this.state.articles = (await this.props.search(searchValue)).map((article) => ({
-                displayName: `${article.icon || "📄"} ${article.name}`.trim(),
                 headline: article.headline ? markup(article.headline) : "",
-                icon: article.icon || "📄",
+                icon: article.icon,
                 id: article.id,
+                name: article.name,
                 isFavorite: article.is_user_favorite,
                 text:
                     article.name &&

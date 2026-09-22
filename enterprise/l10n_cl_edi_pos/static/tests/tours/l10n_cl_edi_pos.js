@@ -1,7 +1,7 @@
 /* global posmodel */
 
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
-import * as ReceiptScreen from "@point_of_sale/../tests/pos/tours/utils/receipt_screen_util";
+import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
 import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_screen_util";
 import * as PartnerList from "@point_of_sale/../tests/pos/tours/utils/partner_list_util";
@@ -23,13 +23,19 @@ registry.category("web_tour.tours").add("test_receipt_header_content", {
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.clickInvoiceButton(),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
-            {
-                trigger: ".pos-receipt .chili-ticket-info:contains('RUT: 76201224-3')",
-            },
-            {
-                trigger: ".pos-receipt-partner:contains('RUT: 76086428-5')",
-            },
+            FeedbackScreen.isContinueEnabled(),
+            FeedbackScreen.checkTicketData({
+                cssRules: [
+                    {
+                        css: "body div",
+                        text: "RUT: 76201224-3",
+                    },
+                    {
+                        css: "body div",
+                        text: "RUT 76086428-5",
+                    },
+                ],
+            }),
         ].flat(),
 });
 
@@ -52,7 +58,7 @@ registry.category("web_tour.tours").add("test_cl_receipt_dte_info", {
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
+            FeedbackScreen.isShown(),
             {
                 trigger: negate(".pos-receipt-order-data:contains('Timbre Electrónico SII')"),
             },
@@ -73,7 +79,7 @@ registry.category("web_tour.tours").add("test_cl_partner_missing_info", {
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
             ProductScreen.clickPartnerButton(),
-            ProductScreen.clickCustomer("AA Test Partner"),
+            ProductScreen.clickCustomer("AAA Missing Info Test Partner"),
             ProductScreen.clickDisplayedProduct("Desk Organizer"),
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Cash"),
@@ -92,8 +98,8 @@ registry.category("web_tour.tours").add("test_refund_consumidor_final_anonimo", 
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.isShown(),
+            FeedbackScreen.clickNextOrder(),
             ProductScreen.clickRefund(),
             TicketScreen.selectOrder("1001"),
             TicketScreen.confirmRefund(),

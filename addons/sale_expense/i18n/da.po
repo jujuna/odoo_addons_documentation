@@ -6,26 +6,68 @@
 # Martin Trigaux, 2022
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-09-14 21:14+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:43+0000\n"
+"PO-Revision-Date: 2026-09-09 14:03+0000\n"
+"Last-Translator: \"Kira Petersen François (peti)\" <peti@odoo.com>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "sale_expense/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_expense
+#: model:ir.module.module,description:base.module_sale_expense
+msgid ""
+"\n"
+"Reinvoice Employee Expense\n"
+"==========================\n"
+"\n"
+"Create some products for which you can re-invoice the costs.\n"
+"This module allow to reinvoice employee expense, by setting the SO directly "
+"on the expense.\n"
+msgstr ""
 
 #. module: sale_expense
 #: model:ir.model.fields,field_description:sale_expense.field_sale_order__expense_count
 msgid "# of Expenses"
 msgstr "# udgifter"
+
+#. module: sale_expense
+#. odoo-python
+#: code:addons/sale_expense/models/account_move.py:0
+msgid "%(count)s expense receipts attached from reinvoiced expenses."
+msgstr ""
+
+#. module: sale_expense
+#. odoo-python
+#: code:addons/sale_expense/models/account_move.py:0
+msgid "1 expense receipt attached from reinvoiced expenses."
+msgstr ""
+
+#. module: sale_expense
+#: model:ir.model.fields,field_description:sale_expense.field_hr_expense__attach_receipts_to_invoice
+msgid "Attach receipts to future customer invoices"
+msgstr ""
+
+#. module: sale_expense
+#: model:ir.model.fields,field_description:sale_expense.field_hr_expense_post_wizard__attach_receipts_to_invoice
+msgid "Attach receipts to future related invoices"
+msgstr ""
+
+#. module: sale_expense
+#: model:ir.model.fields,help:sale_expense.field_hr_expense__attach_receipts_to_invoice
+msgid ""
+"Attach the expense receipts to customer invoices generated later from the "
+"related sales order"
+msgstr ""
 
 #. module: sale_expense
 #: model:ir.model.fields,field_description:sale_expense.field_hr_expense__can_be_reinvoiced
@@ -34,21 +76,16 @@ msgid "Can be reinvoiced"
 msgstr "Kan genfaktureres"
 
 #. module: sale_expense
-#: model:ir.model.fields,field_description:sale_expense.field_hr_expense__sale_order_id
-#: model:ir.model.fields,field_description:sale_expense.field_hr_expense_split__sale_order_id
-msgid "Customer to Reinvoice"
-msgstr "Kunder at genfakturere"
-
-#. module: sale_expense
 #: model:ir.model.fields,field_description:sale_expense.field_account_move__display_name
 #: model:ir.model.fields,field_description:sale_expense.field_account_move_line__display_name
 #: model:ir.model.fields,field_description:sale_expense.field_hr_expense__display_name
+#: model:ir.model.fields,field_description:sale_expense.field_hr_expense_post_wizard__display_name
 #: model:ir.model.fields,field_description:sale_expense.field_hr_expense_split__display_name
 #: model:ir.model.fields,field_description:sale_expense.field_product_template__display_name
 #: model:ir.model.fields,field_description:sale_expense.field_sale_order__display_name
 #: model:ir.model.fields,field_description:sale_expense.field_sale_order_line__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: sale_expense
 #: model:ir.model,name:sale_expense.model_hr_expense
@@ -60,6 +97,11 @@ msgstr "Udgift"
 #: model:ir.model.fields,field_description:sale_expense.field_product_template__expense_policy_tooltip
 msgid "Expense Policy Tooltip"
 msgstr "Værktøjstip til politik om udgifter"
+
+#. module: sale_expense
+#: model:ir.model,name:sale_expense.model_hr_expense_post_wizard
+msgid "Expense Posting Wizard"
+msgstr ""
 
 #. module: sale_expense
 #: model:ir.model,name:sale_expense.model_hr_expense_split
@@ -77,8 +119,8 @@ msgstr "Udgifter"
 #. module: sale_expense
 #. odoo-python
 #: code:addons/sale_expense/models/product_template.py:0
-msgid "Expenses of this category may not be added to a Sales Order."
-msgstr "Udgifter i denne kategori kan ikke føjes til en salgsordre."
+msgid "Expenses of this product may not be added to a Sales Order."
+msgstr ""
 
 #. module: sale_expense
 #. odoo-python
@@ -102,6 +144,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_expense.field_account_move__id
 #: model:ir.model.fields,field_description:sale_expense.field_account_move_line__id
 #: model:ir.model.fields,field_description:sale_expense.field_hr_expense__id
+#: model:ir.model.fields,field_description:sale_expense.field_hr_expense_post_wizard__id
 #: model:ir.model.fields,field_description:sale_expense.field_hr_expense_split__id
 #: model:ir.model.fields,field_description:sale_expense.field_product_template__id
 #: model:ir.model.fields,field_description:sale_expense.field_sale_order__id
@@ -139,9 +182,25 @@ msgid "Product"
 msgstr "Produkt"
 
 #. module: sale_expense
+#: model:ir.module.module,summary:base.module_sale_expense
+msgid "Quotation, Sales Orders, Delivery & Invoicing Control"
+msgstr ""
+
+#. module: sale_expense
+#: model:ir.model.fields,field_description:sale_expense.field_hr_expense__sale_order_id
+#: model:ir.model.fields,field_description:sale_expense.field_hr_expense_split__sale_order_id
+msgid "Reinvoice to"
+msgstr ""
+
+#. module: sale_expense
 #: model:ir.model.fields,field_description:sale_expense.field_hr_expense__sale_order_line_id
 msgid "Sale Order Line"
 msgstr "Salgsordrelinje"
+
+#. module: sale_expense
+#: model:ir.module.module,shortdesc:base.module_sale_expense
+msgid "Sales Expense"
+msgstr ""
 
 #. module: sale_expense
 #: model:ir.model,name:sale_expense.model_sale_order
@@ -154,11 +213,7 @@ msgstr "Salgsordre"
 msgid "Sales Order Line"
 msgstr "Salgsordrelinje"
 
-#~ msgid "Expense Report"
-#~ msgstr "Udgiftsrapport"
-
-#~ msgid "Sale Order Count"
-#~ msgstr "Salgsordre mængde"
-
-#~ msgid "Sales Orders"
-#~ msgstr "Salgsordre"
+#. module: sale_expense
+#: model:ir.model.fields,field_description:sale_expense.field_hr_expense_post_wizard__show_attach_receipts_to_invoice
+msgid "Show Attach Receipts To Invoice"
+msgstr ""

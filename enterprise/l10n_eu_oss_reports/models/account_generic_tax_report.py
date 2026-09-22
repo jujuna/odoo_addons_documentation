@@ -4,6 +4,7 @@
 from odoo import api, models, fields, _
 from odoo.addons.l10n_eu_oss.models.eu_tax_map import EU_TAX_MAP
 from odoo.exceptions import UserError
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 from collections import defaultdict
 from lxml import etree, objectify
@@ -39,31 +40,31 @@ class L10n_Eu_OssTaxReportHandler(models.AbstractModel):
                         col_value = ''
 
                     if expr_label == 'tax':
-                        col_value = sum(tax_line['columns'][i]['no_format'] for tax_line in tax_lines)
+                        col_value = sum(tax_line.columns[i].no_format for tax_line in tax_lines)
 
-                    country_columns.append(report._build_column_dict(col_value, column, options=options))
+                    country_columns.append(report._build_column_data(col_value, column, options=options))
 
-                country_line_id = report._get_generic_line_id('res.country', country.id, parent_line_id=parent_line['id'])
-                country_line = {
-                    'id': country_line_id,
-                    'name': country.display_name,
-                    'parent_id': parent_line['id'],
-                    'columns': country_columns,
-                    'unfoldable': False,
-                    'level': 2,
-                }
+                country_line_id = report._get_generic_line_id('res.country', country.id, parent_line_id=parent_line.id)
+                country_line = AccountReportLineData(
+                    id=country_line_id,
+                    name=country.display_name,
+                    parent_id=parent_line.id,
+                    columns=country_columns,
+                    unfoldable=False,
+                    level=2,
+                )
 
                 rslt.append((0, country_line))
 
                 for tax_line in tax_lines:
-                    tax_line['parent_id'] = country_line_id
-                    tax_line['level'] = 3
-                    tax_parsed_id = report._parse_line_id(tax_line['id'])[-1]
-                    tax_line['id'] = report._get_generic_line_id(
+                    tax_line.parent_id = country_line_id
+                    tax_line.level = 3
+                    tax_parsed_id = report._parse_line_id(tax_line.id)[-1]
+                    tax_line.id = report._get_generic_line_id(
                         markup=tax_parsed_id[0],
                         model_name=tax_parsed_id[1],
                         value=tax_parsed_id[2],
-                        parent_line_id=country_line['id']
+                        parent_line_id=country_line.id
                     )
                     rslt.append((0, tax_line))
 
@@ -74,7 +75,7 @@ class L10n_Eu_OssTaxReportHandler(models.AbstractModel):
         tax_lines_by_country = defaultdict(lambda: [])
         last_tax_type_line = None
         for _seq, line in lines:
-            markup, model, model_id = report._parse_line_id(line['id'])[-1]
+            markup, model, model_id = report._parse_line_id(line.id)[-1]
 
             if markup in tax_type_markups:
                 # Then it's a type_tax_use_section
@@ -170,10 +171,10 @@ class L10n_Eu_OssTaxReportHandler(models.AbstractModel):
         tax = None
         year, quarter, month = get_period()
 
-        for line in filter(lambda x: x['columns'][1]['no_format'], report._get_lines(options)):
-            model, model_id = report._get_model_info_from_id(line['id'])
-            line_net_amt = line['columns'][0].get('no_format', 0.0)
-            line_tax_amt = line['columns'][1].get('no_format', 0.0)
+        for line in filter(lambda x: x.columns[1].no_format, report._get_lines(options)):
+            model, model_id = report._get_model_info_from_id(line.id)
+            line_net_amt = line.columns[0].no_format or 0.0
+            line_tax_amt = line.columns[1].no_format or 0.0
 
             if model == 'res.country':
                 # If there are corrections (a.k.a. negative tax amounts) for the current country,
@@ -280,14 +281,13 @@ class AccountReport(models.Model):
 
     availability_condition = fields.Selection(selection_add=[('oss', "Using OSS")])
 
-    def _is_available_for(self, options):
+    def _is_available_for(self, companies):
         # Overridden to support 'oss' availability condition
-        reports = super()._is_available_for(options)
+        reports = super()._is_available_for(companies)
         reports_available_by_oss = self.filtered(lambda r: r.availability_condition == 'oss')
         if reports_available_by_oss:
             oss_tag = self.env.ref('l10n_eu_oss.tag_oss')
-            company_ids = self.get_report_company_ids(options)
-            if self.env['account.tax.repartition.line'].search_count([('tag_ids', 'in', oss_tag.ids), ('company_id', 'in', company_ids)], limit=1):
+            if self.env['account.tax.repartition.line'].search_count([('tag_ids', 'in', oss_tag.ids), ('company_id', 'in', companies.ids)], limit=1):
                 reports += reports_available_by_oss
 
         return reports

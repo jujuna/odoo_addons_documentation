@@ -2,7 +2,6 @@
 
 {
     'name': 'Denmark - Intrastat',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Intrastat for Denmark
@@ -14,8 +13,8 @@ Intrastat for Denmark
     ],
     'data': [
         'data/account_return_data.xml',
-        'security/ir.model.access.csv',
         'wizard/intrastat_goods_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

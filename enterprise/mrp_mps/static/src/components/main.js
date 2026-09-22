@@ -1,3 +1,4 @@
+import { render, useSubEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
 import { MrpMpsControlPanel, MrpMpsSearchBar } from "../search/mrp_mps_control_panel";
 import MpsLineComponent from '@mrp_mps/components/line';
@@ -10,8 +11,8 @@ import { ActionMenus } from "@web/search/action_menus/action_menus";
 import { download } from "@web/core/network/download";
 import { rpc } from "@web/core/network/rpc";
 import { ExportDataDialog } from "@web/views/view_dialogs/export_data_dialog";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
-import { Component, onWillStart, useSubEnv } from "@odoo/owl";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
+import { Component, onWillStart, t, useProps } from "@odoo/owl";
 import { ViewScaleSelector } from "@web/views/view_components/view_scale_selector";
 
 
@@ -32,10 +33,11 @@ export class MainComponent extends Component {
         ActionMenus,
         ViewScaleSelector,
     };
-    static props = {
+
+    props = useProps({
         ...standardActionServiceProps,
-        searchDomain: { type: Array },
-    };
+        searchDomain: t.array(),
+    });
 
     //--------------------------------------------------------------------------
     // Lifecycle
@@ -67,7 +69,13 @@ export class MainComponent extends Component {
             },
         });
 
-        useBus(this.model, "update", () => this.render(true));
+        useBus(this.model, "update", () => render(this, true));
+
+        useBus(this.model, "reload", async () => {
+            const { config } = this.env;
+            config.offset = Math.max(config.offset - config.limit, 0);
+            await this.model.load(this.props.searchDomain, config.offset, config.limit);
+        });
 
         onWillStart(async () => {
             this.env.config.setDisplayName(_t("Master Production Schedule"));
@@ -91,6 +99,10 @@ export class MainComponent extends Component {
 
     get lines() {
         return this.model.data.production_schedule_ids.slice(0, this.env.config.limit);
+    }
+
+    get hasMPSRecords() {
+        return this.model.data.count;
     }
 
     get manufacturingPeriods() {
@@ -174,10 +186,10 @@ export class MainComponent extends Component {
                     callback: () => this.model.replenishSelectedRecords(),
                 },
                 {
-                    key: "indirect",
-                    description: _t("Toggle Indirect Demand"),
-                    callback: () => this.model.toggleIsIndirect(),
-                }
+                    key: "update_forecast",
+                    description: _t("Update forecast"),
+                    callback: () => this.suggestForecastedDemandAction(),
+                },
             ],
         };
     }
@@ -243,11 +255,11 @@ export class MainComponent extends Component {
         this.dialog.add(ExportDataDialog, dialogProps);
     }
 
-    async suggestForecastedDemand(data, productionScheduleId) {
+    async suggestForecastedDemand(mpsIds) {
         const action = await this.orm.call(
             "mrp.mps.forecast.suggestion",
             "action_open_suggest_forecasted_form_view",
-            [[], productionScheduleId],
+            [[], mpsIds],
             {
                 context: {
                     period_scale: this.currentPeriodType,
@@ -257,7 +269,11 @@ export class MainComponent extends Component {
         );
         return this.action.doAction(
             action,
-            {onClose: () => this.model.reload(productionScheduleId)}
+            { onClose: () => this.model.reload(mpsIds) }
         );
+    }
+
+    suggestForecastedDemandAction() {
+        return this.suggestForecastedDemand(Array.from(this.model.selectedRecords));
     }
 }

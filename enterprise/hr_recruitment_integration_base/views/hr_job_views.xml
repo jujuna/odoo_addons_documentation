@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
                 <button class="oe_stat_button"
-                    icon="fa-newspaper-o"
+                    icon="newspaper"
                     name="action_open_hr_job_post"
                     type="object"
                     groups="hr_recruitment.group_hr_recruitment_user"
@@ -20,20 +20,7 @@
                         />
                 </button>
             </div>
-            <header position="inside">
-                <button name="action_post_job" string="Post on Job Boards" type="object" class="btn-secondary"
-                    groups="hr_recruitment.group_hr_recruitment_user"/>
-            </header>
-            <field name="expected_degree" position="after">
-                <label for="salary_min" string="Salary Range"
-                    groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user"/>
-                <div groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user">
-                    <field name="salary_min" class="oe_inline"/> -
-                    <field name="salary_max" class="oe_inline"/> per
-                    <field name="payment_interval" class="oe_inline"/>
-                </div>
-            </field>
-            <field name="contract_type_id" position="after">
+            <field name="employee_type_id" position="after">
                 <field name="schedule_id" groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user"/>
             </field>
             <xpath expr="//page[@name='trackers_page']" position="after">

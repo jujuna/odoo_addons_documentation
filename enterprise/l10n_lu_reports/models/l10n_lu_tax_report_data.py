@@ -18,6 +18,7 @@ VAT_MANDATORY_FIELDS = {
     '417', '453', '452', '451',
     # custom rate (%) fields are mandatory when their related custom rate (value) are specified
     '394', '128', '153', '136', '149', '144', '396', '162',
+    '129', '137', '145', '165', '164', '163', '175',
 }
 
 # Mapping dictionary: monthly fields as keys, list of corresponding annual fields as values

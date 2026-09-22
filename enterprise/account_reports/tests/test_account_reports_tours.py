@@ -7,9 +7,12 @@ from odoo import fields
 from odoo.tests import tagged
 from odoo.tools import html2plaintext
 from odoo.addons.account.tests.common import AccountTestInvoicingHttpCommon
+from freezegun import freeze_time
 
 @tagged('post_install', '-at_install')
 class TestAccountReportsTours(AccountTestInvoicingHttpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -66,10 +69,11 @@ class TestAccountReportsTours(AccountTestInvoicingHttpCommon):
         move.action_post()
 
     def test_account_reports_tours(self):
-        self.start_tour("/odoo", 'account_reports', login=self.env.user.login)
+        self.start_tour("/odoo/action-account_reports.action_account_report_bs", 'account_reports_tour', login=self.env.user.login)
 
     def test_account_reports_annotations_tours(self):
-        # Create annotations
+        annotations = self.env['account.report.annotation'].search([])
+
         date = fields.Date.today().strftime('%Y-%m-%d')
         message_101401 = self.env['mail.message'].create({
             'model': 'account.account',
@@ -98,9 +102,9 @@ class TestAccountReportsTours(AccountTestInvoicingHttpCommon):
             'message_id': message_101404.id,
         })
 
-        self.start_tour("/odoo", 'account_reports_annotations', login=self.env.user.login)
+        self.start_tour("/odoo/action-account_reports.action_account_report_bs", 'account_reports_annotations', login=self.env.user.login)
 
-        annotations = self.env['account.report.annotation'].search([])
+        annotations = self.env['account.report.annotation'].search([]) - annotations  # remove annotations already present before the tour
 
         self.assertEqual(len(annotations), 2, "There should be two annotations")
 
@@ -125,3 +129,15 @@ class TestAccountReportsTours(AccountTestInvoicingHttpCommon):
         self.assertEqual(len(annotations), 1, "There should be one annotation created by the tour")
         self.assertEqual(bool(annotations.date), True, "The message should be an annotation (pinned)")
         self.assertEqual(html2plaintext(messages.body), "Annotation from the audit", "The message body should match the expected annotation text")
+
+    @freeze_time('2016-12-13')
+    def test_account_reports_load_more_tour(self):
+        self.env.ref('account_reports.aged_receivable_report').load_more_limit = 1
+        partner_c = self.env['res.partner'].create({'name': "partner_c"})
+
+        self.init_invoice('out_invoice', partner=self.partner_a, invoice_date='2016-01-01', amounts=[100], post=True)
+        self.init_invoice('out_invoice', partner=self.partner_a, invoice_date='2016-01-01', amounts=[200], post=True)
+        self.init_invoice('out_invoice', partner=self.partner_b, invoice_date='2016-01-01', amounts=[300], post=True)
+        self.init_invoice('out_invoice', partner=partner_c, invoice_date='2016-01-01', amounts=[400], post=True)
+
+        self.start_tour('/odoo/action-account_reports.action_account_report_ar', 'account_reports_load_more', login=self.env.user.login)

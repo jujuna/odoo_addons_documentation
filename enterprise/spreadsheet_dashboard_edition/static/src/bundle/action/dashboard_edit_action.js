@@ -1,7 +1,6 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { AbstractSpreadsheetAction } from "@spreadsheet_edition/bundle/actions/abstract_spreadsheet_action";
 import { registry } from "@web/core/registry";
-
-import { useSubEnv } from "@odoo/owl";
 
 export class DashboardEditAction extends AbstractSpreadsheetAction {
     static template = "spreadsheet_dashboard_edition.DashboardEditAction";
@@ -16,7 +15,7 @@ export class DashboardEditAction extends AbstractSpreadsheetAction {
             onSpreadsheetShared: this.shareSpreadsheet.bind(this),
             isDashboardPublished: () => this.data && this.data.is_published,
             toggleDashboardPublished: this.togglePublished.bind(this),
-            isRecordReadonly: () => this.data && this.data.isReadonly,
+            isRecordReadonly: () => this.data && !this.data.has_write_access,
         });
     }
 

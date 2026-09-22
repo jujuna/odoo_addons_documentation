@@ -4,7 +4,6 @@
     'name': 'Peru - Inventory and Balance Reports',
     'countries': ['pe'],
     "description": "5th and 6th Set Financial Reports. Inventory and Balance 3.1-3.7, 3.11-3.18, 3.20,3.24 and 3.25",
-    "version": "1.0",
     "category": "Accounting/Localizations/Reporting",
     "website": "https://www.odoo.com/app/accounting",
     'author': 'Odoo S.A.',
@@ -22,7 +21,6 @@
         "views/account_account_views.xml",
         "views/res_company_views.xml",
         "views/res_config_settings_views.xml",
-        "security/ir.model.access.csv",
+        'security/ir.access.csv',
     ],
-    "installable": True,
 }

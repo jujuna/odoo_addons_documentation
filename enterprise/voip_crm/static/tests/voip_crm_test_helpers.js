@@ -1,10 +1,7 @@
-import { defineModels } from "@web/../tests/web_test_helpers";
+import { setupVoipTests } from "@voip/../tests/voip_test_helpers";
 import { CRMLead } from "@voip_crm/../tests/mock_server/mock_models/crm_lead";
 import { ResPartner } from "@voip_crm/../tests/mock_server/mock_models/res_partner";
-import { voipModels } from "@voip/../tests/voip_test_helpers";
 
-export function defineVoipCRMModels() {
-    return defineModels(voipCRMModels);
+export function setupVoipCRMTests() {
+    setupVoipTests({ extraModels: { CRMLead, ResPartner } });
 }
-
-export const voipCRMModels = { ...voipModels, CRMLead, ResPartner };

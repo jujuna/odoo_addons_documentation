@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -9,7 +8,6 @@ This module prevents taking time offs into account when computing employee overt
     """,
 
     'category': 'Services/Timesheets',
-    'version': '1.0',
 
     'depends': ['project_timesheet_holidays', 'timesheet_grid'],
     'auto_install': True,

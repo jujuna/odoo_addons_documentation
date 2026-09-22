@@ -1,4 +1,7 @@
 from odoo import _, api, Command, fields, models
+from odoo.tools.translate import LazyTranslate
+
+_lt = LazyTranslate(__name__)
 
 
 class DocumentsSharing(models.TransientModel):
@@ -22,15 +25,19 @@ class DocumentsSharing(models.TransientModel):
         string='Role', default='view', required=True)
     invite_notify = fields.Boolean("Notify", default=True)
     invite_notify_message = fields.Html("Notification Message")
+    invite_type = fields.Selection([
+        ('people', 'Add People'),
+        ('groups', 'Add Groups')], default="people", string="Add Type")
     invite_partner_ids = fields.Many2many('res.partner')
+    invite_group_ids = fields.Many2many('res.group.functional')
 
     # Additional readonly fields for displaying information
     access_urls = fields.Char("Access URLs", compute="_compute_ui_values")
     is_single = fields.Boolean("Single", compute="_compute_ui_values")
     is_folder_only = fields.Boolean("Folder Only", compute="_compute_ui_values")
     is_readonly = fields.Boolean("Readonly", compute="_compute_ui_values")
-    has_warning_link_with_more_rights = fields.Char(compute="_compute_has_warning_link_with_more_rights")
-    has_warning_partners_without_access = fields.Char(compute="_compute_has_warning_partners_without_access")
+    has_warning_link_with_more_rights = fields.Boolean(compute="_compute_has_warning_link_with_more_rights")
+    has_warning_partners_without_access = fields.Boolean(compute="_compute_has_warning_partners_without_access")
     owner_id = fields.Many2one("res.users", string="Owner of all documents", compute="_compute_ui_values")
 
     WRITE_VALUE_PREFIX = 'write_'
@@ -121,9 +128,9 @@ class DocumentsSharing(models.TransientModel):
         for record in self:
             record.has_warning_link_with_more_rights = (
                     not record.invite_partner_ids and record.access_via_link.endswith('edit') and (
-                    record.access_internal.endswith('view') or any(a.role.endswith('view') for a in record.share_access_ids)))
+                    record.access_internal.endswith('view') or any(a.role.endswith('view') and not a.is_deleted for a in record.share_access_ids)))
 
-    @api.depends('access_via_link', 'invite_partner_ids', 'share_access_ids.partner_id.user_ids')
+    @api.depends('access_via_link', 'invite_partner_ids', 'invite_group_ids', 'share_access_ids.partner_id.user_ids')
     def _compute_has_warning_partners_without_access(self):
         for record in self:
             record.has_warning_partners_without_access = any(r.has_warning_no_access for r in record.share_access_ids)
@@ -136,9 +143,9 @@ class DocumentsSharing(models.TransientModel):
 
     def action_invite_members(self):
         self.ensure_one()
-        if not self.invite_partner_ids:
+        if not (self.invite_partner_ids or self.invite_group_ids):
             params = {
-                'title': _('No partners'),
+                'title': _('No partners/groups'),
                 'message': '',
                 'type': 'warning',
             }
@@ -151,44 +158,96 @@ class DocumentsSharing(models.TransientModel):
         else:
             self.document_ids.action_update_access_rights(
                 partners={
-                    partner: (self.invite_role, None)
+                    partner: (self.invite_role, False)
                     for partner in self.invite_partner_ids
+                },
+                groups={
+                    group: (self.invite_role, False)
+                    for group in self.invite_group_ids
                 },
                 no_propagation=not self.is_folder_only,
             )
-            if self.invite_notify and (
-                    share_template := self.env.ref('documents.mail_template_document_share', raise_if_not_found=False)):
-                access_urls_by_partner = {}
-                for partner in self.invite_partner_ids:
-                    access_urls = {}
-                    for document in self.document_ids:
-                        access_url = document.access_url
-                        member = document.access_ids.filtered(lambda access:
-                            access.partner_id == partner)
-                        if member and member._is_signup_available():
-                            access_url = f'{access_url}?member_signup_token={member._get_member_signup_token()}&member_id={member.id}'
-                        access_urls[document] = access_url
-                    access_urls_by_partner[partner] = access_urls
-                share_template.with_context(
-                    documents=self.document_ids,
-                    access_urls_by_partner=access_urls_by_partner,
-                    message=self.invite_notify_message or "").send_mail_batch(self.invite_partner_ids.ids)
-
+            new_partner_ids = self.invite_partner_ids + self.invite_group_ids.user_ids.partner_id
+            message = (
+                _('%s members added.', len(new_partner_ids))
+                if len(new_partner_ids) > 1
+                else _('Member added.')
+            )
             params = {
-                'title': _('Successfully Shared'),
-                'message': (
-                    _('%s members added.', len(self.invite_partner_ids))
-                    if len(self.invite_partner_ids) > 1
-                    else _('Member added.')
-                ),
+                'title': self.env._('Successfully shared'),
+                'message': message,
                 'type': 'success',
                 'next': self.action_open(self.document_ids.ids),
             }
+            if self.invite_notify:
+                role_rank = {'mixed': 0, 'view': 1, 'edit': 2}
+                existing_partner_role_dict = {}
+                for access in self.share_access_ids:
+                    for partner in access.all_partner_ids:
+                        existing_partner_role_dict[partner.id] = max(access.role, existing_partner_role_dict.get(partner.id, 'view'), key=role_rank.get)
+
+                new_partner_ids = self.invite_partner_ids + self.invite_group_ids.user_ids.partner_id
+                to_notify_partner_ids = new_partner_ids.filtered(
+                    lambda partner: partner.id not in existing_partner_role_dict or role_rank[self.invite_role] > role_rank[existing_partner_role_dict[partner.id]])
+                notification_params = self._action_send_invitation(to_notify_partner_ids)
+                if notification_message := notification_params.pop('message', None):
+                    params['message'] += f' {notification_message}'
+                params.update(notification_params)
+
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': params,
         }
+
+    def _action_send_invitation(self, partners):
+        share_template = self.env.ref('documents.mail_template_document_share', raise_if_not_found=False)
+        if not share_template:
+            return {
+                'message': self.env._('Missing share template'),
+                'type': 'warning',
+            }
+        if (n_documents := len(self.document_ids)) > 1:
+            named_documents = self.document_ids.filtered('name')
+            documents_list = ', '.join(named_documents.mapped('name'))
+            if 0 < len(named_documents) < n_documents:
+                documents_list += ', ...'
+            subtitles = [_lt('Shared Documents'), documents_list]
+        else:
+            subtitles = [_lt('Shared Document'), self.document_ids.name or '']
+
+        access_urls_by_partner = {}
+
+        for partner in partners.filtered('email'):
+            access_urls = {}
+            for document in self.document_ids:
+                access_url = document.access_url
+                member = document.access_ids.filtered(lambda access: access.partner_id == partner)
+                if member and member._is_signup_available():
+                    access_url = f'{access_url}?member_signup_token={member._get_member_signup_token()}&member_id={member.id}'
+                access_urls[document] = access_url
+            access_urls_by_partner[partner] = access_urls
+
+        share_template.with_context(
+            email_notification_force_header=True,
+            email_notification_force_footer=True,
+            email_notification_subtitles=subtitles,
+            email_notification_subtitles_highlight_index=1,
+            documents=self.document_ids,
+            access_urls_by_partner=access_urls_by_partner,
+            message=self.invite_notify_message or "",
+        ).send_mail_batch(partners.ids, email_layout_xmlid='mail.mail_notification_layout')
+
+        notification_params = {
+            'title': self.env._('Successfully shared'),
+            'type': 'success',
+        }
+        if no_email := partners.filtered(lambda p: not p.email):
+            notification_params.update({
+                'type': 'info',
+                'message': self.env._('Skipped %(count)s (no email)', count=len(no_email))
+            })
+        return notification_params
 
     def action_allow_link_access(self):
         if self.has_warning_partners_without_access:
@@ -207,21 +266,43 @@ class DocumentsSharing(models.TransientModel):
 
         is_single_doc = len(documents) == 1
         all_partners = self._filtered_relevant_access(documents).partner_id
+        all_groups = self._filtered_relevant_access(documents).group_id
         access_by_partner_by_doc = {
             doc: {
                      access.partner_id: access.role
-                     for access in self._filtered_relevant_access(doc)
+                     for access in self._filtered_relevant_access(doc) if access.partner_id
                  } | ({doc.owner_id.partner_id: 'edit'} if doc.owner_id else {})
             for doc in documents
+        }
+        access_by_group_by_doc = {
+            doc: {
+                access.group_id: access.role
+                for access in self._filtered_relevant_access(doc) if access.group_id
+            } for doc in documents
         }
 
         if is_single_doc:  # expiration only supported for single document
             expiration_per_partner = {
                 access.partner_id: access.expiration_date
-                for access in self._filtered_relevant_access(documents)
+                for access in self._filtered_relevant_access(documents) if access.partner_id
+            }
+            expiration_per_group = {
+                access.group_id: access.expiration_date
+                for access in self._filtered_relevant_access(documents) if access.group_id
             }
 
         access_shares = []
+        for group in all_groups:
+            role0 = access_by_group_by_doc.get(documents[0], {}).get(group)
+            is_mixed = any(role0 != access_by_group_by_doc.get(doc, {}).get(group) for doc in documents[1:])
+            expiration_date = expiration_per_group.get(group) if is_single_doc else False
+            access_shares.append(Command.create(
+                {
+                    'expiration_date': expiration_date,
+                    'original_expiration_date': expiration_date,
+                    'group_id': group.id,
+                    'role': 'mixed' if is_mixed else role0,
+                }))
         if any(d.owner_id != document0.owner_id for d in documents):  # there are no single owner of all the documents
             # Mixed owner -> add owner so that their rights appear "mixed" if not editor of the documents they don't own
             # Otherwise if there are only one owner, it will be displayed as such
@@ -276,7 +357,7 @@ class DocumentsSharing(models.TransientModel):
     def _filtered_relevant_access(self, documents):
         """Filter out expired access and non access of the documents (logs: role == False, owner access)"""
         return documents.access_ids.filtered(
-            lambda a: a.role and a.partner_id != a.document_id.owner_id.partner_id
+            lambda a: a.role and (a.group_id or a.partner_id != a.document_id.owner_id.partner_id)
                       and (not a.expiration_date or a.expiration_date >= fields.Datetime.now()))
 
     def _get_update_rights_params(self):
@@ -292,14 +373,25 @@ class DocumentsSharing(models.TransientModel):
         partners = {
             access.partner_id: (access.role.removeprefix(self.WRITE_VALUE_PREFIX),
                                 access.expiration_date if self.is_single else None)
-            for access in modified_access
+            for access in modified_access.filtered('partner_id')
         }
         partners.update({
             access.partner_id: (False, False)
-            for access in removed_access
+            for access in removed_access.filtered('partner_id')
+        })
+        groups = {
+            access.group_id: (access.role.removeprefix(self.WRITE_VALUE_PREFIX),
+                                access.expiration_date if self.is_single else None)
+            for access in modified_access.filtered('group_id')
+        }
+        groups.update({
+            access.group_id: (False, False)
+            for access in removed_access.filtered('group_id')
         })
         if partners:
             res['partners'] = partners
+        if groups:
+            res['groups'] = groups
         if self.access_internal.startswith(self.WRITE_VALUE_PREFIX):
             res['access_internal'] = self.access_internal.removeprefix(self.WRITE_VALUE_PREFIX)
         if self.access_via_link.startswith(self.WRITE_VALUE_PREFIX):

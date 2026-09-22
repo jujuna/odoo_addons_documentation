@@ -3,9 +3,13 @@ import { StreamPostComments } from '@social/js/stream_post_comments';
 import { StreamPostCommentListFacebook } from './stream_post_comment_list';
 import { StreamPostCommentsReplyFacebook } from './stream_post_comments_reply';
 import { formatFacebookReactions } from './utils';
-import { onWillStart } from "@odoo/owl";
+import { onWillStart, t, useProps } from "@odoo/owl";
 
 export class StreamPostCommentsFacebook extends StreamPostComments {
+    facebookProps = useProps({
+        onFacebookPostLike: t.any(),
+        summary: t.any(),
+    });
 
     setup() {
         super.setup();
@@ -13,7 +17,7 @@ export class StreamPostCommentsFacebook extends StreamPostComments {
         this.totalLoadedComments = this.props.comments.length;
         this.nextRecordsToken = this.props.nextRecordsToken;
         this.commentsCount = this.props.commentsCount;
-        this.state.showLoadMoreComments = this.totalLoadedComments < this.props.summary.total_count;
+        this.state.showLoadMoreComments = this.totalLoadedComments < this.facebookProps.summary.total_count;
 
         onWillStart(async () => {
             const facebookInfo = await this.orm.read(
@@ -35,15 +39,11 @@ export class StreamPostCommentsFacebook extends StreamPostComments {
         });
 
         this.totalLoadedComments += nextComments.comments.length;
-        if (this.totalLoadedComments >= this.props.summary.total_count) {
+        if (this.totalLoadedComments >= this.facebookProps.summary.total_count) {
             this.state.showLoadMoreComments = false;
         }
         this.comments.push(...nextComments.comments);
         this.nextRecordsToken = nextComments.nextRecordsToken;
-    }
-
-    async _onFacebookPostLike() {
-        await this.props.onFacebookPostLike();
     }
 
     get commentListComponent() {
@@ -59,7 +59,7 @@ export class StreamPostCommentsFacebook extends StreamPostComments {
      */
     get facebookReactions() {
         const reactionsCount = JSON.parse(
-            this.props.originalPost.facebook_reactions_count.raw_value || "{}"
+            this.originalPost.facebook_reactions_count.raw_value || "{}"
         );
         return formatFacebookReactions(reactionsCount);
     }

@@ -12,36 +12,10 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools import format_list
 
 
-# Copied from account.external.tax.mixin in l10n_br_edi
-def deep_update(d, u):
-    """Like {}.update but handles nested dicts recursively. Based on https://stackoverflow.com/a/3233356."""
-    for k, v in u.items():
-        if isinstance(v, dict):
-            d[k] = deep_update(d.get(k, {}), v)
-        else:
-            d[k] = v
-    return d
-
-
-# Copied from account.external.tax.mixin in l10n_br_edi
-def deep_clean(d):
-    """Recursively removes keys with a falsy value in dicts. Based on https://stackoverflow.com/a/48152075."""
-    cleaned_dict = {}
-    for k, v in d.items():
-        if isinstance(v, dict):
-            v = deep_clean(v)
-        if v:
-            cleaned_dict[k] = v
-    return cleaned_dict or None
-
-
 class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "account.external.tax.mixin"]
 
-    l10n_br_edi_avatax_data = fields.Json(
-        help="Brazil: technical field that remembers the last tax summary returned by Avatax.", copy=False
-    )
     l10n_br_avatax_error = fields.Text(
         "Brazil Avatax Error",
         copy=False,
@@ -52,6 +26,7 @@ class PosOrder(models.Model):
         [
             ("accepted", "Accepted"),
             ("error", "Error"),
+            ("cancelled", "Cancelled"),
         ],
         string="Brazil Avatax Status",
         copy=False,
@@ -132,7 +107,7 @@ class PosOrder(models.Model):
         for order in eligible_orders:
             try:
                 order._set_external_taxes(order._get_external_taxes())
-            except (UserError, ValidationError) as e:  # Don't block the POS
+            except (UserError, ValidationError, InsufficientCreditError) as e:  # Don't block the POS
                 order.l10n_br_last_avatax_status = "error"
                 order.l10n_br_avatax_error = str(e)
             else:
@@ -183,22 +158,27 @@ class PosOrder(models.Model):
     def _get_line_data_for_external_taxes(self):
         """account.external.tax.mixin override."""
         if not any([order.l10n_br_is_avatax for order in self]):
-            return super()._get_line_data_for_external_taxes()
+            res = super()._get_line_data_for_external_taxes()
+        else:
+            AccountTax = self.env['account.tax']
+            base_lines = self.lines._prepare_base_lines_for_taxes_computation()
+            AccountTax._add_tax_details_in_base_lines(base_lines, self.company_id)
+            AccountTax._round_base_lines_tax_details(base_lines, self.company_id)
+            AccountTax._add_accounting_data_in_base_lines_tax_details(base_lines, self.company_id)
 
-        AccountTax = self.env['account.tax']
-        base_lines = self._prepare_tax_base_line_values()
-        AccountTax._add_tax_details_in_base_lines(base_lines, self.company_id)
-        AccountTax._round_base_lines_tax_details(base_lines, self.company_id)
-        AccountTax._add_accounting_data_in_base_lines_tax_details(base_lines, self.company_id)
+            operation_type = self.env.ref("l10n_br_avatax.operation_type_1")
+            res = []
+            for line in base_lines:
+                res.append({
+                    'base_line': line,
+                    'description': line['record'].product_id.name,
+                    'operation_type': operation_type,
+                })
 
-        operation_type = self.env.ref("l10n_br_avatax.operation_type_1")
-        res = []
-        for line in base_lines:
-            res.append({
-                'base_line': line,
-                'description': line['record'].product_id.name,
-                'operation_type': operation_type,
-            })
+        for line in res:
+            base_line = line['base_line']
+            if base_line['record'].company_id.l10n_br_is_icbs:
+                line['operation_type'] = base_line['product_id'].l10n_br_operation_type_pos_id or line['operation_type']
 
         return res
 
@@ -315,6 +295,19 @@ class PosOrder(models.Model):
         """We save the Avalara receipt PDF in cases where a customer invoices manually from the backend."""
         self._l10n_br_do_edi(save_avalara_pdf=True)
 
+    def button_l10n_br_edi_pos_cancel_nfce(self):
+        """This is used to cancel NFC-e for this order from the backend"""
+        if self.l10n_br_last_avatax_status == 'accepted' and self.l10n_br_access_key:
+            return {
+                'name': self.env._("NFC-e Cancellation"),
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'l10n_br_edi_pos.cancel.nfce',
+                'target': 'new',
+                'context': {'default_order_id': self.id},
+            }
+
     def action_send_nfce_batch(self):
         errored_orders = self.filtered(lambda order: order.l10n_br_last_avatax_status == 'error' and order.config_id.l10n_br_is_nfce)
         others = self - errored_orders
@@ -379,16 +372,6 @@ class PosOrder(models.Model):
 
         return result
 
-    def _l10n_br_call_avatax_taxes(self, company, document_data):
-        """Override to store the retrieved Avatax data."""
-        api_response = super()._l10n_br_call_avatax_taxes(company, document_data)
-        self.l10n_br_edi_avatax_data = {
-            "header": api_response.get("header"),
-            "lines": api_response.get("lines"),
-            "summary": api_response.get("summary"),
-        }
-        return api_response
-
     def _l10n_br_edi_get_tax_data(self):
         """Copy of account.move. Due to Avalara bugs they're unable to resolve we have to change their tax calculation response before
         sending it back to them. This returns a tuple with what to include in the request ("lines" and "summary")
@@ -441,31 +424,6 @@ class PosOrder(models.Model):
         return {
             "change": self.currency_id.round(sum(self.payment_ids.filtered("is_change").mapped(lambda payment: -payment.amount))),
             "paymentMode": payment_modes,
-        }
-
-    @api.model
-    def _l10n_br_get_location_dict(self, partner):
-        """Copy of account.move."""
-        return {
-            "name": partner.name,
-            "businessName": partner.name,
-            "type": self._l10n_br_get_partner_type(partner),
-            "federalTaxId": partner.vat,
-            "cityTaxId": partner.l10n_br_im_code,
-            "stateTaxId": partner.l10n_br_ie_code,
-            "suframa": partner.l10n_br_isuf_code,
-            "address": {
-                "neighborhood": partner.street2,
-                "street": partner.street_name,
-                "zipcode": partner.zip,
-                "cityName": partner.city,
-                "state": partner.state_id.code,
-                "countryCode": partner.country_id.l10n_br_edi_code,
-                "number": partner.street_number,
-                "complement": partner.street_number2,
-                "phone": partner.phone,
-                "email": partner.email,
-            },
         }
 
     def _l10n_br_get_anonymous_location_dict(self, company_partner):
@@ -654,18 +612,16 @@ class PosOrder(models.Model):
         payload = super()._prepare_l10n_br_avatax_document_service_call(params)
         customer = params['partner']
         company_partner = params['company_partner']
+        anonymous_partner = {}
+        if not customer:
+            anonymous_partner = self._l10n_br_get_anonymous_location_dict(company_partner)
         extra_payload = {
             "header": {
                 "companyLocation": company_partner.vat,
                 "invoiceNumber": params['edi_number'],
                 "invoiceSerial": params['invoice_serial'],
                 "locations": {
-                    "entity": (
-                        self._l10n_br_get_location_dict(customer)
-                        if customer
-                        else self._l10n_br_get_anonymous_location_dict(company_partner)
-                    ),
-                    "establishment": self._l10n_br_get_location_dict(company_partner),
+                    "entity": anonymous_partner,
                 },
                 "goods": {
                     "model": self.env.ref("l10n_br.dt_65").code,
@@ -690,13 +646,10 @@ class PosOrder(models.Model):
         for line in payload["lines"]:
             line.pop("freightAmount")
 
-        if not customer:
-            payload["header"]["locations"].pop("entity")
-
         # extra_payload is cleaned before it's used to avoid e.g. "cityName": False or "number": "". These make
         # Avatax return various errors: e.g. "Falha na estrutura enviada". This is to avoid having lots of if
         # statements.
-        deep_update(payload, deep_clean(extra_payload))
+        self._l10n_br_deep_update_dict(payload, self._l10n_br_deep_clean_dict(extra_payload))
         return payload
 
     def _l10n_br_prepare_invoice_payload(self):
@@ -731,6 +684,9 @@ class PosOrder(models.Model):
             # These exceptions can be thrown by iap_jsonrpc()
             return None, str(e)
 
+    def _l10n_br_edi_pos_cancel_invoice(self, transaction):
+        return self._l10n_br_iap_request('cancel_invoice_goods', self.company_id, transaction)
+
     def _l10n_br_edi_attachments_from_response(self, response, save_avalara_pdf=False):
         """Copy of account.move. Link these attachments to fields to restrict them to who can access pos.order (enforced
         by ir.attachment's check())."""
@@ -740,7 +696,7 @@ class PosOrder(models.Model):
                 "res_id": self.id,
                 "res_field": "l10n_br_edi_xml_attachment_file",
                 "name": f"{self.name}_edi.xml",
-                "datas": response["xml"]["base64"],
+                "raw": response["xml"]["base64"],
             }
         )
 
@@ -751,7 +707,7 @@ class PosOrder(models.Model):
                     "res_id": self.id,
                     "res_field": "l10n_br_edi_pdf_attachment_file",
                     "name": f"{self.name}_edi.pdf",
-                    "datas": response["pdf"]["base64"],
+                    "raw": response["pdf"]["base64"],
                 }
             )
 
@@ -780,9 +736,10 @@ class PosOrder(models.Model):
                     ("l10n_br_avatax_code", "=", l10n_br_avatax_code),
                     ("price_include_override", "=", "tax_included"),
                     ("company_id", "=", self.company_id.id),
+                    ("type_tax_use", "=", "sale"),
                 ],
                 limit=1,
-                order="create_date desc",
+                order="create_date desc, id desc",
             )
         )
 
@@ -801,7 +758,8 @@ class PosOrder(models.Model):
         self.lines.invalidate_recordset(["tax_ids_after_fiscal_position"])
         product_id_to_taxes = defaultdict(float)
         adjustment_lines_vals = []
-        aml_values_list = self._prepare_aml_values_list_per_nature()
+        move_data = self._prepare_account_move_line_data(False)
+        account_move_line = [data['account.move.line'] for data in move_data]
 
         # Figure out how much total tax to remove per product.
         for avatax_line in self.l10n_br_edi_avatax_data["lines"]:
@@ -810,22 +768,45 @@ class PosOrder(models.Model):
             product_id_to_taxes[line.product_id.id] += tax_amount
 
         # Set the removed amounts calculated above on the right product AML.
-        for aml_values in aml_values_list["product"]:
+        # Strip fields that would cause account.move to auto-generate tax lines, since we add them manually below.
+        for aml_values in account_move_line:
             amount = product_id_to_taxes.get(aml_values["product_id"])
             if amount is not None:
                 aml_values["amount_currency"] = aml_values["balance"] = amount
+            aml_values.pop("tax_ids", None)
+            aml_values.pop("extra_tax_data", None)
 
-        adjustment_lines_vals.extend(aml_values_list["product"])
+        adjustment_lines_vals.extend(account_move_line)
+
+        base_lines = self.lines._prepare_base_lines_for_taxes_computation()
+        AccountTax = self.env['account.tax']
+        AccountTax._add_tax_details_in_base_lines(base_lines, self.company_id)
+        AccountTax._round_base_lines_tax_details(base_lines, self.company_id)
+        AccountTax._add_accounting_data_in_base_lines_tax_details(base_lines, self.company_id)
+        tax_results = AccountTax._prepare_tax_lines(base_lines, self.company_id)
+
+        total_balance = 0.0
+        total_amount_currency = 0.0
+        tax_lines = []
+
+        # Create the tax lines
+        for tax_line in tax_results['tax_lines_to_add']:
+            tax_lines.append({
+                **tax_line,
+                'display_type': 'tax',
+            })
+            total_amount_currency += tax_line['amount_currency']
+            total_balance += tax_line['balance']
 
         # Adjust the tax amounts to what Avatax returned, don't rely on what Odoo calculated.
         for l10n_br_avatax_code, details in self.l10n_br_edi_avatax_data["summary"]["taxByType"].items():
-            for aml_values in aml_values_list["tax"]:
+            for aml_values in tax_lines:
                 tax = self._l10n_br_find_tax_for_l10n_br_avatax_code(l10n_br_avatax_code)
                 if self.env["account.tax.repartition.line"].browse(aml_values["tax_repartition_line_id"]).tax_id == tax:
                     aml_values["amount_currency"] = aml_values["balance"] = -details["tax"]
                     aml_values["tax_base_amount"] = -details["subtotalTaxable"] + details["tax"]
 
-        adjustment_lines_vals.extend(aml_values_list["tax"])
+        adjustment_lines_vals.extend(tax_lines)
 
         adjustment_move = self.env["account.move"].create(
             {
@@ -898,7 +879,7 @@ class PosOrder(models.Model):
                     )
 
     def _l10n_br_edi_action_download(self):
-        valid_orders = self.filtered(lambda o: o.l10n_br_edi_xml_attachment_file and o.l10n_br_last_avatax_status == "accepted")
+        valid_orders = self.filtered(lambda o: o.l10n_br_edi_xml_attachment_file and o.l10n_br_last_avatax_status in ['accepted', 'cancelled'])
         if len(valid_orders) != len(self):
             invalid_orders = (self - valid_orders).mapped('name')
             raise UserError(self.env._(

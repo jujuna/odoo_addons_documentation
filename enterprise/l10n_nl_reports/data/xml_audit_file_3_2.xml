@@ -12,7 +12,7 @@
                 <softwareVersion t-out="software_version"/>
             </header>
             <company>
-                <companyIdent t-out="company.company_registry"/>
+                <companyIdent t-out="company.partner_id._get_additional_identifier('NL_KVK') or company.partner_id._get_additional_identifier('NL_OIN')"/>
                 <companyName t-out="company.name"/>
                 <taxRegistrationCountry t-out="company.country_id.code"/>
                 <taxRegIdent t-out="company.vat"/>

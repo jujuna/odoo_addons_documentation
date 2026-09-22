@@ -1,18 +1,17 @@
 import { COLORS, BG_COLORS } from "@web_studio/utils";
-import { Dropdown } from "@web/core/dropdown/dropdown";
 import { SelectMenu } from "@web/core/select_menu/select_menu";
 import { FileInput } from "@web/core/file_input/file_input";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { FontAwesomeIconSelector } from "@web_studio/client_action/components/font_awesome_icon_selector/font_awesome_icon_selector";
+import { StudioIconSelector } from "@web_studio/client_action/components/icon_selector/icon_selector";
 
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { resizeBlobImg } from "@web/core/utils/files";
 
 export const DEFAULT_ICON = {
     backgroundColor: BG_COLORS[0],
     color: COLORS[10],
-    iconClass: "fa fa-home",
+    icon: "home",
     type: "custom_icon",
 };
 
@@ -21,28 +20,26 @@ export const DEFAULT_ICON = {
  *
  * Component which purpose is to design an app icon. It can be an uploaded image
  * which will be displayed as is, or an icon customized with the help of presets
- * of colors and icon symbols (@see web_studio/static/src/utils for the full list of colors
- * and icon classes).
+ * of colors and icon symbols (@see web_studio/static/src/utils for the full list
+ * of colors).
  * @extends Component
  */
 export class IconCreator extends Component {
     static components = {
-        Dropdown,
         FileInput,
-        FontAwesomeIconSelector,
+        StudioIconSelector,
         SelectMenu,
     };
-    static defaultProps = DEFAULT_ICON;
-    static props = {
-        backgroundColor: { type: String, optional: 1 },
-        color: { type: String, optional: 1 },
-        editable: { type: Boolean, optional: 1 },
-        iconClass: { type: String, optional: 1 },
-        type: { validate: (t) => ["base64", "custom_icon"].includes(t), optional: 1 },
-        uploaded_attachment_id: { type: Number, optional: 1 },
-        webIconData: { type: String, optional: 1 },
-        onIconChange: Function,
-    };
+    props = useProps({
+        backgroundColor: t.string().optional(DEFAULT_ICON.backgroundColor),
+        color: t.string().optional(DEFAULT_ICON.color),
+        editable: t.boolean().optional(),
+        icon: t.string().optional(DEFAULT_ICON.icon),
+        type: t.selection(["base64", "custom_icon"]).optional(DEFAULT_ICON.type),
+        uploaded_attachment_id: t.number().optional(),
+        webIconData: t.string().optional(),
+        onIconChange: t.function(),
+    });
     static template = "web_studio.IconCreator";
 
     /**
@@ -51,7 +48,8 @@ export class IconCreator extends Component {
      *      icon.
      * @param {string} [props.color] Color of the custom icon.
      * @param {boolean} props.editable
-     * @param {string} [props.iconClass] Font Awesome class of the custom icon.
+     * @param {string} [props.icon] Material Symbols data-icon name of the
+     *      custom icon, suffixed with "_f" for its filled variant.
      * @param {string} props.type 'base64' (if an actual image) or 'custom_icon'.
      * @param {number} [props.uploaded_attachment_id] Databse ID of an uploaded
      *      attachment
@@ -85,12 +83,10 @@ export class IconCreator extends Component {
     }
 
     getChoices(object) {
-        return object.map((color) => {
-            return {
-                label: color,
-                value: color,
-            };
-        });
+        return object.map((color) => ({
+            label: color,
+            value: color,
+        }));
     }
 
     //--------------------------------------------------------------------------
@@ -109,12 +105,12 @@ export class IconCreator extends Component {
             // Happens when cancelling upload
             return;
         }
-        const res = await this.orm.read("ir.attachment", [file.id], ["datas"]);
+        const res = await this.orm.read("ir.attachment", [file.id], ["raw"]);
 
         this.props.onIconChange({
             type: "base64",
             uploaded_attachment_id: file.id,
-            webIconData: "data:image/png;base64," + res[0].datas.replace(/\s/g, ""),
+            webIconData: "data:image/png;base64," + res[0].raw.replace(/\s/g, ""),
         });
     }
 
@@ -129,7 +125,7 @@ export class IconCreator extends Component {
         this.props.onIconChange({
             backgroundColor: this.props.backgroundColor,
             color: this.props.color,
-            iconClass: this.props.iconClass,
+            icon: this.props.icon,
             type: "custom_icon",
             [palette]: value,
         });

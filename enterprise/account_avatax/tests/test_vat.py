@@ -5,6 +5,7 @@ from .common import TestAccountAvataxCommon
 @tagged("-at_install", "post_install")
 class TestAccountAvalaraVAT(TestAccountAvataxCommon):
     """https://developer.avalara.com/certification/avatax/VAT-badge/"""
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):

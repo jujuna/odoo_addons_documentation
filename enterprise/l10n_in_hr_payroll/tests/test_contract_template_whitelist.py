@@ -22,7 +22,6 @@ class TestWhitelistFromTemplate(TransactionCase):
 
         template = Version.create({
             'name': 'IN Template',
-            'l10n_in_tds': 2000.0,
             'l10n_in_medical_insurance': 5000.0,
             'l10n_in_provident_fund': True,
             'l10n_in_gratuity': 15000.0,
@@ -30,11 +29,8 @@ class TestWhitelistFromTemplate(TransactionCase):
 
         contract = self.employee_in.version_id
 
-        wizard = self.env['hr.version.wizard']\
-            .with_company(self.company_in)\
-            .with_context(active_model='hr.employee', active_id=self.employee_in.id)\
-            .create({'contract_template_id': template.id})
-        wizard.action_load_template()
+        self.employee_in.contract_template_id = template
+        self.employee_in._onchange_contract_template_id()
 
         for field in Version._get_whitelist_fields_from_template():
             self.assertEqual(contract[field], template[field])

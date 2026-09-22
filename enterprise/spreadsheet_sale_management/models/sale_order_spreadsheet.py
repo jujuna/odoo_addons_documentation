@@ -4,6 +4,9 @@ from odoo import api, fields, models, _
 from odoo.fields import Domain
 
 
+from odoo.addons.spreadsheet.utils.helpers import DEFAULT_SHEET_ID
+
+
 SALE_ORDER_LINE_FIELDS = [
     'product_id',
     'product_uom_qty',
@@ -22,11 +25,11 @@ class SaleOrderSpreadsheet(models.Model):
     _inherit = ['spreadsheet.mixin']
     _description = 'Quotation Spreadsheet'
 
-    name = fields.Char(required=True, default=lambda self: self.env._('Untitled spreadsheet'))
+    name = fields.Char(required=True, default=lambda self: self.env._('Untitled spreadsheet'), copy=True)
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     order_id = fields.Many2one('sale.order', index='btree_not_null', ondelete='cascade')
 
-    def get_formview_action(self, access_uid=None):
+    def get_record_default_action(self, access_uid=None):
         return self.action_open_spreadsheet()
 
     @api.model_create_multi
@@ -83,30 +86,31 @@ class SaleOrderSpreadsheet(models.Model):
 
     def _dispatch_insert_list_revision(self):
         command = {
-            'sheetId': 'sheet1',
+            'sheetId': DEFAULT_SHEET_ID,
             'col': 0,
             'row': 0,
-            'id': '1',
+            'listId': '1',
             'linesNumber': 100,
             'columns': [
                 {
                     'name': field_name,
-                    'type': self.env['sale.order.line']._fields[field_name].type
+                    'string': self.env['sale.order.line']._fields[field_name].string
                 } for field_name in SALE_ORDER_LINE_FIELDS
             ],
             'type': 'RE_INSERT_ODOO_LIST',
+            'mode': 'dynamic',
         }
         table_command = {
             'type': 'CREATE_TABLE',
-            'sheetId': 'sheet1',
-            'tableType': 'static',
+            'sheetId': DEFAULT_SHEET_ID,
+            'tableType': 'dynamic',
             'ranges': [{
-                '_sheetId': 'sheet1',
+                '_sheetId': DEFAULT_SHEET_ID,
                 '_zone': {
                     'top': 0,
-                    'bottom': 100,
+                    'bottom': 0,
                     'left': 0,
-                    'right': len(SALE_ORDER_LINE_FIELDS) - 1,
+                    'right': 0,
                 },
             }],
             'config': {

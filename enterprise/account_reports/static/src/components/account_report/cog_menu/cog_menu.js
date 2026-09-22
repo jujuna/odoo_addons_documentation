@@ -1,16 +1,16 @@
-import {Component, useState} from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
+
+import { Component, usePlugin } from "@odoo/owl";
+
+import { AccountReportController } from "@account_reports/components/account_report/controller";
 
 
 export class AccountReportCogMenu extends Component {
     static template = "account_reports.AccountReportCogMenu";
     static components = {Dropdown, DropdownItem};
-    static props = {};
 
-    setup() {
-        this.controller = useState(this.env.controller);
-    }
+    controller = usePlugin(AccountReportController);
 
     //------------------------------------------------------------------------------------------------------------------
     // Buttons

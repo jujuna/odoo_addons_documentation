@@ -2,9 +2,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.social_test_full.tests.common import SocialTestFullCase
+from odoo.tests import tagged
+
 from odoo.addons.social.tests.tools import mock_void_external_calls
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class SocialYoutube(SocialTestFullCase):
     @mock_void_external_calls()
     def test_youtube_link(self):
@@ -14,7 +17,7 @@ class SocialYoutube(SocialTestFullCase):
             'youtube_video_id': 'ABC123'
         })
 
-        social_post.action_post()
+        social_post.action_post_now()
         # check that the video link is correctly added in posts content
         for live_post in social_post.live_post_ids.filtered(
             lambda live_post: live_post.account_id.media_type != 'youtube'

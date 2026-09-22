@@ -6,7 +6,7 @@ import { patch } from "@web/core/utils/patch";
 patch(InvoiceButton.prototype, {
     async onWillInvoiceOrder(order, newPartner) {
         if (this.pos.company.country_id?.code !== "MX") {
-            return true;
+            return await super.onWillInvoiceOrder(...arguments);
         }
         const payload = await makeAwaitable(this.dialog, AddInfoPopup, { order, newPartner });
         if (payload) {

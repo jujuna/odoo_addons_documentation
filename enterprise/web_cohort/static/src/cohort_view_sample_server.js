@@ -72,9 +72,9 @@ function _mockGetCohortData(params) {
             if (mode === "churn") {
                 percentage = 1 - percentage;
             }
+            columns_avg[column].percentage += 100 * percentage * value;
+            columns_avg[column].count += value;
             percentage = Number((100 * percentage).toFixed(1));
-            columns_avg[column].percentage += percentage;
-            columns_avg[column].count += 1;
             columns.push({
                 value: remainingValue,
                 churn_value,

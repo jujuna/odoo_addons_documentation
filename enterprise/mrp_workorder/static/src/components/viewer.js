@@ -3,11 +3,21 @@ import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { url } from "@web/core/utils/urls";
 import { fileTypeMagicWordMap } from "@web/views/fields/image/image_field";
-import { Component, useEffect, useRef } from "@odoo/owl";
+import { Component, onMounted, onPatched, signal, t, useProps } from "@odoo/owl";
 
 class DocumentViewer extends Component {
     static template = "mrp_workorder.DocumentViewer";
-    static props = ["resField", "resModel", "resId", "value", "page"];
+
+    props = useProps({
+        page: t.any(),
+        resField: t.any(),
+        resId: t.any(),
+        resModel: t.any(),
+        value: t.any(),
+    });
+
+    pdfViewerRef = signal.ref();
+    slideViewerRef = signal.ref();
 
     setup() {
         this.notification = useService("notification");
@@ -15,22 +25,29 @@ class DocumentViewer extends Component {
             JVBER: "pdf",
             ...fileTypeMagicWordMap,
         };
-        this.pdfIFrame = useRef("pdf_viewer");
-        useEffect(() => {
+        onMounted(() => {
+            this.updatePdf();
+        });
+        onPatched(() => {
             this.updatePdf();
         });
     }
 
     updatePdf() {
-        if (this.pdfIFrame.el) {
-            const iframe = this.pdfIFrame.el.firstElementChild;
-            iframe.removeAttribute("style");
-            // Once the PDF viewer is loaded, hides everything except the page.
-            iframe.addEventListener("load", () => {
+        if (!this.pdfViewerRef()) {
+            return;
+        }
+        const iframe = this.pdfViewerRef().firstElementChild;
+        iframe.removeAttribute("style");
+        // Once the PDF viewer is loaded, hides everything except the page.
+        iframe.addEventListener(
+            "load",
+            () => {
                 iframe.contentDocument.querySelector("body").style.background = "none";
                 iframe.contentDocument.querySelector("#viewerContainer").style.boxShadow = "none";
-            });
-        }
+            },
+            { once: true }
+        );
     }
 
     onLoadFailed() {
@@ -50,7 +67,7 @@ class DocumentViewer extends Component {
             return "google_slide";
         }
         for (const [magicNumber, type] of Object.entries(this.magicNumbers)) {
-            if (this.props.value.startsWith(magicNumber)) {
+            if (this.props.value.content?.startsWith(magicNumber)) {
                 return type;
             }
         }

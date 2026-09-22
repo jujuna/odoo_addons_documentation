@@ -1,3 +1,4 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { load } from "@odoo/o-spreadsheet";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
@@ -6,7 +7,7 @@ import { WarningDialog } from "@web/core/errors/error_dialogs";
 
 import { AbstractSpreadsheetAction } from "@spreadsheet_edition/bundle/actions/abstract_spreadsheet_action";
 
-import { onWillUnmount, useSubEnv } from "@odoo/owl";
+import { onWillUnmount } from "@odoo/owl";
 import {
     addSpreadsheetFieldSyncExtensionWithCleanUp,
     useSpreadsheetFieldSyncStore,
@@ -70,7 +71,7 @@ export class SpreadsheetFieldSyncAction extends AbstractSpreadsheetAction {
             await listDataSource.load();
             this.model.dispatch("AUTORESIZE_COLUMNS", {
                 sheetId: this.model.getters.getActiveSheetId(),
-                cols: range(0, list.columns.length),
+                cols: range(list.columns.length),
             });
         }
     }

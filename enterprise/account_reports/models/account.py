@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from ast import literal_eval
+
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
-from odoo.tools import SQL, OrderedSet, html2plaintext
-from odoo.addons.account_reports.models.account_audit_account_status import STATUS_SELECTION
+from odoo.tools import SQL, html2plaintext
+from odoo.addons.account.models.account_move import REVIEW_STATE_SELECTION
 
 
 class AccountAccount(models.Model):
@@ -13,58 +14,28 @@ class AccountAccount(models.Model):
     exclude_provision_currency_ids = fields.Many2many('res.currency', relation='account_account_exclude_res_currency_provision', help="Whether or not we have to make provisions for the selected foreign currencies.")
     budget_item_ids = fields.One2many(comodel_name='account.report.budget.item', inverse_name='account_id')  # To use it in the domain when adding accounts from the report
 
-    audit_debit = fields.Monetary(string="Debit", compute="_compute_audit_period", currency_field="company_currency_id", search="_search_audit_debit")
-    audit_credit = fields.Monetary(string="Credit", compute="_compute_audit_period", currency_field="company_currency_id", search="_search_audit_credit")
-    audit_balance = fields.Monetary(string="Balance", compute="_compute_audit_period", currency_field="company_currency_id", search="_search_audit_balance")
+    audit_debit = fields.Monetary(string="Debit", compute="_compute_audit_period", currency_field="company_currency_id", compute_sql="_compute_sql_audit_debit", compute_sudo=False)
+    audit_credit = fields.Monetary(string="Credit", compute="_compute_audit_period", currency_field="company_currency_id", compute_sql="_compute_sql_audit_credit", compute_sudo=False)
+    audit_balance = fields.Monetary(string="Balance", compute="_compute_audit_period", currency_field="company_currency_id", compute_sql="_compute_sql_audit_balance", compute_sudo=False)
     audit_balance_show_warning = fields.Boolean(compute="_compute_audit_balance_show_warning")
-    audit_previous_balance = fields.Monetary(string="Balance N-1", compute="_compute_audit_period", currency_field="company_currency_id", search="_search_audit_previous_balance")
+    audit_previous_balance = fields.Monetary(string="Balance N-1", compute="_compute_audit_period", currency_field="company_currency_id", compute_sql="_compute_sql_audit_previous_balance", compute_sudo=False)
     audit_previous_balance_show_warning = fields.Boolean(compute="_compute_audit_previous_balance_show_warning")
-    audit_var_n_1 = fields.Monetary(string="Var N-1", compute="_compute_audit_variation", currency_field="company_currency_id", search="_search_audit_var_n_1")
-    audit_var_percentage = fields.Float(string="Var %", compute="_compute_audit_variation", search="_search_var_percentage", default=False)
-    audit_status = fields.Selection(selection=STATUS_SELECTION, string="Status", compute="_compute_audit_status", inverse="_inverse_audit_status")
+    audit_var_n_1 = fields.Monetary(string="Var N-1", compute="_compute_audit_variation", currency_field="company_currency_id", compute_sql="_compute_sql_audit_var_n_1", compute_sudo=False)
+    audit_var_percentage = fields.Float(string="Var %", compute="_compute_audit_variation", compute_sql="_compute_sql_audit_var_percentage", compute_sudo=False)
+    audit_status = fields.Selection(selection=REVIEW_STATE_SELECTION, string="Status", compute="_compute_audit_status", inverse="_inverse_audit_status", compute_sql="_compute_sql_audit_status", compute_sudo=False)
 
     account_status = fields.One2many(string="Account Status", comodel_name='account.audit.account.status', inverse_name='account_id')
-    last_message = fields.Char(string="Last Message", compute='_compute_last_message')
-
-    def _common_audit_search(self, field_name: str, operator: str, value, previous=False):
-        if isinstance(value, OrderedSet):
-            value = tuple(value)
-        query = self._search([])
-        query.add_where(self._fields[field_name]._condition_to_sql(
-            field_name, operator, value,
-            self, query.table, query,
-        ))
-
-        result = self.env.execute_query_dict(query.select())
-        return [('id', 'in', [row['id'] for row in result])]
-
-    def _search_audit_debit(self, operator, value):
-        return self._common_audit_search('audit_debit', operator, value)
-
-    def _search_audit_credit(self, operator, value):
-        return self._common_audit_search('audit_credit', operator, value)
-
-    def _search_audit_balance(self, operator, value):
-        return self._common_audit_search('audit_balance', operator, value)
-
-    def _search_audit_previous_balance(self, operator, value):
-        return self._common_audit_search('audit_previous_balance', operator, value)
-
-    def _search_audit_var_n_1(self, operator, value):
-        return self._common_audit_search('audit_var_n_1', operator, value)
-
-    def _search_var_percentage(self, operator, value):
-        return self._common_audit_search('audit_var_percentage', operator, value)
+    last_message = fields.Char(string="Last Comment", compute='_compute_last_message')
 
     @api.depends_context('working_file_id')
     def _compute_audit_period(self):
         working_file = self.env['account.return'].browse(self.env.context.get('working_file_id'))
         found_ids = set()
 
-        if working_file and self.ids:
+        if working_file and any(self._ids):
             query = self._as_query(ordered=False)
             for account_id, debit, credit, balance, previous_balance in self.env.execute_query(query.select(*(
-                self._field_to_sql(query.table, field_name, query)
+                query.table[field_name]
                 for field_name in ('id', 'audit_debit', 'audit_credit', 'audit_balance', 'audit_previous_balance')
             ))):
                 account = self.browse(account_id)
@@ -77,6 +48,80 @@ class AccountAccount(models.Model):
         remaining = self - self.browse(found_ids)
         remaining.audit_debit = remaining.audit_credit = remaining.audit_balance = remaining.audit_previous_balance = 0
 
+    @api.model
+    def _common_audit_aml_sql(self, table, column_name, previous=False):
+        working_file = self.env['account.return'].browse(self.env.context.get('working_file_id'))
+        if not working_file:
+            return SQL("NULL")
+        self.env['account.move.line'].flush_model(['debit', 'credit', 'balance', 'account_id', 'company_id', 'date', 'parent_state'])
+
+        # build the result and check if need to add the join
+        alias_audit = table._make_alias(f"audit_wf{working_file.id}{'p' if previous else ''}")
+        sql_result = SQL("COALESCE(%s, 0.0)", alias_audit[column_name])
+        if alias_audit._alias in table._query._joins:
+            return sql_result
+
+        # get dates
+        company_ids = working_file.company_ids.ids
+        if previous:
+            date_from, date_to = working_file.type_id._get_period_boundaries(
+                working_file.company_id, (working_file.date_from or fields.Date.context_today(self)) - relativedelta(days=1))
+        else:
+            date_from = working_file.date_from
+            date_to = working_file.date_to
+
+        table._query.add_join(
+            'LEFT JOIN',
+            alias_audit,
+            SQL("""
+                (SELECT
+                    SUM(aml.debit) as debit,
+                    SUM(aml.credit) as credit,
+                    SUM(aml.balance) as balance,
+                    account_id
+                FROM (
+                         SELECT aml.debit, aml.credit, aml.balance, aml.account_id
+                           FROM account_move_line aml
+                           JOIN account_account aml_account ON aml_account.id = aml.account_id
+                          WHERE aml.date <= %(date_to)s
+                            AND NOT aml_account.account_type ILIKE ANY(ARRAY['income%%', 'expense%%', 'equity_unaffected'])
+                            AND aml.company_id = ANY(%(company_ids)s)
+                            AND aml.parent_state = 'posted'
+
+                         UNION ALL
+
+                         SELECT aml.debit, aml.credit, aml.balance, aml.account_id
+                           FROM account_move_line aml
+                           JOIN account_account aml_account ON aml_account.id = aml.account_id
+                          WHERE aml.date <= %(date_to)s
+                            AND aml.date >= %(date_from)s
+                            AND aml_account.account_type ILIKE ANY(ARRAY['income%%', 'expense%%', 'equity_unaffected'])
+                            AND aml.company_id = ANY(%(company_ids)s)
+                            AND aml.parent_state = 'posted'
+                     ) aml
+                GROUP BY account_id)
+                """,
+                date_from=date_from,
+                date_to=date_to,
+                company_ids=company_ids,
+            ),
+            SQL("%s = %s", alias_audit.account_id, table.id)
+        )
+
+        return sql_result
+
+    def _compute_sql_audit_debit(self, table):
+        return self._common_audit_aml_sql(table, 'debit')
+
+    def _compute_sql_audit_credit(self, table):
+        return self._common_audit_aml_sql(table, 'credit')
+
+    def _compute_sql_audit_balance(self, table):
+        return self._common_audit_aml_sql(table, 'balance')
+
+    def _compute_sql_audit_previous_balance(self, table):
+        return self._common_audit_aml_sql(table, 'balance', previous=True)
+
     @api.depends('audit_balance', 'audit_previous_balance')
     def _compute_audit_variation(self):
         for account in self:
@@ -86,6 +131,16 @@ class AccountAccount(models.Model):
                 account.audit_var_percentage = False
             else:
                 account.audit_var_percentage = (account.audit_balance - account.audit_previous_balance) / account.audit_previous_balance
+
+    def _compute_sql_audit_var_n_1(self, table):
+        balance_sql = self._compute_sql_audit_balance(table)
+        prev_balance_sql = self._compute_sql_audit_previous_balance(table)
+        return SQL("%s - %s", balance_sql, prev_balance_sql)
+
+    def _compute_sql_audit_var_percentage(self, table):
+        balance_sql = self._compute_sql_audit_balance(table)
+        prev_balance_sql = self._compute_sql_audit_previous_balance(table)
+        return SQL("CASE WHEN %(prev)s <> 0 THEN (%(curr)s - %(prev)s) / %(prev)s * 100 END", curr=balance_sql, prev=prev_balance_sql)
 
     @api.depends_context('working_file_id')
     def _compute_audit_status(self):
@@ -106,6 +161,21 @@ class AccountAccount(models.Model):
                     })
             if create_vals:
                 self.env['account.audit.account.status'].create(create_vals)
+
+    def _compute_sql_audit_status(self, table):
+        working_file = self.env['account.return'].browse(self.env.context.get('working_file_id'))
+        status_model = self.env['account.audit.account.status']
+        status_query = status_model._search([('audit_id', 'in', working_file.ids)])
+        if status_query.is_empty():
+            return SQL("NULL::text")
+        status_alias = table._make_alias('audit_status')
+        table._query.add_join(
+            'LEFT JOIN',
+            status_alias,
+            status_query.subselect(status_query.table.account_id, status_query.table.status),
+            SQL("%s = %s", status_alias.account_id, table.id)
+        )
+        return SQL('%s', status_alias.status)
 
     def _inverse_audit_status(self):
         working_file = self.env['account.return'].browse(self.env.context.get('working_file_id'))
@@ -159,92 +229,21 @@ class AccountAccount(models.Model):
         for account in self:
             account.last_message = last_message_by_account.get(account.id, False)
 
-    def _field_to_sql(self, alias, field_expr, query=None) -> SQL:
-        def add_aml_join(join_alias, date_from, date_to, company_ids):
-            self.env['account.move.line'].flush_model()
-            query.add_join(
-                'LEFT JOIN',
-                join_alias,
-                SQL("""
-                    (SELECT SUM(COALESCE(debit, 0.0)) AS debit,
-                            SUM(COALESCE(credit, 0.0)) AS credit,
-                            SUM(COALESCE(balance, 0.0)) AS balance,
-                            account_id
-                       FROM (
-                                SELECT aml.debit, aml.credit, aml.balance, aml.account_id
-                                  FROM account_move_line aml
-                                  JOIN account_account aml_account ON aml_account.id = aml.account_id
-                                 WHERE aml.date <= %(date_to)s
-                                   AND NOT aml_account.account_type ILIKE ANY(ARRAY['income%%', 'expense%%', 'equity_unaffected'])
-                                   AND aml.company_id = ANY(%(company_ids)s)
-                                   AND aml.parent_state = 'posted'
-
-                                UNION ALL
-
-                                SELECT aml.debit, aml.credit, aml.balance, aml.account_id
-                                  FROM account_move_line aml
-                                  JOIN account_account aml_account ON aml_account.id = aml.account_id
-                                 WHERE aml.date <= %(date_to)s
-                                   AND aml.date >= %(date_from)s
-                                   AND aml_account.account_type ILIKE ANY(ARRAY['income%%', 'expense%%', 'equity_unaffected'])
-                                   AND aml.company_id = ANY(%(company_ids)s)
-                                   AND aml.parent_state = 'posted'
-                            ) aml
-                   GROUP BY account_id)
-                    """,
-                    date_from=date_from,
-                    date_to=date_to,
-                    company_ids=company_ids,
-                ),
-
-                SQL("%s = %s", SQL.identifier(join_alias, 'account_id'), self._field_to_sql(alias, 'id', query))
-            )
-
-        if field_expr not in ('audit_debit', 'audit_credit', 'audit_balance', 'audit_previous_balance', 'audit_status', 'audit_var_n_1', 'audit_var_percentage'):
-            return super()._field_to_sql(alias, field_expr, query)
-
-        if field_expr == 'audit_status':
-            query.add_join(
-                'LEFT JOIN',
-                'account_audit_account_status',
-                'account_audit_account_status',
-                SQL("account_audit_account_status.audit_id = %s AND account_audit_account_status.account_id = %s", self.env.context.get('working_file_id'), self._field_to_sql(alias, 'id', query))
-            )
-            return SQL('account_audit_account_status.status')
-
-        working_file = self.env['account.return'].browse(self.env.context.get('working_file_id'))
-        if not working_file:
-            return SQL()
-
-        if field_expr in ('audit_debit', 'audit_credit', 'audit_balance'):
-            field_name = field_expr.replace('audit_', '')
-            add_aml_join('current_account_move_lines', working_file.date_from, working_file.date_to, working_file.company_ids.ids)
-            return SQL("COALESCE(%s, 0.0)", SQL.identifier('current_account_move_lines', field_name))
-
-        if field_expr == 'audit_previous_balance':
-            previous_period_start, previous_period_end = working_file.type_id._get_period_boundaries(working_file.company_id, (working_file.date_from or fields.Date.today()) - relativedelta(days=1))
-            add_aml_join('prev_account_move_line', previous_period_start, previous_period_end, working_file.company_ids.ids)
-            return SQL("COALESCE(prev_account_move_line.balance, 0.0)")
-
-        if field_expr in ('audit_var_n_1', 'audit_var_percentage'):
-            previous_period_start, previous_period_end = working_file.type_id._get_period_boundaries(working_file.company_id, (working_file.date_from or fields.Date.today()) - relativedelta(days=1))
-            add_aml_join('current_account_move_lines', working_file.date_from, working_file.date_to, working_file.company_ids.ids)
-            add_aml_join('prev_account_move_line', previous_period_start, previous_period_end, working_file.company_ids.ids)
-            if field_expr == 'audit_var_n_1':
-                return SQL("(COALESCE(current_account_move_lines.balance, 0) - COALESCE(prev_account_move_line.balance, 0))")
-            else:
-                return SQL("""
-                    CASE WHEN prev_account_move_line.balance IS NULL THEN NULL
-                         ELSE (COALESCE(current_account_move_lines.balance, 0) - COALESCE(prev_account_move_line.balance, 0)) / COALESCE(prev_account_move_line.balance, 1) * 100
-                    END
-                """)
-
     def action_audit_account(self):
-        domain = [('account_id', 'in', self.ids)]
+        action = self.env['ir.actions.act_window']._for_xml_id("account.action_account_moves_all")
+        context = literal_eval(action.get('context', {}))
         working_file = self.env['account.return'].browse(self.env.context.get('working_file_id'))
         if working_file:
-            domain += [('date', '>=', working_file.date_from), ('date', '<=', working_file.date_to)]
+            context.update({
+                'search_default_audit_date_between': 1,
+                'date_to': fields.Date.to_string(working_file.date_to),
+                'date_from': fields.Date.to_string(working_file.date_from),
+            })
+
         return {
-            **self.env['ir.actions.act_window']._for_xml_id("account.action_account_moves_all"),
-            'domain': domain,
+            **action,
+            'domain': [('account_id', 'in', self.ids)],
+            'context': context,
+            'search_view_id': self.env.ref('account_reports.view_audit_move_line_filter').id,
+            'views': [(self.env.ref('account_reports.view_audit_move_line_list').id, 'list')],
         }

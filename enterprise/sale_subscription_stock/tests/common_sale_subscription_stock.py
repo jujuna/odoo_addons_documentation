@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-from freezegun import freeze_time
-from unittest.mock import patch
 
 from odoo.tests import tagged
 from odoo import Command, fields
@@ -12,6 +8,8 @@ from odoo.addons.stock_account.tests.test_anglo_saxon_valuation_reconciliation_c
 
 @tagged('-at_install', 'post_install')
 class TestSubscriptionStockCommon(TestSubscriptionCommon, ValuationReconciliationTestCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -149,7 +147,7 @@ class TestSubscriptionStockCommon(TestSubscriptionCommon, ValuationReconciliatio
         # update status
         # cls.subscription_delivery._compute_is_deferred()
 
-        with freeze_time("2022-03-02"), patch.object(cls.env.cr, 'now', fields.Datetime.now):
+        with cls.mock_datetime_and_now("2022-03-02"):
             cls.subscription_order.write({'start_date': fields.Date.today(), 'next_invoice_date': False})
             cls.subscription_delivery.write({'start_date': fields.Date.today(), 'next_invoice_date': False})
             cls.subscription_order.action_confirm()
@@ -160,7 +158,7 @@ class TestSubscriptionStockCommon(TestSubscriptionCommon, ValuationReconciliatio
             cls.subscription_delivery.picking_ids._action_done()
 
     def simulate_period(self, subscription, date, move_qty=False):
-        with freeze_time(date), patch.object(self.env.cr, 'now', fields.Datetime.now):
+        with self.mock_datetime_and_now(date):
             today = fields.Date.today()
             invoice = subscription._create_recurring_invoice()
             if invoice and invoice.state == 'draft':

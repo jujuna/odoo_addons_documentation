@@ -2,28 +2,26 @@
 
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
-import { Component } from "@odoo/owl";
+import { Component, useProps, signal, t } from "@odoo/owl";
 import { useInputField } from "@web/views/fields/input_field_hook";
 import { useNumpadDecimal } from "@web/views/fields/numpad_decimal_hook";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class DurationField extends Component {
     static template = "pos_enterprise.DurationField";
-    static props = {
+    props = useProps({
         ...standardFieldProps,
-        inputType: { type: String, optional: true },
-    };
+        inputType: t.string().optional("text"),
+    });
 
-    static defaultProps = {
-        inputType: "text",
-    };
+    numpadDecimalRef = signal.ref();
 
     setup() {
         this.inputRef = useInputField({
             getValue: () => this.displayValue,
-            refName: "numpadDecimal",
+            ref: this.numpadDecimalRef,
         });
-        useNumpadDecimal();
+        useNumpadDecimal(this.numpadDecimalRef);
     }
 
     get displayValue() {

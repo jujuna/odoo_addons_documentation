@@ -3,8 +3,16 @@ import { _t } from "@web/core/l10n/translation";
 import { withSequence } from "@html_editor/utils/resource";
 import { registry } from "@web/core/registry";
 import { isHtmlContentSupported } from "@html_editor/core/selection_plugin";
+import { closestBlock } from "@html_editor/utils/blocks";
 
-class SnippetsPowerboxPlugin extends Plugin {
+function canInsertBlockSnippet(selection) {
+    return (
+        isHtmlContentSupported(selection) &&
+        closestBlock(selection.anchorNode)?.parentElement?.isContentEditable
+    );
+}
+
+export class SnippetsPowerboxPlugin extends Plugin {
     static id = "alert";
     static dependencies = ["dom", "history"];
     /** @type {import("plugins").WebsiteResources} */
@@ -14,63 +22,65 @@ class SnippetsPowerboxPlugin extends Plugin {
                 id: "s_alert",
                 title: _t("Alert"),
                 description: _t("Insert an alert snippet"),
-                icon: "fa-info",
+                icon: "info",
                 run: this.insertSnippet.bind(this, "s_alert"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_rating",
                 title: _t("Rating"),
                 description: _t("Insert a rating snippet"),
-                icon: "fa-star-half-o",
+                icon: "star_half",
                 run: this.insertSnippet.bind(this, "s_rating"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_card",
                 title: _t("Card"),
                 description: _t("Insert a card snippet"),
-                icon: "fa-sticky-note",
+                icon: "sticky_note_2",
+                iconClass: "oi-filled",
                 run: this.insertSnippet.bind(this, "s_card"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_share",
                 title: _t("Share"),
                 description: _t("Insert a share snippet"),
-                icon: "fa-share-square-o",
+                icon: "share",
                 run: this.insertSnippet.bind(this, "s_share"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_text_highlight",
                 title: _t("Text Highlight"),
                 description: _t("Insert a text highlight snippet"),
-                icon: "fa-sticky-note",
+                icon: "sticky_note_2",
+                iconClass: "oi-filled",
                 run: this.insertSnippet.bind(this, "s_text_highlight"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_chart",
                 title: _t("Chart"),
                 description: _t("Insert a chart snippet"),
-                icon: "fa-bar-chart",
+                icon: "bar_chart",
                 run: this.insertSnippet.bind(this, "s_chart"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_progress_bar",
                 title: _t("Progress Bar"),
                 description: _t("Insert a progress bar snippet"),
-                icon: "fa-spinner",
+                icon: "progress_activity",
                 run: this.insertSnippet.bind(this, "s_progress_bar"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_badge",
                 title: _t("Badge"),
                 description: _t("Insert a badge snippet"),
-                icon: "fa-tags",
+                icon: "sell",
                 run: this.insertSnippet.bind(this, "s_badge"),
                 isAvailable: isHtmlContentSupported,
             },
@@ -78,17 +88,18 @@ class SnippetsPowerboxPlugin extends Plugin {
                 id: "s_blockquote",
                 title: _t("Blockquote"),
                 description: _t("Insert a blockquote snippet"),
-                icon: "fa-quote-left",
+                icon: "format_quote",
+                iconClass: "oi-filled",
                 run: this.insertSnippet.bind(this, "s_blockquote"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
             {
                 id: "s_hr",
                 title: _t("Separator"),
                 description: _t("Insert a horizontal separator snippet"),
-                icon: "fa-minus",
+                icon: "remove",
                 run: this.insertSnippet.bind(this, "s_hr"),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: canInsertBlockSnippet,
             },
         ],
         powerbox_categories: withSequence(110, {
@@ -137,13 +148,18 @@ class SnippetsPowerboxPlugin extends Plugin {
                 commandId: "s_hr",
             },
         ],
+        is_node_splittable_predicates: (node) => {
+            if (node.classList?.contains("s_blockquote")) {
+                return false;
+            }
+        },
     };
 
     insertSnippet(name) {
         const snippet = this.config.snippetModel.getSnippetByName("snippet_content", name);
         const content = snippet.content.cloneNode(true);
         this.dependencies.dom.insert(content);
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 }
 

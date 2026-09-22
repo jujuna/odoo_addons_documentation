@@ -1,23 +1,21 @@
+import { Component, t, useProps } from "@odoo/owl";
 import { useSignViewButtons } from "@sign/views/hooks";
 import { useService } from "@web/core/utils/hooks";
-import { useRef, Component } from "@odoo/owl";
 
 export class SignActionHelper extends Component {
     static template = "sign.SignActionHelper";
-    static props = [
-        "resModel"
-    ];
+
+    props = useProps({
+        resModel: t.any(),
+    });
 
     setup() {
-        super.setup(...arguments);
         this.actionService = useService("action");
-        this.fileInput = useRef("uploadFileInput");
-        const functions = useSignViewButtons();
-        Object.assign(this, functions);
+        this.signButtons = useSignViewButtons({ ignoreBusSubscription: true });
     }
 
     onClickUpload(context) {
-        return this.requestFile(context);
+        return this.signButtons.requestFile(context);
     }
 
     onClickSampleSign() {

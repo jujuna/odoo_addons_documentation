@@ -16,14 +16,7 @@ class TestWhatsAppStatistics(MarketingAutomationCommon, WhatsAppCommon):
         super().setUpClass()
         cls.date_reference = Datetime.from_string('2024-11-08 09:00:00')
 
-        cls.participants = cls.env['marketing.participant'].create([
-            {
-                'campaign_id': cls.campaign.id,
-                'res_id': record.id,
-                'state': 'running',
-            }
-            for record in cls.test_contacts[:8]
-        ])
+        cls.participants = cls.campaign._create_participants(cls.test_contacts[:8].ids)
 
         cls.activity_email = cls._create_activity_mail(
             cls.campaign,

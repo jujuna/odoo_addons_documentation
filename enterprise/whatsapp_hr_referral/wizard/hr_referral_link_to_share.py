@@ -10,3 +10,6 @@ class HrReferralLinkToShare(models.TransientModel):
 
     def _get_whatsapp_safe_fields(self):
         return {'job_id.name', 'job_id.company_id.name', 'url', 'recipient'}
+
+    def _phone_get_number_fields(self):
+        return ['recipient']

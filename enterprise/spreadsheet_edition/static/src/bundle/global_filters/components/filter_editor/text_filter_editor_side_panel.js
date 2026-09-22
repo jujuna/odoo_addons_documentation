@@ -1,11 +1,11 @@
 /** @ts-check */
 
+import { proxy } from "@odoo/owl";
 import { AbstractFilterEditorSidePanel } from "./filter_editor_side_panel";
 import { FilterEditorFieldMatching } from "./filter_editor_field_matching";
-import { TextFilterValue } from "@spreadsheet/global_filters/components/filter_text_value/filter_text_value";
 
 import { components } from "@odoo/o-spreadsheet";
-import { useState } from "@odoo/owl";
+import { GlobalFilterInput } from "../global_filter_input/global_filter_input";
 
 const { SelectionInput } = components;
 
@@ -17,26 +17,19 @@ export class TextFilterEditorSidePanel extends AbstractFilterEditorSidePanel {
     static components = {
         ...AbstractFilterEditorSidePanel.components,
         FilterEditorFieldMatching,
-        TextFilterValue,
         SelectionInput,
+        GlobalFilterInput,
     };
 
     setup() {
         super.setup();
-        this.state = useState({
+        this.state = proxy({
             rangeRestriction: !!this.store.filter.rangesOfAllowedValues,
         });
     }
 
     get type() {
         return "text";
-    }
-
-    /**
-     * @param {string[]} strings
-     */
-    updateTextDefaultValue(strings) {
-        super.updateDefaultValue({ strings, operator: "ilike" });
     }
 
     toggleRangeRestriction(isChecked) {

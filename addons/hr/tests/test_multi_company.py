@@ -5,6 +5,8 @@ from odoo.addons.hr.tests.common import TestHrCommon
 
 from odoo.addons.mail.tests.common import mail_new_test_user
 
+from odoo.tests import tagged
+
 from odoo.exceptions import AccessError
 
 
@@ -38,8 +40,8 @@ class TestMultiCompanyReport(TestHrCommon):
 
     def test_single_company_report(self):
         with self.assertRaises(AccessError):  # CacheMiss followed by AccessError
-            self.env['ir.actions.report'].with_user(self.res_users_hr_officer).with_company(
-                self.company_1
+            self.env['ir.actions.report'].with_user(self.res_users_hr_officer).with_context(
+                allowed_company_ids=self.company_1.ids,
             )._render_qweb_pdf('hr.hr_employee_print_badge', res_ids=self.employees.ids)
 
 
@@ -80,27 +82,42 @@ class TestMultiCompany(TestHrCommon):
         cls.env.flush_all()
         cls.env.invalidate_all()
 
-    def test_read_manager_employee(self):
-        # UserB should be able to read its manager's record - without being connected
-        # on company A
-        self.employee_a.with_user(self.user_b).with_company(self.company_b).name
+    def test_manager_cannot_access_employee_from_inactive_company(self):
+        """
+        A manager cannot have access to their subordinate if they are in a
+        different company. Otherwise bugs may appear when accessing
+        company-limited fields of the employee (e.g.: their resource)
+        """
+        current_company = self.env['res.company'].create({'name': 'Scenic company'})
+        other_company = self.env['res.company'].create({'name': 'Cringe company'})
 
-        self.employee_b.with_user(self.user_a).with_company(self.company_a).name
+        manager_user = mail_new_test_user(
+            self.env, groups="hr.group_hr_user", login='manager_user',
+            company_id=current_company.id, company_ids=current_company.ids,
+        )
 
-        # UserB should not be able to read other employees in that company
-        with self.assertRaises(AccessError):
-            self.employee_other_a.with_user(self.user_b).with_company(self.company_b).name
+        manager_employee = self.env['hr.employee'].create({
+            'name': 'Manager employee',
+            'company_id': current_company.id,
+            'user_id': manager_user.id,
+        })
+        employee_same_company, employee_other_company = self.env['hr.employee'].create([
+            {
+                'name': 'Employee same company',
+                'company_id': current_company.id,
+                'parent_id': manager_employee.id,
+            },
+            {
+                'name': 'Employee other company',
+                'company_id': other_company.id,
+                'parent_id': manager_employee.id,
+            },
+        ])
 
-    def test_read_no_manager_company(self):
-        self.employee_b.parent_id = False
+        # employee managed by user and in the same company, we should have access
+        employee_same_company.with_user(manager_user).check_access('read')
 
-        with self.assertRaises(AccessError):
-            self.employee_a.with_user(self.user_b).name
-
-    def test_compute_presence_state(self):
-        self.user_a.company_ids = self.company_a
-        # user A should still read the employee since he is the manager of that employee
-        self.employee_b.with_user(self.user_a).with_company(self.company_a).name
-
-        # user A should still read hr_presence_state even if he does not have access to the company of the employee
-        self.employee_b.with_user(self.user_a).with_company(self.company_a).hr_presence_state
+        with self.assertRaises(
+            AccessError, msg="A manager cannot access their subordinates if they are not in a selected company",
+        ):
+            employee_other_company.with_user(manager_user).check_access('read')

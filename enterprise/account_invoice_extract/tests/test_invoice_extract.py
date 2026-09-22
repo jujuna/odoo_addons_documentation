@@ -8,16 +8,18 @@ from odoo import fields
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.account.tests.test_account_incoming_supplier_invoice import TestAccountInvoiceImportMixin
+from odoo.addons.base.tests.files import PDF_RAW
 from odoo.addons.iap_extract.tests.test_extract_mixin import TestExtractMixin
 from odoo.addons.mail.tests.common import MailCase
 from odoo.tests import tagged
-from odoo.tools import file_open, mute_logger
 
 from ..models.account_invoice import OCR_VERSION
 
 
 @tagged('post_install', '-at_install')
 class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccountInvoiceImportMixin, MailCase):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -38,8 +40,10 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
             limit=1,
         )
 
-        with file_open('base/tests/minimal.pdf', 'rb') as file:
-            cls.sample_pdf_bytes = file.read()
+        # Make sure only the USD currency is active
+        cls.env['res.currency'].search([('name', '!=', 'USD')]).with_context(force_deactivate=True).active = False
+
+        cls.sample_pdf_bytes = PDF_RAW
 
     @classmethod
     def default_env_context(cls):
@@ -134,7 +138,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
     def test_no_merge_check_ocr_status(self):
         # test check_ocr_status without lines merging
         self.env.company.extract_single_line_per_tax = False
-        self.env.company.quick_edit_mode = "out_and_in_invoices"  # Fiduciary mode is necessary for out_invoice
+        self.env.company.document_sequence_editable = True  # Fiduciary mode is necessary for out_invoice
 
         for move_type in ('in_invoice', 'out_invoice'):
             invoice = self.env['account.move'].create({
@@ -163,7 +167,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
             self.assertEqual(invoice.amount_untaxed, 300)
             self.assertEqual(invoice.amount_tax, 30)
             self.assertEqual(invoice.invoice_date, fields.Date.from_string('2019-04-12'))
-            self.assertEqual(invoice.invoice_date_due, fields.Date.from_string('2019-04-19'))
+            self.assertEqual(invoice.invoice_date_due, fields.Date.from_string('2019-04-12'))
             self.assertEqual(invoice.payment_reference, "+++123/1234/12345+++")
             if move_type == 'in_invoice':
                 self.assertEqual(invoice.ref, 'INV0001')
@@ -244,7 +248,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
             self.assertEqual(len(invoice.invoice_line_ids), 2)
 
             # line 1 and 3 should be merged as they both have a 15% tax
-            self.assertEqual(invoice.invoice_line_ids[0].name, "Test - 2019-04-12")
+            self.assertEqual(invoice.invoice_line_ids[0].name, f"{invoice.invoice_line_ids[0].journal_id.default_account_id.name} - {invoice.invoice_line_ids[0].tax_ids.tax_label}")
             self.assertEqual(invoice.invoice_line_ids[0].price_unit, 200)
             self.assertEqual(invoice.invoice_line_ids[0].quantity, 1)
             self.assertEqual(len(invoice.invoice_line_ids[0].tax_ids), 1)
@@ -254,7 +258,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
             self.assertEqual(invoice.invoice_line_ids[0].price_total, 230)
 
             # line 2 has no tax
-            self.assertEqual(invoice.invoice_line_ids[1].name, "Test - 2019-04-12")
+            self.assertEqual(invoice.invoice_line_ids[1].name, invoice.invoice_line_ids[0].journal_id.default_account_id.name)
             self.assertEqual(invoice.invoice_line_ids[1].price_unit, 100)
             self.assertEqual(invoice.invoice_line_ids[1].quantity, 1)
             self.assertEqual(len(invoice.invoice_line_ids[1].tax_ids), 0)
@@ -300,7 +304,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'extract_state': 'waiting_extraction'})
         existing_partner = self.env['res.partner'].create({
             'name': 'test',
-            'bank_ids': [(0, 0, {'acc_number': "BE01234567890123"})],
+            'bank_ids': [(0, 0, {'account_number': "BE01 2345 6789 0123"})],
         })
 
         with self._mock_iap_extract(extract_response=self.get_result_success_response()):
@@ -313,7 +317,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'extract_state': 'waiting_extraction'})
         self.env['res.partner'].create({
             'name': 'Existing partner',
-            'bank_ids': [(0, 0, {'acc_number': "BE01234567890123"})],
+            'bank_ids': [(0, 0, {'account_number': "BE01 2345 6789 0123"})],
         })
 
         with self._mock_iap_extract(extract_response=self.get_result_success_response()):
@@ -349,7 +353,6 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
 
     def test_multi_currency(self):
         # test that if the multi currency is disabled, the currency isn't changed
-        self.env['res.currency'].search([('name', '!=', 'USD')]).with_context(force_deactivate=True).active = False
         invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'extract_state': 'waiting_extraction'})
         test_user = self.env.ref('base.user_root')
         test_user.group_ids = [(3, self.env.ref('base.group_multi_currency').id)]
@@ -440,7 +443,6 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
     def test_tax_adjustments(self):
         # test that if the total computed by Odoo doesn't exactly match the total found by the OCR, the tax are adjusted accordingly
         for move_type in ('in_invoice', 'out_invoice'):
-            self.env['res.currency'].search([('name', '!=', 'USD')]).with_context(force_deactivate=True).active = False
             invoice = self.env['account.move'].create({'move_type': move_type, 'extract_state': 'waiting_extraction'})
             extract_response = self.get_result_success_response()
             extract_response['results'][0]['total']['selected_value']['content'] += 0.01
@@ -571,7 +573,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
                 'VAT_Number': {'content': invoice.partner_id.vat},
                 'currency': {'content': invoice.currency_id.name},
                 'payment_ref': {'content': invoice.payment_reference},
-                'iban': {'content': invoice.partner_bank_id.acc_number},
+                'iban': {'content': invoice.partner_bank_id.account_number},
                 'SWIFT_code': {'content': invoice.partner_bank_id.bank_bic},
                 'merged_lines': True,
                 'invoice_lines': {
@@ -632,7 +634,6 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
                 'total': il.price_total,
             })
 
-    @mute_logger('pypdf._reader')
     def test_automatic_sending_vendor_bill_message_post(self):
         # test that a vendor bill is automatically sent to the OCR server when a message with attachment is posted and the option is enabled
         self.env.company.extract_in_invoice_digitalization_mode = 'auto_send'
@@ -645,8 +646,8 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         expected_parse_params = {
             'version': OCR_VERSION,
             'account_token': 'test_token',
-            'dbuuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
-            'documents': [test_attachment.datas.decode('utf-8')],
+            'dbuuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+            'documents': [test_attachment.raw.to_base64()],
             'user_infos': {
                 'perspective': 'client',
                 'user_company_VAT': invoice.company_id.vat,
@@ -733,7 +734,6 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
             self.assertEqual(inv.extract_document_uuid, 'some_token')
             self.assertEqual(inv.message_main_attachment_id, att)
 
-    @mute_logger('pypdf._reader')
     def test_automatic_sending_customer_invoice_upload(self):
         # test that a customer invoice is automatically sent to the OCR server when uploaded and the option is enabled
         self.env.company.extract_out_invoice_digitalization_mode = 'auto_send'
@@ -755,7 +755,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
             message_id='message_2'
         )
         with self._mock_iap_extract(self.parse_success_response()):
-            invoice = self.env['account.move'].browse(self.env['mail.thread'].message_process('account.move', mail))
+            invoice = self.env['mail.thread'].message_process('account.move', mail)
         self.assertEqual(invoice.extract_state, 'waiting_extraction')
         self.assertEqual(invoice.extract_document_uuid, 'some_token')
 
@@ -764,7 +764,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         self.env.company.extract_out_invoice_digitalization_mode = 'manual_send'
         mail = self._get_email_for_journal_alias()
         with self._mock_iap_extract(self.parse_success_response()):
-            invoice = self.env['account.move'].browse(self.env['mail.thread'].message_process('account.move', mail))
+            invoice = self.env['mail.thread'].message_process('account.move', mail)
         self.assertEqual(invoice.extract_state, 'no_extract_requested')
 
     def test_no_automatic_sending_customer_invoice_message_post(self):
@@ -843,10 +843,11 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         ):
             invoice._check_ocr_status()
 
-        self.assertEqual(invoice.partner_bank_id.acc_number, 'BE01234567890123')
+        self.assertEqual(invoice.partner_bank_id.account_number, 'BE01234567890123')
 
-        # test that it uses the existing bank account if it exists
+        # test that it uses the existing bank account if it exists and if it is trusted
         created_bank_account = invoice.partner_bank_id
+        created_bank_account.allow_out_payment = True
         invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'extract_state': 'waiting_extraction'})
 
         with self._mock_iap_extract(extract_response=self.get_result_success_response()):
@@ -867,11 +868,11 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         invoice = self._create_invoice_with_tax()
 
         self.assertRecordValues(invoice.invoice_line_ids, [{
-                'price_unit': 112,
                 'quantity': 1,
                 'price_subtotal': 100,
                 'price_total': 112,
         }])
+        self.assertAlmostEqual(invoice.invoice_line_ids.price_unit, 112)
 
     def test_tax_price_excluded(self):
         self.env['account.tax'].create({
@@ -932,8 +933,8 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
 
         self.assertEqual(invoice.move_type, 'out_refund')
 
-    def test_action_reload_ai_data(self):
-        # test that the "Reload AI data" button overwrites the content of the invoice with the OCR results
+    def test_action_reload_imported_data(self):
+        # test that the "Reload data" button overwrites the content of the invoice with the OCR results
         self.env.company.extract_single_line_per_tax = False
         ocr_partner = self.env['res.partner'].create({'name': 'Test', 'vat': 'BE0477472701'})
 
@@ -956,7 +957,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
 
         extract_response = self.get_result_success_response()
         with self._mock_iap_extract(extract_response=extract_response):
-            invoice.action_reload_ai_data()
+            invoice.action_reload_imported_data()
 
         self.assertEqual(invoice.extract_state, 'waiting_validation')
 
@@ -966,7 +967,7 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         self.assertEqual(invoice.amount_tax, 30)
         self.assertEqual(invoice.partner_id, ocr_partner)
         self.assertEqual(invoice.invoice_date, fields.Date.from_string('2019-04-12'))
-        self.assertEqual(invoice.invoice_date_due, fields.Date.from_string('2019-04-19'))
+        self.assertEqual(invoice.invoice_date_due, fields.Date.from_string('2019-04-12'))
         self.assertEqual(invoice.payment_reference, '+++123/1234/12345+++')
         self.assertEqual(invoice.ref, 'INV0001')
         self.assertEqual(invoice.invoice_line_ids.mapped('name'), ["Test 1", "Test 2", "Test 3"])
@@ -1012,24 +1013,33 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, TestAccou
         self.assertEqual(bill.state, "posted")
 
     def test_invoice_ocr_note_author(self):
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'extract_state': 'no_extract_requested'})
-        self.env.cr.flush()
+        image_data = ("/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8Q"
+                      "EBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=")
         attachment = self.env['ir.attachment'].create({
             'name': 'test_attachment.png',
             'res_model': 'account.move',
-            'raw': b'My invoice',
+            'raw': base64.b64decode(image_data),
         })
-        with self._mock_iap_extract(extract_response=self.parse_success_response()):
-            invoice.message_post(message_type='comment', attachment_ids=attachment.ids)
-
-        with self._mock_iap_extract(extract_response=self.get_result_success_response()):
-            invoice.check_all_status()
-
         self.env.cr.flush()
-        message = self.env['mail.message'].search([
-            ('model', '=', 'account.move'),
-            ('res_id', '=', invoice.id),
-            ('tracking_value_ids', '!=', False),
-        ]).ensure_one()
-        author_name = message.author_id.complete_name
-        self.assertEqual(author_name, 'OdooBot')
+        with self.mock_mail_gateway(), self.mock_mail_app():
+            with self._mock_iap_extract(extract_response=self.parse_success_response()):
+                invoice.message_post(message_type='comment', attachment_ids=attachment.ids)
+
+            with self._mock_iap_extract(extract_response=self.get_result_success_response()):
+                invoice.check_all_status()
+
+            self.env.cr.flush()
+        track_msg = self._new_msgs.filtered(lambda m: m.message_type == 'tracking')
+        self.assertMessageFields(
+            track_msg, {
+                'author_id': self.env.ref('base.partner_root'),
+                'body': '',
+                'tracking_values': [
+                    ('ref', 'char', False, 'INV0001'),
+                    ('payment_reference', 'char', False, '+++123/1234/12345+++'),
+                    ('amount_untaxed', 'monetary', 0, 300, {'currency': self.env.ref('base.USD')}),
+                ],
+            }
+        )

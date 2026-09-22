@@ -1,52 +1,79 @@
 import { localization } from "@web/core/l10n/localization";
 
-import { useService } from "@web/core/utils/hooks";
-import { Component, useState } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+import { PopoverPlugin } from "@web/core/popover/popover_plugin";
 
+import { Component, computed, signal, t, useEffect, usePlugin, useProps } from "@odoo/owl";
+
+import { AccountReportController } from "@account_reports/components/account_report/controller";
 import { AccountReportDebugPopover } from "@account_reports/components/account_report/line/popover/debug_popover";
 import { AccountReportLineCellEditable } from "@account_reports/components/account_report/line_cell_editable/line_cell_editable";
 
+
 export class AccountReportLine extends Component {
     static template = "account_reports.AccountReportLine";
-    static props = {
-        lineIndex: Number,
-        line: Object,
-    };
     static components = {
         AccountReportLineCellEditable,
     };
+    props = useProps({
+        line: t.object(),
+        lineIndex: t.signal(t.number()),
+        virtualLineIndex: t.number(),
+        numberOfVirtualLines: t.signal(t.number()),
+    });
+
+    controller = usePlugin(AccountReportController);
+    popover = usePlugin(PopoverPlugin);
+
+    lineRef = signal.ref();
+
+    growthComparisonClasses = computed(() => this.getGrowthComparisonClasses());
+    horizontalGroupTotalClasses = computed(() => this.getHorizontalGroupTotalClasses());
+    shouldHide = computed(() => this.props.virtualLineIndex >= this.props.numberOfVirtualLines());
+    hasComparisonData = computed(() => Boolean(this.props.line.column_percent_comparison_data?.figure_type()));
+    hasDebugData = computed(() => Boolean(this.props.line.debug_popup_data?.()));
+    isLevel0 = computed(() => this.props.line.level() === 0);
+
+    lineClasses = "";
 
     setup() {
-        this.popover = useService("popover");
-        this.controller = useState(this.env.controller);
+        useEffect(() => {
+            const classes = this.getLineClasses();
+            if (classes === this.lineClasses) return;
+
+            const prevLineClasses = this.lineClasses;
+            this.lineClasses = classes;
+            const prev = prevLineClasses ? prevLineClasses.trim().split(/\s+/).filter(Boolean) : [];
+            const next = classes ? classes.trim().split(/\s+/).filter(Boolean) : [];
+            this.controller.scheduleClassUpdate(this.lineRef, prev, next);
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Line
     // -----------------------------------------------------------------------------------------------------------------
-    get lineClasses() {
-        let classes = ('level' in this.props.line) ? `line_level_${this.props.line.level}` : 'line_level_default';
+    getLineClasses() {
+        const line = this.props.line;
+        let classes = "level" in line ? `line_level_${line.level()}` : "line_level_default";
 
-        if (!this.props.line.visible || this.isHiddenBySearchFilter())
-            classes += " d-none";
-
-        if (this.props.line.unfolded && this.hasVisibleChild())
+        if (line.unfolded?.() && this.hasVisibleChild())
             classes += " unfolded";
 
-        if (this.controller.isTotalLine(this.props.lineIndex))
+        if (this.controller.isTotalLine(line.id()))
             classes += " total";
 
-        if (this.props.line.class)
-            classes += ` ${this.props.line.class}`;
+        if (line.css_class?.())
+            classes += ` ${line.css_class()}`;
 
         return classes;
     }
 
     hasVisibleChild() {
-        let nextLineIndex = this.props.lineIndex + 1;
+        if (!this.controller.data()) return false;
+        let nextLineIndex = this.props.lineIndex() + 1;
 
-        while (this.controller.isNextLineChild(nextLineIndex, this.props.line['id'])) {
-            if (this.controller.lines[nextLineIndex].visible && !this.isHiddenBySearchFilter(this.controller.lines[nextLineIndex].id))
+        while (this.controller.isNextLineChild(nextLineIndex, this.props.line.id())) {
+            if (this.controller.lines[nextLineIndex].visible && this.controller.lines[nextLineIndex].search_match !== false)
                 return true;
 
             nextLineIndex += 1;
@@ -57,10 +84,10 @@ export class AccountReportLine extends Component {
     // -----------------------------------------------------------------------------------------------------------------
     // Growth comparison
     // -----------------------------------------------------------------------------------------------------------------
-    get growthComparisonClasses() {
-        let classes = "text-end";
+    getGrowthComparisonClasses() {
+        let classes = "text-end fw-bold";
 
-        switch(this.props.line.column_percent_comparison_data.mode) {
+        switch (this.props.line.column_percent_comparison_data.comparison_mode?.()) {
             case "green":
                 classes += " text-success";
                 break;
@@ -78,9 +105,9 @@ export class AccountReportLine extends Component {
     // -----------------------------------------------------------------------------------------------------------------
     // Total Horizontal Group
     // -----------------------------------------------------------------------------------------------------------------
-    get HorizontalGroupTotalClasses() {
+    getHorizontalGroupTotalClasses() {
         let classes = "text-end";
-        switch(Math.sign(this.props.line.horizontal_group_total_data?.no_format)) {
+        switch (Math.sign(this.props.line.horizontal_group_total_data?.no_format())) {
             case 1:
                 break;
             case 0:
@@ -94,25 +121,6 @@ export class AccountReportLine extends Component {
         return classes;
     }
 
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Search
-    //------------------------------------------------------------------------------------------------------------------
-    isHiddenBySearchFilter(lineId = null) {
-        // If no lineId is provided, this will execute on the current line object
-        // Otherwise, it will execute on the given lineId
-        lineId ||= this.props.line.id;
-
-        if (!("lines_searched" in this.controller))
-            return false;
-
-        for (let searchLineId of this.controller.lines_searched)
-            if (this.controller.isLineRelatedTo(searchLineId, lineId) || lineId === searchLineId)
-                return false;
-
-        return true;
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // Debug popover
     //------------------------------------------------------------------------------------------------------------------
@@ -120,7 +128,7 @@ export class AccountReportLine extends Component {
         const close = () => {
             this.popoverCloseFn();
             this.popoverCloseFn = null;
-        }
+        };
 
         if (this.popoverCloseFn)
             close();
@@ -129,7 +137,7 @@ export class AccountReportLine extends Component {
             ev.currentTarget,
             AccountReportDebugPopover,
             {
-                expressionsDetail: JSON.parse(this.props.line.debug_popup_data).expressions_detail,
+                expressionsDetail: JSON.parse(this.props.line.debug_popup_data()).expressions_detail,
                 onClose: close,
             },
             {
@@ -138,4 +146,33 @@ export class AccountReportLine extends Component {
             },
         );
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Virtual Grid
+    //------------------------------------------------------------------------------------------------------------------
+    /** Return the height of a *stored* line in pixels.
+     * 
+     * If you are adding a custom line and this line is higher than normal line, you will need to override this function.
+     * Make sure to check if it's 0 first, as this function also checks if a line is visible or not.
+     * 
+     * @param {AccountReportController} controller 
+     * @param {'left' | 'right'} side The side of the horizontal split we want to know the line is on
+     * @param {Object} line
+     * @param {number} normalLineHeight The height in px of a rendered line without anything except some text
+     * @param {Record<string, number | undefined>} customClassesHeights A map of css_class to their height which were rendered using
+     *  some text and the css_class on the tr.
+     */
+    static getLineHeight(controller, side, line, normalLineHeight) {
+        if (line.visible === false) return 0;
+        if (line.search_match === false) return 0;
+        if (controller.options().horizontal_split && line.horizontal_split_side !== side) return 0;
+        
+        let height = normalLineHeight;
+        if (line.level === 0) {  // since an empty line is added above the line
+            height += normalLineHeight;
+        }
+        return height;
+    }
 }
+
+registry.category("account_reports.default_components").add("AccountReportLine", AccountReportLine);

@@ -5,8 +5,8 @@
         <field name="model">planning.slot</field>
         <field name="inherit_id" ref="planning.planning_view_search_base"/>
         <field name="arch" type="xml">
-            <field name='name' position="before">
-                <field name="employee_skill_ids" groups="planning.group_planning_user" filter_domain="['|', ('resource_id', '=', False), ('employee_skill_ids', 'ilike', self)]"/>
+            <field name="name" position="after">
+                <field name="employee_skill_ids" groups="planning.group_planning_user" filter_domain="['|', ('resource_ids', '=', False), ('employee_skill_ids', 'ilike', self)]"/>
             </field>
         </field>
     </record>

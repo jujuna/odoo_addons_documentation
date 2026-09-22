@@ -1,6 +1,8 @@
 from .common import KnowledgeArticlePermissionsCase
-from odoo.tests import HttpCase
+from odoo.tests import tagged, HttpCase
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleThreadController(KnowledgeArticlePermissionsCase, HttpCase):
     @classmethod
     def setUpClass(cls):
@@ -39,11 +41,20 @@ class TestKnowledgeArticleThreadController(KnowledgeArticlePermissionsCase, Http
                 attachment_ids=portal_attachment.ids)
         )
         self.authenticate('portal_test', 'portal_test')
-        result = self.make_jsonrpc_request('/knowledge/threads/messages', {
-            "thread_model": 'knowledge.article.thread',
-            "thread_ids": [self.readable_article_thread.id]
-        })
-        result_thread_data = result[str(self.readable_article_thread.id)]['data']
+        result_thread_data = self.make_jsonrpc_request(
+            "/mail/store",
+            {
+                "fetch_params": [
+                    [
+                        "/mail/thread/messages",
+                        {
+                            "thread_model": "knowledge.article.thread",
+                            "thread_id": self.readable_article_thread.id,
+                        },
+                    ]
+                ]
+            },
+        )
         result_threads = result_thread_data['mail.thread']
         self.assertEqual(len(result_threads), 1)
         self.assertEqual(self.readable_article_thread.id, result_threads[0]['id'])
@@ -57,5 +68,5 @@ class TestKnowledgeArticleThreadController(KnowledgeArticlePermissionsCase, Http
             {attachment['id'] for attachment in result_attachments},
             {employee_attachment.id, portal_attachment.id}
         )
-        self.assertTrue(result_attachments[0].get('access_token'))
-        self.assertTrue(result_attachments[1].get('access_token'))
+        self.assertTrue(result_attachments[0].get("raw_access_token"))
+        self.assertTrue(result_attachments[1].get("raw_access_token"))

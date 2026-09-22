@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
@@ -17,7 +16,6 @@
         'views/event_event_views.xml',
         'views/event_templates_registration.xml'
     ],
-    'installable': True,
     'auto_install': True,
     'assets': {
         'web.assets_frontend': [

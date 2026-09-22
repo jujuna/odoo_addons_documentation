@@ -7,6 +7,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.fields import Command
 from odoo.tools.float_utils import float_compare
+from odoo.tools.misc import clean_context
 from dateutil.relativedelta import relativedelta
 
 
@@ -21,8 +22,8 @@ class StockPicking(models.Model):
             picking.show_subcontracting_details_visible = any(m.show_subcontracting_details_visible for m in picking.move_ids)
 
     @api.depends('picking_type_id', 'partner_id')
-    def _compute_location_id(self):
-        super()._compute_location_id()
+    def _compute_location_dest_id(self):
+        super()._compute_location_dest_id()
 
         for picking in self:
             # If this is a subcontractor resupply transfer, set the destination location
@@ -36,8 +37,21 @@ class StockPicking(models.Model):
     def _compute_show_lots_text(self):
         super()._compute_show_lots_text()
         for picking in self:
-            if any(move.is_subcontract and move.has_tracking != 'none' for move in picking.move_ids):
+            if any(move.is_subcontract and move.product_id.tracking in ['lot', 'serial'] for move in picking.move_ids):
                 picking.show_lots_text = False
+
+    def _prepare_return_move_default_values(self, move_id):
+        vals = super()._prepare_return_move_default_values(move_id)
+        if move_id.is_subcontract:
+            vals['location_dest_id'] = self.partner_id.with_company(self.company_id).property_stock_subcontractor.id
+        vals['is_subcontract'] = False
+        return vals
+
+    def _prepare_return_picking_default_values(self):
+        vals = super()._prepare_return_picking_default_values()
+        if all(move_id.quantity > 0 and move_id.is_subcontract for move_id in self.move_ids):
+            vals['location_dest_id'] = self.partner_id.with_company(self.company_id).property_stock_subcontractor.id
+        return vals
 
     # -------------------------------------------------------------------------
     # Action methods
@@ -104,10 +118,14 @@ class StockPicking(models.Model):
 
     def _prepare_subcontract_mo_vals(self, subcontract_move, bom):
         subcontract_move.ensure_one()
-        reference = self.env['stock.reference'].create({
-            'name': self.name,
-            'move_ids': [Command.link(subcontract_move.id)],
-        })
+        if not self.reference_ids:
+            references = self.env['stock.reference'].create({
+                'name': self.name,
+                'move_ids': [Command.link(subcontract_move.id)],
+            })
+        else:
+            references = self.reference_ids
+
         product = subcontract_move.product_id
         warehouse = self._get_warehouse(subcontract_move)
         subcontracting_location = \
@@ -118,7 +136,7 @@ class StockPicking(models.Model):
             'subcontractor_id': subcontract_move.picking_id.partner_id.commercial_partner_id.id,
             'picking_ids': [subcontract_move.picking_id.id],
             'product_id': product.id,
-            'product_uom_id': subcontract_move.product_uom.id,
+            'uom_id': subcontract_move.uom_id.id,
             'bom_id': bom.id,
             'location_src_id': subcontracting_location.id,
             'location_dest_id': subcontracting_location.id,
@@ -126,7 +144,7 @@ class StockPicking(models.Model):
             'picking_type_id': warehouse.subcontracting_type_id.id,
             'date_start': subcontract_move.date - relativedelta(days=bom.produce_delay),
             'origin': self.name,
-            'reference_ids': [Command.link(reference.id)],
+            'reference_ids': [Command.link(ref.id) for ref in references],
         }
         return vals
 
@@ -158,7 +176,7 @@ class StockPicking(models.Model):
                     # do not create extra production for move that have their quantity updated
                     return
             quantity = move.product_qty or move.quantity
-            if move.product_uom.compare(quantity, 0) <= 0:
+            if move.uom_id.compare(quantity, 0) <= 0:
                 # If a subcontracted amount is decreased, don't create a MO that would be for a negative value.
                 continue
 
@@ -170,9 +188,12 @@ class StockPicking(models.Model):
         for company, group in group_by_company.items():
             vals_list, moves = group
             grouped_mo = self.env['mrp.production'].with_company(company).create(vals_list)
-            grouped_mo.with_context(self._get_subcontract_mo_confirmation_ctx()).action_confirm()
+            ctx = clean_context(self.env.context)
+            ctx.pop('move_picking_partner_id', None)
+            ctx.update(self._get_subcontract_mo_confirmation_ctx())
+            grouped_mo.with_context(ctx).action_confirm()
             for mo, move in zip(grouped_mo, moves):
                 mo.date_finished = move.date
                 finished_move = mo.move_finished_ids.filtered(lambda m: m.product_id == move.product_id)
-                finished_move.move_dest_ids = [Command.link(move.id)]
+                finished_move.move_dest_ids = [Command.set(move.ids)]
             grouped_mo.action_assign()

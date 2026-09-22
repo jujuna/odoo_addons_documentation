@@ -4,7 +4,7 @@ from ast import literal_eval
 import logging
 
 from odoo import api, models, fields, _
-from odoo.exceptions import ValidationError, UserError
+from odoo.exceptions import AccessError, ValidationError, UserError
 from odoo.fields import Command, Domain
 from collections import defaultdict
 
@@ -44,6 +44,11 @@ class StudioApprovalRuleApprover(models.Model):
         return self.filtered(lambda rec: rec._is_valid())
 
 
+# A reference to be able to securely pass
+# info into a callstack via context.
+_APPROVAL_SYMBOL_ = object()
+
+
 class StudioApprovalRule(models.Model):
     _name = 'studio.approval.rule'
     _description = "Studio Approval Rule"
@@ -58,6 +63,14 @@ class StudioApprovalRule(models.Model):
         except ValueError:
             action = self.env.ref(str_action, raise_if_not_found=False)
             return action and action.id
+
+    @api.model
+    def _cast_domain(self, domain):
+        if isinstance(domain, str):
+            domain = literal_eval(domain)
+        if domain is False or domain is None:
+            return Domain(True)
+        return Domain(domain)
 
     def _group_expand_notification_order(self, options, domain):
         return sorted(set(options).union({'1', '2', '3', '4'}))
@@ -78,7 +91,7 @@ class StudioApprovalRule(models.Model):
         domain="[('id', 'not in', [1]), ('share', '=', False)]",
         tracking=True
     )
-    approver_log_ids = fields.One2many("studio.approval.rule.approver", inverse_name="rule_id", tracking=True)
+    approver_log_ids = fields.One2many("studio.approval.rule.approver", inverse_name="rule_id", tracking=False)
     approval_group_id = fields.Many2one(comodel_name='res.groups', string='Approval Group', help="The users in this group are able to approve or reject the step.", tracking=True)
     users_to_notify = fields.Many2many(
         comodel_name='res.users',
@@ -119,14 +132,22 @@ class StudioApprovalRule(models.Model):
     entry_ids = fields.One2many('studio.approval.entry', 'rule_id', string='Entries')
     entries_count = fields.Integer('Number of Entries', compute='_compute_entries_count')
 
+    # Rules having parent_id are "dummy" in the sense that
+    # they will prevent the execution of a method, to force using
+    # the method to which the parent_id points
+    parent_id = fields.Many2one("studio.approval.rule", index="btree_not_null")
+    child_ids = fields.One2many("studio.approval.rule", "parent_id")
+
     _method_or_action_together = models.Constraint(
-        'CHECK(method IS NULL OR action_id IS NULL)',
+        'CHECK((method IS NOT NULL AND action_id IS NULL) OR (method IS NULL AND action_id IS NOT NULL))',
         "A rule must apply to an action or a method (but not both).",
     )
-    _method_or_action_not_null = models.Constraint(
-        'CHECK(method IS NOT NULL OR action_id IS NOT NULL)',
-        "A rule must apply to an action or a method.",
-    )
+
+    @api.constrains("model_id")
+    def _check_model_id(self):
+        with_parent = self.filtered(lambda r: r.parent_id)
+        if any(r.model_id != r.parent_id.model_id for r in with_parent):
+            raise ValidationError(self.env._("A child rule must operates on the same model as its main rule"))
 
     @api.depends("notification_order")
     def _compute_display_name(self):
@@ -141,12 +162,6 @@ class StudioApprovalRule(models.Model):
 
     def _inverse_approver_ids(self):
         for rec in self:
-            track_message = _("%(user_name)s has set approval rights from %(previous_approvers)s to %(next_approvers)s",
-                user_name=self.env.user.name,
-                previous_approvers=", ".join(self.approver_log_ids.filtered(lambda log: not log.is_delegation).user_id.mapped("name")) or _("no one"),
-                next_approvers=", ".join(rec.approver_ids.mapped("name")) or _("no one")
-                )
-            rec._track_set_log_message(track_message)
             commands = rec._get_approver_log_changes({"approver_ids": rec.approver_ids})
             rec.approver_log_ids = commands
 
@@ -226,6 +241,25 @@ class StudioApprovalRule(models.Model):
         return [("action_id", operator, action_ids)]
 
     @api.model
+    def _search(
+        self,
+        domain,
+        offset=0,
+        limit=None,
+        order=None,
+        *,
+        active_test=True,
+        bypass_access=False,
+    ):
+        # Override: a bit like active_test
+        # Most of the time we don't want subrules to appear on the regular view
+        # but we do want a filter that allows to see them
+        if not self.env.context.get("studio_approval_display_subrules", True):
+            not_subrules = Domain("parent_id", "=", False)
+            domain = Domain.AND([not_subrules, domain])
+        return super()._search(domain, offset, limit, order, active_test=active_test, bypass_access=bypass_access)
+
+    @api.model
     def default_get(self, fields):
         vals = super().default_get(fields)
         default_model_name = self.env.context.get("default_model_name")
@@ -241,15 +275,29 @@ class StudioApprovalRule(models.Model):
     def write(self, vals):
         if "approver_log_ids" in vals:
             vals.pop("approver_ids", None)
+        self = self.filtered(lambda r: not r.parent_id)  # noqa: PLW0642
         write_readonly_fields = bool(set(vals.keys()) & {'model_id', 'method', 'action_id'})
         if write_readonly_fields and any(rule.entry_ids for rule in self):
             raise UserError(_(
                 "Rules with existing entries cannot be modified since it would break existing "
                 "approval entries. You should archive the rule and create a new one instead."))
+        if write_readonly_fields:
+            self.child_ids.unlink()
         res = super().write(vals)
         if "active" in vals:
             self._post_create_delete(operation="create" if vals["active"] else "unlink")
         self._update_registry()
+        return res
+
+    def _track_log_get_default_body(self, track_init_values):
+        res = super()._track_log_get_default_body(track_init_values)
+        if 'approver_ids' in track_init_values:
+            pre = track_init_values['approver_ids'].mapped('name') if track_init_values['approver_ids'] else _("no one")
+            post = self.approver_ids.mapped('name') if self.approver_ids else _("no one")
+
+            return _("%(user_name)s has set approval rights from %(pre)s to %(post)s",
+                user_name=self.env.user.name, pre=pre, post=post,
+            )
         return res
 
     def _base_automation_data_for_model(self, model_id):
@@ -296,7 +344,7 @@ class StudioApprovalRule(models.Model):
 
         self_sudo = self.sudo()
         new_automations = []
-        for model_id in self_sudo.mapped("model_id"):
+        for model_id in self_sudo.filtered(lambda r: not r.parent_id).mapped("model_id"):
             model = model_id.model
             base_auto_data = self_sudo._base_automation_data_for_model(model_id)
             if base_auto_data is None:
@@ -324,6 +372,7 @@ class StudioApprovalRule(models.Model):
                 "model": "base.automation",
                 "res_id": base_auto.id,
                 "module": "web_studio",
+                "noupdate": True,
             })
             server_action = self_sudo.env.ref(get_base_action_server_xml_id(model), raise_if_not_found=False)
             if server_action:
@@ -347,6 +396,7 @@ class StudioApprovalRule(models.Model):
                     "model": "ir.actions.server",
                     "res_id": server_action.id,
                     "module": "web_studio",
+                    "noupdate": True,
                 }, {
                     "name": model_data_name,
                     "model": "ir.actions.server",
@@ -363,8 +413,9 @@ class StudioApprovalRule(models.Model):
             if "approver_log_ids" in vals:
                 vals.pop("approver_ids", None)
         rules = super().create(vals_list)
-        rules._make_automated_actions()
-        rules._post_create_delete(operation="create")
+        if self.env.context.get("_approval_child_rules") is not _APPROVAL_SYMBOL_:
+            rules._make_automated_actions()
+            rules._post_create_delete(operation="create")
         self._update_registry()
         return rules
 
@@ -374,15 +425,14 @@ class StudioApprovalRule(models.Model):
 
     def _update_registry(self):
         """ Update the registry after a modification on approval rules. """
-        if self.env.registry.ready:
+        if self.env.registry.ready and self.env.context.get("_approval_child_rules") is not _APPROVAL_SYMBOL_:
             # re-install the model patches, and notify other workers
+            self.env.transaction.will_change_registry()
             self._unregister_hook()
             self._register_hook()
-            self.env.registry.registry_invalidated = True
 
     def _register_hook(self):
         """ Patch methods that should verify the approval rules """
-
         def _patch(model, method_name, function):
             """ Patch method `name` on `model`, unless it has been patched already. """
             if method_name.startswith("_") or '__' in method_name:
@@ -400,26 +450,32 @@ class StudioApprovalRule(models.Model):
         def _make_approval_method(method_name, model_name):
             """ Instanciate a method that verify the approval rule """
             def method(self, *args, **kwargs):
-                if self.env.su:
-                    # in a sudoed environment, approvals are skipped
-                    # otherwise we risk breaking some important flows
-                    # (e.g. ecommerce order confirmations, invoice posting because
-                    # online payment succeeeded, etc.)
-                    _logger.info("Skipping approval checks in a sudoed environment: method call %s ALLOWED on records %s", method_name, self)
+                if self.env.su or self.env.context.get("_studio_approval_bypass") is _APPROVAL_SYMBOL_:
+                    if self.env.su:
+                        # in a sudoed environment, approvals are skipped
+                        # otherwise we risk breaking some important flows
+                        # (e.g. ecommerce order confirmations, invoice posting because
+                        # online payment succeeeded, etc.)
+                        _logger.info("Skipping approval checks in a sudoed environment: method call %s ALLOWED on records %s", method_name, self)
                     return method.studio_approval_rule_origin(self, *args, **kwargs)
+                self = self.with_context(_studio_approval_bypass=_APPROVAL_SYMBOL_)
                 approved, rules, entries = [], [], []
                 approved_records = self.env[self._name]
                 for record in self:
                     result = self.env['studio.approval.rule'].check_approval(model_name, record.id, method_name, None)
                     approved.append(result['approved'])
-                    rules.append(result['rules'])
+                    rules.extend(result['rules'])
                     entries.append(result['entries'])
                     if result['approved']:
                         approved_records |= record
 
+                rules_seen = set()
+                rules = [r for r in rules if r["id"] not in rules_seen and (rules_seen.add(r["id"]) or True)]
+
                 if all(approved):
                     return method.studio_approval_rule_origin(self, *args, **kwargs)
                 else:
+                    notification_type = "warning"
                     unapproved_records = self - approved_records
                     msg, log_args = "Approval checks failed: method call %s REJECTED on records %s", (method_name, unapproved_records)
                     if approved_records:
@@ -428,25 +484,31 @@ class StudioApprovalRule(models.Model):
                     _logger.info(msg, *log_args)
                     if len(approved_records) > 0:
                         method.studio_approval_rule_origin(approved_records, *args, **kwargs)
-                    message = ''
+                    message = []
                     title = ''
                     if len(self) > 1:
                         title = _('Approvals missing')
-                        message = _('Some records were skipped because approvals were missing to\
-                                    proceed with your request: ')
-                        message += ', '.join(unapproved_records.mapped('display_name'))
+                        message.append(_('Some records were skipped because approvals were missing to\
+                                    proceed with your request:'))
+                        message.append(', '.join(unapproved_records.mapped('display_name')))
                     else:
-                        missing_approvals = self.env['studio.approval.rule'].get_missing_approvals(rules[0], entries[0])
-                        message += _('Some approvals are missing') if len(missing_approvals) > 1 else _('An approval is missing')
+                        missing_approvals = self.env['studio.approval.rule'].get_missing_approvals(rules, entries[0])
+                        message.append(
+                            _('Some approvals are missing.') if len(missing_approvals) > 1 else _('An approval is missing.')
+                        )
 
+                    parent_ids = [r["parent_id"][0] for r in rules if r.get("parent_id")]
+                    if parent_ids:
+                        message = [self.env._('Action disabled due to approval rules')]
+                        notification_type = "danger"
                     return  {
                         'type': 'ir.actions.client',
                         'tag': "display_notification",
                         'params' : {
                             'title': title,
-                            'message': message,
+                            'message': " ".join(message),
                             'sticky': False,
-                            'type': 'warning',
+                            'type': notification_type,
                             'next': {
                                 'type': 'ir.actions.act_window_close',
                             }
@@ -585,8 +647,8 @@ class StudioApprovalRule(models.Model):
 
             can_revoke = False
             for rule in rules_above:
-                domain = literal_eval(rule["domain"] or "[]")
-                if not record.filtered_domain(domain):
+                domain = self._cast_domain(rule["domain"])
+                if not record.sudo().filtered_domain(domain):
                     continue
                 if rule["can_validate"]:
                     can_revoke = True
@@ -702,8 +764,8 @@ class StudioApprovalRule(models.Model):
             ], ["domain", "notification_order"]):
                 if rule["id"] == ruleSudo.id:
                     continue
-                rule_domain = rule["domain"] and literal_eval(rule["domain"])
-                if rule_domain and not record.filtered_domain(rule_domain):
+                rule_domain = self._cast_domain(rule["domain"])
+                if not record.sudo().filtered_domain(rule_domain):
                     continue
                 if rule["notification_order"] == ruleSudo.notification_order:
                     same_level_rules.append(rule["id"])
@@ -806,7 +868,7 @@ class StudioApprovalRule(models.Model):
         )
         rules_data = self.sudo().search_read(
             domain=rules_domain,
-            fields=['name', 'message', 'exclusive_user', 'can_validate', 'action_id', 'method', "approver_ids", "users_to_notify", "approval_group_id", "notification_order", "domain"],
+            fields=['name', 'message', 'exclusive_user', 'can_validate', 'action_id', 'method', "approver_ids", "users_to_notify", "approval_group_id", "notification_order", "domain", "parent_id"],
             order='notification_order asc, exclusive_user desc, id asc')
 
         # Process rules by remapping to the specs
@@ -830,11 +892,7 @@ class StudioApprovalRule(models.Model):
 
             record_ids_for_result = list()
             if records_for_rule:
-                if not rule_domain:
-                    record_ids_for_result = records_for_rule.ids
-                else:
-                    impacted_records = records_for_rule.filtered_domain(rule_domain)
-                    record_ids_for_result = impacted_records.ids
+                record_ids_for_result = records_for_rule.sudo().filtered_domain(self._cast_domain(rule_domain)).ids
 
             # Push rule here to search for entries
             # we won't fetch entries for the False res_id
@@ -993,20 +1051,25 @@ class StudioApprovalRule(models.Model):
         ruleSudo = self.sudo()
         domain = self._get_rule_domain(model, method, action_id)
         # order by 'exclusive_user' so that restrictive rules are approved first
-        rules_data = ruleSudo.search_read(
+        rules_data = ruleSudo.search_fetch(
             domain=domain,
-            fields=['message', 'name', 'domain'],
+            field_names=['message', 'name', 'domain', 'parent_id'],
             order='notification_order asc, exclusive_user desc, id asc'
         )
         applicable_rule_ids = list()
         for rule in rules_data:
-            rule_domain = rule.get('domain') and literal_eval(rule['domain'])
-            if not rule_domain or record.filtered_domain(rule_domain):
+            domain = rule.parent_id.domain if rule.parent_id else rule.domain
+            if record.sudo().filtered_domain(self._cast_domain(domain)):
+                if rule.parent_id:
+                    return {
+                        "approved": False,
+                        "rules": rule.read(['message', 'name', 'domain', 'parent_id']),
+                        "entries": [],
+                    }
                 # the record matches the domain of the rule
                 # or the rule has no domain set on it
-                applicable_rule_ids.append(rule['id'])
-        rules_data = list(filter(lambda r: r['id'] in applicable_rule_ids, rules_data))
-        if not rules_data:
+                applicable_rule_ids.append(rule.id)
+        if not applicable_rule_ids:
             # no rule matching our operation: return early, the user can proceed
             return {'approved': True, 'rules': [], 'entries': []}
         # need sudo, we need to check entries from other people and through record rules
@@ -1039,7 +1102,7 @@ class StudioApprovalRule(models.Model):
                 entries_by_rule[rule_id] = candidate_entry['approved']
         return {
             'approved': all(entries_by_rule.values()),
-            'rules': rules_data,
+            'rules': ruleSudo.browse(applicable_rule_ids).read(['message', 'name', 'domain', 'parent_id']),
             'entries': entries_data,
         }
 
@@ -1069,8 +1132,8 @@ class StudioApprovalRule(models.Model):
                 ('method', '=', ruleSudo.method),
                 ('action_id', '=', ruleSudo.action_id.id)
             ]):
-                rule_domain = approval_rule.domain and literal_eval(approval_rule.domain)
-                if rule_domain and not record.filtered_domain(rule_domain):
+                rule_domain = self._cast_domain(approval_rule.domain)
+                if not record.sudo().filtered_domain(rule_domain):
                     continue
                 existing_entry = entry_sudo.search([
                     ('model', '=', ruleSudo.model_name),
@@ -1126,12 +1189,13 @@ class StudioApprovalRule(models.Model):
         }
 
     def open_kanban_rules(self, model, method=False, action=False):
+        default_action = self.env.ref("web_studio.studio_approval_rule_action")._get_action_dict()
         model_id = self.env["ir.model"]._get(model)
-        context = {
+        context = literal_eval(default_action.get("context", "{}"))
+        context.update({
             "default_model_id": model_id.id,
-            "search_view_ref": "web_studio.studio_approval_rule_button_configuration_search_view",
             "search_default_notification_order": True,
-        }
+        })
         domain = [("model_id", "=", model_id.id)]
         if method:
             context["default_method"] = method
@@ -1141,18 +1205,13 @@ class StudioApprovalRule(models.Model):
             context["default_action_id"] = action_id
             domain.append(("action_id", "=", action_id))
 
-        return {
-            "name": _("Approvals %(model_name)s", model_name=model_id.name),
-            "res_model": "studio.approval.rule",
-            "type": "ir.actions.act_window",
-            "views": [
-                [False, "kanban"],
-                [False, "list"],
-                [False, "form"],
-            ],
+        default_action.update({
+            "display_name": _("Approvals %(model_name)s", model_name=model_id.name),
             "domain": domain,
             "context": context,
-        }
+            "search_view_id": self.env.ref("web_studio.studio_approval_rule_button_configuration_search_view").id,
+        })
+        return default_action
 
     def _get_remaining_rules_domain(self, model_name, method, action_id):
         return Domain.AND([
@@ -1164,26 +1223,36 @@ class StudioApprovalRule(models.Model):
         ])
 
     def _post_create_delete(self, operation=None):
-        for model_name, method, action_id in {(r.model_name, r.method, r.action_id) for r in self}:
+        def rule_key(rule):
+            return (rule.model_name, rule.method or None, rule.action_id or None)
+        grouped = self.filtered(lambda r: not r.parent_id).grouped(rule_key)
+        ChildRule = self.browse().with_context(_approval_child_rules=_APPROVAL_SYMBOL_)
+
+        for (model_name, method, action_id), rules in grouped.items():
             if model_name == "account.move" and method == "action_post":
-                if action := self.env.ref("account.action_validate_account_move", raise_if_not_found=False):
+                if action := self.env.ref("account.action_validate_account_moves", raise_if_not_found=False):
                     if operation == "create":
                         action.binding_model_id = False
                     if operation == "unlink" and not self.search_count(self._get_remaining_rules_domain(model_name, method, action_id)):
                         action.binding_model_id = self.env["ir.model"]._get("account.move").id
 
-    # Tracking Values
-    def _track_filter_for_display(self, tracking_values):
-        approver_log_field = self.env["ir.model.fields"]._get(self._name, "approver_log_ids")
-        approver_ids_field = self.env["ir.model.fields"]._get(self._name, "approver_ids")
-        return tracking_values.filtered(lambda tv: tv.field_id not in [approver_log_field, approver_ids_field])
+            if model_name == "account.move" and method == "action_register_payment":
+                if action := self.env.ref("account.action_move_force_register_payment", raise_if_not_found=False):
+                    if operation == "create":
+                        action.binding_model_id = False
+                    if operation == "unlink" and not self.search_count(self._get_remaining_rules_domain(model_name, method, action_id)):
+                        action.binding_model_id = self.env["ir.model"]._get("account.move").id
 
-    def _mail_track(self, tracked_fields, initial_values):
-        # The one2many may have some deleted records
-        # pop the whole thing to always have the custom message
-        # and avoid a MissingError
-        initial_values.pop("approver_log_ids", None)
-        return super()._mail_track(tracked_fields, initial_values)
+                child_key = ("account.move", "action_force_register_payment", None)
+                if operation == "create":
+                    child_create_dict = dict(zip(["model_name", "method", "action_id"], child_key))
+                    child_create_dict["model_id"] = self.env["ir.model"]._get(child_create_dict.pop("model_name")).id
+                    for rule in rules:
+                        if not rule.child_ids.filtered(lambda r: rule_key(r) == child_key):
+                            ChildRule.create({**child_create_dict, "parent_id": rule.id})
+                if operation == "unlink":
+                    child_rules = rules.mapped("child_ids").filtered(lambda r: rule_key(r) == child_key)
+                    ChildRule.browse(child_rules.ids).unlink()
 
 
 class StudioApprovalEntry(models.Model):
@@ -1200,7 +1269,7 @@ class StudioApprovalEntry(models.Model):
     user_id = fields.Many2one('res.users', string='Approved/rejected by', ondelete='restrict',
                               required=True, default=lambda s: s._default_user_id(), index=True)
     # cascade deletion from the rule should only happen when the model itself is deleted
-    rule_id = fields.Many2one('studio.approval.rule', string='Approval Rule', ondelete='cascade',
+    rule_id = fields.Many2one('studio.approval.rule', string='Rule', ondelete='cascade',
                               required=True, index=True)
     # store these for performance reasons, reading should be fast while writing can be slower
     model = fields.Char(string='Model Name', related="rule_id.model_name", store=True)
@@ -1209,6 +1278,14 @@ class StudioApprovalEntry(models.Model):
     res_id = fields.Many2oneReference(string='Record ID', model_field='model', required=True)
     reference = fields.Char(string='Reference', compute='_compute_reference')
     approved = fields.Boolean(string='Approved')
+    record_display_name = fields.Char(string='Record', compute='_compute_record')
+    state = fields.Selection(selection=[
+            ('approved', 'Approved'),
+            ('rejected', 'Rejected'),
+        ],
+        string='State',
+        compute='_compute_state',
+    )
 
     _uniq_combination = models.Constraint(
         'unique(rule_id,model,res_id)',
@@ -1216,17 +1293,49 @@ class StudioApprovalEntry(models.Model):
     )
     _model_res_id_idx = models.Index("(model, res_id)")
 
-    @api.depends('user_id', 'model', 'res_id')
+    @api.depends('model', 'res_id')
+    def _compute_record(self):
+        recs = {}
+        for model, entries in self.grouped('model').items():
+            records = self.env[model].browse(entries.mapped('res_id'))
+            recs.update({(model, record.id): record.display_name for record in records})
+
+        for entry in self:
+            if not entry.id:
+                entry.record_display_name = None
+            else:
+                entry.record_display_name = recs[entry.model, entry.res_id]
+
+    @api.depends('record_display_name', 'rule_id')
     def _compute_name(self):
+        notification_order_selection = dict(self.env['studio.approval.rule']._fields['notification_order']._description_selection(self.env))
+
         for entry in self:
             if not entry.id:
                 entry.name = _('New Approval Entry')
-            entry.name = '%s - %s(%s)' % (entry.user_id.name, entry.model, entry.res_id)
+            else:
+                entry.name = '%s - %s' % (entry.record_display_name, notification_order_selection.get(entry.rule_id.notification_order, entry.rule_id.notification_order))
 
     @api.depends('model', 'res_id')
     def _compute_reference(self):
         for entry in self:
             entry.reference = "%s,%s" % (entry.model, entry.res_id)
+
+    @api.depends('approved')
+    def _compute_state(self):
+        for entry in self:
+            entry.state = 'approved' if entry.approved else 'rejected'
+
+    def action_show_model(self):
+        self.ensure_one()
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self.model,
+            'res_id': self.res_id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -1286,6 +1395,7 @@ class StudioApprovalRequest(models.Model):
     rule_id = fields.Many2one('studio.approval.rule', string='Approval Rule', ondelete='cascade',
                               required=True, index=True)
     res_id = fields.Many2oneReference(string='Record ID', model_field='model', required=True)
+    model = fields.Char(related='mail_activity_id.res_model')
 
     def _inverse_mail_activity_id(self):
         for rec in self:
@@ -1309,9 +1419,11 @@ class StudioApprovalRuleDelegate(models.TransientModel):
     def create(self, vals_list):
         records = super().create(vals_list)
         for rec in records:
-            rule = rec.approval_rule_id.sudo()
-            rule._delegate_to(rec.approver_ids, rec.date_to)
-            rule.write({"users_to_notify": rec.users_to_notify})
+            rule_su = rec.approval_rule_id.sudo()
+            if not self.env.su and not rule_su.can_validate:
+                raise AccessError(_("You are not allowed to delegate this approval rule."))
+            rule_su._delegate_to(rec.approver_ids, rec.date_to)
+            rule_su.write({"users_to_notify": rec.users_to_notify})
         return records
 
     @api.model

@@ -1,7 +1,8 @@
+import { render } from "@web/owl2/utils";
 import { registry } from "@web/core/registry";
 import { user as originalUser } from "@web/core/user";
 import { useBus, useService } from "@web/core/utils/hooks";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { computeAppsAndMenuItems, reorderApps } from "@web/webclient/menus/menu_helpers";
 
 import { AppCreator } from "./app_creator/app_creator";
@@ -9,12 +10,11 @@ import { Editor } from "./editor/editor";
 import { StudioNavbar } from "./navbar/navbar";
 import { StudioHomeMenu } from "./studio_home_menu/studio_home_menu";
 
-import { Component, onWillStart, onMounted, onPatched, onWillUnmount } from "@odoo/owl";
+import { Component, onWillStart, onMounted, onPatched, onWillUnmount, useProps } from "@odoo/owl";
 
 export class StudioClientAction extends Component {
     static template = "web_studio.StudioClientAction";
     static target = "fullscreen";
-    static props = { ...standardActionServiceProps };
     static components = {
         StudioNavbar,
         StudioHomeMenu,
@@ -22,11 +22,13 @@ export class StudioClientAction extends Component {
         AppCreator,
     };
 
+    props = useProps(standardActionServiceProps);
+
     setup() {
         const homemenuConfig = JSON.parse(originalUser.settings?.homemenu_config || "null");
         this.studio = useService("studio");
         useBus(this.studio.bus, "UPDATE", () => {
-            this.render();
+            render(this);
         });
 
         this.menus = useService("menu");
@@ -46,7 +48,7 @@ export class StudioClientAction extends Component {
             this.homeMenuProps = {
                 apps: apps,
             };
-            this.render();
+            render(this);
         });
 
         onWillStart(() => this.studio.ready);

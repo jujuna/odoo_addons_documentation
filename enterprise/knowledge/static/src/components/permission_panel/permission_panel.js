@@ -2,10 +2,11 @@ import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_d
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { _t } from "@web/core/l10n/translation";
+import { localeCompare } from "@web/core/l10n/utils";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 
 class Member {
     constructor(data) {
@@ -17,7 +18,8 @@ class Member {
     }
 
     get basedOnName() {
-        return `${this.based_on_icon || "📄"} ${this.based_on_name || _t("Untitled")}`;
+        const name = this.based_on_name || _t("Untitled");
+        return this.based_on_icon ? `${this.based_on_icon} ${name}` : name;
     }
 
     get canWrite() {
@@ -37,19 +39,22 @@ class Member {
     }
 }
 
+export const permissionPanelProps = {
+    close: t.function(),
+    openArticle: t.function(),
+    reactiveRecord: t.function([], t.object()),
+    sendArticleToTrash: t.function(),
+};
+
 export class PermissionPanel extends Component {
     static template = "knowledge.PermissionPanel";
-    static props = {
-        reactiveRecordWrapper: Object,
-        openArticle: Function,
-        sendArticleToTrash: Function,
-        close: Function,
-    };
     static components = { Dropdown, DropdownItem };
+
+    props = useProps(permissionPanelProps);
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ members: {}, isArticleLoaded: true });
+        this.state = proxy({ members: {}, isArticleLoaded: true });
         this.actionService = useService("action");
         this.dialog = useService("dialog");
         this.mailStore = useService("mail.store");
@@ -59,7 +64,7 @@ export class PermissionPanel extends Component {
     }
 
     get record() {
-        return this.props.reactiveRecordWrapper.record;
+        return this.props.reactiveRecord();
     }
 
     get hasUniqueWriter() {
@@ -92,7 +97,7 @@ export class PermissionPanel extends Component {
     }
 
     get data() {
-        return this.props.reactiveRecordWrapper.record.data;
+        return this.record.data;
     }
 
     get members() {
@@ -130,22 +135,22 @@ export class PermissionPanel extends Component {
      * @param {integer} articleId
      */
     async loadMembers(articleId = this.record.resId) {
-        const members = await this.orm.call(
-            "knowledge.article",
-            "get_permission_panel_members",
-            [articleId]
-        );
-        this.state.members = members.map((memberVals) => {
-            return new Member(memberVals);
-        }).sort((m1, m2) => {
-            if (m1.isCurrentUser || !m2.name) {
-                return -1;
-            }
-            if (m2.isCurrentUser || !m1.name) {
-                return 1;
-            }
-            return m1.name.localeCompare(m2.name);
-        });
+        const members = await this.orm.call("knowledge.article", "get_permission_panel_members", [
+            articleId,
+        ]);
+        this.state.members = members
+            .map((memberVals) => {
+                return new Member(memberVals);
+            })
+            .sort((m1, m2) => {
+                if (m1.isCurrentUser || !m2.name) {
+                    return -1;
+                }
+                if (m2.isCurrentUser || !m1.name) {
+                    return 1;
+                }
+                return localeCompare(m1.name, m2.name);
+            });
     }
 
     async load() {
@@ -237,7 +242,6 @@ export class PermissionPanel extends Component {
                 "Are you sure you want to restore access? This means this article will now inherit any access set on its parent articles."
             ),
             cancel: () => {},
-            cancelLabel: _t("Discard"),
             confirm: async () => {
                 await this.restore();
             },
@@ -259,7 +263,6 @@ export class PermissionPanel extends Component {
                 // setting own permission to none, user will leave the article
                 this.dialog.add(ConfirmationDialog, {
                     cancel: () => {},
-                    cancelLabel: _t("Discard"),
                     confirm: async () => {
                         await this.setMemberPermission(member, permission);
                         await this.actionService.doAction(
@@ -276,7 +279,6 @@ export class PermissionPanel extends Component {
                 // downgrading own permission from write to read
                 this.dialog.add(ConfirmationDialog, {
                     cancel: () => {},
-                    cancelLabel: _t("Discard"),
                     confirm: async () => {
                         await this.setMemberPermission(member, permission);
                     },
@@ -289,7 +291,6 @@ export class PermissionPanel extends Component {
             // we are desyncing the article from its parent.
             this.dialog.add(ConfirmationDialog, {
                 cancel: () => {},
-                cancelLabel: _t("Discard"),
                 confirm: async () => {
                     await this.setMemberPermission(member, permission);
                 },
@@ -315,8 +316,10 @@ export class PermissionPanel extends Component {
                         "Are you sure you want to leave your private Article? As you are its last member, it will be moved to the Trash."
                     ),
                     cancel: () => {},
-                    cancelLabel: _t("Discard"),
-                    confirm: () => this.props.sendArticleToTrash(),
+                    confirm: () => {
+                        this.props.sendArticleToTrash();
+                        this.props.close();
+                    },
                     confirmLabel: _t("Move to Trash"),
                 });
             } else {
@@ -326,9 +329,9 @@ export class PermissionPanel extends Component {
                         "Are you sure you want to leave this article? That means losing your personal access to it."
                     ),
                     cancel: () => {},
-                    cancelLabel: _t("Discard"),
                     confirm: async () => {
                         await this.removeArticleMember(member);
+                        this.props.close();
                     },
                     confirmLabel: _t("Leave Article"),
                 });
@@ -360,7 +363,6 @@ export class PermissionPanel extends Component {
         ) {
             this.dialog.add(ConfirmationDialog, {
                 cancel: () => {},
-                cancelLabel: _t("Discard"),
                 confirm: async () => {
                     await this.setInternalPermission(permission);
                 },

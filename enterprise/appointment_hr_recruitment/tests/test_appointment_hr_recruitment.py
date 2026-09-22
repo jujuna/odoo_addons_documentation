@@ -11,7 +11,7 @@ from odoo.tests import HttpCase, tagged, users
 class AppointmentHrRecruitmentTest(HttpCase):
 
     @users('admin')
-    def test_tour_default_opportunity_propagation(self):
+    def test_tour_applicant_propagation(self):
         """ Test that the applicant is correctly propagated to the appointment invitation created """
         with freeze_time(datetime(year=2025, month=2, day=12, hour=17)):
             self.env.user.tz = "Europe/Brussels"
@@ -27,7 +27,6 @@ class AppointmentHrRecruitmentTest(HttpCase):
                 'partner_name': 'Test Applicant',
                 'job_id': job_developer.id,
             })
-            appointment_type = self.env['appointment.type'].create({'name': "Test AppointmentHrRecruitment"})
             self.start_tour('/odoo', 'appointment_hr_recruitment_tour', login='admin')
             calendar_event = self.env['calendar.event'].search([('applicant_id', '=', applicant.id)])
             self.assertIn('Ana Tourelle', calendar_event.name)

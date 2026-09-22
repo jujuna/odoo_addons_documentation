@@ -9,12 +9,16 @@
                 <attribute name="groups">account.group_account_user</attribute>
             </xpath>
 
+            <xpath expr="//field[@name='partner_bank_id'][last()]" position="after">
+                <field name="transaction_uuid" groups="base.group_no_one"/>
+            </xpath>
+
             <!-- Stat button to open the manual reconciliation widget -->
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_open_manual_reconciliation_widget" type="object"
-                        string="Payment Matching" class="oe_stat_button" icon="fa-dollar"
+                        string="Payment Matching" class="oe_stat_button" icon="attach_money"
                         groups="account.group_account_user"
-                        invisible="is_reconciled or not move_id or state not in ('in_process', 'paid')"/>
+                        invisible="is_reconciled or not move_id or state not in ('reconciled', 'paid')"/>
             </xpath>
         </field>
     </record>

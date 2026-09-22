@@ -5,8 +5,8 @@
         <field name="model">res.partner.bank</field>
         <field name="inherit_id" ref="base.view_partner_bank_form"/>
         <field name="arch" type="xml">
-            <field name="bank_id" position="after">
-                <field name="l10n_ca_financial_institution_number" invisible="acc_type == 'iban'"/>
+            <field name="partner_id" position="before">
+                <field name="l10n_ca_financial_institution_number" invisible="account_type == 'iban'"/>
             </field>
         </field>
     </record>

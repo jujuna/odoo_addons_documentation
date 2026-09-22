@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -12,10 +11,10 @@ Convert business inquiries that have ended up in the Helpdesk pipeline by mistak
 or generate a ticket from a business inquiry
         """,
     'data': [
-        'security/ir.model.access.csv',
         'wizard/crm_lead_convert2ticket_views.xml',
         'wizard/helpdesk_ticket_to_lead_views.xml',
         'views/crm_lead_views.xml',
+        'security/ir.access.csv',
     ],
     'depends': ['crm', 'helpdesk'],
     'auto_install': True,

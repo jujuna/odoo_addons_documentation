@@ -1,11 +1,11 @@
-import { Component, useRef } from "@odoo/owl";
+import { SignInfoPlugin } from "@sign/services/sign_info_plugin";
+import { Component, signal, t, usePlugin, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { ThankYouDialog } from "./thank_you_dialog";
-import { user } from "@web/core/user";
 import { isEmail } from "@web/core/utils/strings";
 
 export class SignRefusalDialog extends Component {
@@ -13,56 +13,53 @@ export class SignRefusalDialog extends Component {
     static components = {
         Dialog,
     };
-    static props = {
-        close: Function,
-    };
+
+    props = useProps({
+        close: t.function(),
+    });
+
+    refuseNameRef = signal.ref();
+    refuseEmailRef = signal.ref();
+    refuseReasonRef = signal.ref();
+    refuseButtonRef = signal.ref();
 
     setup() {
-        this.refuseNameEl = useRef("refuse-name");
-        this.refuseEmailEl = useRef("refuse-email");
-        this.refuseReasonEl = useRef("refuse-reason");
-        this.refuseButton = useRef("refuse-button");
         this.dialog = useService("dialog");
-        this.signInfo = useService("signInfo");
-        this.user = user.userId;
-        this.isPublicUser = !this.user;
+        this.signInfo = usePlugin(SignInfoPlugin);
+        this.isShared = this.signInfo.get("signRequestState") === "shared";
     }
 
     get dialogProps() {
         return {
             size: "md",
             title: _t("Decline to sign"),
+            contentClass: "o_seprate_dialog_content",
         };
     }
 
     checkForChanges() {
-        const refusal = {
-            reason: this.refuseReasonEl.el.value.trim(),
-            name: this.isPublicUser && this.refuseNameEl.el.value.trim(),
-            email: this.isPublicUser && this.refuseEmailEl.el.value.trim(),
-        }
-        const isRefusalReasonEmpty = refusal.reason.length === 0;
-        const isPublicUserUnindentified = this.isPublicUser && (!refusal.name || !refusal.email);
-
-        this.refuseButton.el.disabled = isRefusalReasonEmpty || isPublicUserUnindentified;
+        const reason = this.refuseReasonRef().value.trim();
+        const isReasonEmpty = reason.length === 0;
+        const isSharedUnidentified =
+            this.isShared &&
+            (!this.refuseNameRef().value.trim() || !this.refuseEmailRef().value.trim());
+        this.refuseButtonRef().disabled = isReasonEmpty || isSharedUnidentified;
     }
 
     async refuse() {
-        const reason = this.refuseReasonEl.el.value;
         const route = `/sign/refuse/${this.signInfo.get("documentId")}/${this.signInfo.get(
             "signRequestItemToken"
         )}`;
         let params = {
-            refusal_reason: reason,
+            refusal_reason: this.refuseReasonRef().value,
         };
 
-        // When not logged in, add name and email of the public user.
-        if (!this.user) {
-            const name = this.refuseNameEl.el.value;
-            const email = this.refuseEmailEl.el.value;
+        if (this.isShared) {
+            const name = this.refuseNameRef().value;
+            const email = this.refuseEmailRef().value;
 
             if (!email || !isEmail(email)) {
-                this.refuseEmailEl.el.classList.add("is-invalid");
+                this.refuseEmailRef().classList.add("is-invalid");
                 return;
             }
 
@@ -70,7 +67,7 @@ export class SignRefusalDialog extends Component {
                 ...params,
                 refusal_name: name,
                 refusal_email: email,
-            }
+            };
         }
 
         const response = await rpc(route, params);
@@ -85,9 +82,8 @@ export class SignRefusalDialog extends Component {
                 }
             );
         }
+        await this.props.close();
         this.dialog.add(SignRefusalDialogTitle);
-
-        this.props.close();
     }
 }
 
@@ -95,7 +91,9 @@ export class SignRefusalDialogTitle extends ThankYouDialog {
     static template = "sign.SignRefusalDialogTitle";
     setup() {
         super.setup();
-        this.message = this.props.message || _t("Document refusal submitted.");
+        this.message =
+            this.props.message ||
+            _t("The document has been refused and the sender has been notified.");
         this.dialog = useService("dialog");
         this.props.isRefused = true;
     }

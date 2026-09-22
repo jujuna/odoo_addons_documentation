@@ -1,8 +1,10 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+import csv
 import io
 
 from odoo import _, fields, models
+from odoo.exceptions import RedirectWarning
 from odoo.fields import Domain
+from odoo.tools import float_repr, float_round
 
 
 class L10n_ThTaxReportHandler(models.AbstractModel):
@@ -29,14 +31,37 @@ class L10n_ThTaxReportHandler(models.AbstractModel):
                     'file_export_type': _('Purchase Tax Report (xlsx)')
                 }
             ))
+            if options['date']['period_type'] == 'month':
+                options['buttons'].append({
+                    'name': _('Export for RD Prep (CSV)'),
+                    'action': 'export_file',
+                    'action_param': 'l10n_th_export_csv',
+                    'sequence': 81,
+                    'branch_allowed': True,
+                    'file_export_type': _('CSV')
+                })
 
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
         return []
 
+    def _l10n_th_get_tax_tags(self, xml_id, fallback_name, country_id):
+        # Fallback to the hardcoded tag name in case the original report is deleted
+        expression = self.env.ref(xml_id, raise_if_not_found=False)
+        name = expression.formula.lstrip('-') if expression else fallback_name
+        return self.env['account.account.tag']._get_tax_tags(name, country_id)
+
     def l10n_th_print_sale_tax_report(self, options):
         report = self.env['account.report'].browse(options['report_id'])
-        base_tags = self.env['account.account.tag']._get_tax_tags('1. Sales amount', report.country_id.id)
-        tax_tags = self.env['account.account.tag']._get_tax_tags('5. Output tax', report.country_id.id)
+        country_id = report.country_id.id
+        base_tags = self._l10n_th_get_tax_tags(
+            'l10n_th.tax_report_out_tax_sale_tag_pos', 'PP30_sale', country_id,
+        )
+        base_tags |= self._l10n_th_get_tax_tags(
+            'l10n_th.tax_report_out_tax_sale_tag_neg', 'PP30_sale_rev', country_id,
+        )
+        tax_tags = self._l10n_th_get_tax_tags(
+            'l10n_th.tax_report_out_tax_tag', 'PP30_tax_output', country_id,
+        )
         data = self._generate_data(base_tags, tax_tags, 'sale', options)
         return {
             "file_name": _("Sales Tax Report"),
@@ -46,8 +71,13 @@ class L10n_ThTaxReportHandler(models.AbstractModel):
 
     def l10n_th_print_purchase_tax_report(self, options):
         report = self.env['account.report'].browse(options['report_id'])
-        base_tags = self.env['account.account.tag']._get_tax_tags('6. Purchase amount that is entitled to deduction of input tax from output tax in tax computation', report.country_id.id)
-        tax_tags = self.env['account.account.tag']._get_tax_tags('7. Input tax (according to invoice of purchase amount in 6.)', report.country_id.id)
+        country_id = report.country_id.id
+        base_tags = self._l10n_th_get_tax_tags(
+            'l10n_th.tax_report_input_tax_purchase_from_out_tax_tag', 'PP30_purchase_deductible', country_id,
+        )
+        tax_tags = self._l10n_th_get_tax_tags(
+            'l10n_th.tax_report_input_tax_tag', 'PP30_tax_input', country_id,
+        )
         data = self._generate_data(base_tags, tax_tags, 'purchase', options)
         return {
             "file_name": _("Purchase Tax Report"),
@@ -175,3 +205,68 @@ class L10n_ThTaxReportHandler(models.AbstractModel):
         data = file_data.read()
 
         return data
+
+    def _l10n_th_generate_tax_report_csv_name(self, options):
+        return "PP30_VAT_Return_" + fields.Date.to_date(options['date'].get('date_from')).strftime('%b_%Y')
+
+    def _l10n_th_generate_tax_report_csv_header(self):
+        return [
+            _("Sequence Number"),
+            _("Branch Number (5)"),
+            _("Number (20)"),
+            _("Postal/ZIP Code (5)"),
+            _("Taxable Sales Amount [Item 4] (15,2)"),
+            _("Output Tax This Month [Item 5] (15,2)"),
+            _("Purchase Amount [Item 6] (15,2)"),
+            _("Input Tax This Month[Item 7] (15,2)"),
+            _("VAT Payable or Access (Refund) [Item 8 or 9] (15,2)"),
+        ]
+
+    def _l10n_th_format_tax_report_line_data(self, line_data):
+        report_codes_to_fetch = {
+            'OUTPUTTAX_TAXABLESALE': 0.0,
+            'OUTPUTTAX_TAX': 0.0,
+            '6_PURCHASE_AMOUNT_THAT_IS_ENTITLED_TO_DEDUCTION_OF_INPUT_TAX_FROM_OUTPUT_TAX_IN_TAX_COMPUTATION': 0.0,
+            'INPUTTAX_TAX': 0.0,
+        }
+        for line in line_data:
+            if line.columns and line.code in report_codes_to_fetch:
+                report_codes_to_fetch[line.code] = line.columns[0].no_format
+
+        report_codes_to_fetch["TAX_PAYABLE_OR_ACCESS"] = report_codes_to_fetch["OUTPUTTAX_TAX"] - report_codes_to_fetch["INPUTTAX_TAX"]
+        return [float_repr(float_round(amount, 2), 2) for amount in report_codes_to_fetch.values()]
+
+    def _l10n_th_generate_tax_report_csv_row(self, index, line_data, company):
+        if not company.street or not company.zip:
+            raise RedirectWarning(
+                _("Please ensure that the company %s has the following fields filled: Street and Zip.", company.name),
+                company._get_records_action(target='new'),
+                _("View Company"),
+            )
+
+        row_values_formatted = self._l10n_th_format_tax_report_line_data(line_data)
+        return [
+            index,
+            company.partner_id._get_additional_identifier('TH_BRANCH_CODE') or ('' if company.parent_id else '00000'),
+            company.street.split(' ')[0].replace(',', ''),
+            company.zip,
+        ] + row_values_formatted
+
+    def l10n_th_export_csv(self, options):
+        report = self.env['account.report'].browse(options['report_id'])
+        csv_data = []
+        companies = self.env['res.company'].browse(report.get_report_company_ids(options)).grouped('id')
+        for index, company in enumerate(options['companies'], start=1):
+            # Since for all companies (main and branch companies), we want the data to be in separate rows.
+            report_data = report._get_lines({**options, 'companies': [company]})
+            csv_data.append(self._l10n_th_generate_tax_report_csv_row(index, report_data, companies[company['id']]))
+
+        with io.StringIO() as buffer:
+            csv.writer(buffer, delimiter='|').writerows([self._l10n_th_generate_tax_report_csv_header()] + csv_data)
+            file_data = buffer.getvalue()
+
+        return {
+            'file_name': self._l10n_th_generate_tax_report_csv_name(options) + '.csv',
+            'file_content': file_data,
+            'file_type': 'csv',
+        }

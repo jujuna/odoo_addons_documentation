@@ -5,6 +5,7 @@ from . import hr_appraisal
 from . import hr_appraisal_goal
 from . import hr_appraisal_note
 from . import hr_employee
+from . import hr_employee_departure
 from . import hr_employee_public
 from . import hr_department
 from . import res_config_settings

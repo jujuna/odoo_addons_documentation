@@ -7,7 +7,7 @@ class ResPartner(models.Model):
 
     agent_ids = fields.One2many("ai.agent", inverse_name="partner_id")
 
-    def _compute_im_status(self):
-        agent_partners = self.with_context(active_test=False).filtered(lambda record: record.agent_ids)
-        agent_partners.im_status = 'agent'
-        super(ResPartner, self - agent_partners)._compute_im_status()
+    def _store_im_status_fields(self, res):
+        super()._store_im_status_fields(res)
+        # sudo: ai.agent - knowing if a partner is an AI agent is acceptable
+        res.many("agent_ids", [], sudo=True)

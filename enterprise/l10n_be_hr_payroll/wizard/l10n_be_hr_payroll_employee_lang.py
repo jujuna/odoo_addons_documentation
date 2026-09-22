@@ -4,7 +4,7 @@
 from collections import defaultdict
 from odoo import api, fields, models
 
-ACCEPTED_CODES = ('fr_BE', 'fr_FR', 'nl_BE', 'nl_NL', 'de_BE', 'de_DE')
+ACCEPTED_CODES = ('fr_BE', 'fr_FR', 'nl_BE', 'nl_NL', 'de_DE')
 
 
 class L10n_BeHrPayrollEmployeeLangWizard(models.TransientModel):

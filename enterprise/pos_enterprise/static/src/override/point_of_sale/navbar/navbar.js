@@ -1,14 +1,21 @@
-import { Navbar } from "@point_of_sale/app/components/navbar/navbar";
+import { BurgerMenuDialog } from "@point_of_sale/app/components/navbar/navbar";
 import { patch } from "@web/core/utils/patch";
 import { cookie } from "@web/core/browser/cookie";
-import { browser } from "@web/core/browser/browser";
+import { location } from "@web/core/browser/browser";
+import { getColorScheme } from "@point_of_sale/utils";
+import { _t } from "@web/core/l10n/translation";
 
-patch(Navbar.prototype, {
+const colorSchemePatch = {
     get colorScheme() {
-        return cookie.get("pos_color_scheme") || "light";
+        return getColorScheme();
+    },
+    get colorSchemeLabel() {
+        return this.colorScheme === "dark" ? _t("Switch to Light Mode") : _t("Switch to Dark Mode");
     },
     toggleColorScheme() {
         cookie.set("pos_color_scheme", this.colorScheme === "dark" ? "light" : "dark");
-        browser.location.reload();
+        location.reload();
     },
-});
+};
+
+patch(BurgerMenuDialog.prototype, colorSchemePatch);

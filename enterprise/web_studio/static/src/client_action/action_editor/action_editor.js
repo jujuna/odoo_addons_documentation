@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, usePlugin, useProps } from "@odoo/owl";
 import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
@@ -7,7 +7,7 @@ import { _t } from "@web/core/l10n/translation";
 import { sortBy } from "@web/core/utils/arrays";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 
 import { Record } from "@web/model/record";
 import {
@@ -21,6 +21,7 @@ import { ThumbnailItem } from "@web_studio/client_action/components/thumbnail_it
 import { viewTypeToString, useStudioServiceAsReactive } from "@web_studio/studio_service";
 import { NewViewDialog } from "../editor/new_view_dialogs/new_view_dialog";
 import { MapNewViewDialog } from "../editor/new_view_dialogs/map_new_view_dialog";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 function getViewCategories() {
     return {
@@ -47,7 +48,7 @@ const actionFieldsGet = {
     id: { type: "integer" },
     name: { type: "char" },
     help: { type: "text" },
-    group_ids: { type: "many2many", relation: "res.groups", string: "Groups" },
+    group_ids: { type: "many2many", relation: "res.groups", string: _t("Access Groups") },
 };
 
 function getActionActiveFields() {
@@ -74,7 +75,6 @@ function getActionValues(action) {
 
 class ActionEditor extends Component {
     static template = "web_studio.ActionEditor";
-    static props = { ...standardActionServiceProps };
     static components = {
         ThumbnailItem,
         DropdownItem,
@@ -83,6 +83,9 @@ class ActionEditor extends Component {
         TextField,
         Many2ManyTagsField,
     };
+
+    props = useProps(standardActionServiceProps);
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         this.studio = useStudioServiceAsReactive();

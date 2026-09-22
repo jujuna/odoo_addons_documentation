@@ -11,17 +11,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-09-16 21:32+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:42+0000\n"
+"PO-Revision-Date: 2026-08-31 16:21+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-s19-4/"
 "google_calendar/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: google_calendar
 #. odoo-python
@@ -52,6 +52,14 @@ msgstr "%(reminder_type)s - %(duration)s นาที"
 #: code:addons/google_calendar/models/calendar.py:0
 msgid "(No title)"
 msgstr "(ไม่มีชื่อเรื่อง)"
+
+#. module: google_calendar
+#: model_terms:ir.ui.view,arch_db:google_calendar.res_config_settings_view_form
+msgid ""
+"<i class=\"oi oi-filled oi-sm me-1\" data-icon=\"info\"/>\n"
+"                                When checked, Google Calendar will not "
+"automatically add a video call link to events without a location."
+msgstr ""
 
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_calendar_event__active
@@ -98,11 +106,6 @@ msgid "Calendar ID"
 msgstr "ปฏิทินไอดี"
 
 #. module: google_calendar
-#: model_terms:ir.ui.view,arch_db:google_calendar.google_calendar_reset_account_view_form
-msgid "Cancel"
-msgstr "ยกเลิก"
-
-#. module: google_calendar
 #: model_terms:ir.ui.view,arch_db:google_calendar.res_config_settings_view_form
 msgid "Client ID"
 msgstr "ไอดีลูกค้า"
@@ -141,8 +144,8 @@ msgstr "กำหนดค่า"
 
 #. module: google_calendar
 #: model_terms:ir.ui.view,arch_db:google_calendar.google_calendar_reset_account_view_form
-msgid "Confirm"
-msgstr "ยืนยัน"
+msgid "Continue"
+msgstr ""
 
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset__create_uid
@@ -155,25 +158,24 @@ msgid "Created on"
 msgstr "สร้างเมื่อ"
 
 #. module: google_calendar
-#: model:ir.model.fields.selection,name:google_calendar.selection__google_calendar_account_reset__delete_policy__delete_odoo
-msgid "Delete from Odoo"
-msgstr "ลบจาก Odoo"
+#: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset__delete_events
+msgid "Delete synced events from Odoo"
+msgstr ""
 
 #. module: google_calendar
-#: model:ir.model.fields.selection,name:google_calendar.selection__google_calendar_account_reset__delete_policy__delete_both
-msgid "Delete from both"
-msgstr "ลบจากทั้งสอง"
+#: model_terms:ir.ui.view,arch_db:google_calendar.res_config_settings_view_form
+msgid "Disable automatic meeting links"
+msgstr ""
 
 #. module: google_calendar
-#: model:ir.model.fields.selection,name:google_calendar.selection__google_calendar_account_reset__delete_policy__delete_google
-msgid "Delete from the current Google Calendar account"
-msgstr "ลบออกจากบัญชีปฏิทิน Google ปัจจุบัน"
+#: model:ir.model.fields,field_description:google_calendar.field_res_config_settings__cal_google_disable_auto_videocall_link
+msgid "Disable videocall generation"
+msgstr ""
 
 #. module: google_calendar
-#. odoo-javascript
-#: code:addons/google_calendar/static/src/views/google_calendar/google_calendar_controller.js:0
-msgid "Discard"
-msgstr "ละทิ้ง"
+#: model:ir.actions.act_window,name:google_calendar.google_calendar_reset_account_action
+msgid "Disconnect Google Calendar"
+msgstr ""
 
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_calendar_alarm_manager__display_name
@@ -211,15 +213,21 @@ msgid "Google"
 msgstr "Google"
 
 #. module: google_calendar
+#: model:ir.module.module,shortdesc:base.module_google_calendar
 #: model_terms:ir.ui.view,arch_db:google_calendar.view_users_form
 msgid "Google Calendar"
 msgstr "ปฏิทิน Google"
 
 #. module: google_calendar
-#: model:ir.actions.act_window,name:google_calendar.google_calendar_reset_account_action
 #: model:ir.model,name:google_calendar.model_google_calendar_account_reset
 msgid "Google Calendar Account Reset"
 msgstr "ตั้งค่าบัญชีปฏิทิน Google ใหม่"
+
+#. module: google_calendar
+#: model:ir.model.fields,field_description:google_calendar.field_res_users__google_account_email
+#: model:ir.model.fields,field_description:google_calendar.field_res_users_settings__google_account_email
+msgid "Google Calendar Email"
+msgstr ""
 
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_calendar_event__google_id
@@ -318,11 +326,6 @@ msgid "Last Updated on"
 msgstr "อัปเดตครั้งล่าสุดเมื่อ"
 
 #. module: google_calendar
-#: model:ir.model.fields.selection,name:google_calendar.selection__google_calendar_account_reset__delete_policy__dont_delete
-msgid "Leave them untouched"
-msgstr "ปล่อยไว้ไม่แตะต้อง"
-
-#. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_calendar_event__need_sync
 #: model:ir.model.fields,field_description:google_calendar.field_calendar_recurrence__need_sync
 #: model:ir.model.fields,field_description:google_calendar.field_google_calendar_sync__need_sync
@@ -334,11 +337,6 @@ msgstr "ต้องการการซิงค์"
 #: model:ir.model.fields,field_description:google_calendar.field_res_users_settings__google_calendar_sync_token
 msgid "Next Sync Token"
 msgstr "การซิงค์โทเค็นถัดไป"
-
-#. module: google_calendar
-#: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset__sync_policy
-msgid "Next Synchronization"
-msgstr "การซิงโครไนซ์ถัดไป"
 
 #. module: google_calendar
 #. odoo-python
@@ -363,24 +361,9 @@ msgid "Reset Account"
 msgstr "ตั้งค่าบัญชีใหม่"
 
 #. module: google_calendar
-#: model_terms:ir.ui.view,arch_db:google_calendar.google_calendar_reset_account_view_form
-msgid "Reset Google Calendar Account"
-msgstr "ตั้งค่าบัญชีปฏิทิน Google ใหม่"
-
-#. module: google_calendar
 #: model:ir.model,name:google_calendar.model_google_calendar_sync
 msgid "Synchronize a record with Google Calendar"
 msgstr "ซิงโครไนซ์บันทึกกับปฏิทิน Google"
-
-#. module: google_calendar
-#: model:ir.model.fields.selection,name:google_calendar.selection__google_calendar_account_reset__sync_policy__all
-msgid "Synchronize all existing events"
-msgstr "ซิงโครไนซ์อีเวนต์ที่มีอยู่ทั้งหมด"
-
-#. module: google_calendar
-#: model:ir.model.fields.selection,name:google_calendar.selection__google_calendar_account_reset__sync_policy__new
-msgid "Synchronize only new events"
-msgstr "ซิงโครไนซ์อีเวนต์ใหม่ทั้งหมด"
 
 #. module: google_calendar
 #. odoo-javascript
@@ -408,7 +391,7 @@ msgid "The following event could not be synced with Google Calendar."
 msgstr "กิจกรรมต่อไปนี้ไม่สามารถซิงค์กับ Google Calendar ได้"
 
 #. module: google_calendar
-#: model:ir.model.fields,help:google_calendar.field_google_calendar_account_reset__delete_policy
+#: model:ir.model.fields,help:google_calendar.field_google_calendar_account_reset__delete_events
 msgid "This will only affect events for which the user is the owner"
 msgstr "ซึ่งจะมีผลกับอีเวนต์ที่ผู้ใช้เป็นเจ้าของเท่านั้น"
 
@@ -436,14 +419,14 @@ msgid "User token"
 msgstr "โทเค็นผู้ใช้"
 
 #. module: google_calendar
-#: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset__delete_policy
-msgid "User's Existing Events"
-msgstr "อีเวนต์ที่มีอยู่ของผู้ใช้"
-
-#. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_calendar_event__videocall_source
 msgid "Videocall Source"
 msgstr "แหล่งที่มาของวิดีโอคอล"
+
+#. module: google_calendar
+#: model_terms:ir.ui.view,arch_db:google_calendar.google_calendar_reset_account_view_form
+msgid "What should happen to previously synced events?"
+msgstr ""
 
 #. module: google_calendar
 #. odoo-python
@@ -458,33 +441,32 @@ msgid ""
 "you don't seem to have permission to modify this event on Google Calendar"
 msgstr "ดูเหมือนคุณจะไม่ได้รับอนุญาตให้แก้ไขอีเวนต์นี้ในปฏิทิน Google"
 
-#~ msgid ""
-#~ "An error occurred while generating the token. Your authorization code may "
-#~ "be invalid or has already expired [%s]. You should check your Client ID "
-#~ "and secret on the Google APIs plateform or try to stop and restart your "
-#~ "calendar synchronisation."
-#~ msgstr ""
-#~ "เกิดข้อผิดพลาดขณะสร้างโทเคน โค้ดการให้สิทธิ์ของคุณอาจไม่ถูกต้องหรือหมดอายุแล้ว [%s] "
-#~ "คุณควรตรวจสอบไอดีลูกค้าและรหัสบนแพลตฟอร์ม Google APIs "
-#~ "หรือพยายามหยุดและเริ่มต้นการซิงโครไนซ์ปฏิทินของคุณใหม่"
+msgid "Confirm"
+msgstr "ยืนยัน"
 
-#~ msgid "Google Calendar Account Data"
-#~ msgstr "ข้อมูลบัญชีปฏิทิน Google"
+msgid "Delete from Odoo"
+msgstr "ลบจาก Odoo"
 
-#~ msgid "Success"
-#~ msgstr "สำเร็จ"
+msgid "Delete from both"
+msgstr "ลบจากทั้งสอง"
 
-#~ msgid "The account for the Google Calendar service is not configured."
-#~ msgstr "ไม่ได้กำหนดค่าบัญชีสำหรับบริการปฏิทิน Google "
+msgid "Delete from the current Google Calendar account"
+msgstr "ลบออกจากบัญชีปฏิทิน Google ปัจจุบัน"
 
-#~ msgid "The synchronization with Google calendar was successfully stopped."
-#~ msgstr "หยุดการซิงโครไนซ์กับปฏิทิน Google สำเร็จแล้ว"
+msgid "Leave them untouched"
+msgstr "ปล่อยไว้ไม่แตะต้อง"
 
-#~ msgid "The user has already a google account"
-#~ msgstr "ผู้ใช้มีบัญชี Google แล้ว"
+msgid "Next Synchronization"
+msgstr "การซิงโครไนซ์ถัดไป"
 
-#~ msgid ""
-#~ "You are about to stop the synchronization of your calendar with Google. "
-#~ "Are you sure you want to continue?"
-#~ msgstr ""
-#~ "คุณกำลังจะหยุดการซิงโครไนซ์ปฏิทินของคุณกับ Google คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ"
+msgid "Reset Google Calendar Account"
+msgstr "ตั้งค่าบัญชีปฏิทิน Google ใหม่"
+
+msgid "Synchronize all existing events"
+msgstr "ซิงโครไนซ์อีเวนต์ที่มีอยู่ทั้งหมด"
+
+msgid "Synchronize only new events"
+msgstr "ซิงโครไนซ์อีเวนต์ใหม่ทั้งหมด"
+
+msgid "User's Existing Events"
+msgstr "อีเวนต์ที่มีอยู่ของผู้ใช้"

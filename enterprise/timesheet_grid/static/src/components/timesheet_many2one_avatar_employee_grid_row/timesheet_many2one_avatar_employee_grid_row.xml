@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
     <t t-name="timesheet_grid.TimesheetMany2OneAvatarEmployeeGridRow">
-        <div t-att-name="props.name" t-attf-class="{{ props.classNames }} d-flex align-items-center gap-1">
-            <span t-attf-class="{{ resId ? 'o_field_many2one_avatar' : '' }} o_avatar o_m2o_avatar p-1" t-on-click.stop.prevent="openCard">
-                <span t-if="!resId and props.canOpen" class="o_avatar_empty o_m2o_avatar_empty"></span>
-                <img t-if="resId"
-                     t-attf-src="/web/image/{{relation}}/{{resId}}/avatar_128"
+        <div t-att-name="this.props.name" class="d-flex align-items-center gap-1" t-att-class="this.props.classNames">
+            <span t-attf-class="{{ this.resId() ? 'o_field_many2one_avatar' : '' }} o_avatar o_m2o_avatar p-1" t-on-click.stop.prevent="this.openCard">
+                <span t-if="!this.resId() and this.props.canOpen" class="o_avatar_empty o_m2o_avatar_empty"></span>
+                <img t-if="this.resId()"
+                     t-attf-src="/web/image/{{ this.relation }}/{{ this.resId() }}/avatar_128"
                      class="rounded"
-                     t-att-data-tooltip="displayName"
+                     t-att-data-tooltip="this.displayName"
                  />
             </span>
-            <Many2OneGridRow t-props="many2OneProps" canOpen="false"/>
-            <EmployeeOvertimeIndication t-props="timesheetOvertimeProps"/>
+            <Many2OneGridRow t-props="this.many2OneProps()" canOpen="false"/>
+            <EmployeeOvertimeIndication t-props="this.timesheetOvertimeProps"/>
         </div>
     </t>
 </templates>

@@ -9,6 +9,13 @@ from odoo.tests.common import tagged
 
 @tagged("post_install", "-at_install")
 class TestExternalTaxSubscriptionController(TestSaleSubscriptionExternalCommon, PaymentHttpCommon, TestSubscriptionCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
+    def setUp(self):
+        super().setUp()
+        self._disable_post_process_patcher()
+        self._patch_account_payment_post_process()
+
     def test_01_external_taxes_called_in_preview(self):
         self.subscription.partner_id = self.user_portal.partner_id
         self.subscription.action_confirm()
@@ -45,9 +52,9 @@ class TestExternalTaxSubscriptionController(TestSaleSubscriptionExternalCommon, 
 
         self.make_jsonrpc_request(url, data)
         tx =  self.subscription.transaction_ids
-        tx._set_done()
+        self._update_transaction(tx, state='done')
         with self.patch_set_external_taxes() as mocked_set:
-            tx._post_process()
+            self._run_post_processing()
         self.assertEqual(
             len(self.subscription.invoice_ids), 1, "One invoice should have been created."
         )

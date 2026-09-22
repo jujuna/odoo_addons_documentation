@@ -18,7 +18,7 @@ class L10n_Lu_ReportsReportAppendixExpenditures(models.Model):
     year = fields.Char(
         string='Year',
         required=True,
-        default=lambda self: self.env.context.get('year', fields.Date.today().year - 1),
+        default=lambda self: self.env.context.get('year', fields.Date.context_today(self).year - 1),
     )
     company_id = fields.Many2one(
         comodel_name='res.company',

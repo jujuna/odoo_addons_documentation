@@ -1,6 +1,6 @@
 // Part of Odoo. See LICENSE file for full copyright and licensing details.
 import { Dialog } from "@web/core/dialog/dialog";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, useProps, t } from "@odoo/owl";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
 import { ProductCard } from "@point_of_sale/app/components/product_card/product_card";
 import { NumericInput } from "@point_of_sale/app/components/inputs/numeric_input/numeric_input";
@@ -12,7 +12,13 @@ const { DateTime } = luxon;
 
 export class EventConfiguratorPopup extends Component {
     static template = "pos_event.EventConfiguratorPopup";
-    static props = ["tickets", "getPayload", "close", "slotResult", "availabilityPerTicket"];
+    props = useProps({
+        tickets: t.array(),
+        getPayload: t.function(),
+        close: t.function(),
+        slotResult: t.object(),
+        availabilityPerTicket: t.object(),
+    });
     static components = {
         Dialog,
         ProductCard,
@@ -21,7 +27,7 @@ export class EventConfiguratorPopup extends Component {
     setup() {
         this.pos = usePos();
         this.dialog = useService("dialog");
-        this.state = useState({});
+        this.state = proxy({});
         this.slotAvailability = this.props.slotResult?.slotAvailability;
         this.slotId = this.props.slotResult?.slotId;
 
@@ -64,7 +70,7 @@ export class EventConfiguratorPopup extends Component {
 
                 if (!available) {
                     this.dialog.add(AlertDialog, {
-                        title: _t("Error"),
+                        title: _t("Oh snap !"),
                         body: _t(
                             "The selected ticket (%s) is not available. Please select a different ticket.",
                             [ticket.name]

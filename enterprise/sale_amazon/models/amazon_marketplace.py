@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import _, api, exceptions, fields, models
+from odoo import api, exceptions, fields, models
 
 
 class AmazonMarketplace(models.Model):
-    _name = 'amazon.marketplace'
+    _name = "amazon.marketplace"
     _description = "Amazon Marketplace"
 
     name = fields.Char(string="Name", required=True, translate=True)
@@ -14,28 +14,24 @@ class AmazonMarketplace(models.Model):
     region = fields.Selection(
         string="Region",
         help="The Amazon region of the marketplace. Please refer to the Selling Partner API "
-             "documentation to find the correct region.",
+        "documentation to find the correct region.",
         selection=[
-            ('us-east-1', "North America"),
-            ('eu-west-1', "Europe"),
-            ('us-west-2', "Far East"),
+            ("us-east-1", "North America"),
+            ("eu-west-1", "Europe"),
+            ("us-west-2", "Far East"),
         ],
-        default='us-east-1',
+        default="us-east-1",
         required=True,
     )
-    seller_central_url = fields.Char(
-        string="Seller Central URL",
-        required=True,
-    )
+    seller_central_url = fields.Char(string="Seller Central URL", required=True)
     tax_included = fields.Boolean(
         string="Tax Included", help="Whether the price includes the tax amount or not."
     )
 
     _unique_api_ref = models.Constraint(
-        'UNIQUE(api_ref)',
-        "There can only exist one marketplace for a given API Identifier.",
+        "UNIQUE(api_ref)", "There can only exist one marketplace for a given API Identifier."
     )
 
     @api.ondelete(at_uninstall=False)
     def _unlink_never(self):
-        raise exceptions.UserError(_("Amazon marketplaces cannot be deleted."))
+        raise exceptions.UserError(self.env._("Amazon marketplaces cannot be deleted."))

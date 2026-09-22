@@ -7,9 +7,9 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         # Extends account_reports
-        rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit)
+        rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
 
         if country_code != 'LT':
             return rslt
@@ -28,17 +28,15 @@ class AccountReturnType(models.Model):
             'date': {
                 'date_from': fields.Date.to_string(instrastat_date_from),
                 'date_to': fields.Date.to_string(instrastat_date_to),
-                'filter': 'custom',
-                'mode': 'range',
             },
             'selected_variant_id': intrastat_return_type.report_id.id,
             'sections_source_id': intrastat_return_type.report_id.id,
             'tax_unit': 'company_only' if not tax_unit else tax_unit.id,
         }
         company_ids = self.env['account.return'].sudo()._get_company_ids(main_company, tax_unit, intrastat_return_type.report_id)
-        options = intrastat_return_type.report_id.with_context(allowed_company_ids=company_ids.ids).get_options(previous_options=options)
+        options = intrastat_return_type.report_id.sudo().with_context(allowed_company_ids=company_ids.ids).get_options(previous_options=options)
 
-        expression_totals_per_col_group = self.env.ref('l10n_lt_reports.lt_tax_return_type').report_id._compute_expression_totals_for_each_column_group(
+        expression_totals_per_col_group = self.env.ref('l10n_lt_reports.lt_tax_return_type').sudo().report_id._compute_expression_totals_for_each_column_group(
             expressions,
             options,
             warnings={},

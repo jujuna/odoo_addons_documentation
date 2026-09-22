@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
 {
-    'name': 'US - Accounting Reports',
-    'version': '1.0',
+    'name': 'United States - Accounting Reports',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting reports for US
     """,
     'website': 'https://www.odoo.com/app/accounting',
     'depends': [
-        'l10n_us_account', 'account_reports'
+        'account_reports',
+        'account_reports_cash_basis',
+        'l10n_us_account',
     ],
     'data': [
         'data/account_return_data.xml',
@@ -16,8 +16,6 @@ Accounting reports for US
         'data/balance_sheet.xml',
         'data/profit_and_loss.xml',
     ],
-    'installable': True,
-    'post_init_hook': '_l10n_us_reports_post_init',
     'auto_install': ['l10n_us_account', 'account_reports'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -5,8 +5,16 @@
         <field name="model">hr.payroll.payment.report.wizard</field>
         <field name="inherit_id" ref="hr_payroll.hr_payroll_payment_report_view_form"/>
         <field name="arch" type="xml">
+            <field name="effective_date" position="after">
+                <label for="sepa_priority" invisible="export_format != 'sepa'"/>
+                <field name="sepa_priority" invisible="export_format != 'sepa'" widget="radio" options="{'horizontal': True}"
+                    class="o_payment_wizard_radio_button"/>
+            </field>
+            <field name="export_format" position="after">
+                <field name="payment_method_line_id" string="Method" invisible="export_format not in ['sepa', 'iso20022_ch']" class="o_hr_medium_field"/>
+            </field>
             <group id="payment_report_group" position="inside">
-                <field name="journal_id" invisible="export_format not in ['sepa', 'iso20022_ch']"/>
+                <field name="journal_id" invisible="export_format not in ['sepa', 'iso20022_ch']" class="o_hr_medium_field"/>
             </group>
         </field>
     </record>

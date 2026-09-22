@@ -1,9 +1,9 @@
-import { useService } from "@web/core/utils/hooks";
+import { signal, useEffect, usePlugin } from "@odoo/owl";
+import { UIPlugin } from "@web/core/ui/ui_plugin";
 
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { AccountReportChatter } from "@account_reports/components/mail/chatter";
-import { useAuditBalanceListChatterService } from "./account_audit_balance_list_chatter_service";
-import { useEffect, useRef } from "@odoo/owl";
+import { auditBalanceListChatterPlugin } from "./account_audit_balance_list_chatter_plugin";
 
 export class AccountAuditBalanceListRenderer extends ListRenderer {
     static template = "account_reports.account_audit_balance_list_renderer";
@@ -13,24 +13,24 @@ export class AccountAuditBalanceListRenderer extends ListRenderer {
         AccountReportChatter,
     };
 
+    AuditChatterRef = signal.ref();
+
+    ui = usePlugin(UIPlugin);
+    chatterPlugin = usePlugin(auditBalanceListChatterPlugin);
+
     setup() {
         super.setup();
-        this.ui = useService("ui");
-        this.chatterService = useAuditBalanceListChatterService();
-
-        this.chatterRef = useRef("AuditChatter");
-
         useEffect(() => {
             if (this.props.list.editedRecord) {
-                this.chatterService.openChatter(this.props.list.editedRecord.evalContext.id);
+                this.chatterPlugin.openChatter(this.props.list.editedRecord.evalContext.id);
             } else {
-                this.chatterService.closeChatter();
+                this.chatterPlugin.closeChatter();
             }
-        }, () => [this.props.list.editedRecord]);
+        });
     }
 
     onGlobalClick(event) {
-        if (this.chatterRef.el.contains(event.target)) {
+        if (this.AuditChatterRef().contains(event.target)) {
             // ignore clicks inside the chatter as we dont want it to close when clicking inside it
             return;
         }

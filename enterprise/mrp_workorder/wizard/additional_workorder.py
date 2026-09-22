@@ -41,7 +41,7 @@ class Mrp_ProductionAdditionalWorkorder(models.TransientModel):
             'duration_expected': self.duration_expected,
             'date_start': self.date_start or self.blocked_by_workorder_id.date_finished,
             'employee_assigned_ids': self.employee_assigned_ids.ids,
-            'product_uom_id': self.production_id.product_uom_id.id,
+            'uom_id': self.production_id.uom_id.id,
             'blocked_by_workorder_ids': [self.blocked_by_workorder_id.id] if self.blocked_by_workorder_id else False,
         })
         if wo.date_start:

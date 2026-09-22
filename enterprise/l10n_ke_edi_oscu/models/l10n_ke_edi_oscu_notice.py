@@ -24,7 +24,7 @@ class L10n_Ke_Edi_OscuNotice(models.Model):
             return
 
         # The API will return all codes added since this date
-        last_request_date = self.env['ir.config_parameter'].get_param('l10n_ke_oscu.last_notice_request_date', '20180101000000')
+        last_request_date = self.env['ir.config_parameter'].get_str('l10n_ke_oscu.last_notice_request_date') or '20180101000000'
         error, data, _date = company._l10n_ke_call_etims('selectNoticeList', {'lastReqDt': last_request_date})
         if error:
             if error['code'] == '001':

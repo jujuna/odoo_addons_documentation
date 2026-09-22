@@ -4,16 +4,27 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-08-28 18:21+0000\n"
+"PO-Revision-Date: 2026-08-28 18:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_mx_edi_stock
+#: model:ir.module.module,description:base.module_l10n_mx_edi_stock
+msgid ""
+"\n"
+"The delivery guide (Complemento XML Carta de Porte) is needed as a proof\n"
+"that you are sending goods between A and B.\n"
+"\n"
+"It is only when a delivery order is validated that you can create the delivery\n"
+"guide.\n"
+msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model:ir.actions.report,print_report_name:l10n_mx_edi_stock.action_report_cartaporte
@@ -25,11 +36,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_hazardous_material
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_unspsc_code__l10n_mx_edi_hazardous_material
 msgid "(MX) Is Hazardous Material"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "01"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1062,6 +1068,13 @@ msgid "IdCCP"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model:ir.model.fields,help:l10n_mx_edi_stock.field_fleet_vehicle__l10n_mx_is_freight_vehicle
+msgid ""
+"If activated, this vehicle can be used as a vehicle for transporting goods "
+"and items on Carta Porte complemento"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__l10n_mx_edi_customs_document_type__goods_direction__import
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__l10n_mx_edi_customs_regime__goods_direction__import
 msgid "Import"
@@ -1113,6 +1126,11 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_fleet_vehicle__l10n_mx_figure_ids
 msgid "Intermediaries"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_fleet_vehicle__l10n_mx_is_freight_vehicle
+msgid "Is Freight Vehicle"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1186,6 +1204,11 @@ msgid "L10N Mx Edi Is Delivery Guide Needed"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_show_update_driver
+msgid "L10N Mx Edi Show Update Driver"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_update_sat_needed
 msgid "L10N Mx Edi Update Sat Needed"
 msgstr ""
@@ -1193,11 +1216,6 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_move_line__l10n_mx_edi_weight
 msgid "L10N Mx Edi Weight"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_fleet_vehicle__l10n_mx_is_freight_vehicle
-msgid "L10N Mx Is Freight Vehicle"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1323,6 +1341,11 @@ msgid "Mexico"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model:ir.module.module,shortdesc:base.module_l10n_mx_edi_stock
+msgid "Mexico - Electronic Delivery Guide"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.view_l10n_mx_edi_hazardous_material_form
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.view_l10n_mx_edi_hazardous_material_list
 msgid "Mexico Hazardous Material Catalog"
@@ -1393,6 +1416,7 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.stock_picking_form_inherit_l10n_mx_edi_stock
 msgid "Operator"
 msgstr ""
 
@@ -1554,6 +1578,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi_stock/models/stock_picking.py:0
 msgid "Please define a gross vehicle weight."
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#. odoo-python
+#: code:addons/l10n_mx_edi_stock/models/stock_picking.py:0
+msgid "Please define the operator of the vehicle."
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1753,6 +1783,11 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__fleet_vehicle__l10n_mx_transport_perm_sct__tpaf16
 msgid "Servicio federal para empresas arrendadoras servicio público federal."
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.stock_picking_form_inherit_l10n_mx_edi_stock
+msgid "Set As Main Driver"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -2136,8 +2171,18 @@ msgid "Vehicle Configuration"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_driver_id
+msgid "Vehicle Operator"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_vehicle_id
 msgid "Vehicle Setup"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model:ir.model.fields,help:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_driver_id
+msgid "Vehicle operator that intervenes on the goods transportation"
 msgstr ""
 
 #. module: l10n_mx_edi_stock

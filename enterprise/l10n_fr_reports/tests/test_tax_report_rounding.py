@@ -6,8 +6,10 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestFrenchFiscalRounding(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
-    @TestAccountReportsCommon.setup_country('fr')
+    @TestAccountReportsCommon.setup_country('fr_comp')
     def setUpClass(cls):
         super().setUpClass()
 
@@ -19,7 +21,7 @@ class TestFrenchFiscalRounding(TestAccountReportsCommon):
 
         # purchase and sales VAT
         cls.tva_20_percent_vente = cls.env.ref(f"account.{cls.company_data['company'].id}_tva_normale")
-        cls.tva_20_percent_ttc_vente = cls.env.ref(f"account.{cls.company_data['company'].id}_tva_normale_ttc")
+        cls.tva_20_normale_encaissement = cls.env.ref(f"account.{cls.company_data['company'].id}_tva_normale_encaissement")
         cls.tva_20_percent_achat = cls.env.ref(f"account.{cls.company_data['company'].id}_tva_acq_normale")
         cls.tva_8pt5_percent_vente = cls.env.ref(f"account.{cls.company_data['company'].id}_tva_specifique")
 
@@ -85,17 +87,30 @@ class TestFrenchFiscalRounding(TestAccountReportsCommon):
             **self._standard_invoice_dict,
             'invoice_line_ids': [
                 (0, 0, {**self._standard_line_dict, 'tax_ids': [(6, 0, self.tva_20_percent_vente.ids)]}),
-                (0, 0, {**self._standard_line_dict, 'tax_ids': [(6, 0, self.tva_20_percent_ttc_vente.ids)]}),
+                (0, 0, {**self._standard_line_dict, 'tax_ids': [(6, 0, self.tva_20_normale_encaissement.ids)]}),
             ],
         }
-        self.env['account.move'].create(invoice_dict).action_post()
+        invoice = self.env['account.move'].create(invoice_dict)
+        invoice.action_post()
+
+        payment = self.env['account.payment'].create({
+            'partner_id': self.partner_a.id,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'date': invoice.date,
+            'amount': 1500.0,
+        })
+        payment.action_post()
+        payment1_rec_line = payment.move_id.line_ids.filtered(lambda x: x.account_type == 'asset_receivable')
+        invoice1_rec_line = invoice.line_ids.filtered(lambda x: x.account_type == 'asset_receivable')
+        (payment1_rec_line + invoice1_rec_line).reconcile()
 
         # We expect one row for each tax, but the rounding should be on the some of the taxes, since they
         # both correspond to the same report line
         expected_closing_entry_lines = [
             (0, 0, {'name': '20% G', 'debit': 24.69, 'credit': 0, 'account_id': self.tva_collected.id}),
-            (0, 0, {'name': '20% G INC', 'debit': 20.58, 'credit': 0, 'account_id': self.tva_collected.id}),
-            (0, 0, {'name': 'Difference from rounding taxes', 'debit': 0, 'credit': 0.27, 'account_id': self.difference_profit_acc.id}),
+            (0, 0, {'name': '20% S', 'debit': 24.69, 'credit': 0, 'account_id': self.tva_collected.id}),
+            (0, 0, {'name': 'Difference from rounding taxes', 'debit': 0, 'credit': 0.38, 'account_id': self.difference_profit_acc.id}),
         ]
         tax_return = self.env['account.return'].create({
             'name': "test return",
@@ -141,14 +156,14 @@ class TestFrenchFiscalRounding(TestAccountReportsCommon):
         carryover_line_id = self.env.ref('l10n_fr_account.tax_report_27').id
         options = self._generate_options(self.report, '2021-05-01', '2021-05-31')
         report_lines = self.report._get_lines(options)
-        carryover_line, = [line for line in report_lines if line['columns'][0]['report_line_id'] == carryover_line_id]
-        self.assertEqual(25.00, carryover_line['columns'][0]['no_format'])
+        carryover_line, = [line for line in report_lines if line.columns[0].report_line_id == carryover_line_id]
+        self.assertEqual(25.00, carryover_line.columns[0].no_format)
 
         # Suppress the pdf output
         with self.allow_pdf_render():
-            tax_return.action_validate(bypass_failing_tests=True)
+            tax_return.action_validate()
 
         options = self._generate_options(self.report, '2021-06-01', '2021-06-30')
         report_lines = self.report._get_lines(options)
-        carryover_line, = [line for line in report_lines if line['columns'][0]['report_line_id'] == carryover_line_id]
-        self.assertEqual(25.00, carryover_line['columns'][0]['no_format'])
+        carryover_line, = [line for line in report_lines if line.columns[0].report_line_id == carryover_line_id]
+        self.assertEqual(25.00, carryover_line.columns[0].no_format)

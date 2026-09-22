@@ -1,5 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
-import { register_payment_method } from "@point_of_sale/app/services/pos_store";
+import { registry } from "@web/core/registry";
 import { PaymentInterfaceIot } from "@pos_iot/app/utils/payment/payment_interface_iot";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
@@ -26,7 +26,7 @@ export class PaymentWorldline extends PaymentInterfaceIot {
 
     getPaymentLineForMessage(order, data) {
         const line = order.getPaymentlineByUuid(data.cid);
-        const terminalProxy = line?.payment_method_id.terminal_proxy;
+        const terminalProxy = line?.payment_method_id.iot_device_id;
         if (line && terminalProxy) {
             return line;
         }
@@ -34,7 +34,6 @@ export class PaymentWorldline extends PaymentInterfaceIot {
     }
 
     onTerminalMessageReceived(data, line) {
-        this._setCardAndReceipt(data, line);
         if (data.Stage === "Cancel") {
             // Result of a cancel request
             if (data.Error) {
@@ -65,21 +64,13 @@ export class PaymentWorldline extends PaymentInterfaceIot {
                 });
                 this._resolvePayment?.(false);
             } else if (data.Response === "Approved") {
+                if (data.Card) {
+                    line.card_type = data.Card;
+                }
                 this._resolvePayment?.(true);
-            } else if (["WaitingForCard", "WaitingForPin"].includes(data.Stage)) {
-                line.setPaymentStatus("waitingCard");
             }
-        }
-    }
-
-    _setCardAndReceipt(data, line) {
-        if (data.Ticket) {
-            line.setReceiptInfo(data.Ticket);
-        }
-        if (data.Card) {
-            line.card_type = data.Card;
         }
     }
 }
 
-register_payment_method("worldline", PaymentWorldline);
+registry.category("pos_payment_providers").add("worldline", PaymentWorldline);

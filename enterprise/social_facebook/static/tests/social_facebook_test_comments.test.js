@@ -9,6 +9,7 @@ import {
     mountView,
     onRpc,
     patchWithCleanup,
+    MockServer,
 } from "@web/../tests/web_test_helpers";
 
 class SocialMedia extends models.ServerModel {
@@ -39,6 +40,7 @@ class SocialAccount extends models.ServerModel {
             stories: 70000,
             stories_trend: -20,
             stats_link: "facebook.com/jack",
+            facebook_account_id: "page-identifier",
             media_id: 1,
         },
         {
@@ -76,8 +78,8 @@ class SocialStream extends models.ServerModel {
     ];
 }
 
-class SocialStreamPostImage extends models.ServerModel {
-    _name = "social.stream.post.image";
+class SocialStreamPostAttachment extends models.ServerModel {
+    _name = "social.stream.post.attachment";
 }
 
 class SocialStreamPost extends models.ServerModel {
@@ -157,7 +159,7 @@ class SocialStreamPost extends models.ServerModel {
                 <field name="link_image_url"/>
                 <field name="link_title"/>
                 <field name="link_description"/>
-                <field name="stream_post_image_ids"/>
+                <field name="stream_post_attachment_ids"/>
                 <field name="facebook_author_id"/>
                 <field name="facebook_user_likes"/>
                 <field name="facebook_reactions_count"/>
@@ -170,7 +172,7 @@ class SocialStreamPost extends models.ServerModel {
                             <div class="d-flex justify-content-between mb-2 px-2">
                                 <t t-set="author_info">
                                     <span class="o_social_stream_post_author_image o_social_author_image o_avatar position-relative rounded overflow-hidden"/>
-                                    <span class="o_social_stream_post_author_name text-truncate ms-2" t-esc="record.author_name.value or 'Unknown'" t-att-title="record.author_name.value or 'Unknown'"/>
+                                    <span class="o_social_stream_post_author_name text-truncate ms-2" t-out="record.author_name.value or 'Unknown'" t-att-title="record.author_name.value or 'Unknown'"/>
                                 </t>
 
                                 <div class="o_social_author_information d-flex align-items-center">
@@ -197,11 +199,11 @@ class SocialStreamPost extends models.ServerModel {
                             <div class="o_social_stream_post_facebook_stats px-2 d-flex justify-content-around"
                                 t-if="record.media_type.raw_value === 'facebook'">
                                 <div t-if="record.facebook_likes_count.raw_value !== 0" t-attf-class="o_social_facebook_likes o_social_subtle_btn ps-2 pe-3 #{record.facebook_user_likes.raw_value ? 'o_social_facebook_user_likes' : ''}">
-                                    <i class="fa fa-thumbs-up me-1" title="Likes"/>
+                                    <i class="oi oi-filled me-1" data-icon="thumb_up" title="Likes"/>
                                     <field name="facebook_likes_count" class="fw-bold"/>
                                 </div>
-                                <div class="o_social_facebook_comments o_social_comments o_social_subtle_btn px-3">
-                                    <i class="fa fa-comments me-1" title="Comments"/>
+                                <div class="o_social_facebook_comments o_social_comments px-3">
+                                    <i class="oi oi-filled me-1" data-icon="forum" title="Comments"/>
                                     <field t-if="record.facebook_comments_count.value !== '0'" name="facebook_comments_count" class="fw-bold"/>
                                 </div>
                                 <div class="flex-grow-1 d-flex text-muted justify-content-end">
@@ -230,15 +232,35 @@ defineModels([
     SocialMedia,
     SocialAccount,
     SocialStream,
-    SocialStreamPostImage,
     SocialStreamPost,
+    SocialStreamPostAttachment,
     SocialLivePost,
 ]);
 
 function mockStatsRpc({ checkSteps } = {}) {
-    onRpc(["refresh_all", "refresh_statistics"], ({ model, method }) => {
+    onRpc(["refresh_all", "refresh_statistics", "fetch_statistics"], ({ model, method }) => {
         if (checkSteps) {
             expect.step(`[${model}] ${method}`);
+        }
+        if (method === "fetch_statistics") {
+            return MockServer.env["social.account"].search_read(
+                [["has_account_stats", "=", true]],
+                [
+                    "id",
+                    "name",
+                    "is_media_disconnected",
+                    "audience",
+                    "audience_trend",
+                    "engagement",
+                    "engagement_trend",
+                    "stories",
+                    "stories_trend",
+                    "has_trends",
+                    "media_id",
+                    "media_type",
+                    "stats_link",
+                ]
+            );
         }
         return {};
     });
@@ -256,6 +278,7 @@ test("Check accounts statistics", async () => {
         "[social.stream] refresh_all",
         "[social.live.post] refresh_statistics",
         "[social.account] refresh_statistics",
+        "[social.account] fetch_statistics",
     ]);
     expect(".o_social_stream_stat_box").toHaveCount(2, {
         message: "Kanban View should contain exactly 2 lines of account statistics.",
@@ -304,6 +327,22 @@ test("Check comments behavior", async () => {
         expect.step("like_comment");
         return {};
     });
+    onRpc("/social_facebook/like_post", async (request) => {
+        expect.step("like_post");
+        const { params } = await request.json();
+        const increment = params.like ? 1 : -1;
+        const [post] = MockServer.env["social.stream.post"].browse(params.stream_post_id);
+        const reactionsCount = JSON.parse(post.facebook_reactions_count);
+        MockServer.env["social.stream.post"].write(params.stream_post_id, {
+            facebook_likes_count: Math.max(0, post.facebook_likes_count + increment),
+            facebook_reactions_count: JSON.stringify({
+                ...reactionsCount,
+                LIKE: Math.max(0, (reactionsCount.LIKE || 0) + increment),
+            }),
+            facebook_user_likes: params.like,
+        });
+        return {};
+    });
     onRpc("/social_facebook/get_comments", () => ({
         summary: { total_count: 1 },
         comments: [
@@ -345,9 +384,29 @@ test("Check comments behavior", async () => {
         type: "kanban",
         resModel: "social.stream.post",
     });
-    await contains(".o_social_stream_post_facebook_stats .fa-comments").click();
+    await contains(".o_social_stream_post_facebook_stats [data-icon='forum']").click();
 
-    // 1. Root comment is displayed with 3 likes and 2 replies options.
+    // 1. Like status and count are updated both in the modal and the kanban.
+    expect(".o_social_comments_modal .o_social_facebook_likes").toHaveClass(
+        "o_social_facebook_user_likes"
+    );
+    expect(".o_social_comments_modal .o_social_facebook_likes").toHaveText("👍5");
+    expect(".o_social_stream_post_kanban_global:first-child .o_social_facebook_likes").toHaveText(
+        "5"
+    );
+
+    await contains(".o_social_comments_modal .o_social_facebook_likes").click();
+    expect.verifySteps(["like_post"]);
+
+    expect(".o_social_comments_modal .o_social_facebook_likes").not.toHaveClass(
+        "o_social_facebook_user_likes"
+    );
+    expect(".o_social_comments_modal .o_social_facebook_likes").toHaveText("👍4");
+    expect(".o_social_stream_post_kanban_global:first-child .o_social_facebook_likes").toHaveText(
+        "4"
+    );
+
+    // 2. Root comment is displayed with 3 likes and 2 replies options.
     expect(
         ".o_social_comments_messages .o_social_comment_text:contains('Root Comment')"
     ).toHaveCount(1, { message: "Root comment should be displayed." });
@@ -360,7 +419,7 @@ test("Check comments behavior", async () => {
         message: "The root comment should have 3 likes",
     });
 
-    // 2. Load replies and check display.
+    // 3. Load replies and check display.
     await contains(".o_social_comment_wrapper span.o_social_comment_load_replies").click();
 
     expect(
@@ -371,9 +430,9 @@ test("Check comments behavior", async () => {
         ".o_social_comment_wrapper .o_social_comment_message div.o_social_comment_text:contains('Sub Comment 2')"
     ).toHaveCount(1, { message: "Second sub comment should be loaded" });
 
-    // 3. Check like/dislike behavior
+    // 4. Check like/dislike behavior
 
-    // 3a. Check like status and count
+    // 4a. Check like status and count
     expect(
         ".o_social_comment .o_social_comment:contains('Sub Comment 1') .o_social_comment_user_likes"
     ).toHaveCount(1, { message: "First comment is liked" });
@@ -390,14 +449,14 @@ test("Check comments behavior", async () => {
         ".o_social_comment .o_social_comment:contains('Sub Comment 2') .o_social_likes_count:contains('10')"
     ).toHaveCount(1, { message: "Sub comment 2 should have 10 likes" });
 
-    // 3b. Dislike first and like second sub-comments
+    // 4b. Dislike first and like second sub-comments
     const subComments = queryAll(".o_social_comment .o_social_comment");
     await contains(".o_social_comment_like", { root: subComments[0] }).click();
     expect.verifySteps(["like_comment"]);
     await contains(".o_social_comment_like", { root: subComments[1] }).click();
     expect.verifySteps(["like_comment"]);
 
-    // 3a. Check like status and count now that it's reversed
+    // 4c. Check like status and count now that it's reversed
     expect(
         ".o_social_comment .o_social_comment:contains('Sub Comment 1'):not(.o_social_comment_user_likes)"
     ).toHaveCount(1, { message: "First comment is NOT liked" });
@@ -414,7 +473,7 @@ test("Check comments behavior", async () => {
         ".o_social_comment .o_social_comment:contains('Sub Comment 2') .o_social_likes_count:contains('11')"
     ).toHaveCount(1, { message: "Sub comment 2 should have 11 likes" });
 
-    // 4. Add comment
+    // 5. Add comment
 
     // Patch "addComment" to return new comment
     // Sadly 'XMLHttpRequest' cannot be mocked easily (would have been better)
@@ -425,12 +484,15 @@ test("Check comments behavior", async () => {
             );
             this.props.onAddComment({
                 from: {
-                    id: 1,
+                    id: "page-identifier",
                     picture: { data: { url: "socialtest/picture" } },
                 },
                 message: formData.get("message"),
                 likes: { summary: { total_count: 3 } },
             });
+            if (this.isCommentEdit) {
+                this.props.toggleEditMode();
+            }
         },
     });
 
@@ -441,7 +503,18 @@ test("Check comments behavior", async () => {
         ".o_social_comment_wrapper .o_social_comment_message div.o_social_comment_text:contains('New Comment')"
     ).toHaveCount(1, { message: "New Comment should be displayed." });
 
-    // 5. Add reply to comment
+    // 6. Edit the new comment
+    await contains(
+        ".o_social_comment:contains('New Comment') .o_social_manage_comment .dropdown-toggle"
+    ).click();
+    await contains(
+        ".o_social_comment:contains('New Comment') .dropdown-item:contains('Edit')"
+    ).click();
+    await contains(".o_social_comments_messages textarea").edit("Edited Comment");
+    await contains(".o_social_comments_messages textarea").press("Enter");
+    expect(".o_social_comment_text:contains('Edited Comment')").toHaveCount(1);
+
+    // 7. Add reply to comment
     await contains(".o_social_comment_wrapper span.o_social_comment_load_replies").click();
     await contains(".o_social_comment .o_social_comment .o_social_comment_reply").click();
     await contains(".o_social_comment .o_social_add_comment").edit("New Reply");

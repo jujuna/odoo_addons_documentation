@@ -4,17 +4,17 @@ from odoo import models
 
 
 class AmazonAccount(models.Model):
-    _inherit = 'amazon.account'
+    _inherit = "amazon.account"
 
     def _create_order_from_data(self, order_data):
-        """ Override to avoid recomputing taxes for orders made through Amazon. """
+        """Override to avoid recomputing taxes for orders made through Amazon."""
         order = super()._create_order_from_data(order_data)
         if order.fiscal_position_id.is_avatax:
             order.fiscal_position_id = False
         return order
 
     def _recompute_subtotal(self, subtotal, tax_amount, taxes, currency, _fiscal_pos=None):
-        """ Override to not consider any tax and only use the tax_excluded amount from Amazon.
+        """Override to not consider any tax and only use the tax_excluded amount from Amazon.
 
         This is done because Amazon does its own tax report to Avatax, but doesn't send the complete
         information to fill each individual separate tax. As when using Avatax, the tax report must

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { Model, helpers } from "@odoo/o-spreadsheet";
+import { Model, helpers, stores } from "@odoo/o-spreadsheet";
 import {
     createSpreadsheetWithChart,
     insertChartInSpreadsheet,
@@ -12,11 +12,14 @@ import {
 } from "@spreadsheet/../tests/helpers/commands";
 import { defineSpreadsheetModels } from "@spreadsheet/../tests/helpers/data";
 import { makeSpreadsheetMockEnv } from "@spreadsheet/../tests/helpers/model";
+import { getMockEnv } from "@web/../tests/web_test_helpers";
+import { makeStoreWithModel } from "@spreadsheet/../tests/helpers/stores";
 
 describe.current.tags("headless");
 defineSpreadsheetModels();
 
 const { toZone } = helpers;
+const { ClipboardStore } = stores;
 
 const serverData = {
     menus: {
@@ -33,20 +36,36 @@ const serverData = {
 };
 
 test("link is kept when copying charts inside of carousel", async () => {
-    const env = await makeSpreadsheetMockEnv({ serverData });
-    const model = new Model({}, { custom: { env } });
+    await makeSpreadsheetMockEnv({ serverData });
+    const model = new Model({}, { custom: { env: getMockEnv() } });
+    makeStoreWithModel(model, ClipboardStore);
 
     createBasicChart(model, "chartId1", { type: "bar" }, undefined, "chartFigureId1");
-    model.dispatch("LINK_ODOO_MENU_TO_CHART", { chartId: "chartId1", odooMenuId: 1 });
+    model.dispatch("UPDATE_ODOO_LINK_TO_CHART", {
+        chartId: "chartId1",
+        odooLink: { type: "odooMenu", odooMenuId: 1 },
+    });
     createBasicChart(model, "chartId2", { type: "line" }, undefined, "chartFigureId2");
-    model.dispatch("LINK_ODOO_MENU_TO_CHART", { chartId: "chartId2", odooMenuId: 1 });
+    model.dispatch("UPDATE_ODOO_LINK_TO_CHART", {
+        chartId: "chartId2",
+        odooLink: { type: "odooMenu", odooMenuId: 1 },
+    });
 
     createCarousel(model, { items: [] }, "carouselId");
     addChartFigureToCarousel(model, "carouselId", "chartFigureId1");
     addChartFigureToCarousel(model, "carouselId", "chartFigureId2");
 
-    expect(model.getters.getChartOdooMenu("chartId1").id).toBe(1);
-    expect(model.getters.getChartOdooMenu("chartId2").id).toBe(1);
+    const oldCarousel = model.getters.getCarousel("carouselId");
+    const oldChartId1 = oldCarousel.items[0].chartId;
+    expect(model.getters.getChartOdooLink(oldChartId1)).toEqual({
+        type: "odooMenu",
+        odooMenuId: 1,
+    });
+    const oldChartId2 = oldCarousel.items[1].chartId;
+    expect(model.getters.getChartOdooLink(oldChartId2)).toEqual({
+        type: "odooMenu",
+        odooMenuId: 1,
+    });
 
     const sheetId = model.getters.getActiveSheetId();
     model.dispatch("SELECT_FIGURE", { figureId: "carouselId" });
@@ -57,15 +76,21 @@ test("link is kept when copying charts inside of carousel", async () => {
     const newCarousel = model.getters.getCarousel(newCarouselId);
 
     const newChartId1 = newCarousel.items[0].chartId;
-    expect(model.getters.getChartOdooMenu(newChartId1).id).toBe(1);
+    expect(model.getters.getChartOdooLink(newChartId1)).toEqual({
+        type: "odooMenu",
+        odooMenuId: 1,
+    });
 
     const newChartId2 = newCarousel.items[1].chartId;
-    expect(model.getters.getChartOdooMenu(newChartId2).id).toBe(1);
+    expect(model.getters.getChartOdooLink(newChartId2)).toEqual({
+        type: "odooMenu",
+        odooMenuId: 1,
+    });
 });
 
 test("cut/paste Odoo chart field matching inside carousels", async () => {
-    const { model } = await createSpreadsheetWithChart({ type: "odoo_pie" });
-    insertChartInSpreadsheet(model, "odoo_bar");
+    const { model } = await createSpreadsheetWithChart({ type: "pie" });
+    insertChartInSpreadsheet(model, "bar");
     const sheetId = model.getters.getActiveSheetId();
     const [chartFigureId1, chartFigureId2] = model.getters
         .getFigures(sheetId)

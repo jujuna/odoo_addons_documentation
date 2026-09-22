@@ -8,6 +8,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestItalianTaxReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('it')
     def setUpClass(cls):
@@ -21,12 +23,10 @@ class TestItalianTaxReport(TestAccountReportsCommon):
         cls.tax_4a = cls.env.ref(f'account.{cls.env.company.id}_4am')
         cls.tax_4a.active = True
         cls.tax_4v = cls.env.ref(f'account.{cls.env.company.id}_4v')
-        cls.tax_4v.tax_group_id.tax_payable_account_id = cls.company_data['default_tax_account_payable']
         cls.tax_4v.active = True
 
         cls.l10n_it_tax_report_partner = cls.env['res.partner'].create({
             'name': 'Blue Interior',
-            'is_company': 1,
             'street': 'Via Tenebrosa 66',
             'city': 'Milan',
             'zip': '00000',
@@ -103,6 +103,29 @@ class TestItalianTaxReport(TestAccountReportsCommon):
                 fields.Date.from_string('2016-01-30')),
             'VP9',
             'credit',
+            40.0,
+        )
+
+    def test_tax_report_carryover_vp14_debit_year(self):
+        """
+        Test to have a value in line vp14 debit at the last period of the year.
+        In this case, we should put that value in line vp7.
+        """
+        self._test_line_report_carryover(
+            'out_invoice',
+            '2015-12-10',
+            1000,
+            self.tax_4a,
+            self._generate_options(
+                self.report,
+                fields.Date.from_string('2015-12-01'),
+                fields.Date.from_string('2015-12-31')),
+            self._generate_options(
+                self.report,
+                fields.Date.from_string('2016-01-01'),
+                fields.Date.from_string('2016-01-30')),
+            'VP7',
+            'debit',
             40.0,
         )
 
@@ -225,11 +248,11 @@ class TestItalianTaxReport(TestAccountReportsCommon):
             'company_id': self.env.company.id,
         })
         with self.allow_pdf_render():
-            tax_return.action_validate(bypass_failing_tests=True)
+            tax_return.action_validate()
 
         # Get to the next month
         report_lines = self.report._get_lines(second_month_options)
-        line = next(line for line in report_lines if target_line_code in line['name'])
+        line = next(line for line in report_lines if target_line_code in line.name)
 
         col_idx = next((idx for idx, col in enumerate(first_month_options.get('columns', [])) if col.get('expression_label') == col_name))
-        self.assertEqual(line['columns'][col_idx]['no_format'], target_line_value)
+        self.assertEqual(line.columns[col_idx].no_format, target_line_value)

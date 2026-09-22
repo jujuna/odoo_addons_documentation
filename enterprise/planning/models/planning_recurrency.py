@@ -1,9 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import pytz
 from calendar import monthrange
-from datetime import datetime, timedelta, time
-
+from datetime import datetime, timedelta, time, UTC
 
 from odoo import api, fields, models, _
 from odoo.tools.date_utils import get_timedelta
@@ -96,21 +94,21 @@ class PlanningRecurrency(models.Model):
                 slot_duration = slot.end_datetime - slot.start_datetime
 
                 # add timezone information to the start and end of the recurrence duration (needed for company / resource availability computation)
-                start_duration = slot.start_datetime.replace(tzinfo=pytz.utc)
-                end_duration = range_limit.replace(tzinfo=pytz.utc)
+                start_duration = slot.start_datetime.replace(tzinfo=UTC)
+                end_duration = range_limit.replace(tzinfo=UTC)
 
                 # get the company's work intervals as well as the public holidays
                 company_calendar_working_days = recurrency.company_id.resource_calendar_id._work_intervals_batch(start_duration, end_duration)[False]
 
                 # get the resource of the recurring shift
-                resource = recurrency.slot_ids.resource_id[-1:]
+                resource = recurrency.slot_ids.resource_ids[-1:]
 
                 # We check whether the slot was generated outisde working days (includes public holidays), if so we will generate the recurrent slots normally
                 days_of_slot = {slot.start_datetime.date() + timedelta(days=i) for i in range(slot_duration.days + 1)}
                 is_slot_outside_working_days = not days_of_slot <= {start.date() for start, stop, dummy in company_calendar_working_days}
 
                 def can_slot_be_generated(next_start):
-                    next_start_utc = next_start.replace(tzinfo=pytz.utc)
+                    next_start_utc = next_start.replace(tzinfo=UTC)
                     lands_on_working_day = any(
                         next_start_utc.date() == start.date()
                         for start, stop, dummy in company_calendar_working_days
@@ -135,7 +133,7 @@ class PlanningRecurrency(models.Model):
 
                 # generate recurring slots
                 occurring_slots = PlanningSlot.search_read([
-                    ('resource_id', '=', resource.id),
+                    ('resource_ids', 'in', resource.ids),
                     ('company_id', '=', resource.company_id.id),
                     ('end_datetime', '>=', slot.start_datetime),
                     ('start_datetime', '<=', range_limit)
@@ -146,14 +144,14 @@ class PlanningRecurrency(models.Model):
 
                 # We check whether the slot was generated outisde working hours, if so we will assign the recurrent slots as well
                 is_slot_outside_working_hours = all(
-                    slot.start_datetime.replace(tzinfo=pytz.utc) >= stop or
-                    slot.end_datetime.replace(tzinfo=pytz.utc) <= start
+                    slot.start_datetime.replace(tzinfo=UTC) >= stop or
+                    slot.end_datetime.replace(tzinfo=UTC) <= start
                     for start, stop, dummy in resource_availability
                 )
 
                 def can_slot_be_assigned(next_start, next_end):
-                    next_start_utc = next_start.replace(tzinfo=pytz.utc)
-                    next_end_utc = next_end.replace(tzinfo=pytz.utc)
+                    next_start_utc = next_start.replace(tzinfo=UTC)
+                    next_end_utc = next_end.replace(tzinfo=UTC)
                     # First we will check whether the resource is busy - we begin by collecting all overlapping slots
                     is_resource_busy = False
                     overlapping_slots = [
@@ -195,10 +193,10 @@ class PlanningRecurrency(models.Model):
                         'recurrency_id': recurrency.id,
                         'company_id': recurrency.company_id.id,
                         'repeat': True,
-                        'state': 'draft'
+                        'state': '1_draft',
                     })[0]
                     if not can_slot_be_assigned(next_start, next_end):
-                        slot_values['resource_id'] = False
+                        slot_values['resource_ids'] = False
                     slot_values_list.append(slot_values)
                 if slot_values_list:
                     PlanningSlot.create(slot_values_list)
@@ -211,7 +209,7 @@ class PlanningRecurrency(models.Model):
         slots = self.env['planning.slot'].search([
             ('recurrency_id', 'in', self.ids),
             ('start_datetime', '>=', start_datetime),
-            ('state', '=', 'draft'),
+            ('state', '=', '1_draft'),
         ])
         slots.unlink()
 
@@ -231,7 +229,7 @@ class PlanningRecurrency(models.Model):
         res = datetime.max
         sorted_slots = self.slot_ids.sorted('end_datetime')
         initial_slot, last_slot = sorted_slots[0], sorted_slots[-1]
-        end_contract = last_slot.employee_id.sudo().version_id.contract_date_end
+        end_contract = last_slot.sudo().employee_ids[:1].version_id.contract_date_end
         end_contract = datetime.combine(end_contract, time.max) if end_contract else res
         # If the initial slot that we are repeating is planned after the end of the resource contract, we generate the slots
         # on out-of-contract dates normally.

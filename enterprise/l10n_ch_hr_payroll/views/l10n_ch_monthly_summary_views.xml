@@ -7,13 +7,13 @@
             <form string="Monthly Summary">
                 <header>
                     <button name="action_generate_pdf" string="Create PDF" type="object" class="btn-primary"
-                        invisible="monthly_summary_pdf_filename"/>
+                        invisible="monthly_summary_pdf_file"/>
                     <button name="action_generate_xls" string="Create XLSX" type="object" class="btn-primary"
-                        invisible="monthly_summary_xls_filename"/>
+                        invisible="monthly_summary_xls_file"/>
                     <button name="action_generate_pdf" string="Create PDF" type="object"
-                        invisible="not monthly_summary_pdf_filename"/>
+                        invisible="not monthly_summary_pdf_file"/>
                     <button name="action_generate_xls" string="Create XLSX" type="object"
-                        invisible="not monthly_summary_xls_filename"/>
+                        invisible="not monthly_summary_xls_file"/>
                 </header>
                 <sheet>
                     <group>
@@ -28,16 +28,14 @@
                             </div>
                             <field name="company_ids" groups="base.group_multi_company" widget="many2many_tags" placeholder="Visible to all"/>
                             <field name="currency_id" invisible="1"/>
-                            <field name="monthly_summary_pdf_filename" invisible="1"/>
-                            <field name="monthly_summary_xls_filename" invisible="1"/>
                         </group>
                     </group>
                     <group string="Generation Complete" invisible="not monthly_summary_pdf_file and not monthly_summary_xls_file">
                         <p colspan="4" invisible="not monthly_summary_pdf_file">
-                            Download the Monthly Summary PDF file: <field name="monthly_summary_pdf_file" readonly="1" filename="monthly_summary_pdf_filename"/>
+                            Download the Monthly Summary PDF file: <field name="monthly_summary_pdf_file" readonly="1" />
                         </p>
                         <p colspan="4" invisible="not monthly_summary_xls_file" class="oe_inline" name="monthly_summary_xls_file">
-                            Download the Monthly Summary XLSX file: <field name="monthly_summary_xls_file" readonly="1" filename="monthly_summary_xls_filename"/>
+                            Download the Monthly Summary XLSX file: <field name="monthly_summary_xls_file" readonly="1" />
                         </p>
                     </group>
                 </sheet>

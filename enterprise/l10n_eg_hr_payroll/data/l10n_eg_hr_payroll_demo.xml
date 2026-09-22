@@ -27,6 +27,22 @@
         <field name="company_id" ref="base.demo_company_eg"/>
     </record>
 
+    <record id="l10n_eg_full_week_40h_resource_calendar" model="resource.calendar">
+        <field name="name">Calender Days 40h/week</field>
+        <field name="company_id" ref="base.demo_company_eg"/>
+        <field name="attendance_ids"
+            eval="[(5, 0, 0),
+                (0, 0, {'dayofweek': '6', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '0', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0, 'work_entry_type_id': ref('hr_work_entry.l10n_eg_work_entry_type_weekend')}),
+                (0, 0, {'dayofweek': '5', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0, 'work_entry_type_id': ref('hr_work_entry.l10n_eg_work_entry_type_weekend')}),
+            ]"
+        />
+    </record>
+
     <record id="eg_hr_department_marketing" model="hr.department">
         <field name="name">Marketing EG</field>
         <field name="company_id" ref="base.demo_company_eg"/>
@@ -72,59 +88,41 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_eg'))]"/>
         <field name="company_id" ref="base.demo_company_eg"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_ngh-image.jpg"/>
-    </record>
-
-    <record id="eg_res_bank_national" model="res.bank">
-        <field name="name">National Bank of Egypt</field>
-        <field name="bic">NBEGEGCXXXX</field>
-        <field name="street">National Bank of Egypt street</field>
-        <field name="city">Cairo</field>
-        <field name="zip">9439004</field>
-        <field name="state" ref="base.state_eg_c"/>
-        <field name="country" ref="base.eg"/>
-        <field name="phone">02 4567 8901</field>
-    </record>
-    <record id="eg_res_bank_national" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_eg_hr_payroll.eg_res_bank_national')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="eg_res_bank_suez_canal" model="res.bank">
-        <field name="name">Suez Canal Bank</field>
-        <field name="bic">SUCAEGCXXXX</field>
-        <field name="street">Suez Canal Bank street</field>
-        <field name="city">Cairo</field>
-        <field name="zip">123004</field>
-        <field name="state" ref="base.state_eg_c"/>
-        <field name="country" ref="base.eg"/>
-        <field name="phone">02 7689 0123</field>
-    </record>
-    <record id="eg_res_bank_suez_canal" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_eg_hr_payroll.eg_res_bank_suez_canal')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_ngh-image.jpg"/>
     </record>
 
     <record id="l10n_eg_res_partner_bank_account_abeer" model="res.partner.bank">
-        <field name="acc_number">EG800002000194728301840280004</field>
+        <field name="account_number">EG800002000194728301840280004</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="eg_res_bank_national"/>
+        <field name="bank_name">National Bank of Egypt</field>
+        <field name="bank_bic">NBEGEGCXXXX</field>
+        <field name="street">National Bank of Egypt street</field>
+        <field name="city">Cairo</field>
+        <field name="zip">9439004</field>
+        <field name="state_id" ref="base.state_eg_c"/>
+        <field name="country_id" ref="base.eg"/>
         <field name="partner_id" ref="l10n_eg_hr_payroll.res_partner_abeer"/>
         <field name="company_id" ref="base.demo_company_eg"/>
-        <field name="currency_id" ref="base.EGP"/>
     </record>
 
     <record id="l10n_eg_res_partner_bank_account_hany" model="res.partner.bank">
-        <field name="acc_number">EG800002000156789012345180002</field>
+        <field name="account_number">EG800002000156789012345180002</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="eg_res_bank_suez_canal"/>
+        <field name="bank_name">Suez Canal Bank</field>
+        <field name="bank_bic">SUCAEGCXXXX</field>
+        <field name="street">Suez Canal Bank street</field>
+        <field name="city">Cairo</field>
+        <field name="zip">123004</field>
+        <field name="state_id" ref="base.state_eg_c"/>
+        <field name="country_id" ref="base.eg"/>
         <field name="partner_id" ref="l10n_eg_hr_payroll.res_partner_hany"/>
         <field name="company_id" ref="base.demo_company_eg"/>
-        <field name="currency_id" ref="base.EGP"/>
     </record>
 
     <record id="hr_employee_abeer" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_eg_hr_payroll.res_partner_abeer')).name"/>
         <field name="job_id" ref="hr.job_developer"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_mit-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_mit-image.jpg"/>
         <field name="work_phone">99 1234 5678</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_eg_hr_payroll.res_partner_abeer')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_eg_hr_payroll.res_partner_abeer"/>
@@ -149,25 +147,26 @@
         <field name="emergency_phone">99 4729 1200</field>
         <field name="certificate">master</field>
         <field name="study_field">Engineering</field>
-        <field name="study_school">Cairo University</field>
         <field name="marital">single</field>
         <field name="department_id" ref="eg_hr_department_marketing"/>
         <field name="wage">35000</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="contract_date_start" eval="DateTime.today() + relativedelta(months=-4, days=-10)"/>
         <field name="contract_date_end" eval="DateTime.today() + relativedelta(months=2, days=-10)"/>
-        <field name="contract_type_id" ref="hr.contract_type_temporary"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="structure_type_id" ref="structure_type_employee_eg"/>
         <field name="l10n_eg_housing_allowance">1000</field>
         <field name="l10n_eg_other_allowances">1000</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_eg_hr_payroll.l10n_eg_res_partner_bank_account_abeer'))]"/>
         <field name="structure_type_id" ref="l10n_eg_hr_payroll.structure_type_employee_eg"/>
+        <field name="address_id" ref="base.partner_demo_company_eg"/>
+        <field name="l10n_eg_eligible_for_eos" eval="True"/>
     </record>
 
     <record id="hr_employee_hany" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_eg_hr_payroll.res_partner_hany')).name"/>
         <field name="job_id" ref="hr.job_consultant"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_ngh-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_ngh-image.jpg"/>
         <field name="work_phone">99 0011 2345</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_eg_hr_payroll.res_partner_hany')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_eg_hr_payroll.hr_employee_abeer"/>
@@ -193,7 +192,6 @@
         <field name="emergency_phone">99 4729 1234</field>
         <field name="certificate">master</field>
         <field name="study_field">Psychology</field>
-        <field name="study_school">Alexandira University</field>
         <field name="marital">single</field>
         <field name="department_id" ref="eg_hr_department_accounting"/>
         <field name="wage">40000</field>
@@ -201,12 +199,14 @@
         <field name="date_version" eval="DateTime(DateTime.today().year-3,month=2,day=25)"/>
         <field name="contract_date_start" eval="DateTime(DateTime.today().year-3,month=2,day=25)"/>
         <field name="contract_date_end" eval="DateTime(DateTime.today().year-2,month=2,day=25)"/>
-        <field name="contract_type_id" ref="hr.contract_type_full_time"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="structure_type_id" ref="structure_type_employee_eg"/>
         <field name="l10n_eg_housing_allowance">1000</field>
         <field name="l10n_eg_other_allowances">1000</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_eg_hr_payroll.l10n_eg_res_partner_bank_account_hany'))]"/>
         <field name="structure_type_id" ref="l10n_eg_hr_payroll.structure_type_employee_eg"/>
+        <field name="address_id" ref="base.partner_demo_company_eg"/>
+        <field name="l10n_eg_eligible_for_eos" eval="True"/>
     </record>
 
     <function name="create_version" model="hr.employee">
@@ -215,7 +215,7 @@
             'date_version': DateTime(DateTime.today().year-2,month=2,day=25) + relativedelta(days=1),
             'contract_date_start': DateTime(DateTime.today().year-2,month=2,day=25) + relativedelta(days=1),
             'contract_date_end': False,
-            'contract_type_id': ref('hr.contract_type_permanent'),
+            'employee_type_id': ref('hr.contract_type_employee'),
             'structure_type_id': ref('structure_type_employee_eg'),
             'wage': 42000.00
         }"/>

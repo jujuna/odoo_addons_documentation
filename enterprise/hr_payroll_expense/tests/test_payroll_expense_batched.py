@@ -10,6 +10,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestPayrollExpenseBatched(TestPayrollExpense):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -20,6 +22,7 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
         payslips_vals = []
         for idx, employee_vals in ((idx, {'name': f'Clone n°{idx:0>2}', 'email': f'clone_{idx}@clone.clone'}) for idx in range(10)):
             new_partner = cls.env['res.partner'].create(employee_vals)
+            cls.product_c.salary_rule_ids = [Command.set([cls.expense_salary_rule.id])]
             new_employee = cls.env['hr.employee'].create({
                 'name': employee_vals['name'],
                 'company_id': cls.company_data['company'].id,
@@ -31,9 +34,12 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
                 'contract_date_end': '2062-01-25',
                 'wage': 5000.33,
                 'structure_type_id': cls.hr_structure_type.id,
+                'structure_id': cls.expense_hr_structure.id,
             })
+
             expenses_vals.append({
                 'name': f"Test Expense {employee_vals['name']}",
+                'payment_mode': 'payslip_account',
                 'employee_id': new_employee.id,
                 'product_id': cls.product_c.id,
                 'total_amount_currency': 1000 + idx,
@@ -55,8 +61,6 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
         cls.batched_expenses = cls.env['hr.expense'].create(expenses_vals)
         cls.batched_expenses.action_submit()
         cls.batched_expenses._do_approve()  # Skip duplicate wizard
-        cls.post_expenses_with_wizard(cls.batched_expenses, date='2022-01-15')
-        cls.batched_expenses.action_report_in_next_payslip()
 
         cls.batched_payslips = cls.env['hr.payslip'].create(payslips_vals)
 
@@ -65,20 +69,16 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
         """ Test that the link is still properly done when payslips are accounted for in batches """
         self.batched_payslips.compute_sheet()
         self.payslip_run.action_validate()
+        # Posting the payslip move should create and post the expense moves
+        self.batched_payslips.move_id.action_post()
 
-        self.assertSequenceEqual(
-            ['posted'] * 10,
-            self.batched_expenses.account_move_id.mapped('state'),
-        )
-
-        self.payslip_run.slip_ids.move_id.action_post()
+        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
         self.assertSequenceEqual(
             ['posted'] * 10,
             self.batched_expenses.account_move_id.mapped('state'),
             "All expense moves should be automatically posted when posting the payslip one",
         )
 
-        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
         self.assertSequenceEqual(
             ['paid'] * 10,
             self.batched_expenses.mapped('state'),
@@ -128,14 +128,15 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
 
         self.batched_payslips.compute_sheet()
         self.payslip_run.action_validate()
+        # Posting the payslip move should create and post the expense moves
+        self.batched_payslips.move_id.action_post()
 
+        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
         self.assertSequenceEqual(
             ['posted'] * 10,
             self.batched_expenses.account_move_id.mapped('state'),
         )
 
-        self.payslip_run.slip_ids.move_id.action_post()
-        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
         self.assertSequenceEqual(
             ['paid'] * 10,
             self.batched_expenses.mapped('state'),
@@ -189,27 +190,29 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
             })
         self.batched_expenses.action_submit()
         self.batched_expenses._do_approve()  # Skip duplicate wizard
-        self.post_expenses_with_wizard(self.batched_expenses)
+
+        # Re-link payslips with the expenses, as the reset of the expenses unlinked them
+        self.batched_payslips.action_payslip_draft()
+        self.assertSetEqual(set(self.batched_expenses.payslip_id.ids), set(self.batched_payslips.ids))
+
+        self.batched_payslips.compute_sheet()
+        self.payslip_run.action_validate()
+        # Posting the payslip move should create and post the expense moves
+        self.batched_payslips.move_id.action_post()
+
+        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
+
         self.assertEqual(
             10,
             len(self.batched_expenses.account_move_id.line_ids.filtered(lambda line: line.display_type == 'payment_term').account_id),
             "We should now have a different account per expense",
         )
 
-        # Re-link payslips with the expenses, as the reset of the expenses unlinked them
-        self.batched_expenses.action_report_in_next_payslip()
-        self.batched_payslips.action_payslip_draft()
-        self.assertSetEqual(set(self.batched_expenses.payslip_id.ids), set(self.batched_payslips.ids))
-
-        self.batched_payslips.compute_sheet()
-        self.payslip_run.action_validate()
         self.assertSequenceEqual(
             ['posted'] * 10,
             self.batched_expenses.account_move_id.mapped('state'),
         )
 
-        self.payslip_run.slip_ids.move_id.action_post()
-        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
         self.assertSequenceEqual(
             ['posted'] * 10,
             self.batched_expenses.mapped('state'),
@@ -273,8 +276,7 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
         different_account_expense.employee_id.work_contact_id.property_account_payable_id = different_account
 
         # Put the expense back on the payslip
-        self.post_expenses_with_wizard(different_account_expense)
-        different_account_expense.action_report_in_next_payslip()
+        different_account_expense._report_in_next_payslip()
         different_account_expense_original_payslip.action_payslip_draft()
         self.assertEqual(
             different_account_expense_original_payslip.id,
@@ -284,20 +286,21 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
 
         self.batched_payslips.compute_sheet()
         self.payslip_run.action_validate()
+        # Posting the payslip move should create and post the expense moves
+        self.batched_payslips.move_id.action_post()
 
+        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
         self.assertSequenceEqual(
             ['posted'] * 10,
             self.batched_expenses.account_move_id.mapped('state'),
         )
 
-        self.payslip_run.slip_ids.move_id.action_post()
         self.assertSequenceEqual(
             ['posted'] * 10,
             self.batched_expenses.account_move_id.mapped('state'),
             "All expense moves should be automatically posted when posting the payslip one",
         )
 
-        self.assertEqual(1, len(self.payslip_run.slip_ids.move_id))
         self.assertSequenceEqual(
             ['paid'] * 10,
             self.batched_expenses.mapped('state'),
@@ -336,6 +339,8 @@ class TestPayrollExpenseBatched(TestPayrollExpense):
 
     @freeze_time('2022-01-25')
     def test_corner_case_batched_payslips_with_edited_expense_moves(self):
+        # Create the moves of the expenses
+        self.batched_expenses._post_without_wizard_payslip_mode()
         edited_expense = self.batched_expenses[0]
 
         # Editing the expense move

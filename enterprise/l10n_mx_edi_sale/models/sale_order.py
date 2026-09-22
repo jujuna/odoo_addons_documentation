@@ -70,10 +70,10 @@ class SaleOrder(models.Model):
             else:
                 order.l10n_mx_edi_usage = False
 
-    @api.depends('company_id', 'l10n_mx_edi_partner_address_complete')
+    @api.depends('company_id', 'l10n_mx_edi_partner_address_complete', 'partner_id')
     def _compute_l10n_mx_edi_cfdi_to_public(self):
         for order in self:
-            order.l10n_mx_edi_cfdi_to_public = order.country_code == 'MX' and not order.l10n_mx_edi_partner_address_complete
+            order.l10n_mx_edi_cfdi_to_public = order.country_code == 'MX' and (not order.l10n_mx_edi_partner_address_complete or order.partner_id.country_code != 'MX')
 
     @api.depends('partner_id')
     def _compute_l10n_mx_edi_payment_policy(self):

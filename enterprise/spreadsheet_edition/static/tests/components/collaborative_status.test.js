@@ -1,10 +1,14 @@
+import { render } from "@web/owl2/utils";
 import { describe, expect, test } from "@odoo/hoot";
 import { defineSpreadsheetModels } from "@spreadsheet/../tests/helpers/data";
-import { contains, makeMockEnv, mountWithCleanup } from "@web/../tests/web_test_helpers";
+import { assignTestEnv, contains, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { Model, stores, LocalTransportService } from "@odoo/o-spreadsheet";
 
 import { CollaborativeStatus } from "@spreadsheet_edition/bundle/components/collaborative_status/collaborative_status";
-import { Component, onMounted, onWillUnmount, xml } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, t, useProps, xml } from "@odoo/owl";
+
+import { range } from "@web/core/utils/numbers";
+
 const { useStoreProvider, ModelStore, ClientFocusStore } = stores;
 
 describe.current.tags("desktop");
@@ -13,17 +17,18 @@ defineSpreadsheetModels();
 class Parent extends Component {
     static template = xml`<CollaborativeStatus/>`;
     static components = { CollaborativeStatus };
-    static props = {
-        model: Object,
-    };
+
+    props = useProps({
+        model: t.object(),
+    });
 
     setup() {
         const stores = useStoreProvider();
         stores.inject(ModelStore, this.props.model);
 
         onMounted(() => {
-            this.props.model.on("update", this, () => this.render(true));
-            stores.on("store-updated", this, this.render.bind(this, true));
+            this.props.model.on("update", this, () => render(this, true));
+            stores.on("store-updated", this, () => render(this, true));
         });
         onWillUnmount(() => {
             this.props.model.off("update", this);
@@ -48,7 +53,7 @@ const CLIENTS = {
 async function mountCollaborativeStatusComponent(clients = []) {
     const transportService = new LocalTransportService();
     const model = new Model({}, { transportService });
-    const env = await makeMockEnv({ model });
+    assignTestEnv({ model });
 
     for (const client of clients) {
         transportService.sendMessage({
@@ -58,8 +63,7 @@ async function mountCollaborativeStatusComponent(clients = []) {
         });
     }
 
-    const parent = await mountWithCleanup(Parent, { env, props: { model: env.model } });
-    return { env, model, transportService, parent };
+    return mountWithCleanup(Parent, { props: { model } });
 }
 
 test("Show user bubble with less than 10 users", async function () {
@@ -68,12 +72,7 @@ test("Show user bubble with less than 10 users", async function () {
 });
 
 test("Show user bubble with more than 10 users", async function () {
-    const clients = [CLIENTS.alice, CLIENTS.bob].concat(
-        Array(10)
-            .keys()
-            .map((x) => CLIENTS.fromId(3 + x))
-            .toArray()
-    );
+    const clients = [CLIENTS.alice, CLIENTS.bob, ...range(3, 13).map(CLIENTS.fromId)];
     await mountCollaborativeStatusComponent(clients);
 
     expect(".o_spreadsheet_user .justify-content-between").toHaveCount(10);
@@ -84,7 +83,7 @@ test("Show user bubble with more than 10 users", async function () {
 });
 
 test("Jump to user", async function () {
-    const { parent } = await mountCollaborativeStatusComponent([CLIENTS.alice, CLIENTS.bob]);
+    const parent = await mountCollaborativeStatusComponent([CLIENTS.alice, CLIENTS.bob]);
     const clientFocusStore = parent.env.getStore(ClientFocusStore);
 
     const funSpy = [];
@@ -98,7 +97,7 @@ test("Jump to user", async function () {
 });
 
 test("Show client tags on hover", async function () {
-    const { parent } = await mountCollaborativeStatusComponent([CLIENTS.alice, CLIENTS.bob]);
+    const parent = await mountCollaborativeStatusComponent([CLIENTS.alice, CLIENTS.bob]);
     const clientFocusStore = parent.env.getStore(ClientFocusStore);
 
     await contains(".o_spreadsheet_users div:nth-child(1) img").hover();

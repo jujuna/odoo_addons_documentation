@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 from datetime import datetime
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+from odoo.tools import BinaryBytes
 
 
 class AccountBatchPayment(models.Model):
@@ -43,7 +43,7 @@ class AccountBatchPayment(models.Model):
             file_data = self._create_aba_document(self.journal_id, aba_values).encode()
             export_file_data = {
                 'filename': f'ABA-{self.journal_id.code}-{filename_date}.aba',
-                'file': base64.encodebytes(file_data),
+                'file': BinaryBytes(file_data),
             }
 
             return export_file_data

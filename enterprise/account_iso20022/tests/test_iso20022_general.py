@@ -1,4 +1,3 @@
-import base64
 from lxml import etree
 from odoo.addons.account_iso20022.tests.test_iso20022_common import TestISO20022CommonCreditTransfer
 from odoo.tests import tagged
@@ -6,11 +5,13 @@ from odoo.tests import tagged
 
 @tagged('post_install', '-at_install')
 class TestISO20022GeneralCreditTransfer(TestISO20022CommonCreditTransfer):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def collect_company_accounting_data(cls, company):
         res = super().collect_company_accounting_data(company)
         res['default_journal_bank'].update({
-            'bank_acc_number': 'BE68539007547034',
+            'bank_account_number': 'BE68539007547034',
         })
         return res
 
@@ -37,7 +38,7 @@ class TestISO20022GeneralCreditTransfer(TestISO20022CommonCreditTransfer):
         })
 
         partner_bank = self.env['res.partner.bank'].create({
-            'acc_number': 'JP1234567890',
+            'account_number': 'JP1234567890',
             'partner_id': partner_jp.id,
             'allow_out_payment': True,
         })
@@ -64,8 +65,7 @@ class TestISO20022GeneralCreditTransfer(TestISO20022CommonCreditTransfer):
         })
         batch._send_after_validation()
 
-        xml_content = base64.b64decode(batch.export_file)
-        xml_doc = etree.fromstring(xml_content)
+        xml_doc = etree.fromstring(bytes(batch.export_file))
         ns = {'ns': next(iter(xml_doc.nsmap.values()))}
 
         amount_node = xml_doc.find('.//ns:InstdAmt', namespaces=ns)

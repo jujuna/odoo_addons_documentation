@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:44+0000\n"
-"PO-Revision-Date: 2026-01-30 18:44+0000\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 17:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -28,11 +28,6 @@ msgstr ""
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__authorization_method
 msgid "Authorization Method"
-msgstr ""
-
-#. module: hr_expense_stripe_demo
-#: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.hr_expense_stripe_test_shipping_wizard_form
-msgid "Cancel"
 msgstr ""
 
 #. module: hr_expense_stripe_demo
@@ -73,13 +68,14 @@ msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model,name:hr_expense_stripe_demo.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__company_id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_shipping_wizard__company_id
 msgid "Company"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#: model:ir.model,name:hr_expense_stripe_demo.model_res_config_settings
+msgid "Config Settings"
 msgstr ""
 
 #. module: hr_expense_stripe_demo
@@ -90,12 +86,17 @@ msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.res_config_settings_view_form
-msgid "Connect (Demo)"
+msgid "Connect (demo)"
 msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields.selection,name:hr_expense_stripe_demo.selection__hr_expense_stripe_test_purchase_wizard__authorization_method__contactless
 msgid "Contactless"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#: model:ir.module.module,summary:base.module_hr_expense_stripe_demo
+msgid "Create and manage company expense cards via Stripe: Demo"
 msgstr ""
 
 #. module: hr_expense_stripe_demo
@@ -121,16 +122,19 @@ msgid "Current Shipping Status"
 msgstr ""
 
 #. module: hr_expense_stripe_demo
-#: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.hr_expense_stripe_test_purchase_wizard
-msgid "Discard"
+#. odoo-python
+#: code:addons/hr_expense_stripe_demo/models/res_company.py:0
+msgid "Demo Stripe accounts can only be created in test mode."
 msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_card__display_name
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_dispute__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_shipping_wizard__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_topup_wizard__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_company__display_name
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -140,11 +144,23 @@ msgid "Employee Expense Card"
 msgstr ""
 
 #. module: hr_expense_stripe_demo
+#: model:ir.module.module,shortdesc:base.module_hr_expense_stripe_demo
+msgid "Expense cards: Demo"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#: model:ir.model,name:hr_expense_stripe_demo.model_hr_expense_stripe_dispute
+msgid "HR Expense Stripe Dispute"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_card__id
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_dispute__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_shipping_wizard__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_topup_wizard__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_company__id
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_config_settings__id
 msgid "ID"
 msgstr ""
 
@@ -247,7 +263,7 @@ msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.hr_expense_stripe_topup_wizard_inherit_demo
-msgid "Simulate Topup"
+msgid "Simulate Top-up"
 msgstr ""
 
 #. module: hr_expense_stripe_demo
@@ -263,6 +279,25 @@ msgstr ""
 #. module: hr_expense_stripe_demo
 #: model:ir.model,name:hr_expense_stripe_demo.model_hr_expense_stripe_topup_wizard
 msgid "Stripe Issuing Top-up Wizard"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#: model:ir.module.module,description:base.module_hr_expense_stripe_demo
+msgid ""
+"Stripe Issuing integration for expenses: Demo module for testing and "
+"demonstration purposes"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#. odoo-javascript
+#: code:addons/hr_expense_stripe_demo/static/src/components/dispute_form_view.xml:0
+msgid "Submit and Lose"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#. odoo-javascript
+#: code:addons/hr_expense_stripe_demo/static/src/components/dispute_form_view.xml:0
+msgid "Submit and Win"
 msgstr ""
 
 #. module: hr_expense_stripe_demo

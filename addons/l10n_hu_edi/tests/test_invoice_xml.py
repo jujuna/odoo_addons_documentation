@@ -3,13 +3,13 @@ from odoo.tests.common import tagged
 from odoo.addons.l10n_hu_edi.tests.common import L10nHuEdiTestCommon
 
 from freezegun import freeze_time
-import base64
 import zipfile
-import io
 
 
 @tagged('post_install_l10n', '-at_install', 'post_install')
 class L10nHuEdiTestInvoiceXml(L10nHuEdiTestCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         with freeze_time('2024-02-01'):
@@ -17,21 +17,25 @@ class L10nHuEdiTestInvoiceXml(L10nHuEdiTestCommon):
 
             cls.company_data['company'].write({
                 'bank_ids': [Command.create({
-                    'acc_number': 'HU0123456789',
+                    'account_number': 'HU0123456789',
+                    'allow_out_payment': True,
                 })]
             })
             cls.partner_company.write({
                 'bank_ids': [Command.create({
-                    'acc_number': 'HU6666666666',
+                    'account_number': 'HU6666666666',
+                    'allow_out_payment': True,
                 })]
             })
             cls.bank_company = cls.env['res.partner.bank'].create({
-                'acc_number': 'HU7357735773',
+                'account_number': 'HU7357735773',
                 'partner_id': cls.company_data['company'].partner_id.id,
+                'allow_out_payment': True,
             })
             cls.bank_partner = cls.env['res.partner.bank'].create({
-                'acc_number': 'HU9487189480',
+                'account_number': 'HU9487189480',
                 'partner_id': cls.partner_company.id,
+                'allow_out_payment': True,
             })
 
     def test_invoice_and_credit_note(self):
@@ -133,8 +137,7 @@ class L10nHuEdiTestInvoiceXml(L10nHuEdiTestCommon):
             })
             tax_audit_export.action_export()
 
-            export_file = base64.b64decode(tax_audit_export.export_file)
-            with io.BytesIO(export_file) as zip_buffer:
+            with tax_audit_export.export_file.open() as zip_buffer:
                 with zipfile.ZipFile(zip_buffer) as zip_file:
                     filenames = zip_file.namelist()
                     with zip_file.open(filenames[0]) as invoice_file:
@@ -145,6 +148,9 @@ class L10nHuEdiTestInvoiceXml(L10nHuEdiTestCommon):
                     self.get_xml_tree_from_string(invoice_xml),
                     self.get_xml_tree_from_string(expected_xml_file.read()),
                 )
+
+            # Assert that the `l10n_hu_chain_index` is not silently set by the tax audit export
+            self.assertFalse(invoice.l10n_hu_invoice_chain_index, "The chain index shouldn't be set by the tax audit report")
 
     def test_multi_currency_tax_sign(self):
         currency_eur = self.env.ref('base.EUR')

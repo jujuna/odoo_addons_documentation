@@ -16,8 +16,8 @@ class BasReportsHandler(models.AbstractModel):
     _inherit = ['account.report.custom.handler']
     _description = 'BAS reports Custom Handler'
 
-    def _report_custom_engine_quarter_percentage(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_quarter_percentage(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         quarter = date_utils.get_quarter_number(fields.Date.from_string(options['date']['date_to']))
-        return {
+        return {next(iter(formulas_dict.values())): {
             'quarter': percentage_per_quarter.get(quarter, 1),
-        }
+        }}

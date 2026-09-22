@@ -4,6 +4,7 @@
         <field name="name">Balance Sheet</field>
         <field name="name@cs">Rozvaha</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -57,8 +58,6 @@
                         <field name="name">A. Receivables for subscribed capital</field>
                         <field name="name@cs">A. Pohledávky za upsaný kapitál</field>
                         <field name="code">l10n_cz_reports_bs_aktiva_a</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_bs_aktiva_a_gross" model="account.report.expression">
                                 <field name="label">gross</field>
@@ -120,8 +119,6 @@
                                         <field name="name">1. Research and development</field>
                                         <field name="name@cs">1. Výzkum a vývoj</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_I_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_I_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -166,8 +163,6 @@
                                                 <field name="name">2.1. Software</field>
                                                 <field name="name@cs">2.1. Software</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_I_2_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_I_2_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -190,8 +185,6 @@
                                                 <field name="name">2.2. Other appreciable rights</field>
                                                 <field name="name@cs">2.2. Další ocenitelná práva</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_I_2_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_I_2_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -216,8 +209,6 @@
                                         <field name="name">3. Goodwill</field>
                                         <field name="name@cs">3. Dobrá vůle</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_I_3</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_I_3_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -240,8 +231,6 @@
                                         <field name="name">4. Other long-term intangible assets</field>
                                         <field name="name@cs">4. Ostatní dlouhodobý nehmotný majetek</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_I_4</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_I_4_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -286,8 +275,6 @@
                                                 <field name="name">5.1. Advances provided for long-term intangible assets</field>
                                                 <field name="name@cs">5.1. Poskytnuté zálohy na dlouhodobý nehmotný majetek</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_I_5_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_I_5_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -310,8 +297,6 @@
                                                 <field name="name">5.2. Work-in-progress intangible assets</field>
                                                 <field name="name@cs">5.2. Nedokončený nehmotný majetek</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_I_5_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_I_5_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -382,8 +367,6 @@
                                                 <field name="name">1.1. Lands</field>
                                                 <field name="name@cs">1.1. Pozemky</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_II_1_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_II_1_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -406,8 +389,6 @@
                                                 <field name="name">1.2. Buildings</field>
                                                 <field name="name@cs">1.2. Budovy</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_II_1_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_II_1_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -432,8 +413,6 @@
                                         <field name="name">2. Tangible movable things and their files</field>
                                         <field name="name@cs">2. Hmotné movité věci a jejich soubory</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_II_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_II_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -456,8 +435,6 @@
                                         <field name="name">3. Valuation difference to acquired assets</field>
                                         <field name="name@cs">3. Oceňovací rozdíl k nabytému majetku</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_II_3</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_II_3_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -502,8 +479,6 @@
                                                 <field name="name">4.1. Perennial corps</field>
                                                 <field name="name@cs">4.1. Víceletý sbor</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_II_4_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_II_4_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -526,8 +501,6 @@
                                                 <field name="name">4.2. Full-grown animals and groups thereof</field>
                                                 <field name="name@cs">4.2. Dospělá zvířata a jejich skupiny</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_II_4_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_II_4_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -550,8 +523,6 @@
                                                 <field name="name">4.3. Other tangible fixed assets</field>
                                                 <field name="name@cs">4.3. Ostatní dlouhodobý hmotný majetek</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_II_4_3</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_II_4_3_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -598,8 +569,6 @@
                                                 <field name="name">5.1. Advance payments for tangible fixed assets</field>
                                                 <field name="name@cs">5.1. Zálohy na dlouhodobý hmotný majetek</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_II_5_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_II_5_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -622,8 +591,6 @@
                                                 <field name="name">5.2. Tangible fixed assets in progress</field>
                                                 <field name="name@cs">5.2. Nedokončený dlouhodobý hmotný majetek</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_II_5_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_II_5_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -672,8 +639,6 @@
                                         <field name="name">1. Shares – controlled or controlling entity</field>
                                         <field name="name@cs">1. Akcie - ovládaná nebo ovládající osoba</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_III_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_III_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -696,8 +661,6 @@
                                         <field name="name">2. Loans and credits – controlled or controlling person</field>
                                         <field name="name@cs">2. Půjčky a úvěry – ovládaná nebo ovládající osoba</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_III_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_III_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -715,8 +678,6 @@
                                         <field name="name">3. Shares – significant influence</field>
                                         <field name="name@cs">3. Akcie – podstatný vliv</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_III_3</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_III_3_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -734,8 +695,6 @@
                                         <field name="name">4. Loans and credits – significant influence</field>
                                         <field name="name@cs">4. Půjčky a úvěry – podstatný vliv</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_III_4</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_III_4_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -753,8 +712,6 @@
                                         <field name="name">5. Other long-term securities and shares</field>
                                         <field name="name@cs">5. Ostatní dlouhodobé cenné papíry a podíly</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_III_5</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_III_5_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -772,8 +729,6 @@
                                         <field name="name">6. Loans and credits – others</field>
                                         <field name="name@cs">6. Půjčky a úvěry – ostatní</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_b_III_6</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_b_III_6_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -808,8 +763,6 @@
                                                 <field name="name">7.1. Another long-term financial assets</field>
                                                 <field name="name@cs">7.1. Další dlouhodobý finanční majetek</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_III_7_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_III_7_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -827,8 +780,6 @@
                                                 <field name="name">7.2. Advance payments for long-term financial assets</field>
                                                 <field name="name@cs">7.2. Zálohy na dlouhodobý finanční majetek</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_b_III_7_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_b_III_7_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -896,8 +847,6 @@
                                         <field name="name">1. Material</field>
                                         <field name="name@cs">1. Materiál</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_I_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_I_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -920,8 +869,6 @@
                                         <field name="name">2. Work in progress and semi-finished goods</field>
                                         <field name="name@cs">2. Nedokončená výroba a polotovary</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_I_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_I_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -966,8 +913,6 @@
                                                 <field name="name">3.1. Finished products</field>
                                                 <field name="name@cs">3.1. Hotové výrobky</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_I_3_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_I_3_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -990,8 +935,6 @@
                                                 <field name="name">3.2. Goods</field>
                                                 <field name="name@cs">3.2. Zboží</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_I_3_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_I_3_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1016,8 +959,6 @@
                                         <field name="name">4. Young and other animals and groups thereof</field>
                                         <field name="name@cs">4. Mláďata a jiná zvířata a jejich skupiny</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_I_4</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_I_4_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1040,8 +981,6 @@
                                         <field name="name">5. Advanced payments for inventory</field>
                                         <field name="name@cs">5. Platby předem za zásoby</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_I_5</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_I_5_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1100,8 +1039,6 @@
                                                 <field name="name">1.1. Trade receivables</field>
                                                 <field name="name@cs">1.1. Pohledávky z obchodního styku</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_II_1_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1119,8 +1056,6 @@
                                                 <field name="name">1.2. Receivables – controlled or controlling entity</field>
                                                 <field name="name@cs">1.2. Pohledávky - ovládaná nebo ovládající osoba</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_II_1_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1138,8 +1073,6 @@
                                                 <field name="name">1.3. Receivables – significant influence</field>
                                                 <field name="name@cs">1.3. Pohledávky - podstatný vliv</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_3</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_II_1_3_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1157,8 +1090,6 @@
                                                 <field name="name">1.4. Deferred tax receivable</field>
                                                 <field name="name@cs">1.4. Odložená daňová pohledávka</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_4</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_II_1_4_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1193,8 +1124,6 @@
                                                         <field name="name">1.5.1. Receivables from equity holders</field>
                                                         <field name="name@cs">1.5.1. Pohledávky za vlastníky akcií</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_5_1</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_1_5_1_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1212,8 +1141,6 @@
                                                         <field name="name">1.5.2. Long-term advanced payments</field>
                                                         <field name="name@cs">1.5.2. Dlouhodobé zálohové platby</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_5_2</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_1_5_2_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1231,8 +1158,6 @@
                                                         <field name="name">1.5.3. Estimated receivables</field>
                                                         <field name="name@cs">1.5.3. Odhadované pohledávky</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_5_3</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_1_5_3_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1250,8 +1175,6 @@
                                                         <field name="name">1.5.4. Other receivables</field>
                                                         <field name="name@cs">1.5.4. Ostatní pohledávky</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_1_5_4</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_1_5_4_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1290,8 +1213,6 @@
                                                 <field name="name">2.1. Trade receivables</field>
                                                 <field name="name@cs">2.1. Obchodní pohledávky</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_II_2_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1309,8 +1230,6 @@
                                                 <field name="name">2.2. Receivables – controlled or controlling entity</field>
                                                 <field name="name@cs">2.2. Pohledávky – ovládaná nebo ovládající osoba</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_II_2_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1328,8 +1247,6 @@
                                                 <field name="name">2.3. Receivables – significant influence</field>
                                                 <field name="name@cs">2.3. Pohledávky – podstatný vliv</field>
                                                 <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_3</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_aktiva_c_II_2_3_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1364,8 +1281,6 @@
                                                         <field name="name">2.4.1. Receivables from equity holders</field>
                                                         <field name="name@cs">2.4.1. Pohledávky za vlastníky akcií</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_4_1</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_2_4_1_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1383,8 +1298,6 @@
                                                         <field name="name">2.4.2. Social security and health insurance</field>
                                                         <field name="name@cs">2.4.2. Sociální zabezpečení a zdravotní pojištění</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_4_2</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_2_4_2_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1402,8 +1315,6 @@
                                                         <field name="name">2.4.3. State – tax receivables</field>
                                                         <field name="name@cs">2.4.3. Stát – daňové pohledávky</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_4_3</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_2_4_3_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1421,8 +1332,6 @@
                                                         <field name="name">2.4.4. Short-term advanced payments</field>
                                                         <field name="name@cs">2.4.4. Krátkodobé zálohové platby</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_4_4</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_2_4_4_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1440,8 +1349,6 @@
                                                         <field name="name">2.4.5. Estimated receivables</field>
                                                         <field name="name@cs">2.4.5. Dohadné účty aktivní</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_4_5</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_2_4_5_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1459,8 +1366,6 @@
                                                         <field name="name">2.4.6. Other receivables</field>
                                                         <field name="name@cs">2.4.6. Ostatní pohledávky</field>
                                                         <field name="code">l10n_cz_reports_bs_aktiva_c_II_2_4_6</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_aktiva_c_II_2_4_6_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -1506,8 +1411,6 @@
                                         <field name="name">1. Accrued incomes</field>
                                         <field name="name@cs">1. Příjmy příštích období</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_III_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_III_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1525,8 +1428,6 @@
                                         <field name="name">2. Other short-term financial assets</field>
                                         <field name="name@cs">2. Ostatní krátkodobý finanční majetek</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_III_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_III_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1568,8 +1469,6 @@
                                         <field name="name">1. Cash</field>
                                         <field name="name@cs">1. Hotovost</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_IV_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_IV_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1587,8 +1486,6 @@
                                         <field name="name">2. Bank accounts</field>
                                         <field name="name@cs">2. Bankovní účty</field>
                                         <field name="code">l10n_cz_reports_bs_aktiva_c_IV_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_aktiva_c_IV_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1627,8 +1524,6 @@
                                 <field name="name">1. Prepaid expenses</field>
                                 <field name="name@cs">1. Náklady příštích období</field>
                                 <field name="code">l10n_cz_reports_bs_aktiva_d_1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_cz_reports_bs_aktiva_d_1_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -1646,8 +1541,6 @@
                                 <field name="name">2. Complex prepaid expenses</field>
                                 <field name="name@cs">2. Komplexní předplacené výdaje</field>
                                 <field name="code">l10n_cz_reports_bs_aktiva_d_2</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_cz_reports_bs_aktiva_d_2_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -1665,8 +1558,6 @@
                                 <field name="name">3. Accrued incomes</field>
                                 <field name="name@cs">3. Příjmy příštích období</field>
                                 <field name="code">l10n_cz_reports_bs_aktiva_d_3</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_cz_reports_bs_aktiva_d_3_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -1742,8 +1633,6 @@
                                         <field name="name">A.I.1. Registered capital</field>
                                         <field name="name@cs">A.I.1. Základní kapitál</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_a_I_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_a_I_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1761,8 +1650,6 @@
                                         <field name="name">A.I.2. Company's own shares(-)</field>
                                         <field name="name@cs">A.I.2. Vlastní akcie společnosti (-)</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_a_I_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_a_I_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1780,8 +1667,6 @@
                                         <field name="name">A.I.3. Changes of registered capital</field>
                                         <field name="name@cs">A.I.3. Změny základního kapitálu</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_a_I_3</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_a_I_3_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1818,8 +1703,6 @@
                                         <field name="name">A.II.1. Changes of registered capital</field>
                                         <field name="name@cs">A.II.1. Změny základního kapitálu</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_a_II_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_a_II_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1854,8 +1737,6 @@
                                                 <field name="name">A.II.2.1. Other capital funds</field>
                                                 <field name="name@cs">A.II.2.1. Ostatní kapitálové fondy</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_a_II_2_1</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_a_II_2_1_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1873,8 +1754,6 @@
                                                 <field name="name">A.II.2.2. Gains and losses from revaluation of assets and liabilities (+/-)</field>
                                                 <field name="name@cs">A.II.2.2. Zisky a ztráty z přecenění majetku a závazků (+/-)</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_a_II_2_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_a_II_2_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1892,8 +1771,6 @@
                                                 <field name="name">A.II.2.3. Gains and losses from revaluation in the course of transformations of business corporations (+/-)</field>
                                                 <field name="name@cs">A.II.2.3. Zisky a ztráty z přecenění v průběhu přeměn obchodních korporací (+/-)</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_a_II_2_3</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_a_II_2_3_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1911,8 +1788,6 @@
                                                 <field name="name">A.II.2.4. Differences resulting from transformations of bussiness corporations (+/-)</field>
                                                 <field name="name@cs">A.II.2.4. Rozdíly vyplývající z přeměn podnikůkorporace (+/-)</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_a_II_2_4</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_a_II_2_4_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1930,8 +1805,6 @@
                                                 <field name="name">A.II.2.5. Differences from the valuation in the course of transformations of business corporations (+/-)</field>
                                                 <field name="name@cs">A.II.2.5. Rozdíly oproti ocenění v průběhu přeměn obchodní korporace (+/-)</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_a_II_2_5</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_a_II_2_5_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -1970,8 +1843,6 @@
                                         <field name="name">A.III.1. Other reserve funds</field>
                                         <field name="name@cs">A.III.1. Ostatní rezervní fondy</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_a_III_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_a_III_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -1989,8 +1860,6 @@
                                         <field name="name">A.III.2. Statutory and other funds</field>
                                         <field name="name@cs">A.III.2. Statutární a jiné fondy</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_a_III_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_a_III_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -2027,8 +1896,6 @@
                                         <field name="name">A.IV.1. Retained earnings or accumulated losses from previous years (+/-)</field>
                                         <field name="name@cs">A.IV.1. Nerozdělený zisk nebo kumulovaná ztráta z předchozích let (+/-)</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_a_IV_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_a_IV_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -2051,7 +1918,7 @@
                                                 <field name="label">cross_report</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">l10n_cz_reports_pl_line_33.balance</field>
-                                                <field name="subformula">cross_report(l10n_cz_reports.l10n_cz_reports_pl)</field>
+                                                <field name="subformula">cross_report(l10n_cz_reports.l10n_cz_reports_pl, force_date_scope)</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
                                             </record>
                                             <record id="l10n_cz_reports_bs_pasiva_a_IV_2_account_codes" model="account.report.expression">
@@ -2082,14 +1949,14 @@
                                         <field name="label">gross</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">l10n_cz_reports_pl_line_33.balance</field>
-                                        <field name="subformula">cross_report(l10n_cz_reports.l10n_cz_reports_pl)</field>
+                                        <field name="subformula">cross_report(l10n_cz_reports.l10n_cz_reports_pl, force_date_scope)</field>
                                         <field name="date_scope">from_fiscalyear</field>
                                     </record>
                                     <record id="l10n_cz_reports_bs_pasiva_a_V_net" model="account.report.expression">
                                         <field name="label">net</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">l10n_cz_reports_pl_line_33.balance</field>
-                                        <field name="subformula">cross_report(l10n_cz_reports.l10n_cz_reports_pl)</field>
+                                        <field name="subformula">cross_report(l10n_cz_reports.l10n_cz_reports_pl, force_date_scope)</field>
                                         <field name="date_scope">from_fiscalyear</field>
                                     </record>
                                 </field>
@@ -2098,8 +1965,6 @@
                                 <field name="name">A.VI. Decided about the advance payments of profit share (-)</field>
                                 <field name="name@cs">A.VI. Rozhodnuto o zálohách na podíl na zisku (-)</field>
                                 <field name="code">l10n_cz_reports_bs_pasiva_a_VI</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_cz_reports_bs_pasiva_a_VI_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -2153,8 +2018,6 @@
                                         <field name="name">B.1. Provision for pension and similar payables</field>
                                         <field name="name@cs">B.1. Rezerva na důchod a podobné závazky</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_b_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_b_1_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -2172,8 +2035,6 @@
                                         <field name="name">B.2. Income tax provision</field>
                                         <field name="name@cs">B.2. Ustanovení o dani z příjmu</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_b_2</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_b_2_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -2191,8 +2052,6 @@
                                         <field name="name">B.3. Provisions under special legislation</field>
                                         <field name="name@cs">B.3. Ustanovení podle zvláštních právních předpisů</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_b_3</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_b_3_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -2210,8 +2069,6 @@
                                         <field name="name">B.4. Provision for pension and similar payables</field>
                                         <field name="name@cs">B.4. Rezerva na důchod a podobné závazky</field>
                                         <field name="code">l10n_cz_reports_bs_pasiva_b_4</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_cz_reports_bs_pasiva_b_4_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -2282,8 +2139,6 @@
                                                         <field name="name">C.I.1.1. Exchangeable bonds</field>
                                                         <field name="name@cs">C.I.1.1. Výměnné dluhopisy</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_I_1_1</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_I_1_1_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2302,8 +2157,6 @@
                                                         <field name="name">C.I.1.2. Other bonds</field>
                                                         <field name="name@cs">C.I.1.2. Jiné dluhopisy</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_I_1_2</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_I_1_2_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2323,8 +2176,6 @@
                                                 <field name="name">C.I.2. Payables to credit institutions</field>
                                                 <field name="name@cs">C.I.2. Závazky vůči úvěrovým institucím</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_I_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_I_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2342,8 +2193,6 @@
                                                 <field name="name">C.I.3. Long-term advance payments received</field>
                                                 <field name="name@cs">C.I.3. Přijaté dlouhodobé zálohy</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_I_3</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_I_3_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2361,8 +2210,6 @@
                                                 <field name="name">C.I.4. Trade payables</field>
                                                 <field name="name@cs">C.I.4. Obchodní závazky</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_I_4</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_I_4_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2380,8 +2227,6 @@
                                                 <field name="name">C.I.5. Long-term bills of exchange to be paid</field>
                                                 <field name="name@cs">C.I.5. Dlouhodobé směnky k úhradě</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_I_5</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_I_5_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2399,8 +2244,6 @@
                                                 <field name="name">C.I.6. Payables – controlled or controlling entity</field>
                                                 <field name="name@cs">C.I.6. Závazky – ovládaná nebo ovládající osoba</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_I_6</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_I_6_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2418,8 +2261,6 @@
                                                 <field name="name">C.I.7. Payables – significant influence</field>
                                                 <field name="name@cs">C.I.7. Závazky – podstatný vliv</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_I_7</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_I_7_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2437,8 +2278,6 @@
                                                 <field name="name">C.I.8. Deferred tax liability</field>
                                                 <field name="name@cs">C.I.8. Odložený daňový závazek</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_I_8</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_I_8_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2473,8 +2312,6 @@
                                                         <field name="name">C.I.9.1. Payables to equity holders</field>
                                                         <field name="name@cs">C.I.9.1. Závazky vůči vlastníkům akcií</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_I_9_1</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_I_9_1_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2492,8 +2329,6 @@
                                                         <field name="name">C.I.9.2. Estimated payables</field>
                                                         <field name="name@cs">C.I.9.2. Dohadné položky závazků</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_I_9_2</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_I_9_2_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2511,8 +2346,6 @@
                                                         <field name="name">C.I.9.3. Other liabilities</field>
                                                         <field name="name@cs">C.I.9.3. Jiné závazky</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_I_9_3</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_I_9_3_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2568,8 +2401,6 @@
                                                         <field name="name">C.II.1.1. Exchangeable bonds</field>
                                                         <field name="name@cs">C.II.1.1. Výměnné dluhopisy</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_1_1</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_1_1_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2588,8 +2419,6 @@
                                                         <field name="name">C.II.1.2. Other bonds</field>
                                                         <field name="name@cs">C.II.1.2. Jiné dluhopisy</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_1_2</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_1_2_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2609,8 +2438,6 @@
                                                 <field name="name">C.II.2. Payables to credit institutions</field>
                                                 <field name="name@cs">C.II.2. Závazky vůči úvěrovým institucím</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_II_2</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_II_2_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2628,8 +2455,6 @@
                                                 <field name="name">C.II.3. Payables to credit institutions</field>
                                                 <field name="name@cs">C.II.3. Závazky vůči úvěrovým institucím</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_II_3</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_II_3_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2647,8 +2472,6 @@
                                                 <field name="name">C.II.4. Trade payables</field>
                                                 <field name="name@cs">C.II.4. Obchodní závazky</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_II_4</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_II_4_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2666,8 +2489,6 @@
                                                 <field name="name">C.II.5. Short-term bills of exchange to be paid</field>
                                                 <field name="name@cs">C.II.5. Krátkodobé směnky k úhradě</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_II_5</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_II_5_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2685,8 +2506,6 @@
                                                 <field name="name">C.II.6. Payables – controlled or controlling entity</field>
                                                 <field name="name@cs">C.II.6. Závazky – ovládaná nebo ovládající osoba</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_II_6</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_II_6_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2704,8 +2523,6 @@
                                                 <field name="name">C.II.7. Payables – significant influence</field>
                                                 <field name="name@cs">C.II.7. Závazky – podstatný vliv</field>
                                                 <field name="code">l10n_cz_reports_bs_pasiva_c_II_7</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_cz_reports_bs_pasiva_c_II_7_gross" model="account.report.expression">
                                                         <field name="label">gross</field>
@@ -2740,8 +2557,6 @@
                                                         <field name="name">C.II.8.1. Payables to equity holders</field>
                                                         <field name="name@cs">C.II.8.1. Závazky vůči vlastníkům akcií</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_8_1</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_8_1_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2759,8 +2574,6 @@
                                                         <field name="name">C.II.8.2. Short-term assistance</field>
                                                         <field name="name@cs">C.II.8.2. Krátkodobá pomoc</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_8_2</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_8_2_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2778,8 +2591,6 @@
                                                         <field name="name">C.II.8.3. Payroll payables</field>
                                                         <field name="name@cs">C.II.8.3. Mzdové závazky</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_8_3</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_8_3_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2797,8 +2608,6 @@
                                                         <field name="name">C.II.8.4. Payables – social security and health insurance</field>
                                                         <field name="name@cs">C.II.8.4. Závazky – sociální a zdravotní pojištění</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_8_4</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_8_4_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2816,8 +2625,6 @@
                                                         <field name="name">C.II.8.5. State – tax liabilities and grants</field>
                                                         <field name="name@cs">C.II.8.5. Stát – daňové závazky a dotace</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_8_5</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_8_5_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2835,8 +2642,6 @@
                                                         <field name="name">C.II.8.6. Estimated payables</field>
                                                         <field name="name@cs">C.II.8.6. Dohadné položky závazků</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_8_6</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_8_6_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2854,8 +2659,6 @@
                                                         <field name="name">C.II.8.7. Other payables</field>
                                                         <field name="name@cs">C.II.8.7. Jiné závazky</field>
                                                         <field name="code">l10n_cz_reports_bs_pasiva_c_II_8_7</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="l10n_cz_reports_bs_pasiva_c_II_8_7_gross" model="account.report.expression">
                                                                 <field name="label">gross</field>
@@ -2898,8 +2701,6 @@
                                 <field name="name">D.I. Accrued expenses</field>
                                 <field name="name@cs">D.I. Výdaje příštích období</field>
                                 <field name="code">l10n_cz_reports_bs_pasiva_d_I</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_cz_reports_bs_pasiva_d_I_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -2917,8 +2718,6 @@
                                 <field name="name">D.II. Deferred revenues</field>
                                 <field name="name@cs">D.II. Výnosy příštích období</field>
                                 <field name="code">l10n_cz_reports_bs_pasiva_d_II</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_cz_reports_bs_pasiva_d_II_gross" model="account.report.expression">
                                         <field name="label">gross</field>

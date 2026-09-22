@@ -1,6 +1,5 @@
 {
     'name': 'Bahrain - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Bahrain
 ============================================

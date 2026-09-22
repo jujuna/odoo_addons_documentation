@@ -7,6 +7,8 @@ from freezegun import freeze_time
 
 
 class TestAtSaftReportCommon(TestSaftReport):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestSaftReport.setup_country('at')
     def setUpClass(cls):
@@ -15,7 +17,6 @@ class TestAtSaftReportCommon(TestSaftReport):
         cls.company_data['company'].write({
             'city': 'Innsbruck',
             'zip': '6020',
-            'company_registry': '123/4567',
             'vat': 'ATU12345675',
             'phone': '+43 512 321 54 76',
             'website': 'www.example.com',
@@ -24,9 +25,9 @@ class TestAtSaftReportCommon(TestSaftReport):
             'l10n_at_oenace_code': 'OENACE-CODE',
             'l10n_at_profit_assessment_method': 'par_4_abs_1',
         })
+        cls.company_data['company'].partner_id.additional_identifiers = {'AT_EN': 'ATU12345675'}
         cls.partner_ceo = cls.env['res.partner'].create({
             'name': 'Mr Big CEO',
-            'is_company': False,
             'phone': '+43 512 321 54 00',
             'email': 'big.CEO@example.com',
             'parent_id': cls.company_data['company'].partner_id.id,
@@ -40,8 +41,8 @@ class TestAtSaftReportCommon(TestSaftReport):
             'phone': '+43 01 23 45 11',
         })
 
-        cls.partner_a.company_registry = '123/4567a'
-        cls.partner_b.company_registry = '123/4567b'
+        cls.partner_a.additional_identifiers = {'AT_EN': 'ATU10000005'}
+        cls.partner_b.additional_identifiers = {'AT_EN': 'ATU10000014'}
 
         cls.product_a.default_code = 'PA'
         cls.product_b.default_code = 'PB'
@@ -96,6 +97,8 @@ class TestAtSaftReportCommon(TestSaftReport):
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAtSaftReport(TestAtSaftReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_saft_report_values(self):
         options = self._generate_options()
         report = self._l10n_at_saft_generate_report(options)
@@ -122,6 +125,8 @@ class TestAtSaftReport(TestAtSaftReportCommon):
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 class TestAtSaftReportXmlValidity(TestAtSaftReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @test_xsd(url='https://www.bmf.gv.at/dam/jcr:3c407d8c-5657-47a7-90fc-e152d884fe42/SAF-T_AT_1.01.xsd')
     def test_saft_report_values(self):
         options = self._generate_options()

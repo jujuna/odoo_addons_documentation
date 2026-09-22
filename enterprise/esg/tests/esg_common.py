@@ -6,6 +6,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestEsgCommon(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -34,7 +36,15 @@ class TestEsgCommon(AccountTestInvoicingCommon):
             cls.asset_fixed_account: True,
             cls.current_assets_account: False,
         }
+        cls.env['res.currency.rate'].create({
+            'currency_id': cls.env.ref('base.EUR').id,
+            'name': '2024-12-01',
+            'rate': 2.0,
+        })
 
+        cls.esg_activity_type = cls.env['esg.activity.type'].create({
+            'name': 'Test IT Operations',
+        })
         cls.emission_source_direct = cls.env['esg.emission.source'].create({
             'name': 'Mobile Combustion',
             'scope': 'direct',
@@ -118,3 +128,8 @@ class TestEsgCommon(AccountTestInvoicingCommon):
             'uom_id': cls.env.ref('uom.product_uom_unit').id,
             'esg_emissions_value': 75.0,
         })
+
+    @classmethod
+    def default_env_context(cls):
+        # OVERRIDE to reactivate the tracking
+        return {}

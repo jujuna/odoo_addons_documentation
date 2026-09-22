@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError
-from odoo.tools.sql import column_exists, create_column
 from odoo.tools import float_round
 
 import re
@@ -16,47 +14,54 @@ class AccountMove(models.Model):
 
     l10n_mx_edi_external_trade = fields.Boolean(
         string="Need external trade?",
-        readonly=False, store=True,
-        compute='_compute_l10n_mx_edi_external_trade',
         help="If this field is active, the CFDI that generates this invoice will include the complement "
-             "'External Trade'.")
+             "'External Trade'.",
+        store=True,
+        compute="_compute_l10n_mx_edi_external_trade",
+        init_storage=lambda model: None,
+    )
     l10n_mx_edi_external_trade_type = fields.Selection(
         selection=[
-            ('02', 'Definitive'),
-            ('03', 'Temporary'),
+            ("01", "Does not apply"),
+            ("02", "Definitive"),
+            ("03", "Temporary"),
+            ("04", "Definitive without alienation"),
         ],
         string="External Trade",
-        readonly=False, store=True,
-        compute='_compute_l10n_mx_edi_external_trade_type',
-        help="If this field is 02, the CFDI will include the complement.")
-
-    def _auto_init(self):
-        """
-        Create compute stored field l10n_mx_edi_external_trade
-        here to avoid MemoryError on large databases.
-        """
-        if not column_exists(self.env.cr, 'account_move', 'l10n_mx_edi_external_trade'):
-            create_column(self.env.cr, 'account_move', 'l10n_mx_edi_external_trade', 'boolean')
-            # _compute_l10n_mx_edi_external_trade uses res_partner.l10n_mx_edi_external_trade,
-            # which is a new field in this module hence all values set to False.
-            self.env.cr.execute("UPDATE account_move set l10n_mx_edi_external_trade=FALSE;")
-        if not column_exists(self.env.cr, 'account_move', 'l10n_mx_edi_external_trade_type'):
-            create_column(self.env.cr, 'account_move', 'l10n_mx_edi_external_trade_type', 'varchar')
-        return super()._auto_init()
+        help="Mexico: Indicates whether the partner is foreign and if an External Trade complement is required.\n"
+             "01 - Does not apply: No Complement.\n"
+             "02 - Definitive: Adds the External Trade complement to CFDI.\n"
+             "03 - Temporal: Used when exporting goods for a temporary period.\n"
+             "04 - Definitive without alienation: Adds the External Trade complement to CFDI if the invoice total is 0.",
+        readonly=False,
+        required=True,
+        store=True,
+        compute="_compute_l10n_mx_edi_external_trade_type",
+        precompute=True,
+        init_storage=lambda model: model.env.cr.execute("""
+            UPDATE account_move SET l10n_mx_edi_external_trade_type='01' WHERE l10n_mx_edi_external_trade_type IS NULL
+        """),
+    )
 
     # -------------------------------------------------------------------------
     # CFDI: HELPERS
     # -------------------------------------------------------------------------
 
-    @api.depends('l10n_mx_edi_external_trade_type')
+    @api.depends('l10n_mx_edi_external_trade_type', 'amount_total', 'currency_id')
     def _compute_l10n_mx_edi_external_trade(self):
         for move in self:
-            move.l10n_mx_edi_external_trade = move.l10n_mx_edi_external_trade_type == '02'
+            move.l10n_mx_edi_external_trade = (
+                move.l10n_mx_edi_external_trade_type == '02'
+                or (
+                    move.l10n_mx_edi_external_trade_type == '04'
+                    and move.currency_id.is_zero(move.amount_total)
+                )
+            )
 
     @api.depends('partner_id', 'partner_id.l10n_mx_edi_external_trade_type')
     def _compute_l10n_mx_edi_external_trade_type(self):
         for move in self:
-            move.l10n_mx_edi_external_trade_type = move.partner_id.l10n_mx_edi_external_trade_type
+            move.l10n_mx_edi_external_trade_type = move.partner_id.l10n_mx_edi_external_trade_type or '01'
 
     # -------------------------------------------------------------------------
     # CFDI
@@ -89,7 +94,7 @@ class AccountMove(models.Model):
 
         # External Trade
         ext_trade_values = cfdi_values['comercio_exterior'] = {}
-        if self.l10n_mx_edi_external_trade_type == '02':
+        if self.l10n_mx_edi_external_trade:
 
             # Customer.
             customer_values = cfdi_values['receptor']
@@ -228,7 +233,7 @@ class AccountMove(models.Model):
                     'fraccion_arancelaria': product.l10n_mx_edi_tariff_fraction_id.code if not is_service else None,
                     'cantidad_aduana': sum(product_values['quantity_list']),
                     'unidad_aduana': product.l10n_mx_edi_umt_aduana_id.l10n_mx_edi_code_aduana,
-                    'valor_unitario_udana': float_round(amount * to_usd_rate, precision_digits=6) if not is_service else 0.0,
+                    'valor_unitario_aduana': float_round(amount * to_usd_rate, precision_digits=6) if not is_service else 0.0,
                     'valor_dolares': total_usd,
                 })
                 ext_trade_values['total_usd'] += total_usd
@@ -237,6 +242,46 @@ class AccountMove(models.Model):
             for base_line in cfdi_values['base_lines']:
                 base_line_cfdi_values = base_line['l10n_mx_cfdi_values']
                 base_line_cfdi_values['informacion_aduanera_list'] = base_line['l10n_mx_edi_custom_numbers']
+
+    def _l10n_mx_edi_get_extra_invoice_report_values(self):
+        cfdi_infos = super()._l10n_mx_edi_get_extra_invoice_report_values()
+        Document = self.env['l10n_mx_edi.document']
+        if not cfdi_infos:
+            return cfdi_infos
+
+        cfdi_node = cfdi_infos['cfdi_node']
+        mercancias_node = cfdi_node.xpath("//*[local-name()='Mercancia']")
+        mercancias_list = [
+            {
+                'identification_no': Document._get_cfdi_value(mercancia_node, 'NoIdentificacion'),
+                'fraccion_arancelaria': Document._get_cfdi_value(mercancia_node, 'FraccionArancelaria'),
+                'customs_quantity': float(Document._get_cfdi_value(mercancia_node, 'CantidadAduana') or '0.0'),
+                'customs_unit': Document._get_cfdi_value(mercancia_node, 'UnidadAduana'),
+                'customs_unit_value': float(Document._get_cfdi_value(mercancia_node, 'ValorUnitarioAduana') or '0.0'),
+                'dollar_value': float(Document._get_cfdi_value(mercancia_node, 'ValorDolares') or '0.0')
+            }
+            for mercancia_node in mercancias_node
+        ]
+        receptor_node = Document._get_cfdi_node(cfdi_node, "//*[local-name()='Receptor']")
+
+        cfdi_infos['has_customs'] = False
+        for concepto_vals in cfdi_infos['conceptos_list']:
+            concepto_node = concepto_vals['concepto_node']
+            customs_info_nodes = concepto_node.xpath("./*[local-name()='InformacionAduanera']")
+            if customs_info_nodes:
+                cfdi_infos['has_customs'] = True
+
+            concepto_vals['customs_numbers'] = ", ".join(
+                customs_number
+                for node in customs_info_nodes
+                if (customs_number := Document._get_cfdi_value(node, 'NumeroPedimento'))
+            )
+
+        return {
+            **cfdi_infos,
+            'mercancias_list': mercancias_list,
+            'tax_registration_id_number': Document._get_cfdi_value(receptor_node, 'NumRegIdTrib'),
+        }
 
 
 class AccountMoveLine(models.Model):
@@ -260,6 +305,7 @@ class AccountMoveLine(models.Model):
         string="UMT Aduana",
         readonly=True, store=True, compute_sudo=True,
         related='product_id.l10n_mx_edi_umt_aduana_id',
+        init_storage=lambda model: None,
         help="Used in complement 'Comercio Exterior' to indicate in the products the TIGIE Units of Measurement. "
              "It is based in the SAT catalog.")
     l10n_mx_edi_qty_umt = fields.Float(
@@ -267,22 +313,15 @@ class AccountMoveLine(models.Model):
         digits=(16, 3),
         readonly=False, store=True,
         compute='_compute_l10n_mx_edi_qty_umt',
+        init_storage=lambda model: None,
         help="Quantity expressed in the UMT from product. It is used in the attribute 'CantidadAduana' in the CFDI")
     l10n_mx_edi_price_unit_umt = fields.Float(
         string="Unit Value UMT",
         readonly=True, store=True,
         compute='_compute_l10n_mx_edi_price_unit_umt',
+        init_storage=lambda model: None,
         help="Unit value expressed in the UMT from product. It is used in the attribute 'ValorUnitarioAduana' in the "
              "CFDI")
-
-    def _auto_init(self):
-        if not column_exists(self.env.cr, "account_move_line", "l10n_mx_edi_umt_aduana_id"):
-            create_column(self.env.cr, "account_move_line", "l10n_mx_edi_umt_aduana_id", "int4")
-            # Since l10n_mx_edi_umt_aduana_id columns does not exist we can assume the columns
-            # l10n_mx_edi_qty_umt and l10n_mx_edi_price_unit_umt do not exist either
-            create_column(self.env.cr, "account_move_line", "l10n_mx_edi_qty_umt", "numeric")
-            create_column(self.env.cr, "account_move_line", "l10n_mx_edi_price_unit_umt", "float8")
-        return super()._auto_init()
 
     # -------------------------------------------------------------------------
     # HELPERS

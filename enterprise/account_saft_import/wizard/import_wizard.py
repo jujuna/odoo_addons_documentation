@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import datetime
 from collections import defaultdict
 from lxml import etree
@@ -75,7 +74,7 @@ class AccountSaftImportWizard(models.TransientModel):
         account_mapping_ids = {}
         for element_account in tree.findall('.//saft:Account', namespaces=nsmap):
             account_id = element_account.find('saft:AccountID', namespaces=nsmap).text
-            account_code = element_account.find('saft:StandardAccountID', namespaces=nsmap).text
+            account_code = self._get_account_code(element_account, nsmap)
             account_code = account_code[:digits] + account_code[digits:].rstrip('0')
             account_opening_debit = element_account.find('saft:OpeningDebitBalance', namespaces=nsmap)
             account_opening_credit = element_account.find('saft:OpeningCreditBalance', namespaces=nsmap)
@@ -98,6 +97,9 @@ class AccountSaftImportWizard(models.TransientModel):
                 existing_accounts_code[account_code] = xml_id
                 account_mapping_ids[account_id].update({'id': xml_id})
         return accounts_to_create, account_mapping_ids
+
+    def _get_account_code(self, element_account, nsmap):
+        return element_account.find('saft:StandardAccountID', namespaces=nsmap).text
 
     def _prepare_opening_balance_move(self, tree, map_accounts):
         """ Create a move if there is inconsistency between opening balance for each account and amls in Odoo
@@ -140,6 +142,7 @@ class AccountSaftImportWizard(models.TransientModel):
 
         journal_misc = self.env['account.journal'].search([*self.env['account.journal']._check_company_domain(self.company_id), ('type', '=', 'general')], limit=1)
 
+        today = fields.Date.context_today(self)
         lines_data = []
         for account_id, balance in account_diff_balance.items():
             lines_data.append(
@@ -147,7 +150,7 @@ class AccountSaftImportWizard(models.TransientModel):
                     'account_id': account_id,
                     'currency_id': currency.id,
                     'amount_currency': balance,
-                    'date': fields.Date.today(),
+                    'date': today,
                     'journal_id': journal_misc.id,
                 })
             )
@@ -155,7 +158,7 @@ class AccountSaftImportWizard(models.TransientModel):
             xml_id = self._make_xml_id('move', f'opening_balance{start_date}')
             return {
                 xml_id: {
-                    'date': fields.Date.today(),
+                    'date': today,
                     'ref': _('SAF-T opening balance move'),
                     'journal_id': journal_misc.id,
                     'partner_id': None,
@@ -320,7 +323,9 @@ class AccountSaftImportWizard(models.TransientModel):
         nsmap = self._get_cleaned_namespace(tree)
         journals_to_create = {}
         moves_to_create = {}
-        existing_journal_xml_ids = self.env['account.journal'].search(self.env['account.journal']._check_company_domain(self.company_id))._get_external_ids()
+        existing_journals = self.env['account.journal'].search(self.env['account.journal']._check_company_domain(self.company_id))
+        existing_journals_codes = existing_journals.mapped('code')
+        existing_journal_xml_ids = existing_journals._get_external_ids()
         existing_journal_xml_ids = {xml_id[0]: journal_id for journal_id, xml_id in existing_journal_xml_ids.items() if xml_id}
         possible_journal_types = self.env['account.journal']._fields['type'].get_values(self.env)
 
@@ -332,7 +337,10 @@ class AccountSaftImportWizard(models.TransientModel):
             xml_id = self._make_xml_id('journal', saft_journal_code)
             journal_id = existing_journal_xml_ids.get(xml_id) or xml_id
             if xml_id not in existing_journal_xml_ids:
-                journal_code = saft_journal_code
+                if saft_journal_code in existing_journals_codes:
+                    journal_code = self.env['account.journal']._get_next_journal_default_code(journal_type, self.company_id)
+                else:
+                    journal_code = saft_journal_code
                 journals_to_create[xml_id] = {
                     'company_id': self.company_id.id,
                     'name': name,
@@ -417,7 +425,7 @@ class AccountSaftImportWizard(models.TransientModel):
 
     def _get_data(self):
         """ Returns the data that is stored inside the XML SAF-T attachment, for each model, to be loaded. """
-        import_data = base64.b64decode(self.attachment_id)
+        import_data = self.attachment_id.content
         tree = etree.fromstring(import_data)
         data = {}
         account_data, map_accounts = self._prepare_account_data(tree)
@@ -431,7 +439,7 @@ class AccountSaftImportWizard(models.TransientModel):
 
         data['account.journal'] = {}  # so journals are loaded before moves
         if self.import_opening_balance:
-            data['account.move'] = self._prepare_opening_balance_move(tree, map_accounts)
+            data['account.move'] = self._prepare_opening_balance_move(tree, map_accounts) or {}
         else:
             data['account.move'] = {}
 
@@ -473,8 +481,8 @@ class AccountSaftImportWizard(models.TransientModel):
         # The workaround is to set the sequence.mixin.constraint_start_date parameter
         # to the date of the oldest move (defaulting to today if there is no move at all).
         domain = self.env['account.move']._check_company_domain(self.company_id)
-        start_date = self.env['account.move'].search(domain, limit=1, order='date asc').date or fields.Date.today()
-        self.env['ir.config_parameter'].sudo().set_param('sequence.mixin.constraint_start_date', start_date.strftime("%Y-%m-%d"))
+        start_date = self.env['account.move'].search(domain, limit=1, order='date asc').date or fields.Date.context_today(self)
+        self.env['ir.config_parameter'].sudo().set_str('sequence.mixin.constraint_start_date', start_date.strftime("%Y-%m-%d"))
 
         data = self._get_data()
 

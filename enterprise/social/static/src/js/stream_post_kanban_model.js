@@ -14,7 +14,7 @@ export class StreamPostKanbanModel extends RelationalModel {
      * Method responsible for refreshing the 'dashboard' view of social.accounts.
      * It will be called on view loading as well as when the user clicks on the 'Refresh' button.
      *
-     * Also refreshes live.post statistics (for 'engagement' field).
+     * Also refreshes live.post statistics.
      *
      * @private
      */
@@ -30,24 +30,7 @@ export class StreamPostKanbanModel extends RelationalModel {
      * @private
      */
     _loadAccountsStats() {
-        return this.orm.searchRead('social.account',
-            [['has_account_stats', '=', true]],
-            [
-                'id',
-                'name',
-                'is_media_disconnected',
-                'audience',
-                'audience_trend',
-                'engagement',
-                'engagement_trend',
-                'stories',
-                'stories_trend',
-                'has_trends',
-                'media_id',
-                'media_type',
-                'stats_link',
-                'image',
-        ]);
+        return this.orm.call('social.account', 'fetch_statistics');
     }
 
     /**

@@ -1,9 +1,8 @@
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
 import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_screen_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
-import * as ReceiptScreen from "@point_of_sale/../tests/pos/tours/utils/receipt_screen_util";
+import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
-import * as combo from "@point_of_sale/../tests/pos/tours/utils/combo_popup_util";
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("PreparationDisplayTour", {
@@ -27,7 +26,7 @@ registry.category("web_tour.tours").add("PreparationDisplayTour", {
             PaymentScreen.validateButtonIsHighlighted(true),
             PaymentScreen.clickValidate(),
 
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.clickNextOrder(),
 
             // Should not send anything to preparation
             ProductScreen.addOrderline("Magnetic Board", "5"),
@@ -41,11 +40,11 @@ registry.category("web_tour.tours").add("PreparationDisplayTour", {
             PaymentScreen.validateButtonIsHighlighted(true),
             PaymentScreen.clickValidate(),
 
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.clickNextOrder(),
         ].flat(),
 });
 
-registry.category("web_tour.tours").add("PreparationDisplayPrinterTour", {
+registry.category("web_tour.tours").add("test_printer_and_order_display", {
     steps: () =>
         [
             Chrome.startPoS(),
@@ -73,28 +72,7 @@ registry.category("web_tour.tours").add("PreparationDisplayTourConfigurableProdu
             PaymentScreen.remainingIs("0.0"),
             PaymentScreen.validateButtonIsHighlighted(true),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
-        ].flat(),
-});
-
-registry.category("web_tour.tours").add("MakePosOrderWithCombo", {
-    steps: () =>
-        [
-            Chrome.startPoS(),
-            Dialog.confirm("Open Register"),
-
-            ProductScreen.clickDisplayedProduct("Office Combo"),
-            combo.select("Combo Product 3"),
-            combo.select("Combo Product 5"),
-            combo.select("Combo Product 7"),
-            Dialog.confirm(),
-            ProductScreen.selectedOrderlineHasDirect("Office Combo", "1"),
-            ProductScreen.clickPayButton(),
-
-            PaymentScreen.clickPaymentMethod("Bank"),
-            PaymentScreen.remainingIs("0.0"),
-            PaymentScreen.validateButtonIsHighlighted(true),
-            PaymentScreen.clickValidate(),
+            FeedbackScreen.isShown(),
         ].flat(),
 });
 
@@ -107,8 +85,8 @@ registry.category("web_tour.tours").add("test_sending_order_in_preparation_shoul
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.isShown(),
+            FeedbackScreen.clickNextOrder(),
         ].flat(),
 });
 
@@ -122,7 +100,7 @@ registry.category("web_tour.tours").add("PosOrderCreationTourPdis", {
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.clickNextOrder(),
             // Make Takeaway order for tomorrow
             ProductScreen.clickDisplayedProduct("Letter Tray", true, "1.0"),
             ProductScreen.selectPreset("Eat in", "Takeaway"),
@@ -131,13 +109,13 @@ registry.category("web_tour.tours").add("PosOrderCreationTourPdis", {
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.clickNextOrder(),
             // Make a Delivery order
             ProductScreen.clickDisplayedProduct("Whiteboard Pen", true, "1.0"),
             ProductScreen.selectPreset("Eat in", "Delivery"),
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.clickNextOrder(),
         ].flat(),
 });

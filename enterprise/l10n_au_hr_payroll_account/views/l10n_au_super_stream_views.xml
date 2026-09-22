@@ -19,7 +19,7 @@
                     <div class="oe_button_box" name="button_box">
                         <field name="payment_id" invisible="1" />
                         <button class="oe_stat_button" type="object" name="action_open_payment"
-                            icon="fa-dollar" invisible="not payment_id">
+                            icon="attach_money" invisible="not payment_id">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Payments</span>
                             </div>
@@ -62,7 +62,7 @@
                 <field name="display_name" />
                 <field name="company_id"/>
                 <field name="activity_ids" widget="list_activity"/>
-                <field name="activity_date_deadline" string="Deadline" widget="remaining_days" />
+                <field name="activity_date_deadline" string="Deadline" widget="relative_date" />
             </list>
         </field>
     </record>

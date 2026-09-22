@@ -5,9 +5,6 @@ patch(PartnerList.prototype, {
     get isBalanceDisplayed() {
         return true;
     },
-    get partnerInfos() {
-        return this.pos.getPartnerCredit(this.props.partner);
-    },
     async searchPartner() {
         const partners = await super.searchPartner();
         this.pos.setAllTotalDueOfPartners(partners);

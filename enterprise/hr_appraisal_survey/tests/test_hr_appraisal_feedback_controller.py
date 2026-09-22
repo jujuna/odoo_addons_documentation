@@ -38,9 +38,15 @@ class TestHrAppraisalFeedbackController(HttpCase):
             email='user_manager@test.com',
         )
 
+        cls.user_work_contact = cls.env['res.partner'].create({
+            'name': 'Me Myself and I',
+            'email': 'mymyselfandi@example.com',
+        })
+
         cls.user_employee = cls.env['hr.employee'].create({
             'name': 'Me Myself and I',
-            'user_id': cls.user.id
+            'user_id': cls.user.id,
+            'work_contact_id': cls.user_work_contact.id,
         })
 
         cls.appraisal_officer = cls.env['hr.employee'].create({
@@ -78,7 +84,7 @@ class TestHrAppraisalFeedbackController(HttpCase):
         with freeze_time(datetime.date(2024, 9, 19)):
             feedback = self.env['appraisal.ask.feedback'].create({
                 'appraisal_id': self.appraisal.id,
-                'employee_ids': [self.user_employee.id],
+                'partner_ids': [self.user_employee.work_contact_id.id],
                 'deadline': datetime.date(2024, 9, 20),
                 'survey_template_id': self.appraisal_survey.id,
             })
@@ -100,7 +106,7 @@ class TestHrAppraisalFeedbackController(HttpCase):
         with freeze_time(datetime.date(2024, 9, 19)):
             feedback = self.env['appraisal.ask.feedback'].create({
                 'appraisal_id': self.appraisal.id,
-                'employee_ids': [self.user_employee.id],
+                'partner_ids': [self.user_employee.work_contact_id.id],
                 'deadline': datetime.date(2024, 9, 19),
                 'survey_template_id': self.appraisal_survey.id,
             })

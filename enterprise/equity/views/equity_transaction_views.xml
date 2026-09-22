@@ -54,7 +54,7 @@
                             <span class="d-flex d-flex-row align-items-baseline fs-6">
                                 <div class="fw-bold col">
                                     <field name="seller_name" invisible="transaction_type != 'transfer'"/>
-                                    <i title="To" class="fa fa-fw fa-arrow-right mx-1" invisible="transaction_type != 'transfer'"/>
+                                    <i title="To" class="oi oi-fw mx-1" data-icon="arrow_forward" invisible="transaction_type != 'transfer'"/>
                                     <field name="subscriber_name"/>
                                 </div>
                                 <div class="ms-auto text-end col">
@@ -64,7 +64,7 @@
                             <div class="d-flex d-flex-row">
                                 <field name="securities" class="me-1" widget="float" digits="[0,0]"/>
                                 <field name="security_class_id"/>
-                                <i title="To" class="fa fa-fw fa-arrow-right mx-1" invisible="transaction_type != 'exercise'"/>
+                                <i title="To" class="oi oi-fw mx-1" data-icon="arrow_forward" invisible="transaction_type != 'exercise'"/>
                                 <field name="destination_class_id"/>
                                 <field
                                     name="transaction_type"
@@ -88,17 +88,11 @@
         <field name="arch" type="xml">
             <form string="Transaction">
                 <header>
-                    <button name="action_transaction_seller_send"
-                        invisible="transaction_type != 'transfer'"
+                    <button name="action_transaction_send"
                         type="object"
-                        string="Send to Seller"
+                        string="Send"
                         class="oe_highlight"
                         data-hotkey="u"/>
-                    <button name="action_transaction_subscriber_send"
-                        type="object"
-                        string="Send to Subscriber"
-                        class="oe_highlight"
-                        data-hotkey="y"/>
                     <widget name="attach_document" string="Upload Files" action="message_post"/>
                     <button
                         name="equity.action_equity_valuation_form"
@@ -114,11 +108,11 @@
                     <field name="subscriber_id_placeholder" invisible="1"/> <!-- Needed for placeholder_field -->
                     <field name="securities_type" invisible="1"/> <!-- Needed for conditions -->
                     <group class="d-flex flex-column">
-                        <field name="transaction_type" widget="selection_badge"/>
+                        <field name="transaction_type" widget="badges_selection"/>
                     </group>
                     <group>
                         <group id="left_group">
-                            <field name="partner_id"/>
+                            <field name="partner_id" context="{'default_is_company': True}"/>
                             <field name="date"/>
                             <field name="seller_id" options="{'placeholder_field': 'subscriber_id_placeholder'}" invisible="transaction_type != 'transfer'" required="securities_type == 'shares'"/>
                             <field name="subscriber_id" options="{'placeholder_field': 'subscriber_id_placeholder'}" string="Buyer" invisible="transaction_type != 'transfer'" required="securities_type == 'shares'"/>
@@ -163,9 +157,11 @@
                             </div>
                             <div class="d-flex">
                                 <field name="security_price" class="w-50" widget="monetary" options="{'currency_field': 'equity_currency_id'}"/>
-                                <div>/ Security</div>
+                                <field name="equity_currency_id" class="w-25" options="{'no_create': True}" groups="base.group_multi_currency" invisible="not can_change_currency"/>
+                                <div>per security</div>
                             </div>
                             <field name="transfer_amount" widget="monetary"/>
+                            <field name="company_id" groups="base.group_multi_company" invisible="not company_id"/>
                         </group>
                     </group>
                     <group string="Notes">

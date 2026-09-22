@@ -1,7 +1,7 @@
+import { proxy } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { rpc } from "@web/core/network/rpc";
-import { useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { AddPageConfirmDialog } from "@website/components/dialog/add_page_dialog";
 
@@ -9,7 +9,7 @@ patch(AddPageConfirmDialog.prototype, {
     setup() {
         super.setup();
         this.notification = useService("notification");
-        this.state = useState({
+        this.state = proxy({
             ...this.state,
             instructions: "",
             tone: "",
@@ -63,7 +63,7 @@ patch(AddPageConfirmDialog.prototype, {
 
     async processSectionsArch() {
         if (this.state.sectionsArch) {
-            const aiGeneratedContent = await rpc('/ai_website/generate_page', {
+            const aiGeneratedContent = await rpc("/ai_website/generate_page", {
                 instructions: this.state.instructions || "",
                 name: this.state.name,
                 sectionsArch: this.state.sectionsArch,

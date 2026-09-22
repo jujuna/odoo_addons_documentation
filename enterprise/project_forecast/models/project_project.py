@@ -2,7 +2,6 @@
 
 import ast
 import datetime
-import json
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -11,7 +10,7 @@ from odoo.exceptions import UserError
 class ProjectProject(models.Model):
     _inherit = 'project.project'
 
-    total_forecast_time = fields.Integer(compute='_compute_total_forecast_time', groups='planning.group_planning_user', export_string_translation=False)
+    total_forecast_time = fields.Integer(compute='_compute_total_forecast_time', export_string_translation=False)
 
     def _compute_total_forecast_time(self):
         shifts_read_group = self.env['planning.slot']._read_group(
@@ -59,24 +58,3 @@ class ProjectProject(models.Model):
             domain=[('start_datetime', '!=', False), ('end_datetime', '!=', False)],
         )
         return action
-
-    # ----------------------------
-    #  Project Updates
-    # ----------------------------
-
-    def _get_stat_buttons(self):
-        buttons = super()._get_stat_buttons()
-        if self.env.user.has_group("planning.group_planning_user"):
-            buttons.append({
-                'icon': 'tasks',
-                'text': self.env._('Planned'),
-                'number': self.env._('%s Hours', self.total_forecast_time),
-                'action_type': 'object',
-                'action': 'action_project_forecast_from_project',
-                'additional_context': json.dumps({
-                    'active_id': self.id,
-                }),
-                'show': True,
-                'sequence': 12,
-            })
-        return buttons

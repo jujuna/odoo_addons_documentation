@@ -1,4 +1,8 @@
 .o_web_studio_editor {
+    --ws-hook-highlight-border: 2px solid rgba(var(--info-rgb), 1);
+    --ws-hook-nearest-border: 1px dashed rgba($o-brand-primary, 0.5);
+    --ws-hook-separator-border: 2px dashed #{rgba($o-brand-primary, 0.5)};
+
     .o_web_studio_editor_manager {
         .o-draggable {
             &, * {
@@ -60,6 +64,63 @@
             }
             .o_web_studio_hook {
                 padding: .5px;
+            }
+
+            .o_web_studio_hook-highlight {
+                --ws-hook-border: var(--ws-hook-highlight-border);
+                min-height: 30px;
+                min-width: 30px;
+                &:not(.o_web_studio_statusbar_hook,.o_web_studio_hook) {
+                    border: var(--ws-hook-border);
+                }
+            }
+        }
+    }
+
+    .o_form_statusbar, .o-form-buttonbox, .o-ws-selection-header-buttons {
+        --ws-hook-separator-padding: 5px 20px;
+        --ws-hook-nearest-padding: 5px
+    }
+
+    .o_web_studio_hook {
+        margin: 1px;
+        border: 0px dashed transparent;
+        transition: all .2s;
+
+        &.o_web_studio_hook_visible {
+            padding: 6px;
+            background: rgba($o-brand-secondary, 0.1);
+            z-index: 100;
+
+            &[data-structures="aside"], &[data-type="t"] {
+                width: 50px !important;
+            }
+
+            &[data-type="ribbon"] {
+                width: 100% !important;
+            }
+        }
+        span.o_web_studio_hook_separator {
+            display: block;
+            position: relative;
+            border: 0px dashed transparent;
+        }
+
+        &.o_web_studio_nearest_hook {
+            cursor: pointer;
+            background-color: rgba($o-brand-primary, 0.02);
+            border: var(--ws-hook-nearest-border);
+            padding: var(--ws-hook-nearest-padding, 18px) !important;
+
+            &[data-type="ribbon"] div {
+                opacity: 1 !important;
+            }
+            span.o_web_studio_hook_separator {
+                display: var(--ws-hook-separator-display, inline);
+                background-color: rgba($o-brand-primary, 0.02);
+                border: var(--ws-hook-separator-border);
+                padding: var(--ws-hook-separator-padding, 20px);
+                margin: 4px 0;
             }
         }
     }

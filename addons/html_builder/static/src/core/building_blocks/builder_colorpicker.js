@@ -1,30 +1,31 @@
-import { ColorSelector } from "@html_editor/main/font/color_selector";
-import { Component, useComponent, useRef } from "@odoo/owl";
+import { getAllUsedColors } from "@html_builder/utils/utils_css";
 import {
-    useColorPicker,
     DEFAULT_COLORS,
     DEFAULT_THEME_COLOR_VARS,
-} from "@web/core/color_picker/color_picker";
-import { BuilderComponent } from "./builder_component";
+    useColorPicker,
+} from "@html_editor/components/color_picker/color_picker";
+import { ColorSelector } from "@html_editor/main/font/color_selector";
+import { Component, signal, t, useProps } from "@odoo/owl";
+import { isCSSColor, isColorGradient } from "@web/core/utils/colors";
+import { useEnv } from "@web/owl2/utils";
 import {
     basicContainerBuilderComponentProps,
     getAllActionsAndOperations,
+    hasPreview,
     revertPreview,
     useBuilderComponent,
     useDomState,
-    useHasPreview,
 } from "../utils";
-import { isCSSColor, isColorGradient } from "@web/core/utils/colors";
-import { getAllUsedColors } from "@html_builder/utils/utils_css";
+import { BuilderComponent } from "./builder_component";
 
 // TODO replace by useInputBuilderComponent after extract unit by AGAU
-export function useColorPickerBuilderComponent() {
-    const comp = useComponent();
-    const { getAllActions, callOperation } = getAllActionsAndOperations(comp);
-    const getAction = comp.env.editor.shared.builderActions.getAction;
+function useColorPickerBuilderComponent(props) {
+    const env = useEnv();
+    const { getAllActions, callOperation } = getAllActionsAndOperations(props);
+    const getAction = env.editor.shared.builderActions.getAction;
     let selectedTab;
     const state = useDomState(getState);
-    const applyOperation = comp.env.editor.shared.history.makePreviewableAsyncOperation(
+    const applyOperation = env.editor.shared.history.makePreviewableAsyncOperation(
         (applySpecs, isPreviewing) => {
             const proms = [];
             for (const applySpec of applySpecs) {
@@ -35,7 +36,7 @@ export function useColorPickerBuilderComponent() {
                         params: applySpec.actionParam,
                         value: applySpec.actionValue,
                         loadResult: applySpec.loadResult,
-                        dependencyManager: comp.env.dependencyManager,
+                        dependencyManager: env.dependencyManager,
                     })
                 );
             }
@@ -55,10 +56,9 @@ export function useColorPickerBuilderComponent() {
         return {
             // defaultTab is the tab to open if the user has not done a selection yet.
             // If the user has already selected a color, the tab of the last selection is opened
-            defaultTab: comp.props.selectedTab,
-            mode: actionParam.mainParam || actionId,
-            selectedColor: actionValue || comp.props.defaultColor,
-            selectedColorCombination: comp.env.editor.shared.color.getColorCombination(
+            defaultTab: props.selectedTab,
+            selectedColor: actionValue || props.defaultColor,
+            selectedColorCombination: env.editor.shared.color.getColorCombination(
                 editingElement,
                 actionParam
             ),
@@ -72,130 +72,13 @@ export function useColorPickerBuilderComponent() {
             : colorValue;
     }
 
-    let previewValue = null;
-    function onApply(colorValue) {
-        previewValue = null;
-        selectedTab = comp.getCorrespondingColorPickerTab(colorValue);
-        callOperation(applyOperation.commit, { userInputValue: getColor(colorValue) });
-    }
-    let onPreview = (colorValue) => {
-        // Avoid previewing the same color twice.
-        if (previewValue === colorValue) {
-            return;
-        }
-        previewValue = colorValue;
-        callOperation(applyOperation.preview, {
-            preview: true,
-            userInputValue: getColor(colorValue),
-            operationParams: {
-                cancellable: true,
-                cancelPrevious: () => applyOperation.revert(),
-            },
-        });
-    };
-    const hasPreview = useHasPreview(getAllActions);
-    if (!hasPreview) {
-        onPreview = () => {};
-    }
-    return {
-        state,
-        onApply,
-        onPreview,
-        onPreviewRevert: () => {
-            previewValue = null;
-            revertPreview(comp.env.editor);
-        },
-    };
-}
-
-export class BuilderColorPicker extends Component {
-    static template = "html_builder.BuilderColorPicker";
-    static props = {
-        ...basicContainerBuilderComponentProps,
-        noTransparency: { type: Boolean, optional: true },
-        enabledTabs: { type: Array, optional: true },
-        grayscales: { type: Object, optional: true },
-        unit: { type: String, optional: true },
-        title: { type: String, optional: true },
-        getUsedCustomColors: { type: Function, optional: true },
-        selectedTab: { type: String, optional: true },
-        defaultColor: { type: String, optional: true },
-        defaultOpacity: { type: Number, optional: true },
-    };
-    static defaultProps = {
-        enabledTabs: ["theme", "gradient", "custom"],
-        defaultColor: "#FFFFFF00",
-        selectedTab: "theme",
-    };
-    static components = {
-        ColorSelector: ColorSelector,
-        BuilderComponent,
-    };
-
-    setup() {
-        useBuilderComponent();
-        const { state, onApply, onPreview, onPreviewRevert } = useColorPickerBuilderComponent();
-        this.colorButton = useRef("colorButton");
-        this.state = state;
-        useColorPicker(
-            "colorButton",
-            {
-                state,
-                applyColor: onApply,
-                applyColorPreview: onPreview,
-                applyColorResetPreview: onPreviewRevert,
-                getUsedCustomColors:
-                    this.props.getUsedCustomColors || this.getUsedCustomColors.bind(this),
-                colorPrefix: "color-prefix-",
-                cssVarColorPrefix: "hb-cp-",
-                noTransparency: this.props.noTransparency,
-                enabledTabs: this.props.enabledTabs,
-                grayscales: this.props.grayscales,
-                defaultOpacity: this.props.defaultOpacity,
-                className: "o-hb-colorpicker",
-                editColorCombination: this.env.editColorCombination,
-            },
-            {
-                onClose: onPreviewRevert,
-                popoverClass: "o-hb-colorpicker-popover",
-            }
-        );
-    }
-
-    getSelectedColorStyle() {
-        if (this.state.selectedColor) {
-            if (isColorGradient(this.state.selectedColor)) {
-                return `background-image: ${this.state.selectedColor}`;
-            }
-            if (isCSSColor(this.state.selectedColor)) {
-                return `background-color: ${this.state.selectedColor}`;
-            }
-            return `background-color: var(--${this.state.selectedColor})`;
-        }
-        if (this.state.selectedColorCombination) {
-            const colorCombination = this.state.selectedColorCombination.replace("_", "-");
-            const el = this.env.getEditingElement();
-            const style = el.ownerDocument.defaultView.getComputedStyle(el);
-            if (style.backgroundImage !== "none") {
-                return `background-image: ${style.backgroundImage}`;
-            } else {
-                return `background-color: var(--${colorCombination}-bg)`;
-            }
-        }
-        return "";
-    }
-
-    getUsedCustomColors() {
-        return getAllUsedColors(this.env.editor.editable);
-    }
-
-    getCorrespondingColorPickerTab(selectedColor) {
+    function getCorrespondingColorPickerTab(selectedColor) {
         if (!selectedColor) {
             return;
         }
 
-        selectedColor = selectedColor.replace(/color-prefix-/g, "");
-        const isTabEnabled = (tab) => this.props.enabledTabs.includes(tab);
+        selectedColor = selectedColor.replaceAll(/color-prefix-/g, "");
+        const isTabEnabled = (tab) => props.enabledTabs.includes(tab);
 
         if (isTabEnabled("gradient") && isColorGradient(selectedColor)) {
             return "gradient";
@@ -216,5 +99,137 @@ export class BuilderColorPicker extends Component {
         if (isTabEnabled("custom")) {
             return "custom";
         }
+    }
+
+    let previewValue = null;
+    function onApply(colorValue) {
+        previewValue = null;
+        selectedTab = getCorrespondingColorPickerTab(colorValue);
+        callOperation(applyOperation.commit, { userInputValue: getColor(colorValue) });
+    }
+    function onPreview(colorValue) {
+        // Avoid previewing the same color twice.
+        if (previewValue === colorValue) {
+            return;
+        }
+        previewValue = colorValue;
+        callOperation(applyOperation.preview, {
+            preview: true,
+            userInputValue: getColor(colorValue),
+            operationParams: {
+                cancellable: true,
+                cancelPrevious: () => applyOperation.revert(),
+            },
+        });
+    }
+    return {
+        state,
+        onApply,
+        onPreview: hasPreview(props, getAllActions) ? onPreview : () => {},
+        onPreviewRevert: () => {
+            previewValue = null;
+            revertPreview(env.editor);
+        },
+    };
+}
+
+export class ColorPickerButton extends Component {
+    static template = "html_builder.ColorPickerButton";
+
+    props = useProps({
+        title: t.string().optional(),
+        style: t.string(),
+        tooltip: t.string().optional(),
+        colorPickerConfig: t.object({
+            props: t.object(),
+            options: t.object(),
+        }),
+    });
+
+    colorButtonRef = signal.ref();
+
+    setup() {
+        useColorPicker(
+            this.colorButtonRef,
+            this.props.colorPickerConfig.props,
+            this.props.colorPickerConfig.options
+        );
+    }
+}
+
+export class BuilderColorPicker extends Component {
+    static components = {
+        ColorSelector: ColorSelector,
+        BuilderComponent,
+        ColorPickerButton,
+    };
+    static template = "html_builder.BuilderColorPicker";
+
+    props = useProps({
+        ...basicContainerBuilderComponentProps,
+        noTransparency: t.boolean().optional(),
+        enabledTabs: t.array().optional(["theme", "gradient", "custom"]),
+        grayscales: t.object().optional(),
+        unit: t.string().optional(),
+        title: t.string().optional(),
+        tooltip: t.string().optional(),
+        getUsedCustomColors: t.function().optional(),
+        selectedTab: t.string().optional("theme"),
+        defaultColor: t.string().optional("#FFFFFF00"),
+        defaultOpacity: t.number().optional(),
+        colorPickerClassName: t.string().optional("o-hb-colorpicker"),
+        colorPickerPopoverClassName: t.string().optional("o-hb-colorpicker-popover"),
+    });
+
+    setup() {
+        useBuilderComponent(this.props);
+        const { state, onApply, onPreview, onPreviewRevert } = useColorPickerBuilderComponent(
+            this.props
+        );
+        this.state = state;
+
+        this.colorPickerConfig = {
+            props: {
+                state,
+                applyColor: onApply,
+                applyColorPreview: onPreview,
+                applyColorResetPreview: onPreviewRevert,
+                getUsedCustomColors:
+                    this.props.getUsedCustomColors || this.getUsedCustomColors.bind(this),
+                colorPrefix: "color-prefix-",
+                cssVarColorPrefix: "hb-cp-",
+                noTransparency: this.props.noTransparency,
+                enabledTabs: this.props.enabledTabs,
+                grayscales: this.props.grayscales,
+                defaultOpacity: this.props.defaultOpacity,
+                className: this.props.colorPickerClassName,
+                editColorCombination: this.env.editColorCombination,
+            },
+            options: {
+                onClose: onPreviewRevert,
+                popoverClass: this.props.colorPickerPopoverClassName,
+            },
+        };
+    }
+
+    getSelectedColorStyle() {
+        if (this.state.selectedColor) {
+            if (isColorGradient(this.state.selectedColor)) {
+                return `background-image: ${this.state.selectedColor}`;
+            }
+            if (isCSSColor(this.state.selectedColor)) {
+                return `background-color: ${this.state.selectedColor}`;
+            }
+            return `background-color: var(--${this.state.selectedColor})`;
+        }
+        if (this.state.selectedColorCombination) {
+            const colorCombination = this.state.selectedColorCombination.replace("_", "-");
+            return `background-color: var(--hb-cp-${colorCombination}-bg); background-image: var(--hb-cp-${colorCombination}-bg-gradient);`;
+        }
+        return "";
+    }
+
+    getUsedCustomColors() {
+        return getAllUsedColors(this.env.editor.editable);
     }
 }

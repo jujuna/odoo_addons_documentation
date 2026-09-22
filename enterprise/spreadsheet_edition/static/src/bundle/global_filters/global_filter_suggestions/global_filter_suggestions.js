@@ -8,7 +8,6 @@ const { useLocalStore } = stores;
 export class GlobalFilterSuggestions extends Component {
     static template = "spreadsheet_edition.GlobalFilterSuggestions";
     static components = { Section };
-    static props = {};
 
     setup() {
         const store = useLocalStore(GlobalFilterSuggestionsStore);

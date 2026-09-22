@@ -11,6 +11,12 @@ class TestPaymentReportBase(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
 
+        cls.struct_type = cls.env['hr.payroll.structure.type'].create({'name': 'Regular'})
+        cls.structure = cls.env['hr.payroll.structure'].create({
+            'name': 'Regular structure',
+            'type_id': cls.struct_type.id,
+        })
+
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Test Employee',
             'company_id': cls.company.id,
@@ -38,6 +44,7 @@ class TestPaymentReportBase(TransactionCase):
             'name': 'Test Payrun',
             'date_start': date(2025, 1, 1),
             'date_end': date(2025, 1, 31),
+            'structure_id': cls.structure.id,
         })
         cls.payslip.payslip_run_id = cls.payrun.id
 

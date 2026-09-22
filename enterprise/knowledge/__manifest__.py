@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -6,7 +5,6 @@
     'summary': 'Centralize, manage, share and grow your knowledge library',
     'description': 'Centralize, manage, share and grow your knowledge library',
     'category': 'Productivity/Knowledge',
-    'version': '1.0',
     'depends': [
         'web',
         'digest',
@@ -28,6 +26,7 @@
         'data/ir_actions_data.xml',
         'data/mail_templates.xml',
         'data/mail_templates_email_layouts.xml',
+        'data/portal_entry_data.xml',
         'wizard/knowledge_invite_views.xml',
         'views/knowledge_article_views.xml',
         'views/knowledge_article_favorite_views.xml',
@@ -36,14 +35,11 @@
         'views/knowledge_article_template_category_views.xml',
         'views/knowledge_templates_portal.xml',
         'views/knowledge_menus.xml',
-        'views/portal_templates.xml',
-        'security/ir.model.access.csv',
-        'security/ir_rule.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/knowledge_article_demo.xml',
     ],
-    'installable': True,
     'application': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
@@ -76,6 +72,7 @@
             ('remove', 'knowledge/static/src/views/hierarchy/**'),
             'knowledge/static/src/services/**/*',
             'knowledge/static/src/macros/**/*',
+            ('remove', 'knowledge/static/src/**/*.dark.scss'),
         ],
         'web.assets_backend_lazy': [
             'knowledge/static/src/views/hierarchy/**',
@@ -85,6 +82,7 @@
         ],
         "web.assets_web_dark": [
             'knowledge/static/src/scss/knowledge_views.dark.scss',
+            'knowledge/static/src/components/sidebar/sidebar_row.dark.scss',
         ],
         'web.assets_unit_tests': [
             'knowledge/static/tests/**/*',
@@ -104,6 +102,15 @@
         ],
         'knowledge.assets_knowledge_print': [
             'knowledge/static/src/scss/knowledge_print.scss',
+        ],
+        "im_livechat.assets_embed_core": [
+            "knowledge/static/src/mail/core/common/**/*",
+        ],
+        "mail.assets_public": [
+            "knowledge/static/src/mail/core/common/**/*",
+        ],
+        "portal.assets_chatter_helpers": [
+            "knowledge/static/src/mail/core/common/**/*",
         ],
     },
 }

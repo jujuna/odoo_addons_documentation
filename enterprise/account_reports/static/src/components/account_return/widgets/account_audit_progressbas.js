@@ -11,11 +11,11 @@ export class AccountAuditProgressbar extends ProgressBarField {
     }
 
     get maxValue() {
-        return this.props.record.data[this.maxValueField];
+        return this.props.record.data[this.props.maxValueField];
     }
 
     get hasMaxValue() {
-        return this.props.record.data.hasOwnProperty(this.maxValueField)
+        return this.props.record.data.hasOwnProperty(this.props.maxValueField)
     }
 }
 

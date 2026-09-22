@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 from odoo.fields import Date
 
 from freezegun import freeze_time
 
 PAY_SCHEDULES = {
     'monthly': 30,
+    'semi-monthly': 14,
     'quarterly': 89,
     'semi-annually': 180,
     'annually': 364,
@@ -17,6 +18,8 @@ PAY_SCHEDULES = {
     'daily': 0,
 }
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestScheduleRelativePayslip(TransactionCase):
 
     @classmethod
@@ -88,20 +91,19 @@ class TestScheduleRelativePayslip(TransactionCase):
             self.billy_contract.write({
                 'schedule_pay': 'quarterly',
             })
-            payslip = self.env['hr.payslip'].new({
-                'name': 'Black Spot February',
+            payslip = self.env['hr.payslip'].create({
                 'employee_id': self.billy_emp.id,
             })
 
             payslip.date_from = Date.to_date('2022-01-31')
             self.assertTrue(
-                payslip.issues and "No running contract over payslip period" in [issue['message'] for issue in payslip.issues.values()],
+                payslip.issues and "No running contract" in [issue['message'] for issue in payslip.issues.values()],
                 "An error should be set on contract validity.")
 
             payslip.date_to = Date.to_date('2022-05-14')
             self.assertTrue(
-                payslip.issues and "No running contract over payslip period" in [issue['message'] for issue in payslip.issues.values()],
+                payslip.issues and "No running contract" in [issue['message'] for issue in payslip.issues.values()],
                 "An error should be set on contract validity.")
             self.assertTrue(
-                payslip.issues and "The duration of the payslip is not accurate according to the structure type." in [issue['message'] for issue in payslip.issues.values()],
+                payslip.issues and "Payslip periods mismatch pay schedule." in [issue['message'] for issue in payslip.issues.values()],
                 "A warning should be set on structure type duration.")

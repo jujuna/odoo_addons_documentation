@@ -1,10 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import datetime
 
 from odoo import models, _, Command
-from odoo.tools.misc import file_open
+from odoo.tools import file_open
 
 
 class ExpenseSampleReceipt(models.Model):
@@ -48,26 +47,25 @@ class ExpenseSampleReceipt(models.Model):
         }
 
         # 4/ Ensure we have a journal
-        if not self.env['hr.expense.post.wizard']._default_journal_id():
+        if not self.env['account.journal'].search([('type', '=', 'purchase'), ('code', '=', 'SAMPL_P')]):
             self.env['account.journal'].create({
                 'type': 'purchase',
                 'company_id': self.env.company.id,
                 'name': 'Sample Journal',
-                'code': 'SAMPLE_P',
+                'code': 'SAMPL_P',
             })
 
         # 5/ Create the expense
         expense = self.env['hr.expense'].create(expense_line_values)
 
         # 6/ Link the attachment
-        image_path = 'hr_expense_extract/static/img/receipt_sample.webp'
-        with file_open(image_path, 'rb') as f:
-            image = base64.b64encode(f.read())
+        with file_open('hr_expense_extract/static/img/receipt_sample.webp', 'rb') as f:
+            image = f.read()
         self.env['ir.attachment'].create({
             'name': 'sample_receipt.jpeg',
             'res_id': expense.id,
             'res_model': 'hr.expense',
-            'datas': image,
+            'raw': image,
             'type': 'binary',
         })
 

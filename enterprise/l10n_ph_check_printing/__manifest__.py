@@ -1,6 +1,5 @@
 {
     'name': 'Philippines Checks Layout',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Check',
     'summary': 'Print PH Checks',
     'description': """

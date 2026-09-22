@@ -9,6 +9,8 @@ from odoo.tests import tagged, freeze_time
 @tagged('post_install_l10n', 'post_install', '-at_install')
 @freeze_time("2020-12-01 03:45:00")
 class TestNacha(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -23,20 +25,23 @@ class TestNacha(AccountTestInvoicingCommon):
 
         cls.company_data["default_journal_bank"].bank_account_id = cls.env["res.partner.bank"].create({
             "partner_id": cls.company_data["company"].partner_id.id,
-            "acc_number": "223344556",
+            "account_number": "223344556",
+            "clearing_label_id": cls.env.ref("base.clearing_label_us").id,
             "clearing_number": "123456780",
         })
 
         cls.bank_partner_a = cls.env["res.partner.bank"].create({
             "partner_id": cls.partner_a.id,
-            "acc_number": "987654321",
+            "account_number": "987654321",
+            "clearing_label_id": cls.env.ref("base.clearing_label_us").id,
             "clearing_number": "123456780",
             "l10n_us_bank_account_type": "savings",
         })
 
         cls.bank_partner_b = cls.env["res.partner.bank"].create({
             "partner_id": cls.partner_b.id,
-            "acc_number": "987654321",
+            "account_number": "987654321",
+            "clearing_label_id": cls.env.ref("base.clearing_label_us").id,
             "clearing_number": "123456780",
         })
 
@@ -155,3 +160,56 @@ class TestNacha(AccountTestInvoicingCommon):
 
         nr_of_offset_records = len([line for line in expected if line.startswith("627")])
         self.assertFile(expected, len(self.batch.payment_ids) + nr_of_offset_records)
+
+    def testIndividualNameAndIdFromCommercialPartner(self):
+        """ When payment.partner_id is an invoice child contact, the entry
+        detail's Individual Identification (VAT) and Individual Name come from the
+        commercial partner so the bank file matches the legal entity.
+        """
+        self.partner_a.vat = '987654321'
+        invoice_contact = self.env['res.partner'].create({
+            'name': 'invoice_contact',
+            'type': 'invoice',
+            'parent_id': self.partner_a.id,
+        })
+        today = fields.Date.context_today(self.env.user)
+        payments = self.env['account.payment'].create([{
+            'partner_id': invoice_contact.id,
+            'memo': 'child_pay_today',
+            'amount': 100.00,
+            'payment_type': 'outbound',
+            'date': today,
+            'partner_bank_id': self.bank_partner_a.id,
+        }, {
+            'partner_id': invoice_contact.id,
+            'memo': 'child_pay_tomorrow',
+            'amount': 50.00,
+            'payment_type': 'outbound',
+            'date': today + relativedelta(days=1),
+            'partner_bank_id': self.bank_partner_a.id,
+        }])
+        payments.action_post()
+        self.batch.payment_ids = payments.sorted()
+
+        expected = [
+            # header
+            f"101 111111118  IMM_ORIG2011301945A094101DESTINATION            company_1_data         {self.batch.id:8d}",
+            # batch header for payment today "BATCH 0"
+            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 0   201130201130   1ORIGINAT0000000",
+            # entry detail — VAT (cols 40-54) and Individual Name (cols 55-76) come from partner_a (commercial), not invoice_contact (child)
+            "632123456780987654321        0000010000987654321      partner_a               0ORIGINAT0000000",
+            # batch control record for "BATCH 0"
+            "82200000010012345678000000000000000000010000COMPANY                            ORIGINAT0000000",
+            # batch header for payment tomorrow "BATCH 1"
+            "5220company_1_data  BATCH/OUT/2020/0001 COMPANY   CCDBATCH 1   201201201201   1ORIGINAT0000001",
+            # entry detail — same commercial-partner VAT and Name as batch 0
+            "632123456780987654321        0000005000987654321      partner_a               0ORIGINAT0000000",
+            # batch control record for "BATCH 1"
+            "82200000010012345678000000000000000000005000COMPANY                            ORIGINAT0000001",
+            # file control record
+            "9000002000001000000020024691356000000000000000000015000                                       ",
+            # padding
+            "9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+            "9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+        ]
+        self.assertFile(expected, len(self.batch.payment_ids))

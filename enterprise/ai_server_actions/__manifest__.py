@@ -5,7 +5,7 @@
     "category": "Hidden",
     "version": "0.1",
     "author": "Odoo S.A.",
-    "license": "LGPL-3",
+    "license": "OEEL-1",
     "depends": ["ai_fields"],
     "auto_install": True,  # TODO merge ai_fields, ai_server_actions into ai in 19
     "data": [

@@ -14,19 +14,16 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
         super().setUpClass()
         cls.default_payroll_structure = cls.env.ref("l10n_au_hr_payroll.hr_payroll_structure_au_regular")
         cls.tax_treatment_category = 'R'
-        cls.long_service = cls.env['hr.leave.type'].create({
-            'name': 'Long Service Leave',
-            'company_id': cls.australian_company.id,
-            'l10n_au_leave_type': 'long_service',
-            'leave_validation_type': 'no_validation',
-            'work_entry_type_id': cls.env.ref('hr_work_entry.l10n_au_work_entry_type_long_service_leave').id,
-        })
-        cls.annual = cls.env['hr.leave.type'].create({
+        cls.long_service = cls.env.ref('hr_work_entry.l10n_au_work_entry_type_long_service_leave')
+        cls.long_service.unit_of_measure = 'day'
+        cls.long_service.l10n_au_work_entry_type = 'long_service'
+        cls.annual = cls.env['hr.work.entry.type'].create({
             'name': 'Annual Leave',
-            'company_id': cls.australian_company.id,
-            'l10n_au_leave_type': 'annual',
+            'code': 'Annual Leave',
+            'l10n_au_work_entry_type': 'annual',
             'leave_validation_type': 'no_validation',
-            'work_entry_type_id': cls.env.ref('hr_work_entry.l10n_au_work_entry_type_paid_time_off').id,
+            'unit_of_measure': 'day',
+            'count_as': 'absence',
         })
 
     # Unused leaves tests
@@ -75,16 +72,16 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             "pre_1993": {"start": date(1978, 8, 17), "end": date(1993, 8, 16)},
             "post_1993": {"start": date(1993, 8, 19), "end": max(contract.date_end, date.today())},
         }
-        for leave_type, amount in leaves.items():
-            leave_type_id = self.annual if leave_type == 'annual' else self.long_service
+        for work_entry_type, amount in leaves.items():
+            work_entry_type_id = self.annual if work_entry_type == 'annual' else self.long_service
             for period, number_of_days in amount.items():
                 start_date = dates[period]['start']
                 end_date = max(dates[period]['end'], contract.date_end or dates[period]['end'])
 
                 # Allocate Holidays
                 allocation = self.env['hr.leave.allocation'].create([{
-                    'name': f'{leave_type_id.name} Allocation',
-                    'holiday_status_id': leave_type_id.id,
+                    'name': f'{work_entry_type_id.name} Allocation',
+                    'work_entry_type_id': work_entry_type_id.id,
                     'number_of_days': number_of_days,
                     'employee_id': employee.id,
                     'state': 'confirm',
@@ -120,7 +117,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -163,7 +160,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -207,7 +204,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -250,7 +247,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -294,7 +291,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -338,7 +335,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -381,7 +378,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -424,7 +421,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -470,7 +467,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -514,7 +511,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -538,7 +535,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
     def test_11_termination_unused_leaves(self):
         employee, contract = self.get_unused_leaves_employee('1976-01-01', '1992-08-1992', '2024-03-12')
         employee.l10n_au_withholding_variation = "leaves"
-        employee.l10n_au_withholding_variation_amount = 30
+        employee.l10n_au_withholding_variation_amount = 0.30
 
         self.create_leaves(
             employee,
@@ -558,7 +555,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -583,7 +580,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
     def test_12_termination_unused_leaves(self):
         employee, contract = self.get_unused_leaves_employee('1976-01-01', '1992-08-1992', '2024-03-12')
         employee.l10n_au_withholding_variation = "salaries"
-        employee.l10n_au_withholding_variation_amount = 30
+        employee.l10n_au_withholding_variation_amount = 0.30
         self.create_leaves(
             employee,
             contract,
@@ -602,7 +599,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 8.0, 60.8, 2584.61),
+                (self.work_entry_types["002.00"].id, 8.0, 60.8, 2584.61),
             ],
             expected_lines=[
                 # (code, total)
@@ -647,7 +644,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 1.0, 7.6, 323.08),
+                (self.work_entry_types["002.00"].id, 1.0, 7.6, 323.08),
             ],
             expected_lines=[
                 # (code, total)
@@ -715,7 +712,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 3.0, (7.6 * 3), 600.1),
+                (self.work_entry_types["002.00"].id, 3.0, (7.6 * 3), 600.1),
             ],
             expected_lines=[
                 # (code, total)
@@ -832,7 +829,6 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
         normal_withholding = -252
 
         payslip = self.env["hr.payslip"].create({
-            "name": "payslip",
             "employee_id": employee.id,
             "version_id": contract.id,
             "struct_id": self.default_payroll_structure.id,
@@ -849,7 +845,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             payslip=payslip,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 5, (7.6 * 5), 1200),
+                (self.work_entry_types["002.00"].id, 5, (7.6 * 5), 1200),
             ],
             expected_lines=[
                 # (code, total)
@@ -880,7 +876,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             payslip=payslip,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 5, (7.6 * 5), 1200),
+                (self.work_entry_types["002.00"].id, 5, (7.6 * 5), 1200),
             ],
             expected_lines=[
                 # (code, total)
@@ -926,7 +922,7 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types["WORK100"].id, 5, 38, 1900),
+                (self.work_entry_types["002.00"].id, 5, 38, 1900),
             ],
             expected_lines=[
                 # (code, total)
@@ -945,4 +941,78 @@ class TestPayrollUnusedLeaves(TestPayrollCommon):
             payslip_date_from=fields.Date.from_string('2024-03-11'),
             payslip_date_to=contract.date_end,
             termination_type="normal"
+        )
+
+    def test_26_unused_leaves_on_batch_payslip_create(self):
+        """Ensure each termination payslip gets its own unused leave when created in batch.
+
+        Creating several payslips at once runs unused-leave computation on a multi-recordset.
+        Each slip must still receive the leave amounts for its employee only.
+        """
+        employee_a, contract_a = self.get_unused_leaves_employee('1995-06-08', '2022-01-03', '2024-03-12')
+        employee_b, contract_b = self.get_unused_leaves_employee('1995-06-08', '2022-01-03', '2024-03-12')
+        self.create_leaves(employee_a, contract_a, {"annual": {"post_1993": 10}})
+        self.create_leaves(employee_b, contract_b, {"annual": {"post_1993": 5}})
+
+        payslips = self.env["hr.payslip"].create([{
+            "name": "payslip",
+            "employee_id": employee.id,
+            "version_id": contract.id,
+            "struct_id": self.default_payroll_structure.id,
+            "date_from": contract.date_end.replace(day=1),
+            "date_to": contract.date_end,
+            "l10n_au_termination_type": "normal",
+        } for employee, contract in ((employee_a, contract_a), (employee_b, contract_b))])
+
+        payslip_a = payslips.filtered(lambda p: p.employee_id == employee_a)
+        payslip_b = payslips.filtered(lambda p: p.employee_id == employee_b)
+        self.assertAlmostEqual(
+            payslip_a._get_input_line_amount('AL'),
+            10 * payslip_a._get_daily_wage(),
+            2,
+            "Employee A should keep their 10 unused annual leave days on the batch-created payslip",
+        )
+        self.assertAlmostEqual(
+            payslip_b._get_input_line_amount('AL'),
+            5 * payslip_b._get_daily_wage(),
+            2,
+            "Employee B should keep their 5 unused annual leave days on the batch-created payslip",
+        )
+
+    def test_27_unused_leaves_on_batch_payslip_create_without_allocation(self):
+        """Ensure a termination payslip whose employee has no allocation does not break the batch.
+
+        Unused leave totals are only keyed on the payslips having a matching allocation, so a
+        batch mixing employees with and without allocations must still resolve to 0 for the latter.
+        """
+        employee_a, contract_a = self.get_unused_leaves_employee('1995-06-08', '2022-01-03', '2024-03-12')
+        employee_b, contract_b = self.get_unused_leaves_employee('1995-06-08', '2022-01-03', '2024-03-12')
+        self.create_leaves(employee_a, contract_a, {"annual": {"post_1993": 10}})
+
+        payslips = self.env["hr.payslip"].create([{
+            "name": "payslip",
+            "employee_id": employee.id,
+            "version_id": contract.id,
+            "struct_id": self.default_payroll_structure.id,
+            "date_from": contract.date_end.replace(day=1),
+            "date_to": contract.date_end,
+            "l10n_au_termination_type": "normal",
+        } for employee, contract in ((employee_a, contract_a), (employee_b, contract_b))])
+
+        payslip_a = payslips.filtered(lambda p: p.employee_id == employee_a)
+        payslip_b = payslips.filtered(lambda p: p.employee_id == employee_b)
+        self.assertAlmostEqual(
+            payslip_a._get_input_line_amount('AL'),
+            10 * payslip_a._get_daily_wage(),
+            2,
+            "Employee A should keep their 10 unused annual leave days on the batch-created payslip",
+        )
+        self.assertFalse(
+            payslip_b.input_line_ids.filtered(lambda x: x.code in ('AL', 'LSL')),
+            "Employee B has no allocation and should not get any unused leave input line",
+        )
+        self.assertEqual(
+            payslips._l10n_au_get_unused_leave_totals()[payslip_b.id],
+            {"annual": 0.0, "long_service": 0.0},
+            "A payslip without allocation should default to 0 instead of being missing from the totals",
         )

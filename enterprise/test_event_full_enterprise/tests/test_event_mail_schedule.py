@@ -144,8 +144,8 @@ class TestEventMailSchedule(TestEventMailFullCommon, WhatsAppCase):
 
         # setup batch and cron limit sizes to check iterative behavior
         batch_size, cron_limit = 5, 20
-        self.env["ir.config_parameter"].sudo().set_param("mail.batch_size", batch_size)
-        self.env["ir.config_parameter"].sudo().set_param("mail.render.cron.limit", cron_limit)
+        self.env["ir.config_parameter"].sudo().set_int("mail.batch_size", batch_size)
+        self.env["ir.config_parameter"].sudo().set_int("mail.render.cron.limit", cron_limit)
 
         # launch before event schedulers -> all communications are sent
         current_now = self.event_date_begin - timedelta(days=1)
@@ -207,8 +207,8 @@ class TestEventMailSchedule(TestEventMailFullCommon, WhatsAppCase):
 
         # setup batch and cron limit sizes to check iterative behavior
         batch_size, cron_limit = 5, 20
-        self.env["ir.config_parameter"].sudo().set_param("mail.batch_size", batch_size)
-        self.env["ir.config_parameter"].sudo().set_param("mail.render.cron.limit", cron_limit)
+        self.env["ir.config_parameter"].sudo().set_int("mail.batch_size", batch_size)
+        self.env["ir.config_parameter"].sudo().set_int("mail.render.cron.limit", cron_limit)
 
         # create registrations -> each one receives its on subscribe communication
         EventMailRegistration = type(self.env['event.mail.registration'])

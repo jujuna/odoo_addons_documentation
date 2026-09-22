@@ -3,7 +3,10 @@
     <record id="profit_and_loss" model="account.report">
         <field name="name">Profit and Loss</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="country_id" ref="base.us"/>
+        <field name="filter_hierarchy">by_default</field>
+        <field name="filter_cash_basis" eval="True"/>
         <field name="column_ids">
             <record id="profit_and_loss_column" model="account.report.column">
                 <field name="name">Balance</field>
@@ -12,11 +15,9 @@
         </field>
         <field name="line_ids">
             <record id="pl_income" model="account.report.line">
-                <field name="name">Income</field>
+                <field name="name">Revenue</field>
                 <field name="code">INC</field>
-                <field name="hierarchy_level">1</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
+                <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="pl_income_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -29,10 +30,7 @@
             <record id="pl_cost_of_sales" model="account.report.line">
                 <field name="name">Cost of Sales</field>
                 <field name="code">COS</field>
-                <field name="parent_id" eval="False"/>
                 <field name="hierarchy_level">1</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="pl_cost_of_sales_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -46,8 +44,7 @@
             <record id="pl_gross_profit" model="account.report.line">
                 <field name="name">Gross Profit</field>
                 <field name="code">GRP</field>
-                <field name="parent_id" eval="False"/>
-                <field name="hierarchy_level">0</field>
+                <field name="hierarchy_level">1</field>
                 <field name="expression_ids">
                     <record id="pl_gross_profit_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -59,10 +56,7 @@
             <record id="pl_expense" model="account.report.line">
                 <field name="name">Expense</field>
                 <field name="code">EXP</field>
-                <field name="parent_id" eval="False"/>
-                <field name="hierarchy_level">1</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
+                <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="pl_expense_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -75,7 +69,6 @@
             </record>
             <record id="pl_net_operating_income" model="account.report.line">
                 <field name="name">Net Operating Income</field>
-                <field name="hierarchy_level">0</field>
                 <field name="code">OPINC</field>
                 <field name="expression_ids">
                     <record id="pl_net_operating_income_balance" model="account.report.expression">
@@ -88,10 +81,7 @@
             <record id="pl_other_income" model="account.report.line">
                 <field name="name">Other Income</field>
                 <field name="code">OIN</field>
-                <field name="parent_id" eval="False"/>
                 <field name="hierarchy_level">1</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="pl_other_income_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -104,10 +94,7 @@
             <record id="pl_other_expense" model="account.report.line">
                 <field name="name">Other Expense</field>
                 <field name="code">OEXP</field>
-                <field name="parent_id" eval="False"/>
                 <field name="hierarchy_level">1</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="pl_other_expense_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -120,7 +107,6 @@
             </record>
             <record id="pl_net_other_income" model="account.report.line">
                 <field name="name">Net Other Income</field>
-                <field name="hierarchy_level">0</field>
                 <field name="code">NOIN</field>
                 <field name="expression_ids">
                     <record id="pl_net_other_income_balance" model="account.report.expression">

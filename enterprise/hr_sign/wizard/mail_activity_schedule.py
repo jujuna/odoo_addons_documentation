@@ -6,10 +6,13 @@ from odoo import models, _
 class MailActivitySchedule(models.TransientModel):
     _inherit = 'mail.activity.schedule'
 
+    def _sign_exclude_activity_types(self):
+        return super()._sign_exclude_activity_types() or self.res_model == 'hr.employee'
+
     def _plan_filter_activity_templates_to_schedule(self):
         if self.res_model != 'hr.employee':
             return super()._plan_filter_activity_templates_to_schedule()
-        return self.plan_id.template_ids.filtered(lambda a: not a.is_signature_request or a.responsible_count > 2)
+        return self.plan_id.template_ids.filtered(lambda a: a.activity_type_id.category != 'sign_request' or a.responsible_count > 2)
 
     def action_schedule_plan(self):
         res = super().action_schedule_plan()
@@ -19,7 +22,7 @@ class MailActivitySchedule(models.TransientModel):
         for employee in self._get_applied_on_records():
             for signature_request in self.plan_id.template_ids - self._plan_filter_activity_templates_to_schedule():
                 employee_role = signature_request.employee_role_id
-                responsible = signature_request._determine_responsible(self.plan_on_demand_user_id, employee)['responsible']
+                responsible = signature_request._determine_responsible(self.plan_on_demand_user_id, self.activity_user_id_fname, employee)['responsible']
 
                 self.env['hr.contract.sign.document.wizard'].create({
                     'version_id': employee.version_id.id,

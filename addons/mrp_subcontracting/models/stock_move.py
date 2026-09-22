@@ -22,7 +22,7 @@ class StockMove(models.Model):
         for move in self:
             if not move.is_subcontract:
                 continue
-            if not move.move_line_ids or move.product_uom.is_zero(move.quantity):
+            if not move.move_line_ids or move.uom_id.is_zero(move.quantity):
                 continue
             productions = move._get_subcontract_production().filtered(lambda m: m.state != 'cancel')
             if not productions:
@@ -41,7 +41,7 @@ class StockMove(models.Model):
         done_moves = self.env['stock.move']
         for move in self:
             if move.is_subcontract:
-                move.is_quantity_done_editable = move.has_tracking == 'none'
+                move.is_quantity_done_editable = move.has_tracking not in ['lot', 'serial']
                 done_moves |= move
         return super(StockMove, self - done_moves)._compute_is_quantity_done_editable()
 
@@ -152,9 +152,12 @@ class StockMove(models.Model):
                 continue
             company = move.company_id
             subcontracting_location = \
-                move.picking_id.partner_id.with_company(company).property_stock_subcontractor \
+                move._get_picking_partner().with_company(company).property_stock_subcontractor \
                 or company.subcontracting_location_id
+            if not move.picking_id:
+                move._assign_picking()
             move.write({
+                'production_group_id': False,
                 'is_subcontract': True,
                 'location_id': subcontracting_location.id
             })
@@ -167,7 +170,7 @@ class StockMove(models.Model):
             picking._subcontracted_produce(subcontract_details)
 
         if subcontract_details_per_picking:
-            self.env['stock.picking'].concat(*list(subcontract_details_per_picking.keys())).action_assign()
+            self.env['stock.picking'].concat(subcontract_details_per_picking).action_assign()
         return res
 
     def _get_subcontract_bom(self):
@@ -177,7 +180,7 @@ class StockMove(models.Model):
             picking_type=self.picking_type_id,
             company_id=self.company_id.id,
             bom_type='subcontract',
-            subcontractor=self.picking_id.partner_id,
+            subcontractor=self._get_picking_partner(),
         )
         return bom
 
@@ -205,9 +208,13 @@ class StockMove(models.Model):
     def _get_available_move_lines(self, assigned_moves_ids, partially_available_moves_ids):
         return super(StockMove, self.filtered(lambda m: not m.is_subcontract))._get_available_move_lines(assigned_moves_ids, partially_available_moves_ids)
 
+    def _should_count_for_quantity_received(self):
+        res = super()._should_count_for_quantity_received()
+        return res or self.is_subcontract or self.location_id.is_subcontract()
+
     def _check_access_if_subcontractor(self, vals):
         if self.env.user._is_portal() and not self.env.su:
-            if vals.get('state') == 'done':
+            if vals.get('state') == 'done' or self.env.context.get('default_state') == 'done':
                 raise AccessError(_("Portal users cannot create a stock move with a state 'Done' or change the current state to 'Done'."))
 
     def _is_subcontract_return(self):
@@ -239,8 +246,8 @@ class StockMove(models.Model):
             productions = move._get_subcontract_production()
             if not productions:
                 continue
-            if move.has_tracking == 'none':
-                if productions.product_uom_id.compare(productions.product_qty, move.quantity) != 0:
+            if move.has_tracking not in ['lot', 'serial']:
+                if productions.uom_id.compare(productions.product_qty, move.quantity) != 0:
                     self.sudo().env['change.production.qty'].with_context(skip_activity=True).create([{
                         'mo_id': productions.id,
                         'product_qty': move.quantity or move.product_uom_qty,
@@ -256,7 +263,7 @@ class StockMove(models.Model):
                     lot_mo = productions.filtered(lambda p: (p.lot_producing_ids and p.lot_producing_ids[0] == lot_id) or (not lot_id and not p.lot_producing_ids))
                     if not lot_mo:
                         mos_to_create[lot_id] = ml_qty
-                    elif lot_mo.product_uom_id.compare(lot_mo.product_qty, ml_qty) != 0:
+                    elif lot_mo.uom_id.compare(lot_mo.product_qty, ml_qty) != 0:
                         self.sudo().env['change.production.qty'].with_context(skip_activity=True).create([{
                             'mo_id': lot_mo.id,
                             'product_qty': ml_qty
@@ -291,3 +298,15 @@ class StockMove(models.Model):
         if self.is_subcontract:
             return super(StockMove, self.with_context(force_lot_m2o=True))._generate_serial_numbers(next_serial, next_serial_count, location_id)
         return super()._generate_serial_numbers(next_serial, next_serial_count, location_id)
+
+    def _get_partner_id(self):
+        if self.raw_material_production_id.subcontractor_id:
+            route = self.env.ref('mrp_subcontracting.route_resupply_subcontractor_mto', raise_if_not_found=False)
+            if route and self.rule_id.route_id == route:
+                return self.raw_material_production_id.subcontractor_id.id
+        return super()._get_partner_id()
+
+    def _get_production_assignation_domain(self):
+        if self.move_dest_ids.raw_material_production_id.subcontractor_id:
+            return []
+        return super()._get_production_assignation_domain()

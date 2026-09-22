@@ -1,9 +1,10 @@
 
-from odoo.tests.common import HttpCase
+from odoo.tests.common import tagged, HttpCase
 
 from .common import DashboardTestCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDashboardController(DashboardTestCommon, HttpCase):
 
     def test_load_with_user_locale(self):
@@ -53,10 +54,24 @@ class TestDashboardController(DashboardTestCommon, HttpCase):
         sample_dashboard_path = 'spreadsheet_dashboard/tests/data/sample_dashboard.json'
         dashboard = self.create_dashboard()
         dashboard.sample_dashboard_file_path = sample_dashboard_path
-        dashboard.main_data_model_ids = [(4, self.env.ref('base.model_res_bank').id)]
-        self.env['res.bank'].sudo().search([]).action_archive()
+        dashboard.main_data_model_ids = [(4, self.env.ref('base.model_res_partner_bank').id)]
+        self.env['res.partner.bank'].sudo().search([]).action_archive()
         response = self.url_open(f'/spreadsheet/dashboard/data/{dashboard.id}')
         self.assertEqual(response.json(), {
             'is_sample': True,
             'snapshot': {'sheets': []},
         })
+
+    def test_load_dashboard_with_unreadable_main_model(self):
+        self.authenticate(self.user.login, self.user.password)
+        sample_dashboard_path = 'spreadsheet_dashboard/tests/data/sample_dashboard.json'
+        dashboard = self.create_dashboard()
+        dashboard.sample_dashboard_file_path = sample_dashboard_path
+        dashboard.main_data_model_ids = [(4, self.env.ref('base.model_ir_model').id)]
+        self.assertFalse(self.env['ir.model'].with_user(self.user).has_access('read'))
+
+        response = self.url_open(f'/spreadsheet/dashboard/data/{dashboard.id}')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertNotIn('is_sample', data)
+        self.assertEqual(data['revisions'], [])

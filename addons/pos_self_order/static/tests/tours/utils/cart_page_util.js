@@ -17,21 +17,50 @@ export function selectTable(table) {
     return [
         {
             content: `Select table ${table}`,
-            trigger: `.self_order_popup_table select`,
-            run: (helpers) => {
-                // The default select (run: select 3) doesn't work here
-                const options = document.querySelectorAll(".self_order_popup_table option");
-                const targetOption = Array.from(options).find((option) =>
-                    option.textContent.includes(table)
-                );
-                const optionValue = targetOption.value;
-                helpers.anchor.value = optionValue;
-                helpers.anchor.dispatchEvent(new Event("change"));
-            },
+            trigger: `.self_order_pills_selection_popup .option-item:contains("${table}")`,
+            run: "click",
         },
         {
             content: `Click on 'Confirm' button`,
-            trigger: `.self_order_popup_table .btn:contains('Continue with table ${table}')`,
+            trigger: `.self_order_pills_selection_popup .btn-primary:contains('Confirm')`,
+            run: "click",
+        },
+    ];
+}
+
+export function selectTimeSlot() {
+    return [
+        {
+            content: `Wait for time slot popup to appear`,
+            trigger: `.self_order_pills_selection_popup`,
+        },
+        {
+            content: `Select first available time slot`,
+            trigger: `.self_order_pills_selection_popup .option-item:first`,
+            run: "click",
+        },
+        {
+            content: `Click on 'Confirm' button`,
+            trigger: `.self_order_pills_selection_popup .btn-primary:contains('Confirm')`,
+            run: "click",
+        },
+    ];
+}
+
+export function selectSpecificSlot(slotValue) {
+    return [
+        {
+            content: `Wait for time slot popup to appear`,
+            trigger: `.self_order_pills_selection_popup`,
+        },
+        {
+            content: `Select time slot ${slotValue}`,
+            trigger: `.self_order_pills_selection_popup .option-item:contains('${slotValue}')`,
+            run: "click",
+        },
+        {
+            content: `Click on 'Confirm' button`,
+            trigger: `.self_order_pills_selection_popup .btn-primary:contains('Confirm')`,
             run: "click",
         },
     ];
@@ -140,12 +169,14 @@ export function cancelOrder() {
 
 export function checkSlotUnavailable(slotValue) {
     return {
-        content: `Check that the first available slot is not ${slotValue}`,
-        trigger: ".slot-select",
+        content: `Check that the ${slotValue} slot is not available`,
+        trigger: `.self_order_pills_selection_popup`,
         run: () => {
-            const select = document.querySelector(".slot-select");
-            // select[0] and select[1] are header values
-            if (select[2].innerText === slotValue) {
+            const slots = Array.from(
+                document.querySelectorAll(".self_order_pills_selection_popup .option-item")
+            );
+            const firstSlotText = slots[0]?.textContent.trim();
+            if (firstSlotText === slotValue) {
                 throw new Error(`${slotValue} should not be available`);
             }
         },

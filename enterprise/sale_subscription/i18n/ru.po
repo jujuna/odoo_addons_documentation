@@ -5,15 +5,15 @@
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-27 18:58+0000\n"
-"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 04:06+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "sale_subscription/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_subscription
 #. odoo-python
@@ -39,6 +39,18 @@ msgstr ""
 "договора."
 
 #. module: sale_subscription
+#: model:ir.module.module,description:base.module_sale_subscription
+msgid ""
+"\n"
+"This module allows you to manage subscriptions.\n"
+"\n"
+"Features:\n"
+"    - Create & edit subscriptions\n"
+"    - Modify subscriptions with sales orders\n"
+"    - Generate invoice automatically at fixed intervals\n"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__nbr
 msgid "# of Lines"
 msgstr "# Количество линий"
@@ -53,7 +65,7 @@ msgstr "% Счастливы"
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid ""
 "%(explanation)s, but the billing period has already been invoiced. %(record)s"
-msgstr ""
+msgstr "%(explanation)s, но за расчетный период уже выставлен счет. %(record)s"
 
 #. module: sale_subscription
 #. odoo-python
@@ -71,19 +83,19 @@ msgstr "%(start)s по %(next)s"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "%s Months"
-msgstr ""
+msgstr "%s мес."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "%s Weeks"
-msgstr ""
+msgstr "%s нед."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "%s Years"
-msgstr ""
+msgstr "%s лет"
 
 #. module: sale_subscription
 #. odoo-python
@@ -118,23 +130,13 @@ msgid ""
 "(*) These recurring products are surcharged according to the prorated period "
 "from %(start)s to %(end)s"
 msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "(Change Plan)"
-msgstr "(План изменений)"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid ""
-")\n"
-"                        <br/>"
-msgstr ""
+"(*) Эти товары по подписке оплачиваются дополнительно в соответствии с "
+"пропорциональным периодом с %(start)s по %(end)s"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "- Until"
-msgstr ""
+msgstr "- До"
 
 #. module: sale_subscription
 #. odoo-python
@@ -149,6 +151,9 @@ msgid ""
 "             Any new delivered quantity during this period for the following "
 "product(s) may never be invoiced:"
 msgstr ""
+".\n"
+"             Любые новые поступления этих товаров в течение данного периода "
+"не подлежат включению в счет:"
 
 #. module: sale_subscription
 #. odoo-python
@@ -166,7 +171,7 @@ msgstr "1 неделя"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "1 Year"
-msgstr ""
+msgstr "1 год"
 
 #. module: sale_subscription
 #: model:sale.subscription.plan,name:sale_subscription.subscription_plan_6_month
@@ -174,89 +179,9 @@ msgid "6 Months"
 msgstr "6 месяцев"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<b>Payment Method</b>"
-msgstr "<b>Метод оплаты</b>"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_advance_payment_inv_sale_subscription
 msgid "<b>Subscriptions</b><br/>"
-msgstr ""
-
-#. module: sale_subscription
-#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
-msgid ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Subscription Renewal\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Dear <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,</p>\n"
-"                            <p>Your subscription <strong t-out=\"object.name "
-"or ''\">Office Cleaning Service\"</strong> needs your attention.</p>\n"
-"                            <p>We invite you to renew it by clicking on the "
-"following link.</p>\n"
-"                            <p>Kind regards.</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
-msgstr ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Продление подписки\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Здравствуйте, <t t-"
-"out=\"object.partner_id.name or ''\">Брэндон Фримен</t>!</p>\n"
-"                            <p>Ваша подписка на услугу <strong t-"
-"out=\"object.name or ''\">«Уборка офисов»</strong> скоро истекает.</p>\n"
-"                            <p>Вы можете продлить подписку, перейдя по "
-"следующей ссылке.</p>\n"
-"                            <p>С уважением,</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Митчелл Админ</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
+msgstr "<b>Подписки</b><br/>"
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.mail_template_subscription_rating
@@ -465,53 +390,48 @@ msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<i class=\"fa fa-download me-1\"/> Download"
-msgstr "<i class=\"fa fa-download me-1\"/> Скачать"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> In Progress"
-msgstr "<i class=\"fa fa-fw fa-check\"/> В процессе"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Paused"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Пауза"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Renewed"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Продлена"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closed"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Закрытый"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closing"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Закрытие"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-repeat\"/> To Renew"
-msgstr "<i class=\"fa fa-fw fa-repeat\"/> Обновить"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "<i class=\"fa fa-plus\"/> Create address"
-msgstr ""
+msgid "<i class=\"oi me-1\" data-icon=\"download\"/> Download"
+msgstr "<i class=\"oi me-1\" data-icon=\"download\"/> Скачать"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
-msgid "<i class=\"oi oi-arrow-right me-1\"/>Back to your subscription"
-msgstr "<i class=\"oi oi-arrow-right me-1\"/>Вернуться к подписке"
+msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Back to your subscription"
+msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Вернуться к подписке"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
-msgid "<option value=\"\">Choose a reason...</option>"
-msgstr "<option value=\"\">Выберите причину...</option>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> To Renew"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> In Progress"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> В процессе"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Paused"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Пауза"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Renewed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Продлена"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Закрытый"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closing"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Закрытие"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "<i class=\"oi\" data-icon=\"add\"/> Create address"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.payment_method_form
@@ -524,22 +444,27 @@ msgstr ""
 "small>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
-msgid ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> To Renew</span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<small class=\"text-muted\">Plan</small>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> Обновить</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Closed</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> To Renew</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Закрытый</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> Обновить</span>"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+msgid ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Closed</span>"
+msgstr ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Закрытый</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -553,36 +478,36 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid ""
-"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"fa fa-fw fa-"
-"check\"/> Upsell</span>"
-msgstr "Допродажа"
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Upsell</span>"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Renewed</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Renewed</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Продлена</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Продлена</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> In Progress</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> In Progress</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> В процессе</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> В процессе</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Paused</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Paused</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Пауза</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Пауза</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -594,6 +519,7 @@ msgstr "<span class=\"badge rounded-pill text-bg-warning\">Закрытие</spa
 msgid ""
 "<span class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Close</span>"
 msgstr ""
+"<span class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Закрыть</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -616,22 +542,9 @@ msgid "<span class=\"text-muted\">Next Billing</span>"
 msgstr "<span class=\"text-muted\">Следующий платеж</span>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Non Recurring</span>:"
-msgstr "<span class=\"text-start\">Непериодические</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Recurring</span>:"
-msgstr "<span class=\"text-start\">Повторяющиеся</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">until</"
-"span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<span class=\"text-muted\">→</span>"
 msgstr ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">до</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -657,6 +570,26 @@ msgstr ""
 "        </span>"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<span>·</span>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Invoices</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Period</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Plan</strong>"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "<strong>Recurring Plan</strong>"
 msgstr "<strong>Повторяющийся план</strong>"
@@ -671,438 +604,200 @@ msgstr ""
 "если вся информация установлена. Пожалуйста, заполните:"
 
 #. module: sale_subscription
+#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
+msgid ""
+"<t>\n"
+"<p>Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,</p>\n"
+"<p>Your subscription <strong t-out=\"object.name or ''\">Office Cleaning "
+"Service\"</strong> needs your attention.</p>\n"
+"<p>We invite you to renew it by clicking on the following link.</p>\n"
+"<p>Kind regards.</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\"/>Mitchell Admin</p>\n"
+"        </t>"
+msgstr ""
+"<t>\n"
+"<p>Здравствуйте, <t t-out=\"object.partner_id.name or ''\">Брэндон Фримен</"
+"t>,</p>\n"
+"<p>Ваша подписка на услугу <strong t-out=\"object.name or ''\">«Уборка "
+"офисов»</strong>  скоро истекает.</p>\n"
+"<p>Вы можете продлить подписку, перейдя по следующей ссылке.</p>\n"
+"<p>С уважением,</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\"/>Митчелл Админ</p>\n"
+"        </t>"
+
+#. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_close
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</"
-"t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">100</t> <t t-out=\"ctx.get('currency') or ''\">$</t> failed.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription failed because we have no payment method recorded for you.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    As your payment should have been made <strong><t t-"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Our final attempt to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">$</t> failed.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Our final attempt to process a payment for your subscription failed "
+"because we have no payment method recorded for you.\n"
+"</t>\n"
+"<br/><br/>\n"
+"As your payment should have been made <strong><t t-"
 "out=\"ctx.get('auto_close_limit') or ''\">5</t> days ago</strong>, your "
 "subscription has been terminated.\n"
-"                    Should you wish to resolve this issue, do not hesitate "
-"to contact us.<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Should you wish to resolve this issue, do not hesitate to contact us.<br/"
+"><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
+"object.user_id.company_id or user.company_id\"/>\n"
+"Здравствуйте, <t t-out=\"object.partner_id.name or ''\">Брэндон Фримен</t>!"
+"<br/><br/>\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Наша последняя попытка обработать платеж за вашу подписку с "
+"использованием вашего метода оплаты\n"
+"    <t t-out=\"ctx.get('payment_token') or ''\">ТОКЕН</t>\n"
+"    на сумму <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">$</t> не удалась.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Ваш банк или кредитное учреждение предоставили следующую информацию "
+"о возникшей проблеме: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Наша последняя попытка обработать платеж за вашу подписку завершилась "
+"неудачей, поскольку вы не указали метод оплаты.\n"
+"</t>\n"
+"<br/><br/>\n"
+"Поскольку оплата должна была быть произведена <strong><t t-"
+"out=\"ctx.get('auto_close_limit') or ''\">5</t> дней назад</strong>, ваша "
+"подписка была закрыта.\n"
+"Если вы хотите решить этот вопрос, свяжитесь с нами.<br/><br/>\n"
+"Спасибо, что выбрали <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Митчелл Админ</t></div>\n"
+"</div>\n"
+"</t>\n"
+"        "
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_reminder
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        We were unable to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is due for renewal but we haven’t received your payment yet. "
-"To keep your subscription active, please make your payment as soon as "
-"possible.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is still valid but will be <strong>suspended</strong>\n"
-"                    on <t t-out=\"format_date(ctx.get('date_close')) or "
-"''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Pay Now\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    If you have any questions, do not hesitate to contact us."
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    We were unable to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> is "
+"due for renewal but we haven’t received your payment yet. To keep your "
+"subscription active, please make your payment as soon as possible.\n"
+"</t>\n"
 "<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> will "
+"be <strong>suspended</strong>\n"
+"<t t-out=\"(ctx.get('date_close') and ('on ' + "
+"format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
+"if payment is not received.<br/>\n"
+"<div style=\"margin: 16px 0px; text-align: center;\">\n"
+"    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
+"\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
+"decoration: none; background-color: {{company.email_secondary_color or "
+"'#875A7B'}}; color: {{company.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"        Pay Now\n"
+"    </a>\n"
+"</div>\n"
+"<br/>\n"
+"If you have any questions, do not hesitate to contact us.<br/><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div>\n"
+"<t t-if=\"user.signature\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</t>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Ваша подписка</span><br/"
-">\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Уборка офисов</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Здравствуйте, <t t-out=\"object.partner_id.name or "
-"''\">Брэндон Фримен</t>!<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Мы не смогли обработать платеж за вашу подписку, "
-"используя ваш метод оплаты\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">ТОКЕН</t>\n"
-"                        на сумму <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Ваш банк или кредитное учреждение предоставили "
-"следующую информацию о возникшей проблеме: <pre t-out=\"ctx['error'] or ''\"/"
-">.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Ваша подписка <t t-out=\"ctx.get('code') or "
-"''\">КОД</t> подлежит продлению, но мы еще не получили ваш платеж. Чтобы "
-"ваша подписка оставалась активной, пожалуйста, произведите оплату как можно "
-"скорее.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Ваша подписка <t t-out=\"ctx.get('code') or ''\">КОД</t> "
-"еще действительна, но будет <strong>приостановлена</strong>\n"
-"                    <t t-out=\"format_date(ctx.get('date_close')) or "
-"''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Оплатить сейчас\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    Если у вас возникнут какие-либо вопросы, не стесняйтесь "
-"обращаться к нам.<br/><br/>\n"
-"                    Спасибо, что выбрали <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Митчелл Админ</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Работает на базе <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Здравствуйте, <t t-out=\"object.partner_id.name or ''\">Брэндон Фримен</t>!"
+"<br/><br/>\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Мы не смогли обработать платеж за вашу подписку, используя ваш метод "
+"оплаты\n"
+"    <t t-out=\"ctx['payment_token'] or ''\">ТОКЕН</t>\n"
+"    на сумму <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Ваш банк или кредитное учреждение предоставили следующую информацию "
+"о возникшей проблеме: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Ваша подписка <t t-out=\"object.client_order_ref or ''\">КОД</t> "
+"подлежит продлению, но мы еще не получили ваш платеж. Чтобы ваша подписка "
+"оставалась активной, пожалуйста, произведите оплату как можно скорее.\n"
+"</t>\n"
+"<br/><br/>\n"
+"Ваша подписка <t t-out=\"object.client_order_ref or ''\">КОД</t> будет "
+"<strong>приостановлена</strong>\n"
+"<t t-out=\"(ctx.get('date_close') and ('on ' + "
+"format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>,\n"
+"если оплата не поступит.<br/>\n"
+"<div style=\"margin: 16px 0px; text-align: center;\">\n"
+"    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
+"\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
+"decoration: none; background-color: {{company.email_secondary_color or "
+"'#875A7B'}}; color: {{company.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"        Оплатить сейчас\n"
+"    </a>\n"
+"</div>\n"
+"<br/>\n"
+"Если у вас возникнут вопросы, мы всегда готовы на них ответить.<br/><br/>\n"
+"Спасибо, что выбрали <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div>\n"
+"<t t-if=\"user.signature\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Митчелл Админ</t></div>\n"
+"</t>\n"
+"</div>\n"
+"</t>\n"
 "        "
 
 #. module: sale_subscription
@@ -1119,7 +814,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "A pause can't take place before the next invoice date."
-msgstr ""
+msgstr "Пауза не может начаться раньше даты выставления следующего счета."
 
 #. module: sale_subscription
 #. odoo-python
@@ -1157,12 +852,7 @@ msgstr "Изменение ARR (нормализованное)"
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_one_time_sale
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__allow_one_time_sale
 msgid "Accept One-Time"
-msgstr ""
-
-#. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_account_move_send
-msgid "Account Move Send"
-msgstr "Перемещение учетки отправка"
+msgstr "Принять однократно"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_needaction
@@ -1263,6 +953,8 @@ msgid ""
 "Allow customers to temporarily pause their subscription for a specific "
 "period. Not available for postpaid subscriptions."
 msgstr ""
+"Разрешить клиентам временно приостанавливать свою подписку на определенный "
+"период. Недоступно для подписок с постоплатой."
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_subscription_plan__related_plan_id
@@ -1320,6 +1012,11 @@ msgid "Attachment Count"
 msgstr "Количество вложений"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
+msgid "Attributes"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__authorized
 msgid "Authorized"
 msgstr "Войти"
@@ -1349,12 +1046,12 @@ msgstr "Автоматическое закрытие после"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Automatic Invoicing"
-msgstr ""
+msgstr "Автоматическое выставление счетов"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Automatic Payments"
-msgstr ""
+msgstr "Автоплатежи"
 
 #. module: sale_subscription
 #. odoo-python
@@ -1490,13 +1187,6 @@ msgid "Campaign"
 msgstr "Кампания"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_change_customer_view_form
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
-msgid "Cancel"
-msgstr "Отменить"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__cancel
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_cancel
 msgid "Cancelled"
@@ -1509,6 +1199,16 @@ msgid ""
 "Cancelling an invoiced subscription wouldn't be fair to the customer. Once "
 "the invoice been created and possibly even paid, it's a done deal. "
 "Cancelling the subscription would definitely cause some chaos!"
+msgstr ""
+"Отменять подписку с уже выставленным счетом – не лучшая идея. Раз счет "
+"создан (а возможно, и оплачен), сделка закрыта. Отмена подписки на этом "
+"этапе точно добавит неразберихи в учет!"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"Cannot close %(subscriptions_name)s: subscription order with recurring plan."
 msgstr ""
 
 #. module: sale_subscription
@@ -1535,7 +1235,7 @@ msgstr "План изменений для"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Change addresses"
-msgstr ""
+msgstr "Изменить адреса"
 
 #. module: sale_subscription
 #: model:ir.actions.server,name:sale_subscription.model_sale_order_subscription_change_customer
@@ -1562,6 +1262,11 @@ msgid "Choose a product name.<br/><i>(e.g. eLearning Access)</i>"
 msgstr ""
 "Выберите название товара.<br/><i>(например, доступ к платформе электронного "
 "обучения)</i>"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
+msgid "Choose a reason..."
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -1600,6 +1305,7 @@ msgid "Closable"
 msgstr "Перекрываемый"
 
 #. module: sale_subscription
+#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
@@ -1607,7 +1313,11 @@ msgid "Close"
 msgstr "Закрыть"
 
 #. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_date
+msgid "Close Date"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_reason_id
@@ -1628,6 +1338,12 @@ msgstr "Близкие причины"
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Close Subscription"
 msgstr "Закрыть подписку"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Close the recurring plan dropdown."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__user_closable_options
@@ -1655,6 +1371,36 @@ msgstr "Закрывается"
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Closing text: %s"
 msgstr "Заключительный текст: %s"
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a payment reminder is sent for subscriptions "
+"with no saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a reminder is sent for subscriptions with no "
+"saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder email is sent when an automatic payment with a saved token fails."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder is sent when an automatic payment fails."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__commercial_partner_id
@@ -1708,7 +1454,7 @@ msgstr "Контакт Марк"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Contact your subscription manager to change it."
-msgstr ""
+msgstr "Свяжитесь со своим менеджером по подпискам, чтобы изменить это."
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_template__duration_unit
@@ -1869,6 +1615,11 @@ msgid "Customer State"
 msgstr "Состояние клиента"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_tag_ids
+msgid "Customer Tags"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_zip
 msgid "Customer ZIP"
 msgstr "Клиент ZIP"
@@ -1893,12 +1644,7 @@ msgstr "Клиенты"
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_log_report__effective_date
 msgid "Date the MRR change was first billed."
-msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Date:"
-msgstr "Дата:"
+msgstr "Дата, когда изменение MRR было впервые включено в счет."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
@@ -1912,11 +1658,50 @@ msgid ""
 "Define if price must be prorated or not for incomplete periods (upsell, "
 "calendar alignment, etc.)"
 msgstr ""
+"Определите, должна ли цена рассчитываться пропорционально для неполных "
+"периодов (допродажи, согласование календаря и т. д.)"
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_product_product__allow_one_time_sale
 #: model:ir.model.fields,help:sale_subscription.field_product_template__allow_one_time_sale
 msgid "Define if the subscription product can also be bought as a one-time."
+msgstr ""
+"Определите, можно ли также купить товар по подписке как разовую покупку."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s months"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s weeks"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s years"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every month"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every week"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every year"
 msgstr ""
 
 #. module: sale_subscription
@@ -1925,9 +1710,19 @@ msgid "Delivery Address"
 msgstr "Адрес доставки"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__delivery_period_display
+msgid "Delivery Period Display"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Details"
 msgstr "Детали"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "Discard"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -1960,6 +1755,7 @@ msgstr "Показать поздно"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__display_name
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__display_name
@@ -1996,6 +1792,8 @@ msgid ""
 "Do you want to resume the subscription today?<br/>\n"
 "                                Next invoice date:"
 msgstr ""
+"Вы хотите возобновить подписку сегодня?<br/>\n"
+"                                Дата выставления следующего счета:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
@@ -2006,6 +1804,11 @@ msgstr "Скачать"
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__draft
 msgid "Draft"
 msgstr "Черновик"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Due"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template__duration_unit
@@ -2055,11 +1858,6 @@ msgid "End Date"
 msgstr "Дата окончания"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "End Date:"
-msgstr "Дата окончания:"
-
-#. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_end_of_contract
 msgid "End of contract"
 msgstr "Окончание контракта"
@@ -2072,11 +1870,8 @@ msgstr "Конец периода"
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
-"Error during renewal of contract %(order_ids)s %(order_refs)s %"
-"(payment_state)s"
+msgid "Error during renewal of contract %(order_ids)s %(order_refs)s"
 msgstr ""
-"Ошибка при продлении контракта %(order_ids)s %(order_refs)s %(payment_state)s"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2104,14 +1899,14 @@ msgid "Expansion"
 msgstr "Экспансия"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Expiration Date:"
-msgstr "Дата окончания срока:"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__purchase_price
+msgid "Expected Cost"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Extend Until"
-msgstr ""
+msgstr "Продлить до"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
@@ -2143,12 +1938,6 @@ msgid "First contract date"
 msgstr "Дата заключения первого контракта"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_product__subscription_rule_ids_fixed
-#: model:ir.model.fields,field_description:sale_subscription.field_product_template__subscription_rule_ids_fixed
-msgid "Fixed Subscription Pricings"
-msgstr ""
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_follower_ids
 msgid "Followers"
 msgstr "Подписчики"
@@ -2160,6 +1949,12 @@ msgstr "Подписчики"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+msgid "For"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "From"
 msgstr "От"
 
@@ -2177,6 +1972,11 @@ msgstr "Планируемые действия"
 #: model:ir.model,name:sale_subscription.model_payment_link_wizard
 msgid "Generate Sales Payment Link"
 msgstr "Ссылка для оплаты продаж"
+
+#. module: sale_subscription
+#: model:ir.module.module,summary:base.module_sale_subscription
+msgid "Generate recurring invoices and manage renewals"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2236,7 +2036,6 @@ msgstr ""
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "History"
 msgstr "История"
 
@@ -2261,6 +2060,7 @@ msgstr "Я не использую его"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__id
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__id
@@ -2311,7 +2111,6 @@ msgstr ""
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,help:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid ""
 "If set, confirming a sale order with this product will create a subscription"
@@ -2321,9 +2120,10 @@ msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__pricelist_id
-msgid "If you change the pricelist, only newly added lines will be affected."
+msgid ""
+"If you change the pricelist, the prices of all order lines will be updated "
+"accordingly."
 msgstr ""
-"Если вы измените прайс-лист, это коснется только новых добавленных строк."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2331,11 +2131,13 @@ msgid ""
 "If you wish to reopen it, you can pay your invoice for the current invoicing "
 "period"
 msgstr ""
+"Если вы хотите возобновить ее, вы можете оплатить счет за текущий расчетный "
+"период"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "In Error"
-msgstr ""
+msgstr "В состоянии ошибки"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2527,17 +2329,17 @@ msgstr "Поздние Мероприятия"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_kanban
 msgid "Latest Rating: Happy"
-msgstr ""
+msgstr "Последняя оценка: Доволен"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_kanban
 msgid "Latest Rating: Neutral"
-msgstr ""
+msgstr "Последняя оценка: Нейтрально"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_kanban
 msgid "Latest Rating: Unhappy"
-msgstr ""
+msgstr "Последняя оценка: Недоволен"
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2554,12 +2356,6 @@ msgstr "Давайте добавим цену для выбранной пер�
 #. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
-msgid "Let's choose the customer for your subscription"
-msgstr "Выберите клиента для вашей подписки"
-
-#. module: sale_subscription
-#. odoo-javascript
-#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Let's go to the catalog to create our first subscription product"
 msgstr "Давайте перейдем в каталог, чтобы создать наш первый товар по подписке"
 
@@ -2569,6 +2365,8 @@ msgid "Log Currency"
 msgstr "Валюта журнала"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_monthly
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_order_log_growth_tree
@@ -2627,7 +2425,7 @@ msgid "MRR:"
 msgstr "MRR:"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
+#: model:portal.entry,description:sale_subscription.portal_subscription_entry
 msgid "Manage your subscriptions"
 msgstr "Управление вашими подписками"
 
@@ -2659,6 +2457,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin
 msgid "Margin"
 msgstr "Отступ"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin_percent
+msgid "Margin (%)"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__medium_id
@@ -2702,6 +2505,11 @@ msgid "Monthly"
 msgstr "Ежемесячно"
 
 #. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.monthly_template
+msgid "Monthly Cleaning"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_monthly
 msgid "Monthly Recurring"
 msgstr "Ежемесячные повторяющиеся"
@@ -2716,7 +2524,7 @@ msgstr "Ежемесячный периодический доход"
 #. module: sale_subscription
 #: model:product.template,description_sale:sale_subscription.product_car_leasing_product_template
 msgid "Monthly lease for city or business driving"
-msgstr ""
+msgstr "Ежемесячная аренда для городских или деловых поездок"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_template__duration_unit__month
@@ -2845,6 +2653,13 @@ msgid "No valid Payment Method"
 msgstr "Нет действующего способа оплаты"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid "No-token payment reminder days"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Non Recurring"
 msgstr "Не повторяющиеся"
@@ -2918,6 +2733,8 @@ msgid ""
 "Onboarding example showing how the app tracks customer subscriptions and "
 "visualizes MRR growth."
 msgstr ""
+"Пример ознакомления, показывающий, как модуль отслеживает подписки клиентов "
+"и визуализирует рост MRR."
 
 #. module: sale_subscription
 #. odoo-python
@@ -2926,16 +2743,13 @@ msgid ""
 "Oops! Before you can delete a confirmed subscription, you'll need to close "
 "and cancel it."
 msgstr ""
+"Ой! Прежде чем вы сможете удалить подтвержденную подписку, вам нужно ее "
+"закрыть и отменить."
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__related_plan_id
 msgid "Optional Plans"
 msgstr "Дополнительные планы"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Options"
-msgstr "Опции"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__order_reference
@@ -2955,6 +2769,11 @@ msgid "Order Invoice Status"
 msgstr "Статус счета заказа"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_name
+msgid "Order Line Name"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__name
 msgid "Order Reference"
 msgstr "Ссылка на заказ"
@@ -2965,9 +2784,9 @@ msgid "Order Status"
 msgstr "Статус заказа"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Orders"
-msgstr "Заказы"
+#: model:ir.model,name:sale_subscription.model_sale_order_template
+msgid "Order Templates"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__origin_order_id
@@ -3008,7 +2827,7 @@ msgstr "Партнерская подписка"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__pausable_by_user
 msgid "Pausable"
-msgstr ""
+msgstr "С возможностью приостановки"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
@@ -3024,17 +2843,17 @@ msgstr "Приостановить подписку"
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Pause duration cannot exceed 1 period."
-msgstr ""
+msgstr "Длительность паузы не может превышать 1 период."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Pause subscription"
-msgstr ""
+msgstr "Приостановить подписку"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
 msgid "Pause the subscription from"
-msgstr ""
+msgstr "Приостановить подписку с"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order__subscription_state__4_paused
@@ -3089,16 +2908,9 @@ msgid "Payment Transaction"
 msgstr "Платеж"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment not recorded"
-msgstr "Платеж не зарегистрирован"
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment recorded: %s"
-msgstr "Платеж зарегистрирован: %s"
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid "Payment failure reminder days"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.email_payment_reminder
@@ -3126,15 +2938,19 @@ msgstr "Незавершенная сделка"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__plan_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__plan_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_list_multi_edit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Plan"
 msgstr "План"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Plan:"
-msgstr "Тарифный план:"
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/product/product.xml:0
+msgid "Plan not available"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -3157,6 +2973,8 @@ msgstr "Добавьте товар по подписке в подписку и
 msgid ""
 "Please contact your sales manager if you want to reopen this subscription."
 msgstr ""
+"Пожалуйста, свяжитесь со своим менеджером по продажам, если вы хотите "
+"возобновить эту подписку."
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -3177,7 +2995,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Please select a date to pause the subscription until."
-msgstr ""
+msgstr "Пожалуйста, выберите дату, до которой нужно приостановить подписку."
 
 #. module: sale_subscription
 #. odoo-python
@@ -3193,7 +3011,7 @@ msgid "Portal: retention step"
 msgstr "Портал: шаг удержания"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 msgid "Price"
 msgstr "Цена"
@@ -3238,19 +3056,11 @@ msgid "Product Category"
 msgstr "Категория товара"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_product_product
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__product_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Product Variant"
-msgstr "Вариация товара"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Product Variants"
-msgstr "Варианты товаров"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
-msgid "Product Varient"
 msgstr "Вариация товара"
 
 #. module: sale_subscription
@@ -3261,10 +3071,15 @@ msgid "Products"
 msgstr "Товары"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Prorated"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_prorated_price
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__allow_prorated_price
 msgid "Prorated Price"
-msgstr ""
+msgstr "Пропорциональная цена"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__qty_delivered
@@ -3299,8 +3114,6 @@ msgid "Quantity"
 msgstr "Количество"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__draft
@@ -3315,7 +3128,6 @@ msgid "Quotation Sent"
 msgstr "Коммерческое предложение отправлено"
 
 #. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_sale_order_template
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Quotation Template"
 msgstr "Шаблон предложения"
@@ -3391,8 +3203,9 @@ msgid "Reason"
 msgstr "Причина"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__is_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_order_product_search_inherit
@@ -3403,12 +3216,12 @@ msgstr "Повторяющийся"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_total
 msgid "Recurring Amount"
-msgstr ""
+msgstr "Регулярная сумма"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_details
-msgid "Recurring Details"
-msgstr "Повторяющиеся детали"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
+msgid "Recurring Invoice"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__plan_id
@@ -3424,23 +3237,12 @@ msgid "Recurring Plan"
 msgstr "Повторяющийся план"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Recurring Plan:"
-msgstr "Повторяющийся план:"
-
-#. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_plan_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_plans
 msgid "Recurring Plans"
 msgstr "Повторяющийся план"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
-msgid "Recurring Prices"
-msgstr "Повторяющиеся цены"
-
-#. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__subscription_item_ids
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__subscription_rule_ids
 msgid "Recurring Pricing"
 msgstr "Периодическое ценообразование"
@@ -3452,6 +3254,25 @@ msgstr "Повторяющийся доход"
 
 #. module: sale_subscription
 #. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the beginning of the "
+"period."
+msgstr ""
+"Счета по регулярным заказам с этим товаром будут выставляться в начале "
+"периода."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the end of the period."
+msgstr ""
+"Счета по регулярным заказам с этим товаром будут выставлены к оплате в конце "
+"расчетного периода."
+
+#. module: sale_subscription
+#. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.constraint,message:sale_subscription.constraint_sale_subscription_plan_check_for_valid_billing_period_value
 msgid ""
@@ -3460,16 +3281,6 @@ msgid ""
 msgstr ""
 "Период повторения должен быть положительным числом. Убедитесь, что вводимое "
 "значение является правильным положительным числовым значением."
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Recurring prices"
-msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Reference:"
-msgstr "Ссылка:"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__cancel
@@ -3550,15 +3361,6 @@ msgstr "Отчет"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"Request a online payment from the customer to confirm the order. For a "
-"subscription, a payment will be required also before each renewal"
-msgstr ""
-"Запросите онлайн-оплату от клиента для подтверждения заказа. Для подписки "
-"оплата потребуется также перед каждым продлением"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
 msgid "Resume"
 msgstr "Резюме"
@@ -3566,12 +3368,12 @@ msgstr "Резюме"
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_resume_and_pause_subscription
 msgid "Resume and Pause Subscription"
-msgstr ""
+msgstr "Возобновить и приостановить подписку"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Resume subscription"
-msgstr ""
+msgstr "Возобновить подписку"
 
 #. module: sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_report_cohort
@@ -3699,6 +3501,12 @@ msgid "Save"
 msgstr "Сохранить"
 
 #. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Save your subscription."
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Search Sales Order"
 msgstr "Поиск заказа на продажу"
@@ -3713,6 +3521,18 @@ msgstr "Поиск шаблона"
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select a recurring product"
 msgstr "Выберите товар по подписке"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this product."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this recurring plan."
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -3733,12 +3553,6 @@ msgstr "Отправить почту (автоматическая оплата
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__subscription_action__manual_send_mail
 msgid "Send Mail (manual payment)"
 msgstr "Отправить почту (ручная оплата)"
-
-#. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_multi
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_single
-msgid "Send an SMS Text Message"
-msgstr "Отправка текстового сообщения SMS"
 
 #. module: sale_subscription
 #: model:mail.template,description:sale_subscription.email_payment_close
@@ -3780,6 +3594,11 @@ msgid "Settings"
 msgstr "Настройки"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__starred
 msgid "Show Subscription on dashboard"
 msgstr "Показать подписку на приборной панели"
@@ -3804,14 +3623,23 @@ msgstr "Дата начала"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_digest
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Start Date:"
 msgstr "Дата начала:"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Started"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_state_change
 msgid "State Change"
 msgstr "Изменение штата"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
+msgid "State before"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -3917,7 +3745,7 @@ msgstr "Количество подписчиков"
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_line__display_type__subscription_discount
 msgid "Subscription Discount"
-msgstr ""
+msgstr "Скидка при подписке"
 
 #. module: sale_subscription
 #. odoo-python
@@ -3937,31 +3765,24 @@ msgid "Subscription Logs"
 msgstr "Журналы подписки"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Subscription Manager:"
-msgstr "Ответственный за подписку:"
-
-#. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_subscription_plan
 msgid "Subscription Plan"
 msgstr "План подписки"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Subscription Pricelist Rules"
-msgstr ""
+msgstr "Правила прайс-листов подписки"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__subscription_rule_ids
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__subscription_rule_ids
 msgid "Subscription Pricings"
-msgstr ""
+msgstr "Цены на подписку"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid "Subscription Product"
 msgstr "Товар по подписке"
@@ -3973,7 +3794,6 @@ msgstr "Предложение о подписке"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__subscription_state
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__subscription_state
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Subscription State"
@@ -4015,28 +3835,18 @@ msgstr "Состояние подписки изменилось"
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Subscription was resumed on the %s."
-msgstr ""
+msgstr "Подписка была возобновлена %s."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Subscription will be paused from %(date_from)s to %(date_to)s."
-msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Subscription:"
-msgstr "Подписка:"
+msgstr "Подписка будет приостановлена с %(date_from)s по %(date_to)s."
 
 #. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_alert
 msgid "Subscription: Default Email Alert"
 msgstr "Подписка: Оповещение по электронной почте по умолчанию"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_default_alert
-msgid "Subscription: Default SMS Alert"
-msgstr "Подписка: SMS-оповещение по умолчанию"
 
 #. module: sale_subscription
 #: model:mail.template,name:sale_subscription.email_payment_close
@@ -4049,36 +3859,28 @@ msgid "Subscription: Payment Reminder"
 msgstr "Подписка: Напоминание об оплате"
 
 #. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_failure
-msgid "Subscription: Payment failure"
-msgstr "Подписка: Сбой платежа"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_reminder
-msgid "Subscription: Payment reminder"
-msgstr "Подписка: Напоминание об оплате"
-
-#. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_rating
 msgid "Subscription: Rating Request"
 msgstr "Подписка: Запрос рейтинга"
 
 #. module: sale_subscription
 #. odoo-python
-#: code:addons/sale_subscription/models/res_partner.py:0
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action_filtered
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_res_users__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__active_subs_count
+#: model:ir.module.module,shortdesc:base.module_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_analysis
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_root
+#: model:portal.entry,name:sale_subscription.portal_subscription_entry
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_menu_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_search_view_inherit_sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_partner_view_inherit_sale_subscription
@@ -4101,6 +3903,9 @@ msgid ""
 "continuously,customer didn't pay, etc.) will be automatically closed after "
 "this period."
 msgstr ""
+"Подписки, просроченные в продлении (например, автоматическая оплата "
+"постоянно не проходит, клиент не оплатил и т. д.), будут автоматически "
+"закрыты по истечении этого срока."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -4191,7 +3996,7 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "The delivery address can not be changed."
-msgstr ""
+msgstr "Адрес доставки не может быть изменен."
 
 #. module: sale_subscription
 #: model:ir.model.constraint,message:sale_subscription.constraint_sale_order_template_check_duration_value
@@ -4260,6 +4065,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid ""
+"The payment method you selected can only pay amounts starting from %s. "
+"Please create or select another one."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/controllers/portal.py:0
+msgid ""
 "The payment method you selected can only pay amounts up to %s. Please create "
 "or select another one."
 msgstr ""
@@ -4278,6 +4091,8 @@ msgid ""
 "The reason: \"%s\" is here for good. It's essential for our subscription "
 "application like coffee is for a Monday morning!"
 msgstr ""
+"Причина: «%s» добавлена навсегда. Она необходима для нашего модуля Подписки "
+"так же, как кофе необходим в понедельник утром!"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -4295,6 +4110,21 @@ msgstr "Продление %s было отменено."
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__subscription_start_date
 msgid "The start date indicate when the subscription periods begin."
 msgstr "Дата начала указывает, когда начинается период подписки."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"The start date of an upsell cannot be greater or equal to the next invoice "
+"date of the subscription %s.\n"
+"You should first invoice the original subscription, use an earlier start "
+"date for the upsell or create a renewal quotation."
+msgstr ""
+"Дата начала допродажи не может быть больше или равна дате следующего счета "
+"по подписке %s.\n"
+"Сначала вы должны выставить счет по исходной подписке, использовать более "
+"раннюю дату начала для допродажи или создать коммерческое предложение на "
+"продление."
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_renew
@@ -4360,14 +4190,11 @@ msgid ""
 "the\n"
 "                following active subscriptions:"
 msgstr ""
-"Этот способ оплаты не может быть удален, поскольку в настоящее время он "
-"связан со следующими активными подписками\n"
-"                следующими активными подписками:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "This subscription has been paused by the customer until"
-msgstr ""
+msgstr "Эта подписка была приостановлена клиентом до"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -4375,6 +4202,8 @@ msgid ""
 "This subscription is overdue and exceeds the auto-close limit of the "
 "recurring plan. It will be closed soon by the system."
 msgstr ""
+"Эта подписка просрочена и превышает лимит автозакрытия плана. Система "
+"закроет ее в ближайшее время."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4395,7 +4224,7 @@ msgstr "Этот заказ на повышение продаж был созд
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__is_closing
 msgid "To Be Closed"
-msgstr ""
+msgstr "К закрытию"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -4459,6 +4288,11 @@ msgid "Type of event"
 msgstr "Тип мероприятия"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__utm_reference
+msgid "UTM Reference"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Unassigned"
 msgstr "Не назначено"
@@ -4466,7 +4300,7 @@ msgstr "Не назначено"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_kanban
 msgid "Unhappy face"
-msgstr ""
+msgstr "Недовольное лицо"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__billing_period_unit
@@ -4490,6 +4324,11 @@ msgid "Unpaid subscription"
 msgstr "Неоплаченная подписка"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_delivered_amount
+msgid "Untaxed Amount Delivered"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_amount_invoiced
 msgid "Untaxed Amount Invoiced"
 msgstr "Облагаемая налогом сумма, выставленная в счете"
@@ -4511,6 +4350,7 @@ msgstr "Не облагается налогом Итого:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "Until"
 msgstr "До"
 
@@ -4572,12 +4412,12 @@ msgstr "Допродажи"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__user_pause_start
 msgid "User Pause Start"
-msgstr ""
+msgstr "Начало паузы пользователем"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
-msgid "Variant Values"
-msgstr "Значения переменных"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "Valid until"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__visible_in_portal
@@ -4617,7 +4457,7 @@ msgstr "Склад"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__warn_system_closing
 msgid "Warn System Closing"
-msgstr ""
+msgstr "Предупреждение о системном закрытии"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4652,19 +4492,14 @@ msgid "We don't want you to leave us like this."
 msgstr "Мы не хотим, чтобы вы оставили нас вот так."
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__website_message_ids
-msgid "Website Messages"
-msgstr "Веб-сайт сообщения"
-
-#. module: sale_subscription
-#: model:ir.model.fields,help:sale_subscription.field_sale_order__website_message_ids
-msgid "Website communication history"
-msgstr "История общений с сайта"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_subscription_plan__billing_period_unit__week
 msgid "Weeks"
 msgstr "Недель"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
+msgid "When"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order__starred
@@ -4675,6 +4510,11 @@ msgstr "Должна ли эта подписка отображаться на 
 #: model:sale.subscription.plan,name:sale_subscription.subscription_plan_year
 msgid "Yearly"
 msgstr "Ежегодно"
+
+#. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.yearly_template
+msgid "Yearly Cleaning"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_yearly
@@ -4695,11 +4535,15 @@ msgid ""
 "                Any new delivered quantity during that period may never be "
 "invoiced."
 msgstr ""
+"Вы собираетесь выставить счет за будущий период подписки для товаров, "
+"политика актирования которых основана на доставленном количестве.\n"
+"                Любое новое количество, доставленное в этот период, может "
+"остаться невыставленным."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.invoice_warning_message
 msgid "You are about to invoice the subscription until the"
-msgstr ""
+msgstr "Вы собираетесь выставить счет по подписке до"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_portal_templates_warnings
@@ -4709,6 +4553,16 @@ msgid ""
 msgstr ""
 "Вы собираетесь окончательно закрыть подписку, которая действует до\n"
 "                    &amp;nbsp;"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"You can not change the recurring property of this product because it has "
+"been sold already (%s)"
+msgstr ""
+"Вы не можете изменить признак регулярности для этого товара, так как он уже "
+"был продан (%s)"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4780,6 +4634,8 @@ msgid ""
 "You cannot generate a payment link for a recurring plan without a recurring "
 "product."
 msgstr ""
+"Невозможно создать ссылку на оплату плана подписки, если к нему не привязан "
+"товар по подписке."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4788,6 +4644,8 @@ msgid ""
 "You cannot generate a payment link for a recurring product without a "
 "recurring plan."
 msgstr ""
+"Невозможно создать ссылку на оплату подписки, если в ней не указан товар по "
+"подписке."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4806,18 +4664,19 @@ msgstr ""
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "You cannot pause a subscription that is not yet due."
 msgstr ""
+"Вы не можете приостановить подписку, срок оплаты которой еще не наступил."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "You cannot pause a subscription with postpaid lines."
-msgstr ""
+msgstr "Невозможно приостановить подписку, содержащую позиции с постоплатой."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "You cannot pause the subscription for 0 days."
-msgstr ""
+msgstr "Вы не можете приостановить подписку на 0 дней."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4843,6 +4702,7 @@ msgstr "Вы не можете повторно открыть подписку,
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "You cannot resume a subscription that is not yet due."
 msgstr ""
+"Вы не можете возобновить подписку, срок оплаты которой еще не наступил."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4874,17 +4734,6 @@ msgstr "Вы не можете продать подписку в другой �
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid ""
-"You cannot upsell a subscription whose next invoice date is in the past.\n"
-"Please, invoice directly the %s contract."
-msgstr ""
-"Вы не можете продать подписку, следующая дата выставления счета которой уже "
-"прошла.\n"
-"Пожалуйста, выставляйте счет непосредственно по договору %s."
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
 "You cannot validate a renewal quotation starting before the next invoice "
 "date of the parent contract. Please update the start date after the %s."
 msgstr ""
@@ -4908,7 +4757,8 @@ msgstr ""
 "услуга."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 msgid "Your Subscription"
 msgstr "Ваша подписка"
 
@@ -4936,7 +4786,7 @@ msgstr "Срок действия вашей подписки истек, ско
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Your subscription is paused until"
-msgstr ""
+msgstr "Ваша подписка приостановлена до"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_portal_templates_warnings
@@ -4946,7 +4796,7 @@ msgstr "Ваша подписка будет закрыта"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Your subscription will be paused from"
-msgstr ""
+msgstr "Ваша подписка будет приостановлена с"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -4973,7 +4823,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/models/res_partner.py:0
 msgid "is_subscription"
-msgstr ""
+msgstr "is_subscription"
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,retention_button_link:sale_subscription.close_reason_1
@@ -4989,18 +4839,13 @@ msgstr "сообщение"
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "next_invoice_date"
-msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "on"
-msgstr "вкл"
+msgstr "next_invoice_date"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid "order_id"
-msgstr ""
+msgstr "order_id"
 
 #. module: sale_subscription
 #. odoo-python
@@ -5042,7 +4887,7 @@ msgstr "в год"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "plan_id"
-msgstr ""
+msgstr "plan_id"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -5074,7 +4919,7 @@ msgstr "обновление"
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "subscription_state"
-msgstr ""
+msgstr "subscription_state"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
@@ -5085,17 +4930,6 @@ msgstr "в"
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "until"
 msgstr "до"
-
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_failure
-msgid ""
-"{{ object.company_id.name }}: Our final attempt to process a payment for "
-"your subscription failed. As your payment should have been made on "
-"{{ object.next_invoice_date }}, your subscription has been terminated."
-msgstr ""
-"{{ object.company_id.name }}: Наша последняя попытка обработать платеж за "
-"вашу подписку не удалась. Поскольку оплата должна была быть произведена в "
-"{{ object.next_invoice_date }}, ваша подписка была прекращена."
 
 #. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.mail_template_subscription_alert
@@ -5110,1905 +4944,5 @@ msgstr ""
 msgid "{{ object.company_id.name }}: Service Rating Request"
 msgstr "{{ object.company_id.name }}: Запрос на оценку услуг"
 
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_reminder
-msgid ""
-"{{ object.company_id.name }}: We were unable to process a payment for your "
-"subscription. Your subscription {{ object.name }} is still valid but will be "
-"suspended on {{ object.next_invoice_date }} unless the payment succeeds in "
-"the meantime."
-msgstr ""
-"{{ object.company_id.name }}: Мы не смогли обработать платеж за вашу "
-"подписку. Ваша подписка {{ object.name }} все еще действительна, но будет "
-"приостановлена {{ object.next_invoice_date }}, если за это время платеж не "
-"пройдет успешно."
-
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_default_alert
-msgid ""
-"{{ object.company_id.name }}: Your subscription {{ object.name }} needs your "
-"attention. If you have some concerns about it, please contact "
-"{{ object.user_id.name }}, your contact person."
-msgstr ""
-"{{ object.company_id.name }}: Ваша подписка {{ object.name }} нуждается в "
-"вашем внимании. Если у вас есть какие-то сомнения по этому поводу, "
-"пожалуйста, свяжитесь с {{ object.user_id.name }}, вашим контактным лицом."
-
-#~ msgid "Applied On"
-#~ msgstr "Применяется на"
-
-#~ msgid "%s to %s"
-#~ msgstr ""
-#~ "\n"
-#~ "%s - %s"
-
-#~ msgid ""
-#~ "\n"
-#~ "- You are trying to invoice recurring orders that are past their end "
-#~ "date. Please change their end date or renew them before creating new "
-#~ "invoices."
-#~ msgstr ""
-#~ "\n"
-#~ "- Вы пытаетесь выставить счет за повторяющиеся заказы, дата окончания "
-#~ "которых истекла. Пожалуйста, измените дату их окончания или обновите их, "
-#~ "прежде чем создавать новые счета."
-
-#~ msgid "3 Months"
-#~ msgstr "3 месяца"
-
-#~ msgid ""
-#~ "<b>Congratulations</b>, your first subscription quotation is ready to be "
-#~ "sent!"
-#~ msgstr ""
-#~ "<b>Поздравляем</b>, ваше первое предложение о подписке готово к отправке!"
-
-#~ msgid ""
-#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-#~ "                <table style=\"width:600px;margin:5px auto;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td t-if=\"not "
-#~ "object.company_id.uses_default_logo\">\n"
-#~ "                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-#~ "company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-#~ "width:100px;\"></a>\n"
-#~ "                        </td><td style=\"text-align:right;vertical-"
-#~ "align:middle;\">\n"
-#~ "                                Subscription Renewal\n"
-#~ "                        </td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "                <table style=\"width:600px;margin:0px "
-#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-#~ "                            <p>Dear <t t-out=\"object.partner_id.name or "
-#~ "''\">Brandon Freeman</t>,</p>\n"
-#~ "                            <p>Your subscription <strong t-"
-#~ "out=\"object.name or ''\">Office Cleaning Service\"</strong> needs your "
-#~ "attention.</p>\n"
-#~ "                            <p>We invite you to renew it by clicking on "
-#~ "the following link.</p>\n"
-#~ "                            <p>Kind regards.</p>\n"
-#~ "                        </td></tr>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\" t-"
-#~ "out=\"object.user_id.signature or ''\">--<br>Mitchell Admin</td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "            </div>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-#~ "                <table style=\"width:600px;margin:5px auto;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td t-if=\"not "
-#~ "object.company_id.uses_default_logo\">\n"
-#~ "                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-#~ "company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-#~ "width:100px;\"></a>\n"
-#~ "                        </td><td style=\"text-align:right;vertical-"
-#~ "align:middle;\">\n"
-#~ "                                Продление подписки\n"
-#~ "                        </td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "                <table style=\"width:600px;margin:0px "
-#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-#~ "                            <p>Уважаемый <t t-"
-#~ "out=\"object.partner_id.name or ''\">Брэндон Фриман</t>,</p>\n"
-#~ "                            <p>Ваша подписка <strong t-out=\"object.name "
-#~ "or ''\">\"Служба уборки офисов\"</strong> нуждается в вашем внимании.</"
-#~ "p>\n"
-#~ "                            <p>Мы приглашаем вас продлить ее, перейдя по "
-#~ "следующей ссылке.</p>\n"
-#~ "                            <p>С уважением.</p>\n"
-#~ "                        </td></tr>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\" t-"
-#~ "out=\"object.user_id.signature or ''\">--<br>Mitchell Admin</td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "            </div>\n"
-#~ "        "
-
-#~ msgid ""
-#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-#~ "            <t t-set=\"access_token\" t-"
-#~ "value=\"object._rating_get_access_token()\"></t>\n"
-#~ "                <table style=\"width:600px;margin:5px auto;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td t-if=\"not "
-#~ "object.company_id.uses_default_logo\">\n"
-#~ "                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-#~ "company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-#~ "width:100px;\"></a>\n"
-#~ "                        </td><td style=\"text-align:right;vertical-"
-#~ "align:middle;\">\n"
-#~ "                                Satisfaction Survey\n"
-#~ "                        </td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "                <table style=\"width:600px;margin:0px "
-#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-#~ "                            <p>Hello,</p>\n"
-#~ "                            <p>Please take a moment to rate our services "
-#~ "related to your subscription \"<strong t-out=\"object.name or ''\">Office "
-#~ "Cleaning Service\"</strong>\"\n"
-#~ "                               assigned to <strong t-"
-#~ "out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>."
-#~ "</p>\n"
-#~ "                            <p>We appreciate your feedback. It helps us "
-#~ "to improve continuously.</p>\n"
-#~ "                        </td></tr>\n"
-#~ "                        <tr><td style=\"padding:10px 20px\">\n"
-#~ "                            <table summary=\"o_mail_notification\" "
-#~ "style=\"width:100%;border-top:1px solid #e1e1e1;\">\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"text-align:center;\">\n"
-#~ "                                        <h2 style=\"font-weight:300;font-"
-#~ "size:18px;\">\n"
-#~ "                                            Tell us how you feel about "
-#~ "our services:\n"
-#~ "                                        </h2>\n"
-#~ "                                        <div style=\"text-color: "
-#~ "#888888\">(click on one of these smileys)</div>\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"padding:10px 10px;\">\n"
-#~ "                                        <table style=\"width:100%;text-"
-#~ "align:center;\">\n"
-#~ "                                            <tr>\n"
-#~ "                                                <td>\n"
-#~ "                                                    <a t-attf-href=\"/"
-#~ "rate/{{ access_token }}/5\">\n"
-#~ "                                                        <img "
-#~ "alt=\"Satisfied\" src=\"/rating/static/src/img/rating_5.png\" "
-#~ "title=\"Satisfied\">\n"
-#~ "                                                    </a>\n"
-#~ "                                                </td>\n"
-#~ "                                                <td>\n"
-#~ "                                                    <a t-attf-href=\"/"
-#~ "rate/{{ access_token }}/3\">\n"
-#~ "                                                        <img alt=\"Okay\" "
-#~ "src=\"/rating/static/src/img/rating_3.png\" title=\"Okay\">\n"
-#~ "                                                    </a>\n"
-#~ "                                                </td>\n"
-#~ "                                                <td>\n"
-#~ "                                                    <a t-attf-href=\"/"
-#~ "rate/{{ access_token }}/1\">\n"
-#~ "                                                        <img "
-#~ "alt=\"Dissatisfied\" src=\"/rating/static/src/img/rating_1.png\" "
-#~ "title=\"Dissatisfied\">\n"
-#~ "                                                    </a>\n"
-#~ "                                                </td>\n"
-#~ "                                            </tr>\n"
-#~ "                                        </table>\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                            </table>\n"
-#~ "                        </td></tr>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\" t-"
-#~ "out=\"object.user_id.signature or ''\">--<br>Mitchell Admin</td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "                <table style=\"width:600px;margin:auto;text-"
-#~ "align:center;font-size:12px;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td style=\"padding-top:10px;color:#afafaf;"
-#~ "\">\n"
-#~ "                            <p>Email automatically sent by <a "
-#~ "target=\"_blank\" href=\"https://www.odoo.com/app/subscriptions\" "
-#~ "style=\"color:#875A7B;text-decoration:none;\">Odoo Subscription</a> for "
-#~ "<a t-att-href=\"object.company_id.website\" style=\"color:#875A7B;text-"
-#~ "decoration:none;\" t-out=\"object.company_id.name or ''\">YourCompany</"
-#~ "a></p>\n"
-#~ "                        </td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "            </div>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-#~ "family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-#~ "            <t t-set=\"access_token\" t-"
-#~ "value=\"object._rating_get_access_token()\"></t>\n"
-#~ "                <table style=\"width:600px;margin:5px auto;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td t-if=\"not "
-#~ "object.company_id.uses_default_logo\">\n"
-#~ "                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-#~ "company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-#~ "width:100px;\"></a>\n"
-#~ "                        </td><td style=\"text-align:right;vertical-"
-#~ "align:middle;\">\n"
-#~ "                                Опрос об удовлетворенности\n"
-#~ "                        </td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "                <table style=\"width:600px;margin:0px "
-#~ "auto;background:white;border:1px solid #e1e1e1;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-#~ "                            <p>Здравствуйте,</p>\n"
-#~ "                            <p>Пожалуйста, уделите немного времени, чтобы "
-#~ "оценить наши услуги, связанные с вашей подпиской<strong t-"
-#~ "out=\"object.name or ''\">\"Служба уборки офисов\"</strong>\n"
-#~ "                               назначенному <strong t-"
-#~ "out=\"object._rating_get_operator().name or ''\">администратору Митчеллу</"
-#~ "strong>.</p>\n"
-#~ "                            <p>Мы ценим ваши отзывы. Это помогает нам "
-#~ "постоянно совершенствоваться.</p>\n"
-#~ "                        </td></tr>\n"
-#~ "                        <tr><td style=\"padding:10px 20px\">\n"
-#~ "                            <table summary=\"o_mail_notification\" "
-#~ "style=\"width:100%;border-top:1px solid #e1e1e1;\">\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"text-align:center;\">\n"
-#~ "                                        <h2 style=\"font-weight:300;font-"
-#~ "size:18px;\">\n"
-#~ "                                            Расскажите нам, что вы "
-#~ "думаете о наших услугах:\n"
-#~ "                                        </h2>\n"
-#~ "                                        <div style=\"text-color: "
-#~ "#888888\">(нажмите на один из этих смайликов)</div>\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"padding:10px 10px;\">\n"
-#~ "                                        <table style=\"width:100%;text-"
-#~ "align:center;\">\n"
-#~ "                                            <tr>\n"
-#~ "                                                <td>\n"
-#~ "                                                    <a t-attf-href=\"/"
-#~ "rate/{{ access_token }}/5\">\n"
-#~ "                                                        <img "
-#~ "alt=\"Satisfied\" src=\"/rating/static/src/img/rating_5.png\" "
-#~ "title=\"Satisfied\">\n"
-#~ "                                                    </a>\n"
-#~ "                                                </td>\n"
-#~ "                                                <td>\n"
-#~ "                                                    <a t-attf-href=\"/"
-#~ "rate/{{ access_token }}/3\">\n"
-#~ "                                                        <img alt=\"Okay\" "
-#~ "src=\"/rating/static/src/img/rating_3.png\" title=\"Okay\">\n"
-#~ "                                                    </a>\n"
-#~ "                                                </td>\n"
-#~ "                                                <td>\n"
-#~ "                                                    <a t-attf-href=\"/"
-#~ "rate/{{ access_token }}/1\">\n"
-#~ "                                                        <img "
-#~ "alt=\"Dissatisfied\" src=\"/rating/static/src/img/rating_1.png\" "
-#~ "title=\"Dissatisfied\">\n"
-#~ "                                                    </a>\n"
-#~ "                                                </td>\n"
-#~ "                                            </tr>\n"
-#~ "                                        </table>\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                            </table>\n"
-#~ "                        </td></tr>\n"
-#~ "                        <tr><td style=\"padding:15px 20px 10px 20px;\" t-"
-#~ "out=\"object.user_id.signature or ''\">--<br>Mitchell Admin</td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "                <table style=\"width:600px;margin:auto;text-"
-#~ "align:center;font-size:12px;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <tr><td style=\"padding-top:10px;color:#afafaf;"
-#~ "\">\n"
-#~ "                            <p>Email, автоматически отправленный <a "
-#~ "target=\"_blank\" href=\"https://www.odoo.com/app/subscriptions\" "
-#~ "style=\"color:#875A7B;text-decoration:none;\">Odoo Subscription</a> для "
-#~ "<a t-att-href=\"object.company_id.website\" style=\"color:#875A7B;text-"
-#~ "decoration:none;\" t-out=\"object.company_id.name or ''\">YourCompany</"
-#~ "a></p>\n"
-#~ "                        </td></tr>\n"
-#~ "                    </tbody>\n"
-#~ "                </table>\n"
-#~ "            </div>\n"
-#~ "        "
-
-#~ msgid ""
-#~ "<em class=\"text-muted\" colspan=\"2\" invisible=\"not id\">\n"
-#~ "                                Action data can not be updated to avoid "
-#~ "unexpected behaviors. Create a new action instead.\n"
-#~ "                            </em>"
-#~ msgstr ""
-#~ "<em class=\"text-muted\" colspan=\"2\" invisible=\"not id\">\n"
-#~ "                                Данные действия не могут быть обновлены, "
-#~ "чтобы избежать неожиданного поведения. Вместо этого создайте новое "
-#~ "действие.\n"
-#~ "                            </em>"
-
-#~ msgid ""
-#~ "<em class=\"text-muted\" invisible=\"not is_sale_order_alert\">\n"
-#~ "                        Action data can not be updated to avoid "
-#~ "unexpected behaviors. Create a new automation rule instead.\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<em class=\"text-muted\" invisible=\"not is_sale_order_alert\">\n"
-#~ "                        Данные действия не могут быть обновлены, чтобы "
-#~ "избежать неожиданного поведения. Вместо этого создайте новое правило "
-#~ "автоматизации.\n"
-#~ "                    </em>"
-
-#~ msgid "<i class=\"fa fa-download\"/> Download"
-#~ msgstr "<i class=\"fa fa-download\"/> Скачать"
-
-#~ msgid "<i class=\"fa fa-print\"/> Print"
-#~ msgstr "<i class=\"fa fa-print\"/> Печать"
-
-#~ msgid "<small class=\"text-muted\">Subscription Manager:</small>"
-#~ msgstr "<small class=\"text-muted\">Менеджер подписки:</small>"
-
-#~ msgid "<span class=\"align-middle\">for this subscription.</span>"
-#~ msgstr "<span class=\"align-middle\">для этой подписки.</span>"
-
-#~ msgid ""
-#~ "<span class=\"fa fa-lg fa-building-o p-2\" title=\"Values set here are "
-#~ "company-specific.\" groups=\"base.group_multi_company\"/>"
-#~ msgstr ""
-#~ "<span class=\"fa fa-lg fa-building-o p-2\" title=\"Values set here are "
-#~ "company-specific.\" groups=\"base.group_multi_company\"/>"
-
-#~ msgid "<strong invisible=\"not rating_operator\">%</strong>"
-#~ msgstr "<strong invisible=\"not rating_operator\">%</strong>"
-
-#~ msgid "<strong> and </strong>"
-#~ msgstr "<strong> и </strong>"
-
-#~ msgid "<strong>Recurring Plan:</strong>"
-#~ msgstr "<strong>Повторяющийся план:</strong>"
-
-#~ msgid "<strong>subscriptions</strong>"
-#~ msgstr "<strong>подписки</strong>"
-
-#~ msgid "<strong>to</strong>"
-#~ msgstr "<strong>на</strong>"
-
-#~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"padding: 16px; background-color: white; color: #454748; border-"
-#~ "collapse:separate;\">\n"
-#~ "<tbody>\n"
-#~ "    <!-- HEADER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\">\n"
-#~ "                    <t t-set=\"company\" t-value=\"object.company_id or "
-#~ "object.invoice_user_id.company_id or user.company_id\"></t>\n"
-#~ "                    <span style=\"font-size: 10px;\">Your Subscription</"
-#~ "span><br>\n"
-#~ "                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-#~ "out=\"ctx.get('code', ctx.get('subscription_name')) or "
-#~ "'Document'\">Document</span>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-#~ "company.uses_default_logo\">\n"
-#~ "                    <img t-attf-src=\"/logo.png?company={{ company.id }}"
-#~ "\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"company.name\">\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- CONTENT -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-#~ "                    Dear <t t-out=\"object.partner_id.name or "
-#~ "''\">Brandon Freeman</t>,<br><br>\n"
-#~ "                    Your Subscription (<t t-"
-#~ "out=\"ctx.get('subscription_name') or ''\">CODE</t>\n"
-#~ "                    <t t-if=\"ctx.get('code')\">\n"
-#~ "                    , Reference: <t t-out=\"ctx.get('code')\"></t>\n"
-#~ "                    </t>) has just been renewed\n"
-#~ "                    <t t-if=\"ctx.get('total_amount') and "
-#~ "ctx.get('payment_token')\">\n"
-#~ "                        via a payment of <t t-"
-#~ "out=\"ctx.get('total_amount') or ''\">100</t> <t t-"
-#~ "out=\"ctx.get('currency_name') or ''\">$</t> charged on <t t-"
-#~ "out=\"ctx.get('payment_token') or ''\">PAYMENT_TOKEN</t>.\n"
-#~ "                    </t>\n"
-#~ "                    <br><br>\n"
-#~ "                    You will find your invoice attached.\n"
-#~ "                    <t t-if=\"ctx.get('next_date')\">\n"
-#~ "                        Your next invoice will be on <t t-"
-#~ "out=\"format_date(ctx.get('next_date')) or ''\">05/05/2021</t>.\n"
-#~ "                    </t>\n"
-#~ "                    <br><br>\n"
-#~ "                    If you have any questions, do not hesitate to contact "
-#~ "us.\n"
-#~ "                    <br><br>\n"
-#~ "                    Thank you for choosing <t t-out=\"company.name or "
-#~ "''\">YourCompany</t>!\n"
-#~ "                    <div t-if=\"user.signature\">\n"
-#~ "                        <br><br>\n"
-#~ "                        <t t-out=\"user.signature or ''\">--<br>Mitchell "
-#~ "Admin</t>\n"
-#~ "                    </div>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- FOOTER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; font-"
-#~ "size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\">\n"
-#~ "                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-#~ "0.7;\">\n"
-#~ "                    <t t-if=\"company.phone\">\n"
-#~ "                        <t t-out=\"company.phone or ''\">+1 650-123-4567</"
-#~ "t> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.email\">\n"
-#~ "                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}"
-#~ "\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.email "
-#~ "or ''\">info@yourcompany.com</a> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.website\">\n"
-#~ "                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-#~ "style=\"text-decoration:none; color: #454748;\" t-out=\"company.website "
-#~ "or ''\">http://www.example.com</a>\n"
-#~ "                    </t>\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "</tbody>\n"
-#~ "</table>\n"
-#~ "</td></tr>\n"
-#~ "<!-- POWERED BY -->\n"
-#~ "<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-#~ "        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-#~ "utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "      </td></tr>\n"
-#~ "    </table>\n"
-#~ "</td></tr>\n"
-#~ "</table>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"padding: 16px; background-color: white; color: #454748; border-"
-#~ "collapse:separate;\">\n"
-#~ "<tbody>\n"
-#~ "    <!-- HEADER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\">\n"
-#~ "                    <t t-set=\"company\" t-value=\"object.company_id or "
-#~ "object.invoice_user_id.company_id or user.company_id\"></t>\n"
-#~ "                    <span style=\"font-size: 10px;\">Ваша подписка</"
-#~ "span><br>\n"
-#~ "                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-#~ "out=\"ctx.get('code', ctx.get('subscription_name')) or "
-#~ "'Document'\">Документ</span>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-#~ "company.uses_default_logo\">\n"
-#~ "                    <img t-attf-src=\"/logo.png?company={{ company.id }}"
-#~ "\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"company.name\">\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- CONTENT -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-#~ "                    Уважаемый <t t-out=\"object.partner_id.name or "
-#~ "''\">Брэндон Фриман</t>,<br><br>\n"
-#~ "                    Ваша подписка<t t-out=\"ctx.get('subscription_name') "
-#~ "or ''\">(КОД</t>\n"
-#~ "                   <t t-if=\"ctx.get('code')\">\n"
-#~ "                    , Ссылка: <t t-out=\"ctx.get('code')\"></t>\n"
-#~ "                    ) только что была продлена\n"
-#~ "                   </t> <t t-if=\"ctx.get('total_amount') and "
-#~ "ctx.get('payment_token')\">\n"
-#~ "                        посредством платежа в размере <t t-"
-#~ "out=\"ctx.get('total_amount') or ''\">100</t> <t t-"
-#~ "out=\"ctx.get('currency_name') or ''\">$</t>, списанных с <t t-"
-#~ "out=\"ctx.get('payment_token') or ''\">PAYMENT_TOKEN</t>.\n"
-#~ "                   </t>\n"
-#~ "                   <br><br>\n"
-#~ "                    В приложении вы найдете счет-фактуру.\n"
-#~ "                   <t t-if=\"ctx.get('next_date')\">\n"
-#~ "                        Следующий счет будет выставлен <t t-"
-#~ "out=\"format_date(ctx.get('next_date')) or ''\">05/05/2021</t>.\n"
-#~ "                   </t>\n"
-#~ "                   <br><br>\n"
-#~ "                    Если у вас возникнут вопросы, не стесняйтесь "
-#~ "обращаться к нам.\n"
-#~ "                   <br><br>\n"
-#~ "                    Спасибо, что выбрали <t t-out=\"company.name or "
-#~ "''\">YourCompany</t>!\n"
-#~ "                    <div t-if=\"user.signature\">\n"
-#~ "                        <br><br>\n"
-#~ "                        <t t-out=\"user.signature or ''\">--<br>Mitchell "
-#~ "Admin</t>\n"
-#~ "                    </div>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- FOOTER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; font-"
-#~ "size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\">\n"
-#~ "                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-#~ "0.7;\">\n"
-#~ "                    <t t-if=\"company.phone\">\n"
-#~ "                       <t t-out=\"company.phone or ''\">+1 650-123-4567</"
-#~ "t> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.email\">\n"
-#~ "                       <a t-attf-href=\"'mailto:%s' % {{ company.email }}"
-#~ "\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.email "
-#~ "or ''\">info@yourcompany.com</a> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.website\">\n"
-#~ "                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-#~ "style=\"text-decoration:none; color: #454748;\" t-out=\"company.website "
-#~ "or ''\">http://www.example.com</a>\n"
-#~ "                    </t>\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "</tbody>\n"
-#~ "</table>\n"
-#~ "</td></tr>\n"
-#~ "<!-- POWERED BY -->\n"
-#~ "<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-#~ "        Работает на <a target=\"_blank\" href=\"https://www.odoo.com?"
-#~ "utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "      </td></tr>\n"
-#~ "    </table>\n"
-#~ "</td></tr>\n"
-#~ "</table>\n"
-#~ "        "
-
-#~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"padding: 16px; background-color: white; color: #454748; border-"
-#~ "collapse:separate;\">\n"
-#~ "<tbody>\n"
-#~ "    <!-- HEADER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\">\n"
-#~ "                    <t t-set=\"company\" t-value=\"object.company_id or "
-#~ "object.user_id.company_id or user.company_id\"></t>\n"
-#~ "                    <span style=\"font-size: 10px;\">Your Subscription</"
-#~ "span><br>\n"
-#~ "                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-#~ "out=\"object.name or ''\">Office Cleaning Service</span>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-#~ "company.uses_default_logo\">\n"
-#~ "                    <img t-attf-src=\"/logo.png?company={{ company.id }}"
-#~ "\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"company.name\">\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- CONTENT -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-#~ "                    Hello <t t-out=\"object.partner_id.name or "
-#~ "''\">Brandon Freeman</t>,<br><br>\n"
-#~ "                    <t t-if=\"ctx.get('payment_token') and "
-#~ "ctx.get('total_amount')\">\n"
-#~ "                        Our final attempt to process a payment for your "
-#~ "subscription using your payment method\n"
-#~ "                        <t t-out=\"ctx.get('payment_token') or "
-#~ "''\">TOKEN</t>\n"
-#~ "                        for <t t-out=\"ctx['total_amount'] or ''\">100</"
-#~ "t> <t t-out=\"ctx.get('currency') or ''\">$</t> failed.\n"
-#~ "                        <t t-if=\"ctx.get('error')\">\n"
-#~ "                            Your bank or credit institution gave the "
-#~ "following details about the issue: <pre t-out=\"ctx['error'] or ''\"></"
-#~ "pre>.\n"
-#~ "                        </t>\n"
-#~ "                    </t>\n"
-#~ "                    <t t-else=\"\">\n"
-#~ "                        Our final attempt to process a payment for your "
-#~ "subscription failed because we have no payment method recorded for you.\n"
-#~ "                    </t>\n"
-#~ "                    <br><br>\n"
-#~ "                    As your payment should have been made <strong><t t-"
-#~ "out=\"ctx.get('auto_close_limit') or ''\">5</t> days ago</strong>, your "
-#~ "subscription has been terminated.\n"
-#~ "                    Should you wish to resolve this issue, do not "
-#~ "hesitate to contact us.<br><br>\n"
-#~ "                    Thank you for choosing <t t-out=\"company.name or "
-#~ "''\">YourCompany</t>!\n"
-#~ "                    <div t-if=\"user.signature\">\n"
-#~ "                        <br><br>\n"
-#~ "                        <t t-out=\"user.signature or ''\">--<br>Mitchell "
-#~ "Admin</t>\n"
-#~ "                    </div>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- FOOTER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; font-"
-#~ "size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\">\n"
-#~ "                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-#~ "0.7;\">\n"
-#~ "                    <t t-if=\"company.phone\">\n"
-#~ "                        <t t-out=\"company.phone or ''\">+1 650-123-4567</"
-#~ "t> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.email\">\n"
-#~ "                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}"
-#~ "\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.email "
-#~ "or ''\">info@yourcompany.com</a> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.website\">\n"
-#~ "                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-#~ "style=\"text-decoration:none; color: #454748;\" t-out=\"company.website "
-#~ "or ''\">http://www.example.com</a>\n"
-#~ "                    </t>\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "</tbody>\n"
-#~ "</table>\n"
-#~ "</td></tr>\n"
-#~ "<!-- POWERED BY -->\n"
-#~ "<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-#~ "        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-#~ "utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "      </td></tr>\n"
-#~ "    </table>\n"
-#~ "</td></tr>\n"
-#~ "</table>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"padding: 16px; background-color: white; color: #454748; border-"
-#~ "collapse:separate;\">\n"
-#~ "<tbody>\n"
-#~ "    <!-- HEADER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\">\n"
-#~ "                    <t t-set=\"company\" t-value=\"object.company_id or "
-#~ "object.user_id.company_id or user.company_id\"></t>\n"
-#~ "                    <span style=\"font-size: 10px;\">Ваша подписка</"
-#~ "span><br>\n"
-#~ "                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-#~ "out=\"object.name or ''\">Служба уборки офисов</span>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-#~ "company.uses_default_logo\">\n"
-#~ "                    <img t-attf-src=\"/logo.png?company={{ company.id }}"
-#~ "\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"company.name\">\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- CONTENT -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-#~ "                    Здравствуйте, <t t-out=\"object.partner_id.name or "
-#~ "''\">Брэндон Фриман</t>,<br><br>\n"
-#~ "                   <t t-if=\"ctx.get('payment_token') and "
-#~ "ctx.get('total_amount')\">\n"
-#~ "                        Наша последняя попытка обработать платеж за вашу "
-#~ "подписку, используя ваш метод оплаты\n"
-#~ "                       <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</"
-#~ "t>\n"
-#~ "                        на сумму <t t-out=\"ctx['total_amount'] or "
-#~ "''\">100</t> <t t-out=\"ctx.get('currency') or ''\"> долларов</t> не "
-#~ "удалась.\n"
-#~ "                       <t t-if=\"ctx.get('error')\">\n"
-#~ "                            Ваш банк или кредитная организация "
-#~ "предоставили следующую информацию о проблеме: <pre t-out=\"ctx['error'] "
-#~ "or ''\"></pre>.\n"
-#~ "                       </t>\n"
-#~ "                   </t>\n"
-#~ "                   <t t-else=\"\">\n"
-#~ "                        Наша последняя попытка обработать платеж за вашу "
-#~ "подписку не удалась, потому что у нас нет зарегистрированного для вас "
-#~ "способа оплаты.\n"
-#~ "                   </t>\n"
-#~ "                   <br><br>\n"
-#~ "                    Поскольку оплата должна была быть произведена "
-#~ "<strong><t t-out=\"ctx.get('auto_close_limit') or ''\">5</t> дней назад</"
-#~ "strong>, ваша подписка была прекращена.\n"
-#~ "                    Если вы хотите решить этот вопрос, свяжитесь с нами."
-#~ "<br><br>\n"
-#~ "                    Спасибо, что выбрали <t t-out=\"company.name or "
-#~ "''\">YourCompany</t>!\n"
-#~ "                    <div t-if=\"user.signature\">\n"
-#~ "                        <br><br>\n"
-#~ "                        <t t-out=\"user.signature or ''\">--<br>Mitchell "
-#~ "Admin</t>\n"
-#~ "                    </div>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- FOOTER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; font-"
-#~ "size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\">\n"
-#~ "                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-#~ "0.7;\">\n"
-#~ "                    <t t-if=\"company.phone\">\n"
-#~ "                       <t t-out=\"company.phone or ''\">+1 650-123-4567</"
-#~ "t> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.email\">\n"
-#~ "                       <a t-attf-href=\"'mailto:%s' % {{ company.email }}"
-#~ "\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.email "
-#~ "or ''\">info@yourcompany.com</a> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.website\">\n"
-#~ "                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-#~ "style=\"text-decoration:none; color: #454748;\" t-out=\"company.website "
-#~ "or ''\">http://www.example.com</a>\n"
-#~ "                    </t>\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "</tbody>\n"
-#~ "</table>\n"
-#~ "</td></tr>\n"
-#~ "<!-- POWERED BY -->\n"
-#~ "<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-#~ "        Работает на <a target=\"_blank\" href=\"https://www.odoo.com?"
-#~ "utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "      </td></tr>\n"
-#~ "    </table>\n"
-#~ "</td></tr>\n"
-#~ "</table>\n"
-#~ "        "
-
-#~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"padding: 16px; background-color: white; color: #454748; border-"
-#~ "collapse:separate;\">\n"
-#~ "<tbody>\n"
-#~ "    <!-- HEADER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\">\n"
-#~ "                    <t t-set=\"company\" t-value=\"object.company_id or "
-#~ "object.user_id.company_id or user.company_id\"></t>\n"
-#~ "                    <span style=\"font-size: 10px;\">Your Subscription</"
-#~ "span><br>\n"
-#~ "                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-#~ "out=\"object.name or ''\">Office Cleaning Service</span>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-#~ "company.uses_default_logo\">\n"
-#~ "                    <img t-attf-src=\"/logo.png?company={{ company.id }}"
-#~ "\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"company.name\">\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- CONTENT -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-#~ "                    Hello <t t-out=\"object.partner_id.name or "
-#~ "''\">Brandon Freeman</t>,<br><br>\n"
-#~ "                    <t t-if=\"ctx.get('payment_token') and "
-#~ "ctx.get('total_amount')\">\n"
-#~ "                        We were unable to process a payment for your "
-#~ "subscription using your payment method\n"
-#~ "                        <t t-out=\"ctx['payment_token'] or ''\">TOKEN</"
-#~ "t>\n"
-#~ "                        for <t t-out=\"ctx['total_amount'] or ''\">10</t> "
-#~ "<t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-#~ "                        <t t-if=\"ctx.get('error')\">\n"
-#~ "                            Your bank or credit institution gave the "
-#~ "following details about the issue: <pre t-out=\"ctx['error'] or ''\"></"
-#~ "pre>.\n"
-#~ "                        </t>\n"
-#~ "                    </t>\n"
-#~ "                    <t t-else=\"\">\n"
-#~ "                        We were unable to process a payment for your "
-#~ "subscription because we have no payment method recorded for you.\n"
-#~ "                    </t>\n"
-#~ "                    <br><br>\n"
-#~ "                    Your subscription <t t-out=\"ctx.get('code') or "
-#~ "''\">CODE</t> is still valid but will be <strong>suspended</strong>\n"
-#~ "                    on <t t-out=\"format_date(ctx.get('date_close')) or "
-#~ "''\">05/05/2021</t> unless the payment succeeds in the mean time (we will "
-#~ "retry once every day).\n"
-#~ "                    Please double-check that you have sufficient funds."
-#~ "<br><br>\n"
-#~ "                    If you have any questions, do not hesitate to contact "
-#~ "us.<br><br>\n"
-#~ "                    Thank you for choosing <t t-out=\"company.name or "
-#~ "''\">YourCompany</t>!\n"
-#~ "                    <div>\n"
-#~ "                    <t t-if=\"user.signature\">\n"
-#~ "                        <br><br>\n"
-#~ "                        <t t-out=\"user.signature or ''\">--<br>Mitchell "
-#~ "Admin</t>\n"
-#~ "                    </t>\n"
-#~ "                    </div>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- FOOTER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; font-"
-#~ "size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\">\n"
-#~ "                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-#~ "0.7;\">\n"
-#~ "                    <t t-if=\"company.phone\">\n"
-#~ "                        <t t-out=\"company.phone or ''\">+1 650-123-4567</"
-#~ "t> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.email\">\n"
-#~ "                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}"
-#~ "\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.email "
-#~ "or ''\">info@yourcompany.com</a> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.website\">\n"
-#~ "                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-#~ "style=\"text-decoration:none; color: #454748;\" t-out=\"company.website "
-#~ "or ''\">http://www.example.com</a>\n"
-#~ "                    </t>\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "</tbody>\n"
-#~ "</table>\n"
-#~ "</td></tr>\n"
-#~ "<!-- POWERED BY -->\n"
-#~ "<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-#~ "        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-#~ "utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "      </td></tr>\n"
-#~ "    </table>\n"
-#~ "</td></tr>\n"
-#~ "</table>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"padding: 16px; background-color: white; color: #454748; border-"
-#~ "collapse:separate;\">\n"
-#~ "<tbody>\n"
-#~ "    <!-- HEADER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\">\n"
-#~ "                    <t t-set=\"company\" t-value=\"object.company_id or "
-#~ "object.user_id.company_id or user.company_id\"></t>\n"
-#~ "                    <span style=\"font-size: 10px;\">Ваша подписка</"
-#~ "span><br>\n"
-#~ "                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-#~ "out=\"object.name or ''\">Служба уборки офисов</span>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-#~ "company.uses_default_logo\">\n"
-#~ "                    <img t-attf-src=\"/logo.png?company={{ company.id }}"
-#~ "\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"company.name\">\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- CONTENT -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-#~ "0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-#~ "                    Здравствуйте, <t t-out=\"object.partner_id.name or "
-#~ "''\">Брэндон Фриман</t>,<br><br>\n"
-#~ "                   <t t-if=\"ctx.get('payment_token') and "
-#~ "ctx.get('total_amount')\">\n"
-#~ "                        Мы не смогли обработать платеж за вашу подписку, "
-#~ "используя ваш метод оплаты\n"
-#~ "                       <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-#~ "                        на сумму <t t-out=\"ctx['total_amount'] or "
-#~ "''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-#~ "                       <t t-if=\"ctx.get('error')\">\n"
-#~ "                            Ваш банк или кредитная организация "
-#~ "предоставили следующие данные о выпуске: <pre t-out=\"ctx['error'] or "
-#~ "''\"></pre>.\n"
-#~ "                       </t>\n"
-#~ "                   </t>\n"
-#~ "                   <t t-else=\"\">\n"
-#~ "                        Мы не смогли обработать платеж за вашу подписку, "
-#~ "поскольку у нас нет зарегистрированного для вас способа оплаты.\n"
-#~ "                   </t>\n"
-#~ "                   <br><br>\n"
-#~ "                    Ваш подписной <t t-out=\"ctx.get('code') or ''\">КОД</"
-#~ "t> остается в силе, но будет <strong>приостановлен</strong>\n"
-#~ "                   <t t-out=\"format_date(ctx.get('date_close')) or "
-#~ "''\">05/05/2021</t>, если за это время платеж не пройдет успешно (мы "
-#~ "будем повторять попытку один раз в день).\n"
-#~ "                    Пожалуйста, проверьте, достаточно ли у вас средств."
-#~ "<br><br>\n"
-#~ "                    Если у вас есть какие-либо вопросы, не стесняйтесь "
-#~ "связаться с нами.<br><br>\n"
-#~ "                    Спасибо, что выбрали <t t-out=\"company.name or "
-#~ "''\">YourCompany</t>!\n"
-#~ "                    <div>\n"
-#~ "                    <t t-if=\"user.signature\">\n"
-#~ "                        <br><br>\n"
-#~ "                        <t t-out=\"user.signature or ''\">--<br>Mitchell "
-#~ "Admin</t>\n"
-#~ "                    </t>\n"
-#~ "                    </div>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td style=\"text-align:center;\">\n"
-#~ "                    <hr width=\"100%\" style=\"background-"
-#~ "color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-#~ "size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "    <!-- FOOTER -->\n"
-#~ "    <tr>\n"
-#~ "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "width=\"590\" style=\"min-width: 590px; background-color: white; font-"
-#~ "size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\">\n"
-#~ "                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-#~ "                </td></tr>\n"
-#~ "                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-#~ "0.7;\">\n"
-#~ "                    <t t-if=\"company.phone\">\n"
-#~ "                       <t t-out=\"company.phone or ''\">+1 650-123-4567</"
-#~ "t> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.email\">\n"
-#~ "                       <a t-attf-href=\"'mailto:%s' % {{ company.email }}"
-#~ "\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.email "
-#~ "or ''\">info@yourcompany.com</a> |\n"
-#~ "                    </t>\n"
-#~ "                    <t t-if=\"company.website\">\n"
-#~ "                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-#~ "style=\"text-decoration:none; color: #454748;\" t-out=\"company.website "
-#~ "or ''\">http://www.example.com</a>\n"
-#~ "                    </t>\n"
-#~ "                </td></tr>\n"
-#~ "            </table>\n"
-#~ "        </td>\n"
-#~ "    </tr>\n"
-#~ "</tbody>\n"
-#~ "</table>\n"
-#~ "</td></tr>\n"
-#~ "<!-- POWERED BY -->\n"
-#~ "<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-#~ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-#~ "style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-#~ "        Работает на <a target=\"_blank\" href=\"https://www.odoo.com?"
-#~ "utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "      </td></tr>\n"
-#~ "    </table>\n"
-#~ "</td></tr>\n"
-#~ "</table>\n"
-#~ "        "
-
-#~ msgid "Action"
-#~ msgstr "Действие"
-
-#~ msgid "Action Name"
-#~ msgstr "Название действия"
-
-#~ msgid "Action To Do"
-#~ msgstr "Действия, которые нужно предпринять"
-
-#~ msgid "Actions"
-#~ msgstr "Действия"
-
-#~ msgid "Activity"
-#~ msgstr "Активность"
-
-#~ msgid "Activity Type"
-#~ msgstr "Тип активности"
-
-#~ msgid "Add a new plan"
-#~ msgstr "Добавить новый план"
-
-#~ msgid "Add a price rule"
-#~ msgstr "Добавить правило цены"
-
-#~ msgid "Amount Signed"
-#~ msgstr "Подписанная сумма"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Аналитический Счёт"
-
-#~ msgid "Anticipate payment"
-#~ msgstr "Ожидайте оплаты"
-
-#~ msgid "Apply on"
-#~ msgstr "Подайте заявление"
-
-#~ msgid "Archived Product"
-#~ msgstr "Архивный продукт"
-
-#~ msgid "Archived Products"
-#~ msgstr "Архивные продукты"
-
-#~ msgid "Assign To"
-#~ msgstr "Назначить в"
-
-#~ msgid "Assign a new partner to the contract"
-#~ msgstr "Назначьте нового партнера по контракту"
-
-#~ msgid "Automation Rule"
-#~ msgstr "Правило автоматизации"
-
-#~ msgid "Automation Rule Name"
-#~ msgstr "Имя правила автоматизации"
-
-#~ msgid "Automation Rules"
-#~ msgstr "Правила автоматизации"
-
-#~ msgid "Bad"
-#~ msgstr "Плохо"
-
-#~ msgid "Bad Health"
-#~ msgstr "Плохое здоровье"
-
-#~ msgid "Before Update Domain"
-#~ msgstr "До обновления домена"
-
-#~ msgid "Can be Recurring"
-#~ msgstr "Может быть повторяющимся"
-
-#~ msgid "Cancel Subscription"
-#~ msgstr "Отменить подписку"
-
-#~ msgid "Click here to add some products or services to your quotation."
-#~ msgstr ""
-#~ "Нажмите здесь, чтобы добавить несколько товаров или услуг к вашему "
-#~ "предложению."
-
-#~ msgid "Companies"
-#~ msgstr "Компании"
-
-#~ msgid "Create a new subscription alert"
-#~ msgstr "Создайте новое оповещение о подписке"
-
-#~ msgid "Create a new subscription plan"
-#~ msgstr "Создайте новый план подписки"
-
-#~ msgid "Create next activity"
-#~ msgstr "Создать следующее действие"
-
-#~ msgid "Create subscriptions plan"
-#~ msgstr "Создание плана подписки"
-
-#~ msgid "Cron Nextcall"
-#~ msgstr "Cron Nextcall"
-
-#~ msgid "Custom Subscription Pricings"
-#~ msgstr "Индивидуальные цены на подписку"
-
-#~ msgid "Date"
-#~ msgstr "Дата"
-
-#~ msgid "Default Recurrence"
-#~ msgstr "Рецидив по умолчанию"
-
-#~ msgid "Default period to use as recurrence for a new quotation."
-#~ msgstr ""
-#~ "Период по умолчанию, используемый в качестве рекурсии для новой котировки."
-
-#~ msgid "Delay After Trigger"
-#~ msgstr "Задержка после срабатывания"
-
-#~ msgid ""
-#~ "Delay after the trigger date. You can put a negative number if you need a "
-#~ "delay before the trigger date, like sending a reminder 15 minutes before "
-#~ "a meeting."
-#~ msgstr ""
-#~ "Задержка после даты срабатывания. Вы можете поставить отрицательное "
-#~ "число, если вам нужна задержка до даты срабатывания, например отправить "
-#~ "напоминание за 15 минут до встречи."
-
-#~ msgid "Delay after trigger date"
-#~ msgstr "Отсрочка после даты срабатывания"
-
-#~ msgid "Delay type"
-#~ msgstr "Тип задержки"
-
-#~ msgid "Description"
-#~ msgstr "Описание"
-
-#~ msgid "Destination"
-#~ msgstr "Место назначения"
-
-#~ msgid "Due Date In"
-#~ msgstr "Дата выполнения В"
-
-#~ msgid "Due type"
-#~ msgstr "Тип исполнения"
-
-#~ msgid "Duration"
-#~ msgstr "Продолжительность"
-
-#~ msgid "Email Template"
-#~ msgstr "Шаблон электронной почты"
-
-#~ msgid "Error during renewal of contract %s %s %s"
-#~ msgstr "Ошибка при продлении контракта %s %s %s"
-
-#~ msgid "Failed Payments"
-#~ msgstr "Неудачные платежи"
-
-#~ msgid "Fields that trigger the onchange."
-#~ msgstr "Поля, которые вызывают срабатывание на изменении."
-
-#~ msgid "Good"
-#~ msgstr "Хорошо"
-
-#~ msgid "Good Health"
-#~ msgstr "Хорошее здоровье"
-
-#~ msgid "Group By"
-#~ msgstr "Группировать по"
-
-#~ msgid "Has Mail Thread"
-#~ msgstr "Почтовая нить"
-
-#~ msgid "Health"
-#~ msgstr "Здоровье"
-
-#~ msgid "Helps you handle subscriptions and recurring invoicing."
-#~ msgstr ""
-#~ "Помогает вам обрабатывать подписки и повторяющиеся выставления счетов."
-
-#~ msgid ""
-#~ "If present, this condition must be satisfied before executing the "
-#~ "automation rule."
-#~ msgstr ""
-#~ "Если оно присутствует, это условие должно быть выполнено перед "
-#~ "выполнением правила автоматизации."
-
-#~ msgid ""
-#~ "If present, this condition must be satisfied before the update of the "
-#~ "record."
-#~ msgstr ""
-#~ "Если это условие присутствует, оно должно быть выполнено до обновления "
-#~ "записи."
-
-#~ msgid "If you wish to reopen it, the"
-#~ msgstr "Если вы хотите снова открыть его, это"
-
-#~ msgid ""
-#~ "If you wish to reopen it, you can pay your invoice for the current "
-#~ "invoicing period."
-#~ msgstr ""
-#~ "Если вы хотите снова открыть его, вы можете оплатить счет за текущий "
-#~ "период."
-
-#~ msgid "Initial"
-#~ msgstr "Начальная"
-
-#~ msgid ""
-#~ "Invoice for subscription {{ ctx.get('code', "
-#~ "ctx.get('subscription_name')) }}"
-#~ msgstr ""
-#~ "Счет за подписку {{ ctx.get('code', ctx.get('subscription_name')) }}"
-
-#~ msgid "Is Sale Order Alert"
-#~ msgstr "Оповещение о заказе на продажу"
-
-#~ msgid "Last Run"
-#~ msgstr "Последний запуск"
-
-#~ msgid "Latest Rating: Dissatisfied"
-#~ msgstr "Последняя оценка: Недовольные"
-
-#~ msgid "Latest Rating: Okay"
-#~ msgstr "Последняя оценка: Хорошо"
-
-#~ msgid "Latest Rating: Satisfied"
-#~ msgstr "Последнее рейтинг: Довольные"
-
-#~ msgid "Least Delay Msg"
-#~ msgstr "Сообщение с наименьшей задержкой"
-
-#~ msgid "Let's configure the product price"
-#~ msgstr "Давайте настроим цену продукта"
-
-#~ msgid "Log Calls"
-#~ msgstr "Журнал звонков"
-
-#~ msgid "Log a note..."
-#~ msgstr "Запишите в примечания..."
-
-#~ msgid "MRR Between"
-#~ msgstr "MRR между"
-
-#~ msgid "MRR Change Amount"
-#~ msgstr "Изменение MRR Сумма"
-
-#~ msgid "MRR Change More"
-#~ msgstr "MRR Изменить Подробнее"
-
-#~ msgid "MRR Change Period"
-#~ msgstr "Период изменения MRR"
-
-#~ msgid "MRR Change Unit"
-#~ msgstr "Изменение MRR Единица измерения"
-
-#~ msgid "MRR Range Max"
-#~ msgstr "Диапазон MRR Макс"
-
-#~ msgid "MRR Range Min"
-#~ msgstr "Диапазон MRR Мин"
-
-#~ msgid "Manage Payment Method"
-#~ msgstr "Управление способом оплаты"
-
-#~ msgid "Model"
-#~ msgstr "Модель"
-
-#~ msgid "Model Name"
-#~ msgstr "Название модели"
-
-#~ msgid "Model on which the automation rule runs."
-#~ msgstr "Модель, на которой выполняется правило автоматизации."
-
-#~ msgid "Modification"
-#~ msgstr "Модификация"
-
-#~ msgid "Neutral"
-#~ msgstr "Нейтрально"
-
-#~ msgid "Next Billing Date:"
-#~ msgstr "Следующая дата выставления счета:"
-
-#~ msgid "Note"
-#~ msgstr "Заметка"
-
-#~ msgid "On Change Fields Trigger"
-#~ msgstr "Триггер при изменении полей"
-
-#~ msgid "Operation not supported"
-#~ msgstr "Операция не поддерживается"
-
-#~ msgid "Over"
-#~ msgstr "Над"
-
-#~ msgid "Payment method:"
-#~ msgstr "Способ оплаты:"
-
-#~ msgid "Period over which the KPI is calculated"
-#~ msgstr "Период, за который рассчитывается КПЭ"
-
-#~ msgid "Plans"
-#~ msgstr "Планы"
-
-#~ msgid "Pricing rule of subscription products"
-#~ msgstr "Правила ценообразования на товары по подписке"
-
-#~ msgid "Print"
-#~ msgstr "Печать"
-
-#~ msgid "Quotation Template Option"
-#~ msgstr "Вариант шаблона коммерческого предложения"
-
-#~ msgid "Rating Operator"
-#~ msgstr "Рейтинг Оператор"
-
-#~ msgid "Rating Percentage"
-#~ msgstr "Рейтинг Процент"
-
-#~ msgid ""
-#~ "Rating Satisfaction is the ratio of positive rating to total number of "
-#~ "rating."
-#~ msgstr ""
-#~ "Удовлетворенность рейтингом - это отношение положительных оценок к общему "
-#~ "количеству оценок."
-
-#~ msgid "Record Getter"
-#~ msgstr "Устройство получения записей"
-
-#~ msgid "Recurring Price"
-#~ msgstr "Повторяющаяся стоимость"
-
-#~ msgid ""
-#~ "Recurring products are discounted according to the prorated period from "
-#~ "%s to %s"
-#~ msgstr ""
-#~ "На повторяющиеся продукты скидка начисляется в соответствии с "
-#~ "пропорциональным периодом от %s до %s"
-
-#~ msgid ""
-#~ "Recurring products are entirely discounted as the next period has not "
-#~ "been invoiced yet."
-#~ msgstr ""
-#~ "На повторяющиеся продукты предоставляется полная скидка, поскольку счет "
-#~ "за следующий период еще не выставлен."
-
-#~ msgid "Related Order"
-#~ msgstr "Связанный заказ"
-
-#~ msgid "Responsible"
-#~ msgstr "Ответственный"
-
-#~ msgid "SMS Template"
-#~ msgstr "SMS шаблон"
-
-#~ msgid "Sad face"
-#~ msgstr "Грустное лицо"
-
-#~ msgid "Sale Options"
-#~ msgstr "Варианты продажи"
-
-#~ msgid "Sale Order Alert"
-#~ msgstr "Оповещение о заказе на продажу"
-
-#~ msgid "Sales"
-#~ msgstr "Продажи"
-
-#~ msgid "Sales Team Leader"
-#~ msgstr "Руководитель группы продаж"
-
-#~ msgid ""
-#~ "Select Variants of the Product for which this rule applies. Leave empty "
-#~ "if this rule applies for any variant of this template."
-#~ msgstr ""
-#~ "Выберите вариации товара, к которым применяется это правило. Оставьте "
-#~ "поле пустым, если правило должно применяться ко всем вариациям этого "
-#~ "шаблона."
-
-#~ msgid "Select a recurrence"
-#~ msgstr "Выберите рецидив"
-
-#~ msgid "Select products on which this pricing will be applied."
-#~ msgstr "Выберите товары, к которым будет применяться данная цена."
-
-#~ msgid "Send an SMS Text Message to the customer"
-#~ msgstr "Отправьте SMS-сообщение клиенту"
-
-#~ msgid "Send an email to the customer"
-#~ msgstr "Отправьте электронное письмо клиенту"
-
-#~ msgid "Send message"
-#~ msgstr "Отправить сообщение"
-
-#~ msgid ""
-#~ "Sent automatically with subscription invoice when payment is successful"
-#~ msgstr ""
-#~ "Отправляется автоматически вместе со счетом за подписку при успешной "
-#~ "оплате"
-
-#~ msgid "Server Action"
-#~ msgstr "Server Action"
-
-#~ msgid "Set Contract Health value"
-#~ msgstr "Установите значение Здоровье по контракту"
-
-#~ msgid "Set Payment Method"
-#~ msgstr "Установите способ оплаты"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr ""
-#~ "Показать все записи, у которых дата следующего действия наступает до "
-#~ "сегодняшнего дня"
-
-#~ msgid "Show the health status"
-#~ msgstr "Показать состояние здоровья"
-
-#~ msgid ""
-#~ "Some triggers need a reference to a selection field. This field is used "
-#~ "to store it."
-#~ msgstr ""
-#~ "Некоторым триггерам требуется ссылка на поле выбора. Это поле "
-#~ "используется для ее хранения."
-
-#~ msgid ""
-#~ "Some triggers need a reference to another field. This field is used to "
-#~ "store it."
-#~ msgstr ""
-#~ "Некоторым триггерам требуется ссылка на другое поле. Это поле "
-#~ "используется для ее хранения."
-
-#~ msgid "Specific Products"
-#~ msgstr "Определенные товары"
-
-#~ msgid "Specific Users"
-#~ msgstr "Конкретные пользователи"
-
-#~ msgid "Stage"
-#~ msgstr "Этап"
-
-#~ msgid "Stage from"
-#~ msgstr "Этап из"
-
-#~ msgid "Stage goes from"
-#~ msgstr "Этап начинается с"
-
-#~ msgid ""
-#~ "Subscription %s has been canceled. The parent order %s has been "
-#~ "reopened.\n"
-#~ "                                                You should close %s if "
-#~ "the customer churned, or renew it if the customer continue the service.\n"
-#~ "                                                Note: if you already "
-#~ "created a new subscription instead of renewing it, please cancel your "
-#~ "newly\n"
-#~ "                                                created subscription and "
-#~ "renew %s instead"
-#~ msgstr ""
-#~ "Подписка %s была отменена. Родительский заказ %s был снова открыт.\n"
-#~ "                                                Вам следует закрыть %s, "
-#~ "если клиент отменил подписку, или возобновить ее, если клиент продолжает "
-#~ "пользоваться услугой.\n"
-#~ "                                                Примечание: если вы уже "
-#~ "создали новую подписку, а не возобновили ее, пожалуйста, отмените только "
-#~ "что созданную\n"
-#~ "                                                созданную подписку и "
-#~ "возобновите %s вместо нее"
-
-#~ msgid "Subscription Information"
-#~ msgstr "Информация о подписке"
-
-#~ msgid "Subscription Plans"
-#~ msgstr "Планы подписки"
-
-#~ msgid "Subscription Salesperson"
-#~ msgstr "Продавец подписки"
-
-#~ msgid ""
-#~ "Subscription plans are used to configure the recurring, invoicing, and "
-#~ "self-service behavior of subscriptions."
-#~ msgstr ""
-#~ "Планы подписки используются для настройки повторяющихся подписок, "
-#~ "выставления счетов и самообслуживания."
-
-#~ msgid "Subscription reached its end date"
-#~ msgstr "Срок действия подписки истек"
-
-#~ msgid "Subscription stage category when the change occurred"
-#~ msgstr "Категория стадии подписки, когда произошло изменение"
-
-#~ msgid "Subscription: Payment Success And Invoice"
-#~ msgstr "Подписка: Успешная оплата и счет-фактура"
-
-#~ msgid "Take action on less satisfied clients"
-#~ msgstr "Примите меры в отношении менее довольных клиентов"
-
-#~ msgid ""
-#~ "The automation rule will be triggered if and only if one of these fields "
-#~ "is updated.If empty, all fields are watched."
-#~ msgstr ""
-#~ "Правило автоматизации будет срабатывать только в том случае, если одно из "
-#~ "этих полей будет обновлено. Если поле пустое, то наблюдаются все поля."
-
-#~ msgid ""
-#~ "The company of the plan is different from the company of the pricelist"
-#~ msgstr "Компания плана отличается от компании прейскуранта"
-
-#~ msgid ""
-#~ "The reason %s is required by the Subscription application and cannot be "
-#~ "deleted."
-#~ msgstr ""
-#~ "Причина %s требуется для правильной работы модуля Подписки и не может "
-#~ "быть удалена."
-
-#~ msgid ""
-#~ "The scheduled action for alerts has been deleted. Update the "
-#~ "Subscriptions module to re-create it."
-#~ msgstr ""
-#~ "Запланированное действие для оповещений было удалено. Обновите модуль "
-#~ "Подписки, чтобы создать его заново."
-
-#~ msgid ""
-#~ "There are multiple pricings for an unique product, plan and pricelist."
-#~ msgstr ""
-#~ "Для одного и того же товара, тарифного плана и прайс-листа задано "
-#~ "несколько цен."
-
-#~ msgid "There is an"
-#~ msgstr "Есть"
-
-#~ msgid ""
-#~ "This code will be run to find on which record the automation rule should "
-#~ "be run."
-#~ msgstr ""
-#~ "Этот код будет запущен, чтобы найти, на какой записи должно быть запущено "
-#~ "правило автоматизации."
-
-#~ msgid ""
-#~ "This will trigger the action on all linked subsccriptions, regardless of "
-#~ "possible timed conditions. Are you sure you want to proceed?"
-#~ msgstr ""
-#~ "Это вызовет действие для всех связанных субскрипций, независимо от "
-#~ "возможных временных условий. Вы уверены, что хотите продолжить?"
-
-#~ msgid "Timed Condition"
-#~ msgstr "Временное условие"
-
-#~ msgid "Title"
-#~ msgstr "Заголовок"
-
-#~ msgid "Total Recurring"
-#~ msgstr "Всего повторяющихся"
-
-#~ msgid "Trigger"
-#~ msgstr "Триггер"
-
-#~ msgid "Trigger Date"
-#~ msgstr "Дата срабатывания"
-
-#~ msgid "Trigger Field"
-#~ msgstr "Поле триггера"
-
-#~ msgid "Trigger Field Model"
-#~ msgstr "Модель триггерного поля"
-
-#~ msgid "Trigger Fields"
-#~ msgstr "Поля триггера"
-
-#~ msgid "Trigger Now"
-#~ msgstr "Триггер сейчас"
-
-#~ msgid "Trigger On"
-#~ msgstr "Тригер Вкл"
-
-#~ msgid "Trigger Reference"
-#~ msgstr "Ссылка на триггер"
-
-#~ msgid "Trigger Reference Display Name"
-#~ msgstr "Ссылка на триггер Отображаемое имя"
-
-#~ msgid ""
-#~ "Trigger alerts for salespersons or customers: churn, invoice not paid, "
-#~ "upsell, etc."
-#~ msgstr ""
-#~ "Запускайте оповещения для продавцов или клиентов: отток, неоплаченный "
-#~ "счет, повышение продаж и т. д."
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Ед. изм"
-
-#~ msgid ""
-#~ "Unpaid subscription after the due date majored by this number of days "
-#~ "will be automatically closed by the subscriptions expiration scheduled "
-#~ "action. \n"
-#~ "If the chosen payment method has failed to renew the subscription after "
-#~ "this time, the subscription is automatically closed."
-#~ msgstr ""
-#~ "Неоплаченная подписка по истечении срока, превышающего указанное "
-#~ "количество дней, будет автоматически закрыта по расписанию истечения "
-#~ "срока действия подписки.\n"
-#~ "Если выбранный способ оплаты не смог продлить подписку по истечении этого "
-#~ "времени, подписка будет автоматически закрыта."
-
-#~ msgid "Update health value according to MRR"
-#~ msgstr "Обновление значения здоровья в соответствии с MRR"
-
-#~ msgid "Url"
-#~ msgstr "Url"
-
-#~ msgid "Use Calendar"
-#~ msgstr "Используйте календарь"
-
-#~ msgid "Use employee work schedule"
-#~ msgstr "Используйте график работы сотрудников"
-
-#~ msgid ""
-#~ "Use subscriptions to follow tasks, issues, timesheets or invoicing based "
-#~ "on\n"
-#~ "                work done, expenses and/or sales orders. Odoo will "
-#~ "automatically manage\n"
-#~ "                the alerts for the renewal of the subscriptions to the "
-#~ "right salesperson."
-#~ msgstr ""
-#~ "Используйте подписки для отслеживания задач, проблем, табелей учета "
-#~ "рабочего времени или выставления счетов на основе\n"
-#~ "                выполненной работы, расходов и/или заказов на продажу. "
-#~ "Odoo будет автоматически управлять\n"
-#~ "                оповещениями о продлении подписок для нужного продавца."
-
-#~ msgid "Use the user's working schedule."
-#~ msgstr "Используйте рабочий график пользователя."
-
-#~ msgid "Valid Until:"
-#~ msgstr "Действует до:"
-
-#~ msgid ""
-#~ "Want recurring billing via subscription management? Get started by "
-#~ "clicking here"
-#~ msgstr ""
-#~ "Хотите получать периодические платежи через управление подписками? "
-#~ "Начните с этого, нажав здесь"
-
-#~ msgid "Webhook UUID"
-#~ msgstr "UUID вебхука"
-
-#~ msgid ""
-#~ "When calculating a day-based timed condition, it is possibleto use a "
-#~ "calendar to compute the date based on working days."
-#~ msgstr ""
-#~ "При расчете временного условия на основе дня можно использовать календарь "
-#~ "для вычисления даты на основе рабочих дней."
-
-#~ msgid ""
-#~ "When should the condition be triggered.\n"
-#~ "                If present, will be checked by the scheduler. If empty, "
-#~ "will be checked at creation and update."
-#~ msgstr ""
-#~ "Когда должно сработать условие.\n"
-#~ "                Если присутствует, будет проверяться планировщиком. Если "
-#~ "пусто, будет проверяться при создании и обновлении."
-
-#~ msgid "When unchecked, the rule is hidden and will not be executed."
-#~ msgstr "Если флажок снят, правило скрыто и не будет выполняться."
-
-#~ msgid ""
-#~ "You are about to permanently close a subscription that is valid until"
-#~ msgstr ""
-#~ "Вы собираетесь окончательно закрыть подписку, которая действовала до"
-
-#~ msgid ""
-#~ "You can not delete a confirmed subscription. You must first close and "
-#~ "cancel it before you can delete it."
-#~ msgstr ""
-#~ "Вы не можете удалить подтвержденную подписку. Перед удалением подписки ее "
-#~ "необходимо закрыть и отменить."
-
-#~ msgid "You cannot cancel a subscription that has been invoiced."
-#~ msgstr "Вы не можете отменить подписку, по которой был выставлен счет."
-
-#~ msgid ""
-#~ "You cannot send a sale order with a subscription plan and no recurring "
-#~ "product."
-#~ msgstr ""
-#~ "Вы не можете отправить заказ на продажу с планом подписки и без "
-#~ "повторяющегося продукта."
-
-#~ msgid ""
-#~ "You cannot send a sale order with recurring product and no subscription "
-#~ "plan."
-#~ msgstr ""
-#~ "Вы не можете отправить заказ на продажу с повторяющимся продуктом и без "
-#~ "плана подписки."
-
-#~ msgid "You must be logged in to manage your payment methods."
-#~ msgstr "Вы должны войти в систему, чтобы управлять способами оплаты."
-
-#~ msgid "Your contract is recurrent"
-#~ msgstr "Ваш контракт является периодическим"
-
-#~ msgid "Your payment method has been changed for this subscription."
-#~ msgstr "Ваш способ оплаты был изменен для этой подписки."
-
-#~ msgid "archived product(s)"
-#~ msgstr "архивированный продукт(ы)"
-
-#~ msgid "e.g. Closed Subscription"
-#~ msgstr "например, Закрытая подписка"
-
-#~ msgid "e.g. Discuss proposal"
-#~ msgstr "например, Предложить обсудить"
-
-#~ msgid "greater than"
-#~ msgstr "больше чем"
-
-#~ msgid "less than"
-#~ msgstr "менее чем"
-
-#~ msgid "missing payments (from"
-#~ msgstr "недостающие платежи (из"
-
-#~ msgid "name"
-#~ msgstr "имя"
-
-#~ msgid "quotation and"
-#~ msgstr "котировка и"
-
-#~ msgid "to this day) will be automatically processed."
-#~ msgstr "по сей день) будут автоматически обработаны."
-
-#~ msgid "upsell"
-#~ msgstr "upsell"
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"redo\"/> To Renew"
+#~ msgstr "<i class=\"oi oi-fw\" data-icon=\"redo\"/> Обновить"

@@ -12,6 +12,8 @@ from unittest.mock import patch
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('be')
     def setUpClass(cls):
@@ -65,7 +67,8 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
     def test_simple_invoice(self):
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
-        options = self._generate_options(self.report, fields.Date.from_string('2022-06-01'), fields.Date.from_string('2022-06-30'))
+        options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        options['unfold_all'] = True
 
         # Foreign partners invoices should not show
         self.create_and_post_account_move('out_invoice', self.partner_a.id, '2022-06-01', product_quantity=100, product_price_unit=50)
@@ -79,12 +82,14 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 3000.0,             630.0),
-                ('Partner A (BE)',          'BE0246697724',     1000.0,             210.0),
-                ('Partner B (BE)',          'BE0766998497',     2000.0,             420.0),
+                ('Partner VAT Listing',     3000.0,             630.0),
+                ('BE0246697724',            1000.0,             210.0),
+                ('Partner A (BE)',          1000.0,             210.0),
+                ('BE0766998497',            2000.0,             420.0),
+                ('Partner B (BE)',          2000.0,             420.0),
             ],
             options,
         )
@@ -92,15 +97,18 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
     def test_report_load_more_limit(self):
         """ The aim of this test is to ensure that we load report columns/lines
             correctly when we have a load more limit.
-            If we have 3 moves for 3 different partners, with a load more
+            If we have 3 moves for 3 different vat numbers, with a load more
             limit sets to 2 elements, the report should give us 4 report lines.
             1 parent line containing the totals
-            2 lines (one per partner)
-            and a load more line to load the last partner.
+            2 lines (one per vat number)
+            and a load more line to load the last vat number.
             The test is also verifying that the XML is correctly generated and that
             the load_more_limit doesn't impact it at all.
         """
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
+
+        # to be able to limit the number of lines we can't have multiple groupby levels
+        self.env.ref('l10n_be_reports.l10n_be_partner_vat_listing_line').user_groupby = 'vat_number'
         self.report.load_more_limit = 2
         options = self._generate_options(
             self.report,
@@ -114,13 +122,13 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [0,                             1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 6000.0,             1260.0),
-                ('Partner A (BE)',          'BE0246697724',     1000.0,             210.0),
-                ('Partner B (BE)',          'BE0766998497',     2000.0,             420.0),
-                ('Load more...',            '',                 '',                 ''),
+                ('Partner VAT Listing',     6000.0,             1260.0),
+                ('BE0246697724',            1000.0,             210.0),
+                ('BE0477472701',            3000.0,             630.0),
+                ('1 more',                  2000.0,             420.0),
             ],
             options,
         )
@@ -149,14 +157,14 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
                         <ns2:VATAmount>210.00</ns2:VATAmount>
                     </ns2:Client>
                     <ns2:Client SequenceNumber="2">
-                        <ns2:CompanyVATNumber issuedBy="BE">0766998497</ns2:CompanyVATNumber>
-                        <ns2:TurnOver>2000.00</ns2:TurnOver>
-                        <ns2:VATAmount>420.00</ns2:VATAmount>
-                    </ns2:Client>
-                    <ns2:Client SequenceNumber="3">
                         <ns2:CompanyVATNumber issuedBy="BE">0477472701</ns2:CompanyVATNumber>
                         <ns2:TurnOver>3000.00</ns2:TurnOver>
                         <ns2:VATAmount>630.00</ns2:VATAmount>
+                    </ns2:Client>
+                    <ns2:Client SequenceNumber="3">
+                        <ns2:CompanyVATNumber issuedBy="BE">0766998497</ns2:CompanyVATNumber>
+                        <ns2:TurnOver>2000.00</ns2:TurnOver>
+                        <ns2:VATAmount>420.00</ns2:VATAmount>
                     </ns2:Client>
                     <ns2:Comment></ns2:Comment>
                 </ns2:ClientListing>
@@ -164,7 +172,6 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
         """
 
         # Following what export_file function does
-        options['export_mode'] = 'file'
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(self.env[self.report._get_custom_handler_model()].partner_vat_listing_export_to_xml(options)['file_content']),
             self.get_xml_tree_from_string(expected_xml)
@@ -172,11 +179,12 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
     def test_report_2_different_partners_with_same_vat(self):
         """ The aim of this test is to ensure that two different partners
-            with the same vat number are correctly represented in the report.
-            The report should have one line per partner even if they have the same
-            vat number.
-            However, for the XML generation, the logic is a bit different and the
-            report should give us one line per vat number instead of per partner.
+            with the same VAT number are correctly represented in the report.
+            The report should have one line per VAT number even if there are multiple
+            partners with the same VAT number. When unfolded, it should then show one
+            line per partner under that VAT number.
+            For the XML generation, the report should export one entry
+            per VAT number, and no lines per partners.
         """
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
         options = self._generate_options(
@@ -184,6 +192,7 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
             '2022-06-01',
             '2022-06-30',
         )
+        options['unfold_all'] = True
 
         # Copy an existing partner to have the same VAT but not the same name
         # The idea behind this is verifying that even if lines are not sorted on the vat number,
@@ -198,13 +207,15 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [0,                             1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [0,                             1,                  2],
             [
-                ('Partner VAT Listing',     '',                 9000.0,             1890.0),
-                ('Partner A (BE)',          'BE0246697724',     3000.0,             630.0),
-                ('Partner B (BE)',          'BE0766998497',     2000.0,             420.0),
-                ('Partner Z (BE)',          'BE0246697724',     4000.0,             840.0),
+                ('Partner VAT Listing',     9000.0,             1890.0),
+                ('BE0246697724',            7000.0,             1470.0),
+                ('Partner A (BE)',          3000.0,             630.0),
+                ('Partner Z (BE)',          4000.0,             840.0),
+                ('BE0766998497',            2000.0,             420.0),
+                ('Partner B (BE)',          2000.0,             420.0),
             ],
             options,
         )
@@ -243,7 +254,104 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
         """
 
         # Following what export_file function does
-        options['export_mode'] = 'file'
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(self.env[self.report._get_custom_handler_model()].partner_vat_listing_export_to_xml(options)['file_content']),
+            self.get_xml_tree_from_string(expected_xml)
+        )
+
+    def test_ignore_VAT_partners(self):
+        self.partner_ignore_be = self.env['res.partner'].create({
+            'name': 'Partner C (BE)',
+            'country_id': self.env.ref('base.be').id,
+            'vat': '/',
+        })
+
+        self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
+        options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        options['unfold_all'] = True
+
+        self.create_and_post_account_move('out_invoice', self.partner_ignore_be.id, '2022-06-01', product_quantity=10, product_price_unit=200)
+
+        self.create_and_post_account_move('out_invoice', self.partner_b_be.id, '2022-06-01', product_quantity=10, product_price_unit=200)
+        self.create_and_post_account_move('out_invoice', self.partner_a_be.id, '2022-06-01', product_quantity=10, product_price_unit=100)
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
+            [
+                ('Partner VAT Listing',     3000.0,             630.0),
+                ('BE0246697724',            1000.0,             210.0),
+                ('Partner A (BE)',          1000.0,             210.0),
+                ('BE0766998497',            2000.0,             420.0),
+                ('Partner B (BE)',          2000.0,             420.0),
+            ],
+            options,
+        )
+
+    def test_partners_with_same_vat_reach_threshold_together(self):
+        """
+        Partners sharing the same VAT number should be included when their
+        aggregated turnover reaches the partner VAT listing threshold even
+        if individually they do not reach it.
+        """
+        self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
+        options = self._generate_options(
+            self.report,
+            '2022-06-01',
+            '2022-06-30',
+        )
+        options['unfold_all'] = True
+
+        partner_a_be_copy_1 = self.partner_a_be.copy({'name': 'Partner A Copy 1 (BE)'})
+        partner_a_be_copy_2 = self.partner_a_be.copy({'name': 'Partner A Copy 2 (BE)'})
+
+        self.create_and_post_account_move('out_invoice', self.partner_a_be.id, '2022-06-01', product_quantity=1, product_price_unit=100)
+        self.create_and_post_account_move('out_invoice', partner_a_be_copy_1.id, '2022-06-01', product_quantity=1, product_price_unit=100)
+        self.create_and_post_account_move('out_invoice', partner_a_be_copy_2.id, '2022-06-01', product_quantity=1, product_price_unit=100)
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
+            [
+                ('Partner VAT Listing',     300.0,              63.0),
+                ('BE0246697724',            300.0,              63.0),
+                ('Partner A (BE)',          100.0,              21.0),
+                ('Partner A Copy 1 (BE)',   100.0,              21.0),
+                ('Partner A Copy 2 (BE)',   100.0,              21.0),
+            ],
+            options,
+        )
+
+        # The sequence changes between executions of the test. To handle that, we increase it by 1 more, so we can get its value here
+        sequence_number = self.env['ir.sequence'].next_by_code('declarantnum')
+        ref = f"0477472701{str(int(sequence_number) + 1).zfill(4)[-4:]}"
+
+        expected_xml = f"""
+            <ns2:ClientListingConsignment xmlns="http://www.minfin.fgov.be/InputCommon" xmlns:ns2="http://www.minfin.fgov.be/ClientListingConsignment" ClientListingsNbr="1">
+                <ns2:ClientListing SequenceNumber="1" ClientsNbr="1" DeclarantReference="{ref}" TurnOverSum="300.00" VATAmountSum="63.00">
+                    <ns2:Declarant>
+                        <VATNumber>0477472701</VATNumber>
+                        <Name>company_1_data</Name>
+                        <Street></Street>
+                        <PostCode></PostCode>
+                        <City></City>
+                        <CountryCode>BE</CountryCode>
+                        <EmailAddress>jsmith@mail.com</EmailAddress>
+                        <Phone>+32475123456</Phone>
+                    </ns2:Declarant>
+                    <ns2:Period>2022</ns2:Period>
+                    <ns2:Client SequenceNumber="1">
+                        <ns2:CompanyVATNumber issuedBy="BE">0246697724</ns2:CompanyVATNumber>
+                        <ns2:TurnOver>300.00</ns2:TurnOver>
+                        <ns2:VATAmount>63.00</ns2:VATAmount>
+                    </ns2:Client>
+                    <ns2:Comment></ns2:Comment>
+                </ns2:ClientListing>
+            </ns2:ClientListingConsignment>
+        """
+
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(self.env[self.report._get_custom_handler_model()].partner_vat_listing_export_to_xml(options)['file_content']),
             self.get_xml_tree_from_string(expected_xml)
@@ -251,7 +359,8 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
     def test_misc_operation(self):
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
-        options = self._generate_options(self.report, fields.Date.from_string('2022-06-01'), fields.Date.from_string('2022-06-30'))
+        options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        options['unfold_all'] = True
 
         move_1 = self.create_and_post_account_move('out_invoice', self.partner_b_be.id, '2022-06-01', product_quantity=10, product_price_unit=200)
         move_2 = self.create_and_post_account_move('out_invoice', self.partner_a_be.id, '2022-06-01', product_quantity=10, product_price_unit=100)
@@ -261,19 +370,22 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 3000.0,             630.0),
-                ('Partner A (BE)',          'BE0246697724',     1000.0,             210.0),
-                ('Partner B (BE)',          'BE0766998497',     2000.0,             420.0),
+                ('Partner VAT Listing',     3000.0,             630.0),
+                ('BE0246697724',            1000.0,             210.0),
+                ('Partner A (BE)',          1000.0,             210.0),
+                ('BE0766998497',            2000.0,             420.0),
+                ('Partner B (BE)',          2000.0,             420.0),
             ],
             options,
         )
 
     def test_invoices_with_refunds(self):
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
-        options = self._generate_options(self.report, fields.Date.from_string('2022-06-01'), fields.Date.from_string('2022-06-30'))
+        options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        options['unfold_all'] = True
 
         # Partial refund
         self.create_and_post_account_move('out_invoice', self.partner_a_be.id, '2022-06-01', product_quantity=10, product_price_unit=100)
@@ -285,47 +397,53 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 800.0,              168.0),
-                ('Partner A (BE)',          'BE0246697724',     800.0,              168.0),
-                ('Partner B (BE)',          'BE0766998497',     0.0,                0.0),
+                ('Partner VAT Listing',     800.0,              168.0),
+                ('BE0246697724',            800.0,              168.0),
+                ('Partner A (BE)',          800.0,              168.0),
+                ('BE0766998497',            0.0,                0.0),
+                ('Partner B (BE)',          0.0,                0.0),
             ],
             options,
         )
 
     def test_refunds_without_invoices(self):
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
-        options = self._generate_options(self.report, fields.Date.from_string('2022-06-01'), fields.Date.from_string('2022-06-30'))
+        options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        options['unfold_all'] = True
 
         self.create_and_post_account_move('out_refund', self.partner_a_be.id, '2022-06-02', product_quantity=10, product_price_unit=100)
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 -1000.0,            -210.0),
-                ('Partner A (BE)',          'BE0246697724',     -1000.0,            -210.0),
+                ('Partner VAT Listing',     -1000.0,            -210.0),
+                ('BE0246697724',            -1000.0,            -210.0),
+                ('Partner A (BE)',          -1000.0,            -210.0),
             ],
             options,
         )
 
     def test_zero_tax(self):
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
-        options = self._generate_options(self.report, fields.Date.from_string('2022-06-01'), fields.Date.from_string('2022-06-30'))
+        options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        options['unfold_all'] = True
 
         self.tax_sale_a.amount = 0
         self.init_invoice('out_invoice', partner=self.partner_a_be, post=True, amounts=[1000], taxes=[self.tax_sale_a], invoice_date='2022-06-29')
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 1000.0,            0.0),
-                ('Partner A (BE)',          'BE0246697724',     1000.0,            0.0),
+                ('Partner VAT Listing',     1000.0,            0.0),
+                ('BE0246697724',            1000.0,            0.0),
+                ('Partner A (BE)',          1000.0,            0.0),
             ],
             options,
         )
@@ -333,16 +451,18 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
     def test_invoice_with_refund_less_than_250(self):
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
         options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        options['unfold_all'] = True
         self.create_and_post_account_move('out_invoice', self.partner_a_be.id, '2022-06-01', product_quantity=2, product_price_unit=100)
         self.create_and_post_account_move('out_refund', self.partner_a_be.id, '2022-06-02', product_quantity=1, product_price_unit=100)
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 100.0,              21.0),
-                ('Partner A (BE)',          'BE0246697724',     100.0,              21.0),
+                ('Partner VAT Listing',     100.0,              21.0),
+                ('BE0246697724',            100.0,              21.0),
+                ('Partner A (BE)',          100.0,              21.0),
             ],
             options,
         )
@@ -355,10 +475,10 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 0.0,            0.0),
+                ('Partner VAT Listing',     0.0,                0.0),
             ],
             options,
         )
@@ -372,10 +492,10 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
         self.create_and_post_account_move('out_refund', self.partner_a_be.id, '2022-06-02', product_quantity=1, product_price_unit=100)
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 0.0,              0.0),
+                ('Partner VAT Listing',     0.0,              0.0),
             ],
             options,
         )
@@ -388,7 +508,7 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
             return invoice.line_ids.filtered('tax_line_id').display_name
 
         self.report.filter_unfold_all = True
-        self.env.ref('l10n_be_reports.l10n_be_partner_vat_listing_line').user_groupby = 'account_id, partner_id, id'
+        self.env.ref('l10n_be_reports.l10n_be_partner_vat_listing_line').user_groupby = 'vat_number, account_id, partner_id, id'
         options = self._generate_options(self.report, '2022-06-01', '2022-06-30', default_options={'unfold_all': True})
 
         invoice_1 = self.init_invoice('out_invoice', partner=self.partner_a_be, post=True, amounts=[100], taxes=[self.tax_sale_a], invoice_date='2022-06-29')
@@ -409,27 +529,30 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                                                             VAT number          Turnover         VAT amount
-            [   0,                                                                       1,                  2,              3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',                                                 '',             1300.0,          273.0),
+                ('Partner VAT Listing',                                             1300.0,          273.0),
 
-                (self.company_data['default_account_tax_sale'].display_name,            '',                0.0,          273.0),
-                ('Partner A (BE)',                                          'BE0246697724',                0.0,           63.0),
-                (get_tax_line_name(invoice_3),                                          '',                0.0,           42.0),
-                (get_tax_line_name(invoice_1),                                          '',                0.0,           21.0),
-                ('Partner C (BE)',                                          'BE0477472701',                0.0,          210.0),
-                (get_tax_line_name(invoice_2),                                          '',                0.0,          210.0),
+                ('BE0246697724',                                                     300.0,           63.0),
+                (self.company_data['default_account_tax_sale'].display_name,           0.0,           63.0),
+                ('Partner A (BE)',                                                     0.0,           63.0),
+                (get_tax_line_name(invoice_3),                                         0.0,           42.0),
+                (get_tax_line_name(invoice_1),                                         0.0,           21.0),
+                (self.company_data['default_account_revenue'].display_name,          100.0,            0.0),
+                ('Partner A (BE)',                                                   100.0,            0.0),
+                (get_base_line_name(invoice_1),                                      100.0,            0.0),
+                (new_income_account.display_name,                                    200.0,            0.0),
+                ('Partner A (BE)',                                                   200.0,            0.0),
+                (get_base_line_name(invoice_3),                                      200.0,            0.0),
 
-                (self.company_data['default_account_revenue'].display_name,             '',             1100.0,            0.0),
-                ('Partner A (BE)',                                          'BE0246697724',              100.0,            0.0),
-                (get_base_line_name(invoice_1),                                         '',              100.0,            0.0),
-                ('Partner C (BE)',                                          'BE0477472701',             1000.0,            0.0),
-                (get_base_line_name(invoice_2),                                         '',             1000.0,            0.0),
-
-                (new_income_account.display_name,                                       '',              200.0,            0.0),
-                ('Partner A (BE)',                                          'BE0246697724',              200.0,            0.0),
-                (get_base_line_name(invoice_3),                                         '',              200.0,            0.0),
+                ('BE0477472701',                                                    1000.0,          210.0),
+                (self.company_data['default_account_tax_sale'].display_name,           0.0,          210.0),
+                ('Partner C (BE)',                                                     0.0,          210.0),
+                (get_tax_line_name(invoice_2),                                         0.0,          210.0),
+                (self.company_data['default_account_revenue'].display_name,         1000.0,            0.0),
+                ('Partner C (BE)',                                                  1000.0,            0.0),
+                (get_base_line_name(invoice_2),                                     1000.0,            0.0),
             ],
             options,
         )
@@ -477,10 +600,10 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
         options = self.report.get_options({})
         self.assertLinesValues(
             self.report._get_lines(options),
-            #   Name                        VAT number          Turnover            VAT amount
-            [   0,                          1,                  2,                  3],
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
             [
-                ('Partner VAT Listing',     '',                 0,                  0),
+                ('Partner VAT Listing',     0,                  0),
             ],
             options,
         )
@@ -554,7 +677,6 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
 
         # Create a new partner for the representative and link it to the company.
         representative = self.env['res.partner'].create({
-            'company_type': 'company',
             'name': 'Fidu BE',
             'street': 'Fidu Street 123',
             'city': 'Brussels',
@@ -591,6 +713,50 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
                         <Street></Street>
                         <PostCode></PostCode>
                         <City></City>
+                        <CountryCode>BE</CountryCode>
+                        <EmailAddress>jsmith@mail.com</EmailAddress>
+                        <Phone>+32475123456</Phone>
+                    </ns2:Declarant>
+                    <ns2:Period>2018</ns2:Period>
+                    <ns2:Comment></ns2:Comment>
+                </ns2:ClientListing>
+            </ns2:ClientListingConsignment>
+        """ % ref
+
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(self.env[self.report._get_custom_handler_model()].partner_vat_listing_export_to_xml(options)['file_content']),
+            self.get_xml_tree_from_string(expected_xml)
+        )
+
+    @freeze_time('2019-12-31')
+    def test_generate_xml_minimal_with_invoice_address(self):
+        options = self.report.get_options({})
+
+        # create an invoice address for the company without email and phone
+        self.env['res.partner'].create({
+            'type': 'invoice',
+            'country_id': self.env.ref('base.be').id,
+            'zip': 1000,
+            'city': 'Brussels',
+            'street': 'XYZ street',
+            'parent_id': self.env.company.partner_id.id,
+        })
+
+        # The sequence changes between execution of the test. To handle that, we increase by 1 more, so we can get its value here
+        sequence_number = self.env['ir.sequence'].next_by_code('declarantnum')
+        ref = f"0477472701{str(int(sequence_number) + 1).zfill(4)[-4:]}"
+
+        # This is the minimum expected from the belgian tax report xml.
+        # The address is coming from the invoice address with a fallback on the parent company for email and phone.
+        expected_xml = """
+            <ns2:ClientListingConsignment xmlns="http://www.minfin.fgov.be/InputCommon" xmlns:ns2="http://www.minfin.fgov.be/ClientListingConsignment" ClientListingsNbr="1">
+                <ns2:ClientListing SequenceNumber="1" ClientsNbr="0" DeclarantReference="%s" TurnOverSum="0.00" VATAmountSum="0.00">
+                    <ns2:Declarant>
+                        <VATNumber>0477472701</VATNumber>
+                        <Name>company_1_data</Name>
+                        <Street>XYZ street</Street>
+                        <PostCode>1000</PostCode>
+                        <City>Brussels</City>
                         <CountryCode>BE</CountryCode>
                         <EmailAddress>jsmith@mail.com</EmailAddress>
                         <Phone>+32475123456</Phone>

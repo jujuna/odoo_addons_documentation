@@ -1,13 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from lxml import etree
-import warnings
 
 from odoo import _, fields, models
 from odoo.exceptions import RedirectWarning, UserError
 from odoo.tools import SQL
 from odoo.tools.misc import format_date
 from odoo.tools.float_utils import float_repr
-
 
 
 class L10n_EeTaxReportHandler(models.AbstractModel):
@@ -65,7 +63,7 @@ class L10n_EeTaxReportHandler(models.AbstractModel):
             raise UserError(_('Choose a month to export the VAT Report'))
 
         sender_company = report._get_sender_company_for_export(options)
-        if not sender_company.company_registry:
+        if not sender_company.partner_id._get_additional_identifier('EE_EN'):
             raise RedirectWarning(
                 message=_("No company registry number associated with your company. Please define one."),
                 action={
@@ -82,7 +80,7 @@ class L10n_EeTaxReportHandler(models.AbstractModel):
             )
 
         xml_data = {
-            'tax_payer_reg_code': sender_company.company_registry,
+            'tax_payer_reg_code': sender_company.partner_id._get_additional_identifier('EE_EN'),
             # Not needed when uploaded personally, since you logged in at the Estonian government platform with your ID
             'submitter_person_code': '',
             'year': date_to.year,
@@ -108,13 +106,13 @@ class L10n_EeTaxReportHandler(models.AbstractModel):
         currency = self.env.company.currency_id
 
         for line in kmd_lines:
-            if 'report_line_id' not in line['columns'][0]:
+            if not line.columns[0].report_line_id:
                 continue
-            line_id = line['columns'][0]['report_line_id']
+            line_id = line.columns[0].report_line_id
             if line_id not in tax_line_mapping:
                 continue
             xml_variable = tax_line_mapping[line_id]
-            balance = line['columns'][colexpr_to_idx['balance']]['no_format']
+            balance = line.columns[colexpr_to_idx['balance']].no_format
             if balance and xml_variable.endswith('_cars'):  # line indicating number of cars
                 xml_data[xml_variable] = f"{balance:.0f}"
             elif balance and xml_variable in ('line_1', 'line_1_2'):
@@ -130,20 +128,28 @@ class L10n_EeTaxReportHandler(models.AbstractModel):
         }
         for kmd_inf_part, export_section in report_export_mapping.items():
             kmd_inf_report = self.env.ref(f'l10n_ee_reports.{kmd_inf_part}', raise_if_not_found=False)
-            kmd_inf_report_options = kmd_inf_report.get_options(previous_options={**options, 'unfold_all': True})
+            # Passing 'no_report_reroute', otherwise options would keep the previous report_id, which causes an error in _get_lines.
+            kmd_inf_report_options = kmd_inf_report.get_options(
+                previous_options={
+                    **options,
+                    'unfold_all': True,
+                    'no_report_reroute': True,
+                    'export_mode': 'file',
+                }
+            )
             kmd_inf_lines = kmd_inf_report._get_lines(kmd_inf_report_options)
 
             for line in kmd_inf_lines:
                 # The grouping lines do not need to be included in the KMD INF, since they do not represent invoice values.
-                if not line['groupby']:
+                if not line.groupby:
                     annex_line = {}
-                    for col in line['columns']:
-                        label = col['expression_label']
-                        value = col['no_format']
-                        if col['figure_type'] == 'monetary':
+                    for col in line.columns:
+                        label = col.expression_label
+                        value = col.no_format
+                        if col.figure_type == 'monetary':
                             if value:
                                 value = float_repr(currency.round(value), currency.decimal_places)
-                        elif col['figure_type'] == 'date':
+                        elif col.figure_type == 'date':
                             value = format_date(self.env, value, date_format='yyyy-MM-dd')
                         annex_line[label] = value
                     xml_data[export_section].append(annex_line)
@@ -167,6 +173,14 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options=None):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
 
+        options.setdefault('buttons', []).append({
+            'name': _('Export as XML'),
+            'sequence': 40,
+            'action': 'export_file',
+            'action_param': 'export_to_xml',
+            'file_export_type': _('XML'),
+        })
+
         if report == self.env.ref('l10n_ee_reports.kmd_inf_report_part_a', raise_if_not_found=False):
             # Part A grouped lines display no information, hence part A should be unfolded by default
             options['unfold_all'] = options['export_mode'] == 'print' or previous_options.get('unfold_all', True) if previous_options else True
@@ -184,17 +198,17 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
         for expand_function_name, lines_to_expand in lines_to_expand_by_function.items():
             for line_to_expand in lines_to_expand:
                 if expand_function_name == '_report_expand_unfoldable_line_with_groupby':
-                    report_line_id = report._get_res_id_from_line_id(line_to_expand['id'], 'account.report.line')
+                    report_line_id = report._get_res_id_from_line_id(line_to_expand.id, 'account.report.line')
                     expressions_to_evaluate = report.line_ids.expression_ids.filtered(
                         lambda x: x.report_line_id.id == report_line_id and x.engine == 'custom'
                     )
                     if not expressions_to_evaluate:
                         continue
 
-                group_by = line_to_expand['groupby'].split(',')
-                groupby_to_expand = group_by[1] if len(group_by) > 1 else line_to_expand['groupby']
+                group_by = line_to_expand.groupby.split(',')
+                groupby_to_expand = group_by[1] if len(group_by) > 1 else line_to_expand.groupby
 
-                for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+                for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
                     all_column_groups_expression_totals = report._compute_expression_totals_for_each_column_group(
                         expressions_to_evaluate,
                         column_group_options,
@@ -204,7 +218,7 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
                     all_line_ids = {
                         grouping_key
                         for grouping_key, _value
-                        in all_column_groups_expression_totals[column_group_key][expressions_to_evaluate[0]]['value']
+                        in all_column_groups_expression_totals[column_group_index][expressions_to_evaluate[0]]['value']
                     }
 
                     # Batch fetch move_id for these lines
@@ -212,15 +226,15 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
                     line_to_move_map = {l.id: l.move_id.id for l in move_lines}
 
                     for expression in expressions_to_evaluate:
-                        for grouping_key, result in all_column_groups_expression_totals[column_group_key][expression]['value']:
+                        for grouping_key, result in all_column_groups_expression_totals[column_group_index][expression]['value']:
                             move_id = line_to_move_map[grouping_key]
 
                             # Build the same key to be used later
                             full_key = f"[{report_line_id}]move_id:{move_id}=>id"
-                            rslt.setdefault(full_key, {}).setdefault(column_group_key, {}).setdefault(expression, {'value': [], 'sublines_info': set()})
+                            rslt.setdefault(full_key, {}).setdefault(column_group_index, {}).setdefault(expression, {'value': [], 'sublines_info': set()})
 
-                            rslt[full_key][column_group_key][expression]['value'].append((grouping_key, result))
-                            rslt[full_key][column_group_key][expression]['sublines_info'].add(grouping_key)
+                            rslt[full_key][column_group_index][expression]['value'].append((grouping_key, result))
+                            rslt[full_key][column_group_index][expression]['sublines_info'].add(grouping_key)
         return rslt
 
     def _custom_line_postprocessor(self, report, options, lines):
@@ -230,7 +244,7 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
         lines = super()._custom_line_postprocessor(report, options, lines)
         if report == self.env.ref('l10n_ee_reports.kmd_inf_report_part_a', raise_if_not_found=False):
             for line in lines:
-                if not line['groupby']:
+                if not line.groupby:
                     row_names = {
                         '5': 'VAT 5%',
                         '5erikord': 'VAT 5% special procedure §41/42',
@@ -245,9 +259,9 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
                         '24': 'VAT 24%',
                         '24erikord': 'VAT 24% special procedure §41/42'
                     }
-                    line['name'] = row_names[line['columns'][5]['no_format']]  # column 'tax_rate'
-                    comments = line['columns'][7]['no_format']  # column 'comments'
-                    line['name'] += ' special procedure §41^1' if '2' in comments else ''
+                    line.name = row_names[line.columns[5].no_format]  # column 'tax_rate'
+                    comments = line.columns[7].no_format  # column 'comments'
+                    line.name += ' special procedure §41^1' if '2' in comments else ''
         return lines
 
     def _customize_warnings(self, report, options, all_column_groups_expression_totals, warnings):
@@ -277,17 +291,18 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
         """
         Returns a list of partner IDs that should potentially have been included in the report. Those are partners
         with a move with taxable supply at 24%, 22%, 20%, 13%, 9% or 5% in the selected period and no VAT, if:
-        - For part A, if there is no country_id or if country_id is EE
-        - For part B, if there is no country_id
+        - no country and no VAT
+        - no country and VAT not starting with EE
+        - no country and VAT is "/"
         """
         query = report._get_report_query(options, 'strict_range')
 
         if report == self.env.ref('l10n_ee_reports.kmd_inf_report_part_a', raise_if_not_found=False):
-            move_type = "('out_invoice', 'out_refund')"
-            add_where_clause = "AND (res_partner.country_id IS NULL OR res_country.code = 'EE')"
+            move_type = SQL("('out_invoice', 'out_refund')")
         else:
-            move_type = "('in_invoice', 'in_refund')"
-            add_where_clause = "AND res_partner.country_id IS NULL"
+            move_type = SQL("('in_invoice', 'in_refund')")
+
+        add_where_clause = SQL("AND res_partner.country_id IS NULL AND (res_partner.vat IS NULL OR res_partner.vat NOT ILIKE 'EE%%')")
 
         tax_group_xmlids = ['tax_group_vat_24', 'tax_group_vat_22', 'tax_group_vat_20', 'tax_group_vat_13', 'tax_group_vat_9', 'tax_group_vat_5']
         tax_group_ids = [tax_group.id for xmlid in tax_group_xmlids
@@ -303,14 +318,13 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
             WHERE %(search_condition)s
                 AND account_tax_group.id = ANY(%(tax_group_ids)s)
                 AND account_move_line__move_id.move_type IN %(move_type)s
-                AND res_partner.vat IS NULL
                 %(add_where_clause)s
         """,
             table_references=query.from_clause,
             search_condition=query.where_clause,
             tax_group_ids=tax_group_ids,
-            move_type=SQL(move_type),
-            add_where_clause=SQL(add_where_clause),
+            move_type=move_type,
+            add_where_clause=add_where_clause,
         )
         self.env.cr.execute(sql_query)
         return [r[0] for r in self.env.cr.fetchall()]
@@ -373,7 +387,7 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
     # CUSTOM ENGINES
     ####################################################
 
-    def _report_custom_engine_kmd_inf_a(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_kmd_inf_a(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Part A contains information about invoices issued.
 
             Only invoices containing supply taxable at the rate of 24%, 22%, 20%, 13%, 9% or 5% are included. Different lines are
@@ -382,9 +396,9 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
             Furthermore, if the invoice contains the supply taxable at the rate of 0% or tax-exempt supply or if the
             invoice contains the supply that is taxable at two or more different tax rates, special code 3 is used.
         """
-        return self._report_custom_engine_kmd_inf(options, current_groupby, next_groupby, 'a')
+        return {next(iter(formulas_dict.values())): self._kmd_inf_engine_common(options, current_groupby, 'a')}
 
-    def _report_custom_engine_kmd_inf_b(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_kmd_inf_b(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Part B contains information about invoices received.
 
             Only invoices containing supply declared in field 5 of the Form KMD are included. Each line corresponds to
@@ -392,9 +406,19 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
             § 30 or § 32 of the VAT Act. Special code 12 is used for the acquisition of goods subject to VAT under the
             special arrangements provided for in § 41^1 of the VAT Act.
         """
-        return self._report_custom_engine_kmd_inf(options, current_groupby, next_groupby, 'b')
+        return {next(iter(formulas_dict.values())): self._kmd_inf_engine_common(options, current_groupby, 'b')}
 
-    def _report_custom_engine_kmd_inf(self, options, current_groupby, next_groupby, kmd_inf_part):
+    def _convert_threshold_to_company_currency(self, threshold, options):
+        """ Returns a EUR threshold to company currency, using the options' date_to for conversion """
+        threshold_currency = self.env.ref('base.EUR')
+
+        if not threshold_currency.active:
+            raise UserError(_("Currency %s, used for a threshold in this report, is either nonexistent or inactive. Please create or activate it.", threshold_currency.name))
+
+        company_currency = self.env.company.currency_id
+        return threshold_currency._convert(threshold, company_currency, self.env.company, options['date']['date_to'])
+
+    def _kmd_inf_engine_common(self, options, current_groupby, kmd_inf_part):
         """ Builds the query and dictionary necessary to display the report lines for the KMD INF.
 
         The query for part A and part B are built separately, as they have different columns and group by.
@@ -405,8 +429,86 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
         """
         # Build parameters for query
         report = self.env['account.report'].browse(options['report_id'])
-        report._check_groupby_fields((next_groupby.split(',') if next_groupby else []) + ([current_groupby] if current_groupby else []))
-        query = report._get_report_query(options, 'strict_range')
+        if current_groupby:
+            report._check_groupby_fields([current_groupby])
+        partners_to_exclude = []
+
+        # First get all the partners that match the domain but don't reach the threshold. We'll have to exclude them
+        # Skip when current_groupby == 'id' because when you expand an invoice to see its tax details,
+        # Odoo's report engine automatically filters the query to show only that one invoice's lines.
+        # This would wrongly exclude the partner if that single invoice is below €1,000, even when
+        # the partner's total for the month is above €1,000.
+        if current_groupby != 'id':
+            domain = [
+                ('partner_id', '!=', False),
+                ('account_type', 'not in', ('asset_receivable', 'liability_payable')),
+            ]
+            domain += [('move_id.move_type', 'in', ('in_invoice', 'in_refund'))] if kmd_inf_part == 'b' else [('move_id.move_type', 'in', ('out_invoice', 'out_refund'))]
+            query = report._get_report_query(options, 'strict_range', domain)
+            threshold_value = self._convert_threshold_to_company_currency(1000, options)
+
+            if kmd_inf_part == 'a':
+                extra_where = SQL("""
+                    AND res_partner.is_company
+                    AND EXISTS (
+                        SELECT 1
+                        FROM account_move_line_account_tax_rel rel
+                        JOIN account_tax ON account_tax.id = rel.account_tax_id
+                        WHERE rel.account_move_line_id = account_move_line.id
+                        AND account_tax.amount != 0
+                    )
+                """)
+            else:
+                xmlids = ['tax_report_line_5_tag', 'tax_report_line_5_1_tag', 'tax_report_line_5_2_tag', 'tax_report_line_5_3_tag', 'tax_report_line_5_4_tag']
+                tag_ids = self._get_tag_ids_from_report_lines(xmlids)
+
+                extra_where = SQL("""
+                    AND EXISTS (
+                        SELECT 1
+                        FROM account_move_line aml
+                        LEFT JOIN account_account_tag_account_move_line_rel AS tag_rel ON tag_rel.account_move_line_id = aml.id
+                        WHERE aml.move_id = account_move_line__move_id.id
+                        AND aml.display_type = 'tax'
+                        AND tag_rel.account_account_tag_id = ANY(%(tag_ids)s)
+                        GROUP BY aml.move_id
+                        HAVING SUM(aml.balance) != 0
+                    )
+                """, tag_ids=tag_ids)
+
+            partners_to_exclude_query = SQL("""
+                SELECT account_move_line.partner_id
+                FROM %(table_references)s
+                LEFT JOIN res_partner ON res_partner.id = account_move_line__move_id.commercial_partner_id
+                LEFT JOIN res_country ON res_country.id = res_partner.country_id
+                WHERE %(search_condition)s
+                AND account_move_line.partner_id IS NOT NULL
+                AND (res_country.code = 'EE' OR res_partner.vat ILIKE %(country_code)s)
+                %(extra_where)s
+                GROUP BY account_move_line.partner_id
+                HAVING
+                    COALESCE(
+                        ABS(SUM(%(balance_select)s)
+                            FILTER (WHERE account_move_line__move_id.move_type IN ('out_invoice', 'in_invoice') AND account_move_line.tax_line_id IS NULL)),
+                        0
+                    ) < %(threshold_value)s
+                AND
+                    COALESCE(
+                        ABS(SUM(%(balance_select)s)
+                            FILTER (WHERE account_move_line__move_id.move_type IN ('out_refund', 'in_refund') AND account_move_line.tax_line_id IS NULL)),
+                        0
+                    ) < %(threshold_value)s
+            """,
+            balance_select=query.table.consolidation_balance,
+            table_references=query.from_clause,
+            search_condition=query.where_clause,
+            country_code='EE%',
+            extra_where=extra_where,
+            threshold_value=threshold_value,
+            )
+            self.env.cr.execute(partners_to_exclude_query)
+            partners_to_exclude = [row[0] for row in self.env.cr.fetchall()]
+
+        query = report._get_report_query(options, 'strict_range', [('partner_id', 'not in', partners_to_exclude)])
 
         # Additional lines in the query depending on the group by
         if current_groupby == 'id':
@@ -454,7 +556,7 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
 
                 SELECT
                     %(select_from_groupby)s
-                    res_partner.company_registry AS buyer_reg_code,
+                    res_partner.additional_identifiers->>'EE_EN' AS buyer_reg_code,
                     res_partner.name AS buyer_name,
                     account_move_line__move_id.name AS invoice_number,
                     account_move_line__move_id.invoice_date AS invoice_date,
@@ -495,7 +597,6 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
                     AND account_move_line__move_id.move_type IN ('out_invoice', 'out_refund')
                     AND tax_rate != '0'
                     AND res_partner.is_company
-                    AND res_partner.vat != '/'
                     AND (res_country.code = 'EE' OR res_partner.vat ILIKE %(country_code)s)
 
                 GROUP BY
@@ -520,7 +621,7 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
             sql_query = SQL("""
                 SELECT
                     %(select_from_groupby)s
-                    res_partner.company_registry AS seller_reg_code,
+                    res_partner.additional_identifiers->>'EE_EN' AS seller_reg_code,
                     res_partner.name AS seller_name,
                     COALESCE(account_move_line__move_id.ref, account_move_line__move_id.name) AS invoice_number,
                     account_move_line__move_id.invoice_date AS invoice_date,
@@ -596,3 +697,205 @@ class L10n_EeKmdInfReportHandler(models.AbstractModel):
             if ref
             for tag_id in ref._get_matching_tags().ids
         })
+
+    def _compute_xml_version(self, options):
+        """ Compute the version of the XML file to export."""
+        date_to = fields.Date.from_string(options['date'].get('date_to'))
+        if date_to >= fields.Date.from_string("2025-07-01"):
+            return "KMD6"
+        elif date_to >= fields.Date.from_string("2025-01-01"):
+            return "KMD5"
+        return "KMD4"
+
+    def _check_sender_company_registry(self, report, options):
+        sender_company = report._get_sender_company_for_export(options)
+        if not sender_company.partner_id._get_additional_identifier('EE_EN'):
+            raise RedirectWarning(
+                message=_("No company registry number associated with your company. Please define one."),
+                action=sender_company._get_records_action(name=_("Company: %s", sender_company.name), target='new'),
+                button_text=_("Go to Company"),
+            )
+        return sender_company
+
+    def _generate_annex_lines(self, report, options):
+        """
+        Generate XML-ready annex lines for KMD INF reports.
+
+        Converts report lines into dictionaries and formats monetary and date values
+        as required by the XML schema.
+        """
+        currency = self.env.company.currency_id
+        lines = []
+
+        # Fail safe, if options are not as expected
+        if options.get('report_id') != report.id:
+            options['report_id'] = report.id
+
+        for line in report._get_lines(options):
+            if line.groupby:
+                continue
+            annex_line = {}
+            for col in line.columns:
+                label = col.expression_label
+                value = col.no_format
+                if col.figure_type == 'monetary' and value:
+                    value = float_repr(currency.round(value), currency.decimal_places)
+                elif col.figure_type == 'date' and value:
+                    value = format_date(self.env, value, date_format='yyyy-MM-dd')
+                annex_line[label] = value
+            lines.append(annex_line)
+        return lines
+
+    def export_to_xml(self, options):
+        """
+        Entry point for XML exports.
+
+        Based on the selected report section, this method exports:
+        - Full VAT report (KMD + KMD INF), or
+        - Individual KMD INF Part A / Part B annexes.
+        """
+        selected_section_id = options.get('selected_section_id')
+        if not selected_section_id:
+            return {'file_content': None, 'file_type': None, 'file_name': None}
+
+        date_to = options.get('date', {}).get('string').replace(' ', '_').replace('_-_', '_').lower()
+        sender_company = self.env['account.report'].browse(selected_section_id)._get_sender_company_for_export(options)
+
+        if selected_section_id == self.env.ref("l10n_ee.tax_report").id:
+            return self._export_to_tax_xml(options)
+        elif selected_section_id == self.env.ref("l10n_ee_reports.kmd_inf_report_part_a").id:
+            xml_data = self._export_kmd_inf_to_xml(options, selected_section_id, 'sale_lines')
+            xml_content = self.env['ir.qweb']._render('l10n_ee_reports.kmd_inf_part_a_xml', values=xml_data)
+            file_name = f"kmd_inf_part_a_report_{date_to}_{sender_company.name.replace(' ', '_').lower()}.xml"
+        elif selected_section_id == self.env.ref("l10n_ee_reports.kmd_inf_report_part_b").id:
+            xml_data = self._export_kmd_inf_to_xml(options, selected_section_id, 'purchase_lines')
+            xml_content = self.env['ir.qweb']._render('l10n_ee_reports.kmd_inf_part_b_xml', values=xml_data)
+            file_name = f"kmd_inf_part_b_report_{date_to}_{sender_company.name.replace(' ', '_').lower()}.xml"
+        else:
+            raise ValueError("Invalid KMD INF report section selected.")
+
+        tree = etree.fromstring(xml_content)
+        formatted_xml = etree.tostring(tree, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+
+        return {
+            'file_name': file_name,
+            'file_content': formatted_xml,
+            'file_type': 'xml',
+        }
+
+    def _export_to_tax_xml(self, options):
+        """
+        Export the full KMD Report to XML.
+
+        This includes:
+        - Main KMD tax report
+        - KMD INF Part A (sales)
+        - KMD INF Part B (purchases)
+
+        Only monthly tax returns are supported.
+        """
+        report = self.env['account.report'].browse(options.get('selected_section_id'))
+        date = options['date']
+        date_to = fields.Date.from_string(date.get('date_to'))
+
+        if options['date']['period_type'] != 'month':
+            raise UserError(_('Choose a month to export the VAT Report'))
+        if options['return_periodicity']['periodicity'] != 'monthly':
+            raise UserError(_('This report can only be exported for Monthly tax returns.'))
+
+        sender_company = self._check_sender_company_registry(report, options)
+
+        xml_data = {
+            'tax_payer_reg_code': sender_company.partner_id._get_additional_identifier('EE_EN'),
+            # Not needed when uploaded personally, since you logged in at the Estonian government platform with your ID
+            'submitter_person_code': '',
+            'year': date_to.year,
+            'month': date_to.month,
+            'version': self._compute_xml_version(options),
+            'declaration_type': 1,  # Standard declaration type for monthly returns
+            'sale_lines': [],
+            'purchase_lines': [],
+        }
+
+        # Tax report (KMD report)
+        options = report.get_options(previous_options={'date': date, 'unfold_all': True})
+        kmd_lines = report._get_lines(options)
+
+        tax_line_prefix = 'l10n_ee.tax_report_line_'
+        tax_line_numbers = (
+            '1', '1_24', '1_1', '1_2', '2', '2_1', '2_2',
+            '3', '3_1', '3_1_1', '3_2', '3_2_1',
+            '5', '5_1', '5_2', '5_3', '5_3_cars', '5_4', '5_4_cars',
+            '6', '6_1', '7', '7_1', '8', '9', '10', '11',
+        )
+
+        tax_line_mapping = {}
+        for line_number in tax_line_numbers:
+            tax_line = self.env.ref(f'{tax_line_prefix}{line_number}', raise_if_not_found=False)
+            if not tax_line:
+                continue
+            tax_line_mapping[tax_line.id] = f'line_{line_number}'
+
+        colexpr_to_idx = {col['expression_label']: idx for idx, col in enumerate(options['columns'])}
+        currency = self.env.company.currency_id
+
+        for line in kmd_lines:
+            line_id = line.columns[0].report_line_id
+            if line_id is None or line_id not in tax_line_mapping:
+                continue
+            xml_variable = tax_line_mapping[line_id]
+            balance = line.columns[colexpr_to_idx['balance']].no_format
+            if balance and xml_variable.endswith('_cars'):  # line indicating number of cars
+                xml_data[xml_variable] = f"{balance:.0f}"
+            elif balance and xml_variable in ('line_1', 'line_1_2'):
+                total_balance = balance + float(xml_data.get('line_1', '0.0'))
+                xml_data['line_1'] = f'{total_balance:.2f}'
+            elif balance:
+                xml_data[xml_variable] = float_repr(currency.round(balance), currency.decimal_places)
+
+        report_export_mapping = (
+            ('kmd_inf_report_part_a', 'sale_lines'),
+            ('kmd_inf_report_part_b', 'purchase_lines'),
+        )
+
+        for kmd_inf_part, export_section in report_export_mapping:
+            kmd_inf_report = self.env.ref(f'l10n_ee_reports.{kmd_inf_part}')
+            kmd_inf_report_options = kmd_inf_report.get_options(previous_options={**options, 'unfold_all': True})
+            xml_data[export_section] = self._generate_annex_lines(kmd_inf_report, kmd_inf_report_options)
+
+        xml_content = self.env['ir.qweb']._render('l10n_ee_reports.vat_report_xml', values=xml_data)
+        tree = etree.fromstring(xml_content)
+        formatted_xml = etree.tostring(tree, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+
+        return {
+            'file_name': report.get_default_report_filename(options, 'xml'),
+            'file_content': formatted_xml,
+            'file_type': 'xml',
+        }
+
+    def _export_kmd_inf_to_xml(self, options, report_id, line_key):
+        """
+        Export a single KMD INF annex (Part A or Part B) to XML data.
+
+        This method is shared by both annex exports and only prepares
+        the XML data. Rendering is done by the caller.
+        """
+        report = self.env['account.report'].browse(report_id)
+        date_to = fields.Date.from_string(options['date'].get('date_to'))
+        kmd_inf_report_options = report.get_options(previous_options={**options, 'unfold_all': True})
+
+        # Ensure monthly period
+        if kmd_inf_report_options['date']['period_type'] != 'month':
+            raise UserError(_('Choose a month to export the VAT Report'))
+
+        sender_company = self._check_sender_company_registry(report, kmd_inf_report_options)
+
+        return {
+            'tax_payer_reg_code': sender_company.partner_id._get_additional_identifier('EE_EN'),
+            'submitter_person_code': '',  # optional
+            'year': date_to.year,
+            'month': date_to.month,
+            'version': self._compute_xml_version(kmd_inf_report_options),
+            'declaration_type': 1,  # Standard declaration type for monthly returns
+            line_key: self._generate_annex_lines(report, kmd_inf_report_options),
+        }

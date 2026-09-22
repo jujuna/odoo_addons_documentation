@@ -35,8 +35,8 @@ class WT003ReportCustomHandler(models.AbstractModel):
         currency = self.env.company.currency_id
 
         query = report._get_report_query(options, 'strict_range')
-        tag_rel_alias = query.left_join(query.table, 'id', 'account_account_tag_account_move_line_rel', 'account_move_line_id', 'tag_rel')
-        tag_alias = query.left_join(tag_rel_alias, 'account_account_tag_id', 'account_account_tag', 'id', 'tag')
+        tag_t = query.table._sudo()._join('tax_tag_ids')
+        tag_t = tag_t._with_model(tag_t._model.with_context(lang='en_US'))
         query = SQL(
             """
             WITH tag_amounts_per_move AS (
@@ -73,9 +73,9 @@ class WT003ReportCustomHandler(models.AbstractModel):
         GROUP BY commercial_partner_name, commercial_partner_vat, fiscal_position_id, date, name
         ORDER BY date desc, name desc
             """,
-            tag_name=self.env['account.account.tag'].with_context(lang='en_US')._field_to_sql(tag_alias, 'name'),
-            balance_negate=self.env['account.account.tag']._field_to_sql(tag_alias, 'balance_negate', query),
-            tag_id=self.env['account.account.tag']._field_to_sql(tag_alias, 'id', query),
+            tag_name=tag_t.name,
+            balance_negate=tag_t.balance_negate,
+            tag_id=tag_t.id,
             table_references=query.from_clause,
             search_condition=query.where_clause,
         )

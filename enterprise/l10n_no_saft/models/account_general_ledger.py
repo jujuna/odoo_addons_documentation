@@ -81,9 +81,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         date_to = fields.Date.to_date(options['date']['date_to'])
         # Fetch data from beginning
         query = report._get_report_query(options, 'from_beginning')
-        account_alias = query.join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
-        account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
-        account_type = SQL.identifier(account_alias, 'account_type')
+        account_t = query.table._sudo()._join('account_id', kind='JOIN')
         # The balance dating from earlier periods are computed as opening
         # The balance up to the end of the current period are computed as closing
         self.env.cr.execute(SQL(
@@ -98,12 +96,12 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             AND %(account_type)s IN ('asset_receivable', 'liability_payable')
             GROUP BY account_move_line.partner_id, %(account_code)s, account_move_line.date
             ''',
-            account_code=account_code,
+            account_code=account_t.code,
             date_from=date_from,
             date_to=date_to,
             table_references=query.from_clause,
             search_condition=query.where_clause,
-            account_type=account_type,
+            account_type=account_t.account_type,
         ))
 
         partners_accounts = {}

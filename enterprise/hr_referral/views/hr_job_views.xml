@@ -29,69 +29,119 @@
                             </div>
                             <field name="description" class="text-muted pb-2 mt-2"/>
                             <div class="d-flex flex-column mt-auto">
-                                <div class="o_button_referral d-flex gap-1">
-                                    <a  role="button"
-                                        name="%(hr_referral_send_mail_action)d"
-                                        type="action"
-                                        class="btn btn-secondary w-25 flex-shrink-1">
-                                        <i  class="fa fa-2x fa-envelope-o"
-                                            role="img"
-                                            aria-label="Send by Mail"/>
-                                        <br/>
-                                        <span title='Send by Mail'>Send Email</span>
-                                    </a>
-                                    <a  role="button"
-                                        name="%(hr_referral_send_sms_action)d"
-                                        type="action"
-                                        class="btn btn-secondary w-25 flex-shrink-1">
-                                        <i  class="fa fa-2x fa-mobile"
-                                            role="img"
-                                            aria-label="Send by SMS"/>
-                                        <br/>
-                                        <span title='Send by SMS'>Send SMS</span>
-                                    </a>
-                                    <a  role="button"
-                                        t-attf-href="#{record.website_url.raw_value}"
-                                        target="_blank"
-                                        class="btn btn-secondary w-25 flex-shrink-1 o_hr_referral_job_url">
-                                        <i  class="fa fa-2x fa-globe"
+                                <div class="d-flex gap-1">
+                                    <!-- Job Page button -->
+                                    <a name="action_share_external"
+                                        type="object"
+                                        role="button"
+                                        class="btn btn-secondary flex-fill d-flex align-items-center justify-content-center gap-2">
+                                        <i class="oi oi-lg"
+                                            data-icon="public"
                                             role="img"
                                             aria-label="Job Page"/>
-                                        <br/>
                                         <span title='More info'>Job Page</span>
                                     </a>
-                                    <!-- Empty div to ensure the shrinking without the presence of a 4th button -->
-                                    <div class="w-25 flex-shrink-1"/>
-                                </div>
-                                <div class="d-flex gap-1">
-                                    <field  name="id" widget="CopyClipboardReferralButton" class="w-25 flex-shrink-1"/>
-                                    <a role="button" name="action_share_external" type="object" class="btn btn-secondary w-25 flex-shrink-1" context="{'default_channel': 'facebook'}">
-                                        <span title="Share on Facebook">
-                                            <i class="fa fa-2x fa-facebook" role="img" aria-label="Share on facebook"/>
-                                        </span>
-                                        <span class="d-block mt-2 text-primary">
-                                            <t t-if="record.facebook_clicks &gt; 0"><field name="facebook_clicks"/> click(s)</t>
-                                            <t t-else="">Share Now</t>
-                                        </span>
-                                    </a>
-                                    <a role="button" name="action_share_external" type="object" class="btn btn-secondary w-25 flex-shrink-1" context="{'default_channel': 'twitter'}">
-                                        <span title="Share on Twitter">
-                                            <i class="fa fa-2x fa-twitter" role="img" aria-label="Share on twitter"/>
-                                        </span>
-                                        <span class="d-block mt-2 text-primary">
-                                            <t t-if="record.twitter_clicks &gt; 0"><field name="twitter_clicks"/> click(s)</t>
-                                            <t t-else="">Share Now</t>
-                                        </span>
-                                    </a>
-                                    <a role="button" name="action_share_external" type="object" class="btn btn-secondary w-25 flex-shrink-1" context="{'default_channel': 'linkedin'}">
-                                        <span title="Share on Linkedin">
-                                            <i class="fa fa-2x fa-linkedin" role="img" aria-label="Share on linkedin"/>
-                                        </span>
-                                        <span class="d-block mt-2 text-primary">
-                                            <t t-if="record.linkedin_clicks &gt; 0"><field name="linkedin_clicks"/> click(s)</t>
-                                            <t t-else="">Share Now</t>
-                                        </span>
-                                    </a>
+                                    <!-- Send Actions Dropdown -->
+                                    <div class="btn-group flex-fill" role="group">
+                                        <button type="button"
+                                            class="btn btn-secondary dropdown-toggle d-flex align-items-center justify-content-center gap-2"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="oi oi-lg oi-filled" data-icon="send" role="img"
+                                                aria-label="Send"/>
+                                            <span>Send</span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li>
+                                                <a class="dropdown-item o_hr_referral_send_mail"
+                                                    name="%(hr_referral_send_mail_action)d"
+                                                    type="action" role="button">
+                                                    <i class="oi oi-lg oi-fw oi-filled me-2 text-center" data-icon="mail" role="img"
+                                                        aria-label="Send by Email"/>
+                                                    Send by Email </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    name="%(hr_referral_send_sms_action)d"
+                                                    type="action" role="button">
+                                                    <i class="oi oi-lg oi-fw me-2 text-center" data-icon="smartphone" role="img"
+                                                        aria-label="Send by SMS"/>
+                                                    Send by SMS </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- Share Actions Dropdown -->
+                                    <div class="btn-group flex-fill" role="group">
+                                        <button type="button"
+                                            class="btn btn-secondary dropdown-toggle d-flex align-items-center justify-content-center gap-2"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="oi oi-lg" data-icon="family_history" role="img"
+                                                aria-label="Share"/>
+                                            <span>Share</span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li>
+                                                <a
+                                                    class="dropdown-item d-flex align-items-center justify-content-between"
+                                                    name="action_share_external" type="object"
+                                                    context="{'default_channel': 'facebook'}"
+                                                    role="button">
+                                                    <span class="d-flex align-items-center">
+                                                        <i class="oi oi-lg oi-fw me-2 text-center"
+                                                            data-icon="oi_facebook"
+                                                            role="img"
+                                                            aria-label="Share on Facebook"/>
+                                                        Share on Facebook </span>
+                                                    <span class="text-primary ms-2">
+                                                        <t t-if="record.facebook_clicks &gt; 0">
+                                                            <field name="facebook_clicks"/> click(s)
+                                                        </t>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a
+                                                    class="dropdown-item d-flex align-items-center justify-content-between"
+                                                    name="action_share_external" type="object"
+                                                    context="{'default_channel': 'linkedin'}"
+                                                    role="button">
+                                                    <span class="d-flex align-items-center">
+                                                        <i class="oi oi-lg oi-fw me-2 text-center"
+                                                            data-icon="oi_linkedin"
+                                                            role="img"
+                                                            aria-label="Share on LinkedIn"/>
+                                                        Share on LinkedIn </span>
+                                                    <span class="text-primary ms-2">
+                                                        <t t-if="record.linkedin_clicks &gt; 0">
+                                                            <field name="linkedin_clicks" /> click(s)
+                                                        </t>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a
+                                                    class="dropdown-item d-flex align-items-center justify-content-between"
+                                                    name="action_share_external" type="object"
+                                                    context="{'default_channel': 'twitter'}"
+                                                    role="button">
+                                                    <span class="d-flex align-items-center">
+                                                        <i class="oi oi-lg oi-fw me-2 text-center" data-icon="oi_x"
+                                                            role="img" aria-label="Share on X"/>
+                                                        Share on X</span>
+                                                    <span class="text-primary ms-2">
+                                                        <t t-if="record.twitter_clicks &gt; 0">
+                                                            <field name="twitter_clicks" /> click(s)
+                                                        </t>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <field name="id"
+                                                    widget="CopyClipboardReferralButton"
+                                                    class="dropdown-item"/>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </main>
@@ -148,18 +198,18 @@
         <field name="arch" type="xml">
             <header position="inside">
                 <button name="action_referral_campaign"
-                        string="Promote"
-                        type="object"
-                        class="btn btn-secondary"
-                        groups="hr_recruitment.group_hr_recruitment_manager"
-                        invisible="not website_published"                        
-                        />
+                    string="Promote"
+                    type="object"
+                    class="btn btn-secondary"
+                    groups="hr_recruitment.group_hr_recruitment_user"
+                    invisible="not website_published"
+                />
             </header>
         </field>
     </record>
 
     <menuitem
-        parent="menu_hr_referral_configuration"
+        parent="menu_hr_referral_recruitment_configuration"
         id="menu_hr_referral_job_configuration"
         action="hr.action_hr_job"
         groups="hr_referral.group_hr_referral_manager"

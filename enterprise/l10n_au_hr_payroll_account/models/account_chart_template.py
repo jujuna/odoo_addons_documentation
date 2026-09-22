@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, _
+from odoo import models
+
 from odoo.exceptions import UserError
 
 
@@ -13,11 +14,10 @@ class AccountChartTemplate(models.AbstractModel):
         if template_code == "au":
             clearing_house = self.env.ref('l10n_au_hr_payroll_account.res_partner_clearing_house', raise_if_not_found=False)
             if not clearing_house:
-                raise UserError(_("No clearing house record found for this company!"))
-            account_21400 = self.env['account.account'].with_company(company).search([
-                ('company_ids', '=', company.id),
-                ('code', '=', 21400)])
-            clearing_house.with_company(company).property_account_payable_id = account_21400
+                raise UserError(self.env._("No clearing house record found for this company!"))
+            account_21400 = self.ref('au_21400')
+            if account_21400:
+                clearing_house.with_company(company).property_account_payable_id = account_21400
             company.write({
                 'ytd_reset_day': 1,
                 'ytd_reset_month': '7',
@@ -32,20 +32,17 @@ class AccountChartTemplate(models.AbstractModel):
             | Superannuation | 21400  | 62420 |                                      |
             | Child Support  | 21500  | 62460 | Will be reversed for negative values |
         """
-        account_codes = [
-            #  Debit
-            "62430",  # Wages & Salaries
-            "62460",  # Child Support
-            "62420",  # Superannuation
-            # Credit
-            "21300",  # Wages & Salaries
-            "21500",  # Child Support
-            "21400",  # Superannuation
-            "21420",  # PAYG Withholding
-            "21200",  # Trade Creditors
-            "21800",  # Other Deductions
-        ]
-        default_account = "62430"
+        #  Debit
+        wages_salaries_exp = 'au_62430'
+        child_support_exp = 'au_62460'
+        superannuation_exp = 'au_62420'
+        # Credit
+        wages_salaries_payable = 'au_21300'
+        child_support_payable = 'au_21500'
+        superannuation_payable = 'au_21400'
+        payg_withholding_payable = 'au_21420'
+        trade_creditors = 'au_21200'
+        other_deductions = 'au_21800'
 
         # ================================================ #
         #          AU Employee Payroll Structure          #
@@ -59,49 +56,53 @@ class AccountChartTemplate(models.AbstractModel):
         schedule_1_deductions = self.env.ref("l10n_au_hr_payroll.l10n_au_fees_and_deductions_structure_1")
         schedule_1_rule_expense_refund = self.env.ref("l10n_au_hr_payroll_account.l10n_au_salary_expense_refund_structure_1")
         schedule_1_rule_net = self.env['hr.salary.rule'].search([
-            ('struct_id', '=', structure_schedule_1.id),
+            ('struct_ids', 'in', structure_schedule_1.id),
             ('code', '=', 'NET')
         ])
 
         rules_mapping = {
             # Schedule 1
             schedule_1_rule_withholding_net: {
-                "credit": "62430",
-                "debit": "21420",
+                "credit": wages_salaries_exp,
+                "debit": payg_withholding_payable,
                 "debit_tags": "W2",
                 "credit_tags": "W1",
             },
             schedule_1_rule_net: {
-                "credit": "21300",
-                "debit": "62430",
+                "credit": wages_salaries_payable,
+                "debit": wages_salaries_exp,
                 "debit_tags": "W1",
             },
             schedule_1_rule_super: {
-                "credit": "21400",
-                "debit": "62420",
+                "credit": superannuation_payable,
+                "debit": superannuation_exp,
             },
             schedule_1_rule_super_concessional: {
-                "credit": "21400",
-                "debit": "62420",
+                "credit": superannuation_payable,
+                "debit": superannuation_exp,
             },
             schedule_1_rule_child_support: {
-                "credit": "62460",
-                "debit": "21500",
+                "credit": child_support_exp,
+                "debit": child_support_payable,
                 "credit_tags": "W1",
             },
             schedule_1_deductions: {
-                "debit": "21800",
-                "credit": "62430",
+                "debit": other_deductions,
+                "credit": wages_salaries_exp,
             },
             schedule_1_rule_expense_refund: {
-                "credit": "21300",
-                "debit": "21200",
+                "credit": wages_salaries_payable,
+                "debit": trade_creditors,
             },
         }
 
         self._configure_payroll_account(
             companies,
             "AU",
-            account_codes=account_codes,
+            account_refs=[
+                wages_salaries_exp, child_support_exp, superannuation_exp, wages_salaries_payable, child_support_payable,
+                superannuation_payable, payg_withholding_payable, trade_creditors, other_deductions
+            ],
             rules_mapping=rules_mapping,
-            default_account=default_account)
+            default_account=wages_salaries_exp
+        )

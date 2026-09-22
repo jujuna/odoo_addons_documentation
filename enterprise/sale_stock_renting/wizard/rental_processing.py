@@ -2,7 +2,7 @@
 
 from markupsafe import Markup
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -10,20 +10,30 @@ class RentalOrderWizard(models.TransientModel):
     _inherit = 'rental.order.wizard'
 
     has_tracked_lines = fields.Boolean(
-        string="Has lines with tracked products", compute='_compute_has_tracked_lines')
+        string="Has lines with tracked products", compute='_compute_has_tracked_lines'
+    )
 
     has_lines_missing_stock = fields.Boolean(
-        string="Has lines whose products have insufficient stock", compute="_compute_has_lines_missing_stock")
+        string="Has lines whose products have insufficient stock",
+        compute="_compute_has_lines_missing_stock",
+    )
 
     @api.depends('rental_wizard_line_ids')
     def _compute_has_tracked_lines(self):
         for wizard in self:
-            wizard.has_tracked_lines = any(line.tracking == 'serial' for line in wizard.rental_wizard_line_ids)
+            wizard.has_tracked_lines = any(
+                line.tracking == 'serial' for line in wizard.rental_wizard_line_ids
+            )
 
     @api.depends('rental_wizard_line_ids.qty_delivered')
     def _compute_has_lines_missing_stock(self):
         for wizard in self:
-            wizard.has_lines_missing_stock = any(line.is_product_storable and line.status == 'pickup' and line.qty_delivered > line.qty_available for line in wizard.rental_wizard_line_ids)
+            wizard.has_lines_missing_stock = any(
+                line.is_product_storable
+                and line.status == 'pickup'
+                and line.qty_delivered > line.qty_available
+                for line in wizard.rental_wizard_line_ids
+            )
 
 
 class RentalOrderWizardLine(models.TransientModel):
@@ -32,9 +42,7 @@ class RentalOrderWizardLine(models.TransientModel):
     def _default_wizard_line_vals(self, line, status):
         default_line_vals = super()._default_wizard_line_vals(line, status)
 
-        default_line_vals.update({
-            'tracking': line.product_id.tracking,
-        })
+        default_line_vals.update({'tracking': line.product_id.tracking})
 
         pickeable_lots = self.env['stock.lot']
         returnable_lots = self.env['stock.lot']
@@ -46,18 +54,22 @@ class RentalOrderWizardLine(models.TransientModel):
             if line.product_id.tracking == 'serial':
                 # If product is tracked by serial numbers
                 # Get lots in stock:
-                rentable_lots = self.env['stock.lot']._get_available_lots(line.product_id, line.order_id.warehouse_id.lot_stock_id)
+                rentable_lots = self.env['stock.lot']._get_available_lots(
+                    line.product_id, line.order_id.warehouse_id.lot_stock_id
+                )
                 # Get lots reserved/pickedup and not already returned
                 rented_lots = line.product_id._get_unavailable_lots(
                     fields.Datetime.now(),
                     line.return_date,
                     ignored_soline_id=line.id,
-                    warehouse_id=line.order_id.warehouse_id.id)
+                    warehouse_id=line.order_id.warehouse_id.id,
+                )
 
                 # Don't show reserved lots if they aren't back (or were moved by another app)
                 if pickedup_lots:
                     # As we ignored current SaleOrderLine for availability, we need to add
-                    # its pickedup_lots to the rented ones to make sure it cannot be picked-up twice.
+                    # its pickedup_lots to the rented ones to make sure it cannot be picked-up
+                    # twice.
                     rented_lots += pickedup_lots
 
                 if returned_lots:
@@ -75,17 +87,16 @@ class RentalOrderWizardLine(models.TransientModel):
                 # * lots expected to go to another client before
                 # as reserved lots (which will be auto-filled as pickedup_lots).
                 reserved_lots = reserved_lots & pickeable_lots
-                default_line_vals.update({
-                    'qty_delivered': len(reserved_lots),
-                })
+                default_line_vals.update({'qty_delivered': len(reserved_lots)})
 
             if line.product_id.is_storable:
                 default_line_vals.update({
                     'qty_available': line.product_id.with_context(
                         from_date=max(line.reservation_begin, fields.Datetime.now()),
                         to_date=line.return_date,
-                        warehouse_id=line.order_id.warehouse_id.id).qty_available,
-                    'is_product_storable': True
+                        warehouse_id=line.order_id.warehouse_id.id,
+                    ).qty_available,
+                    'is_product_storable': True,
                 })
                 # On pickup: only show quantity currently available
                 # because the unavailable qty is in company_id.rental_loc_id.
@@ -94,7 +105,7 @@ class RentalOrderWizardLine(models.TransientModel):
                 'pickedup_lot_ids': [(6, 0, reserved_lots.ids)],
                 'returned_lot_ids': [(6, 0, returned_lots.ids)],
                 'pickeable_lot_ids': [(6, 0, pickeable_lots.ids)],
-                'returnable_lot_ids': [(6, 0, returnable_lots.ids)]
+                'returnable_lot_ids': [(6, 0, returnable_lots.ids)],
             })
         elif status == 'return':
             returnable_lots = pickedup_lots - returned_lots
@@ -102,7 +113,7 @@ class RentalOrderWizardLine(models.TransientModel):
                 'pickedup_lot_ids': [(6, 0, pickedup_lots.ids)],
                 'returned_lot_ids': [(6, 0, returnable_lots.ids)],
                 'pickeable_lot_ids': [(6, 0, pickeable_lots.ids)],
-                'returnable_lot_ids': [(6, 0, returnable_lots.ids)]
+                'returnable_lot_ids': [(6, 0, returnable_lots.ids)],
             })
 
         return default_line_vals
@@ -112,16 +123,14 @@ class RentalOrderWizardLine(models.TransientModel):
 
     tracking = fields.Selection(related='product_id.tracking')
 
-    pickeable_lot_ids = fields.Many2many(
-        'stock.lot', 'wizard_pickeable_serial', store=False)
-    returnable_lot_ids = fields.Many2many(
-        'stock.lot', 'wizard_returnable_serial', store=False)
+    pickeable_lot_ids = fields.Many2many('stock.lot', 'wizard_pickeable_serial', store=False)
+    returnable_lot_ids = fields.Many2many('stock.lot', 'wizard_returnable_serial', store=False)
     pickedup_lot_ids = fields.Many2many(
-        'stock.lot', 'wizard_pickedup_serial',
-        domain="[('id', 'in', pickeable_lot_ids)]")
+        'stock.lot', 'wizard_pickedup_serial', domain="[('id', 'in', pickeable_lot_ids)]"
+    )
     returned_lot_ids = fields.Many2many(
-        'stock.lot', 'wizard_returned_serial',
-        domain="[('id', 'in', returnable_lot_ids)]")
+        'stock.lot', 'wizard_returned_serial', domain="[('id', 'in', returnable_lot_ids)]"
+    )
 
     @api.depends('product_id')
     def _compute_is_product_storable(self):
@@ -142,17 +151,26 @@ class RentalOrderWizardLine(models.TransientModel):
         for wizard_line in self:
             if wizard_line.status == 'pickup' and wizard_line.tracking == 'serial':
                 if wizard_line.qty_delivered != len(wizard_line.pickedup_lot_ids):
-                    raise ValidationError(_("Please specify the serial numbers picked up for the tracked products."))
+                    raise ValidationError(
+                        wizard_line.env._(
+                            "Please specify the serial numbers picked up for the tracked products."
+                        )
+                    )
 
     @api.constrains('returned_lot_ids', 'qty_returned')
     def _is_return_tracking_fulfilled(self):
         for wizard_line in self:
             if wizard_line.status == 'return' and wizard_line.tracking == 'serial':
                 if wizard_line.qty_returned != len(wizard_line.returned_lot_ids):
-                    raise ValidationError(_("Please specify the serial numbers returned for the tracked products."))
+                    raise ValidationError(
+                        wizard_line.env._(
+                            "Please specify the serial numbers returned for the tracked products."
+                        )
+                    )
 
     def _apply(self):
-        serial_lines = self.filtered(lambda line: line.tracking == 'serial')
+        wizard_lines = self.with_context(rental_direct_stock_move=True)
+        serial_lines = wizard_lines.filtered(lambda line: line.tracking == 'serial')
 
         # First, we deduct from the wizard the lots already picked up/returned
         for line in serial_lines:
@@ -170,7 +188,7 @@ class RentalOrderWizardLine(models.TransientModel):
                     'returned_lot_ids': [(6, 0, returned_lot_ids.ids)],
                 })
 
-        msg = super()._apply()
+        msg = super(RentalOrderWizardLine, wizard_lines)._apply()
         for line in serial_lines:
             sol = line.order_line_id
             if line.status == 'pickup':
@@ -180,17 +198,20 @@ class RentalOrderWizardLine(models.TransientModel):
         return msg
 
     def _generate_log_message(self):
-        """Override"""
+        """Override."""
         msg = ""
         for line in self:
             order_line = line.order_line_id
             diff, old_qty, new_qty = line._get_diff()
             if diff:  # i.e. diff>0
-
                 msg += Markup("<li> %s") % (order_line.product_id.display_name)
 
                 if old_qty > 0:
-                    msg += Markup(": %s -> <b> %s </b> %s ") % (old_qty, new_qty, order_line.product_uom_id.name)
+                    msg += Markup(": %s -> <b> %s </b> %s ") % (
+                        old_qty,
+                        new_qty,
+                        order_line.product_uom_id.name,
+                    )
                 elif new_qty != 1 or order_line.product_uom_qty > 1.0:
                     msg += ": %s %s " % (new_qty, order_line.product_uom_id.name)
                 # If qty = 1, product has been picked up, no need to specify quantity

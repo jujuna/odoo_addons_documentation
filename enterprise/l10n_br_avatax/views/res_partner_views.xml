@@ -8,10 +8,10 @@
             <field name="arch" type="xml">
                 <group name="fiscal_information" position="inside">
                     <field name="l10n_br_tax_regime" invisible="'BR' not in fiscal_country_codes"/>
-                    <field name="l10n_br_taxpayer" invisible="'BR' not in fiscal_country_codes"/>
                     <field name="l10n_br_activity_sector" invisible="'BR' not in fiscal_country_codes"/>
-                    <field name="l10n_br_subject_cofins" invisible="'BR' not in fiscal_country_codes" required="'BR' in fiscal_country_codes"/>
+                    <field name="l10n_br_taxpayer" invisible="'BR' not in fiscal_country_codes"/>
                     <field name="l10n_br_subject_pis" invisible="'BR' not in fiscal_country_codes" required="'BR' in fiscal_country_codes"/>
+                    <field name="l10n_br_subject_cofins" invisible="'BR' not in fiscal_country_codes" required="'BR' in fiscal_country_codes"/>
                     <field name="l10n_br_is_subject_csll" invisible="'BR' not in fiscal_country_codes"/>
                     <field name="l10n_br_iss_simples_rate" invisible="'BR' not in fiscal_country_codes or 'simplified' not in l10n_br_tax_regime"/>
                 </group>
@@ -30,7 +30,6 @@
                     <field name="city_id" string="City" optional="hide"/>
                     <field name="state_id" optional="hide"/>
                     <field name="zip" optional="hide"/>
-                    <field name="l10n_latam_identification_type_id"/>
                     <field name="vat"/>
                     <field name="l10n_br_tax_regime"/>
                     <field name="l10n_br_taxpayer"/>

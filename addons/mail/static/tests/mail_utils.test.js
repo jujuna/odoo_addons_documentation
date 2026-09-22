@@ -1,5 +1,6 @@
-import { addLink, parseAndTransform } from "@mail/utils/common/format";
+import { addLink, inlineElement, parseAndTransform } from "@mail/utils/common/format";
 import { useSequential } from "@mail/utils/common/hooks";
+import { createElementFromContent, getInnerHtml } from "@mail/utils/common/html";
 import {
     contains,
     defineMailModels,
@@ -35,6 +36,7 @@ test("add_link utility function", () => {
         "https://github.com/odoo/enterprise/compare/chỗgiặt...chỗgiặt-voip-fix_demo_data-tsm?expand=1": true,
         "https://github.com/odoo/enterprise/compare/@...}-voip-fix_demo_data-tsm?expand=1": true,
         "https://x.com": true,
+        "http://localhost:8069/mail/message/25": true,
     };
 
     for (const [content, willLinkify] of Object.entries(testInputs)) {
@@ -64,7 +66,7 @@ test("addLink: utility function and special entities", () => {
         ],
         [
             markup`<p>https://example.com/"hello"&gt;</p>`,
-            '<p><a target="_blank" rel="noreferrer noopener" href="https://example.com/">https://example.com/</a>"hello"&gt;</p>',
+            '<p><a target="_blank" rel="noreferrer noopener" href="https://example.com/">https://example.com/</a>&quot;hello&quot;&gt;</p>',
         ],
         // & and ' linkified since they are in URL regex
         [
@@ -73,9 +75,9 @@ test("addLink: utility function and special entities", () => {
         ],
         [
             markup`<p>https://example.com/'yeah'</p>`,
-            '<p><a target="_blank" rel="noreferrer noopener" href="https://example.com/\'yeah\'">https://example.com/\'yeah\'</a></p>',
+            '<p><a target="_blank" rel="noreferrer noopener" href="https://example.com/&#x27;yeah&#x27;">https://example.com/&#x27;yeah&#x27;</a></p>',
         ],
-        [markup`<p>:'(</p>`, "<p>:'(</p>"],
+        [markup`<p>:'(</p>`, "<p>:&#x27;(</p>"],
         [markup`:'(`, ":&#x27;("],
         ["<p>:'(</p>", "&lt;p&gt;:&#x27;(&lt;/p&gt;"],
         [":'(", ":&#x27;("],
@@ -85,7 +87,26 @@ test("addLink: utility function and special entities", () => {
         // Already encoded url should not be encoded twice
         [
             markup`https://odoo.com/%5B%5D`,
-            `<a target="_blank" rel="noreferrer noopener" href="https://odoo.com/%5B%5D">https://odoo.com/[]</a>`,
+            `<a target="_blank" rel="noreferrer noopener" href="https://odoo.com/%5B%5D">https://odoo.com/%5B%5D</a>`,
+        ],
+        [
+            markup`https://www.odoo.com/appointment/10552?filter_appointment_type_ids=%5B6706%2C%2B6705%2C%2B5292%2C%2B10552%5D`,
+            `<a target="_blank" rel="noreferrer noopener" href="https://www.odoo.com/appointment/10552?filter_appointment_type_ids=%5B6706%2C%2B6705%2C%2B5292%2C%2B10552%5D">https://www.odoo.com/appointment/10552?filter_appointment_type_ids=%5B6706%2C%2B6705%2C%2B5292%2C%2B10552%5D</a>`,
+        ],
+        [
+            markup`www.odoo.com`,
+            `<a target="_blank" rel="noreferrer noopener" href="http://www.odoo.com/">www.odoo.com</a>`,
+        ],
+        [
+            markup`https://odoo.com/?q=ỗ`,
+            `<a target="_blank" rel="noreferrer noopener" href="https://odoo.com/?q=%E1%BB%97">https://odoo.com/?q=ỗ</a>`,
+        ],
+        [markup`http://999.999.999.999`, "http://999.999.999.999"],
+        [markup`www.example.com:999999`, "www.example.com:999999"],
+        [markup`www.example.com:abc`, "www.example.com:abc"],
+        [
+            markup`http://999.999.999.999 www.odoo.com`,
+            `http://999.999.999.999 <a target="_blank" rel="noreferrer noopener" href="http://www.odoo.com/">www.odoo.com</a>`,
         ],
     ];
 
@@ -219,4 +240,26 @@ test("isSequential doesn't execute intermediate call.", async () => {
     const result = await Promise.all([sequence(), sequence(), sequence(), sequence(), sequence()]);
     expect(result).toEqual([1, undefined, undefined, undefined, 5]);
     expect.verifySteps(["1", "5"]);
+});
+
+function inlineHtml(content) {
+    return getInnerHtml(inlineElement(createElementFromContent(content)));
+}
+
+test("inlineElement replaces br with spaces", () => {
+    expect(inlineHtml(markup`a<br/>b`).toString()).toBe("a\u00a0b");
+});
+
+test("inlineElement inserts spaces between adjacent block elements", () => {
+    expect(inlineHtml(markup`<div>Before</div><p>After</p>`).toString()).toBe("Before\u00a0After");
+});
+
+test("inlineElement copies rel and target attributes from links", () => {
+    expect(
+        inlineHtml(
+            markup`<a href="https://odoo.com" target="_blank" rel="noreferrer noopener" id="link-id">Odoo</a>`
+        ).toString()
+    ).toBe(
+        '<a href="https://odoo.com" target="_blank" rel="noreferrer noopener">https://odoo.com</a>'
+    );
 });

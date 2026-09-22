@@ -42,58 +42,6 @@ class AccountPayment(models.Model):
             name=self.env._("Matched Transactions")
         )
 
-    def _get_amls_for_payment_without_move(self):
-        valid_payment_states = ['draft', *self.env['account.batch.payment']._valid_payment_states()]
-        lines_to_create = []
-        for payment in self:
-            if payment.state not in valid_payment_states:
-                continue
-
-            line2amount = defaultdict(float)
-
-            payment_term_lines = payment.invoice_ids.line_ids.filtered(lambda line: line.display_type == "payment_term" and not line.reconciled).sorted("date")
-            remaining = payment.amount_signed
-            for line in payment_term_lines:
-                if not remaining:
-                    break
-
-                if float_compare(payment.amount_signed, 0, payment.currency_id.decimal_places) >= 0:
-                    current = min(remaining, line.currency_id._convert(from_amount=line.amount_currency, to_currency=payment.currency_id))
-                else:
-                    current = max(remaining, line.currency_id._convert(from_amount=line.amount_currency, to_currency=payment.currency_id))
-                remaining -= current
-                line2amount[line] -= current
-
-            if remaining:
-                line2amount[False] -= remaining
-
-            for line, amount in line2amount.items():
-                if line:
-                    line_to_create = line._get_aml_values(
-                        name=payment.name,
-                        balance=payment.currency_id._convert(from_amount=amount, to_currency=self.env.company.currency_id),
-                        amount_currency=amount,
-                        reconciled_lines_ids=[Command.set(line.ids)],
-                        payment_lines_ids=[Command.set(payment.ids)],
-                    )
-                else:
-                    partner_account = (
-                        payment.partner_id.property_account_payable_id
-                        if payment.payment_type == "outbound"
-                        else payment.partner_id.property_account_receivable_id
-                    )
-                    line_to_create = {
-                        'name': payment.name,
-                        'partner_id': payment.partner_id.id,
-                        'account_id': partner_account.id,
-                        'currency_id': payment.currency_id.id,
-                        'amount_currency': amount,
-                        'balance': payment.currency_id._convert(from_amount=amount, to_currency=self.env.company.currency_id),
-                        'payment_lines_ids': [Command.set(payment.ids)],
-                    }
-                lines_to_create.append(line_to_create)
-        return lines_to_create
-
     def _get_aml_amount_in_payment_currency(self, aml):
         """ Converts the account move line's amount into its payment's (self) currency.
 
@@ -162,7 +110,8 @@ class AccountPayment(models.Model):
                 exchange_diff_balance = st_line._lines_get_account_balance_exchange_diff(line.currency_id, line.amount_residual, line.amount_residual_currency)
                 amls_to_add = [line._get_aml_values(
                     name=line.name,
-                    balance=line.currency_id._convert(from_amount=-current_amount, to_currency=company_currency, date=st_line.date),
+                    balance=payment.currency_id._convert(from_amount=-current_amount, to_currency=company_currency, date=st_line.date),
+                    currency_id=payment.currency_id.id,
                     amount_currency=-current_amount,
                     reconciled_lines_ids=[Command.set(line.ids)],
                     payment_lines_ids=[Command.set(payment.ids)],
@@ -218,3 +167,55 @@ class AccountPayment(models.Model):
                     'payment_lines_ids': [Command.set(payment.ids)],
                 })
         return amls_to_create, has_exchange_diff
+
+    def _get_amls_for_payment_without_move(self):
+        valid_payment_states = ['draft', *self._valid_payment_states()]
+        lines_to_create = []
+        for payment in self:
+            if payment.state not in valid_payment_states:
+                continue
+
+            line2amount = defaultdict(float)
+
+            payment_term_lines = payment.invoice_ids.line_ids.filtered(lambda line: line.display_type == "payment_term" and not line.reconciled).sorted("date")
+            remaining = payment.amount_signed
+            for line in payment_term_lines:
+                if not remaining:
+                    break
+
+                if float_compare(payment.amount_signed, 0, payment.currency_id.decimal_places) >= 0:
+                    current = min(remaining, line.currency_id._convert(from_amount=line.amount_currency, to_currency=payment.currency_id))
+                else:
+                    current = max(remaining, line.currency_id._convert(from_amount=line.amount_currency, to_currency=payment.currency_id))
+                remaining -= current
+                line2amount[line] -= current
+
+            if remaining:
+                line2amount[False] -= remaining
+
+            for line, amount in line2amount.items():
+                if line:
+                    line_to_create = line._get_aml_values(
+                        name=payment.name,
+                        balance=payment.currency_id._convert(from_amount=amount, to_currency=self.env.company.currency_id),
+                        amount_currency=amount,
+                        reconciled_lines_ids=[Command.set(line.ids)],
+                        payment_lines_ids=[Command.set(payment.ids)],
+                    )
+                else:
+                    partner_account = (
+                        payment.partner_id.property_account_payable_id
+                        if payment.payment_type == "outbound"
+                        else payment.partner_id.property_account_receivable_id
+                    )
+                    line_to_create = {
+                        'name': payment.name,
+                        'partner_id': payment.partner_id.id,
+                        'account_id': partner_account.id,
+                        'currency_id': payment.currency_id.id,
+                        'amount_currency': amount,
+                        'balance': payment.currency_id._convert(from_amount=amount, to_currency=self.env.company.currency_id),
+                        'payment_lines_ids': [Command.set(payment.ids)],
+                    }
+                lines_to_create.append(line_to_create)
+        return lines_to_create

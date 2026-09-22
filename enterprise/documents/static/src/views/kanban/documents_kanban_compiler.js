@@ -1,13 +1,19 @@
-import { KanbanCompiler } from "@web/views/kanban/kanban_compiler";
+import { CardCompiler } from "@web/views/card/card_compiler";
 import { isTextNode } from "@web/views/view_compiler";
 import { createElement } from "@web/core/utils/xml";
 
-export class DocumentsKanbanCompiler extends KanbanCompiler {
+export class DocumentsKanbanCompiler extends CardCompiler {
     setup() {
         super.setup();
         this.compilers.push({ selector: "[t-name='card']", fn: this.compileCard });
-        this.compilers.push({ selector: "div.o_documents_attachment", fn: this.compileDocumentsAttachment });
-        this.compilers.push({ selector: "div.o_kanban_image_wrapper", fn: this.compileImageWrapper });
+        this.compilers.push({
+            selector: "div.o_documents_attachment",
+            fn: this.compileDocumentsAttachment,
+        });
+        this.compilers.push({
+            selector: "div.o_kanban_image_wrapper",
+            fn: this.compileImageWrapper,
+        });
     }
 
     /**
@@ -27,7 +33,10 @@ export class DocumentsKanbanCompiler extends KanbanCompiler {
             card.prepend(dummyElement);
             const fileInput = card.querySelector("input.o_kanban_replace_document");
             if (fileInput) {
-                fileInput.setAttribute("t-on-change.stop.prevent", `(ev) => __comp__.props.record.onReplaceDocument(ev)`);
+                fileInput.setAttribute(
+                    "t-on-change.stop.prevent",
+                    `(ev) => __comp__.props.record.onReplaceDocument(ev)`
+                );
                 // Prevent double click issues
                 fileInput.setAttribute("t-on-click.stop", `() => {}`);
             }
@@ -44,9 +53,9 @@ export class DocumentsKanbanCompiler extends KanbanCompiler {
         // `o_record_selected` if the document is currently selected
         elem.setAttribute(
             "t-attf-class",
-            (elem.getAttribute("t-attf-class") || "")
-            + " {{(record.type.raw_value === 'binary' && !record.attachment_id.raw_value && !record.shortcut_document_id.raw_value) ? 'oe_file_request' : ''}}"
-            + " {{__comp__.props.record.selected ? 'o_record_selected' : ''}}"
+            (elem.getAttribute("t-attf-class") || "") +
+                " {{record.type.raw_value === 'request' ? 'oe_file_request' : ''}}" +
+                " {{__comp__.props.record.selected ? 'o_record_selected' : ''}}"
         );
         // Selector and FileUploadProgressBar
         const content = new DOMParser().parseFromString(

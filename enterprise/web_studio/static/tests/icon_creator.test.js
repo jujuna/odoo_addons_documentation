@@ -23,7 +23,7 @@ test("icon creator: with initial web icon data", async () => {
                 expect(icon).toEqual({
                     backgroundColor: "#FFFFFF",
                     color: "#00CEB3",
-                    iconClass: "fa fa-home",
+                    icon: "home",
                     type: "custom_icon",
                 });
             },
@@ -47,7 +47,7 @@ test("icon creator: without initial web icon data", async () => {
             backgroundColor: "rgb(255, 0, 128)",
             color: "rgb(0, 255, 0)",
             editable: false,
-            iconClass: "fa fa-heart",
+            icon: "favorite",
             type: "custom_icon",
             onIconChange: () => {},
         },
@@ -61,5 +61,34 @@ test("icon creator: without initial web icon data", async () => {
         color: "rgb(0, 255, 0)",
     });
 
-    expect(".o_app_icon i").toHaveClass(["fa", "fa-heart"]);
+    expect(".o_app_icon i").toHaveAttribute("data-icon", "favorite");
 });
+
+test("icon creator: select an outlined and a filled icon", async () => {
+    await mountWithCleanup(IconCreator, {
+        props: {
+            backgroundColor: "#FFFFFF",
+            color: "#00CEB3",
+            editable: true,
+            icon: "home",
+            type: "custom_icon",
+            onIconChange({ icon }) {
+                expect.step(icon);
+            },
+        },
+    });
+
+    await contains(".o_web_studio_selector_icon").click();
+    expect(".font-icons-icon:not(.oi-filled)[data-icon='home']").toHaveClass(
+        "o_we_attachment_selected"
+    );
+
+    await contains(".font-icons-icon.oi-filled[data-icon='favorite']").click();
+    expect.verifySteps(["favorite_f"]);
+    expect(".o_web_studio_selector_icon_menu").toHaveCount(0);
+
+    await contains(".o_web_studio_selector_icon").click();
+    await contains(".font-icons-icon:not(.oi-filled)[data-icon='favorite']").click();
+    expect.verifySteps(["favorite"]);
+});
+

@@ -9,4 +9,3 @@ from . import commission_plan_target_forecast
 from . import commission_achievement
 from . import crm_team
 from . import res_users
-from . import res_config_settings

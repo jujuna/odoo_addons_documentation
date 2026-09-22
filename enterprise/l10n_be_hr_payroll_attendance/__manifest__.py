@@ -3,10 +3,8 @@
 {
     'name': 'Belgian Payroll - Attendance',
     'category': 'Human Resources/Employees',
-    'countries': ['be'],
     'sequence': 95,
     'summary': 'Manage extra hours for your hourly paid employees for belgian payroll',
-    'installable': True,
     'auto_install': True,
     'depends': [
         'hr_payroll_attendance',

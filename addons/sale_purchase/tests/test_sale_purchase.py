@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import timedelta
 
-from odoo import Command
+from odoo import fields, Command
 from odoo.exceptions import UserError, AccessError
 from odoo.tests import tagged
 from odoo.addons.sale_purchase.tests.common import TestCommonSalePurchaseNoChart
@@ -8,6 +9,8 @@ from odoo.addons.sale_purchase.tests.common import TestCommonSalePurchaseNoChart
 
 @tagged('-at_install', 'post_install')
 class TestSalePurchase(TestCommonSalePurchaseNoChart):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -114,13 +117,13 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
 
     def test_uom_conversion(self):
         """ Test generated PO use the right UoM according to product configuration """
-        self.service_purchase_2.seller_ids.product_uom_id = self.env.ref('uom.product_uom_unit')
+        self.service_purchase_2.seller_ids.uom_id = self.env.ref('uom.product_uom_unit')
         self.sale_order_2.action_confirm()
         purchase_line = self.env['purchase.order.line'].search([('sale_line_id', '=', self.sol2_service_purchase_2.id)])  # only one line
 
         self.assertTrue(purchase_line, "The SO line should generate a PO line")
-        self.assertEqual(purchase_line.product_uom_id, self.service_purchase_2.seller_ids.product_uom_id, "The UoM on the purchase line should be the one from the product configuration")
-        self.assertNotEqual(purchase_line.product_uom_id, self.sol2_service_purchase_2.product_uom_id, "As the product configuration, the UoM on the SO line should still be different from the one on the PO line")
+        self.assertEqual(purchase_line.uom_id, self.service_purchase_2.seller_ids.uom_id, "The UoM on the purchase line should be the one from the product configuration")
+        self.assertNotEqual(purchase_line.uom_id, self.sol2_service_purchase_2.product_uom_id, "As the product configuration, the UoM on the SO line should still be different from the one on the PO line")
         self.assertEqual(purchase_line.product_qty, self.sol2_service_purchase_2.product_uom_qty * 12, "The quantity from the SO should be converted with th UoM factor on the PO line")
 
     def test_no_supplier(self):
@@ -250,7 +253,7 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
         service = self.env['product.product'].create({
             'name': 'Super Product',
             'type': 'service',
-            'service_to_purchase': True,
+            'service_tracking': 'subcontract',
             'seller_ids': [(0, 0, {
                 'partner_id': self.partner_vendor_service.id,
                 'min_qty': 1,
@@ -274,7 +277,7 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
         so.action_confirm()
 
         po = self.env['purchase.order'].search([('partner_id', '=', self.partner_vendor_service.id)], order='id desc', limit=1)
-        self.assertEqual(po.order_line.name, "[C01] Name01")
+        self.assertEqual(po.order_line.label, "[C01] Name01")
 
     def test_pol_custom_attribute(self):
         """
@@ -306,7 +309,6 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
             'partner_id': self.partner_a.id,
             'order_line': [
                 Command.create({
-                    'name': self.service_purchase_1.name,
                     'product_id': self.service_purchase_1.id,
                     'product_uom_qty': 1,
                     'product_custom_attribute_value_ids': [
@@ -320,30 +322,22 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
         })
         sale_order.action_confirm()
         pol = sale_order._get_purchase_orders().order_line
-        self.assertEqual(pol.name, f"{self.service_purchase_1.display_name}\n{product_attribute.name}: {product_attribute_value.name}: {custom_value}")
+        self.assertEqual(pol.name, f"{product_attribute.name}: {product_attribute_value.name}: {custom_value}")
 
-    def test_service_to_purchase_multi_company(self):
-        """Test the service to purchase in a multi-company environment
+    def test_service_tracking_subcontract_multi_company_validation(self):
+        """ Test the service tracking 'subcontract' in a multi-company environment.
 
-        The `product.template.service_to_purchase` is a company_dependent field, whose
-        value depends on the company are in, which is not necessarily the order company
-
-        Granted that:
-        - The current company is company_1
-        - The product is configured as a service to be purchased on company_1
-        - The product is NOT configured as a service to be purchased on company_2
-        - We process an order on company_2, while being logged in company_1
-
-        The order must be processed without generating a PO, respecting the product
-        setting for this order's company. We also check that the opposite case holds
-        true as well (i.e. PO is generated when confirming with a company that isn't
-        configured for it, but the SO's company is)
+        Since 'service_tracking' is non-company-dependent field:
+        1. Setting it to 'subcontract' in Company 1 applies it globally.
+        2. A Vendor (seller_ids) must be defined for each company where the product is sold.
+        3. If sold in Company 1 (with vendor), a PO should be created.
+        4. If sold in Company 2 (without vendor), an Error should be raised.
         """
         company_1 = self.env.company
         company_2 = self.company_data_2['company']
         self.env.user.company_ids += company_2
-        self.assertTrue(self.service_purchase_1.service_to_purchase)
-        self.assertFalse(self.service_purchase_1.with_company(company_2).service_to_purchase)
+        self.assertTrue(self.service_purchase_1.service_tracking == 'subcontract')
+        self.assertTrue(self.service_purchase_1.with_company(company_2).service_tracking == 'subcontract')
         order = self.env['sale.order'].create({
             'partner_id': self.partner_a.id,
             'company_id': company_2.id,
@@ -357,8 +351,8 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
         # FIXME: there is some sort of multi-company misconfiguration with the permissions that require a sudo here
         # for this test to run. Issue doesn't occur when running test locally => probably some other module is messing
         # with the permissions and/or there's an issue with the subsidiary setup
-        order.sudo().with_company(company_1).action_confirm()
-        self.assertFalse(order.purchase_order_count)
+        with self.assertRaises(UserError):
+            order.sudo().with_company(company_1).action_confirm()
 
         order2 = self.env['sale.order'].create({
             'partner_id': self.partner_a.id,
@@ -375,7 +369,7 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
         order2.sudo().with_company(company_2).action_confirm()
         self.assertTrue(order2.purchase_order_count)
 
-    def test_service_to_purchase_branch_tax_propagation(self):
+    def test_service_tracking_subcontract_branch_tax_propagation(self):
         """
         Ensure that SO/PO of a branch can use root company's taxes
         """
@@ -391,7 +385,7 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
             'invoice_policy': 'delivery',
             'taxes_id': self.company_data['default_tax_sale'],
             'supplier_taxes_id': self.company_data['default_tax_purchase'],
-            'service_to_purchase': True,
+            'service_tracking': 'subcontract',
             'seller_ids': [Command.create({
                 'partner_id': self.partner_b.id,
                 'min_qty': 1,
@@ -407,3 +401,121 @@ class TestSalePurchase(TestCommonSalePurchaseNoChart):
         self.assertEqual(so.order_line.tax_ids, self.company_data['default_tax_sale'])
         so.action_confirm()
         self.assertEqual(so.order_line.purchase_line_ids.tax_ids, self.company_data['default_tax_purchase'])
+
+    def test_sale_purchase_forecasted_stock_without_stock(self):
+        """ Test available and forecasted qty in SO line widget """
+        if self.env['ir.module.module']._get('stock').state == 'installed':
+            self.skipTest("Stock is installed, can't test stock without stock flow.")  # Will still run in single app build
+
+        # Setup: Create a product with qty on hand and SO line with that product
+        self.product.qty_available = 25  # consu product
+        self.product.is_storable = True
+        self.assertEqual(self.product.virtual_available, 25)  # Makes sure no PO or SO impacting forecasted
+        sale_order_1, sale_order_2 = self.env['sale.order'].create([{
+            'partner_id': self.partner_a.id,
+            'commitment_date': fields.Datetime.now() + timedelta(days=2),
+            'order_line': [
+                Command.create({
+                    'product_id': self.product.id,
+                    'product_uom_qty': 10,
+                })
+            ]}, {
+            'partner_id': self.partner_a.id,
+                'commitment_date': fields.Datetime.now() + timedelta(days=12),  # After PO below
+                'order_line': [
+                    Command.create({
+                        'product_id': self.product.id,
+                        'product_uom_qty': 20,
+                    })
+                ]
+        }])
+
+        po = self.env['purchase.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({
+                'name': self.product_a.name,
+                'product_id': self.product.id,
+                'product_qty': 50,
+                'date_planned': fields.Datetime.now() + timedelta(days=10)
+            })],
+        })
+
+        self.assertEqual(sale_order_1.order_line[0].qty_delivered, 0.0)
+        self.assertEqual(sale_order_1.order_line[0].qty_available_today, 25.0)
+        self.assertEqual(self.product.outgoing_qty, 0.0)
+
+        # confirming order 1 should show up on incoming qty ANd forecasted at_date
+        sale_order_1.action_confirm()
+        self.env.invalidate_all()
+        self.assertEqual(self.product.outgoing_qty, 10.0)
+        self.assertEqual(sale_order_1.order_line[0].virtual_available_at_date, 15.0)
+        self.assertEqual(sale_order_2.order_line[0].virtual_available_at_date, 15.0)
+        self.assertEqual(sale_order_2.order_line[0].qty_available_today, 15.0)  # 25 on_hand - 10 reserved
+
+        # Validating purchase should show up on incoming qty ANd forecasted at_date ONLY on SOs with date > day + 10
+        po.button_confirm()
+        self.env.invalidate_all()
+        self.assertEqual(self.product.incoming_qty, 50.0)
+        self.assertEqual(sale_order_1.order_line[0].virtual_available_at_date, 15.0)
+        self.assertEqual(sale_order_2.order_line[0].virtual_available_at_date, 65.0)
+        self.assertEqual(sale_order_2.order_line[0].qty_available_today, 15.0)
+
+        # confirming order 2 should show up on incoming qty ANd forecasted at_date ONLY on SOs with date > day + 12
+        sale_order_2.action_confirm()
+        self.env.invalidate_all()
+        self.assertEqual(self.product.outgoing_qty, 30.0)
+        self.assertEqual(sale_order_1.order_line[0].virtual_available_at_date, 15.0)
+        self.assertEqual(sale_order_2.order_line[0].virtual_available_at_date, 45.0)
+        self.assertEqual(sale_order_2.order_line[0].qty_available_today, 0.0)  # 25 on_hand - 30 reserved, min 0
+
+        sale_order_1.deliver_sold_quantity()
+        self.env.invalidate_all()
+        self.assertEqual(self.product.qty_available, 15.0)  # 25 on_hand - 10 sold
+        self.assertEqual(self.product.outgoing_qty, 20.0)  # 30 outgoing - 10 sold
+        self.assertEqual(sale_order_2.order_line[0].qty_available_today, 0.0)  # 15 on_hand - 20 reserved, min 0
+        self.assertEqual(sale_order_2.order_line[0].virtual_available_at_date, 45.0)
+
+        po.action_receive()
+        self.env.invalidate_all()
+        self.assertEqual(self.product.qty_available, 65.0)  # 15 on_hand + 50 received
+        self.assertEqual(self.product.incoming_qty, 0)
+        self.assertEqual(sale_order_2.order_line[0].qty_available_today, 45.0)
+        self.assertEqual(sale_order_2.order_line[0].virtual_available_at_date, 45.0)
+
+        sale_order_2.deliver_sold_quantity()
+        self.env.invalidate_all()
+        self.assertEqual(self.product.qty_available, 45.0)  # 65 on_hand - 20 sold
+        self.assertEqual(self.product.outgoing_qty, 0.0)
+
+        self.product.is_storable = False  # revert to original state
+
+    def test_purchase_service_qty_increase_with_uom_conversion(self):
+        """Ensure that increasing the quantity of a service-to-purchase product
+        with different Sales UoM and Purchase UoM correctly computes the qty
+        in the Purchase Order.
+
+        Case:
+        - SO created with 1 dozen → PO = 12 units
+        - SO increased to 2 dozen → new PO should be 12 units
+        """
+        self.service_purchase_2.seller_ids.uom_id = self.env.ref('uom.product_uom_unit')
+        so = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [
+                Command.create({
+                    'name': self.service_purchase_2.name,
+                    'product_id': self.service_purchase_2.id,
+                    'product_uom_qty': 1,
+                    'product_uom_id': self.env.ref('uom.product_uom_dozen').id,
+                })
+            ],
+        })
+        so.action_confirm()
+        # Case 1: initial confirmation with 1 dozen
+        po_1 = so._get_purchase_orders()
+        self.assertEqual(po_1.order_line.product_qty, 12, "Initial PO should have 12 units (1 dozen  from SOL converted to PO uom)")
+        po_1.button_confirm()
+        # Case 2: increase SO quantity to 2 dozen
+        so.order_line.product_uom_qty = 2
+        po_2 = so._get_purchase_orders() - po_1
+        self.assertEqual(po_2.order_line.product_qty, 12, "The quantity on the SO line should be converted to the purchase UoM.")

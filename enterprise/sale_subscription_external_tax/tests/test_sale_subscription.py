@@ -6,6 +6,7 @@ from freezegun import freeze_time
 
 from odoo import Command, fields
 from odoo.tests.common import tagged
+from odoo.addons.payment.tests.common import PaymentCommon
 from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSubscriptionCommon
 
 
@@ -28,7 +29,14 @@ class TestSaleSubscriptionExternalCommon:
 
 
 @tagged("-at_install", "post_install")
-class TestSaleSubscriptionExternal(TestSubscriptionCommon, TestSaleSubscriptionExternalCommon):
+class TestSaleSubscriptionExternal(TestSubscriptionCommon, TestSaleSubscriptionExternalCommon, PaymentCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
+    def setUp(self):
+        super().setUp()
+        self._disable_post_process_patcher()
+        self._patch_account_payment_post_process()
+
     def test_01_subscription_external_taxes_called(self):
         self.subscription.action_confirm()
 
@@ -77,7 +85,7 @@ class TestSaleSubscriptionExternal(TestSubscriptionCommon, TestSaleSubscriptionE
         with self.patch_set_external_taxes(new_set_external_taxes):
             sub.button_external_tax_calculation()
 
-        tx = self.env['payment.transaction'].sudo().create({
+        self.env['payment.transaction'].sudo().create({
             'payment_method_id': self.payment_method_id,
             'amount': sub.amount_total,
             'currency_id': sub.currency_id.id,
@@ -98,7 +106,7 @@ class TestSaleSubscriptionExternal(TestSubscriptionCommon, TestSaleSubscriptionE
         self.env.invalidate_all()
 
         with self.patch_set_external_taxes(new_set_external_taxes):
-            tx._post_process()
+            self._run_post_processing()
 
         self.assertEqual(sub.amount_total, sub.invoice_ids[0].amount_paid, 'Subscription should be fully paid')
 

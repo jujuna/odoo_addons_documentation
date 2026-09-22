@@ -7,24 +7,25 @@
 # Abe Manyo, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Abe Manyo (abem)" <abem@odoo.com>, 2025.
+# "Abe Manyo (abem)" <abem@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-11-27 14:15+0000\n"
-"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:46+0000\n"
+"PO-Revision-Date: 2026-09-18 00:25+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
 "web_studio/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_studio
 #. odoo-python
@@ -65,18 +66,23 @@ msgstr ""
 "            "
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
+#: model:ir.module.module,description:base.module_web_studio
 msgid ""
 "\n"
-"    There are no many2one fields related to the current model.\n"
-"    To create a one2many field on the current model, you must first create "
-"its many2one counterpart on the model you want to relate to.\n"
-msgstr ""
+"Studio - Customize Odoo\n"
+"=======================\n"
 "\n"
-"    Tidak ada field many2one yang terkait model saat ini.\n"
-"    Untuk membuat field one2many pada model, Anda harus pertama membuat "
-"counteraprt many2one counterpart pada model yang Anda ingin kaitkan.\n"
+"This addon allows the user to customize most element of the user interface, "
+"in a\n"
+"simple and graphical way. It has two main features:\n"
+"\n"
+"* create a new application (add module, top level menu item, and default "
+"action)\n"
+"* customize an existing application (edit menus, actions, views, "
+"translations, ...)\n"
+"\n"
+"Note: Only the admin user is allowed to make those customizations.\n"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -119,6 +125,12 @@ msgid "\" failed."
 msgstr "\" gagal."
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
+msgid "# Code editor"
+msgstr "# Editor kode"
+
+#. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/studio_approval.py:0
 msgid "%(user_name)s delegated approval rights to %(delegate_to)s"
@@ -127,12 +139,8 @@ msgstr "%(user_name)s mendelegasikan hak penyetuju ke %(delegate_to)s"
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/studio_approval.py:0
-msgid ""
-"%(user_name)s has set approval rights from %(previous_approvers)s to %"
-"(next_approvers)s"
-msgstr ""
-"%(user_name)s memiliki hak penyetuju dari %(previous_approvers)s sampai %"
-"(next_approvers)s"
+msgid "%(user_name)s has set approval rights from %(pre)s to %(post)s"
+msgstr "%(user_name)s telah mengatur hak persetujuan dari %(pre)s ke %(post)s"
 
 #. module: web_studio
 #. odoo-python
@@ -161,21 +169,23 @@ msgstr "%s record"
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_kanban_view
 msgid ""
-"<i role=\"img\" class=\"fa fa-user-times\" title=\"Exclusive approval\"/>"
+"<i role=\"img\" class=\"oi oi-filled\" data-icon=\"person_remove\" "
+"title=\"Exclusive approval\"/>"
 msgstr ""
-"<i role=\"img\" class=\"fa fa-user-times\" title=\"Persetujuan eksklusif\"/>"
+"<i role=\"img\" class=\"oi oi-filled\" data-icon=\"person_remove\" "
+"title=\"Persetujuan eksklusif\"/>"
 
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/controllers/main.py:0
 msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                Add a new access control list\n"
+"                Add a new access record\n"
 "            </p>\n"
 "            "
 msgstr ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                Tambahkan daftar kontrol akses baru\n"
+"                Tambahkan akses record baru\n"
 "            </p>\n"
 "            "
 
@@ -200,6 +210,13 @@ msgid "<span><b>Good job!</b> You went through all steps of this tour.</span>"
 msgstr "<span><b>Good job!</b> Anda melewati semua langkah di tur ini.</span>"
 
 #. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
+msgid "A child rule must operates on the same model as its main rule"
+msgstr ""
+"Aturan turunan harus beroperasi pada model yang sama dengan aturan induknya"
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/view_editor_model.js:0
 msgid "A field with the same name already exists."
@@ -216,31 +233,20 @@ msgid "A rule must apply to an action or a method (but not both)."
 msgstr "Peraturan harus menerapkan tindakan atau metode (tapi tidak keduanya)."
 
 #. module: web_studio
-#: model:ir.model.constraint,message:web_studio.constraint_studio_approval_rule_method_or_action_not_null
-msgid "A rule must apply to an action or a method."
-msgstr "Peraturan harus menerapkan tindakan atau metode."
-
-#. module: web_studio
-#: model:ir.model.fields,field_description:web_studio.field_ir_model__abstract
-msgid "Abstract Model"
-msgstr "Model Abstrak"
-
-#. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
-msgid "Access Control"
-msgstr "Kontrol Akses"
+#: code:addons/web_studio/static/src/client_action/action_editor/action_editor.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/limit_group_visibility/limit_group_visibility.js:0
+#: model:ir.model,name:web_studio.model_res_groups
+msgid "Access Groups"
+msgstr "Kelompok Akses"
 
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/controllers/main.py:0
-msgid "Access Control Lists"
-msgstr "Daftar Kontrol Akses"
-
-#. module: web_studio
-#: model:ir.model,name:web_studio.model_res_groups
-msgid "Access Groups"
-msgstr "Kelompok Akses"
+msgid "Access Records"
+msgstr "Akses Record"
 
 #. module: web_studio
 #. odoo-javascript
@@ -257,12 +263,17 @@ msgstr "Akses record dari grafik"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
+#: model:ir.model,name:web_studio.model_ir_actions_actions
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__action_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__action_id
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_search_view
 msgid "Action"
 msgstr "Tindakan"
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_ir_actions_report__name
+msgid "Action Name"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__message_needaction
@@ -278,6 +289,12 @@ msgstr "Jendela Tindakan"
 #: model:ir.model,name:web_studio.model_ir_actions_act_window_view
 msgid "Action Window View"
 msgstr "Jendela Tindakan"
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
+msgid "Action disabled due to approval rules"
+msgstr "Tindakan dinonaktifkan karena aturan persetujuan"
 
 #. module: web_studio
 #. odoo-javascript
@@ -300,7 +317,6 @@ msgstr "Action: %s"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
-#: model:ir.model,name:web_studio.model_ir_actions_actions
 msgid "Actions"
 msgstr "Action"
 
@@ -342,9 +358,15 @@ msgstr "Tampilan aktivitas tidak tersedia untuk model ini"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+msgid "Add"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/chatter_container.xml:0
 msgid "Add Chatter Widget"
-msgstr "Tambahkan Widget Obrolan"
+msgstr "Tambahkan Widget Chatter"
 
 #. module: web_studio
 #. odoo-javascript
@@ -361,13 +383,6 @@ msgstr "Tambahkan Tombol"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/action_button/action_button.xml:0
-msgid "Add a button"
-msgstr "Tambahkan tombol"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
 msgid "Add a pipeline status bar"
 msgstr "Tambahkan status bar pipeline"
 
@@ -375,7 +390,13 @@ msgstr "Tambahkan status bar pipeline"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 msgid "Add an approval step"
-msgstr "Tambahkan langkah penyetuju"
+msgstr "Tambahkan langkah persetujuan"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Add button"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -400,6 +421,12 @@ msgstr "Tambahkan record di bawah"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.js:0
 msgid "Add record on top"
 msgstr "Tambahkan record di atas"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/editor_statusbar_widget.xml:0
+msgid "Add stage"
+msgstr "Tambahkan tahap"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard__additional_export_data
@@ -441,17 +468,7 @@ msgstr "Agregat"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
 msgid "All Day"
-msgstr "Sepanjang hari"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid ""
-"All changes done to the report's structure will be discarded and the report "
-"will be reset to its factory settings."
-msgstr ""
-"Semua perubahan yang dilakukan ke struktur laporan akan dibuang dan laporan "
-"akan direset ke pengaturan pabrik."
+msgstr "Sepanjang Hari"
 
 #. module: web_studio
 #. odoo-javascript
@@ -463,23 +480,21 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-msgid "Allow Resequencing"
-msgstr "Izinkan Pengurutan ulang"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/limit_group_visibility/limit_group_visibility.xml:0
 msgid "Allow visibility to groups"
-msgstr "Izinkan visibilitas ke kelompo"
+msgstr "Izinkan visibilitas untuk grup"
 
 #. module: web_studio
 #. odoo-javascript
-#. odoo-python
-#: code:addons/web_studio/models/studio_approval.py:0
 #: code:addons/web_studio/static/src/approval/approval_hook.js:0
 msgid "An approval is missing"
 msgstr "Kurang penyetuju"
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
+msgid "An approval is missing."
+msgstr "Belum ada persetujuan."
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_delegate_approvers
@@ -506,10 +521,9 @@ msgstr "Kelompok Persetujuan"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 msgid "Approval Order"
-msgstr "Pesanan Penyetuju"
+msgstr "Order Persetujuan"
 
 #. module: web_studio
-#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__rule_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_request__rule_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_delegate__approval_rule_id
 msgid "Approval Rule"
@@ -528,7 +542,7 @@ msgstr "Peraturan Penyetuju Delegasi"
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_button_configuration_search_view
 msgid "Approval Rules"
-msgstr "Peraturan-Peraturan Persetujuan"
+msgstr "Peraturan Persetujuan"
 
 #. module: web_studio
 #. odoo-javascript
@@ -564,18 +578,28 @@ msgstr "Setujui"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__approved
+#: model:ir.model.fields.selection,name:web_studio.selection__studio_approval_entry__state__approved
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 msgid "Approved"
 msgstr "Disetujui"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.notify_approval
-msgid "Approved <i class=\"fa fa-thumbs-up text-success\"/>"
-msgstr "Disetuju <i class=\"fa fa-thumbs-up text-success\"/>"
+msgid ""
+"Approved <i class=\"oi oi-filled text-success\" data-icon=\"thumb_up\"/>"
+msgstr ""
+"Disetuju <i class=\"oi oi-filled text-success\" data-icon=\"thumb_up\"/>"
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
+msgid "Approved by"
+msgstr "Disetujui oleh"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/approval/approval_infos.xml:0
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 msgid "Approved on"
 msgstr "Disetujui pada"
 
@@ -588,7 +612,7 @@ msgstr "Disetujui/Ditolak oleh"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 msgid "Approver Group"
-msgstr "Kelompok Penyetuju"
+msgstr "Grup Penyetuju"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__approver_log_ids
@@ -626,15 +650,25 @@ msgstr "Mengarsipkan"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
+msgid ""
+"Are you sure you want to remove the %(node)s %(field)s from the view?\n"
+"If you need it back, add it from the list of existing fields."
+msgstr ""
+"Apakah Anda yakin ingin menghapus %(node)s %(field)s dari tampilan?\n"
+"Bila Anda membutuhkannya kembali, tambahkan dari daftar field yang tersedia."
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/view_editor_model.js:0
 msgid "Are you sure you want to remove the selection values?"
 msgstr "Apakah Anda yakin ingin menghapus selection values?"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
-msgid "Are you sure you want to remove this %s from the view?"
-msgstr "Apakah Anda yakin ingin menghapus %s ini dari tampilan?"
+msgid "Are you sure you want to remove this %(node)s from the view?"
+msgstr "Apakah Anda yakin ingin menghapus %(node)s ini dari tampilan?"
 
 #. module: web_studio
 #. odoo-javascript
@@ -808,6 +842,7 @@ msgstr "Panggil metode"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
 msgid "Can Create"
 msgstr "Dapat Membuat"
 
@@ -823,7 +858,7 @@ msgstr "Dapat Menghapus"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/form_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
 msgid "Can Duplicate"
-msgstr "Dapat Menduplikasika"
+msgstr "Dapat Menduplikasi"
 
 #. module: web_studio
 #. odoo-javascript
@@ -831,7 +866,7 @@ msgstr "Dapat Menduplikasika"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
 msgid "Can Edit"
-msgstr "Dapatkah Edit"
+msgstr "Dapat Mengedit"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__can_validate
@@ -849,23 +884,6 @@ msgstr "Tidak dapat patch 'buat'm 'tulis' dan 'unlink'."
 #: code:addons/web_studio/models/studio_approval.py:0
 msgid "Can't patch private methods."
 msgstr "Tidak daapt patch metode pribadi."
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/editor/new_model_item/new_model_item.xml:0
-#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/map_new_view_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/new_view_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-#: code:addons/web_studio/static/src/client_action/studio_home_menu/icon_creator_dialog/icon_creator_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:web_studio.view_studio_export_wizard
-msgid "Cancel"
-msgstr "Batal"
 
 #. module: web_studio
 #. odoo-javascript
@@ -887,9 +905,11 @@ msgstr "Ganti Gambar"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-msgid "Change the placeholder or the expression for an existing field"
-msgstr "Ubah placeholder atau expression untuk field yang sudah tersedia"
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Changes to this shared block will affect other reports using it"
+msgstr ""
+"Perubahan pada blok bersama ini akan memengaruhi laporan lain yang "
+"menggunakannya"
 
 #. module: web_studio
 #. odoo-javascript
@@ -907,6 +927,11 @@ msgstr "CheckBox"
 #: model:ir.model.fields,help:web_studio.field_ir_model_data__studio
 msgid "Checked if it has been edited with Studio."
 msgstr "Centa bila sudah diedit dengan Studio."
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__child_ids
+msgid "Child"
+msgstr "Anak"
 
 #. module: web_studio
 #. odoo-javascript
@@ -930,7 +955,7 @@ msgstr "Churn"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/class_attribute/class_attribute.xml:0
 msgid "Class"
-msgstr "Class"
+msgstr "Kelas"
 
 #. module: web_studio
 #. odoo-javascript
@@ -942,7 +967,6 @@ msgstr "Klik untuk melilhat semua peraturan persetujuan."
 #. odoo-javascript
 #: code:addons/web_studio/static/src/approval/approval_infos.xml:0
 #: code:addons/web_studio/static/src/client_action/navbar/navbar.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
 msgid "Close"
 msgstr "Tutup"
@@ -988,15 +1012,11 @@ msgid "Column grouping"
 msgstr "Kelompok Kolom"
 
 #. module: web_studio
-#: model:ir.model,name:web_studio.model_res_company
-msgid "Companies"
-msgstr "Perusahaan"
-
-#. module: web_studio
 #. odoo-javascript
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/static/src/client_action/model_configurator/model_configurator.js:0
+#: model:ir.model,name:web_studio.model_res_company
 msgid "Company"
 msgstr "Perusahaan"
 
@@ -1006,6 +1026,12 @@ msgstr "Perusahaan"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/search/search_editor.xml:0
 msgid "Components"
 msgstr "Komponen"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Condition"
+msgstr "Syarat"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1058,8 +1084,7 @@ msgstr "Konfigurasikan model"
 #: code:addons/web_studio/static/src/client_action/studio_home_menu/icon_creator_dialog/icon_creator_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
 msgid "Confirm"
 msgstr "Konfirmasi"
 
@@ -1117,6 +1142,12 @@ msgstr "Tidak dapat mengganti latar belakang"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.js:0
+msgid "Create %(name)s (%(technical_name)s)"
+msgstr "Buat %(name)s (%(technical_name)s)"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.js:0
 msgid "Create Menu"
 msgstr "Buat Menu"
@@ -1132,6 +1163,11 @@ msgstr "Buat Model"
 #: code:addons/web_studio/static/src/client_action/editor/new_model_item/new_model_item.xml:0
 msgid "Create a new Model"
 msgstr "Buat Model baru"
+
+#. module: web_studio
+#: model:ir.module.module,summary:base.module_web_studio
+msgid "Create and customize your Odoo apps"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1240,35 +1276,10 @@ msgid "Custom field names cannot contain double underscores."
 msgstr "Nama field kustom tidak boleh memiliki dua garis bawah."
 
 #. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-msgid "Custom fields:"
-msgstr "Field kustom:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-msgid "Custom models:"
-msgstr "Model kustom:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-msgid "Custom reports:"
-msgstr "Laporan kustom:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-msgid "Custom views:"
-msgstr "Tampilan kustom:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-msgid "Customization made with Studio will be permanently lost"
-msgstr "Kustomisasi yang dibuat di Studio akan hilang selamanya"
-
-#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
-msgid "DIFF"
-msgstr "DIFF"
+msgid "Customizations"
+msgstr "Kustomisasi"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1276,6 +1287,8 @@ msgstr "DIFF"
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/models/ir_ui_view.py:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.js:0
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_tree_view
 msgid "Date"
 msgstr "Tanggal"
 
@@ -1313,13 +1326,25 @@ msgstr "Hari"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 msgid "Day Precision"
-msgstr "Tingkat Ketelitian Hari"
+msgstr "Ketepatan Hari"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.js:0
 msgid "Decimal"
 msgstr "Desimal"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties.xml:0
+msgid "Decoration"
+msgstr "Dekorasi"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties.xml:0
+msgid "Decoration Condition"
+msgstr "Kondisi Dekorasi"
 
 #. module: web_studio
 #. odoo-python
@@ -1344,13 +1369,13 @@ msgstr "Data Ekspor Default"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
 msgid "Default Group By"
-msgstr "Kelompokkan Berdasarkan Default"
+msgstr "Pengelompokan Default"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 msgid "Default Group by"
-msgstr "Kelompokkan Berdasarkan"
+msgstr "Pengelompokan Default"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1359,18 +1384,22 @@ msgid "Default Scale"
 msgstr "Scale Default"
 
 #. module: web_studio
+#: model:ir.model,name:web_studio.model_ir_default
+msgid "Default Value"
+msgstr "Value Default"
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
-#: model:ir.model,name:web_studio.model_ir_default
 msgid "Default Values"
-msgstr "Nilai Baku"
+msgstr "Value Default"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 msgid "Default value"
-msgstr "Value Default"
+msgstr "Value default"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1398,12 +1427,6 @@ msgid "Defines the sequential order in which the approvals are requested."
 msgstr "Mendefinisikan sequential order di mana approval akan diminta."
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
-msgid "Delay Field"
-msgstr "Delay Field"
-
-#. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_kanban_view
 msgid "Delegate"
@@ -1423,6 +1446,12 @@ msgstr "Delegasikan ke"
 #: model_terms:ir.ui.view,arch_db:web_studio.act_report_xml_view_kanban
 msgid "Delete"
 msgstr "Hapus"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/view_editor_model.js:0
+msgid "Delete Values"
+msgstr "Hapus Value-Value"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_model__is_demo_data
@@ -1467,8 +1496,24 @@ msgstr "Nonaktifkan Tampilan"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_snackbar.xml:0
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_delegate_approvers
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid "Disabled"
+msgstr "Dinonaktifkan"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
+#: code:addons/web_studio/static/src/client_action/editor/new_model_item/new_model_item.xml:0
+#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/map_new_view_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/new_view_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
+#: code:addons/web_studio/static/src/client_action/studio_home_menu/icon_creator_dialog/icon_creator_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
 msgid "Discard"
 msgstr "Buang"
 
@@ -1487,6 +1532,7 @@ msgstr "Mode Tampilan"
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_base_automation__display_name
 #: model:ir.model.fields,field_description:web_studio.field_base_module_uninstall__display_name
+#: model:ir.model.fields,field_description:web_studio.field_ir_access__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window_view__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_actions__display_name
@@ -1496,12 +1542,10 @@ msgstr "Mode Tampilan"
 #: model:ir.model.fields,field_description:web_studio.field_ir_filters__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_http__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_model__display_name
-#: model:ir.model.fields,field_description:web_studio.field_ir_model_access__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_data__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_fields__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_module_module__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_qweb__display_name
-#: model:ir.model.fields,field_description:web_studio.field_ir_rule__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_view__display_name
 #: model:ir.model.fields,field_description:web_studio.field_mail_activity__display_name
@@ -1573,6 +1617,12 @@ msgstr "Tarik menu ke kanan untuk membuat sub-menu"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Drop a Many2One or Selection field"
+msgstr "Taruh field Many2One atau Pilihan"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_record_menu.xml:0
 msgid "Dropdown menu"
 msgstr "Menu dropdown"
@@ -1589,8 +1639,10 @@ msgid "Dynamic Table"
 msgstr "Tabel Dinamik"
 
 #. module: web_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/web_studio/models/ir_ui_view.py:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 msgid "Edit"
 msgstr "Edit"
 
@@ -1614,9 +1666,27 @@ msgstr "Edit Pemilih Warna"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
+msgid "Edit Condition"
+msgstr "Syarat Pengeditan"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
 msgid "Edit Menu"
 msgstr "Menu Edit"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
+msgid "Edit Stages"
+msgstr "Tahapan Pengeditan"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.js:0
+msgid "Edit Stages for field %s"
+msgstr "Edit Tahap untuk field %s"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1626,21 +1696,15 @@ msgstr "Edit Value"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-msgid "Edit field"
-msgstr "Edit field"
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Edit report action"
+msgstr "Edit tindakan laporan"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
 msgid "Edit selection"
 msgstr "Edit seleksi"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid "Edit sources"
-msgstr "Edit sumber"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1656,7 +1720,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
 msgid "Editing item:"
-msgstr "Mengedit item:"
+msgstr "Item pengeditan:"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor.js:0
+msgid "Editor"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -1666,7 +1736,7 @@ msgstr "Email"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_mail_template
-msgid "Email Templates"
+msgid "Email Template"
 msgstr "Templat Email"
 
 #. module: web_studio
@@ -1687,12 +1757,6 @@ msgid "Enable Mass Editing"
 msgstr "Aktifkan Editing Massal"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-msgid "Enable Routing"
-msgstr "Aktifkan Routing"
-
-#. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/models/ir_ui_view.py:0
@@ -1701,6 +1765,7 @@ msgstr "Tanggal Berakhir"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__entry_ids
+#: model:ir.ui.menu,name:web_studio.menu_studio_approval_entry
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view
 msgid "Entries"
 msgstr "Entri-entri"
@@ -1734,7 +1799,7 @@ msgstr "Approval Eksklusif"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.xml:0
 msgid "Existing Fields"
-msgstr "Field yang Tersedia"
+msgstr "Field yang Sudah Ada"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1746,7 +1811,7 @@ msgstr "Model yang Tersedia"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 msgid "Expand Groups"
-msgstr "Perluas Group"
+msgstr "Perluas Grup"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1755,6 +1820,12 @@ msgstr "Perluas Group"
 #: model_terms:ir.ui.view,arch_db:web_studio.view_studio_export_wizard
 msgid "Export"
 msgstr "Ekspor"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.js:0
+msgid "Expression is invalid. Please correct it"
+msgstr "Expression tidak valid. Mohon betulkan"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1788,10 +1859,9 @@ msgstr "Favorit"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+#: model:ir.model,name:web_studio.model_ir_model_fields
 msgid "Field"
 msgstr "Kolom"
 
@@ -1808,9 +1878,12 @@ msgid "Field properties: %s"
 msgstr "Properti-properti field: %s"
 
 #. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_model_fields
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.js:0
 msgid "Fields"
-msgstr "Kolom"
+msgstr "Field"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_model__excluded_fields
@@ -1834,6 +1907,7 @@ msgstr "Nama file untuk %s"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/search/search_editor.js:0
+#: model:ir.model,name:web_studio.model_ir_filters
 msgid "Filter"
 msgstr "Saring"
 
@@ -1854,15 +1928,8 @@ msgstr "Label filter"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/search/search_editor.xml:0
-#: model:ir.model,name:web_studio.model_ir_filters
 msgid "Filters"
-msgstr "Penyaring"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-msgid "First Status"
-msgstr "Status Pertama"
+msgstr "Filter"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1906,7 +1973,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/limit_group_visibility/limit_group_visibility.xml:0
 msgid "Forbid visibility to groups"
-msgstr "Larang visibilitas ke kelompo"
+msgstr "Larang visibilitas untuk grup"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_delegate_approvers
@@ -1922,6 +1989,8 @@ msgstr "Formulir"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
 msgid "Format"
 msgstr "Format"
@@ -1931,6 +2000,12 @@ msgstr "Format"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor.js:0
 msgid "Forward"
 msgstr "Forward"
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "Future Activities"
+msgstr "Aktivitas Mendatang"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1956,12 +2031,6 @@ msgstr "Generate %s View"
 #: code:addons/web_studio/static/src/client_action/model_configurator/model_configurator.js:0
 msgid "Get contact, phone and email fields on records"
 msgstr "Dapatkan field kontak, telepon dan email pada record"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.js:0
-msgid "Go back"
-msgstr "Kembali"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2023,6 +2092,12 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Groups"
+msgstr "Grup"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.js:0
 msgid "HTML"
 msgstr "HTML"
@@ -2051,20 +2126,10 @@ msgstr "Memiliki Pesan"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid ""
-"Header and footer are shared with other reports which may be impacted by the "
-"reset."
-msgstr ""
-"Header dan footer dibagi dengan laporan lain yang mungkin terdampak oleh "
-"reset."
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 msgid "Help Tooltip"
-msgstr "Tooltip Help"
+msgstr "Tooltip Bantuan"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2075,6 +2140,12 @@ msgid ""
 msgstr ""
 "Di sini, Anda dapat <b>memberikan nama</b> ke field Anda (misalnya referensi "
 "buku, ISBN, Catatan Internal, dsb.)."
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Hidden"
+msgstr "Tersembunyi"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2105,6 +2176,12 @@ msgstr "Prioritas Tinggi"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 msgid "Highlight Color Field"
 msgstr "Field Warna Highlight"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
+msgid "History"
+msgstr "Riwayat"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_res_company__background_image
@@ -2143,6 +2220,7 @@ msgstr ""
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_base_automation__id
 #: model:ir.model.fields,field_description:web_studio.field_base_module_uninstall__id
+#: model:ir.model.fields,field_description:web_studio.field_ir_access__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window_view__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_actions__id
@@ -2152,12 +2230,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:web_studio.field_ir_filters__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_http__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_model__id
-#: model:ir.model.fields,field_description:web_studio.field_ir_model_access__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_data__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_fields__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_module_module__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_qweb__id
-#: model:ir.model.fields,field_description:web_studio.field_ir_rule__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_view__id
 #: model:ir.model.fields,field_description:web_studio.field_mail_activity__id
@@ -2187,6 +2263,7 @@ msgstr "ID"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
 msgid "Icon"
 msgstr "Ikon"
@@ -2201,14 +2278,6 @@ msgstr "Bila dicentang, pesan baru memerlukan perhatian Anda."
 #: model:ir.model.fields,help:web_studio.field_studio_approval_rule__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Bila dicentang, beberapa pesan mungkin memiliki kesalahan pengiriman."
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-msgid "If not set, the width is automatically computed to fit optimally"
-msgstr ""
-"Bila tidak ditetapkan, lebar secara otomatis dihitung untuk secara optimal "
-"sesuai"
 
 #. module: web_studio
 #: model:ir.model.fields,help:web_studio.field_studio_export_model__include_attachment
@@ -2299,12 +2368,6 @@ msgid "Include Demo Data"
 msgstr "Termasuk Data Demo"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid "Include header and footer"
-msgstr "Termasuk header dan footer"
-
-#. module: web_studio
 #: model:ir.model.fields,help:web_studio.field_ir_ui_menu__is_studio_configuration
 msgid ""
 "Indicates that this menu was created by Studio to hold configuration sub-"
@@ -2312,18 +2375,6 @@ msgid ""
 msgstr ""
 "Indikasikan bahwa menu ini dibuat oleh Studio untuk menahan konfigurasi sub-"
 "menu"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-msgid "Insert"
-msgstr "Insert"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-msgid "Insert a field"
-msgstr "Masukkan field"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2374,12 +2425,6 @@ msgid "Invalid studio_approval %s in button"
 msgstr "studio_approval %s invalid di tombol"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
-msgid "Invisible"
-msgstr "Sembunyikan"
-
-#. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_approver__is_delegation
 msgid "Is Delegation"
 msgstr "Apakah Delegasi"
@@ -2420,7 +2465,6 @@ msgstr "Status Kanban"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/properties/group_properties/group_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/properties/page_properties/page_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
@@ -2457,10 +2501,10 @@ msgid "Last Updated on"
 msgstr "Terakhir Diperbarui pada"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
-msgid "Leave DIFF"
-msgstr "Tinggalkan DIFF"
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "Late Activities"
+msgstr "Aktivitas Terakhir"
 
 #. module: web_studio
 #: model:ir.actions.client,name:web_studio.action_web_studio_leave_with
@@ -2480,7 +2524,6 @@ msgstr ""
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 msgid "Limit visibility to groups"
 msgstr "Batasi visibilitas ke kelompok"
 
@@ -2547,6 +2590,12 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
+msgid "Mapbox Token"
+msgstr "Token Mapbox"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
 msgid "Measure"
 msgstr "Ukur"
@@ -2597,7 +2646,6 @@ msgstr "Pesan-Pesan"
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__method
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__method
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_search_view
 msgid "Method"
 msgstr "Metode"
@@ -2624,11 +2672,10 @@ msgstr "Mode"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.xml:0
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
+#: model:ir.model,name:web_studio.model_ir_model
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__model_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_model__model_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard_data__model
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_search_view
 msgid "Model"
 msgstr "Model"
@@ -2638,11 +2685,6 @@ msgstr "Model"
 #: code:addons/web_studio/wizard/studio_export_wizard.py:0
 msgid "Model '%s' should not contain records with the same ID."
 msgstr "Model '%s' harusnya tidak memiliki record dengan ID yang sama."
-
-#. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_model_access
-msgid "Model Access"
-msgstr "Akses Model"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_ir_model_data
@@ -2668,7 +2710,10 @@ msgid "Model name"
 msgstr "Contoh"
 
 #. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_model
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.js:0
 msgid "Models"
 msgstr "Model"
 
@@ -2711,12 +2756,11 @@ msgstr "Bulan"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 msgid "Month Precision"
-msgstr "Tingkat Ketelitian Bulan"
+msgstr "Ketepatan Bulan"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
@@ -2733,7 +2777,7 @@ msgstr "Teks Multiline"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.js:0
 msgid "Multiple records views"
-msgstr "Lebih dari satu record view"
+msgstr "Tampilan beberapa record"
 
 #. module: web_studio
 #. odoo-python
@@ -2742,15 +2786,16 @@ msgid "My %s"
 msgstr "%s Saya"
 
 #. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "My Activities"
+msgstr "Aktivitas Saya"
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
 msgid "My Button"
 msgstr "Tombol Saya"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
-msgid "My entries"
-msgstr "Entri Saya"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2763,6 +2808,7 @@ msgstr "N/A"
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__name
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__name
 msgid "Name"
@@ -2778,7 +2824,7 @@ msgstr "Baru"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
 msgid "New %s"
-msgstr "Baru %s"
+msgstr "%s Baru"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2802,7 +2848,7 @@ msgstr "Field Baru"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.xml:0
 msgid "New Fields"
-msgstr "Field-Field Baru"
+msgstr "Field Baru"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2846,7 +2892,7 @@ msgstr "Tombol baru"
 #: code:addons/web_studio/static/src/client_action/app_creator/app_creator.xml:0
 #: code:addons/web_studio/static/src/client_action/model_configurator/model_configurator.xml:0
 msgid "Next"
-msgstr "Next"
+msgstr "Berikutnya"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2970,16 +3016,15 @@ msgstr ""
 "memilih kelompok lain atau secara manual berikan ID eksternal ke grup ini."
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-msgid "Only visible during the edition of the report"
-msgstr "Hanya terlihat selama mengedit laporan"
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_button_configuration_search_view
+msgid "Only subrules"
+msgstr "Hanya subaturan"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 msgid "Open Record On Click"
-msgstr "Buka Catatan Pada Klik"
+msgstr "Buka Record Saat Klik"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2996,6 +3041,12 @@ msgstr "Buka tampilan kanban approval"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid "Optimized"
+msgstr "Dioptimalkan"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 msgid "Optional"
 msgstr "Opsional"
@@ -3005,7 +3056,13 @@ msgstr "Opsional"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
 msgid "Order"
-msgstr "Order"
+msgstr "Urutan"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid "Ordered"
+msgstr ""
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.act_report_xml_view_kanban
@@ -3019,9 +3076,14 @@ msgstr "Konfigurasi Format Kertas"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
 msgid "Paper format"
 msgstr "Format kertas"
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__parent_id
+msgid "Parent"
+msgstr "Induk"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3067,12 +3129,6 @@ msgstr "Tahapan pipeline"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-msgid "Pipeline status bar"
-msgstr "Status bar pipeline"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
 #: code:addons/web_studio/static/src/studio_service.js:0
 msgid "Pivot"
@@ -3101,8 +3157,8 @@ msgstr "Preset"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 msgid "Preview"
 msgstr "Pratinjau"
 
@@ -3121,9 +3177,15 @@ msgstr "Sebelum"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 msgid "Print"
 msgstr "Cetak"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Print Menu"
+msgstr "Cetak Menu"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3143,10 +3205,22 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Properties"
+msgstr "Properti"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor.js:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.js:0
 msgid "Quarter"
 msgstr "Kuartil"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.js:0
+msgid "Quarter Day"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3165,7 +3239,7 @@ msgstr "Buat Cepat"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
 msgid "Quick Create Field"
-msgstr "Field Buat Cepat"
+msgstr "Buat Cepat Field"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_ir_qweb
@@ -3190,19 +3264,15 @@ msgid "Ratings"
 msgstr "Rating"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
-msgid "Readonly"
-msgstr "Readonly"
-
-#. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 msgid "Ready"
 msgstr "Siap"
 
 #. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__record_display_name
 msgid "Record"
 msgstr "Catatan"
 
@@ -3224,10 +3294,10 @@ msgstr "Record-Record"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/view_editor_snackbar.xml:0
 msgid "Redo"
-msgstr "Redo"
+msgstr "Ulangi"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__reference
@@ -3241,20 +3311,35 @@ msgid "Reject"
 msgstr "Tolak"
 
 #. module: web_studio
+#: model:ir.model.fields.selection,name:web_studio.selection__studio_approval_entry__state__rejected
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 msgid "Rejected"
 msgstr "Ditolak"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.notify_approval
-msgid "Rejected <i class=\"fa fa-thumbs-down text-danger\"/>"
-msgstr "Ditolak <i class=\"fa fa-thumbs-down text-danger\"/>"
+msgid ""
+"Rejected <i class=\"oi oi-filled text-danger\" data-icon=\"thumb_down\"/>"
+msgstr ""
+"Ditolak <i class=\"oi oi-filled text-danger\" data-icon=\"thumb_down\"/>"
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
+msgid "Rejected by"
+msgstr "Ditolak oleh"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/approval/approval_infos.xml:0
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 msgid "Rejected on"
 msgstr "Ditolak pada"
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_request__model
+msgid "Related Document Model"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3264,9 +3349,21 @@ msgstr "Field Terkait"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid "Reload from attachment"
-msgstr "Muat ulang dari lampiran"
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+msgid "Related field"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
+msgid "Remove %s"
+msgstr "Hapus %s"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
+msgid "Remove %s from view"
+msgstr "Hapus %s dari tampilan"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3293,25 +3390,13 @@ msgstr "Report Action"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-msgid "Report Tools"
-msgstr "Tool Laporan"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
 msgid "Report edition failed"
 msgstr "Mengedit laporan gagal"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid "Report name"
-msgstr "Nama laporan"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.js:0
 msgid "Report preview not available"
 msgstr "Pratinjau laporan tidak tersedia"
 
@@ -3319,7 +3404,7 @@ msgstr "Pratinjau laporan tidak tersedia"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.js:0
 msgid "Reporting views"
-msgstr "Melaporkan tampilan"
+msgstr "Tampilan laporan"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3332,12 +3417,6 @@ msgstr "Laporan"
 #: code:addons/web_studio/controllers/main.py:0
 msgid "Reports for %(model_name)s (%(model)s)"
 msgstr "Laporan untuk %(model_name)s (%(model)s)"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
-msgid "Required"
-msgstr "Wajib"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard_data__res_id
@@ -3365,13 +3444,6 @@ msgstr "Reset Tampilan"
 #: model:ir.model,name:web_studio.model_reset_view_arch_wizard
 msgid "Reset View Architecture Wizard"
 msgstr "Wizard Reset Tampilan Arsitektur"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.js:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid "Reset report"
-msgstr "Reset laporan"
 
 #. module: web_studio
 #. odoo-python
@@ -3413,21 +3485,34 @@ msgstr "Pita"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
+msgid "Routing"
+msgstr "Routing"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor_sidebar.xml:0
 msgid "Row grouping - First level"
-msgstr "Pengelompokkan baris - Tingkat pertama"
+msgstr "Pengelompokan baris - Tingkat pertama"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor_sidebar.xml:0
 msgid "Row grouping - Second level"
-msgstr "Pengelompokkan baris - Tingkat kedua"
+msgstr "Pengelompokan baris - Tingkat kedua"
 
 #. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_rule
+#: model:ir.model,name:web_studio.model_ir_access
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__rule_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_approver__rule_id
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 msgid "Rule"
 msgstr "Peraturan"
+
+#. module: web_studio
+#: model:ir.ui.menu,name:web_studio.menu_studio_approval_rule
+msgid "Rules"
+msgstr "Aturan"
 
 #. module: web_studio
 #. odoo-python
@@ -3463,7 +3548,7 @@ msgstr "Error Pengiriman SMS"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_snackbar.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
 msgid "Save"
 msgstr "Simpan"
@@ -3500,6 +3585,13 @@ msgstr "Menyimpan laporan \""
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
+msgid "Scheduling"
+msgstr "Penjadwalan"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
 #: code:addons/web_studio/static/src/studio_service.js:0
 msgid "Search"
@@ -3513,15 +3605,15 @@ msgstr "Cari ..."
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-msgid "Second Status"
-msgstr "Status Kedua"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
 msgid "Second dimension"
 msgstr "Dimensi kedua"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
+msgid "Security"
+msgstr "Keamanan"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3536,21 +3628,15 @@ msgid "Select a Field"
 msgstr "Pilih Field"
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+msgid "Select a M2O field from another model pointing to the current model"
+msgstr ""
+
+#. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view_quick_create
 msgid "Select a group..."
 msgstr "Pilih kelompok..."
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
-msgid "Select a related field"
-msgstr "Pilih field yang terkait"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.js:0
-msgid "Select a related field."
-msgstr "Pilih field yang terkait."
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view
@@ -3581,6 +3667,18 @@ msgstr "Pilih reciprocal ManyToOne field"
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view_quick_create
 msgid "Select users..."
 msgstr "Pilih user..."
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid ""
+"Select your Mapbox routing preference:\\n- Ordered: Keeps stops in their "
+"predefined order\\n- Optimized: Reorders stops to minimize travel time and "
+"distance"
+msgstr ""
+"Pilih preferensi routing Mapbox Anda:\\n- Berurutan: Menjaga urutan "
+"perhentian sesuai urutan yang telah ditentukan\\n- Dioptimalkan: Mengatur "
+"ulang urutan perhentian untuk meminimalkan waktu tempuh dan jarak"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3627,9 +3725,27 @@ msgstr "Tindakan Server"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Set"
+msgstr "Tetapkan"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
 msgid "Set As Default"
 msgstr "Tetapkan Sebagai Default"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
+msgid ""
+"Set a fixed width (e.g. 100) or a minimum width (e.g. [100]) or a width "
+"range (e.g. [100, 200]). If not set, the width is automatically computed to "
+"fit optimally."
+msgstr ""
+"Tetapkan lebar tetap (contoh 100) atau lebar minimal (contoh [100]) atau "
+"rentang lebar (contoh [100, 200]). Bila tidak ditetapkan, lebar secara "
+"otomatis dihitung agar cocok secara optimal."
 
 #. module: web_studio
 #. odoo-javascript
@@ -3641,7 +3757,7 @@ msgstr "Tetapkan harga atau biaya pada record"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
 msgid "Show Invisible Elements"
-msgstr "Tetapkan Element yang Tidak Terlihat"
+msgstr "Tampilkan Elemen Tersembunyi"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3657,15 +3773,9 @@ msgstr "Secara default tunjukkan"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-msgid "Show in print menu"
-msgstr "Tunjukkan di menu cetak"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
 msgid "Show link to record"
-msgstr "Tunjukkan link ke record"
+msgstr "Tampilkan link ke record"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3687,8 +3797,6 @@ msgstr "Lambat"
 
 #. module: web_studio
 #. odoo-javascript
-#. odoo-python
-#: code:addons/web_studio/models/studio_approval.py:0
 #: code:addons/web_studio/static/src/approval/approval_hook.js:0
 msgid "Some approvals are missing"
 msgstr "Kurang beberapa approval"
@@ -3696,17 +3804,24 @@ msgstr "Kurang beberapa approval"
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/studio_approval.py:0
+msgid "Some approvals are missing."
+msgstr "Beberapa persetujuan belum ada."
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
 msgid ""
 "Some records were skipped because approvals were missing "
-"to                                    proceed with your request: "
+"to                                    proceed with your request:"
 msgstr ""
-"Beberapa record dilewati karena approval tidak ada untuk melanjutkan dengan "
-"permintaan Anda: "
+"Beberapa record dilewati karena persetujuan belum "
+"ada                                    untuk melanjutkan permintaan Anda:"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
+#, fuzzy
 msgid "Sort By"
 msgstr "Sortir Berdasarkan"
 
@@ -3714,13 +3829,19 @@ msgstr "Sortir Berdasarkan"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
 msgid "Sort by"
-msgstr "Susun menurut"
+msgstr "Sortir berdasarkan"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
 msgid "Sorting"
 msgstr "Penyortiran"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor.js:0
+msgid "Sources"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3748,6 +3869,18 @@ msgid "Stage"
 msgstr "Tahapan"
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Stage 1"
+msgstr "Tahap 1"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Stage 2"
+msgstr "Tahap 2"
+
+#. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 msgid "Stage Name"
@@ -3758,6 +3891,12 @@ msgstr "Nama Tahap"
 #: code:addons/web_studio/static/src/client_action/model_configurator/model_configurator.js:0
 msgid "Stage and visualize records in a custom pipeline"
 msgstr "Stage dan visualisasikan record pada pipeline kustom"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
+msgid "Start Buffer Field"
+msgstr "Field Buffer Awal"
 
 #. module: web_studio
 #. odoo-python
@@ -3774,6 +3913,17 @@ msgstr "Tanggal Mulai"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 msgid "Start Date Field"
 msgstr "Field Tanggal Mulai"
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__state
+msgid "State"
+msgstr "Status"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Statusbar"
+msgstr "Statusbar"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__notification_order
@@ -3829,6 +3979,12 @@ msgstr "Langkah 9"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
+msgid "Stop Buffer Field"
+msgstr "Field Buffer Akhir"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/new_view_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor_sidebar.xml:0
@@ -3837,8 +3993,15 @@ msgid "Stop Date Field"
 msgstr "Field Tanggal Berakhir"
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
+msgid "Structure"
+msgstr "Struktur"
+
+#. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_data__studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard_data__studio
+#: model:ir.module.module,shortdesc:base.module_web_studio
 msgid "Studio"
 msgstr "Studio"
 
@@ -3849,7 +4012,6 @@ msgstr "Studio App Creator"
 
 #. module: web_studio
 #: model:ir.actions.act_window,name:web_studio.studio_approval_entry_action
-#: model:ir.ui.menu,name:web_studio.menu_studio_approval_entry
 msgid "Studio Approval Entries"
 msgstr "Entri Persetujuan Studio"
 
@@ -3873,9 +4035,13 @@ msgstr "Peraturan Persetujuan Studio"
 
 #. module: web_studio
 #: model:ir.actions.act_window,name:web_studio.studio_approval_rule_action
-#: model:ir.ui.menu,name:web_studio.menu_studio_approval_rule
 msgid "Studio Approval Rules"
 msgstr "Peraturan Approval Studio"
+
+#. module: web_studio
+#: model:ir.ui.menu,name:web_studio.menu_technical_studio_approvals
+msgid "Studio Approvals"
+msgstr "Persetujuan Studio"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_menu__is_studio_configuration
@@ -3913,8 +4079,8 @@ msgstr "Data Ekspor Studio"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_studio_export_model
-msgid "Studio Export Models"
-msgstr "Model-Model Ekspor Studio"
+msgid "Studio Export Model"
+msgstr "Model Ekspor Studio"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_studio_export_wizard
@@ -3925,6 +4091,11 @@ msgstr "Wizard Ekspor Studio"
 #: model:ir.model,name:web_studio.model_studio_mixin
 msgid "Studio Mixin"
 msgstr "Studio Mixin"
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "Studio customizations:"
+msgstr "Kustomisasi studio:"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3944,6 +4115,12 @@ msgstr "Fitur yang disarankan untuk model baru Anda"
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_specific_and_computed_properties.js:0
 msgid "Sum"
 msgstr "Jumlah"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
+msgid "Sum Field"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3971,12 +4148,6 @@ msgstr "Label"
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 msgid "Technical Name"
 msgstr "Nama Teknis"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-msgid "Technical name"
-msgstr "Nama teknis"
 
 #. module: web_studio
 #. odoo-python
@@ -4048,14 +4219,14 @@ msgstr "Field yang terkait tombol harus many2one ke %s."
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
 msgid ""
-"The report could not be loaded as some error occured. Usually it means that "
+"The report could not be loaded as some error occurred. Usually it means that "
 "some view inherits from another but targets a node that doesn't exist. It "
 "might be due to the mutations of the base views during the upgrade process."
 msgstr ""
-"Laporan tidak dapat dimuat karena ada beberapa error. Biasanya ini berarti "
-"beberapa tampilan mewarisi dari tampilan lain tapi menarget node yang tidak "
-"tersedia. Ini mungkin terjadi oleh karena mutasi tampilan dasar pada proses "
-"upgrade."
+"Laporan tidak dapat dimuat karena ada beberapa kesalahan. Biasanya ini "
+"berarti beberapa tampilan mewarisi tampilan lain, tetapi menarget node yang "
+"tidak tersedia. Ini mungkin terjadi akibat mutasi tampilan dasar selama "
+"proses upgrade."
 
 #. module: web_studio
 #. odoo-javascript
@@ -4098,19 +4269,31 @@ msgstr ""
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: model:ir.model.fields,help:web_studio.field_studio_approval_rule__approval_group_id
 msgid "The users in this group are able to approve or reject the step."
-msgstr "User-user di kelompok ini dapat menyetujui atau menolak langkah."
+msgstr "User di kelompok ini dapat menyetujui atau menolak langkah."
 
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/controllers/main.py:0
 msgid ""
-"There are %s records using selection values not listed in those you are "
-"trying to save.\n"
-"Are you sure you want to remove the selection values of those records?"
+"There are %s records that use the values you are trying to remove.\n"
+"Are you sure you want to get rid of them?"
 msgstr ""
-"Terdapat %s record yang menggunakan selection values yang tidak didaftarkan "
-"di record yang Anda ingin simpan.\n"
-"Apakah Anda yakin ingin menghapus selection values record-record tersebut?"
+"Terdapat %s rekaman yang menggunakan value yang Anda coba hapus.\n"
+"Apakah Anda yakin ingin menghapus mereka?"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
+msgid ""
+"There are no many2one fields related to the current model.\n"
+"\n"
+"To create a one2many field on the current model, you must first create its "
+"many2one counterpart on the model you want to relate to.\n"
+msgstr ""
+"Tidak ada field many2one yang terkait model saat ini.\n"
+"\n"
+"Untuk membuat field one2many pada model saat ini, Anda harus membuat "
+"counterpart many2one terlebih dahulu pada model yang ingin dikaitkan.\n"
 
 #. module: web_studio
 #. odoo-python
@@ -4121,7 +4304,7 @@ msgstr "Tidak ada metode %(method)s pada model %(model_name)s (%(model_id)s)"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.js:0
 msgid ""
 "There is no record on which this report can be previewed. Create at least "
 "one record to preview the report."
@@ -4131,21 +4314,14 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.xml:0
-msgid "There is no record to preview"
-msgstr "Tidak ada record untuk dipratinjau"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: model:ir.model.fields,help:web_studio.field_studio_approval_rule__approver_ids
 msgid ""
 "These users are able to approve or reject the step and will be assigned to "
 "an activity when their approval is requested."
 msgstr ""
-"User-user ini akan dapat menyetujui atau menolak langkah dan akan ditugaskan "
-"ke kegiatan saat persetujuan mereka diminta."
+"User ini akan dapat menyetujui atau menolak langkah dan akan ditugaskan ke "
+"kegiatan saat persetujuan mereka diminta."
 
 #. module: web_studio
 #. odoo-javascript
@@ -4155,14 +4331,14 @@ msgid ""
 "These users will receive a notification via internal note when the step is "
 "approved or rejected"
 msgstr ""
-"User-user ini akan menerima notifikasi melalui catatan internal saat langkah "
+"User ini akan menerima notifikasi melalui catatan internal saat langkah "
 "disetujui atau ditolak"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-msgid "Third Status"
-msgstr "Status Ketiga"
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
+msgid "This action is blocked by other rules"
+msgstr "Tindakan ini diblokir oleh aturan lain"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4242,6 +4418,12 @@ msgid "To <b>customize a field</b>, click on its <i>label</i>."
 msgstr "Untuk <b>mengkustomisasi field</b>, klik pada <i>labelnya</i>."
 
 #. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "Today Activities"
+msgstr "Aktivitas Hari ini"
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/systray_item/systray_item.xml:0
 msgid "Toggle Studio"
@@ -4255,9 +4437,21 @@ msgstr "Total"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
+msgid "Track in chatter"
+msgstr "Lacak di chatter"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.js:0
+msgid "Translate Report"
+msgstr "Terjemahkan Laporan"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
 msgid "Type"
-msgstr "Jenis"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -4267,10 +4461,16 @@ msgstr "Ketik catatan Anda di sini..."
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/view_editor_snackbar.xml:0
 msgid "Undo"
-msgstr "Undo"
+msgstr "Batalkan"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
+msgid "Unsaved changes"
+msgstr "Perubahan belum disimpan"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_delegate__date_to
@@ -4290,7 +4490,7 @@ msgstr "Dapat Diupdate"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
 msgid "Update"
 msgstr "Perbarui"
 
@@ -4306,6 +4506,8 @@ msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_approver__user_id
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_tree_view
 msgid "User"
 msgstr "Pengguna"
 
@@ -4320,6 +4522,12 @@ msgstr "Tugas user"
 #: code:addons/web_studio/static/src/approval/studio_approval.xml:0
 msgid "User avatar placeholder"
 msgstr "Placeholder avatar user"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.js:0
+msgid "Users"
+msgstr "User"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4373,6 +4581,18 @@ msgstr "Tampilan"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Visibility"
+msgstr "Visibilitas"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Visible"
+msgstr "Terlihat"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/approval/studio_approval.xml:0
 msgid "Waiting for approval"
 msgstr "Menunggu persetujuan"
@@ -4395,16 +4615,6 @@ msgid "Webhooks"
 msgstr "Webhook"
 
 #. module: web_studio
-#: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__website_message_ids
-msgid "Website Messages"
-msgstr "Pesan situs"
-
-#. module: web_studio
-#: model:ir.model.fields,help:web_studio.field_studio_approval_rule__website_message_ids
-msgid "Website communication history"
-msgstr "Sejarah komunikasi situs"
-
-#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor.js:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.js:0
@@ -4415,7 +4625,7 @@ msgstr "Pekan"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 msgid "Week Precision"
-msgstr "Tingkat Ketelitian Minggu"
+msgstr "Ketepatan Minggu"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4433,7 +4643,7 @@ msgstr "Bagaimana dengan <b>tampilan Kanban</b>?"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 msgid "What should the button do"
-msgstr "Apa yang tombol akan lakukan"
+msgstr "Fungsi tombol"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4445,11 +4655,6 @@ msgstr "Saat Membuat Record"
 #: model:ir.model.fields,help:web_studio.field_studio_approval_rule__can_validate
 msgid "Whether the rule can be approved by the current user"
 msgstr "Apakah peraturan dapat disetujui oleh user saat ini"
-
-#. module: web_studio
-#: model:ir.model.fields,help:web_studio.field_ir_model__abstract
-msgid "Whether this model is abstract"
-msgstr "Apakah model ini abstrak"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4504,8 +4709,23 @@ msgstr "Tahun"
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/studio_approval.py:0
+msgid "You are not allowed to delegate this approval rule."
+msgstr ""
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
 msgid "You can not approve this rule."
 msgstr "Anda tidak dapat menyetujui peraturan ini."
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties.js:0
+msgid ""
+"You can't select the 'Start date field' and 'End date field' at the same time"
+msgstr ""
+"Anda tidak dapat memilih 'Field tanggal mulai' dan 'Field tanggal akhir' "
+"secara bersamaan"
 
 #. module: web_studio
 #. odoo-python
@@ -4557,10 +4777,20 @@ msgid "e.g. Real Estate"
 msgstr "contohnya Real Estate"
 
 #. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "field<span invisible=\"custom_fields == 1\">s</span>"
+msgstr "field<span invisible=\"custom_fields == 1\"></span>"
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 msgid "for company"
-msgstr "untuk perusahaa"
+msgstr "untuk perusahaan"
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "model<span invisible=\"custom_models == 1\">s</span>"
+msgstr "model<span invisible=\"custom_models == 1\"></span>"
 
 #. module: web_studio
 #. odoo-python
@@ -4573,6 +4803,11 @@ msgstr "tidak ada"
 #: code:addons/web_studio/static/src/client_action/icon_creator/icon_creator.xml:0
 msgid "or"
 msgstr "atau"
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "report<span invisible=\"custom_reports == 1\">s</span>"
+msgstr "laporan<span invisible=\"custom_reports == 1\"></span>"
 
 #. module: web_studio
 #. odoo-python
@@ -4599,6 +4834,11 @@ msgid "upload one"
 msgstr "unggah satu"
 
 #. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "view<span invisible=\"custom_views == 1\">s</span>"
+msgstr "tampilan<span invisible=\"custom_views == 1\"></span>"
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 msgid "x_studio_"
@@ -4610,468 +4850,19 @@ msgstr "x_studio_"
 msgid "{{ item.isInEdition ? 'Add selection' : 'Edit selection' }}"
 msgstr "{{ item.isInEdition ? 'Add selection' : 'Edit selection' }}"
 
-#~ msgid "Multine Text"
-#~ msgstr "Teks Multine"
+#~ msgid ""
+#~ "All changes done to the report's structure will be discarded and the "
+#~ "report will be reset to its factory settings."
+#~ msgstr ""
+#~ "Semua perubahan yang dilakukan ke struktur laporan akan dibuang dan "
+#~ "laporan akan direset ke pengaturan pabrik."
 
 #~ msgid ""
-#~ " <p class=\"o_view_nocontent_smiling_face\">\n"
-#~ "                Add a new automated action\n"
-#~ "            </p>\n"
-#~ "            "
+#~ "Header and footer are shared with other reports which may be impacted by "
+#~ "the reset."
 #~ msgstr ""
-#~ " <p class=\"o_view_nocontent_smiling_face\">\n"
-#~ "                Tambahkan tindakan otomatis baru\n"
-#~ "            </p>\n"
-#~ "            "
-
-#~ msgid "(t-if=\""
-#~ msgstr "(t-if=\""
-
-#~ msgid "Abstract"
-#~ msgstr "Abstrak"
-
-#~ msgid ""
-#~ "Actions may trigger specific behavior like opening calendar view or "
-#~ "automatically mark as done when a document is uploaded"
-#~ msgstr ""
-#~ "Tindakan dapat memicu perilaku spesifik seperti membuka tampilan kalender "
-#~ "atau secara otomatis ditandai sebagai selesai saat dokumen diunggah"
-
-#~ msgid "Activity Type"
-#~ msgstr "Jenis Aktivitas"
-
-#~ msgid "Add"
-#~ msgstr "Tambah"
-
-#~ msgid "Add a description..."
-#~ msgstr "Tambahkan keterangan..."
-
-#~ msgid "Add a priority"
-#~ msgstr "Tambahkan prioritas"
-
-#~ msgid "Add an approval rule"
-#~ msgstr "Tambahkan aturan untuk persetujuan"
-
-#~ msgid "Add an avatar"
-#~ msgstr "Tambahkan avatar"
-
-#~ msgid "Add in the print menu"
-#~ msgstr "Tambahkan ke print menu"
-
-#~ msgid "Add selection"
-#~ msgstr "Tambahkan pilihan"
-
-#~ msgid "Add tags"
-#~ msgstr "Tambahkan tag"
-
-#~ msgid "Address Block"
-#~ msgstr "Tambahkan Blok"
-
-#~ msgid "Alignment"
-#~ msgstr "Alignment"
-
-#~ msgid "Amount total"
-#~ msgstr "Jumlah total"
-
-#~ msgid "Amount untaxed"
-#~ msgstr "Jumlah yang tidak kena pajak"
-
-#~ msgid "Approved as"
-#~ msgstr "Disetujui sebagai"
-
-#~ msgid "As expression"
-#~ msgstr "Sebagai expresi"
-
-#~ msgid "Automated Action"
-#~ msgstr "Tindakan Otomatis"
-
-#~ msgid "Automated Actions"
-#~ msgstr "Tindakan-Tindakan Otomatis"
-
-#~ msgid "Block"
-#~ msgstr "Blok"
-
-#~ msgid "Bordered"
-#~ msgstr "Dengan Border"
-
-#~ msgid "Borderless"
-#~ msgstr "Tanpa Border"
-
-#~ msgid "By default: "
-#~ msgstr "Secara default:"
-
-#~ msgid "Change the <b>background</b>, make it yours."
-#~ msgstr "Ganti <b>latar belakang</b>, sesuai keinginan Anda."
-
-#~ msgid "Clear"
-#~ msgstr "Clear"
-
-#~ msgid "Click here."
-#~ msgstr "Klik di sini."
-
-#~ msgid "Click to edit messaging features on your model."
-#~ msgstr "Klik untuk edit fitur pesan pada model Anda."
-
-#~ msgid "Colors"
-#~ msgstr "Warna"
-
-#~ msgid "Columns"
-#~ msgstr "Kolom"
-
-#~ msgid "Compact"
-#~ msgstr "Compact"
-
-#~ msgid "Custom color"
-#~ msgstr "Warna Kustom"
-
-#~ msgid "Customizations"
-#~ msgstr "Kustomisasi"
-
-#~ msgid "Data table"
-#~ msgstr "Tabel data"
-
-#~ msgid "Do you want to add a dropdown with colors?"
-#~ msgstr "Apakah Anda ingin menambahkan dropdown dengan warna?"
-
-#~ msgid ""
-#~ "Drag & drop <b>another field</b>. Let’s try with a <i>selection field</i>."
-#~ msgstr ""
-#~ "Drag & drop <b>field baru</b>. Mari kita coba dengan <i>selection field</"
-#~ "i>."
-
-#~ msgid "Drag building block here"
-#~ msgstr "Tarik blok penyusun ke sini"
-
-#~ msgid "Dropdown Menu"
-#~ msgstr "Menu Dropdown"
-
-#~ msgid "Edit Value"
-#~ msgstr "Edit Value"
-
-#~ msgid "Else"
-#~ msgstr "Else"
-
-#~ msgid "Email Alias"
-#~ msgstr "Email Alias"
-
-#~ msgid "Esc expression"
-#~ msgstr "Ekspresi Esc"
-
-#~ msgid "Field & Label"
-#~ msgstr "Field & Label"
-
-#~ msgid "Field Column"
-#~ msgstr "Kolom Field"
-
-#~ msgid "Field expression"
-#~ msgstr "Ekspresi Field"
-
-#~ msgid "Field in Cell"
-#~ msgstr "Field dalam Cell"
-
-#~ msgid "Font style"
-#~ msgstr "Style font"
-
-#~ msgid "Foreach expression"
-#~ msgstr "Ekspresi Foreach"
-
-#~ msgid "Graph View"
-#~ msgstr "Tampilan Grafik"
-
-#~ msgid "Grid View"
-#~ msgstr "Tampilan Grid"
-
-#~ msgid "Groups used in approval rules must have an external identifier."
-#~ msgstr ""
-#~ "Kelompok yang digunakan pada peraturan persetujuan harus memiliki "
-#~ "identifier eksternal."
-
-#~ msgid "Heading1"
-#~ msgstr "Heading1"
-
-#~ msgid "Heading2"
-#~ msgstr "Heading2"
-
-#~ msgid "Heading3"
-#~ msgstr "Heading3"
-
-#~ msgid "Heading4"
-#~ msgstr "Heading4"
-
-#~ msgid "Heading5"
-#~ msgstr "Heading5"
-
-#~ msgid "Heading6"
-#~ msgstr "Heading6"
-
-#~ msgid ""
-#~ "In order to use a monetary field, you need a currency field on the model. "
-#~ "Do you want to create a currency field first? You can make this field "
-#~ "invisible afterwards."
-#~ msgstr ""
-#~ "Untuk menggunakan field keuangan, Anda harus memiliki field mata uang "
-#~ "pada model. Apakah Anda ingin membuat field keuangan terlebih dahulu? "
-#~ "Anda setelah itu dapat menyembunyikan field ini. "
-
-#~ msgid "Inline"
-#~ msgstr "Inline"
-
-#~ msgid "Italic"
-#~ msgstr "Italic"
-
-#~ msgid ""
-#~ "Let’s check the result. Close Odoo Studio to get an <b>overview of your "
-#~ "app</b>."
-#~ msgstr ""
-#~ "Periksa hasilnya. Tutup Odoo Studio untuk mendapatkan <b>gambaran umum "
-#~ "aplikasi Anda</b>."
-
-#~ msgid "Limit approver to this rule"
-#~ msgstr "Batasi pemberi persetujuan ke peraturan ini"
-
-#~ msgid "List View"
-#~ msgstr "Tampilan Daftar"
-
-#~ msgid "Loading..."
-#~ msgstr "Memuat..."
-
-#~ msgid "Manually sort records in the list view"
-#~ msgstr "Secara manual sortir record dalam tampilan daftar"
-
-#~ msgid "Margins"
-#~ msgstr "Margin"
-
-#~ msgid "Module file (.zip)"
-#~ msgstr "Module file (.zip)"
-
-#~ msgid ""
-#~ "Nicely done! Let’s build your screen now; <b>drag</b> a <i>text field</i> "
-#~ "and <b>drop</b> it in your view, on the right."
-#~ msgstr ""
-#~ "Kerja bagus! Mari bangun layar Anda sekarang; <b>drag</b> satu <i>field "
-#~ "teks</i> dan <b>drop</b> field di tampilan Anda, di bagian kanan."
-
-#~ msgid "No view found for the given report!"
-#~ msgstr "Tidak ada tampilan yang ditemukan untuk laporan tersebut!"
-
-#~ msgid "Normal"
-#~ msgstr "Normal"
-
-#~ msgid "Now you’re on your own. Enjoy your <b>super power</b>."
-#~ msgstr ""
-#~ "Sekarang Anda dapat melakukannya sendiri. Nikmati <b>superpower</b> Anda."
-
-#~ msgid "Odoo Studio Icon"
-#~ msgstr "Ikon Odoo Studio"
-
-#~ msgid "Offset"
-#~ msgstr "Offset"
-
-#~ msgid "Only %s members can approve this rule."
-#~ msgstr "Hanya member %s yang dapat menyetujui peraturan ini."
-
-#~ msgid "Options"
-#~ msgstr "Opsi"
-
-#~ msgid "Please specify a field name for the selected model."
-#~ msgstr "Mohon tetapkan nama field untuk model yang dipilih."
-
-#~ msgid "Please specify a field."
-#~ msgstr "Mohon tetapkan field."
-
-#~ msgid "Printed Report Name"
-#~ msgstr "Cetak Nama Laporan"
-
-#~ msgid "Properties"
-#~ msgstr "Properti"
-
-#~ msgid "Rejected as"
-#~ msgstr "Ditolak sebagai"
-
-#~ msgid "Related expression"
-#~ msgstr "Expresi terkait"
-
-#~ msgid "Relation:"
-#~ msgstr "Hubungan:"
-
-#~ msgid "Report"
-#~ msgstr "Laporan"
-
-#~ msgid "Select a related field:"
-#~ msgstr "Pilih field yang terkait:"
-
-#~ msgid "Send a"
-#~ msgstr "Kirimkan"
-
-#~ msgid "Set Cover Image"
-#~ msgstr "Tetapkan Gambar Cover"
-
-#~ msgid ""
-#~ "Set an <b>email alias</b>. Then, try to send an email to this address; it "
-#~ "will create a document automatically for you. Pretty cool, huh?"
-#~ msgstr ""
-#~ "Tetapkan <b>alias email</b>. Lalu, coba kirimkan email ke alamt ini; ini "
-#~ "akan membuat secara otomatis dokumen untuk Anda. Keren, kan?"
-
-#~ msgid "Set approval rules"
-#~ msgstr "Tetapkan peraturan persetujua"
-
-#~ msgid "Set expression"
-#~ msgstr "Tetapkan ekspresi"
-
-#~ msgid "Size"
-#~ msgstr "Ukuran"
-
-#~ msgid "Small"
-#~ msgstr "Kecil"
-
-#~ msgid "Source"
-#~ msgstr "Sumber"
-
-#~ msgid "Striped"
-#~ msgstr "Striped"
-
-#~ msgid "Studio Approvals"
-#~ msgstr "Persetujuan Studio"
-
-#~ msgid "Studio Approvals Rules"
-#~ msgstr "Peraturan Persetujuan Studio"
-
-#~ msgid "Subtotal & Total"
-#~ msgstr "Subtotal & Total"
-
-#~ msgid "Table"
-#~ msgstr "Tabel"
-
-#~ msgid "Table style"
-#~ msgstr "Style tabel"
-
-#~ msgid "Taxes amount by groups"
-#~ msgstr "Jumlah pajak oleh kelompok-kelompok"
-
-#~ msgid "Text decoration"
-#~ msgstr "Dekorasi teks"
-
-#~ msgid "Text in Cell"
-#~ msgstr "Teks di Cell"
-
-#~ msgid "The following approvals are missing:"
-#~ msgstr "Persetujuan berikut hilang:"
-
-#~ msgid "The record field name is missing"
-#~ msgstr "Nama field record hilang"
-
-#~ msgid "There is no method %s on the model %s (%s)"
-#~ msgstr "Tidak ada metode %s pada model %s (%s)"
-
-#~ msgid ""
-#~ "This field is placed after another element that is only displayed under "
-#~ "certain conditions."
-#~ msgstr ""
-#~ "Field ini ditempatkan setelah element lain yang hanya ditampilkan bila "
-#~ "syarat-syarat tertentu dipenuhi."
-
-#~ msgid ""
-#~ "This report could not be previewed or edited because it could not be "
-#~ "rendered with this message: %s. This could be happening because this is a "
-#~ "custom report type that needs custom data to be rendered and so is not "
-#~ "editable by studio."
-#~ msgstr ""
-#~ "Laporan ini tidak dapat di pratinjau atau di-edit karena tidak dapat "
-#~ "dirender dengan pesan ini: %s. Ini bisa terjadi karena ini adalah jenis "
-#~ "laporan kustom yang membutuhkan data khusus untuk di-render dan karenanya "
-#~ "tidak dapat diedit oleh studio."
-
-#~ msgid "Three Columns"
-#~ msgstr "Tiga Kolom"
-
-#~ msgid "Title Block"
-#~ msgstr "Blok Judul"
-
-#~ msgid "To edit this document please create a record first"
-#~ msgstr "Untuk mengedit dokumen ini silakan membuat record terlebih dahulu"
-
-#~ msgid "Two Columns"
-#~ msgstr "Dua Kolom"
-
-#~ msgid "Underline"
-#~ msgstr "Garis-bawahi"
-
-#~ msgid "Visible for"
-#~ msgstr "Terlihat untuk"
-
-#~ msgid "Visible if"
-#~ msgstr "Terlihat bila"
-
-#~ msgid "Want more fun? Let’s create more <b>views</b>."
-#~ msgstr "Want more fun? Let’s create more <b>views</b>."
-
-#~ msgid "Want to customize the background? Let’s activate <b>Odoo Studio</b>."
-#~ msgstr "Ingin kustomisasi background? Ayo aktifkan <b>Odoo Studio</b>."
-
-#~ msgid "Width"
-#~ msgstr "Lebar"
-
-#~ msgid ""
-#~ "Wow, nice! And I’m sure you can make it even better! Use this icon to "
-#~ "open <b>Odoo Studio</b> and customize any screen."
-#~ msgstr ""
-#~ "Wow, nice! Dan saya yakin Anda dapat membuatnya lebih baik lagi! Gunakan "
-#~ "ikon ini untuk membuka <b>Odoo Studio</b> dan kustomisasi layar apapun."
-
-#~ msgid "You can only display a user or a partner"
-#~ msgstr "Anda hanya dapat menampilkan user atau mitra"
-
-#~ msgid "You cannot cancel an approval you didn't set yourself."
-#~ msgstr ""
-#~ "Anda tidak dapat membatalkan persetujuan yang tidak Anda buat sendiri."
-
-#~ msgid "You cannot modify this view, it is part of the generic layout"
-#~ msgstr ""
-#~ "Anda tidak dapat memodifikasi tampilan ini, karena tampilan ini merupakan "
-#~ "bagian dari layout umum"
-
-#~ msgid "You first need to create a many2many field in the form view."
-#~ msgstr ""
-#~ "Anda harus terlebih dahulu membuat field many2many di tampilan formulir."
-
-#~ msgid "You must have at least one option set"
-#~ msgstr "Anda harus memiliki setidaknya satu opsi."
-
-#~ msgid "You must select a related field"
-#~ msgstr "Anda harus memilih field yang terkait"
-
-#~ msgid "You must select a relation"
-#~ msgstr "Anda harus memilih relasi"
-
-#~ msgid "You need to be part of these groups to see this field:"
-#~ msgstr ""
-#~ "Anda harus merupakan bagian dari kelompok-kelompok ini untuk melihat "
-#~ "field ini:"
-
-#~ msgid ""
-#~ "You need to use a many2many or one2many field to display a list of items"
-#~ msgstr ""
-#~ "Anda harus menggunakan field many2many atau one2many untuk menampilkan "
-#~ "daftar item"
-
-#~ msgid "bottom"
-#~ msgstr "bawah"
-
-#~ msgid "left"
-#~ msgstr "kiri"
-
-#~ msgid "px"
-#~ msgstr "px"
-
-#~ msgid "reset color"
-#~ msgstr "reset warna"
-
-#~ msgid "right"
-#~ msgstr "kanan"
-
-#~ msgid "test email"
-#~ msgstr "test email"
-
-#~ msgid "top"
-#~ msgstr "atas"
+#~ "Header dan footer dibagi dengan laporan lain yang mungkin terdampak oleh "
+#~ "reset."
+
+#~ msgid "Include header and footer"
+#~ msgstr "Termasuk header dan footer"

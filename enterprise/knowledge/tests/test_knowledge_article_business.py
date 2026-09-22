@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
 
 from datetime import datetime, timedelta
 from lxml import html
-from unittest.mock import patch
 
 from odoo import exceptions
 from odoo.addons.knowledge.tests.common import KnowledgeCommon, KnowledgeCommonWData
@@ -76,10 +74,11 @@ class KnowledgeCommonBusinessCase(KnowledgeCommonWData):
 
 
 @tagged('knowledge_internals', 'knowledge_management')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
     """ Test business API and main tools or helpers methods. """
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_create(self):
         """ Testing the helper to create articles with right values. """
@@ -174,7 +173,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
         self.assertListEqual(sidebar_articles['favorite_ids'], [playground_root.id])
         self.assertListEqual([article['id'] for article in sidebar_articles['articles']], (playground_children + playground_root).ids)
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink', 'odoo.tests')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink', 'odoo.tests')
     @users('employee')
     def test_article_invite_members(self):
         """ Test inviting members API. Create a hierarchy of 3 shared articles
@@ -283,7 +282,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
                             self.partner_employee_manager: 'none',
                             self.partner_employee2: 'read'})
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.addons.mail.models.mail_mail')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.addons.mail.models.mail_mail')
     @users('employee')
     def test_article_invite_members_rights(self):
         """ Testing trying to bypass granted privilege: inviting people require
@@ -299,7 +298,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
                                msg='Invite: cannot try to reject people with read permission'):
             article_shared.invite_members(partners, 'none')
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.addons.mail.models.mail_mail')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.addons.mail.models.mail_mail')
     @users('employee')
     def test_article_invite_members_non_accessible_children(self):
         """ Test that user cannot give access to non-accessible children article
@@ -423,7 +422,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
         playground_articles_asmanager = playground_articles.with_user(self.user_employee_manager)
         self.assertEqual(playground_articles_asmanager.mapped('is_user_favorite'), [False, False, False])
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_article_make_private(self):
         """ Testing the API that makes an article 'private'. Making an article
@@ -573,7 +572,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
             wkspace_child_no_access.with_env(self.env).body
         wkspace_child_no_access.with_user(self.user_employee2).body
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_article_make_private_w_desynchronized(self):
         """ Test a special case when making private: we have desynchronized children.
@@ -644,7 +643,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
         self.assertFalse(workspace_child_desync.is_desynchronized)
         self.assertEqual(workspace_child_tosync.parent_id, article_workspace)
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee_manager')
     def test_article_make_private_w_parent(self):
         """ Test a special case when making private: moving under an existing private parent. """
@@ -672,7 +671,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
             {}
         )
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_move_to(self):
         """ Testing the API for moving articles. """
@@ -722,8 +721,7 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
         with self.assertRaises(exceptions.ValidationError):
             workspace_children[0].move_to(parent_id=workspace_child_item.id)
 
-
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_move_to_shared(self):
         """ Testing the valid moves to the shared section. """
@@ -870,10 +868,11 @@ class TestKnowledgeArticleBusiness(KnowledgeCommonBusinessCase):
             baby_user.action_join()
 
 @tagged('knowledge_internals', 'knowledge_management')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleCopy(KnowledgeCommonBusinessCase):
     """ Test copy and duplication of articles """
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_duplicate(self):
         """ Test articles duplication (=copy/copy_batch methods). Verifies that
@@ -918,7 +917,7 @@ class TestKnowledgeArticleCopy(KnowledgeCommonBusinessCase):
         with self.assertRaises(exceptions.AccessError):
             article_write_member.copy()
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('admin')
     def test_article_duplicate_admin(self):
         """ Test duplicate (copy_batch) as admin as he has enough rights to really
@@ -941,7 +940,7 @@ class TestKnowledgeArticleCopy(KnowledgeCommonBusinessCase):
             "Check descendants name is also updated (not only direct children)"
         )
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_make_private_copy(self):
         article_hidden = self.article_private_manager.with_env(self.env)
@@ -960,6 +959,7 @@ class TestKnowledgeArticleCopy(KnowledgeCommonBusinessCase):
         )
         self.assertFalse(new_article.child_ids)
         self.assertFalse(new_article.parent_id)
+        self.assertEqual(str(article_readonly.body), str(new_article.body))
 
     def test_article_make_private_copy_having_embedded_views_of_article_items(self):
         """ When the user copies an article, the system should copy the body
@@ -1082,7 +1082,7 @@ class TestKnowledgeArticleCopy(KnowledgeCommonBusinessCase):
             self.assertEqual(view_props['view_type'], expected_view_type)
             self.assertEqual(view_props['context'], expected_context)
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_copy(self):
         article_hidden = self.article_private_manager.with_env(self.env)
@@ -1115,6 +1115,7 @@ class TestKnowledgeArticleCopy(KnowledgeCommonBusinessCase):
 
 
 @tagged('knowledge_internals', 'knowledge_management')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleRemoval(KnowledgeCommonBusinessCase):
     """ Test unlink / archive management of articles """
 
@@ -1139,7 +1140,7 @@ class TestKnowledgeArticleRemoval(KnowledgeCommonBusinessCase):
         self.assertFalse(article_to_trash.active)
         self.assertTrue(article_to_trash.to_delete)
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_archive(self):
         """ Testing archive that should also archive children. """
@@ -1199,7 +1200,7 @@ class TestKnowledgeArticleRemoval(KnowledgeCommonBusinessCase):
             self.assertFalse(article.active, 'Archive: should propagate to children')
             self.assertEqual(article.to_delete, test_trash, 'Trash: should propagate to children')
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_archive_mixed_rights(self):
         self._test_archive_mixed_rights(test_trash=False)
@@ -1292,19 +1293,19 @@ class TestKnowledgeArticleRemoval(KnowledgeCommonBusinessCase):
             # Note: could be different if writable_child had custom partners. Not the case here so we can use '=='.
             self.assertTrue(article_shared.article_member_ids.partner_id == writable_child.article_member_ids.partner_id)
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_trashed(self):
         """ Testing 'send to trash' that should also trash children. """
         self._test_archive(test_trash=True)
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_trashed_mixed_rights(self):
         """ Test Trash in case of mixed rights """
         self._test_archive_mixed_rights(test_trash=True)
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('admin')
     def test_unlink_admin(self):
         """ Admin (system) has access to unlink, test propagation and effect
@@ -1316,7 +1317,7 @@ class TestKnowledgeArticleRemoval(KnowledgeCommonBusinessCase):
             'Unlink: should also unlink children'
         )
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_unlink_employee(self):
         """ Employee cannot unlink anyway """
@@ -1441,7 +1442,7 @@ class TestKnowledgeArticleRemoval(KnowledgeCommonBusinessCase):
 
         before = datetime.now() - timedelta(days=self.env['knowledge.article'].DEFAULT_ARTICLE_TRASH_LIMIT_DAYS + 1)
         # Older article
-        with patch.object(self.env.cr, 'now', return_value=before):
+        with self.mock_datetime_and_now(before):
             trashed_to_unlink = self.env['knowledge.article'].create({
                 'active': False,
                 'internal_permission': 'write',
@@ -1499,7 +1500,7 @@ class TestKnowledgeShare(KnowledgeCommonWData):
             self.partner_public: 'read'
         })
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink', 'odoo.tests')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink', 'odoo.tests')
     @users('employee2')
     def test_knowledge_article_share(self):
         # private article of "employee manager"

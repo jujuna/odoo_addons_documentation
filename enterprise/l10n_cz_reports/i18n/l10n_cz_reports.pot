@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:05+0000\n"
-"PO-Revision-Date: 2025-12-30 19:05+0000\n"
+"POT-Creation-Date: 2026-08-28 18:18+0000\n"
+"PO-Revision-Date: 2026-08-28 18:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -27,6 +27,18 @@ msgid ""
 "    2 - Supply of goods within the territory of the European Community in the form of triangular trade (Section 17 of the Act), this code is to be filled in by the middle person only\n"
 "    3 - Supply of a service with a place of supply in another Member State (Article 9(1) of the Act), if the recipient of the service is obliged to declare and pay the tax\n"
 "    Required in the line not marked as cancellation line.\n"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.module.module,description:base.module_l10n_cz_reports
+msgid ""
+"\n"
+"Accounting reports for Czech Republic\n"
+"=====================================\n"
+"This module includes accounting reports for Czech Republic, including:\n"
+"- VAT Control Statement (creation and XML export). For more information, see https://adisspr.mfcr.cz/dpr/adis/idpr_pub/epo2_info/popis_struktury_detail.faces?zkratka=DPHKH1\n"
+"- Souhrnné hlášení VIES Report (creation and XML export). For more information, see https://adisspr.mfcr.cz/dpr/adis/idpr_pub/epo2_info/popis_struktury_detail.faces?zkratka=DPHSHV\n"
+"- Tax report (XML export). For more information, see https://adisspr.mfcr.cz/dpr/adis/idpr_pub/epo2_info/popis_struktury_detail.faces?zkratka=DPHDP3\n"
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -69,8 +81,33 @@ msgid "3 Service"
 msgstr ""
 
 #. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vat_control_statement_wizard_form
+msgid "<span>Download your VAT Control Statement.</span><br/>"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.tax_return_submission_wizard_form
+msgid "<span>Download your VAT Statement.</span><br/>"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vies_summary_submission_wizard_form
+msgid "<span>Download your VIES Summary Statement.</span><br/>"
+msgstr ""
+
+#. module: l10n_cz_reports
 #: model:ir.model,name:l10n_cz_reports.model_account_chart_template
 msgid "Account Chart Template"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model,name:l10n_cz_reports.model_account_return
+msgid "Accounting Return"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model,name:l10n_cz_reports.model_account_return_type
+msgid "Accounting Return Type"
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -119,6 +156,20 @@ msgid "Construction and assembly work - provision of workers"
 msgstr ""
 
 #. module: l10n_cz_reports
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: l10n_cz_reports
 #: model_terms:ir.ui.view,arch_db:l10n_cz_reports.view_product_template_form
 msgid "Czech Accounting"
 msgstr ""
@@ -136,6 +187,11 @@ msgstr ""
 #. module: l10n_cz_reports
 #: model:ir.ui.menu,name:l10n_cz_reports.account_reports_cz_statements_menu
 msgid "Czech Republic"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.module.module,shortdesc:base.module_l10n_cz_reports
+msgid "Czech Republic- Accounting Reports"
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -183,12 +239,24 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_move__display_name
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_account_return__display_name
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_account_return_type__display_name
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_tax__display_name
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_tax_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_vat_control_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_vies_summary_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_product_template__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.tax_return_submission_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vat_control_statement_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vies_summary_submission_wizard_form
+msgid "Download XML"
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -224,7 +292,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_chart_template__id
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_move__id
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_move_line__id
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_account_return__id
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_account_return_type__id
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_tax__id
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__id
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__id
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__id
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_tax_report_handler__id
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_vat_control_report_handler__id
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_vies_summary_report_handler__id
@@ -235,6 +308,13 @@ msgstr ""
 #. module: l10n_cz_reports
 #: model:ir.model.fields,help:l10n_cz_reports.field_account_tax__l10n_cz_reverse_charge
 msgid "Indicates if the tax is to be used with reverse charge transactions"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__instructions
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__instructions
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__instructions
+msgid "Instructions"
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -256,6 +336,27 @@ msgstr ""
 #. module: l10n_cz_reports
 #: model:ir.model,name:l10n_cz_reports.model_account_move_line
 msgid "Journal Item"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.tax_return_submission_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vat_control_statement_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vies_summary_submission_wizard_form
+msgid "Log in to the"
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -300,14 +401,51 @@ msgid "Provision of defined electronic communications services"
 msgstr ""
 
 #. module: l10n_cz_reports
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_tax_return_submission_wizard__return_id
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vat_control_statement_wizard__return_id
+#: model:ir.model.fields,field_description:l10n_cz_reports.field_l10n_cz_reports_vies_summary_submission_wizard__return_id
+msgid "Return"
+msgstr ""
+
+#. module: l10n_cz_reports
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_tax__l10n_cz_reverse_charge
 msgid "Reverse Charge Tax"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.tax_return_submission_wizard_form
+msgid ""
+"Select the \"Elektronická podání pro Finanční správu\" section and choose "
+"\"Elektronické formuláře\"."
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vat_control_statement_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vies_summary_submission_wizard_form
+msgid ""
+"Select the \"Elektronická podání pro Finanční správu\"section and choose "
+"\"Elektronické formuláře\"."
 msgstr ""
 
 #. module: l10n_cz_reports
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_bank_statement_line__l10n_cz_scheme_code
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_move__l10n_cz_scheme_code
 msgid "Special scheme code"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vies_summary_submission_wizard_form
+msgid "Submit the EC Sales List."
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vat_control_statement_wizard_form
+msgid "Submit the VAT Control Statement."
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.tax_return_submission_wizard_form
+msgid "Submit the VAT Statement."
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -322,10 +460,42 @@ msgid "Tax"
 msgstr ""
 
 #. module: l10n_cz_reports
+#: model:ir.model,name:l10n_cz_reports.model_l10n_cz_reports_tax_return_submission_wizard
+msgid "Tax Return Submission Wizard"
+msgstr ""
+
+#. module: l10n_cz_reports
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_account_move_line__l10n_cz_transaction_code
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_product_product__l10n_cz_transaction_code
 #: model:ir.model.fields,field_description:l10n_cz_reports.field_product_template__l10n_cz_transaction_code
 msgid "Transaction code"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.tax_return_submission_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vat_control_statement_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vies_summary_submission_wizard_form
+msgid "Upload the xml file."
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:account.return.type,name:l10n_cz_reports.cz_vat_control_statement_return_type
+msgid "VAT Control Statement"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model,name:l10n_cz_reports.model_l10n_cz_reports_vat_control_statement_wizard
+msgid "VAT Control Statement Wizard"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:account.return.type,name:l10n_cz_reports.cz_vies_summary_return_type
+msgid "VIES Summary"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model:ir.model,name:l10n_cz_reports.model_l10n_cz_reports_vies_summary_submission_wizard
+msgid "VIES Summary Submission Wizard"
 msgstr ""
 
 #. module: l10n_cz_reports
@@ -351,4 +521,11 @@ msgstr ""
 #: code:addons/l10n_cz_reports/models/l10n_cz_vies_summary_handler.py:0
 #: code:addons/l10n_cz_reports/models/tax_report_handler.py:0
 msgid "XML"
+msgstr ""
+
+#. module: l10n_cz_reports
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.tax_return_submission_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vat_control_statement_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_cz_reports.vies_summary_submission_wizard_form
+msgid "mojedane.cz"
 msgstr ""

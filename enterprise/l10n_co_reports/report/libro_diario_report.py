@@ -19,7 +19,7 @@ class LibroDiarioReport(models.AbstractModel):
         doc = {'lines': []}
         labels = [column['expression_label'] for column in options['columns']]
         for line in lines:
-            values = [column.get('name') for column in line['columns']]
+            values = [column.name for column in line.columns]
             doc['lines'].append(dict(zip(labels, values)))
         if not doc['lines']:
             raise UserError(_('No lines were provided to print.'))

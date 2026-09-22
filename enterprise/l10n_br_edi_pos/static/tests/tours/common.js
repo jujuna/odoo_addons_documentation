@@ -3,23 +3,25 @@ import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
 import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_screen_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
 import * as TicketScreen from "@point_of_sale/../tests/pos/tours/utils/ticket_screen_util";
+import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 
 function checkReceipt(invoiceNumber) {
-    return [
-        {
-            content: "Receipt should contain sandbox warning",
-            trigger:
-                ".pos-receipt > div:contains('ISSUED IN SANDBOX ENVIRONMENT - WITHOUT FISCAL VALUE')",
-        },
-        {
-            content: "Receipt should contain header modifications",
-            trigger: ".pos-receipt > div:contains('Auxiliary Document of Consumer Invoice')",
-        },
-        {
-            content: "Receipt should contain NFC-e invoice number",
-            trigger: `.pos-receipt > div:contains('NFC-e nº ${invoiceNumber}')`,
-        },
-    ];
+    return FeedbackScreen.checkTicketData({
+        cssRules: [
+            {
+                css: "body div",
+                text: "ISSUED IN SANDBOX ENVIRONMENT - WITHOUT FISCAL VALUE",
+            },
+            {
+                css: "body div",
+                text: "Auxiliary Document of Consumer Invoice",
+            },
+            {
+                css: "body div",
+                text: `NFC-e nº ${invoiceNumber}`,
+            },
+        ],
+    });
 }
 
 function checkNoExcludedTaxesProducts() {
@@ -33,6 +35,9 @@ function checkNoExcludedTaxesProducts() {
             content: "Click search more",
             trigger: ".search-more-button > button",
             run: "click",
+        },
+        {
+            trigger: ".status-buttons:has(.oi-spin)",
         },
         Chrome.isSynced(), // wait for async search to complete
         {
@@ -55,15 +60,12 @@ export function generateTour(invoiceNumber, customerName) {
         ProductScreen.clickPayButton(),
         PaymentScreen.clickPaymentMethod("Cash"),
         PaymentScreen.clickValidate(),
+        FeedbackScreen.isContinueEnabled(),
         checkReceipt(invoiceNumber),
+        FeedbackScreen.clickNextOrder(),
         Chrome.clickOrders(),
         TicketScreen.selectFilter("Paid"),
-        {
-            content: "Reprint the receipt",
-            trigger: "button:contains('Print Receipt')",
-            run: "click",
-        },
-        checkReceipt(invoiceNumber),
+        TicketScreen.selectOrder("001"),
         Chrome.endTour(),
     ].flat();
 }

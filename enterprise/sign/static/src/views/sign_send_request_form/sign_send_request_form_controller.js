@@ -1,13 +1,14 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { formView } from "@web/views/form/form_view";
+import { formControllerProps } from "@web/views/form/form_controller";
 import { registry } from "@web/core/registry";
-import { EventBus, useSubEnv } from "@odoo/owl";
+import { EventBus, useProps, t } from "@odoo/owl";
 
 export class SignSendRequestController extends formView.Controller {
-    static props = {
-        ...formView.Controller.props,
-        fullComposerBus: { type: EventBus, optional: true },
-    };
-    static defaultProps = { fullComposerBus: new EventBus() };
+    props = useProps({
+        ...formControllerProps,
+        fullComposerBus: t.instanceOf(EventBus).optional(new EventBus()),
+    });
     setup() {
         super.setup();
         useSubEnv({

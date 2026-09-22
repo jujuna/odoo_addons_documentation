@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Point of Sale Restaurant Appointment',
-    'version': '1.0',
     'category': 'Sales/Point of Sale',
     'sequence': 6,
     'summary': 'This module lets you manage online reservations for restaurant tables',
@@ -12,11 +10,13 @@
     'auto_install': True,
     'data': [
         'views/appointment_resource_views.xml',
+        'views/pos_order_views.xml',
         'views/pos_restaurant_views.xml',
         'views/calendar_event_views.xml',
     ],
     'demo': [
         'demo/pos_restaurant_appointment_demo.xml',
+        'demo/calendar_event_demo.xml',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

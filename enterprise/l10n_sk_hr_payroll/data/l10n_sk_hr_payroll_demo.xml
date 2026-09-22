@@ -62,57 +62,39 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_sk'))]"/>
         <field name="company_id" ref="base.demo_company_sk"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_sk_hr_payroll/static/img/hr_employe_frantiska.jpg"/>
-    </record>
-
-    <record id="sk_res_bank_slovenska_sporitelna" model="res.bank">
-        <field name="name">Slovenská Sporiteľňa</field>
-        <field name="bic">GIBASKBXXXX</field>
-        <field name="street">Slovenská Sporiteľňa Street</field>
-        <field name="city">Bratislava</field>
-        <field name="zip">80103</field>
-        <field name="country" ref="base.sk"/>
-        <field name="phone">999/349-9381</field>
-    </record>
-    <record id="sk_res_bank_slovenska_sporitelna" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_sk_hr_payroll.sk_res_bank_slovenska_sporitelna')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="sk_res_bank_vub_banka" model="res.bank">
-        <field name="name">VUB Banka</field>
-        <field name="bic">SUBASKBXXXX</field>
-        <field name="street">VUB Banka Rd</field>
-        <field name="city">Trebejov</field>
-        <field name="zip">898912</field>
-        <field name="country" ref="base.sk"/>
-        <field name="phone">999/019-8391</field>
-    </record>
-    <record id="sk_res_bank_vub_banka" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_sk_hr_payroll.sk_res_bank_vub_banka')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="l10n_sk_hr_payroll/static/img/hr_employe_frantiska.jpg"/>
     </record>
 
     <record id="res_partner_bank_account_richard" model="res.partner.bank">
-        <field name="acc_number">SK8975000000000032165471</field>
+        <field name="account_number">SK8975000000000032165471</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_sk_hr_payroll.sk_res_bank_slovenska_sporitelna"/>
+        <field name="bank_name">Slovenská Sporiteľňa</field>
+        <field name="bank_bic">GIBASKBXXXX</field>
+        <field name="street">Slovenská Sporiteľňa Street</field>
+        <field name="city">Bratislava</field>
+        <field name="zip">80103</field>
+        <field name="country_id" ref="base.sk"/>
         <field name="partner_id" ref="l10n_sk_hr_payroll.res_partner_richard"/>
         <field name="company_id" ref="base.demo_company_sk"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="res_partner_bank_account_frantiska" model="res.partner.bank">
-        <field name="acc_number">SK3193779311764615225576</field>
+        <field name="account_number">SK3193779311764615225576</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_sk_hr_payroll.sk_res_bank_vub_banka"/>
+        <field name="bank_name">VUB Banka</field>
+        <field name="bank_bic">SUBASKBXXXX</field>
+        <field name="street">VUB Banka Rd</field>
+        <field name="city">Trebejov</field>
+        <field name="zip">898912</field>
+        <field name="country_id" ref="base.sk"/>
         <field name="partner_id" ref="l10n_sk_hr_payroll.res_partner_frantiska"/>
         <field name="company_id" ref="base.demo_company_sk"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="hr_employee_richard" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_sk_hr_payroll.res_partner_richard')).name"/>
         <field name="job_title">Technical Lead</field>
-        <field name="image_1920" type="base64" file="l10n_sk_hr_payroll/static/img/hr_employee_richard.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_sk_hr_payroll/static/img/hr_employee_richard.jpg"/>
         <field name="work_phone">999/093-7982</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_sk_hr_payroll.res_partner_richard')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_sk_hr_payroll.res_partner_richard"/>
@@ -135,7 +117,6 @@
         <field name="emergency_phone">999/890-4281</field>
         <field name="certificate">other</field>
         <field name="study_field">Frontend developer</field>
-        <field name="study_school">Univerzita Komenského</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_sk_hr_payroll.res_partner_bank_account_richard'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -148,11 +129,12 @@
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_sk').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="hr_employee_frantiska" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_sk_hr_payroll.res_partner_frantiska')).name"/>
-        <field name="image_1920" type="base64" file="l10n_sk_hr_payroll/static/img/hr_employe_frantiska.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_sk_hr_payroll/static/img/hr_employe_frantiska.jpg"/>
         <field name="work_phone">999/093-7983</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_sk_hr_payroll.res_partner_frantiska')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_sk_hr_payroll.hr_employee_richard"/>
@@ -177,7 +159,6 @@
         <field name="emergency_phone">999/473-8209</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Comenius University Bratislava</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_sk_hr_payroll.res_partner_bank_account_frantiska'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -192,6 +173,7 @@
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_sk').id)], limit=1)"/>
         <field name="l10n_sk_meal_voucher_employee">6.40</field>
         <field name="l10n_sk_meal_voucher_employer">3.52</field>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <function name="create_version" model="hr.employee">

@@ -2,8 +2,9 @@ import { _t } from "@web/core/l10n/translation";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useService } from "@web/core/utils/hooks";
 import { Notebook } from "@web/core/notebook/notebook";
+import { registry } from "@web/core/registry";
 
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 import { SpreadsheetSelectorPanel } from "./spreadsheet_selector_panel";
 
 const NAME_LABELS = {
@@ -12,6 +13,8 @@ const NAME_LABELS = {
     LINK: _t("Link name"),
     GRAPH: _t("Graph name"),
 };
+
+const pagesComponentRegistry = registry.category("spreadsheet_selector_dialog_pages_component");
 
 /**
  * @typedef State
@@ -29,18 +32,20 @@ const NAME_LABELS = {
 export class SpreadsheetSelectorDialog extends Component {
     static template = "spreadsheet_edition.SpreadsheetSelectorDialog";
     static components = { Dialog, Notebook };
-    static props = {
-        actionOptions: Object,
-        type: String,
-        threshold: { type: Number, optional: true },
-        maxThreshold: { type: Number, optional: true },
-        name: String,
-        close: Function,
-    };
+
+    props = useProps({
+        actionOptions: t.object(),
+        type: t.string(),
+        threshold: t.number().optional(),
+        maxThreshold: t.number().optional(),
+        name: t.string(),
+        close: t.function(),
+        context: t.object(),
+    });
 
     setup() {
         /** @type {State} */
-        this.state = useState({
+        this.state = proxy({
             threshold: this.props.threshold,
             name: this.props.name,
             confirmationIsPending: false,
@@ -54,19 +59,26 @@ export class SpreadsheetSelectorDialog extends Component {
         onWillStart(async () => {
             const spreadsheetModels = await orm.call(
                 "spreadsheet.mixin",
-                "get_selector_spreadsheet_models"
+                "get_selector_spreadsheet_models",
+                [],
+                {
+                    context: this.props.context,
+                }
             );
-            this.noteBookPages = spreadsheetModels.map(({ model, display_name, allow_create }) => ({
-                Component: SpreadsheetSelectorPanel,
-                id: model,
-                title: display_name,
-                props: {
-                    model,
-                    displayBlank: allow_create,
-                    onSpreadsheetSelected: this.onSpreadsheetSelected.bind(this),
-                    onSpreadsheetDblClicked: this._onInsert.bind(this),
-                },
-            }));
+            this.noteBookPages = spreadsheetModels.map(
+                ({ model, display_name, allow_create, component, additional_props }) => ({
+                    Component: pagesComponentRegistry.get(component, SpreadsheetSelectorPanel),
+                    id: model,
+                    title: display_name,
+                    props: {
+                        model,
+                        displayBlank: allow_create,
+                        onSpreadsheetSelected: this.onSpreadsheetSelected.bind(this),
+                        onSpreadsheetDblClicked: this._onInsert.bind(this),
+                        ...(additional_props ?? {}),
+                    },
+                })
+            );
         });
     }
 

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from . import discuss_channel
+from . import mail_guest
 from . import res_config_settings
 from . import social_media
 from . import social_account

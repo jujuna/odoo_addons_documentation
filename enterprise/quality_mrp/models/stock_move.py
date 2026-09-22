@@ -25,7 +25,7 @@ class StockMove(models.Model):
         mo_moves = defaultdict(lambda: self.env['stock.move'])
         check_vals_list = []
         for move in self:
-            if move.production_id and move.location_dest_usage != 'inventory':
+            if move.production_id and not move.is_scrap:
                 mo_moves[move.production_id] |= move
 
         # QC of product type

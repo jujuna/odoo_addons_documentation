@@ -1,39 +1,46 @@
+import {
+    Component,
+    onError,
+    onMounted,
+    onPatched,
+    signal,
+    t,
+    toRaw,
+    useProps,
+    xml,
+} from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
+import { useService } from "@web/core/utils/hooks";
+import { useSubEnv } from "@web/owl2/utils";
 import { WithSearch } from "@web/search/with_search/with_search";
 import { cleanClickedElements } from "@web_studio/client_action/view_editor/editors/utils";
-import { Component, onError, onMounted, toRaw, useRef, xml, useSubEnv, useEffect } from "@odoo/owl";
-import { useService } from "@web/core/utils/hooks";
-import { _t } from "@web/core/l10n/translation";
 
 export class StudioView extends Component {
     static components = { WithSearch };
     static template = xml`
-        <div t-att-style="style" class="w-100 h-100" t-ref="viewRenderer">
-            <WithSearch t-props="withSearchProps" t-slot-scope="search">
-                <t t-component="viewEditorModel.editorInfo.editor.Controller" t-props="Object.assign(controllerProps, search)" />
+        <div class="w-100 h-100" t-att-class="{ 'pe-none': this.studioViewProps.setOverlay }" t-ref="this.viewRendererRef">
+            <WithSearch t-props="this.props" t-slot-scope="searchParams">
+                <t
+                    t-component="this.viewEditorModel.editorInfo.editor.Controller"
+                    t-props="{ ...this.viewEditorModel.controllerProps, ...searchParams }"
+                />
             </WithSearch>
         </div>
     `;
-    static props = { autoClick: { type: Function, optional: true }, "*": true }; // Same as View.js. This is just a wrapper
+
+    /** Same as {@link "@web/views/view"}: this is just a wrapper */
+    props = useProps();
+    studioViewProps = useProps({
+        autoClick: t.function().optional(),
+        setOverlay: t.boolean().optional(),
+    });
+
+    viewRendererRef = signal.ref();
+
     setup() {
         this.notification = useService("notification");
-        this.style = this.props.setOverlay ? "pointer-events: none;" : "";
-        this.withSearchProps = {
-            resModel: this.props.resModel,
-            SearchModel: this.props.SearchModel,
-            context: this.props.context,
-            domain: this.props.domain,
-            globalState: this.props.globalState,
-            searchViewArch: this.props.searchViewArch,
-            searchViewFields: this.props.searchViewFields,
-            irFilters: this.props.searchViewIrFilters,
-            display: this.props.display,
-            defaultGroupBy: this.props.defaultGroupBy,
-        };
         this.viewEditorModel = this.env.viewEditorModel;
 
-        this.viewRenderer = useRef("viewRenderer");
-
-        this.controllerProps = { ...this.viewEditorModel.controllerProps };
         if (this.viewEditorModel.initialState.activeNodeXpath) {
             onMounted(() => {
                 const initialActiveNodeXpath = this.viewEditorModel.initialState.activeNodeXpath;
@@ -41,22 +48,28 @@ export class StudioView extends Component {
                 this.viewEditorModel.activeNodeXpath = initialActiveNodeXpath;
             });
         }
-        useEffect(
-            (xpath) => {
-                if (xpath) {
-                    this.updateActiveNode({ xpath, resetSidebarOnNotFound: true });
-                }
-            },
-            () => [this.viewEditorModel.activeNodeXpath]
-        );
+        let lastActiveNodeXpath;
+        const applyActiveNode = () => {
+            const xpath = this.viewEditorModel.activeNodeXpath;
+            if (xpath === lastActiveNodeXpath) {
+                return;
+            }
+            lastActiveNodeXpath = xpath;
+            if (xpath) {
+                this.updateActiveNode({ xpath, resetSidebarOnNotFound: true });
+            }
+        };
+        onMounted(applyActiveNode);
+        onPatched(applyActiveNode);
 
         const rawModel = toRaw(this.viewEditorModel);
-        useEffect(
-            () => {
+        const resetIsInEdition = () => {
+            if (rawModel.isInEdition) {
                 rawModel.isInEdition = false;
-            },
-            () => [rawModel.isInEdition]
-        );
+            }
+        };
+        onMounted(resetIsInEdition);
+        onPatched(resetIsInEdition);
 
         onError((error) => {
             if (rawModel.isInEdition) {
@@ -77,15 +90,18 @@ export class StudioView extends Component {
 
         const config = {
             ...this.env.config,
-            onNodeClicked: (xpath) => {
+            onNodeClicked: (xpath, params) => {
+                if (params?.discard_studio_click) {
+                    return;
+                }
                 if (this.updateActiveNode({ xpath })) {
                     this.viewEditorModel.activeNodeXpath = xpath;
                 }
             },
         };
 
-        if (this.props.autoClick) {
-            onMounted(() => this.props.autoClick());
+        if (this.studioViewProps.autoClick) {
+            onMounted(this.studioViewProps.autoClick);
         }
 
         useSubEnv({
@@ -100,8 +116,8 @@ export class StudioView extends Component {
 
     updateActiveNode({ xpath, resetSidebarOnNotFound = false }) {
         const vem = this.env.viewEditorModel;
-        cleanClickedElements(this.viewRenderer.el);
-        const el = this.viewRenderer.el.querySelector(
+        cleanClickedElements(this.viewRendererRef());
+        const el = this.viewRendererRef().querySelector(
             `[data-studio-xpath="${xpath}"], [studioxpath="${xpath}"]`
         );
         if (!el) {
@@ -111,7 +127,7 @@ export class StudioView extends Component {
             return false;
         }
         if (vem.editorInfo.editor.styleClickedElement) {
-            vem.editorInfo.editor.styleClickedElement(this.viewRenderer, { xpath });
+            vem.editorInfo.editor.styleClickedElement(this.viewRendererRef, { xpath });
             return true;
         }
         const clickable = el.closest(".o-web-studio-editor--element-clickable");

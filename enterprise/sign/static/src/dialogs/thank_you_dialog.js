@@ -1,65 +1,51 @@
+import { SignInfoPlugin } from "@sign/services/sign_info_plugin";
 import { _t } from "@web/core/l10n/translation";
 import { session } from "@web/session";
 import { user } from "@web/core/user";
 import { Dialog } from "@web/core/dialog/dialog";
 import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, t, usePlugin, useProps } from "@odoo/owl";
 import { isMobileOS } from "@web/core/browser/feature_detection";
-
 
 export class ThankYouDialog extends Component {
     static template = "sign.ThankYouDialog";
     static components = {
         Dialog,
     };
-    static props = {
-        message: {
-            type: String,
-            optional: true,
-        },
-        subtitle: {
-            type: String,
-            optional: true,
-        },
-        redirectURL: {
-            type: String,
-            optional: true,
-        },
-        redirectURLText: {
-            type: String,
-            optional: true,
-        },
-        close: Function,
-        reference: {
-            type: String,
-            optional: true
-        },
-        isRefused: {
-            type: Boolean,
-            optional: true
-        },
-    };
+
+    props = useProps({
+        message: t.string().optional(),
+        subtitle: t.string().optional(),
+        redirectURL: t.string().optional(),
+        redirectURLText: t.string().optional(),
+        close: t.function(),
+        reference: t.string().optional(),
+        isRefused: t.boolean().optional(),
+    });
 
     setup() {
         this.dialog = useService("dialog");
-        this.signInfo = useService("signInfo");
+        this.signInfo = usePlugin(SignInfoPlugin);
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             nextDocuments: [],
             buttons: [],
-            signUpButton: null
+            signUpButton: null,
         });
         this.redirectURL = this.processURL(this.props.redirectURL);
         let defaultMessage = _t("You will get the signed document by email.");
         if (this.signInfo.get("companyCountryCode") === "US") {
             // U.S. signers may request a paper copy in addition to the electronic document,
             // as required by the ESIGN Act.
-            defaultMessage = _t("You will get the signed document by email. You may also request a paper copy from the sender.");
+            defaultMessage = _t(
+                "You will get the signed document by email.\nYou may also request a paper copy from the sender."
+            );
         }
         this.message = this.props.message || defaultMessage;
         onWillStart(this.willStart);
         this.isMobileOS = isMobileOS();
+        this.env.dialogData.dismiss = () => this.onClickClose();
     }
 
     get suggestSignUp() {
@@ -85,21 +71,30 @@ export class ThankYouDialog extends Component {
             ]);
             this.closeAction = result.action;
             this.closeLabel = result.label;
-            const closeContext = result.custom_action ? { stackPosition: "replacePreviousAction" } : { clearBreadcrumbs: true };
+            const closeContext = result.custom_action
+                ? { stackPosition: "replacePreviousAction" }
+                : { clearBreadcrumbs: true };
             this.closeContext = closeContext;
         }
         if (!this.props.isRefused) {
             const result = await rpc("/sign/sign_request_items", {
                 request_id: this.signInfo.get("documentId"),
                 sign_item_id: this.signInfo.get("signRequestItemId"),
-                token: this.signInfo.get("signRequestToken"),
+                token: this.signInfo.get("signRequestItemToken"),
             });
             if (result && result.length) {
                 this.state.nextDocuments = result.map((doc) => {
+                    const docName =
+                        doc.name.length > 80 ? doc.name.substring(0, 80) + "..." : doc.name;
+                    const formattedDate = luxon.DateTime.fromISO(doc.date).toLocaleString({
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                    });
                     return {
                         id: doc.id,
-                        name: doc.name,
-                        date: doc.date,
+                        name: docName,
+                        date: formattedDate,
                         user: doc.user || _t("Deleted User"),
                         accessToken: doc.token,
                         requestId: doc.requestId,
@@ -119,7 +114,7 @@ export class ThankYouDialog extends Component {
                 click: () => {
                     window.location.assign(this.redirectURL);
                 },
-                classes: 'btn btn-primary o_sign_thankyou_redirect_button',
+                classes: "btn btn-primary o_sign_thankyou_redirect_button",
             });
         }
 
@@ -204,7 +199,8 @@ export class ThankYouDialog extends Component {
                 this.signInfo.get("documentId"),
                 this.signInfo.get("signRequestToken"),
                 "/completed"
-            ), "_blank"
+            ),
+            "_blank"
         );
     }
 

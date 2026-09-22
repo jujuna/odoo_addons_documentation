@@ -2,23 +2,23 @@
 # This file contains the translation of the following modules:
 # * hr_expense_stripe_demo
 #
-# "Junko Augias (juau)" <juau@odoo.com>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-20 08:15+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 03:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "hr_expense_stripe_demo/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__amount_currency
@@ -34,11 +34,6 @@ msgstr "ATM手数料"
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__authorization_method
 msgid "Authorization Method"
 msgstr "認証方式"
-
-#. module: hr_expense_stripe_demo
-#: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.hr_expense_stripe_test_shipping_wizard_form
-msgid "Cancel"
-msgstr "取消"
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__capture_surcharge
@@ -78,30 +73,36 @@ msgstr "クローズ"
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model,name:hr_expense_stripe_demo.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__company_id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_shipping_wizard__company_id
 msgid "Company"
 msgstr "会社"
 
 #. module: hr_expense_stripe_demo
+#: model:ir.model,name:hr_expense_stripe_demo.model_res_config_settings
+msgid "Config Settings"
+msgstr "構成設定"
+
+#. module: hr_expense_stripe_demo
 #. odoo-python
 #: code:addons/hr_expense_stripe_demo/models/res_company.py:0
 msgid "Configure Company"
-msgstr ""
+msgstr "会社設定"
 
 #. module: hr_expense_stripe_demo
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.res_config_settings_view_form
-msgid "Connect (Demo)"
-msgstr ""
+msgid "Connect (demo)"
+msgstr "接続 (デモ)"
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields.selection,name:hr_expense_stripe_demo.selection__hr_expense_stripe_test_purchase_wizard__authorization_method__contactless
 msgid "Contactless"
 msgstr "非接触"
+
+#. module: hr_expense_stripe_demo
+#: model:ir.module.module,summary:base.module_hr_expense_stripe_demo
+msgid "Create and manage company expense cards via Stripe: Demo"
+msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__create_uid
@@ -126,16 +127,19 @@ msgid "Current Shipping Status"
 msgstr "現在の配送ステータス"
 
 #. module: hr_expense_stripe_demo
-#: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.hr_expense_stripe_test_purchase_wizard
-msgid "Discard"
-msgstr "破棄"
+#. odoo-python
+#: code:addons/hr_expense_stripe_demo/models/res_company.py:0
+msgid "Demo Stripe accounts can only be created in test mode."
+msgstr "Stripeのデモアカウントは、テストモードでのみ作成可能です。"
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_card__display_name
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_dispute__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_shipping_wizard__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_topup_wizard__display_name
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_company__display_name
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr "表示名"
 
@@ -145,11 +149,23 @@ msgid "Employee Expense Card"
 msgstr "従業員経費カード"
 
 #. module: hr_expense_stripe_demo
+#: model:ir.module.module,shortdesc:base.module_hr_expense_stripe_demo
+msgid "Expense cards: Demo"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#: model:ir.model,name:hr_expense_stripe_demo.model_hr_expense_stripe_dispute
+msgid "HR Expense Stripe Dispute"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_card__id
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_dispute__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_shipping_wizard__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_topup_wizard__id
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_company__id
+#: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_res_config_settings__id
 msgid "ID"
 msgstr "ID"
 
@@ -252,8 +268,8 @@ msgstr "出荷シミュレーション"
 
 #. module: hr_expense_stripe_demo
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe_demo.hr_expense_stripe_topup_wizard_inherit_demo
-msgid "Simulate Topup"
-msgstr "トップアップのシミュレーション"
+msgid "Simulate Top-up"
+msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields,field_description:hr_expense_stripe_demo.field_hr_expense_stripe_test_purchase_wizard__force_capture
@@ -269,6 +285,25 @@ msgstr "Stripe通貨"
 #: model:ir.model,name:hr_expense_stripe_demo.model_hr_expense_stripe_topup_wizard
 msgid "Stripe Issuing Top-up Wizard"
 msgstr "Stripe Issuing残高チャージウィザード"
+
+#. module: hr_expense_stripe_demo
+#: model:ir.module.module,description:base.module_hr_expense_stripe_demo
+msgid ""
+"Stripe Issuing integration for expenses: Demo module for testing and "
+"demonstration purposes"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#. odoo-javascript
+#: code:addons/hr_expense_stripe_demo/static/src/components/dispute_form_view.xml:0
+msgid "Submit and Lose"
+msgstr ""
+
+#. module: hr_expense_stripe_demo
+#. odoo-javascript
+#: code:addons/hr_expense_stripe_demo/static/src/components/dispute_form_view.xml:0
+msgid "Submit and Win"
+msgstr ""
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model.fields.selection,name:hr_expense_stripe_demo.selection__hr_expense_stripe_test_shipping_wizard__new_shipping_status__submit
@@ -314,7 +349,7 @@ msgstr ""
 msgid ""
 "To create a Stripe account for your company, please set a postal code on "
 "your company address."
-msgstr ""
+msgstr "Stripeアカウントを作成するには、会社住所に郵便番号を設定してください。"
 
 #. module: hr_expense_stripe_demo
 #: model:ir.model,name:hr_expense_stripe_demo.model_hr_expense_stripe_test_shipping_wizard

@@ -3,7 +3,10 @@ import { QualityCheck } from "@mrp_workorder/mrp_display/mrp_record_line/quality
 
 patch(QualityCheck.prototype, {
     get icon() {
-        return this.type === "worksheet" ? "fa fa-file-text" : super.icon;
+        return this.type === "worksheet" ? "article" : super.icon;
+    },
+    get iconClass() {
+        return this.type === "worksheet" ? "oi-filled" : "";
     },
     get passFailTypes() {
         return [...super.passFailTypes, "worksheet"];

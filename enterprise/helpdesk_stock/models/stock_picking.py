@@ -3,6 +3,7 @@
 
 from markupsafe import Markup
 from odoo import api, fields, models
+from odoo.fields import Domain
 
 
 class StockPicking(models.Model):
@@ -61,6 +62,45 @@ class StockPicking(models.Model):
                 ticket.message_post(subtype_id=subtype.id, body=body)
 
         return res
+
+    def _create_empty_picking(self):
+        picking_default_vals = {
+            'move_ids': [],
+            'state': 'draft',
+            'return_id': False,
+        }
+        if self.env.context.get('default_ticket_id'):
+            ticket_id = self.env['helpdesk.ticket'].browse(self.env.context['default_ticket_id'])
+            # Take return picking type of outgoing type if found, else take the incoming type
+            domain = Domain('company_id', '=', ticket_id.company_id.id)
+            if ticket_id.sale_order_id:
+                domain = Domain.AND([
+                    domain,
+                    [('warehouse_id', 'in', ticket_id.sale_order_id.warehouse_id.id)]
+                ])
+
+            picking_type = self.env['stock.picking.type'].search([
+                Domain.AND([
+                    domain,
+                    [('code', '=', 'outgoing')],
+                ])
+            ], limit=1).return_picking_type_id
+
+            if not picking_type:
+                picking_type = self.env['stock.picking.type'].search([
+                    Domain.AND([
+                        domain,
+                        [('code', '=', 'incoming')],
+                    ])
+                ], limit=1)
+
+            picking_default_vals['origin'] = self.env._('Ticket: %(ticket_name)s', ticket_name=ticket_id.name)
+            picking_default_vals['partner_id'] = ticket_id.partner_id.address_get(['delivery'])['delivery']
+            picking_default_vals['ticket_id'] = ticket_id.id
+            picking_default_vals['picking_type_id'] = picking_type.id
+
+        new_picking = self.create(picking_default_vals)
+        return new_picking
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -5,7 +5,8 @@ import { omit } from "@web/core/utils/objects";
 
 import { ListEditorRenderer, columnsStyling } from "./list_editor_renderer";
 
-import { Component, xml } from "@odoo/owl";
+import { Component, useProps, t, xml } from "@odoo/owl";
+import { standardViewProps } from "@web/views/standard_view_props";
 import { ListEditorSidebar } from "./list_editor_sidebar/list_editor_sidebar";
 import { getStudioNoFetchFields, useModelConfigFetchInvisible } from "../utils";
 
@@ -76,11 +77,25 @@ function useParentedStaticList(model, parentRecord, resIds) {
     model._createEmptyRoot = () => null;
 }
 
+// listView.Controller (ListController) does not export its props schema:
+// inlined from @web/views/list/list_controller.
+const listEditorControllerProps = {
+    ...standardViewProps,
+    allowSelectors: t.boolean().optional(true),
+    onSelectionChanged: t.function().optional(),
+    readonly: t.boolean().optional(),
+    allowOpenAction: t.boolean().optional(true),
+    Model: t.function(),
+    Renderer: t.function(),
+    buttonTemplate: t.string(),
+    archInfo: t.object(),
+    createRecord: t.function().optional(() => () => {}),
+    selectRecord: t.function().optional(() => () => {}),
+    parentRecord: t.object().optional(),
+};
+
 class ListEditorController extends listView.Controller {
-    static props = {
-        ...listView.Controller.props,
-        parentRecord: { type: Object, optional: true },
-    };
+    props = useProps(listEditorControllerProps);
     setup() {
         super.setup();
         useModelConfigFetchInvisible(this.model);
@@ -91,8 +106,8 @@ class ListEditorController extends listView.Controller {
 }
 
 class ControllerShadow extends Component {
-    static props = { ...ListEditorController.props };
-    static template = xml`<t t-component="Component" t-props="componentProps" />`;
+    props = useProps({ ...listEditorControllerProps });
+    static template = xml`<t t-component="this.Component" t-props="this.componentProps" />`;
     get Component() {
         return ListEditorController;
     }
@@ -113,7 +128,16 @@ const listEditor = {
         const props = listView.props(...arguments);
         props.allowSelectors = false;
         props.readonly = true;
-        props.showButtons = false;
+        const { controlPanel } = props.display || {};
+        if (controlPanel) {
+            props.display = {
+                ...props.display,
+                controlPanel: {
+                    ...controlPanel,
+                    buttons: false,
+                },
+            };
+        }
         return props;
     },
     Sidebar: ListEditorSidebar,
@@ -126,17 +150,21 @@ registry.category("studio_editors").add("list", listEditor);
 
 const colNearestHookClass = "o_web_studio_nearest_hook";
 listEditor.styleNearestHook = function styleNearestColumn(mainRef, nearestHook) {
-    const xpath = nearestHook.dataset.xpath;
-    const position = nearestHook.dataset.position;
-    columnsStyling(
-        mainRef.el,
-        `.o_web_studio_hook[data-xpath='${xpath}'][data-position='${position}']`,
-        [colNearestHookClass]
-    );
+    if (!nearestHook.closest("table.o_list_table")) {
+        nearestHook.classList.add(colNearestHookClass);
+    } else {
+        const xpath = nearestHook.dataset.xpath;
+        const position = nearestHook.dataset.position;
+        columnsStyling(
+            mainRef(),
+            `.o_web_studio_hook[data-xpath='${xpath}'][data-position='${position}']`,
+            [colNearestHookClass]
+        );
+    }
 };
 
 listEditor.styleClickedElement = (mainRef, params) => {
-    columnsStyling(mainRef.el, `[data-studio-xpath='${params.xpath}']:not(.o_web_studio_hook)`, [
+    columnsStyling(mainRef(), `[data-studio-xpath='${params.xpath}']:not(.o_web_studio_hook)`, [
         "o-web-studio-editor--element-clicked",
     ]);
 };

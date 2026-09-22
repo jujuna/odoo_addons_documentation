@@ -67,6 +67,11 @@ class MarketingTestSms(models.Model):
     description = fields.Text()
     customer_id = fields.Many2one('res.partner', 'Partner')
     text_trans = fields.Char(translate=True)
+    # some security-like fields to play with webhooks / server actions
+    access_token = fields.Char(groups='base.group_erp_manager')
+    char_field_with_groups = fields.Char(groups='website.group_website_designer')  # website dep
+    user_related_on_customer_id = fields.Many2one('res.users', related='customer_id.user_id')
+    res_partner_category_ids = fields.Many2many('res.partner.category')
 
     @api.depends('customer_id')
     def _compute_from_customer(self):

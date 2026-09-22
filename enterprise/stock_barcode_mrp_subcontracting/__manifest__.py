@@ -1,16 +1,13 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': "Subcontract with Barcode",
     'summary': "Allows the subcontracting process with the barcode views",
     'category': 'Supply Chain/Inventory',
-    'version': '1.0',
     'description': """
 This bridge module is auto-installed when the modules stock_barcode and mrp_subcontracting are installed.
     """,
     'depends': ['stock_barcode', 'mrp_subcontracting'],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

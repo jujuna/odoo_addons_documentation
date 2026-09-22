@@ -12,7 +12,7 @@ const _FACEBOOK_REACTIONS = {
  * Convert the reactions counts to the sorted emojis version.
  * E.G.
  * input: {"LIKE": 9, "CARE": 11, "LOVE": 1}
- * output: [['🥰', 11], ['👍', 9], ['❤️', 1]]
+ * output: [['🥰', 11, like], ['👍', 9, care], ['❤️', 1, love]]
  */
 export function formatFacebookReactions(reactions, limit) {
     let sorted = Object.entries(reactions || {})
@@ -29,5 +29,6 @@ export function formatFacebookReactions(reactions, limit) {
     return sorted.map(([reactionName, reactionCount]) => [
         _FACEBOOK_REACTIONS[reactionName],
         reactionCount,
+        reactionName.toLowerCase(),
     ]);
 }

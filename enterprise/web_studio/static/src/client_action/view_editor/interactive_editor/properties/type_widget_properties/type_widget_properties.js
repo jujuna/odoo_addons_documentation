@@ -1,4 +1,12 @@
-import { Component, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
+import {
+    Component,
+    onWillStart,
+    onWillUpdateProps,
+    proxy,
+    t,
+    usePlugin,
+    useProps,
+} from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
@@ -11,20 +19,26 @@ import {
     FIELD_TYPE_ATTRIBUTES,
     COMPUTED_DISPLAY_OPTIONS,
 } from "@web_studio/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_specific_and_computed_properties";
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 export class TypeWidgetProperties extends Component {
     static template =
         "web_studio.ViewEditor.InteractiveEditorProperties.Field.TypeWidgetProperties";
     static components = { Property };
-    static props = {
-        node: { type: Object },
-        onChangeAttribute: { type: Function },
-    };
+    props = useProps({
+        node: t.object(),
+        onChangeAttribute: t.function(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         this.orm = useService("orm");
         this.fieldService = useService("field");
-        this.attributes = useState({
+        this.dialog = useService("dialog");
+        this.attributes = proxy({
             field: [],
             selection: [],
             boolean: [],
@@ -33,6 +47,7 @@ export class TypeWidgetProperties extends Component {
             string: [],
             digits: [],
         });
+        this.fieldDefs = this.env.viewEditorModel.fields;
 
         onWillStart(async () => {
             await this.computeAttributesList(this.props);
@@ -61,18 +76,16 @@ export class TypeWidgetProperties extends Component {
     async getAttributesOfTypeField(props) {
         const fieldAttributes = this.getWidgetAttributes("field", props);
         if (fieldAttributes.length) {
-            const fields = Object.entries(this.env.viewEditorModel.fields).map(([key, value]) => {
-                return {
-                    ...value,
-                    name: value.name || key,
-                };
-            });
+            const fields = Object.entries(this.env.viewEditorModel.fields).map(([key, value]) => ({
+                ...value,
+                name: value.name || key,
+            }));
             // for each attribute looking for a field, compute the choices to display in the SelectMenu
             await Promise.all(
                 fieldAttributes.map(async (attribute) => {
-                    const choices = await this.getFieldChoices(attribute, fields);
+                    const choices = await this.getFieldChoices(props, attribute, fields);
                     if (
-                        this.props.node.field?.type === "monetary" &&
+                        props.node.field?.type === "monetary" &&
                         attribute.name === "currency_field"
                     ) {
                         attribute.isRequired = true;
@@ -112,7 +125,8 @@ export class TypeWidgetProperties extends Component {
             this.props.node.field.type,
             this.props.node.attrs.widget,
             [],
-            this.env.debug
+            this.debugMode.isActive(),
+            this.env.viewEditorModel.viewType
         );
         return {
             choices: widgets.map(([value, label]) => {
@@ -123,6 +137,65 @@ export class TypeWidgetProperties extends Component {
                 };
             }),
         };
+    }
+
+    /**
+     * @returns the list of available decoration for the current node
+     */
+    get decorationChoices() {
+        return {
+            choices: [
+                { label: "None", value: "empty" },
+                { label: "Bold", value: "bf" },
+                { label: "Italic", value: "it" },
+                { label: "Muted", value: "muted" },
+                { label: "Success", value: "success" },
+                { label: "Danger", value: "danger" },
+                { label: "Warning", value: "warning" },
+                { label: "Info", value: "info" },
+                { label: "Primary", value: "primary" },
+            ],
+        };
+    }
+
+    /**
+     * @returns the list of available decoration condition (model fields) for the current node
+     */
+    get decorationConditionChoices() {
+        return {
+            choices: Object.entries(this.fieldDefs).map((el) => ({
+                label: el[1].string,
+                value: el[0],
+            })),
+        };
+    }
+
+    /**
+     * @returns the decoration attribute for the current node
+     */
+    getDecorationAttribute() {
+        const { attrs } = this.props.node;
+        const decoPrefix = "decoration-";
+        const key = Object.keys(attrs).find((k) => k.startsWith(decoPrefix));
+        return (
+            key && { decoration: key, value: attrs[key], modifier: key.slice(decoPrefix.length) }
+        );
+    }
+
+    /**
+     * @returns true if the field's type is 'many2one'
+     */
+    showDecoration() {
+        const type = this.fieldDefs[this.props.node.attrs.name]?.type;
+        return type === "many2one";
+    }
+
+    /**
+     * @returns true if there is a decoration on the node except when it equals 'decoration-empty'
+     */
+    showDecorationCondition() {
+        const attr = this.getDecorationAttribute();
+        return !!attr && attr.modifier !== "empty";
     }
 
     /**
@@ -146,10 +219,10 @@ export class TypeWidgetProperties extends Component {
         const fieldSpecificViewProperties = FIELD_TYPE_ATTRIBUTES[fieldType]?.[viewType] || [];
 
         return [
-            ...fieldCommonViewsProperties.map((e) => ({ ...e, isAttribute: true })),
-            ...fieldSpecificViewProperties.map((e) => ({ ...e, isAttribute: true })),
             // create a deep copy of the options description to avoid modifying the original objects
             ...JSON.parse(JSON.stringify(this.getSupportedOptionsAndAttributes(props))),
+            ...fieldCommonViewsProperties.map((e) => ({ ...e, isAttribute: true })),
+            ...fieldSpecificViewProperties.map((e) => ({ ...e, isAttribute: true })),
         ];
     }
 
@@ -201,19 +274,17 @@ export class TypeWidgetProperties extends Component {
             .filter((attribute) => attribute !== undefined);
     }
 
-    async getFieldChoices(attribute, fields) {
+    async getFieldChoices(props, attribute, fields) {
         let availableFields = fields;
         if (
             attribute.isRelationalField &&
-            this.props.node.field.relation !== this.env.viewEditorModel.resModel
+            props.node.field.relation !== this.env.viewEditorModel.resModel
         ) {
-            const newFields = await this.fieldService.loadFields(this.props.node.field.relation);
-            availableFields = Object.entries(newFields).map(([key, value]) => {
-                return {
-                    ...value,
-                    name: value.name || key,
-                };
-            });
+            const newFields = await this.fieldService.loadFields(props.node.field.relation);
+            availableFields = Object.entries(newFields).map(([key, value]) => ({
+                ...value,
+                name: value.name || key,
+            }));
         }
         // Specific code to filter available fields to display is handled here as supportedOptions
         // is a generic description and don't allow to describe the full spec of an option
@@ -379,11 +450,25 @@ export class TypeWidgetProperties extends Component {
             value = ""; // the currency_field arch option will be deleted
         }
 
+        const options = { ...this.props.node.attrs.options };
+        const isDateRange = this.props.node.attrs.widget === "daterange";
+        if (
+            isDateRange &&
+            value &&
+            ((name === "start_date_field" && options["end_date_field"]) ||
+                (name === "end_date_field" && options["start_date_field"]))
+        ) {
+            return this.dialog.add(AlertDialog, {
+                body: _t(
+                    "You can't select the 'Start date field' and 'End date field' at the same time"
+                ),
+            });
+        }
+
         const currentProperty = this.getOptionObj(name);
         if (currentProperty.isAttribute) {
             return this.props.onChangeAttribute(value, name);
         }
-        const options = { ...this.props.node.attrs.options };
         if (value || currentProperty.type === "boolean") {
             if (currentProperty.type === "digits") {
                 // The digits options is composed of two integers.
@@ -394,10 +479,14 @@ export class TypeWidgetProperties extends Component {
                     return;
                 }
                 options[name] = [value * 2, value];
-            } else if (["[", "{"].includes(value[0]) || !isNaN(value)) {
+            } else if (["[", "{"].includes(value[0])) {
                 options[name] = JSON.parse(value);
             } else if (currentProperty.type === "number") {
-                options[name] = Number(value);
+                const valueAsNumber = Number(value);
+                if (isNaN(valueAsNumber)) {
+                    return;
+                }
+                options[name] = valueAsNumber;
             } else {
                 options[name] = value;
             }
@@ -405,5 +494,48 @@ export class TypeWidgetProperties extends Component {
             delete options[name];
         }
         this.props.onChangeAttribute(JSON.stringify(options), "options");
+    }
+
+    async onChangeDecoration(modifier) {
+        const attr = this.getDecorationAttribute();
+        const decoration = attr?.decoration ?? "decoration-empty";
+        const value = attr?.value ?? "1";
+
+        const newDecoration = `decoration-${modifier}`;
+        if (newDecoration !== decoration) {
+            await this._onChangeDecoration(newDecoration, value);
+        }
+    }
+
+    async onChangeDecorationCondition(newValue) {
+        const { decoration, value } = this.getDecorationAttribute();
+        if (newValue !== value) {
+            await this._onChangeDecoration(decoration, newValue);
+        }
+    }
+
+    async _onChangeDecoration(decoration, value) {
+        const { attrs } = this.props.node;
+
+        const new_attrs = {
+            [decoration]: decoration === "decoration-empty" ? null : value,
+        };
+
+        Object.keys(attrs).forEach((key) => {
+            if (key.startsWith("decoration-") && key !== decoration) {
+                new_attrs[key] = null;
+            }
+        });
+
+        const operation = {
+            node: this.props.node,
+            target: this.env.viewEditorModel.getFullTarget(
+                this.env.viewEditorModel.activeNodeXpath
+            ),
+            type: "attributes",
+            position: "attributes",
+            new_attrs: new_attrs,
+        };
+        return this.env.viewEditorModel.doOperation(operation);
     }
 }

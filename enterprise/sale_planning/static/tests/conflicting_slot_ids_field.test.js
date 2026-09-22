@@ -48,8 +48,9 @@ test("Test the conflict slot message content", async () => {
         type: "form",
     });
 
-    expect(".o_conflicting_slot").toHaveCount(1);
-    expect(queryText(".o_conflicting_slot")).toBe(
-        "Sep 1, 2021, 9:00 AMSep 1, 2021, 1:00 PM\n(4h) (100.00%) - Sale Order Line 1"
+    expect(".o_field_conflicting_slot_ids").toHaveCount(1);
+    expect(".o_field_conflicting_slot_ids button").toHaveCount(1);
+    expect(queryText(".o_field_conflicting_slot_ids button")).toBe(
+        "1 conflicts"
     );
 });

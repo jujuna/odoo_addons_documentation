@@ -3,23 +3,30 @@
 # * documents_project
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025.
-# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025.
+# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025, 2026.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-11 23:46+0000\n"
-"Last-Translator: \"Patricia Gutiérrez (pagc)\" <pagc@odoo.com>\n"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 03:25+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/documents_project/es_419/>\n"
+"odoo-master/documents_project/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_project
+#: model:ir.module.module,description:base.module_documents_project
+msgid ""
+"\n"
+"Add the ability to create invoices from the document module.\n"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_ir_attachment
@@ -28,8 +35,8 @@ msgstr "Archivo adjunto"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_res_company
-msgid "Companies"
-msgstr "Empresas"
+msgid "Company"
+msgstr "Empresa"
 
 #. module: documents_project
 #. odoo-python
@@ -37,13 +44,18 @@ msgstr "Empresas"
 #: code:addons/documents_project/models/res_company.py:0
 msgid "Company Project Folders cannot be linked to another company.%s"
 msgstr ""
-"Las carpetas de Proyecto de la empresa no se pueden vincular a otra empresa."
-"%s"
+"Las carpetas de Proyecto de la empresa no se pueden vincular a otra "
+"empresa.%s"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_res_config_settings
 msgid "Config Settings"
 msgstr "Ajustes de configuración"
+
+#. module: documents_project
+#: model:ir.model,website_form_label:documents_project.model_project_task
+msgid "Create a Task"
+msgstr "Crear una tarea"
 
 #. module: documents_project
 #: model:documents.document,name:documents_project.project_1_document_1
@@ -65,6 +77,7 @@ msgstr "Carpeta de Proyecto predeterminada"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:documents_project.field_project_project__display_name
+#: model:ir.model.fields,field_description:documents_project.field_project_task__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__display_name
 msgid "Display Name"
@@ -76,13 +89,18 @@ msgid "Document"
 msgstr "Documento"
 
 #. module: documents_project
-#. odoo-python
-#: code:addons/documents_project/models/project_project.py:0
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents_dashboard
-#: model_terms:ir.ui.view,arch_db:documents_project.project_view_kanban_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.edit_project_document_form_inherit
+#: model_terms:ir.ui.view,arch_db:documents_project.project_view_card_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.view_task_form2
 msgid "Documents"
 msgstr "Documentos"
+
+#. module: documents_project
+#: model:ir.module.module,shortdesc:base.module_documents_project
+msgid "Documents - Projects"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_project_project__documents_folder_id
@@ -103,8 +121,7 @@ msgstr "Carpeta"
 #: model:ir.model.fields,help:documents_project.field_project_project__documents_folder_id
 msgid ""
 "Folder in which all of the documents of this project will be categorized."
-msgstr ""
-"Carpeta en la que se organizarán todos los documentos de este proyecto."
+msgstr "Carpeta en la que se organizarán todos los documentos de este proyecto."
 
 #. module: documents_project
 #: model_terms:ir.ui.view,arch_db:documents_project.res_config_settings_view_form_inherit_documents_project
@@ -116,6 +133,7 @@ msgstr "Carpeta donde se crean los nuevos proyectos"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__id
 #: model:ir.model.fields,field_description:documents_project.field_project_project__id
+#: model:ir.model.fields,field_description:documents_project.field_project_task__id
 #: model:ir.model.fields,field_description:documents_project.field_res_company__id
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__id
 msgid "ID"
@@ -138,15 +156,30 @@ msgid "Project Folder"
 msgstr "Carpeta de proyecto"
 
 #. module: documents_project
+#: model:ir.module.module,summary:base.module_documents_project
+msgid "Project from documents"
+msgstr ""
+
+#. module: documents_project
 #: model:documents.document,name:documents_project.document_project_folder
 #: model:ir.model.fields,field_description:documents_project.field_documents_document__project_ids
 msgid "Projects"
 msgstr "Proyectos"
 
 #. module: documents_project
+#: model:ir.model.fields,field_description:documents_project.field_project_task__document_count
+msgid "Related Document Count"
+msgstr "Número de documentos relacionados"
+
+#. module: documents_project
 #: model:ir.model,name:documents_project.model_documents_tag
 msgid "Tag"
 msgstr "Etiqueta"
+
+#. module: documents_project
+#: model:ir.model,name:documents_project.model_project_task
+msgid "Task"
+msgstr "Tarea"
 
 #. module: documents_project
 #. odoo-python
@@ -190,9 +223,9 @@ msgid ""
 "to which it is linked. Please update the company of the \"%(project)s\" "
 "project, or leave the company of this folder empty."
 msgstr ""
-"Esta carpeta debe permanecer en la misma empresa que el proyecto \"%"
-"(project)s\" al cual está vinculado. Actualice la empresa del proyecto \"%"
-"(project)s\" o deje la empresa de esta carpeta en blanco."
+"Esta carpeta debe permanecer en la misma empresa que el proyecto \"%(project)"
+"s\" al cual está vinculado. Actualice la empresa del proyecto \"%(project)"
+"s\" o deje la empresa de esta carpeta en blanco."
 
 #. module: documents_project
 #. odoo-python
@@ -216,6 +249,33 @@ msgstr ""
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "Uh-oh! The project app needs the \"%s\" folder, so you can’t delete it."
 msgstr "Proyectos necesita la carpeta %s, así que no puedes eliminarla."
+
+#. module: documents_project
+#: model:ir.model.fields,help:documents_project.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the "
+"configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+"Usa estas palabras clave en el título para configurar nuevas tareas:\n"
+"\n"
+"        30h Asigna 30 horas a la tarea\n"
+"        #etiquetas Agrega etiquetas a la tarea\n"
+"        @usuario Asígnale la tarea a un usuario\n"
+"        ! Define que la prioridad de la tarea es media\n"
+"        !! Define que la prioridad de la tarea es alta\n"
+"        !!! Define que la prioridad de la tarea es urgente\n"
+"\n"
+"        Asegúrate de utilizar el formato y el orden correcto, por ejemplo: "
+"Realizar mejoras a la pantalla de configuración 5h #función #v16 @Mitchell !"
 
 #. module: documents_project
 #. odoo-python
@@ -249,3 +309,6 @@ msgstr ""
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot set a company on the %s folder."
 msgstr "No puede configurar una empresa en la carpeta %s."
+
+msgid "Document Count"
+msgstr "Número de documentos"

@@ -1,3 +1,4 @@
+import { useEnv } from "@web/owl2/utils";
 import { kanbanView } from "@web/views/kanban/kanban_view";
 import { FieldStudio } from "@web_studio/client_action/view_editor/editors/components/field_studio";
 import { WidgetStudio } from "@web_studio/client_action/view_editor/editors/components/widget_studio";
@@ -6,7 +7,8 @@ import { ViewButtonStudio } from "@web_studio/client_action/view_editor/editors/
 import { StudioHook } from "@web_studio/client_action/view_editor/editors/components/studio_hook_component";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component, toRaw, useEnv, useState, xml, onError } from "@odoo/owl";
+import { Component, useProps, t, toRaw, xml, onError, proxy } from "@odoo/owl";
+import { kanbanRecordProps } from "@web/views/kanban/kanban_record";
 import { KanbanEditorCompiler } from "./kanban_editor_compiler";
 
 class FieldStudioKanbanRecord extends FieldStudio {
@@ -18,15 +20,16 @@ class FieldStudioKanbanRecord extends FieldStudio {
 const KanbanRecord = kanbanView.Renderer.components.KanbanRecord;
 
 class KanbanEditorRecordMenu extends Component {
-    static props = {
-        slots: Object,
-        studioXpath: String,
-    };
     static template = "web_studio.KanbanEditorRecordMenu";
+
+    props = useProps({
+        slots: t.object(),
+        studioXpath: t.string(),
+    });
 }
 
 function useSafeKanban() {
-    const state = useState({ hasError: false });
+    const state = proxy({ hasError: false });
     const viewEditorModel = toRaw(useEnv().viewEditorModel);
     onError((error) => {
         const hasError = state.hasError;
@@ -62,7 +65,7 @@ class _KanbanEditorRecord extends KanbanRecord {
     };
     setup() {
         super.setup();
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         this.dialogService = useService("dialog");
         this.safe = useSafeKanban();
     }
@@ -83,14 +86,14 @@ class _KanbanEditorRecord extends KanbanRecord {
     }
     get dropdownXpath() {
         const compiledTemplateMenu =
-            this.props.archInfo.templateDocs[this.constructor.KANBAN_MENU_ATTRIBUTE];
+            this.props.archInfo.templateDocs[this.constructor.MENU_ATTRIBUTE];
         return computeXpath(compiledTemplateMenu, "kanban");
     }
 }
 
 export class KanbanEditorRecord extends Component {
-    static props = [...KanbanRecord.props];
-    static template = xml`<t t-component="KanbanRecord" t-props="kanbanRecordProps" />`;
+    props = useProps({ ...kanbanRecordProps });
+    static template = xml`<t t-component="this.KanbanRecord" t-props="this.kanbanRecordProps" />`;
 
     get KanbanRecord() {
         if (this.env.viewEditorModel.mode !== "interactive") {

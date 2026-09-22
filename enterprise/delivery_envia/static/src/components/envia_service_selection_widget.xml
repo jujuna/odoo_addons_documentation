@@ -5,12 +5,12 @@
             <div class="row">
                 <label class="fw-bold text-wrap text-break">Carrier:</label>
                 <div class="col-auto">
-                    <Dropdown t-if="available_carriers">
+                    <Dropdown t-if="this.available_carriers">
                         <button class="btn btn-primary o-dropdown-caret">
-                            <t t-out="activeCarrier"/>
+                            <t t-out="this.activeCarrier"/>
                         </button>
                         <t t-set-slot="content">
-                            <t t-foreach="available_carriers" t-as="e_carrier" t-key='e_carrier'>
+                            <t t-foreach="this.available_carriers" t-as="e_carrier" t-key='e_carrier'>
                                 <DropdownItem onSelected="() => this._onCarrierSelected(e_carrier)"><t t-out="e_carrier.toUpperCase()"/></DropdownItem>
                             </t>
                         </t>
@@ -21,12 +21,12 @@
             <div class="row">
                 <label class="fw-bold text-wrap text-break">Service:</label>
                 <div class="col-auto">
-                    <Dropdown t-if="availableServices">
+                    <Dropdown t-if="this.availableServices">
                         <button class="btn btn-primary o-dropdown-caret">
-                            <t t-out="activeService.carrier_name.toUpperCase()"/> - <t t-out="activeService.description"/>
+                            <t t-out="this.activeService.carrier_name.toUpperCase()"/> - <t t-out="this.activeService.description"/>
                         </button>
                         <t t-set-slot="content">
-                            <t t-foreach="availableServices" t-as="service" t-key='service.id'>
+                            <t t-foreach="this.availableServices" t-as="service" t-key='service.id'>
                                 <DropdownItem onSelected="() => this._onServiceSelected(service.name)"><t t-out="service.carrier_name.toUpperCase()"/> - <t t-out="service.description"/></DropdownItem>
                             </t>
                         </t>

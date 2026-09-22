@@ -1,5 +1,5 @@
 import { describe, expect, test, getFixture } from "@odoo/hoot";
-import { hover, waitFor, press } from "@odoo/hoot-dom";
+import { click, hover, press, waitFor, waitForNone, queryOne } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { helpers, registries, stores } from "@odoo/o-spreadsheet";
 import { selectCell } from "@spreadsheet/../tests/helpers/commands";
@@ -22,17 +22,12 @@ test("Hover cell only shows messages, Composer appears on click", async () => {
     const { model, pyEnv, env } = await setupWithThreads();
     const sheetId = model.getters.getActiveSheetId();
     await createThread(model, pyEnv, { sheetId, ...toCartesian("A2") }, ["wave"]);
-
     env.getStore(DelayedHoveredCellStore).hover({ col: 0, row: 1 });
-    await animationFrame();
-
-    expect(".o-thread-popover .o-mail-Thread").toHaveCount(1);
-    expect(".o-thread-popover .o-mail-Composer").toHaveCount(0);
-
+    await waitFor(".o-thread-popover .o-mail-Thread");
+    await waitForNone(".o-thread-popover .o-mail-Composer");
     await contains("div.o-thread-popover [tabindex]").focus();
-    await animationFrame();
-    expect(".o-mail-Thread").toHaveCount(1);
-    expect(".o-mail-Composer").toHaveCount(1);
+    await waitFor(".o-mail-Thread:count(1)");
+    await waitFor(".o-mail-Composer:count(1)");
 });
 
 test("Composer is not focused when navigating cells with keyboard", async () => {
@@ -45,12 +40,9 @@ test("Composer is not focused when navigating cells with keyboard", async () => 
     await animationFrame();
 
     await press("arrowdown");
-    await animationFrame();
-
-    expect(".o-thread-popover").toHaveCount(1);
-    expect(".o-mail-Thread").toHaveCount(1);
-    expect(".o-mail-Composer").toHaveCount(1);
-
+    await waitFor(".o-thread-popover:count(1)");
+    await waitFor(".o-mail-Thread:count(1)");
+    await waitFor(".o-mail-Composer:count(1)");
     const mailComposerInput = parent.querySelector(".o-mail-Composer textarea");
     expect(document.activeElement).not.toBe(mailComposerInput);
 
@@ -68,8 +60,8 @@ test("Selecting the cell with a resolved thread does not open the thread popover
     model.dispatch("EDIT_COMMENT_THREAD", { threadId, sheetId, col: 0, row: 0, isResolved: true });
     selectCell(model, "A1");
     await animationFrame();
-    expect(".o-thread-popover").toHaveCount(0);
-    expect(".o-mail-Thread").toHaveCount(0);
+    await waitForNone(".o-thread-popover");
+    await waitForNone(".o-mail-Thread");
 });
 
 test("Send messages from the popover", async () => {
@@ -78,25 +70,40 @@ test("Send messages from the popover", async () => {
     const action = await getActionMenu(topbarMenuRegistry, ["insert", "insert_comment"], env);
     expect(action.isVisible(env)).toBe(true);
     await action.execute(env);
-    await animationFrame();
-
-    expect(".o-mail-Composer textarea:first").toBeFocused();
-
+    await waitFor(".o-mail-Composer textarea:first:focus");
     await contains(".o-mail-Composer textarea").edit("msg1", { confirm: false });
     await contains(".o-mail-Composer textarea").press("Enter", { ctrlKey: true });
     await waitFor(".o-mail-Message", { timeout: 500, visible: false });
     let threadIds = model.getters.getCellThreads(model.getters.getActivePosition());
     expect(threadIds).toEqual([{ threadId: 1, isResolved: false }]);
-    expect(".o-mail-Message").toHaveCount(1);
-
+    await waitFor(".o-mail-Message:count(1)");
     await contains(".o-mail-Composer textarea", { visible: false }).edit("msg2");
     await animationFrame();
     await contains(".o-mail-Composer button[name='send-message']:enabled").click();
-    expect(".o-mail-Message").toHaveCount(2);
-
+    await waitFor(".o-mail-Message:count(2)");
     threadIds = model.getters.getCellThreads(model.getters.getActivePosition());
     expect(threadIds).toEqual([{ threadId: 1, isResolved: false }]);
-    expect(".o-mail-Message").toHaveCount(2);
+    await waitFor(".o-mail-Message:count(2)");
+});
+
+test("Clicking a link in a comment should not be prevented", async () => {
+    const { model, pyEnv } = await setupWithThreads();
+    const sheetId = model.getters.getActiveSheetId();
+    await createThread(model, pyEnv, { sheetId, ...toCartesian("A2") }, [
+        `<a href="http://example.com">a link</a>`,
+    ]);
+    selectCell(model, "A2");
+    await waitFor(".o-thread-popover .o-mail-Message");
+
+    const popover = queryOne(".o-thread-popover");
+    popover.addEventListener("click", (ev) => {
+        expect.step("link_clicked");
+        expect(ev.defaultPrevented).toBe(false);
+        ev.preventDefault();
+    });
+    const link = queryOne(".o-thread-popover .o-mail-Message a");
+    await click(link);
+    expect.verifySteps(["link_clicked"]);
 });
 
 test("Open side panel from thread popover", async () => {
@@ -106,7 +113,7 @@ test("Open side panel from thread popover", async () => {
     selectCell(model, "A2");
     await animationFrame();
     await contains(".o-thread-popover div.o-thread-highlight button").click();
-    expect(".o-threads-side-panel").toHaveCount(1);
+    await waitFor(".o-threads-side-panel:count(1)");
 });
 
 test.tags("desktop");
@@ -116,10 +123,10 @@ test("Upload button is not visible for spreadsheet cell threads", async () => {
     await createThread(model, pyEnv, { sheetId, ...toCartesian("A2") }, ["wave"]);
     selectCell(model, "A2");
     await hover(waitFor(".o-mail-Message"));
-    expect(".o-mail-Composer button[name='upload-files']").toHaveCount(0);
+    await waitForNone(".o-mail-Composer button[name='upload-files']");
     await contains(".o-mail-Message [title='Expand']").click();
     await contains(".o-dropdown-item:contains('Edit')").click();
-    expect(".o-mail-Message button[name='upload-files']").toHaveCount(0);
+    await waitForNone(".o-mail-Message button[name='upload-files']");
 });
 
 test.tags("desktop");
@@ -133,8 +140,7 @@ test("edit comment from the thread popover", async () => {
     await contains(".dropdown-item:contains(Edit)").click();
     await contains(".o-mail-Composer textarea").edit("msg1", { confirm: false });
     await contains(".o-mail-Composer textarea").press("Enter");
-    await waitFor(".o-mail-Message-content:contains(msg1 (edited))");
-    expect(".o-mail-Message-content").toHaveText("msg1 (edited)");
+    await waitFor(".o-mail-Message-content:text(msg1 (edited))");
 });
 
 test("Spreadsheet cell thread composer shows only one send button", async () => {
@@ -146,6 +152,6 @@ test("Spreadsheet cell thread composer shows only one send button", async () => 
     await animationFrame();
 
     // There should only be one send button (from chat window composer)
-    expect(".o-mail-Composer .o-mail-Composer-send").toHaveCount(0);
-    expect(".o-mail-Composer button[name='send-message']").toHaveCount(1);
+    await waitFor(".o-mail-Composer button[name='send-message']:count(1)");
+    await waitForNone(".o-mail-Composer .o-mail-Composer-send");
 });

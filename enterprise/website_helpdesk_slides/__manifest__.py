@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -21,6 +20,9 @@ Website Slides integration for the helpdesk module
         'views/helpdesk_views.xml',
         'views/helpdesk_templates.xml',
         'views/slide_channel_views.xml',
+    ],
+    'demo': [
+        'data/helpdesk_demo.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

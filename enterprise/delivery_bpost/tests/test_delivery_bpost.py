@@ -7,7 +7,9 @@ from odoo.addons.delivery_bpost.models.delivery_bpost import TRACKING_REF_DELIM
 
 _logger = logging.getLogger(__name__)
 
+
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeliveryBpost(TransactionCase):
 
     def setUp(self):
@@ -28,9 +30,7 @@ class TestDeliveryBpost(TransactionCase):
         # else "vat" field is not copied on children partners and can
         # cause exception when VAT numbers validation is enabled
         self.your_company.write({'country_id': self.env.ref('base.be').id})
-
-        self.agrolait = self.env.ref('base.res_partner_2')
-        self.agrolait.write({'name': 'Odoo Brussels',
+        self.agrolait = self.env['res.partner'].create({'name': 'Odoo Brussels',
                              'street': 'Avenue Edmond Van Nieuwenhuyse 6',
                              'street2': False,
                              'state_id': False,
@@ -38,8 +38,7 @@ class TestDeliveryBpost(TransactionCase):
                              'zip': 1160,
                              'country_id': self.env.ref('base.be').id,
                              'phone': '022903490'})
-        self.think_big_system = self.env.ref('base.res_partner_18')
-        self.think_big_system.write({'name': "Palais de l'Élysee",
+        self.think_big_system = self.env['res.partner'].create({'name': "Palais de l'Élysee",
                                  'street': '55 Rue du Faubourg Saint-Honoré',
                                  'street2': False,
                                  'state_id': False,
@@ -48,7 +47,6 @@ class TestDeliveryBpost(TransactionCase):
                                  'country_id': self.env.ref('base.fr').id,
                                  'phone': '0142928100'})
         self.odooinc = self.env['res.partner'].create({'name': "Odoo Inc.",
-                                 'is_company': True,
                                  'street': '1485 Bayshore Blvd',
                                  'street2': 'Suite 450',
                                  'state_id': self.env.ref('base.state_us_5').id,
@@ -56,10 +54,26 @@ class TestDeliveryBpost(TransactionCase):
                                  'zip': 94124,
                                  'country_id': self.env.ref('base.us').id,
                                  'phone': '+1 (650) 691-3277  '})
-        self.iPadMini = self.env.ref('product.product_product_6')
-        self.product2 = self.env.ref('product.product_product_7')
-        self.product3 = self.env.ref('product.product_product_9')
+
         self.uom_unit = self.env.ref('uom.product_uom_unit')
+        self.product1 = self.env['product.product'].create({'name': "Large Cabinet",
+                                 'standard_price': 800.0,
+                                 'list_price': 320.0,
+                                 'is_storable': True,
+                                 'weight': 0.330,
+                                 'uom_id': self.uom_unit.id})
+        self.product2 = self.env['product.product'].create({'name': "Storage Box",
+                                 'standard_price': 14.0,
+                                 'list_price': 15.8,
+                                 'is_storable': True,
+                                 'weight': 0.01,
+                                 'uom_id': self.uom_unit.id})
+        self.product3 = self.env['product.product'].create({'name': "Pedal Bin",
+                                 'standard_price': 10.0,
+                                 'list_price': 47.0,
+                                 'is_storable': True,
+                                 'weight': 0.01,
+                                 'uom_id': self.uom_unit.id})
         self.stock_location = self.env.ref('stock.stock_location_stock')
         self.customer_location = self.env.ref('stock.stock_location_customers')
 
@@ -68,10 +82,10 @@ class TestDeliveryBpost(TransactionCase):
 
         sol_vals = [
             {
-                "product_id": self.iPadMini.id,
+                "product_id": self.product1.id,
                 "name": "[A1232] Large Cabinet",
                 "product_uom_qty": 1.0,
-                "price_unit": self.iPadMini.lst_price,
+                "price_unit": self.product1.lst_price,
             },
             {
                 "product_id": self.product2.id,
@@ -129,10 +143,10 @@ class TestDeliveryBpost(TransactionCase):
     def test_02_bpost_basic_europe_flow(self):
         SaleOrder = self.env['sale.order']
 
-        sol_vals = {'product_id': self.iPadMini.id,
+        sol_vals = {'product_id': self.product1.id,
                     'name': "[A1232] Large Cabinet",
                     'product_uom_qty': 1.0,
-                    'price_unit': self.iPadMini.lst_price}
+                    'price_unit': self.product1.lst_price}
 
         so_vals = {'partner_id': self.think_big_system.id,
                    'order_line': [(0, None, sol_vals)]}
@@ -172,10 +186,10 @@ class TestDeliveryBpost(TransactionCase):
         SaleOrder = self.env['sale.order']
         # set invoice policy to 'real'
         self.env.ref('delivery_bpost.delivery_carrier_bpost_inter').invoice_policy = 'real'
-        sol_vals = {'product_id': self.iPadMini.id,
+        sol_vals = {'product_id': self.product1.id,
                     'name': "[A1232] Large Cabinet",
                     'product_uom_qty': 1.0,
-                    'price_unit': self.iPadMini.lst_price}
+                    'price_unit': self.product1.lst_price}
 
         so_vals = {'partner_id': self.think_big_system.id,
                    'order_line': [(0, None, sol_vals)]}
@@ -222,7 +236,7 @@ class TestDeliveryBpost(TransactionCase):
         StockPicking = self.env['stock.picking']
 
         order1_vals = {
-                    'product_id': self.iPadMini.id,
+                    'product_id': self.product1.id,
                     'product_uom_qty': 1.0,
                     'location_id': self.stock_location.id,
                     'location_dest_id': self.customer_location.id}

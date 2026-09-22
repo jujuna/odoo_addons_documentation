@@ -24,8 +24,10 @@ import {
     getPillWrapper,
     mountGanttView,
     dragPill,
+    resizePill,
 } from "./web_gantt_test_helpers";
 
+import { browser } from "@web/core/browser/browser";
 import { GanttRenderer } from "@web_gantt/gantt_renderer";
 
 /** @typedef {import("@web_gantt/gantt_renderer").ConnectorProps} ConnectorProps */
@@ -277,148 +279,6 @@ test("Connectors are correctly rendered.", async () => {
     });
 });
 
-test("Connectors are correctly computed and rendered when consolidation is active.", async () => {
-    ProjectTask._records = [
-        {
-            id: 1,
-            name: "Task 1",
-            planned_date_begin: "2021-10-11 18:30:00",
-            date_deadline: "2021-10-11 19:29:59",
-            user_ids: [1],
-            depend_on_ids: [],
-        },
-        {
-            id: 2,
-            name: "Task 2",
-            planned_date_begin: "2021-10-12 11:30:00",
-            date_deadline: "2021-10-12 12:29:59",
-            user_ids: [1, 3],
-            depend_on_ids: [1],
-        },
-        {
-            id: 3,
-            name: "Task 3",
-            planned_date_begin: "2021-10-13 06:30:00",
-            date_deadline: "2021-10-13 07:29:59",
-            user_ids: [],
-            depend_on_ids: [2],
-        },
-        {
-            id: 4,
-            name: "Task 4",
-            planned_date_begin: "2021-10-14 22:30:00",
-            date_deadline: "2021-10-14 23:29:59",
-            user_ids: [2, 3],
-            depend_on_ids: [2],
-        },
-        {
-            id: 5,
-            name: "Task 5",
-            planned_date_begin: "2021-10-15 01:53:10",
-            date_deadline: "2021-10-15 02:34:34",
-            user_ids: [],
-            depend_on_ids: [],
-        },
-        {
-            id: 6,
-            name: "Task 6",
-            planned_date_begin: "2021-10-16 23:00:00",
-            date_deadline: "2021-10-16 23:21:01",
-            user_ids: [1, 3],
-            depend_on_ids: [4, 5],
-        },
-        {
-            id: 7,
-            name: "Task 7",
-            planned_date_begin: "2021-10-17 10:30:12",
-            date_deadline: "2021-10-17 11:29:59",
-            user_ids: [1, 2, 3],
-            depend_on_ids: [6],
-        },
-        {
-            id: 8,
-            name: "Task 8",
-            planned_date_begin: "2021-10-18 06:30:12",
-            date_deadline: "2021-10-18 07:29:59",
-            user_ids: [1, 3],
-            depend_on_ids: [7],
-        },
-        {
-            id: 9,
-            name: "Task 9",
-            planned_date_begin: "2021-10-19 06:30:12",
-            date_deadline: "2021-10-19 07:29:59",
-            user_ids: [2],
-            depend_on_ids: [8],
-        },
-        {
-            id: 10,
-            name: "Task 10",
-            planned_date_begin: "2021-10-19 06:30:12",
-            date_deadline: "2021-10-19 07:29:59",
-            user_ids: [2],
-            depend_on_ids: [],
-        },
-        {
-            id: 11,
-            name: "Task 11",
-            planned_date_begin: "2021-10-18 06:30:12",
-            date_deadline: "2021-10-18 07:29:59",
-            user_ids: [2],
-            depend_on_ids: [10],
-        },
-        {
-            id: 12,
-            name: "Task 12",
-            planned_date_begin: "2021-10-18 06:30:12",
-            date_deadline: "2021-10-19 07:29:59",
-            user_ids: [2],
-            depend_on_ids: [],
-        },
-        {
-            id: 13,
-            name: "Task 13",
-            planned_date_begin: "2021-10-18 07:29:59",
-            date_deadline: "2021-10-20 07:29:59",
-            user_ids: [2],
-            depend_on_ids: [12],
-        },
-    ];
-
-    await mountGanttView({
-        ...ganttViewParams,
-        arch: /* xml */ `<gantt date_start="planned_date_begin" date_stop="date_deadline" default_range="month" dependency_field="depend_on_ids" consolidation_max="{'user_ids': 100 }"/>`,
-    });
-
-    // groups have been created of r
-    expect(".o_gantt_row_header.o_gantt_group.o_group_open").toHaveCount(4);
-
-    function getGroupRow(index) {
-        return queryAll(".o_gantt_row_header.o_gantt_group")[index];
-    }
-
-    expect(SELECTORS.connector).toHaveCount(22);
-
-    await contains(getGroupRow(1)).click();
-    expect(getGroupRow(1)).not.toHaveClass("o_group_open");
-    expect(SELECTORS.connector).toHaveCount(13);
-
-    await contains(getGroupRow(1)).click();
-    expect(SELECTORS.connector).toHaveCount(22);
-
-    await contains(getGroupRow(1)).click();
-    expect(SELECTORS.connector).toHaveCount(13);
-
-    await contains(getGroupRow(2)).click();
-    expect(SELECTORS.connector).toHaveCount(6);
-
-    await contains(getGroupRow(0)).click();
-    expect(SELECTORS.connector).toHaveCount(4);
-
-    await contains(getGroupRow(3)).click();
-    expect(SELECTORS.connector).toHaveCount(0);
-});
-
 test("Connector hovered state is triggered and color is set accordingly.", async () => {
     await mountGanttView(ganttViewParams);
 
@@ -442,20 +302,13 @@ test("Buttons are displayed when hovering a connector.", async () => {
     expect(queryAll(SELECTORS.connectorStrokeButton, { root: getConnector(1) })).toHaveCount(1);
 });
 
-test("Buttons are displayed when hovering a connector after a pill has been hovered.", async () => {
+test("Buttons are displayed when hovering a pill.", async () => {
     await mountGanttView(ganttViewParams);
     expect(queryAll(SELECTORS.connectorStrokeButton, { root: getConnector(1) })).toHaveCount(0);
 
     await hover(getPill("Task 1"));
     await animationFrame();
 
-    expect(queryAll(SELECTORS.connectorStrokeButton, { root: getConnector(1) })).toHaveCount(0);
-
-    await hover(getConnectorStroke(1));
-    await animationFrame();
-    await animationFrame();
-
-    expect(getConnector(1)).toHaveClass(CLASSES.highlightedConnector);
     expect(queryAll(SELECTORS.connectorStrokeButton, { root: getConnector(1) })).toHaveCount(1);
 });
 
@@ -654,6 +507,44 @@ test("Switch to full-size browser: the connections between pills should be dipla
     });
 });
 
+test("Connectors move with pills during drag operation", async () => {
+    onRpc("project.task", "web_gantt_reschedule", () => ({
+        type: "success",
+        message: "Tasks rescheduled",
+        old_vals_per_pill_id: {},
+    }));
+
+    await mountGanttView(ganttViewParams);
+
+    const initialPath = queryFirst(".o_connector_stroke", { root: getConnector(1) }).getAttribute(
+        "d"
+    );
+
+    const { moveTo, drop } = await dragPill("Task 2");
+    await moveTo({ columnHeader: "20", groupHeader: "October 2021" });
+    await animationFrame();
+
+    const updatedPath = queryFirst(".o_connector_stroke", { root: getConnector(1) }).getAttribute(
+        "d"
+    );
+
+    expect(updatedPath).not.toBe(initialPath);
+
+    await drop();
+});
+
+test("Connectors use orthogonal paths instead of bezier curves", async () => {
+    await mountGanttView(ganttViewParams);
+
+    const strokePath = queryFirst(".o_connector_stroke", { root: getConnector(1) });
+    const pathData = strokePath.getAttribute("d");
+
+    const isOrthogonalPath = (pathData) =>
+        /^M\s*[\d.,\s-]+(?:\s*[LQ]\s*[\d.,\s-]+)*$/.test(pathData) && !/[CS]/.test(pathData);
+
+    expect(isOrthogonalPath(pathData)).toBe(true);
+});
+
 test.tags("broken");
 test("Connect two very distant pills", async () => {
     ProjectTask._records = [
@@ -740,41 +631,101 @@ test("move a pill in the same row (Maintain Buffer Reschedule)", async () => {
 
     expect(".o_notification").toHaveCount(1);
     expect(".o_notification .o_notification_buttons button").toHaveCount(1);
-    await contains(".o_notification .o_notification_buttons button i.fa-undo").click();
+    await contains(".o_notification .o_notification_buttons button i[data-icon='undo']").click();
     expect.verifySteps([
         [
-          "web_gantt_reschedule",
-          [
-            {
-              date_deadline: "2021-10-21 23:29:59",
-              planned_date_begin: "2021-10-21 22:30:12",
-              user_ids: false,
-            },
-            "maintainBuffer",
+            "web_gantt_reschedule",
             [
-              7,
+                {
+                    date_deadline: "2021-10-21 23:29:59",
+                    planned_date_begin: "2021-10-21 22:30:12",
+                    user_ids: false,
+                },
+                "maintainBuffer",
+                [7],
+                "depend_on_ids",
+                null,
+                "planned_date_begin",
+                "date_deadline",
             ],
-            "depend_on_ids",
-            null,
-            "planned_date_begin",
-            "date_deadline",
-          ],
         ],
         [
-          "action_rollback_scheduling",
-          [
+            "action_rollback_scheduling",
             [
-              7,
+                [7],
+                {
+                    7: {
+                        start: "2021-10-17 11:30:00",
+                        stop: "2021-10-17 21:29:59",
+                    },
+                },
             ],
-            {
-              7: {
-                start: "2021-10-17 11:30:00",
-                stop: "2021-10-17 21:29:59",
-              },
-            },
-          ],
         ],
-      ]
-    );
+    ]);
 });
 
+test("reschedule gets triggered when resizing a pill (Maintain Buffer Reschedule)", async () => {
+    onRpc(({ method }) => {
+        expect.step(method);
+        if (["web_gantt_reschedule"].includes(method)) {
+            return {
+                type: "success",
+                message: "Tasks rescheduled",
+            };
+        }
+    });
+    await mountGanttView(ganttViewParams);
+
+    // resize to one cell larger (1 day)
+    await resizePill(getPillWrapper("Task 1"), "end", +1);
+    expect.verifySteps(["get_views", "get_gantt_data", "web_gantt_reschedule", "get_gantt_data"]);
+});
+
+test("'Show dependencies' toggle hides/shows connectors and persists to localStorage", async () => {
+    patchWithCleanup(browser.localStorage, {
+        getItem: () => null,
+        setItem: (key, value) => {
+            if (key.includes("gantt_show_connectors")) {
+                expect.step(`show_connectors:${value}`);
+            }
+        },
+    });
+    await mountGanttView(ganttViewParams);
+
+    expect(".o_gantt_renderer").not.toHaveClass("o_gantt_hide_connectors");
+
+    await contains(".o_gantt_reschedule_methods").click();
+    await contains(".dropdown-item:text(Show dependencies)").click();
+    await animationFrame();
+    expect(".o_gantt_renderer").toHaveClass("o_gantt_hide_connectors");
+    expect.verifySteps(["show_connectors:false"]);
+
+    await contains(".o_gantt_reschedule_methods").click();
+    await contains(".dropdown-item:text(Show dependencies)").click();
+    await animationFrame();
+    expect(".o_gantt_renderer").not.toHaveClass("o_gantt_hide_connectors");
+    expect.verifySteps(["show_connectors:true"]);
+});
+
+test("'Show dependencies' state is restored from localStorage on mount", async () => {
+    patchWithCleanup(browser.localStorage, {
+        getItem: (key) => (key.includes("gantt_show_connectors") ? "false" : null),
+        setItem: () => {},
+    });
+    await mountGanttView(ganttViewParams);
+    expect(".o_gantt_renderer").toHaveClass("o_gantt_hide_connectors");
+});
+
+test("hovering a pill highlights its connectors and un-highlights on leave", async () => {
+    await mountGanttView(ganttViewParams);
+
+    expect(SELECTORS.highlightedConnector).toHaveCount(0);
+
+    await hover(queryFirst(getPillWrapper("Task 1")));
+    await runAllTimers();
+    expect(SELECTORS.highlightedConnector).toHaveCount(2);
+
+    await hover(queryFirst(SELECTORS.cell));
+    await runAllTimers();
+    expect(SELECTORS.highlightedConnector).toHaveCount(0);
+});

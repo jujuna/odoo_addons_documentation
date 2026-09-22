@@ -31,8 +31,12 @@ export class StreamPostCommentInstagram extends StreamPostComment {
         return '/social_instagram/delete_comment';
     }
 
+    get likesIcon() {
+        return 'favorite';
+    }
+
     get likesClass() {
-        return 'fa-heart';
+        return 'oi-filled';
     }
 
     get isLikable() {

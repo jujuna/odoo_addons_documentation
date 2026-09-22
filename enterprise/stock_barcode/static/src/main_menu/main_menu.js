@@ -2,75 +2,19 @@ import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { registry } from "@web/core/registry";
-import { useBus, useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useState, markup } from "@odoo/owl";
-import { ManualBarcodeScanner } from "@barcodes/components/manual_barcode";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
-import { url } from "@web/core/utils/urls";
+import { markup, proxy, useProps } from "@odoo/owl";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
+import { StockBarcodeMainScanner } from "../main_scanner/main_scanner";
 
-export class MainMenu extends Component {
-    static props = { ...standardActionServiceProps };
-    static components = {};
+export class MainMenu extends StockBarcodeMainScanner {
     static template = "stock_barcode.MainMenu";
 
+    props = useProps(standardActionServiceProps);
+
     setup() {
-        const displayDemoMessage = this.props.action.params.message_demo_barcodes;
-        this.actionService = useService("action");
-        this.dialogService = useService("dialog");
-        this.pwaService = useService("pwa");
-        this.home = useService("home_menu");
-        this.notificationService = useService("notification");
-        this.state = useState({ displayDemoMessage });
-        this.barcodeService = useService("barcode");
-        useBus(this.barcodeService.bus, "barcode_scanned", (ev) =>
-            this._onBarcodeScanned(ev.detail.barcode)
-        );
-
-        onWillStart(async () => {
-            const data = await rpc("/stock_barcode/get_main_menu_data");
-            this.locationsEnabled = data.groups.locations;
-            this.packagesEnabled = data.groups.package;
-            this.trackingEnabled = data.groups.tracking;
-            this.quantCount = data.quant_count;
-            this.soundEnable = data.play_sound;
-            if (this.soundEnable) {
-                const fileExtension = new Audio().canPlayType("audio/ogg; codecs=vorbis")
-                    ? "ogg"
-                    : "mp3";
-                this.sounds = {
-                    success: new Audio(
-                        url(`/stock_barcode/static/src/audio/success.${fileExtension}`)
-                    ),
-                };
-                this.sounds.success.load();
-            }
-        });
-    }
-
-    logout() {
-        const path = `/web/session/logout${
-            this.pwaService.isScopedApp ? "?redirect=scoped_app/barcode" : ""
-        }`;
-        window.open(path, "_self");
-    }
-
-    openManualBarcodeDialog() {
-        let res;
-        let rej;
-        const promise = new Promise((resolve, reject) => {
-            res = resolve;
-            rej = reject;
-        });
-        this.dialogService.add(ManualBarcodeScanner, {
-            facingMode: "environment",
-            onResult: (barcode) => {
-                this._onBarcodeScanned(barcode);
-                res(barcode);
-            },
-            onError: (error) => rej(error),
-        });
-        promise.catch((error) => console.log(error));
-        return promise;
+        super.setup();
+        const displayDemoMessage = this.props.action.params?.message_demo_barcodes || false;
+        this.state = proxy({ ...super.state, displayDemoMessage });
     }
 
     removeDemoMessage() {
@@ -90,27 +34,6 @@ export class MainMenu extends Component {
             cancelLabel: _t("Leave it"),
         };
         this.dialogService.add(ConfirmationDialog, params);
-    }
-
-    playSound(soundName) {
-        if (this.soundEnable) {
-            this.sounds[soundName].currentTime = 0;
-            this.sounds[soundName].play().catch((error) => {
-                // `play` returns a promise. In case this promise is rejected (permission
-                // issue for example), catch it to avoid Odoo's `UncaughtPromiseError`.
-                this.soundEnable = false;
-                console.warn(error);
-            });
-        }
-    }
-
-    async _onBarcodeScanned(barcode) {
-        const res = await rpc("/stock_barcode/scan_from_main_menu", { barcode });
-        if (res.action) {
-            this.playSound("success");
-            return this.actionService.doAction(res.action);
-        }
-        this.notificationService.add(res.warning, { type: "danger" });
     }
 
     /** Builds the barcode landing page bullet points, decribing features available depending on settings */
@@ -140,6 +63,7 @@ export class MainMenu extends Component {
             bullets.push(_t("Scan a %(bold_s)stracking number%(bold_e)s to find a transfer", tags));
         }
         bullets.push(_t("Scan a %(bold_s)spicking%(bold_e)s to open it", tags));
+        bullets.push(_t("Scan a %(bold_s)scontact%(bold_e)s to see their pending transfers", tags));
         if (this.locationsEnabled) {
             bullets.push(_t("Scan a %(bold_s)slocation%(bold_e)s to initiate a transfer", tags));
         }

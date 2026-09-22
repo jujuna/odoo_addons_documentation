@@ -6,6 +6,8 @@ from odoo.tests import tagged
 @tagged("post_install", "post_install_l10n", "-at_install")
 class TestAustraliaTparReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('au')
     def setUpClass(cls):
@@ -72,7 +74,7 @@ class TestAustraliaTparReport(TestAccountReportsCommon):
 
         tpar_report = self.env.ref('l10n_au_reports.tpar_report')
 
-        options = self._generate_options(tpar_report, fields.Date.from_string('2023-01-01'), fields.Date.from_string('2023-12-31'))
+        options = self._generate_options(tpar_report, '2023-01-01', '2023-12-31')
         options['unfold_all'] = True
 
         self.assertLinesValues(

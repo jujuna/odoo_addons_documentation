@@ -7,15 +7,13 @@
             <t t-set="successful_lines" t-value="order.order_line.filtered(lambda line: line.calendar_event_id or (line.calendar_booking_ids and not line.calendar_booking_ids.not_available))"/>
             <t t-set="failed_lines" t-value="order.order_line.filtered(lambda line: line.calendar_booking_ids.not_available)"/>
             <t t-if="successful_lines">
-                <t t-call="website_appointment_sale.appointment_sale_confirmation_cards">
-                    <t t-set="sale_order_lines" t-value="successful_lines"/>
-                </t>
+                <t t-call="website_appointment_sale.appointment_sale_confirmation_cards"
+                    sale_order_lines="successful_lines"/>
             </t>
             <t t-if="failed_lines">
                 <h4>Oops, it looks like the following Meeting(s) were not booked smoothly:</h4>
-                <t t-call="website_appointment_sale.appointment_sale_confirmation_cards">
-                    <t t-set="sale_order_lines" t-value="failed_lines"/>
-                </t>
+                <t t-call="website_appointment_sale.appointment_sale_confirmation_cards"
+                    sale_order_lines="failed_lines"/>
             </t>
         </t>
     </xpath>
@@ -39,26 +37,26 @@
                             t-if="event.appointment_status == 'request'"
                             class="badge text-bg-success o_wevent_badge position-absolute top-0 start-0 m-3 p-2"
                         >
-                            <i class="fa fa-thumbs-up me-1"/>Reserved
+                            <i class="oi oi-filled me-1" data-icon="thumb_up"/>Reserved
                         </small>
                         <small
                             t-elif="event"
                             class="badge text-bg-success o_wevent_badge position-absolute top-0 start-0 m-3 p-2"
                         >
-                            <i class="fa fa-check me-1" role="img"/>Booked
+                            <i class="oi me-1" data-icon="check" role="img"/>Booked
                         </small>
                         <small
                             t-elif="booking.not_available"
                             class="badge text-bg-danger o_wevent_badge position-absolute top-0 start-0 m-2 p-2"
                         >
-                            <i class="fa fa-exclamation-triangle me-1" role="img"/>
+                            <i class="oi me-1" data-icon="warning" role="img"/>
                             Please Contact Us
                         </small>
                         <small
                             t-else=""
-                            class="badge text-bg-warning o_wevent_badge position-absolute top-0 start-0 m-2 p-2"
+                            class="badge text-bg-warning o_wevent_badge position-absolute top-0 start-0 m-2"
                         >
-                            <i class="fa fa-clock-o me-1" role="img"/>Awaiting Payment
+                            <i class="oi me-1" data-icon="schedule" role="img"/>Awaiting Payment
                         </small>
                     </div>
                 </div>

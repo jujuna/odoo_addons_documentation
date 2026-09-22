@@ -4,35 +4,26 @@ import json
 import re
 import mimetypes
 
-from markupsafe import Markup
-
 from odoo import api, models, fields, _, Command
 from odoo.addons.whatsapp.tools.lang_list import Languages
+from odoo.addons.whatsapp.tools.text_formatting import format_wa_markup_to_html
 from odoo.addons.whatsapp.tools.whatsapp_api import WhatsAppApi
 from odoo.addons.whatsapp.tools.whatsapp_exception import WhatsAppError
 from odoo.exceptions import UserError, ValidationError, AccessError
-from odoo.tools import plaintext2html
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools.urls import urljoin as url_join
 
 LATITUDE_LONGITUDE_REGEX = r'^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$'
-
-COMMON_WHATSAPP_PHONE_SAFE_FIELDS = {
-    'mobile',
-    'phone',
-    'phone_sanitized',
-    'partner_id.phone',
-    'phone_sanitized.phone',
-    'x_studio_mobile',
-    'x_studio_phone',
-    'x_studio_partner_id.phone',
-    'x_studio_partner_id.phone_sanitized',
-}
+TEMPLATE_VARIABLE_REGEX = r'{{([^{}]+)}}'  # Extract variables value like `user_name` or `1`
+NAMED_VARIABLE_VALUE_REGEX = r'[a-z][a-z0-9_]*'  # Validate named variables value
+NAMED_VARIABLE_REGEX = r'{{' + NAMED_VARIABLE_VALUE_REGEX + r'}}'  # Match named placeholders like `{{user_name}}`.
+NUMBER_VARIABLE_VALUE_REGEX = r'[1-9][0-9]*'  # Validate numbered variables value
+NUMBER_VARIABLE_REGEX = r'{{' + NUMBER_VARIABLE_VALUE_REGEX + r'}}'  # Match numbered placeholders like `{{1}}`.
 
 
 class WhatsappTemplate(models.Model):
     _name = 'whatsapp.template'
-    _inherit = ['mail.thread']
+    _inherit = ['whatsapp.base.template']
     _description = 'WhatsApp Template'
     _order = 'sequence asc, write_date desc, id'
 
@@ -51,13 +42,11 @@ class WhatsappTemplate(models.Model):
             for model in self.env['ir.model'].sudo().search([])
         ]
 
-    name = fields.Char(string="Name", tracking=True)
     template_name = fields.Char(
         string="Template Name",
         compute='_compute_template_name', readonly=False, store=True,
         copy=False)
     sequence = fields.Integer(required=True, default=0)
-    active = fields.Boolean(default=True)
 
     wa_account_id = fields.Many2one(
         comodel_name='whatsapp.account', string="Account", compute="_compute_wa_account_id",
@@ -74,9 +63,14 @@ class WhatsappTemplate(models.Model):
         string='Related Document Model',
         related='model_id.model',
         precompute=True, store=True, readonly=True)
+    use_default_recipient = fields.Boolean(
+        string='Default Recipient',
+        default=True,
+        help="Enable this option to send the message to the default recipient linked to the record (e.g., partner). "
+             "When disabled, you must specify the phone field path manually.")
     phone_field = fields.Char(
         string='Phone Field', compute='_compute_phone_field',
-        precompute=True, readonly=False, required=True, store=True)
+        precompute=True, readonly=False, store=True)
     lang_code = fields.Selection(string="Language", selection=Languages, default='en', required=True)
     template_type = fields.Selection([
         ('authentication', 'Authentication'),
@@ -102,24 +96,8 @@ class WhatsappTemplate(models.Model):
         ('red', 'Red'),
         ('yellow', 'Yellow'),
         ('green', 'Green')], string="Quality", default='none', copy=False, tracking=True)
-    allowed_user_ids = fields.Many2many(
-        comodel_name='res.users', string="Users",
-        domain=[('share', '=', False)])
 
-    body = fields.Text(string="Template body", tracking=True)
-    header_type = fields.Selection([
-        ('none', 'None'),
-        ('text', 'Text'),
-        ('image', 'Image'),
-        ('video', 'Video'),
-        ('document', 'Document'),
-        ('location', 'Location')], string="Header Type", default='none')
-    header_text = fields.Char(string="Template Header Text", size=60)
-    header_attachment_ids = fields.Many2many(
-        'ir.attachment', string="Template Static Header",
-        bypass_search_access=True,
-        copy=False)  # keep False to avoid linking attachments; we have to copy them instead
-    footer_text = fields.Char(string="Footer Message")
+    header_type = fields.Selection(selection_add=[('location', 'Location')])
     report_id = fields.Many2one(
         comodel_name='ir.actions.report', string="Report",
         compute="_compute_report_id", readonly=False, store=True,
@@ -128,6 +106,14 @@ class WhatsappTemplate(models.Model):
         'whatsapp.template.variable', 'wa_template_id', string="Template Variables",
         store=True, compute='_compute_variable_ids', precompute=True, readonly=False,
         copy=False)  # done with custom code due to buttons variables
+    variable_type = fields.Selection([
+        ('positional', 'Number'),
+        ('named', 'Name'),
+    ], string="Variable Type", default='positional', required=True,
+    help="""Choose how variables are written in the template:
+    - Number: {{1}}, {{2}}, ...
+    - Name: {{user_name}}, {{order_id}}, ...
+    """)
     button_ids = fields.One2many(
         'whatsapp.template.button', 'wa_template_id', string="Buttons",
         copy=True)  # will copy their variables
@@ -141,14 +127,42 @@ class WhatsappTemplate(models.Model):
         "Duplicate template is not allowed for one Meta account.",
     )
 
-    @api.constrains('header_text')
+    @api.constrains('body', 'variable_type')
+    def _check_body_text(self):
+        for template in self:
+            body_variables = re.findall(TEMPLATE_VARIABLE_REGEX, template.body or '')
+            if not body_variables:
+                continue
+            invalid_vars = [var for var in body_variables if not template._is_valid_variable(var, with_braces=False)]
+            if invalid_vars:
+                raise ValidationError(_(
+                    'Invalid variables: %(variables)s\nVariable type "%(type)s" expects format like %(expected)s.',
+                    variables=', '.join('{{' + var + '}}' for var in invalid_vars),
+                    type=dict(template._fields['variable_type'].selection).get(template.variable_type),
+                    expected=template._get_variable_format_example(),
+                ))
+            # positional sequence check
+            if template.variable_type == 'positional':
+                variable_indices = sorted({int(var) for var in body_variables})
+                if variable_indices and (variable_indices[0] != 1 or variable_indices[-1] != len(variable_indices)):
+                    missing = next(
+                        (index for index in range(1, len(variable_indices)) if variable_indices[index - 1] + 1 != variable_indices[index]),
+                        0) + 1
+                    raise ValidationError(_('Body variables should start at 1 and not skip any number, missing %d', missing))
+
+    @api.constrains('header_text', 'header_type', 'variable_type')
     def _check_header_text(self):
+        super()._check_header_text()
         for tmpl in self.filtered(lambda l: l.header_type == 'text'):
-            header_variables = list(re.findall(r'{{[1-9][0-9]*}}', tmpl.header_text))
-            if len(header_variables) > 1 or (header_variables and header_variables[0] != '{{1}}'):
-                raise ValidationError(
-                    _("The Header Text must either contain no variable or the first one {{1}}.")
-                )
+            header_variables = re.findall(TEMPLATE_VARIABLE_REGEX, tmpl.header_text or '')
+            if not header_variables:
+                continue
+            if len(header_variables) > 1:
+                raise ValidationError(_('The Header Text must contain at most one variable.'))
+            if tmpl.variable_type == 'named' and not tmpl._is_valid_variable(header_variables[0], with_braces=False):
+                raise ValidationError(_('Variable type "Name" expects placeholders like {{customer_name}} in the header text.'))
+            elif tmpl.variable_type == 'positional' and header_variables[0] != '1':
+                raise ValidationError(_('Variable type "Number" only supports {{1}} as a placeholder in the header text.'))
 
     @api.constrains('phone_field', 'model')
     def _check_phone_field(self):
@@ -176,22 +190,13 @@ class WhatsappTemplate(models.Model):
                       model=tmpl.model)
                 ) from err
 
-    @api.constrains('header_attachment_ids', 'header_type', 'report_id')
-    def _check_header_attachment_ids(self):
-        templates_with_attachments = self.filtered('header_attachment_ids')
-        for tmpl in templates_with_attachments:
-            if len(tmpl.header_attachment_ids) > 1:
-                raise ValidationError(_('You may only use one header attachment for each template'))
-            if tmpl.header_type not in ['image', 'video', 'document']:
-                raise ValidationError(_("Only templates using media header types may have header documents"))
-            if not any(tmpl.header_attachment_ids.mimetype in mimetypes for mimetypes in self.env['whatsapp.message']._SUPPORTED_ATTACHMENT_TYPE[tmpl.header_type]):
-                raise ValidationError(_("File type %(file_type)s not supported for header type %(header_type)s",
-                                        file_type=tmpl.header_attachment_ids.mimetype, header_type=tmpl.header_type))
-        for tmpl in self - templates_with_attachments:
-            if tmpl.header_type == 'document' and not tmpl.report_id:
-                raise ValidationError(_("Header document or report is required"))
-            if tmpl.header_type in ['image', 'video']:
-                raise ValidationError(_("Header document is required"))
+    @api.constrains('header_attachment_id', 'header_type', 'report_id')
+    def _check_header_attachment_id(self):
+        """ A document header can also be rendered from a report. """
+        documents = self.filtered(lambda tmpl: tmpl.header_type == 'document' and not tmpl.header_attachment_id)
+        if documents.filtered(lambda tmpl: not tmpl.report_id):
+            raise ValidationError(_('Header document or report is required'))
+        super(WhatsappTemplate, self - documents)._check_header_attachment_id()
 
     @api.constrains('button_ids', 'variable_ids')
     def _check_buttons(self):
@@ -203,22 +208,25 @@ class WhatsappTemplate(models.Model):
             if len(tmpl.button_ids.filtered(lambda button: button.button_type == 'phone_number')) > 1:
                 raise ValidationError(_('Maximum 1 Call Number button allowed.'))
 
-    @api.constrains('variable_ids')
+    @api.constrains('variable_ids', 'variable_type')
     def _check_body_variables(self):
         for template in self:
             variables = template.variable_ids.filtered(lambda variable: variable.line_type == 'body')
+            if not variables:
+                continue
             free_text_variables = variables.filtered(lambda variable: variable.field_type == 'free_text')
             if len(free_text_variables) > 10:
                 raise ValidationError(_('Only 10 free text is allowed in body of template'))
+            # positional sequence check
+            if template.variable_type == 'positional':
+                variable_indices = sorted(var._extract_variable_value() for var in variables)
+                if len(variable_indices) > 0 and (variable_indices[0] != 1 or variable_indices[-1] != len(variables)):
+                    missing = next(
+                        (index for index in range(1, len(variables)) if variable_indices[index - 1] + 1 != variable_indices[index]),
+                        0) + 1
+                    raise ValidationError(_('Body variables should start at 1 and not skip any number, missing %d', missing))
 
-            variable_indices = sorted(var._extract_variable_index() for var in variables)
-            if len(variable_indices) > 0 and (variable_indices[0] != 1 or variable_indices[-1] != len(variables)):
-                missing = next(
-                    (index for index in range(1, len(variables)) if variable_indices[index - 1] + 1 != variable_indices[index]),
-                    0) + 1
-                raise ValidationError(_('Body variables should start at 1 and not skip any number, missing %d', missing))
-
-    @api.constrains('header_type', 'variable_ids')
+    @api.constrains('header_type', 'variable_ids', 'variable_type')
     def _check_header_variables(self):
         for template in self:
             location_vars = template.variable_ids.filtered(lambda var: var.line_type == 'location')
@@ -230,8 +238,10 @@ class WhatsappTemplate(models.Model):
                 raise ValidationError(_('Location variables should only exist when a "location" header is selected.'))
             if len(text_vars) > 1:
                 raise ValidationError(_('There should be at most 1 variable in the header of the template.'))
-            if text_vars and text_vars._extract_variable_index() != 1:
+            if template.variable_type == 'positional' and text_vars and text_vars._extract_variable_value() != 1:
                 raise ValidationError(_('Free text variable in the header should be {{1}}'))
+            elif template.variable_type == 'named' and text_vars and not template._is_valid_variable(text_vars.name):
+                raise ValidationError(_('Free text variable in the header should be a valid named placeholder like {{user_name}}'))
 
     @api.constrains('model')
     def _check_model(self):
@@ -243,16 +253,20 @@ class WhatsappTemplate(models.Model):
     #                 Compute Methods
     #=====================================================
 
-
-    @api.depends('model')
+    @api.depends('model', 'use_default_recipient')
     def _compute_phone_field(self):
-        to_reset = self.filtered(lambda template: not template.model)
+        to_reset = self.filtered(lambda template: not template.model or template.use_default_recipient)
         if to_reset:
             to_reset.phone_field = False
-        for template in self.filtered('model'):
-            if template.phone_field and template.phone_field in self.env[template.model]._fields:
-                continue
-            if 'phone' in self.env[template.model]._fields:
+        for template in self - to_reset:
+            model = self.env[template.model]
+            if template.phone_field:
+                try:
+                    model._find_value_from_field_path(template.phone_field)
+                    continue
+                except UserError:
+                    pass
+            if 'phone' in model._fields:
                 template.phone_field = 'phone'
 
     @api.depends('name', 'status', 'wa_template_uid')
@@ -268,23 +282,23 @@ class WhatsappTemplate(models.Model):
         for template in self.filtered('model'):
             template.model_id = self.env['ir.model']._get_id(template.model)
 
-    @api.depends('model')
+    @api.depends('header_type', 'model')
     def _compute_report_id(self):
-        """ Reset if model changes to avoid ill defined reports """
-        to_reset = self.filtered(lambda tpl: tpl.report_id.model != tpl.model)
+        """ Reset if header type or model changes to avoid ill defined reports """
+        to_reset = self.filtered(lambda tpl: tpl.report_id.model != tpl.model or tpl.header_type != "document")
         if to_reset:
             to_reset.report_id = False
 
-    @api.depends('header_type', 'header_text', 'body')
+    @api.depends('header_type', 'header_text', 'body', 'variable_type')
     def _compute_variable_ids(self):
         """compute template variable according to header text, body and buttons"""
         for tmpl in self:
             to_delete = self.env["whatsapp.template.variable"]
             to_keep = self.env["whatsapp.template.variable"]
             to_create_values = []
-
-            header_variables = list(re.findall(r'{{[1-9][0-9]*}}', tmpl.header_text or ''))
-            body_variables = set(re.findall(r'{{[1-9][0-9]*}}', tmpl.body or ''))
+            # prepare variables
+            header_variables = tmpl._find_variables(tmpl.header_text)
+            body_variables = set(tmpl._find_variables(tmpl.body))
 
             # if there is header text
             existing_header_text_variable = tmpl.variable_ids.filtered(lambda line: line.line_type == 'header')
@@ -293,7 +307,11 @@ class WhatsappTemplate(models.Model):
             elif not header_variables and existing_header_text_variable:
                 to_delete += existing_header_text_variable
             elif existing_header_text_variable:
-                to_keep += existing_header_text_variable
+                if existing_header_text_variable.name != header_variables[0]:
+                    to_delete += existing_header_text_variable
+                    to_create_values.append({'name': header_variables[0], 'line_type': 'header', 'wa_template_id': tmpl.id})
+                else:
+                    to_keep += existing_header_text_variable
 
             # if the header is a location
             existing_header_location_variables = tmpl.variable_ids.filtered(lambda line: line.line_type == 'location')
@@ -314,7 +332,7 @@ class WhatsappTemplate(models.Model):
             new_body_variable_names = [var_name for var_name in body_variables if var_name not in existing_body_variables.mapped('name')]
             deleted_body_variables = existing_body_variables.filtered(lambda var: var.name not in body_variables)
 
-            to_create_values += [{'name': var_name, 'line_type': 'body', 'wa_template_id': tmpl.id} for var_name in set(new_body_variable_names)]
+            to_create_values += [{'name': var_name, 'line_type': 'body', 'wa_template_id': tmpl.id} for var_name in new_body_variable_names]
             to_delete += deleted_body_variables
             to_keep += existing_body_variables - deleted_body_variables
 
@@ -369,22 +387,6 @@ class WhatsappTemplate(models.Model):
                                         account_name=template.wa_account_id.name
                                     ) if template.wa_account_id.name else template.name
 
-    @api.onchange('header_type')
-    def _onchange_header_type(self):
-        toreset_attachments = self.filtered(lambda t: t.header_type not in {"image", "video", "document"})
-        if toreset_attachments:
-            toreset_attachments.header_attachment_ids = [(5, 0)]
-            toreset_attachments.report_id = False
-        toreset_text = self.filtered(lambda t: t.header_type != "text")
-        if toreset_text:
-            toreset_text.header_text = False
-
-    @api.onchange('header_attachment_ids')
-    def _onchange_header_attachment_ids(self):
-        for template in self:
-            template.header_attachment_ids.res_id = template.id
-            template.header_attachment_ids.res_model = template._name
-
     @api.onchange('wa_account_id')
     def _onchange_wa_account_id(self):
         """Avoid carrying remote sync data when changing account."""
@@ -405,8 +407,6 @@ class WhatsappTemplate(models.Model):
         records = super().create(vals_list)
         # the model of the variable might have been changed with x2many commands
         records.variable_ids._check_field_name()
-        # update the attachment res_id for new records
-        records._onchange_header_attachment_ids()
         return records
 
     def write(self, vals):
@@ -424,15 +424,8 @@ class WhatsappTemplate(models.Model):
         values_list = super().copy_data(default=default)
 
         for values, template in zip(values_list, self):
-            if not values.get("name"):
-                values["name"] = _('%(original_name)s (copy)', original_name=template.name)
             if not values.get("template_name"):
                 values["template_name"] = f'{template.template_name}_copy'
-            if not values.get('header_attachment_ids') and template.header_attachment_ids:
-                values['header_attachment_ids'] = [
-                    (0, 0, att.copy_data(default={'res_id': False})[0])
-                    for att in template.header_attachment_ids
-                ]
             if template.variable_ids:
                 variable_commands = values.get('variable_ids', []) + [
                     (0, 0, {
@@ -460,9 +453,17 @@ class WhatsappTemplate(models.Model):
         head_component = {'type': 'HEADER', 'format': self.header_type.upper()}
         if self.header_type == 'text' and self.header_text:
             head_component['text'] = self.header_text
-            header_params = self.variable_ids.filtered(lambda line: line.line_type == 'header')
+            header_params = self.variable_ids.filtered(lambda line: line.line_type == 'header')[:1]
             if header_params:
-                head_component['example'] = {'header_text': header_params.mapped('demo_value')}
+                if self.variable_type == 'named':
+                    head_component['example'] = {
+                        'header_text_named_params': [{
+                            'example': header_params.demo_value,
+                            'param_name': header_params._extract_variable_value(),
+                        }]
+                    }
+                else:
+                    head_component['example'] = {'header_text': header_params.mapped('demo_value')}
         elif self.header_type in ['image', 'video', 'document']:
             head_component['example'] = {
                 'header_handle': [file_handle]
@@ -474,9 +475,18 @@ class WhatsappTemplate(models.Model):
         if not self.body:
             return None
         body_component = {'type': 'BODY', 'text': self.body}
-        body_params = self.variable_ids.filtered(lambda line: line.line_type == 'body').sorted(key=lambda var: var._extract_variable_index())
+        body_params = self.variable_ids.filtered(lambda line: line.line_type == 'body')
         if body_params:
-            body_component['example'] = {'body_text': [body_params.mapped('demo_value')]}
+            if self.variable_type == 'named':
+                body_component['example'] = {
+                    'body_text_named_params': [{
+                        'example': var.demo_value,
+                        'param_name': var._extract_variable_value(),
+                    } for var in body_params]
+                }
+            else:
+                body_params = body_params.sorted(key=lambda var: var._extract_variable_value())
+                body_component['example'] = {'body_text': [body_params.mapped('demo_value')]}
         return body_component
 
     def _get_template_button_component(self):
@@ -527,7 +537,7 @@ class WhatsappTemplate(models.Model):
                     raise ValidationError(_("There is no record for preparing demo pdf in model %(model)s", model=self.model_id.name))
                 attachment = self._generate_attachment_from_report(record)
             else:
-                attachment = self.header_attachment_ids
+                attachment = self.header_attachment_id
             if not attachment:
                 raise ValidationError(self.env._("Header Document is missing"))
         file_handle = False
@@ -546,6 +556,7 @@ class WhatsappTemplate(models.Model):
             'name': self.template_name,
             'language': self.lang_code,
             'category': self.template_type.upper(),
+            'parameter_format': self.variable_type,
             'components': components,
         })
         try:
@@ -587,7 +598,9 @@ class WhatsappTemplate(models.Model):
         for button in template_vals['button_ids']:
             button['variable_ids'] = [Command.create(var) for var in button['variable_ids']]
         template_vals['button_ids'] = [Command.create(button) for button in template_vals['button_ids']]
-        template_vals['header_attachment_ids'] = [Command.create(attachment) for attachment in template_vals['header_attachment_ids']]
+        header_attachment_vals = template_vals.pop('header_attachment_vals')
+        if header_attachment_vals:
+            template_vals['header_attachment_id'] = self.env['ir.attachment'].create(header_attachment_vals).id
         return template_vals
 
     def _get_additional_button_values(self, button):
@@ -595,7 +608,7 @@ class WhatsappTemplate(models.Model):
 
     def _update_template_from_response(self, remote_template_vals):
         self.ensure_one()
-        update_fields = ('body', 'header_type', 'header_text', 'footer_text', 'lang_code', 'template_type', 'status', 'quality')
+        update_fields = ('body', 'header_type', 'header_text', 'footer_text', 'lang_code', 'template_type', 'status', 'quality', 'variable_type')
         template_vals = self._get_template_vals_from_response(remote_template_vals, self.wa_account_id)
         update_vals = {field: template_vals[field] for field in update_fields}
 
@@ -614,9 +627,11 @@ class WhatsappTemplate(models.Model):
             button.update(additional_button_vals)
 
         update_vals['button_ids'] = [Command.clear()] + [Command.create(button) for button in template_vals['button_ids']]
-        if not self.header_attachment_ids or self.header_type != template_vals['header_type']:
-            new_attachment_commands = [Command.create(attachment) for attachment in template_vals['header_attachment_ids']]
-            update_vals['header_attachment_ids'] = [Command.clear()] + new_attachment_commands
+        if not self.header_attachment_id or self.header_type != template_vals['header_type']:
+            if template_vals['header_attachment_vals']:
+                update_vals['header_attachment_id'] = self.env['ir.attachment'].create(template_vals['header_attachment_vals']).id
+            else:
+                update_vals['header_attachment_id'] = False
 
         self.write(update_vals)
 
@@ -631,7 +646,7 @@ class WhatsappTemplate(models.Model):
             'button_ids': [],
             'footer_text': False,
             'header_text': False,
-            'header_attachment_ids': [],
+            'header_attachment_vals': False,
             'header_type': 'none',
             'lang_code': remote_template_vals['language'],
             'name': remote_template_vals['name'].replace("_", " ").title(),
@@ -640,6 +655,7 @@ class WhatsappTemplate(models.Model):
             'template_name': remote_template_vals['name'],
             'template_type': remote_template_vals['category'].lower(),
             'variable_ids': [],
+            'variable_type': 'positional',
             'wa_account_id': wa_account.id,
             'wa_template_uid': int(remote_template_vals['id']),
         }
@@ -650,12 +666,21 @@ class WhatsappTemplate(models.Model):
                 if component['format'] == 'TEXT':
                     template_vals['header_text'] = component['text']
                     if 'example' in component:
-                        for index, example_value in enumerate(component['example'].get('header_text', [])):
-                            template_vals['variable_ids'].append({
-                                'name': '{{%s}}' % (index + 1),
-                                'demo_value': example_value,
-                                'line_type': 'header',
-                            })
+                        if header_text_named_params := component['example'].get('header_text_named_params'):
+                            template_vals['variable_type'] = 'named'
+                            for header_param in header_text_named_params:
+                                template_vals['variable_ids'].append({
+                                    'demo_value': header_param['example'],
+                                    'line_type': 'header',
+                                    'name': '{{%s}}' % header_param['param_name'],
+                                })
+                        else:
+                            for index, example_value in enumerate(component['example'].get('header_text', [])):
+                                template_vals['variable_ids'].append({
+                                    'demo_value': example_value,
+                                    'line_type': 'header',
+                                    'name': '{{%s}}' % (index + 1),
+                                })
                 elif component['format'] == 'LOCATION':
                     for location_val in ['name', 'address', 'latitude', 'longitude']:
                         template_vals['variable_ids'].append({
@@ -675,22 +700,31 @@ class WhatsappTemplate(models.Model):
                             'VIDEO': ('mp4', 'video/mp4'),
                             'DOCUMENT': ('pdf', 'application/pdf')
                         }[component['format']]
-                    template_vals['header_attachment_ids'] = [{
+                    template_vals['header_attachment_vals'] = {
                         'name': f'{template_vals["template_name"]}{extension}',
                         'res_model': self._name,
                         'res_id': self.ids[0] if self else False,
                         'raw': data,
                         'mimetype': mimetype,
-                    }]
+                    }
             elif component_type == 'BODY':
                 template_vals['body'] = component['text']
                 if 'example' in component:
-                    for index, example_value in enumerate(component['example'].get('body_text', [[]])[0]):
-                        template_vals['variable_ids'].append({
-                            'name': '{{%s}}' % (index + 1),
-                            'demo_value': example_value,
-                            'line_type': 'body',
-                        })
+                    if body_text_named_params := component['example'].get('body_text_named_params'):
+                        template_vals['variable_type'] = 'named'
+                        for body_param in body_text_named_params:
+                            template_vals['variable_ids'].append({
+                                'demo_value': body_param['example'],
+                                'line_type': 'body',
+                                'name': '{{%s}}' % body_param['param_name'],
+                            })
+                    else:
+                        for index, example_value in enumerate(component['example'].get('body_text', [[]])[0]):
+                            template_vals['variable_ids'].append({
+                                'demo_value': example_value,
+                                'line_type': 'body',
+                                'name': '{{%s}}' % (index + 1),
+                            })
             elif component_type == 'FOOTER':
                 template_vals['footer_text'] = component['text']
             elif component_type == 'BUTTONS':
@@ -722,11 +756,14 @@ class WhatsappTemplate(models.Model):
         """ Prepare header component for sending WhatsApp template message"""
         header = []
         header_type = self.header_type
-        if header_type == 'text' and template_variables_value.get('header-{{1}}'):
-            value = (free_text_json or {}).get('header_text') or template_variables_value.get('header-{{1}}') or ' '
+        if header_type == 'text' and (header_variable := self.variable_ids.filtered(lambda line: line.line_type == 'header')):
+            value = (free_text_json or {}).get('header_text') or template_variables_value.get(f'header-{header_variable.name}') or ' '
+            header_parameter = {'type': 'text', 'text': value}
+            if self.variable_type == 'named':
+                header_parameter['parameter_name'] = header_variable._extract_variable_value()
             header = {
                 'type': 'header',
-                'parameters': [{'type': 'text', 'text': value}]
+                'parameters': [header_parameter]
             }
         elif header_type in ['image', 'video', 'document']:
             header = {
@@ -757,14 +794,25 @@ class WhatsappTemplate(models.Model):
         """ Prepare body component for sending WhatsApp template message"""
         if not self.variable_ids:
             return None
+        body_variables = self.variable_ids.filtered(lambda line: line.line_type == 'body')
+        if not body_variables:
+            return None
         parameters = []
         free_text_count = 1
-        for body_val in self.variable_ids.filtered(lambda line: line.line_type == 'body'):
-            free_text_value = body_val.field_type == 'free_text' and free_text_json.get(f'free_text_{free_text_count}') or False
-            parameters.append({
+        if self.variable_type == 'named':
+            # sort by appearance in body to preserve order of parameters
+            body_variables = body_variables.sorted(key=lambda var: self.body.find(var.name))
+        else:
+            body_variables = body_variables.sorted(key=lambda var: var._extract_variable_value())
+        for body_val in body_variables:
+            free_text_value = body_val.field_type == 'free_text' and (free_text_json or {}).get(f'free_text_{free_text_count}') or False
+            parameter = {
                 'type': 'text',
                 'text': free_text_value or template_variables_value.get(f'{body_val.line_type}-{body_val.name}') or ' '
-            })
+            }
+            if self.variable_type == 'named':
+                parameter['parameter_name'] = body_val._extract_variable_value()
+            parameters.append(parameter)
             if body_val.field_type == 'free_text':
                 free_text_count += 1
         return {'type': 'body', 'parameters': parameters}
@@ -781,11 +829,9 @@ class WhatsappTemplate(models.Model):
         for button in dynamic_buttons:
             button_var = button.variable_ids[0]
             dynamic_url = button.website_url
+            value = (free_text_json or {}).get(f'button_dynamic_url_{free_text_index}') or (template_variables_value or {}).get(f'button-{button.name}') or ''
             if button_var.field_type == 'free_text':
-                value = free_text_json.get(f'button_dynamic_url_{free_text_index}') or ' '
                 free_text_index += 1
-            else:
-                value = template_variables_value.get(f'button-{button.name}') or ' '
             value = value.replace(dynamic_url, '').lstrip('/')  # / is implicit
             components.append({
                 'type': 'button',
@@ -807,8 +853,8 @@ class WhatsappTemplate(models.Model):
         # generate attachment
         if not attachment and self.report_id:
             attachment = self._generate_attachment_from_report(record)
-        if not attachment and self.header_attachment_ids:
-            attachment = self.header_attachment_ids[0]
+        if not attachment and self.header_attachment_id:
+            attachment = self.header_attachment_id
 
         # generate content
         header = self._get_header_component(free_text_json=free_text_json, attachment=attachment, template_variables_value=template_variables_value)
@@ -890,22 +936,6 @@ class WhatsappTemplate(models.Model):
                   latitude=latitude, longitude=longitude)
             )
 
-    @api.model
-    def _format_markup_to_html(self, body_html):
-        """
-            Convert WhatsApp format text to HTML format text
-            *bold* -> <b>bold</b>
-            _italic_ -> <i>italic</i>
-            ~strikethrough~ -> <s>strikethrough</s>
-            ```monospace``` -> <code>monospace</code>
-        """
-        formatted_body = str(plaintext2html(body_html))  # stringify for regex
-        formatted_body = re.sub(r'\*(.*?)\*', r'<b>\1</b>', formatted_body)
-        formatted_body = re.sub(r'\b_([^_\s][^_]*?[^_\s])_\b', r'<i>\1</i>', formatted_body)  # apply italic when whitespace surrounded for not breaking urls
-        formatted_body = re.sub(r'~(.*?)~', r'<s>\1</s>', formatted_body)
-        formatted_body = re.sub(r'```(.*?)```', r'<code>\1</code>', formatted_body)
-        return Markup(formatted_body)
-
     def _get_formatted_body(self, demo_fallback=False, variable_values=None):
         """Get formatted body and header with specified values.
 
@@ -921,12 +951,12 @@ class WhatsappTemplate(models.Model):
             header_variables = self.variable_ids.filtered(lambda line: line.line_type == 'header')
             if header_variables:
                 fallback_value = header_variables[0].demo_value if demo_fallback else ' '
-                header = header.replace('{{1}}', variable_values.get('header-{{1}}', fallback_value))
+                header = header.replace(header_variables[0].name, variable_values.get(f'header-{header_variables[0].name}', fallback_value))
         body = self.body
         for var in self.variable_ids.filtered(lambda var: var.line_type == 'body'):
             fallback_value = var.demo_value if demo_fallback else ' '
             body = body.replace(var.name, variable_values.get(f'{var.line_type}-{var.name}', fallback_value))
-        return self._format_markup_to_html(f'*{header}*\n\n{body}' if header else body)
+        return format_wa_markup_to_html(f'*{header}*\n\n{body}' if header else body)
 
     # ------------------------------------------------------------
     # TOOLS
@@ -948,3 +978,64 @@ class WhatsappTemplate(models.Model):
                 ('allowed_user_ids', '=', False),
                 ('allowed_user_ids', 'in', self.env.user.ids)
         ], limit=1)
+
+    def _find_variables(self, text):
+        self.ensure_one()
+        return re.findall(self._get_variable_regex(), text or '')
+
+    def _get_variable_format_example(self):
+        self.ensure_one()
+        if self.variable_type == 'named':
+            return '{{customer_name}}, {{order_id}}, ...'
+        return '{{1}}, {{2}}, ...'
+
+    def _get_variable_regex(self, with_braces=True):
+        self.ensure_one()
+        if self.variable_type == 'named':
+            return NAMED_VARIABLE_REGEX if with_braces else NAMED_VARIABLE_VALUE_REGEX
+        return NUMBER_VARIABLE_REGEX if with_braces else NUMBER_VARIABLE_VALUE_REGEX
+
+    def _is_valid_variable(self, variable, with_braces=True):
+        self.ensure_one()
+        return bool(re.fullmatch(self._get_variable_regex(with_braces=with_braces), variable))
+
+    def get_template_demo_values(self):
+        """Return demo values used as placeholder text in the whatsapp composer.
+
+        :returns: dict mapping variable placeholder keys (e.g. 'free_text_1') to their demo values.
+        """
+        self.ensure_one()
+        demo_values = {}
+
+        # Header placeholder
+        if self.header_type == 'text':
+            header_variable = next(
+                (
+                    variable
+                    for variable in self.variable_ids
+                    if variable.line_type == 'header'
+                    and variable.field_type == 'free_text'
+                ),
+                None,
+            )
+            if header_variable:
+                demo_values['header_text_1'] = header_variable.demo_value
+
+        # Body placeholders
+        body_variables = self.variable_ids.filtered(lambda line: line.line_type == 'body' and line.field_type == 'free_text')
+        if self.variable_type == 'named':
+            # sort by appearance in body to preserve order of parameters
+            body_variables = body_variables.sorted(key=lambda var: self.body.find(var.name))
+            for i, body_variable in enumerate(body_variables, start=1):
+                demo_values[f'free_text_{i}'] = body_variable.demo_value
+        else:
+            for body_variable in body_variables:
+                demo_values[f'free_text_{body_variable._extract_variable_value()}'] = body_variable.demo_value
+
+        # Button placeholders
+        freetext_btn_vars = self.variable_ids.filtered(lambda line: line.line_type == 'button' and line.field_type == 'free_text')
+        freetext_btn_vars = freetext_btn_vars.sorted(key=lambda var: var.button_id.sequence)
+        for i, btn_var in enumerate(freetext_btn_vars, start=1):
+            demo_values[f'button_dynamic_url_{i}'] = btn_var.demo_value
+
+        return demo_values

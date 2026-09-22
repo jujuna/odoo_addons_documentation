@@ -1,37 +1,37 @@
 import { rpc } from "@web/core/network/rpc";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, markup, onWillStart, signal, types, useProps } from "@odoo/owl";
 
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
-/**
- * @typedef {Object} Props
- * @property {function} close
- * @property {import("models").Follower} follower
- * @property {function} onFollowerChanged
- * @extends {Component<Props, Env>}
- */
 export class FollowerSubtypeDialog extends Component {
     static components = { Dialog };
-    static props = ["close", "follower", "onFollowerChanged"];
     static template = "mail.FollowerSubtypeDialog";
 
     setup() {
         super.setup();
         this.store = useService("mail.store");
-        this.state = useState({
-            /** @type {import("models").MailMessageSubtype[]} */
-            subtypes: [],
+        this.props = useProps({
+            close: types.function([types.instanceOf(MouseEvent)]),
+            follower: types.instanceOf(this.store["mail.followers"]),
+            onFollowerChanged: types.function([]),
+        });
+        this.subtypes = signal(null, {
+            type: types.array(types.instanceOf(this.store["mail.message.subtype"])),
         });
         onWillStart(async () => {
-            const { store_data, subtype_ids } = await rpc("/mail/read_subscription_data", {
-                follower_id: this.props.follower.id,
-            });
-            this.store.insert(store_data);
-            this.state.subtypes = subtype_ids.map((id) =>
-                this.store["mail.message.subtype"].get(id)
+            const { store_data, subtype_ids, parent_id, parent_model } = await rpc(
+                "/mail/read_subscription_data",
+                { follower_id: this.props.follower.id }
             );
+            this.store.insert(store_data);
+            this.subtypes.set(subtype_ids.map((id) => this.store["mail.message.subtype"].get(id)));
+            this.parentRecord = this.store["mail.thread"].get({
+                id: parent_id,
+                model: parent_model,
+            });
         });
     }
 
@@ -47,35 +47,91 @@ export class FollowerSubtypeDialog extends Component {
         }
     }
 
-    async onClickApply() {
-        const selectedSubtypes = this.state.subtypes.filter((s) =>
+    async onClickUpdateAll() {
+        this.store.env.services.dialog.add(ConfirmationDialog, {
+            body: _t(
+                'Are you sure you want to mass-update notifications preferences of all existing records of the %(parent_model_name)s "%(parent_record_name)s"?',
+                {
+                    parent_model_name: this.parentRecord.modelName.toLowerCase(),
+                    parent_record_name: this.parentRecord.display_name,
+                }
+            ),
+            confirmLabel: _t("Yes, Update All"),
+            confirm: async () => {
+                await this.updateSubscription({ updateAll: true });
+            },
+            cancel: () => {},
+        });
+    }
+
+    async updateSubscription({ updateAll = false } = {}) {
+        const thread = this.props.follower.thread;
+        const selectedSubtypes = this.subtypes().filter((s) =>
             s.in(this.props.follower.subtype_ids)
         );
-        if (selectedSubtypes.length === 0) {
-            await this.props.follower.remove();
-        } else {
+        if (updateAll) {
             await this.env.services.orm.call(
-                this.props.follower.thread.model,
-                "message_subscribe",
-                [[this.props.follower.thread.id]],
+                thread.model,
+                "message_update_siblings_subscription",
+                [[thread.id]],
                 {
                     partner_ids: [this.props.follower.partner_id.id],
                     subtype_ids: selectedSubtypes.map((subtype) => subtype.id),
                 }
             );
-            if (this.store.mt_comment.notIn(selectedSubtypes)) {
-                this.props.follower.removeRecipient();
+        } else {
+            if (selectedSubtypes.length === 0) {
+                await this.props.follower.remove();
+            } else {
+                await this.env.services.orm.call(thread.model, "message_subscribe", [[thread.id]], {
+                    partner_ids: [this.props.follower.partner_id.id],
+                    subtype_ids: selectedSubtypes.map((subtype) => subtype.id),
+                });
             }
-            this.env.services.notification.add(
-                _t("The subscription preferences were successfully applied."),
-                { type: "success" }
-            );
         }
-        this.props.onFollowerChanged();
+        if (this.store.mt_comment.notIn(selectedSubtypes)) {
+            this.props.follower.removeRecipient();
+        }
+        this.env.services.notification.add(_t("Notification preferences updated."), {
+            type: "success",
+        });
+        this.props.onFollowerChanged(thread);
         this.props.close();
     }
 
     get title() {
-        return _t("Edit Subscription of %(name)s", { name: this.props.follower.displayName });
+        return _t("Notification Preferences");
+    }
+
+    get isParentModel() {
+        return this.subtypes().some((subtype) => subtype.parent_id);
+    }
+
+    get childRecordsHint() {
+        return _t(
+            "This sets default notifications for all future records under this %(model_name)s.",
+            { model_name: this.props.follower.thread.modelName.toLowerCase() }
+        );
+    }
+
+    get parentRecordHint() {
+        const record = this.parentRecord;
+        const parentRecordLink = markup`<a data-oe-model="${record.model}" href="/odoo/${record.model}/${record.id}">${record.display_name}</a>`;
+        return _t(
+            "💡 You can set default notifications for all future records in the notification preferences of the %(parent_model_name)s %(parent_record_name)s.",
+            {
+                parent_model_name: record.modelName.toLowerCase(),
+                parent_record_name: parentRecordLink,
+            }
+        );
+    }
+
+    /** @param {MouseEvent} ev */
+    onClickParentRecordLink(ev) {
+        if (!ev.target.closest(`a[data-oe-model="${this.parentRecord.model}"]`)) {
+            return;
+        }
+        ev.preventDefault();
+        this.parentRecord.open();
     }
 }

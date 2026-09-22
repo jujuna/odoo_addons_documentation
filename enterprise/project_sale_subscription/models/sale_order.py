@@ -12,9 +12,9 @@ class SaleOrder(models.Model):
         # Only normal SO, new subscription or renewal can generate services
         return not self.subscription_state or self.subscription_state in SUBSCRIPTION_PROGRESS_STATE
 
-    def _set_deferred_end_date_from_template(self):
+    def _write_confirmation_values(self):
         self.ensure_one()
-        super()._set_deferred_end_date_from_template()
+        super()._write_confirmation_values()
         if self.end_date:
             self.order_line.task_id.recurrence_id.sudo().write({
                 'repeat_type': 'until',

@@ -76,15 +76,30 @@ function insertText(element, text, offsets = null) {
             })
         );
         element.dispatchEvent(
+            new InputEvent("beforeinput", {
+                ...evOptions,
+                inputType: "insertText",
+                data: char,
+            })
+        );
+
+        const newNode = doc.createTextNode(char);
+        element.append(newNode);
+
+        // Move the caret after the inserted character
+        // and collapse the selection.
+        range.setStart(newNode, newNode.length);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        element.dispatchEvent(
             new InputEvent("input", {
                 ...evOptions,
                 inputType: "insertText",
                 data: char,
             })
         );
-        const newNode = doc.createTextNode(char);
-        element.append(newNode);
-        range.setEndAfter(newNode);
 
         element.dispatchEvent(
             new KeyboardEvent("keyup", {
@@ -135,10 +150,11 @@ registry
     .add("web_studio.test_disable_fields_commands_when_unavailable", {
         steps: () => [
             {
-                trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p",
+                trigger:
+                    ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p.some_p",
                 async run(helpers) {
                     const el = this.anchor;
-                    openEditorPowerBox(el);
+                    openEditorPowerBox(el, { start: 0 });
                 },
             },
             {
@@ -162,7 +178,7 @@ let silentPatch;
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar input[id='name']",
+            trigger: ".o-web-studio-report-editor-sidebar input[id='name']",
             run: "edit modified in test && click body",
         },
         {
@@ -197,12 +213,15 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition", 
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xml", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='report_edit_sources']",
             run: "click",
         },
         {
             trigger:
-                ".o_web_studio_xml_resource_selector .o_web_studio_xml_resource_select_menu input:value('web_studio.test_report_document (web_studio.test_report_document)')",
+                ".o-web-studio-report-editor-sidebar button[name='web_studio.test_report_document'].active",
+        },
+        {
+            trigger: `.ace_content:contains(<p t-field="doc.name" lock-id="2"/>)`,
         },
         {
             trigger: ".o_web_studio_code_editor.ace_editor",
@@ -216,13 +235,15 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
             },
         },
         {
-            trigger: ".o_web_studio_xml_resource_selector .o_select_menu_toggler",
-            run: "click",
+            trigger: `.ace_content:contains(<span class="test-added-0">in document view</span>)`,
         },
         {
             trigger:
-                ".o-dropdown--menu .o_select_menu_item:contains('web_studio.test_report (web_studio.studio_test_report_view)')",
+                ".o-web-studio-report-editor-sidebar button[name='web_studio.studio_test_report_view']",
             run: "click",
+        },
+        {
+            trigger: `.ace_content:contains(<t t-call="web_studio.test_report_document" lock-id="6"/>)`,
         },
         {
             trigger: ".o_web_studio_code_editor.ace_editor",
@@ -236,11 +257,14 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: `.ace_content:contains(<span class="test-added-1">in main view</span>)`,
+        },
+        {
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
         {
             trigger:
@@ -256,7 +280,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_discard", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar input[id='name']",
+            trigger: ".o-web-studio-report-editor-sidebar input[id='name']",
             run: "edit modified in test && click body",
         },
         {
@@ -271,7 +295,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_di
             run: "editor edited with odoo editor 2",
         },
         {
-            trigger: ".o-web-studio-discard-report.btn-secondary",
+            trigger: ".o-web-studio-discard-report:not([disabled])",
             run: "click",
         },
         {
@@ -279,10 +303,8 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_di
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(0)",
-            run() {
-                assertEqual(this.anchor.textContent, "");
-            },
+            trigger:
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(0):text()",
         },
     ],
 });
@@ -290,7 +312,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_di
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_cancel_discard", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar input[id='name']",
+            trigger: ".o-web-studio-report-editor-sidebar input[id='name']",
             run: "edit modified in test && click body",
         },
         {
@@ -301,7 +323,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_ca
             run: "editor edited with odoo editor",
         },
         {
-            trigger: ".o-web-studio-discard-report.btn-secondary",
+            trigger: ".o-web-studio-discard-report:not([disabled])",
             run: "click",
         },
         {
@@ -313,11 +335,11 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_ca
                 ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(0):contains(edited with odoo editor)",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -325,7 +347,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_ca
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xml_discard", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='report_edit_sources']",
             run: "click",
         },
         {
@@ -337,17 +359,12 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
             },
         },
         {
-            trigger: ".o-web-studio-discard-report.btn-secondary",
+            trigger: ".o-web-studio-discard-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-container :iframe body",
-            run() {
-                const element = this.anchor.querySelector(".test-added");
-                if (element) {
-                    throw new Error("The changes should have been discarded");
-                }
-            },
+            content: "The changes should have been discarded",
+            trigger: ".o-web-studio-report-container :iframe body:not(:has(.test-added))",
         },
     ],
 });
@@ -366,7 +383,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_er
                 const telse = editor.document.createElement("t");
                 telse.setAttribute("t-else", "");
                 editor.shared.dom.insert(telse);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
             },
         },
         {
@@ -374,7 +391,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_er
             run: "editor edited with odoo editor 2",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
@@ -390,7 +407,7 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_er
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xml_error", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='report_edit_sources']",
             run: "click",
         },
         {
@@ -405,20 +422,15 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
             trigger: ".o_notification:contains(Report edition failed)",
         },
         {
-            trigger: ".o-web-studio-report-container :iframe body",
-            run() {
-                const element = this.anchor.querySelector(".test-added");
-                if (element) {
-                    throw new Error("The changes should have been discarded");
-                }
-            },
+            content: `The changes should have been discarded`,
+            trigger: ".o-web-studio-report-container :iframe body:not(:has(.test-added))",
         },
     ],
 });
@@ -426,16 +438,27 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
 registry.category("web_tour.tours").add("web_studio.test_report_reset_archs", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar button[name='report_reset_archs']",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='report_edit_sources']",
             run: "click",
         },
         {
-            trigger: ".modal-footer button.btn-danger:contains(Reset report)",
+            trigger: ".o-web-studio-report-editor-xml-resource:text('bad view')",
             run: "click",
         },
         {
-            trigger:
-                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(1):contains(from file)",
+            trigger: ".o-web-studio-report-editor-xml button[name='view_diff']",
+            run: "click",
+        },
+        {
+            trigger: "[name='reset_mode'] input[data-value='hard']",
+            run: "click",
+        },
+        {
+            trigger: ".modal-footer button[name='reset_view_button']",
+            run: "click",
+        },
+        {
+            trigger: ".o-web-studio-report-editor :iframe p:text(from file)",
         },
     ],
 });
@@ -445,11 +468,11 @@ const steps = [];
 registry.category("web_tour.tours").add("web_studio.test_print_preview", {
     steps: () => [
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg input[name='preview_mode']",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='preview_mode']",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg button[name='report_print_preview']",
+            trigger: ".o-web-studio-report-editor-sidebar button:text(Print)",
             run(helpers) {
                 downloadProm = new Promise((resolve) => {
                     const unpatch = patch(download, {
@@ -468,7 +491,7 @@ registry.category("web_tour.tours").add("web_studio.test_print_preview", {
             },
         },
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg",
+            trigger: ".o-web-studio-report-editor-sidebar",
             async run() {
                 await downloadProm;
                 assertEqual(steps.length, 1);
@@ -499,7 +522,7 @@ registry.category("web_tour.tours").add("web_studio.test_table_rendering", {
                 assertEqual(
                     this.anchor.outerHTML.replace(/\n\s*/g, ""),
                     `<q-table class="invalid_table oe_unbreakable" o-diff-key="7" style="--q-table-col-count: 1;">
-                    <t t-foreach="doc.child_ids" t-as="child" o-diff-key="8" oe-context="{&quot;docs&quot;: {&quot;model&quot;: &quot;res.partner&quot;, &quot;name&quot;: &quot;Contact&quot;, &quot;in_foreach&quot;: false}, &quot;company&quot;: {&quot;model&quot;: &quot;res.company&quot;, &quot;name&quot;: &quot;Companies&quot;, &quot;in_foreach&quot;: false}, &quot;doc&quot;: {&quot;model&quot;: &quot;res.partner&quot;, &quot;name&quot;: &quot;Contact&quot;, &quot;in_foreach&quot;: true}, &quot;child&quot;: {&quot;model&quot;: &quot;res.partner&quot;, &quot;name&quot;: &quot;Contact&quot;, &quot;in_foreach&quot;: true}}">
+                    <t t-foreach="doc.child_ids" t-as="child" o-diff-key="8" oe-context="{&quot;docs&quot;: {&quot;model&quot;: &quot;res.partner&quot;, &quot;name&quot;: &quot;Contact&quot;, &quot;in_foreach&quot;: false}, &quot;company&quot;: {&quot;model&quot;: &quot;res.company&quot;, &quot;name&quot;: &quot;Company&quot;, &quot;in_foreach&quot;: false}, &quot;doc&quot;: {&quot;model&quot;: &quot;res.partner&quot;, &quot;name&quot;: &quot;Contact&quot;, &quot;in_foreach&quot;: true}, &quot;child&quot;: {&quot;model&quot;: &quot;res.partner&quot;, &quot;name&quot;: &quot;Contact&quot;, &quot;in_foreach&quot;: true}}">
                         <q-tr o-diff-key="9" class="oe_unbreakable"><q-td o-diff-key="10" class="oe_unbreakable">I am not valid</q-td></q-tr>
                     </t>
                 </q-table>`.replace(/\n\s*/g, "")
@@ -516,15 +539,15 @@ registry.category("web_tour.tours").add("web_studio.test_table_rendering", {
             run: "editor p edited with odooEditor",
         },
         {
-            trigger: ".o_web_studio_sidebar input[id='name']",
+            trigger: ".o-web-studio-report-editor-sidebar input[id='name']",
             run: "edit modified && click body",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -533,10 +556,11 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
     steps: () => [
         {
             // 1 sec delay to make sure we call the download route
-            trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
+            trigger:
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable:has(.o-we-hint) p:eq(2)",
             async run(helpers) {
                 const el = this.anchor;
-                openEditorPowerBox(el);
+                openEditorPowerBox(el, { start: 0 });
             },
         },
         {
@@ -545,7 +569,7 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
         },
 
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover",
+            trigger: ".o-dynamic-field-popover",
         },
         {
             trigger: ".o_model_field_selector_value",
@@ -556,13 +580,13 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
                 ".o-web-studio-report-editor-wysiwyg div:has(> .o-web-studio-report-container)",
             async run({ waitUntil }) {
                 const placeholderBox = getBoundingClientRect.call(
-                    document.querySelector(".o-web-studio-report-dynamic-placeholder-popover")
+                    document.querySelector(".o-dynamic-field-popover")
                 );
                 assertEqual(this.anchor.scrollTop, 0);
                 this.anchor.scrollTop = 9999;
                 await waitUntil(() => {
                     const newPlaceholderbox = getBoundingClientRect.call(
-                        document.querySelector(".o-web-studio-report-dynamic-placeholder-popover")
+                        document.querySelector(".o-dynamic-field-popover")
                     );
                     // The field placeholder should have followed its anchor, and it happens that the anchor's container
                     // has been scrolled, so the anchor has moved upwards (and is actually outside of the viewPort, to the top)
@@ -581,11 +605,11 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']",
+            trigger: ".o-dynamic-field-popover input[name='label_value']",
             run: "edit some default value",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
@@ -593,7 +617,7 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
                 ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable span[t-field='doc.function'][title='doc.function']",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
         },
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(0)",
@@ -602,11 +626,11 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -644,20 +668,20 @@ registry.category("web_tour.tours").add("web_studio.test_add_field_blank_report"
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover",
+            trigger: ".o-dynamic-field-popover",
         },
         {
             trigger:
                 ".o-web-studio-report-editor-wysiwyg div:has(> .o-web-studio-report-container)",
             async run({ waitUntil }) {
                 const placeholderBox = getBoundingClientRect.call(
-                    document.querySelector(".o-web-studio-report-dynamic-placeholder-popover")
+                    document.querySelector(".o-dynamic-field-popover")
                 );
                 assertEqual(this.anchor.scrollTop, 0);
                 this.anchor.scrollTop = 9999;
                 await waitUntil(() => {
                     const newPlaceholderbox = getBoundingClientRect.call(
-                        document.querySelector(".o-web-studio-report-dynamic-placeholder-popover")
+                        document.querySelector(".o-dynamic-field-popover")
                     );
                     // The field placeholder should have followed its anchor, and it happens that the anchor's container
                     // has been scrolled, so the anchor has moved upwards (and is actually outside of the viewPort, to the top)
@@ -676,19 +700,18 @@ registry.category("web_tour.tours").add("web_studio.test_add_field_blank_report"
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']",
+            trigger: ".o-dynamic-field-popover input[name='label_value']",
             run: "edit some default value",
         },
         {
-            trigger:
-                ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']:value(some default value)",
+            trigger: ".o-dynamic-field-popover input[name='label_value']:value(some default value)",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
-            trigger: "body:not(:has(.o-web-studio-report-dynamic-placeholder-popover))",
+            trigger: "body:not(:has(.o-dynamic-field-popover))",
         },
         {
             // check that field was added successfully
@@ -702,11 +725,11 @@ registry.category("web_tour.tours").add("web_studio.test_add_field_blank_report"
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -737,7 +760,7 @@ registry.category("web_tour.tours").add("web_studio.test_toolbar_appearance", {
             run: "click",
         },
         {
-            trigger: ".o-web-studio-discard-report",
+            trigger: ".o-web-studio-discard-report:not([disabled])",
             run: "click",
         },
         {
@@ -759,31 +782,30 @@ registry.category("web_tour.tours").add("web_studio.test_edition_without_lang", 
             },
         },
         {
-            trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
-            run: "click",
-        },
-        {
-            trigger: ".o_web_studio_xml_resource_select_menu .o_select_menu_toggler",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='report_edit_sources']",
             run: "click",
         },
         {
             trigger:
-                ".o-dropdown--menu .o_select_menu_item:contains(report_editor_customization_diff)",
+                ".o-web-studio-report-editor-xml-resource:text('Odoo Studio: web_studio.test_report_document report customization')",
             run: "click",
         },
         {
-            trigger: ".o_web_studio_code_editor_info .o_field_translate",
+            trigger: ".o-web-studio-report-editor-xml button.o-translate-button",
             run: "click",
         },
         {
-            trigger: ".o_translation_dialog .row:eq(1)",
-            run() {
-                assertEqual(this.anchor.children[0].textContent.trim(), "French / Français");
-                assertEqual(this.anchor.children[1].textContent.trim(), "original term edited");
-            },
+            trigger: ".o_translation_dialog .modal-title:contains(Translate Report)",
         },
         {
-            trigger: ".o_translation_dialog .row:eq(1) textarea",
+            trigger: ".o-translate-lang-buttons button:contains(French)",
+            run: "click",
+        },
+        {
+            trigger: ".o-translate-lang-buttons button.active:contains(French)",
+        },
+        {
+            trigger: ".o_translation_dialog input:value(original term edited)",
             run: "edit translated edited term && click body",
         },
         {
@@ -799,7 +821,7 @@ registry.category("web_tour.tours").add("web_studio.test_edition_without_lang", 
 registry.category("web_tour.tours").add("web_studio.test_report_xml_other_record", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='report_edit_sources']",
             run: "click",
         },
         {
@@ -809,17 +831,17 @@ registry.category("web_tour.tours").add("web_studio.test_report_xml_other_record
             trigger: ".o-web-studio-report-container :iframe body p:contains(partner_1)",
         },
         {
-            trigger: ".o-web-studio-report-search-record input:value(partner_1)",
+            trigger: ".o-web-studio-report-editor-sidebar input:value(partner_1)",
         },
         {
-            trigger: ".o-web-studio-report-pager .o_pager_next",
+            trigger: ".o-web-studio-report-editor-sidebar .o_pager_next",
             run: "click",
         },
         {
             trigger: ".o-web-studio-report-container :iframe body p:contains(partner_2)",
         },
         {
-            trigger: ".o-web-studio-report-search-record input:value(partner_2)",
+            trigger: ".o-web-studio-report-editor-sidebar input:value(partner_2)",
         },
     ],
 });
@@ -833,7 +855,7 @@ registry.category("web_tour.tours").add("web_studio.test_partial_eval", {
                 const oeContext = closestContextElement.getAttribute("oe-context");
                 const expected = {
                     docs: { model: "res.partner", name: "Contact", in_foreach: false },
-                    company: { model: "res.company", name: "Companies", in_foreach: false },
+                    company: { model: "res.company", name: "Company", in_foreach: false },
                     doc: { model: "res.partner", name: "Contact", in_foreach: true },
                     my_children: { model: "res.partner", name: "Contact", in_foreach: false },
                     child: { model: "res.partner", name: "Contact", in_foreach: true },
@@ -865,10 +887,11 @@ registry.category("web_tour.tours").add("web_studio.test_render_multicompany", {
 registry.category("web_tour.tours").add("web_studio.test_add_non_searchable_field", {
     steps: () => [
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
+            trigger:
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable:has(.o-we-hint) p:eq(2)",
             async run(helpers) {
                 const el = this.anchor;
-                openEditorPowerBox(el);
+                openEditorPowerBox(el, { start: 0 });
             },
         },
         {
@@ -888,19 +911,19 @@ registry.category("web_tour.tours").add("web_studio.test_add_non_searchable_fiel
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']",
+            trigger: ".o-dynamic-field-popover input[name='label_value']",
             run: "edit file default value",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -908,10 +931,11 @@ registry.category("web_tour.tours").add("web_studio.test_add_non_searchable_fiel
 registry.category("web_tour.tours").add("web_studio.test_report_edition_binary_field", {
     steps: () => [
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
+            trigger:
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable:has(.o-we-hint) p:eq(2)",
             async run(helpers) {
                 const el = this.anchor;
-                openEditorPowerBox(el);
+                openEditorPowerBox(el, { start: 0 });
             },
         },
         {
@@ -940,16 +964,17 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_binary_f
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']",
+            trigger: ".o-dynamic-field-popover input[name='label_value']",
             run: "edit file default value",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
             async run(helpers) {
+                await new Promise((r) => setTimeout(r, 500));
                 const el = this.anchor;
                 openEditorPowerBox(el, { start: nodeSize(el) }); // after the file field
             },
@@ -979,19 +1004,19 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_binary_f
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']",
+            trigger: ".o-dynamic-field-popover input[name='label_value']",
             run: "edit image default value",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -999,10 +1024,11 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_binary_f
 registry.category("web_tour.tours").add("web_studio.test_report_edition_dynamic_table", {
     steps: () => [
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
+            trigger:
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable:has(.o-we-hint) p:eq(2)",
             async run(helpers) {
                 const el = this.anchor;
-                openEditorPowerBox(el);
+                openEditorPowerBox(el, { start: 0 });
             },
         },
         {
@@ -1023,7 +1049,7 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_dynamic_
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
@@ -1063,11 +1089,11 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_dynamic_
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']",
+            trigger: ".o-dynamic-field-popover input[name='label_value']",
             run: "edit Some Summary",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
@@ -1075,11 +1101,11 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_dynamic_
                 ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable table td span[t-field='x2many_record.summary']",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1091,40 +1117,46 @@ registry.category("web_tour.tours").add("web_studio.test_saving_xml_editor_reloa
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
         {
             trigger: ".o_web_studio_xml_editor .ace_editor",
-            run() {
-                ace.edit(this.anchor)
-                    .getSession()
-                    .insert(
-                        { row: 2, column: 0 },
-                        '<span class="test-added-0">in document view</span>\n'
-                    );
+            async run() {
+                await nextTick(); // Wait for ace to be fully operational
+                const editor = ace.edit(this.anchor);
+                editor.selection.moveToPosition({
+                    row: 2,
+                    column: 0,
+                });
+                editor.insert('<span class="test-added-0">in document view</span>');
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
         {
             trigger: ".o_web_studio_xml_editor .ace_editor",
-            run() {
-                const aceValue = ace.edit(this.anchor).getSession().getValue();
+            async run() {
+                const editor = ace.edit(this.anchor);
+                const aceValue = editor.getSession().getValue();
 
                 assertEqual(
                     normalizeXML(aceValue),
                     normalizeXML(`
-                        <t t-name="web_studio.test_report_document">
-                            <div><p t-field="doc.name"/></div>
+                        <t t-name="web_studio.test_report_document" lock-id="0">
+                            <div lock-id="1"><p t-field="doc.name" lock-id="2"/></div>
                             <span class="test-added-0">in document view</span>
-                            <p><br/></p>
+                            <p lock-id="3"><br lock-id="4" /></p>
                         </t>`)
                 );
+
+                const cursor = editor.getCursorPosition();
+                assertEqual(cursor.row, 2);
+                assertEqual(cursor.column, 50);
             },
         },
     ],
@@ -1195,22 +1227,8 @@ registry.category("web_tour.tours").add("web_studio.test_xml_and_form_diff", {
             run: "click",
         },
         {
-            trigger: ".o_web_studio_xml_resource_select_menu input.o_select_menu_toggler",
-            run() {
-                const currentViewKey = this.anchor.value.split(" (")[0];
-                assertEqual(
-                    currentViewKey,
-                    "web_studio.report_editor_customization_diff.view._web_studio.test_report_document"
-                );
-            },
-        },
-        {
-            trigger: ".o_web_studio_xml_resource_select_menu .o_select_menu_toggler",
-            run: "click",
-        },
-        {
             trigger:
-                ".o-dropdown--menu .o_select_menu_item:contains(web_studio.test_report_document)",
+                ".o-web-studio-report-editor-sidebar button:contains('test_report_document report customization')",
             run: "click",
         },
         {
@@ -1222,11 +1240,21 @@ registry.category("web_tour.tours").add("web_studio.test_xml_and_form_diff", {
         },
         {
             trigger:
-                ".o_form_view .o_field_widget[name='view_name']:contains(web_studio.test_report_document)",
+                ".o_form_view .o_field_widget[name='view_name']:contains('test_report_document report customization')",
         },
         {
-            trigger:
-                ".o_form_view .o_field_widget[name='compare_view_id'] input:value(web_studio_backup__web_studio.test_report_document)",
+            trigger: ".o_form_view .o_field_widget [data-value='other_view']",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view .o_field_widget[name='compare_view_id'] input:value()",
+        },
+        {
+            trigger: ".modal-footer button:text(Discard)",
+            run: "click",
+        },
+        {
+            trigger: ":not(.o_form_view)",
         },
     ],
 });
@@ -1241,7 +1269,7 @@ registry.category("web_tour.tours").add("web_studio.test_remove_branding_on_copy
                 const originNode = this.anchor.querySelector(`[ws-view-id]`);
                 const copy = originNode.cloneNode(true);
                 originNode.insertAdjacentElement("afterend", copy);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
                 // Wait for a full macrotask tick and a frame to let the mutation observer
                 // of the ReportEditorWysiwyg to catch up on the change and finish its operations
                 await nextTick();
@@ -1258,16 +1286,12 @@ registry.category("web_tour.tours").add("web_studio.test_remove_branding_on_copy
 registry.category("web_tour.tours").add("web_studio.test_different_view_document_name", {
     steps: () => [
         {
-            trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
-            run: "click",
-        },
-        {
-            trigger: ".o_web_studio_xml_resource_selector .o_select_menu_toggler",
+            trigger: ".o-web-studio-report-editor-sidebar button[name='report_edit_sources']",
             run: "click",
         },
         {
             trigger:
-                ".o-dropdown--menu .o_select_menu_item:contains('web_studio.test_report_document (web_studio.test_report_document_1)')",
+                ".o-web-studio-report-editor-sidebar button[name='web_studio.test_report_document_1']",
         },
     ],
 });
@@ -1282,16 +1306,16 @@ registry.category("web_tour.tours").add("web_studio.test_edit_main_arch", {
                 const newNode = doc.createElement("div");
                 newNode.classList.add("added");
                 this.anchor.insertAdjacentElement("beforebegin", newNode);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
                 await nextTick();
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1306,16 +1330,16 @@ registry.category("web_tour.tours").add("web_studio.test_edit_in_t_call", {
                 const newNode = doc.createElement("div");
                 newNode.classList.add("added");
                 this.anchor.insertAdjacentElement("beforebegin", newNode);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
                 await nextTick();
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1331,22 +1355,22 @@ registry.category("web_tour.tours").add("web_studio.test_edit_main_and_in_t_call
                 newNode0.classList.add("added0");
                 const target0 = this.anchor.querySelector(".outside-t-call");
                 target0.insertAdjacentElement("beforebegin", newNode0);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
                 await nextTick();
                 const newNode1 = doc.createElement("div");
                 newNode1.classList.add("added1");
                 const target1 = this.anchor.querySelector(".in-t-call");
                 target1.insertAdjacentElement("beforebegin", newNode1);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
                 await nextTick();
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1377,16 +1401,16 @@ registry.category("web_tour.tours").add("web_studio.test_translations_are_copied
                 const newNode = doc.createElement("div");
                 (newNode.textContent = "term3 from edition"),
                     this.anchor.insertAdjacentElement("beforebegin", newNode);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
                 return nextTick();
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1417,16 +1441,16 @@ registry.category("web_tour.tours").add("web_studio.test_dont_translate_on_save"
                 el.textContent = "new content";
                 this.anchor.insertAdjacentElement("beforebegin", el);
                 const editor = editorsWeakMap.get(doc);
-                editor.shared.history.addStep();
+                editor.shared.history.commit();
                 await nextTick();
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
         {
             trigger: "body :iframe .odoo-editor-editable#wrapwrap span",
@@ -1444,11 +1468,11 @@ registry.category("web_tour.tours").add("web_studio.test_dont_translate_on_save"
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1462,11 +1486,11 @@ registry.category("web_tour.tours").add("web_studio.test_do_not_delete_unspecial
             },
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1480,8 +1504,13 @@ registry.category("web_tour.tours").add("web_studio.test_edit_header_only_compan
                 const span = el.ownerDocument.createElement("span");
                 span.classList.add("studio-added");
                 el.insertAdjacentElement("afterend", span);
+                const sel = el.ownerDocument.getSelection();
+                sel.removeAllRanges();
                 openEditorPowerBox(span);
             },
+        },
+        {
+            trigger: ".o-web-studio-options-container-header:contains(web.external_layout_standard)",
         },
         {
             trigger: ".o-we-powerbox .o-we-command:contains(Insert a field)",
@@ -1492,15 +1521,15 @@ registry.category("web_tour.tours").add("web_studio.test_edit_header_only_compan
             run: "click",
         },
         {
-            trigger: ".o_model_field_selector_popover_item_name:contains(Company ID)",
+            trigger: ".o_model_field_selector_popover_item_name:contains(Company Name)",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']",
+            trigger: ".o-dynamic-field-popover input[name='label_value']",
             run: "edit studio company id",
         },
         {
-            trigger: ".o-web-studio-report-dynamic-placeholder-popover button.btn-primary",
+            trigger: ".o-dynamic-field-popover button.btn-primary",
             run: "click",
         },
         {
@@ -1508,11 +1537,11 @@ registry.category("web_tour.tours").add("web_studio.test_edit_header_only_compan
                 "body :iframe .odoo-editor-editable#wrapwrap .header [t-field][data-oe-demo='studio company id']",
         },
         {
-            trigger: ".o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
-            trigger: ".o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });
@@ -1529,6 +1558,50 @@ registry.category("web_tour.tours").add("web_studio.test_report_without_view", {
         },
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio.test_can_insert_bare_x2many", {
+    steps: () => [
+        {
+            trigger:
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable div.spot-on",
+            async run(helpers) {
+                const el = this.anchor;
+                openEditorPowerBox(el, { start: 0 });
+            },
+        },
+        {
+            trigger: ".o-we-powerbox .o-we-command:contains(Field)",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_value",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o_model_field_selector_popover_item:contains(Related Contacts):not(:has(.o_model_field_selector_popover_item_relation)) button",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_value:contains(Related Contacts)",
+        },
+        {
+            trigger: ".o-dynamic-field-popover button.btn-primary",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable span[t-field='doc.child_ids']",
+        },
+        {
+            trigger: ".o-web-studio-save-report:not([disabled])",
+            run: "click",
+        },
+        {
+            trigger: ".o-web-studio-save-report[disabled]",
         },
     ],
 });

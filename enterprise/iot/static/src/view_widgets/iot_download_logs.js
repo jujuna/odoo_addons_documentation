@@ -1,34 +1,41 @@
-import { registry } from '@web/core/registry';
-import { useService } from '@web/core/utils/hooks';
-import { _t } from '@web/core/l10n/translation';
-import { Component } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
+import { downloadFile } from "@web/core/network/download";
+import { Component, t, useProps } from "@odoo/owl";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { formatEndpoint } from "@iot_base/network_utils/http";
+import { formatEndpoint } from "@iot/network_utils/http";
+
+const { DateTime } = luxon;
 
 export class IoTBoxDownloadLogs extends Component {
     static template = `iot.HeaderButton`;
-    static props = {
+    props = useProps({
         ...standardWidgetProps,
-        btn_name: { type: String },
-        btn_class: { type: String },
-    };
+        btn_name: t.string(),
+        btn_class: t.string(),
+    });
 
     setup() {
         super.setup();
-        this.notification = useService('notification');
-        this.http = useService('http');
+        this.notification = useService("notification");
+        this.http = useService("http");
     }
     get ip_url() {
-        return formatEndpoint(this.props.record.data.ip, '');
+        return formatEndpoint(this.props.record.data.ip, "");
     }
     get name() {
         return this.props.record.data.name;
     }
     async onClick() {
         try {
-            const response = await this.http.get(this.ip_url + '/hw_proxy/hello', 'text');
-            if (response == 'ping') {
-                window.location = this.ip_url + '/iot_drivers/download_logs';
+            const response = await this.http.get(this.ip_url + "hw_proxy/hello", "text");
+            if (response == "ping") {
+                const timestamp = DateTime.now().toUTC().toFormat("yyyy-MM-dd_hh-mm-ss");
+                const filename = `${this.name} (${timestamp}).log`;
+                const logsResponse = await fetch(this.ip_url + "iot_drivers/download_logs");
+                const logsText = await logsResponse.text();
+                downloadFile(logsText, filename);
             } else {
                 this.doWarnFail();
             }
@@ -37,17 +44,15 @@ export class IoTBoxDownloadLogs extends Component {
         }
     }
     doWarnFail() {
-        this.notification.add(_t('Failed to download logs from %s', this.name), { type: "danger" });
+        this.notification.add(_t("Failed to download logs from %s", this.name), { type: "danger" });
     }
 }
 
 export const ioTBoxDownloadLogs = {
     component: IoTBoxDownloadLogs,
-    extractProps: ({ attrs }) => {
-        return {
-            btn_name: attrs.btn_name,
-            btn_class: attrs.btn_class
-        };
-    },
+    extractProps: ({ attrs }) => ({
+        btn_name: attrs.btn_name,
+        btn_class: attrs.btn_class,
+    }),
 };
 registry.category("view_widgets").add("iot_download_logs", ioTBoxDownloadLogs);

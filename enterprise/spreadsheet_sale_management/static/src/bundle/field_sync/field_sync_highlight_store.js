@@ -3,9 +3,11 @@ import { getFirstListFunction } from "@spreadsheet/list/list_helpers";
 
 const { positionToZone } = helpers;
 
-const { SpreadsheetStore, HighlightStore, DelayedHoveredCellStore } = stores;
+const { SpreadsheetStore, HighlightStore, DelayedHoveredCellStore, ViewportsStore } = stores;
 
 export class FieldSyncHighlightStore extends SpreadsheetStore {
+    viewStore = this.get(ViewportsStore);
+
     constructor(get) {
         super(get);
         this.hoveredCell = get(DelayedHoveredCellStore);
@@ -30,12 +32,13 @@ export class FieldSyncHighlightStore extends SpreadsheetStore {
             return [];
         }
         const highlights = [];
-        const cells = this.getters.getCells(sheetId);
-        for (const cellId in cells) {
-            const cell = cells[cellId];
-            const cellPosition = this.getters.getCellPosition(cellId);
-            if (cell.isFormula && this.getters.isPixelPositionVisible(cellPosition)) {
-                const listFunction = getFirstListFunction(cell.compiledFormula.tokens);
+        for (const cell of this.getters.getCells(sheetId)) {
+            const cellPosition = this.getters.getCellPosition(cell.id);
+            if (
+                cell.isFormula &&
+                this.viewStore.viewports.isPixelPositionVisible(sheetId, cellPosition)
+            ) {
+                const listFunction = getFirstListFunction(cell.compiledFormula, this.getters);
                 if (!listFunction) {
                     continue;
                 }

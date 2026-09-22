@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { InteractiveEditorSidebar } from "@web_studio/client_action/view_editor/interactive_editor/interactive_editor_sidebar";
 import {
@@ -21,10 +21,12 @@ import { OTdLabelProperties } from "./properties/o_td_label_properties/o_td_labe
 
 export class FormEditorSidebar extends Component {
     static template = "web_studio.ViewEditor.FormEditorSidebar";
-    static props = {
-        openViewInForm: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-    };
+
+    props = useProps({
+        openViewInForm: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+    });
+
     static components = {
         InteractiveEditorSidebar,
         NewFields,
@@ -49,7 +51,7 @@ export class FormEditorSidebar extends Component {
 
     setup() {
         this.dialog = useService("dialog");
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         this.editArchAttributes = useEditNodeAttributes({ isRoot: true });
         this.propertiesComponents = {
             button: {
@@ -61,7 +63,14 @@ export class FormEditorSidebar extends Component {
             field: {
                 component: FieldProperties,
                 props: {
-                    availableOptions: ["invisible", "required", "readonly", "string", "help"],
+                    availableOptions: [
+                        "invisible",
+                        "required",
+                        "readonly",
+                        "string",
+                        "help",
+                        "tracking",
+                    ],
                 },
             },
             group: {

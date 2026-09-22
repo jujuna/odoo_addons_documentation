@@ -8,7 +8,7 @@ export class ContentExpandablePlugin extends Plugin {
     static id = "contentexpandable";
     static dependencies = ["protectedNode", "selection"];
     resources = {
-        clean_for_save_handlers: ({ root }) => this.cleanForSave(root),
+        clean_for_save_processors: (root) => this.cleanForSave(root),
         delete_backward_overrides: this.deleteBackward.bind(this),
         move_node_blacklist_selectors: ".o_mail_reply_container, .o_mail_reply_container *",
     };
@@ -52,7 +52,7 @@ export class ContentExpandablePlugin extends Plugin {
             this.dependencies.protectedNode.setProtectingNode(subEl, false);
             subEl.classList.add("d-none");
         }
-        const mailQuoteElement = this.editable.querySelectorAll('*[data-o-mail-quote="1"]');
+        const mailQuoteElement = ele.querySelectorAll('*[data-o-mail-quote="1"]');
         for (const element of mailQuoteElement) {
             element.removeAttribute("data-o-mail-quote");
             element.removeAttribute("style");
@@ -84,5 +84,6 @@ export class ContentExpandablePlugin extends Plugin {
             el.querySelector(".o-mail-Message-viewMore-container")?.remove();
             el.setAttribute("data-o-mail-quote", "1");
         }
+        return root;
     }
 }

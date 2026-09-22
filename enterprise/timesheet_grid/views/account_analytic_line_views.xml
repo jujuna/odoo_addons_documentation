@@ -10,19 +10,9 @@
             <field name="arch" type="xml">
                 <xpath expr="/list" position="attributes">
                     <attribute name="sample">1</attribute>
-                    <attribute name="js_class">timesheet_timer_list</attribute>
-                </xpath>
-                <xpath expr="/list" position="inside">
-                    <field name="is_timer_running" column_invisible="True"/>
-                    <field name="timer_start" column_invisible="True"/>
-                    <field name="display_timer" column_invisible="True"/>
-                </xpath>
-                <xpath expr="//field[@name='date']" position="attributes">
-                    <attribute name="readonly">readonly_timesheet or timer_start</attribute>
                 </xpath>
                 <xpath expr="//field[@name='unit_amount']" position="attributes">
-                    <attribute name="readonly">id and (readonly_timesheet or timer_start)</attribute>
-                    <attribute name="widget">timesheet_uom_timer</attribute>
+                    <attribute name="readonly" add="id" separator="and"/>
                 </xpath>
             </field>
         </record>
@@ -52,12 +42,6 @@
                         <button name="action_validate_timesheet" string="Validate" type="object"
                                 groups="hr_timesheet.group_hr_timesheet_approver"/>
                     </header>
-                </xpath>
-                <xpath expr="//field[@name='employee_id']" position="before">
-                    <field name="is_timer_running" column_invisible="1"/>
-                </xpath>
-                <xpath expr="//field[@name='employee_id']" position="attributes">
-                    <attribute name="readonly">is_timer_running</attribute>
                 </xpath>
             </field>
         </record>
@@ -94,41 +78,34 @@
             <field name="arch" type="xml">
                 <kanban position="attributes">
                     <attribute name="sample">1</attribute>
-                    <attribute name="js_class">timesheet_timer_kanban</attribute>
+                    <attribute name="default_group_by">date:day</attribute>
+                    <attribute name="quick_create_view">timesheet_grid.quick_create_account_analytic_line_form_inherit</attribute>
                 </kanban>
                 <xpath expr="/kanban" position="inside">
                     <field name="readonly_timesheet" invisible="1"/>
-                    <field name="timer_start" invisible="1"/>
-                    <field name="display_timer" invisible="1"/>
-                    <field name="is_timer_running" invisible="1"/>
                 </xpath>
-                <xpath expr="//footer/div" position="replace"/>
-                <field name="name" position="attributes">
-                    <attribute name="required">0</attribute>
-                </field>
-                <xpath expr="//div/span[@t-att-title='record.employee_id.value']" position="attributes">
+                <xpath expr="//div/field[@name='employee_id']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//div/div" position="after">
-                    <div invisible="readonly_timesheet or display_timer" class="ms-auto text-nowrap">
-                        <field name="unit_amount" string="Time Spent" widget="timesheet_uom" options="{'force_button': true}"/>
-                    </div>
-                    <div invisible="readonly_timesheet or not display_timer" class="ms-auto text-nowrap">
-                        <field name="unit_amount" widget="timesheet_uom_timer" decoration-danger="unit_amount &gt; 24 or unit_amount &lt; 0"
-                            decoration-muted="unit_amount == 0" readonly="1"
-                            class="d-flex align-items-center justify-content-center"/>
-                    </div>
-                    <div invisible="not readonly_timesheet" class="ms-auto text-nowrap">
-                        <field name="unit_amount" widget="timesheet_uom" decoration-danger="unit_amount &gt; 24 or unit_amount &lt; 0"
-                            decoration-muted="unit_amount == 0" readonly="1"/>
-                    </div>
-                 </xpath>
                 <xpath expr="//field[@name='task_id']" position="attributes">
+                    <attribute name="context">{'default_project_id': project_id, 'search_default_my_tasks': True, 'search_default_open_tasks': True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='task_id'][last()]" position="attributes">
                     <attribute name="context">{'default_project_id': project_id, 'search_default_my_tasks': True, 'search_default_open_tasks': True}</attribute>
                 </xpath>
             </field>
         </record>
-        <!-- add timer to My Timesheet kanban view -->
+
+        <record id="quick_create_account_analytic_line_form_inherit" model="ir.ui.view">
+            <field name="name">account.analytic.line.kanban.quick_create.timesheet_grid</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="hr_timesheet.quick_create_account_analytic_line_form"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='employee_id']" position="replace"/>
+            </field>
+        </record>
+
         <record id="hr_timesheet.act_hr_timesheet_line_view_kanban" model="ir.actions.act_window.view">
             <field name="view_id" ref="timesheet_grid.timesheet_kanban_view"/>
         </record>
@@ -141,10 +118,9 @@
                 <xpath expr="//field[@name='unit_amount']" position="after">
                     <field name="validated" invisible="1"/>
                     <field name="user_can_validate" invisible="1"/>
-                    <field name="timer_start" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='unit_amount']" position="attributes">
-                    <attribute name="readonly">id and (readonly_timesheet or timer_start)</attribute>
+                    <attribute name="readonly" add="id" separator="and"/>
                 </xpath>
                 <xpath expr="//sheet" position="before">
                     <header>
@@ -183,7 +159,7 @@
             <field name="model">account.analytic.line</field>
             <field name="arch" type="xml">
                 <grid string="Timesheets"
-                      js_class="timer_timesheet_grid"
+                      js_class="timesheet_grid_my_timesheets"
                       barchart_total="1"
                       create_inline="1"
                       form_view_id="%(timesheet_grid.hr_timesheet_line_form_grid)d"
@@ -320,16 +296,13 @@
                                 ('employee_id.parent_id.user_id', '=', uid),
                                 ('employee_id.is_subordinate', '=', True),
                     ]"/>
-                    <filter name="my_department_timesheet" string="My Department" domain="[('employee_id.member_of_department', '=', True)]"/>
-                    <filter name="my_project" string="My Projects" domain="[('project_id.user_id', '=', uid)]" context="{'group_expand': False}"/>
-                    <filter name="my_tasks" string="My Tasks" domain="[('task_id.user_ids', 'in', uid)]"/>
                 </xpath>
             </field>
         </record>
 
         <!-- make sure this view will be loaded after timesheet_grid.timesheet_view_search -->
         <record id="hr_timesheet.hr_timesheet_line_my_timesheet_search" model="ir.ui.view">
-            <field name="inherit_id" ref="timesheet_view_search" />
+            <field name="inherit_id" ref="timesheet_view_search"/>
         </record>
 
         <record id="hr_timesheet_line_inherit_my_timesheet_search" model="ir.ui.view">
@@ -337,8 +310,10 @@
             <field name="model">account.analytic.line</field>
             <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_my_timesheet_search"/>
             <field name="arch" type="xml">
-                <filter name="my_department_timesheet" position="replace"/>
                 <filter name="my_team_timesheet" position="replace"/>
+                <xpath expr="//filter[@name='my_projects_and_tasks']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
             </field>
         </record>
 

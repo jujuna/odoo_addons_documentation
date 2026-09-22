@@ -1,7 +1,10 @@
 from odoo.addons.crm.tests.common import TestCrmCommon
+from odoo.tests import tagged
+
 from odoo.fields import Command
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCrmSubscription(TestCrmCommon):
 
     def test_crm_sale_subscription_revenue(self):
@@ -96,3 +99,52 @@ class TestCrmSubscription(TestCrmCommon):
         so2.action_confirm()
         self.assertEqual(self.lead_1.expected_revenue, 200)
         self.assertEqual(self.lead_1.recurring_revenue, 240)
+
+    def test_subscription_count_on_lead(self):
+        """ Subscriptions linked to a lead's partner are counted and accessible via action. """
+        subscription_plan = self.env['sale.subscription.plan'].create({
+            'name': 'Monthly',
+            'billing_period_value': 1,
+            'billing_period_unit': 'month',
+        })
+        # contact_1 belongs to contact_company_1, contact_2 is its own commercial partner.
+        self.lead_1.partner_id = self.contact_1
+        lead_2 = self.env['crm.lead'].create({
+            'name': 'Second Lead',
+            'type': 'lead',
+            'user_id': self.user_sales_leads.id,
+            'team_id': self.sales_team_1.id,
+            'partner_id': self.contact_2.id,
+        })
+
+        # Subscription linked directly to lead_1 via opportunity_id.
+        sub_lead_1 = self.env['sale.order'].create({
+            'partner_id': self.contact_1.id,
+            'opportunity_id': self.lead_1.id,
+            'plan_id': subscription_plan.id,
+            'is_subscription': True,
+        })
+        self.assertEqual(self.lead_1.subscription_count, 1, "Subscription linked to the opportunity must be counted")
+        action = self.lead_1.action_open_subscriptions()
+        self.assertEqual(action['views'], [(False, 'form')], "Single subscription should open form view")
+        self.assertEqual(action['res_id'], sub_lead_1.id)
+
+        # Subscription for the same commercial company but not linked to any opportunity.
+        self.env['sale.order'].create({
+            'partner_id': self.contact_1.id, 'plan_id': subscription_plan.id, 'is_subscription': True,
+        })
+        # subscription_count depends only on partner_id, so a new sale.order doesn't invalidate the cache.
+        self.lead_1.invalidate_recordset(['subscription_count'])
+        self.assertEqual(self.lead_1.subscription_count, 2, "Company subscription not tied to opportunity must also count")
+        action = self.lead_1.action_open_subscriptions()
+        self.assertNotIn('res_id', action, "Multiple subscriptions must not redirect to a single form")
+        self.assertIn('domain', action)
+
+        # Subscription for lead_2's partner, linked to lead_2 only.
+        self.env['sale.order'].create({
+            'partner_id': self.contact_2.id, 'opportunity_id': lead_2.id, 'plan_id': subscription_plan.id, 'is_subscription': True,
+        })
+        # Trigger batch computation to verify counts don't bleed between opportunities.
+        (self.lead_1 | lead_2)._compute_subscription_count()
+        self.assertEqual(self.lead_1.subscription_count, 2, "lead_1 count must not include lead_2 subscriptions")
+        self.assertEqual(lead_2.subscription_count, 1, "lead_2 must count only its own subscriptions")

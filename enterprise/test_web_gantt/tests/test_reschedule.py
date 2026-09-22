@@ -4,13 +4,49 @@
 from datetime import datetime, timedelta, date
 
 from odoo import Command
-from odoo.tests import freeze_time
+from odoo.tests import tagged, freeze_time
 from odoo.addons.web_gantt.models.models import Base
 from .common import TestWebGantt
 
 
 @freeze_time(datetime(2021, 1, 1))
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestWebGanttReschedule(TestWebGantt):
+
+    def test_reschedule_reverse_browse_order(self):
+        """
+        Check that rescheduling works without throwing an error
+        when no suitable start/end dates are found for candidates based
+        on their dependencies
+        """
+        pill_2 = self.env['test.web.gantt.pill'].create({
+            'name': 'Pill 2',
+            self.date_start_field_name: "2021-06-02 00:00:00",
+            self.date_stop_field_name: "2021-06-02 10:00:00",
+        })
+        pill_1 = self.env['test.web.gantt.pill'].create({
+            'name': 'Pill 1',
+            self.date_start_field_name: "2021-06-01 00:00:00",
+            self.date_stop_field_name: "2021-06-01 10:00:00",
+            self.dependency_inverted_field_name: [(6, 0, [pill_2.id])],
+        })
+        pill_2.write({self.dependency_field_name: [(6, 0, [pill_1.id])]})
+
+        res = self.gantt_reschedule_maintain_buffer(pill_1, {
+            self.date_stop_field_name: "2021-06-01 08:00:00",
+        })
+        self.assertTrue(res, "Rescheduling should complete without exceptions.")
+
+    def test_reschedule_only_date_stop_passed(self):
+        """
+        Test that when only date_stop is provided during rescheduling,
+        it does not trigger a KeyError when the method tries to access the old start date.
+        """
+        res = self.gantt_reschedule_consume_buffer(self.pill_1, {
+            self.date_stop_field_name: "2021-03-01 17:00:00",
+        })
+        self.assertTrue(res, "Rescheduling should complete without exceptions.")
+
     def test_reschedule_cascading_forward(self):
         """ This test purpose is to ensure that the forward rescheduling is properly working. """
         # 1- consume buffer
@@ -337,6 +373,19 @@ class TestWebGanttReschedule(TestWebGantt):
         )
         self.assert_not_replanned(self.pills2_1 | self.pills2_4, self.initial_dates)
 
+    def test_reschedule_with_properties_field(self):
+        """Test reschedule with a fields.Properties subfield."""
+
+        self.assertEqual(self.pill_5_child.pill_properties, {"my_char": "Helloo", "my_int": 19})
+
+        result = self.gantt_reschedule_consume_buffer(self.pill_5_child, {
+            "pill_properties.my_char": "World",
+        })
+        self.assertEqual(self.pill_5_child.pill_properties, {"my_char": "World", "my_int": 19})
+
+        self.pill_5_child.action_rollback_scheduling(result["old_vals_per_pill_id"])
+        self.assertEqual(self.pill_5_child.pill_properties, {"my_char": "Helloo", "my_int": 19})
+
     def test_reschedule_dates(self):
         pill = self.env["test.web.gantt.pill2"].create({
             self.date_start_field_name: "2021-04-27",
@@ -362,3 +411,16 @@ class TestWebGanttReschedule(TestWebGantt):
             pill[self.date_start_field_name],
             date(2021, 4, 28),
         )
+
+    def test_gantt_reschedule_without_start_date_of_dependency(self):
+        ''' Test that when rescheduling a pill whose dependency has no start date,
+            the rescheduling is properly working and does not crash
+            because of the missing start date of the next pill.
+        '''
+        self.pill_2[self.date_start_field_name] = False
+        self.pill_2[self.date_stop_field_name] = False
+        res = self.gantt_reschedule_maintain_buffer(self.pill_1, {
+            self.date_start_field_name: '2021-06-12 00:00:00',
+            self.date_stop_field_name: '2021-06-18 10:00:00',
+        })
+        self.assertEqual(res.get('type'), 'success')

@@ -4,18 +4,18 @@
         <Dialog title.translate="Download Annual Report" size="'sm'">
             <label class="d-flex gap-1 cursor-pointer">
                 <span class="form-check form-switch">
-                    <input t-model="state.includeChildArticles" class="form-check-input" type="checkbox" role="switch"/>
+                    <input t-model.proxy="this.state.includeChildArticles" class="form-check-input" type="checkbox" role="switch"/>
                 </span>
                 Include child articles
             </label>
             <label class="d-flex gap-1 cursor-pointer">
                 <span class="form-check form-switch">
-                    <input t-model="state.includePdfFiles" class="form-check-input" type="checkbox" role="switch"/>
+                    <input t-model.proxy="this.state.includePdfFiles" class="form-check-input" type="checkbox" role="switch"/>
                 </span>
                 Include PDF Files
             </label>
             <t t-set-slot="footer">
-                <button class="btn btn-primary" t-on-click="exportAuditReportToPDF">Download PDF</button>
+                <button class="btn btn-primary" t-on-click="this.exportAuditReportToPDF">Download PDF</button>
                 <button class="btn btn-secondary" t-on-click="() => this.props.close()">Discard</button>
             </t>
         </Dialog>

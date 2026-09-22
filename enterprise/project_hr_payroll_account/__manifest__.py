@@ -2,12 +2,13 @@
 
 {
     'name': 'Project Payroll Accounting',
-    'version': '1.0',
     'category': 'Services/payroll/account',
     'summary': 'Project payroll accounting',
     'description': 'Bridge created to add the number of contracts linked to an AA to a project form',
     'depends': ['project', 'hr_payroll_account'],
-    'installable': True,
+    'data': [
+        'views/project_project_views.xml',
+    ],
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

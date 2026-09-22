@@ -1,33 +1,30 @@
-import { Component, onMounted, onPatched, useState, useRef } from "@odoo/owl";
+import { Component, onMounted, onPatched, props, proxy, signal, t } from "@odoo/owl";
 
 /**
  * Represents the page of a PDF.
  */
 export class PdfPage extends Component {
-    static defaultProps = {
-        isPreview: false,
-        isSelected: false,
-    };
-    static props = {
-        canvas: { type: Object, optional: true },
-        isPreview: { type: Boolean, optional: true },
-        isSelected: { type: Boolean, optional: true },
-        isFocused: { type: Boolean, optional: true },
-        onPageClicked: { type: Function, optional: true },
-        onPageDragged: { type: Function, optional: true },
-        onPageDropped: { type: Function, optional: true },
-        onSelectClicked: { type: Function, optional: true },
-        toRender: { type: Boolean, optional: true },
-        pageId: String,
-    };
+    props = props({
+        canvas: t.object().optional(),
+        isPreview: t.boolean().optional(false),
+        isSelected: t.boolean().optional(false),
+        isFocused: t.boolean().optional(),
+        onPageClicked: t.function().optional(),
+        onPageDragged: t.function().optional(),
+        onPageDropped: t.function().optional(),
+        onSelectClicked: t.function().optional(),
+        toRender: t.boolean().optional(),
+        pageId: t.string(),
+    });
     static template = "documents.component.PdfPage";
 
+    // Used to append a canvas when it has been rendered.
+    canvasWrapperRef = signal.ref();
+
     setup() {
-        this.state = useState({
+        this.state = proxy({
             isHover: false,
         });
-        // Used to append a canvas when it has been rendered.
-        this.canvasWrapperRef = useRef("canvasWrapper");
         this.isRendered = false;
 
         onMounted(() => this.renderPage(this.props.canvas));
@@ -54,8 +51,8 @@ export class PdfPage extends Component {
         if (!canvas || this.isRendered) {
             return;
         }
-        this.canvasWrapperRef.el.querySelector(".o_documents_pdf_canvas")?.remove();
-        this.canvasWrapperRef.el.appendChild(canvas);
+        this.canvasWrapperRef().querySelector(".o_documents_pdf_canvas")?.remove();
+        this.canvasWrapperRef().appendChild(canvas);
         this.isRendered = true;
     }
 

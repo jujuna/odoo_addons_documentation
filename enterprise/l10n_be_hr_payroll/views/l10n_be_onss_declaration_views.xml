@@ -11,18 +11,13 @@
                         string="Test SFTP Connection"
                         type="object"
                         groups="base.group_no_one"/>
-                    <button
-                        name="action_post"
-                        string="Post Declaration"
-                        type="object"
-                        class="oe_highlight"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,posted,received,notified"/>
+                    <field name="state" widget="statusbar" statusbar_visible="posted,received,notified"/>
                 </header>
                 <sheet>
                     <div name="button_box" position="inside">
                         <button name="action_open_onss_file"
                             class="oe_stat_button"
-                            icon="fa-book"
+                            icon="book"
                             type="object"
                             invisible="not onss_file_count">
                             <div class="o_stat_info">
@@ -36,7 +31,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="dmfa_id"/>
+                            <field name="batch_declaration_id"/>
                             <field name="environment"/>
                             <field name="error_message" invisible="not error_message"/>
                         </group>
@@ -51,16 +46,18 @@
         <field name="model">l10n.be.onss.declaration</field>
         <field name="arch" type="xml">
             <list string="ONSS Declarations">
-                <field name="dmfa_id"/>
+                <field name="name"/>
+                <field name="create_date" string="Creation Date"/>
                 <field name="environment"/>
                 <field
                     name="state"
                     widget="badge"
-                    decoration-info="state == 'draft'"
                     decoration-muted="state == 'posted'"
+                    decoration-info="state == 'notified'"
+                    decoration-success="state == 'received'"
                     decoration-danger="state == 'error'"
-                    decoration-success="state == 'notified'"/>
-                <field name="onss_file_count"/>
+                    decoration-warning="state == 'other'"/>
+                <button string="Download" type="object" name="action_download_onss_xml" icon="download"/>
             </list>
         </field>
     </record>

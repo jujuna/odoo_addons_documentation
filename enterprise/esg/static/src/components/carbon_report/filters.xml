@@ -4,11 +4,11 @@
         <xpath expr="//div[@id='filter_extra_options']" position="before">
             <Dropdown>
                 <button class="btn btn-secondary">
-                    <i class="fa fa-cloud me-1"/>Gas
+                    <i class="oi me-1" data-icon="cloud"/>Gas
                 </button>
 
                 <t t-set-slot="content">
-                    <t t-foreach="controller.cachedFilterOptions.carbon_report_selected_gas" t-as="gasItem" t-key="gasItem_index">
+                    <t t-foreach="this.controller.cachedFilterOptions().carbon_report_selected_gas" t-as="gasItem" t-key="gasItem_index">
                         <DropdownItem
                             class="{ selected: gasItem.selected }"
                             onSelected="() => this.filterClicked({ optionKey: 'carbon_report_selected_gas.' + gasItem_index + '.selected', reload: true})"

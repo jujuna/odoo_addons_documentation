@@ -1,21 +1,16 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 
 export class ThumbnailItem extends Component {
-    static defaultProps = {
-        showMoreMenu: true,
-        onClick: () => {},
-        canClick: true,
-    };
     static template = "web_studio.ThumbnailItem";
-    static props = {
-        className: { type: String, optional: true },
-        showMoreMenu: { type: Boolean, optional: true },
-        icon: { type: Object },
-        onClick: { type: Function, optional: true },
-        canClick: { type: Boolean, optional: true },
-        slots: true,
-    };
+    props = useProps({
+        className: t.string().optional(),
+        showMoreMenu: t.boolean().optional(true),
+        icon: t.object(),
+        onClick: t.function().optional(() => () => {}),
+        canClick: t.boolean().optional(true),
+        slots: t.any(),
+    });
     static components = { Dropdown };
 
     get hasDropdown() {

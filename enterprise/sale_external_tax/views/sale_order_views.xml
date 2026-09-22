@@ -15,6 +15,12 @@
                         invisible="locked or state == 'cancel' or not is_tax_computed_externally"
                         groups="sales_team.group_sale_salesman,account.group_account_invoice"/>
             </div>
+            <xpath expr="//field[@id='document_tax_mode_mobile']" position="attributes">
+                <attribute name="invisible" add="is_tax_computed_externally" separator="or"/>
+            </xpath>
+            <xpath expr="//field[@id='document_tax_mode']" position="attributes">
+                <attribute name="invisible" add="is_tax_computed_externally" separator="or"/>
+            </xpath>
         </field>
     </record>
 </odoo>

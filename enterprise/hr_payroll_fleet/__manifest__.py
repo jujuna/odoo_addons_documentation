@@ -2,13 +2,13 @@
 
 {
     'name': 'Payroll - Fleet',
-    'version': '1.0',
     'category': 'Human Resources/Payroll',
     'summary': 'Integration between Payroll and Fleet.',
     'depends': ['hr_payroll', 'hr_fleet'],
     'auto_install': True,
     'data': [
-        'data/hr_payroll_dashboard_warning_data.xml',
+        'data/hr_payroll_warning_data.xml',
+        'views/fleet_vehicle_model_views.xml',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

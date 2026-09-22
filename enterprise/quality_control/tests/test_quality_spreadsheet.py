@@ -4,11 +4,14 @@ from freezegun import freeze_time
 
 
 from .test_common import TestQualityCommon
+from odoo.tests import tagged
+
 from odoo.addons.spreadsheet_edition.tests.spreadsheet_test_case import (
     SpreadsheetTestCase,
 )
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestQualitySpreadsheet(TestQualityCommon, SpreadsheetTestCase):
 
     def test_delete_history_after_inactivity(self):
@@ -17,7 +20,7 @@ class TestQualitySpreadsheet(TestQualityCommon, SpreadsheetTestCase):
                 'name': 'My spreadsheet',
                 'check_cell': 'A1',
             })
-            spreadsheet.dispatch_spreadsheet_message(
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
             snapshot = {"revisionId": "next-revision"}

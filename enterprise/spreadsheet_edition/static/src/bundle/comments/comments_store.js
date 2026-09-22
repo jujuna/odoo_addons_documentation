@@ -20,16 +20,6 @@ export class CommentsStore extends SpreadsheetStore {
         });
     }
 
-    handle(cmd) {
-        switch (cmd.type) {
-            case "SET_VIEWPORT_OFFSET":
-                if (this.cellPopoverStore.persistentCellPopover?.type === "OdooCellComment") {
-                    this.cellPopoverStore.close();
-                }
-                break;
-        }
-    }
-
     get renderingLayers() {
         return ["Triangle"];
     }
@@ -92,12 +82,11 @@ export class CommentsStore extends SpreadsheetStore {
      *
      * @param {*} ctx Grid rendering context
      */
-    drawLayer({ ctx }, layer) {
+    drawLayer({ ctx, viewports, sheetId, activePosition }, layer) {
         if (!this.areCommentsActive || layer !== "Triangle" || this.getters.isReadonly()) {
             return;
         }
 
-        const sheetId = this.getters.getActiveSheetId();
         const threadInfos = this.getters.getThreadInfosInSheet(sheetId);
 
         for (const { col, row, isResolved } of threadInfos) {
@@ -105,9 +94,9 @@ export class CommentsStore extends SpreadsheetStore {
             if (zone.left !== col || zone.top !== row) {
                 continue;
             }
-            const { x, y, width, height } = this.getters.getVisibleRect(zone);
+            const { x, y, width, height } = viewports.getVisibleRect(sheetId, zone);
             if (width > 0 && height > 0) {
-                const { col: activeCol, row: activeRow } = this.getters.getActivePosition();
+                const { col: activeCol, row: activeRow } = activePosition;
                 if (
                     isInside(activeCol, activeRow, zone) &&
                     (this.drawResolvedBackground || !isResolved)

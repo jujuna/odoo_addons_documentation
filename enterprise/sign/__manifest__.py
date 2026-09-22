@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Sign',
-    'version': '1.0',
     'category': 'Sales/Sign',
     'sequence': 105,
     'summary': "Send and request electronic signatures.",
@@ -10,18 +9,21 @@ Sign and complete your documents easily. Customize your documents with text and 
 Let your customers follow the signature process easily.
     """,
     'website': 'https://www.odoo.com/app/sign',
-    'depends': ['mail', 'attachment_indexation', 'portal', 'sms', 'certificate'],
+    'depends': ['mail', 'attachment_indexation', 'portal', 'sms', 'certificate', 'iap'],
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'data/iap_service_data.xml',
         'data/mail_activity_type_data.xml',
         'data/mail_templates.xml',
         'data/sign_data.xml',
         'data/sign_tour.xml',
+        'data/portal_entry_data.xml',
         'views/sign_template_views_mobile.xml',
         'wizard/sign_template_preview_views.xml',
         'wizard/sign_request_share.xml',
         'wizard/sign_send_request_views.xml',
+        'wizard/certificate_wizard_view.xml',
+        'wizard/mail_activity_schedule_views.xml',
         'views/sign_request_templates.xml',
         'views/sign_template_templates.xml',
         'views/sign_request_views.xml',
@@ -34,8 +36,12 @@ Let your customers follow the signature process easily.
         'views/res_partner_views.xml',
         'views/sign_pdf_iframe_templates.xml',
         'views/terms_views.xml',
+        'views/ir_actions_server_views.xml',
+        'views/mail_activity_plan_views.xml',
+        'views/mail_activity_plan_template_views.xml',
         'report/sign_log_reports.xml',
-        'report/green_saving_reports.xml'
+        'report/green_saving_reports.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/sign_demo.xml',
@@ -43,12 +49,12 @@ Let your customers follow the signature process easily.
     'application': True,
     'post_init_hook': '_sign_post_init',
     'uninstall_hook': 'uninstall_hook',
-    'installable': True,
+    'iap_paid_service': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'assets': {
         'sign.assets_pdf_iframe': [
-            'web/static/src/libs/fontawesome/css/font-awesome.css',
+            ('include', 'web.icons_fonts'),
             'web/static/lib/bootstrap/scss/_functions.scss',
             'web/static/src/scss/functions.scss',
             'web/static/src/scss/pre_variables.scss',
@@ -65,11 +71,11 @@ Let your customers follow the signature process easily.
             'web/static/src/scss/bs_mixins_overrides.scss',
             'web/static/lib/bootstrap/scss/utilities/_api.scss',
             'web/static/src/scss/utils.scss',
-            'web/static/src/scss/primary_variables.scss',
             'web_enterprise/static/src/scss/primary_variables.scss',
-            'sign/static/src/css/iframe.css',
+            'web/static/src/scss/primary_variables.scss',
+            'sign/static/src/css/iframe.scss',
             'web/static/src/scss/secondary_variables.scss',
-            'sign/static/src/scss/iframe.scss',
+            'sign/static/src/scss/sign_item.scss',
         ],
         'sign.assets_green_report': [
             'sign/static/src/css/green_saving_reports.scss',
@@ -77,17 +83,19 @@ Let your customers follow the signature process easily.
         'web.assets_backend': [
             'sign/static/src/js/**/*',
             'sign/static/src/scss/sign_common.scss',
+            'sign/static/src/scss/sign_item.scss',
             'sign/static/src/scss/sign_backend.scss',
-            'sign/static/src/activity/**',
+            'sign/static/src/scss/thank_you_dialog.scss',
+            'sign/static/src/core/**/*',
             'sign/static/src/mixin/**/*',
             'sign/static/src/components/**/*',
             'sign/static/src/backend_components/**/*',
             'sign/static/src/views/**/*',
             'sign/static/src/dialogs/**/*',
-            'sign/static/src/editor/**/*',
             'sign/static/src/services/**/*',
             'sign/static/src/fields/**/*',
             'sign/static/src/file_viewer/**/*',
+            'sign/static/src/scss/activity.scss',
             ('remove', 'sign/static/src/views/sign_request_activity/**'),
         ],
         'web.assets_backend_lazy': [
@@ -97,9 +105,9 @@ Let your customers follow the signature process easily.
             'sign/static/src/components/**/*',
             'sign/static/src/scss/sign_common.scss',
             'sign/static/src/scss/sign_frontend.scss',
+            'sign/static/src/scss/thank_you_dialog.scss',
             'sign/static/src/dialogs/**/*',
             'sign/static/src/services/**/*',
-            'sign/static/src/file_viewer/**/*',
         ],
         'web.assets_tests': [
             'sign/static/tests/tours/**/*',
@@ -117,12 +125,13 @@ Let your customers follow the signature process easily.
             'web/static/lib/bootstrap/scss/_maps.scss',
             ('include', 'web._assets_bootstrap_frontend'),
 
-            'web/static/src/libs/fontawesome/css/font-awesome.css',
-            'web/static/src/scss/fontawesome_overridden.scss',
+            ('include', 'web.icons_fonts'),
             ('include', 'web._assets_core'),
-
-            'web/static/lib/jquery/jquery.js',
-
+            'web/static/src/public/**/*.js',
+            ('remove', 'web/static/src/public/database_manager.js'),
+            ('remove', 'web/static/src/public/error_notifications.js'),
+            ("remove", 'web/static/src/public/public_root.js'),
+            ("remove", 'web/static/src/public/public_root_instance.js'),
             'web/static/lib/popper/popper.js',
             'web/static/lib/bootstrap/js/dist/util/index.js',
             'web/static/lib/bootstrap/js/dist/dom/data.js',
@@ -156,18 +165,27 @@ Let your customers follow the signature process easily.
 
             'sign/static/src/scss/sign_common.scss',
             'sign/static/src/scss/sign_frontend.scss',
+            'sign/static/src/scss/thank_you_dialog.scss',
             'sign/static/src/components/**/*',
             'sign/static/src/dialogs/**/*',
             'sign/static/src/services/**/*',
 
             'sign/static/tests/tours/**/*',
             'sign/static/src/js/tours/tour_utils.js',
-            'web_tour/static/src/js/**/*',
-            'web_tour/static/src/tour_utils.js',
-            'web/static/lib/hoot-dom/**/*',
+            ('include', 'web_tour.assets'),
+            'web_tour/static/src/tour_pointer/tour_pointer.scss',
         ],
         'web.assets_web_dark': [
             'sign/static/src/scss/sign.dark.scss',
+        ],
+        'mail.assets_public': [
+            'sign/static/src/core/common/**/*',
+        ],
+        "im_livechat.assets_embed_core": [
+            "sign/static/src/core/common/**/*",
+        ],
+        "portal.assets_chatter_helpers": [
+            "sign/static/src/core/common/**/*",
         ],
     }
 }

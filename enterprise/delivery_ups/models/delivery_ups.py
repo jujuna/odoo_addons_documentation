@@ -63,6 +63,11 @@ class DeliveryCarrier(models.Model):
             if carrier.delivery_type == 'ups':
                 carrier.can_generate_return = True
 
+    def _compute_supports_cash_on_delivery(self):
+        ups_carriers = self.filtered(lambda carrier: carrier.delivery_type == 'ups')
+        super(DeliveryCarrier, self - ups_carriers)._compute_supports_cash_on_delivery()
+        ups_carriers.supports_cash_on_delivery = True
+
     def _compute_supports_shipping_insurance(self):
         super()._compute_supports_shipping_insurance()
         for carrier in self:
@@ -119,7 +124,7 @@ class DeliveryCarrier(models.Model):
         else:
             quote_currency = ResCurrency.search([('name', '=', result['currency_code'])], limit=1)
             price = quote_currency._convert(
-                float(result['price']), order.currency_id, order.company_id, order.date_order or fields.Date.today())
+                float(result['price']), order.currency_id, order.company_id, order.date_order)
 
         if self.ups_bill_my_account and order.partner_ups_carrier_account:
             # Don't show delivery amount, if ups bill my account option is true
@@ -144,7 +149,7 @@ class DeliveryCarrier(models.Model):
 
             shipment_info = {
                 'require_invoice': picking._should_generate_commercial_invoice(),
-                'invoice_date': fields.Date.today().strftime('%Y%m%d'),
+                'invoice_date': fields.Date.context_today(self).strftime('%Y%m%d'),
                 'description': picking.origin or picking.name,
                 'total_qty': sum(sml.quantity for sml in picking.move_line_ids),
                 'ilt_monetary_value': '%d' % sum(sml.sale_price for sml in picking.move_line_ids),
@@ -194,7 +199,7 @@ class DeliveryCarrier(models.Model):
             else:
                 quote_currency = ResCurrency.search([('name', '=', result['currency_code'])], limit=1)
                 price = quote_currency._convert(
-                    float(result['price']), currency_order, company, order.date_order or fields.Date.today())
+                    float(result['price']), currency_order, company, order.date_order)
 
             package_labels = []
             for track_number, label_binary_data in result.get('label_binary_data').items():
@@ -238,7 +243,7 @@ class DeliveryCarrier(models.Model):
 
         shipment_info = {
             'is_return': True,
-            'invoice_date': fields.Date.today().strftime('%Y%m%d'),
+            'invoice_date': fields.Date.context_today(self).strftime('%Y%m%d'),
             'description': picking.origin or picking.name,
             'total_qty': sum(sml.quantity for sml in picking.move_line_ids),
             'ilt_monetary_value': '%d' % invoice_line_total,
@@ -286,7 +291,7 @@ class DeliveryCarrier(models.Model):
         else:
             quote_currency = ResCurrency.search([('name', '=', result['currency_code'])], limit=1)
             price = quote_currency._convert(
-                float(result['price']), currency_order, company, order.date_order or fields.Date.today())
+                float(result['price']), currency_order, company, order.date_order)
 
         package_labels = []
         for track_number, label_binary_data in result.get('label_binary_data').items():

@@ -10,11 +10,11 @@
             <field name="arch" type="xml">
                 <div name="button_box" position="inside">
                     <button class="oe_stat_button" type="object" name="action_view_invoice"
-                        icon="fa-pencil-square-o" invisible="invoice_count == 0">
+                        icon="edit_square" invisible="invoice_count == 0">
                         <field string="Customer Invoices" name="invoice_count" widget="statinfo"/>
                     </button>
                     <button class="oe_stat_button" type="object" name="action_view_vendor_bill"
-                        icon="fa-file-text-o" invisible="vendor_bill_count == 0">
+                        icon="article" invisible="vendor_bill_count == 0">
                         <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
                     </button>
                 </div>
@@ -28,11 +28,15 @@
             <field name="arch" type="xml">
                 <field name="debit" position="attributes">
                     <attribute name="column_invisible">False</attribute>
-                    <attribute name="groups">account.group_account_readonly</attribute>
+                    <attribute name="groups">account.group_account_readonly,account.group_account_invoice</attribute>
                 </field>
                 <field name="credit" position="attributes">
                     <attribute name="column_invisible">False</attribute>
-                    <attribute name="groups">account.group_account_readonly</attribute>
+                    <attribute name="groups">account.group_account_readonly,account.group_account_invoice</attribute>
+                </field>
+                <field name="balance" position="attributes">
+                    <attribute name="column_invisible">False</attribute>
+                    <attribute name="groups">account.group_account_readonly,account.group_account_invoice</attribute>
                 </field>
             </field>
         </record>

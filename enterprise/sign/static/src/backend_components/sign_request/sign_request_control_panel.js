@@ -1,6 +1,7 @@
+import { SignInfoPlugin } from "@sign/services/sign_info_plugin";
 import { user } from "@web/core/user";
 import { _t } from "@web/core/l10n/translation";
-import { Component, useEffect, useComponent, markup } from "@odoo/owl";
+import { Component, t, usePlugin, useProps } from "@odoo/owl";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
@@ -8,50 +9,8 @@ import { SignRequestDocumentsDropdown } from "@sign/backend_components/sign_requ
 import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
 import multiFileUpload from "@sign/backend_components/multi_file_upload";
-
-function useResendButtons() {
-    const component = useComponent();
-    const onClickResend = async (e) => {
-        const parent = e.currentTarget.parentNode;
-        const signRequestItemId = parseInt(parent.dataset.id);
-        await component.orm.call(
-            "sign.request.item",
-            "send_signature_accesses",
-            [signRequestItemId],
-            { context: user.context }
-        );
-        e.target.innerText = _t("Resent!");
-    };
-    useEffect(
-        (showResendButtons) => {
-            if (!showResendButtons) {
-                return;
-            }
-            const status = document.querySelector("div.signer-status");
-            const signerNames = status.querySelectorAll(
-                ".o_sign_signer_status.o_sign_signer_waiting"
-            );
-            const sequencedSignatureMailSentOrderSet = component.signInfo.get("sequencedSignatureMail");
-            Array.from(signerNames).forEach((signerNameEl) => {
-                signerNameEl.style.display = "flex";
-                signerNameEl.style.alignItems = "flex-end";
-                if (!sequencedSignatureMailSentOrderSet){
-                    const requestItemStates = component.signInfo.get("requestItemStates") || {};
-                    const stateSet = requestItemStates[signerNameEl.dataset.id];
-                    const text = stateSet ? _t("Resend") : _t("Send");
-                    const title = stateSet ? _t("Resend the invitation") : _t("Send the invitation");
-                    const button = document.createElement("button");
-                    button.title = title;
-                    button.innerText = text;
-                    button.className = "o_sign_resend_access_button btn btn-link ms-2 me-2";
-                    signerNameEl.appendChild(button);
-                    button.addEventListener("click", onClickResend);
-                }
-            });
-        },
-        () => [component.showResendButtons]
-    );
-}
+import { SignerStatusBadge } from "@sign/components/sign_request/signer_status_badge";
+import { SignHeaderTags } from "@sign/backend_components/sign_template/sign_header_tags";
 
 export class SignRequestControlPanel extends Component {
     static template = "sign.SignRequestControlPanel";
@@ -60,27 +19,22 @@ export class SignRequestControlPanel extends Component {
         Dropdown,
         DropdownItem,
         SignRequestDocumentsDropdown,
+        SignerStatusBadge,
+        SignHeaderTags,
     };
-    static props = {
-        signerStatus: {
-            type: Object,
-            optional: true,
-        },
-        goBackToKanban: { type: Function },
-    };
+
+    props = useProps({
+        goBackToKanban: t.function(),
+        signer_status_props_json: t.object().optional(),
+    });
 
     setup() {
         this.controlPanelDisplay = {};
         this.action = useService("action");
         this.orm = useService("orm");
-        this.signInfo = useService("signInfo");
+        this.signInfo = usePlugin(SignInfoPlugin);
         this.nextTemplate = multiFileUpload.getNext();
-        useResendButtons();
         this.addDialog = useOwnedDialogs();
-    }
-
-    get markupSignerStatus() {
-        return markup(this.props.signerStatus.innerHTML);
     }
 
     get showResendButtons() {
@@ -92,7 +46,8 @@ export class SignRequestControlPanel extends Component {
     get allowCancel() {
         const needToSign = this.signInfo.get("needToSign");
         const state = this.signInfo.get("signRequestState");
-        return needToSign && !["signed", "canceled"].includes(state);
+        const isAuthor = this.signInfo.get("createUid") === user.userId;
+        return (isAuthor || needToSign) && !["signed", "canceled"].includes(state);
     }
 
     // In a normal OWL context, this property ensures the dropdown renders fine.
@@ -100,6 +55,40 @@ export class SignRequestControlPanel extends Component {
     // so this will be undefined and the component won't render which is needed.
     get shouldShowDownloadDropdown() {
         return true;
+    }
+
+    // Always true in normal mode, and explicitly false in signing mode
+    // to hide the button.
+    get shouldShowDetailsButton() {
+        return true;
+    }
+
+    get hasMultipleDocuments() {
+        const count = this.signInfo.get("document_count") || 1;
+        return count > 1;
+    }
+
+    get signerStatusBadgeProps() {
+        return {
+            ...this.props.signer_status_props_json,
+            showResendButtons: this.showResendButtons,
+            onResendClick: this.ResendDocument.bind(this),
+            sequencedSignatureMail: this.signInfo.get("sequencedSignatureMail"),
+        };
+    }
+
+    get TagsProps() {
+        const requestId = this.signInfo.get("documentId");
+        if (!requestId) {
+            return null;
+        }
+        return {
+            resModel: "sign.request",
+            resId: requestId,
+            fieldsInfo: {
+                template_tags: { type: "many2many", relation: "sign.request.tag", string: "Tags" },
+            },
+        };
     }
 
     async signDocument() {
@@ -115,16 +104,41 @@ export class SignRequestControlPanel extends Component {
             body: _t("Are you sure you want to cancel this sign request?"),
             confirm: async () => {
                 await this.orm.call("sign.request", "cancel", [this.signInfo.get("documentId")]);
-                const result = await this.orm.call(
-                    "sign.request",
-                    "get_close_values",
-                    [[this.signInfo.get("documentId")]],
-                );
+                const result = await this.orm.call("sign.request", "get_close_values", [
+                    [this.signInfo.get("documentId")],
+                ]);
                 const context = result.custom_action ? {} : { clearBreadcrumbs: true };
                 this.env.services.action.doAction(result.action, context);
             },
             cancel: () => {},
         });
+    }
+
+    async ResendDocument(signRequestItemId) {
+        await this.orm.call("sign.request.item", "send_signature_accesses", [signRequestItemId], {
+            context: user.context,
+        });
+    }
+
+    async openFormView() {
+        const action = await this.orm.call("sign.request", "get_record_default_action", [
+            [this.signInfo.get("documentId")],
+        ]);
+        await this.action.doAction(action);
+    }
+
+    async openSendWizard() {
+        const action = await this.orm.call("sign.request", "action_send", [
+            this.signInfo.get("documentId"),
+        ]);
+        await this.action.doAction(action);
+    }
+
+    async saveAsTemplate() {
+        const action = await this.orm.call("sign.request", "action_save_as_template", [
+            this.signInfo.get("documentId"),
+        ]);
+        await this.action.doAction(action);
     }
 
     async goToNextDocument() {

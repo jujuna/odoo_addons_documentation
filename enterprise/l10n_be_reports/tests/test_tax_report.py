@@ -11,6 +11,8 @@ from unittest.mock import patch
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class BelgiumTaxReportTest(AccountSalesReportCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountSalesReportCommon.setup_country('be')
     def setUpClass(cls):
@@ -113,7 +115,6 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
 
         # Create a new partner for the representative and link it to the company.
         representative = self.env['res.partner'].create({
-            'company_type': 'company',
             'name': 'Fidu BE',
             'street': 'Fidu Street 123',
             'city': 'Brussels',
@@ -165,6 +166,70 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
                 </ns2:VATDeclaration>
             </ns2:VATConsignment>
             """ % ref
+
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(self.env[report.custom_handler_model_name].export_tax_report_to_xml(options)['file_content']),
+            self.get_xml_tree_from_string(expected_xml)
+        )
+
+    @freeze_time('2019-12-31')
+    def test_generate_xml_minimal_for_fiscal_position_with_foreign_vat(self):
+        """
+        Test the generation of a minimal Belgian VAT report XML for a company
+        located outside Belgium with a fiscal position that specifies a foreign VAT number
+        for Belgium
+
+        The report uses the company's current data (name, address, email, phone)
+        The VAT number is correctly taken from the `foreign_vat` field of the fiscal position
+        """
+        company_us = self.env['res.company'].create({
+            'name': 'Test US Main',
+            'country_id': self.env.ref('base.us').id,
+            'email': 'test@test.com',
+            'phone': '0123456789',
+            'vat': "US1234",
+        })
+
+        self.env['account.fiscal.position'].create({
+            'name': 'Test Fiscal Position BE',
+            'company_id': company_us.id,
+            'foreign_vat': 'BE0980737405',
+            'country_id': self.env.ref('base.be').id,
+        })
+
+        report = self.env.ref('l10n_be.tax_report_vat')
+        options = report.with_company(company_us).get_options({})
+
+        # The partner id is changing between execution of the test so we need to append it manually to the reference.
+        ref = str(company_us.partner_id.id) + '112019'
+
+        # This is the minimum expected from the belgian tax report xml.
+        # As no values are in the report, we only find the grid 71 which is always expected to be present.
+        expected_xml = """
+        <ns2:VATConsignment xmlns="http://www.minfin.fgov.be/InputCommon" xmlns:ns2="http://www.minfin.fgov.be/VATConsignment" VATDeclarationsNbr="1">
+            <ns2:VATDeclaration SequenceNumber="1" DeclarantReference="%s">
+                <ns2:Declarant>
+                    <VATNumber xmlns="http://www.minfin.fgov.be/InputCommon">0980737405</VATNumber>
+                    <Name>Test US Main</Name>
+                    <Street></Street>
+                    <PostCode></PostCode>
+                    <City></City>
+                    <CountryCode>US</CountryCode>
+                    <EmailAddress>test@test.com</EmailAddress>
+                    <Phone>0123456789</Phone>
+                </ns2:Declarant>
+                <ns2:Period>
+                    <ns2:Month>11</ns2:Month>
+                    <ns2:Year>2019</ns2:Year>
+                </ns2:Period>
+                <ns2:Data>
+                    <ns2:Amount GridNumber="71">0.00</ns2:Amount>
+                </ns2:Data>
+                <ns2:ClientListingNihil>NO</ns2:ClientListingNihil>
+                <ns2:Ask Restitution="NO"/>
+            </ns2:VATDeclaration>
+        </ns2:VATConsignment>
+        """ % ref
 
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(self.env[report.custom_handler_model_name].export_tax_report_to_xml(options)['file_content']),
@@ -338,7 +403,7 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
             'date_to': '2019-03-31',
         })
 
-        wizard_lock = self.env['l10n_be_reports.vat.return.lock.wizard'].create({
+        wizard_sub = self.env['l10n_be_reports.vat.return.submission.wizard'].create({
             'return_id': account_return.id,
             'is_prorata_necessary': True,
             'prorata_year': 2019,
@@ -346,8 +411,10 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
             'prorata_at_100': 50,
             'prorata_at_0': 50,
         })
+        company.l10n_be_intervat_mode = 'disabled'
         with self.allow_pdf_render():
-            wizard_lock.action_proceed_with_locking()
+            account_return.action_submit()
+            wizard_sub.action_proceed_with_submission()
         xml_file = account_return.attachment_ids.filtered(lambda a: a.name.endswith(".xml"))
 
         # The partner id is changing between execution of the test so we need to append it manually to the reference.
@@ -425,13 +492,15 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
             'date_from': '2019-11-01',
             'date_to': '2019-11-30',
         })
-        wizard_lock = self.env['l10n_be_reports.vat.return.lock.wizard'].create({
+        account_return.company_id.l10n_be_intervat_mode = 'disabled'
+        wizard_sub = self.env['l10n_be_reports.vat.return.submission.wizard'].create({
             'return_id': account_return.id,
         })
         with self.allow_pdf_render():
-            wizard_lock.action_proceed_with_locking()
+            account_return.action_submit()
+            wizard_sub.action_proceed_with_submission()
+            action = account_return._proceed_with_submission()
 
-        action = account_return._proceed_with_submission()
         vat_wizard = self.env[action['res_model']].browse(action['res_id'])
         vat_wizard.action_mark_as_paid()
 
@@ -496,7 +565,7 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
             'date_to': '2019-11-30',
         })
 
-        wizard = self.env['l10n_be_reports.vat.return.lock.wizard'].create({
+        wizard = self.env['l10n_be_reports.vat.return.submission.wizard'].create({
             'return_id': account_return.id,
         })
 
@@ -556,7 +625,7 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
             'date_to': '2019-12-31',
         })
 
-        wizard = self.env['l10n_be_reports.vat.return.lock.wizard'].create({
+        wizard = self.env['l10n_be_reports.vat.return.submission.wizard'].create({
             'return_id': account_return.id,
         })
 
@@ -598,3 +667,104 @@ class BelgiumTaxReportTest(AccountSalesReportCommon):
             self.get_xml_tree_from_string(self.env[report.custom_handler_model_name].export_tax_report_to_xml(options)['file_content']),
             self.get_xml_tree_from_string(expected_xml)
         )
+
+    @freeze_time('2026-02-15')
+    def test_carryover_negative_value_in_xml(self):
+        """ Test that negative values don't appear in the xml when the line is carried over the next period """
+        self._create_invoice(
+            move_type='in_refund',
+            invoice_date='2026-01-20',
+            post=True,
+            invoice_line_ids=[self._prepare_invoice_line(price_unit=100000, tax_ids=self.tax_purchase_a)]
+        )
+
+        report = self.env.ref('l10n_be.tax_report_vat')
+        options = self._generate_options(report, '2026-01-01', '2026-01-31')
+
+        # The partner id is changing between execution of the test so we need to append it manually to the reference.
+        ref = str(self.env.company.partner_id.id) + '012026'
+
+        expected_xml = """
+        <ns2:VATConsignment xmlns:ns2="http://www.minfin.fgov.be/VATConsignment" xmlns="http://www.minfin.fgov.be/InputCommon" VATDeclarationsNbr="1">
+
+            <ns2:VATDeclaration DeclarantReference="%s" SequenceNumber="1">
+                <ns2:Declarant>
+                    <VATNumber>0477472701</VATNumber>
+                    <Name>company_1_data</Name>
+                    <Street> </Street>
+                    <PostCode/>
+                    <City/>
+                    <CountryCode>BE</CountryCode>
+                    <EmailAddress>jsmith@mail.com</EmailAddress>
+                    <Phone>+32475123456</Phone>
+                </ns2:Declarant>
+                <ns2:Period>
+                    <ns2:Month>01</ns2:Month>
+                    <ns2:Year>2026</ns2:Year>
+                </ns2:Period>
+                <ns2:Data>
+                    <ns2:Amount GridNumber="63">21000.00</ns2:Amount>
+                    <ns2:Amount GridNumber="71">21000.00</ns2:Amount>
+                    <ns2:Amount GridNumber="85">100000.00</ns2:Amount>
+                </ns2:Data>
+                <ns2:ClientListingNihil>NO</ns2:ClientListingNihil>
+                <ns2:Ask Restitution="NO"/>
+            </ns2:VATDeclaration>
+        </ns2:VATConsignment>
+        """ % ref
+
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(self.env[report.custom_handler_model_name].export_tax_report_to_xml(options)['file_content']),
+            self.get_xml_tree_from_string(expected_xml)
+        )
+
+    def test_be_provision_account(self):
+        """ For the change of provisioning account in 2026-05-01, test these four cases:
+            - old date, existing partner, existing old bank account
+            - new date, existing partner, existing new bank account
+            - old date, created partner, created old bank account
+            - new date, created partner, created new bank account
+        """
+        move_dates = [('2026-02-01', '2026-02-28'), ('2026-05-01', '2026-05-31')] * 2
+        expected_acc_numbers = ['BE22679200300047', 'BE41679200364210'] * 2
+        return_type = self.env.ref('l10n_be_reports.be_vat_return_type')
+
+        def get_fps_partner():
+            return self.env['res.partner'].search([
+                ('name', '=', 'VAT Revenue Services'),
+                ('active', 'in', [True, False]),
+            ])
+
+        for idx, ((start_date, end_date), expected_acc_number) in enumerate(zip(move_dates, expected_acc_numbers)):
+            bank_account = self.env['res.partner.bank']
+            if idx >= 2:
+                return_type.payment_partner_bank_id = False  # prevents fkey blocking deletion for next line
+                get_fps_partner().unlink()  # also delete the previously created res.partner.bank
+            else:
+                bank_account = self.env['res.partner.bank'].create({
+                    'partner_id': get_fps_partner().id,
+                    'account_number': expected_acc_number,
+                    'allow_out_payment': True,
+                })
+            scenario = f'period={start_date}-{end_date}, fps_account={get_fps_partner().exists().name}'
+            with self.subTest(scenario=scenario):
+                account_return = self.env['account.return'].create({
+                    'name': 'BE Tax Return',
+                    'type_id': return_type.id,
+                    'company_id': self.env.company.id,
+                    'date_from': start_date,
+                    'date_to': end_date,
+                })
+                with self.allow_pdf_render():
+                    account_return.action_validate()
+
+                wizard_action = account_return._get_pay_wizard()
+                pay_wizard = self.env[wizard_action['res_model']].browse(wizard_action['res_id'])
+                if bank_account:
+                    self.assertEqual(pay_wizard.partner_bank_id, bank_account)
+                else:
+                    self.assertRecordValues(pay_wizard.partner_bank_id, [{
+                        'sanitized_account_number': expected_acc_number,
+                        'partner_id': get_fps_partner().id,
+                        'allow_out_payment': True,
+                    }])

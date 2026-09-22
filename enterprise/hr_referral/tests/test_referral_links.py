@@ -55,21 +55,17 @@ class TestReferralLinks(TestHrReferralBase, HttpCase):
         job = self.env['hr.job'].create({
             'name': 'Test Job Referral Campaign',
             'no_of_recruitment': '5',
-            'company_id': self.company_1.id,
             'is_published': True,
         })
         self.env['hr.employee'].create([
             {
                 'name': 'Steve employee',
-                'company_id': self.company_1.id,
                 'user_id': self.steve_user.id
             }, {
                 'name': 'Richard employee',
-                'company_id': self.company_1.id,
                 'user_id': self.richard_user.id
             }, {
                 'name': 'Employee without user',
-                'company_id': self.company_1.id,
             },
         ])
         self.steve_user.email = 'steve.employee@company_test.com'
@@ -77,16 +73,12 @@ class TestReferralLinks(TestHrReferralBase, HttpCase):
         self.steve_user.group_ids += self.env.ref("hr_recruitment.group_hr_recruitment_manager")
 
         self.assertFalse(job.utm_campaign_id)
-        self.steve_user.write({
-            'company_ids': [(4, self.company_1.id)],
-            'company_id': self.company_1.id,
-        })
         self.start_tour("/odoo", 'hr_referral_utm_campaign_tour', login="stv")
 
         self.assertTrue(job.utm_campaign_id.id)
         nb_trackers = self.env['link.tracker'].search_count([('campaign_id', '=', job.utm_campaign_id.id)])
         nb_employee_with_user = self.env['hr.employee'].search_count([
             ('user_id', '!=', False),
-            ('company_id', '=', self.company_1.id)
+            ('company_id', '=', self.env.company.id),
         ])
         self.assertEqual(nb_trackers, nb_employee_with_user)

@@ -1,32 +1,24 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
-import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
 export class ErrorScreen extends Component {
-    static defaultProps = { title: _t("Something went wrong 😵‍💫"), isNonBlocking: false };
-    static props = {
-        title: { type: String, optional: true },
-        isNonBlocking: { type: Boolean, optional: true },
-        message: String,
-        button: {
-            type: Object,
-            shape: {
-                callback: Function,
-                text: String,
-            },
-            optional: true,
-        },
-    };
     static template = "voip.ErrorScreen";
+
+    props = useProps({
+        isBlocking: t.boolean(),
+        isConnecting: t.boolean(),
+        message: t.string().optional(),
+        technical: t.string().optional(),
+        technicalExtra: t.string().optional(),
+        buyCreditsUrl: t.string().optional(),
+    });
 
     setup() {
         this.voip = useService("voip");
     }
 
-    onClick() {
-        if (this.props.isNonBlocking) {
-            this.voip.resolveError();
-        }
+    onClickCloseButton() {
+        this.voip.resolveError();
     }
 }

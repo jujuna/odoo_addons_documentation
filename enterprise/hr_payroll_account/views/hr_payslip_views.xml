@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
                 <field name="move_id" invisible="1" readonly="1"/>
-                <button class="oe_stat_button" name="action_open_move" type="object" icon="fa-dollar"
+                <button class="oe_stat_button" name="action_open_move" type="object" icon="attach_money"
                         invisible="not move_id" groups="account.group_account_readonly">
                     <div class="o_stat_info">
                         <span class="o_stat_text" invisible="move_state != 'draft'">Journal Entry <br/>(Draft)</span>
@@ -18,27 +18,17 @@
             </div>
 
             <xpath expr="//button[@name='action_payslip_done']" position="replace">
-                <button string="Create Draft Entry" name="action_payslip_done" type="object" invisible="state != 'draft' or not line_ids" class="oe_highlight" context="{'payslip_generate_pdf': True}" confirm="Are you sure you want to proceed?"/>
+                <button string="Validate" name="action_payslip_done" type="object" invisible="state != 'draft' or not line_ids" class="oe_highlight" context="{'payslip_generate_pdf': True}" confirm="Are you sure you want to proceed?"/>
             </xpath>
-            <button name="action_payslip_done" position="after">
-                <button
-                        name="action_register_payment"
-                        string="Pay"
-                        type="object"
-                        data-hotkey="w"
-                        class="oe_highlight"
-                        context="{'dont_redirect_to_payments': True, 'hr_payroll_payment_register': True}"
-                        invisible="state != 'validated' or not move_id or batch_payroll_move_lines"
-                        groups="account.group_account_invoice"/>
-            </button>
             <field name="paid" position="after">
                 <field name="date" readonly="state != 'draft'"/>
                 <field name="journal_id" required="1"/>
                 <field name="batch_payroll_move_lines" invisible="1"/>
             </field>
-            <button name="action_payslip_paid" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </button>
+            <xpath expr="//page[@name='salary_computation']//field[@name='line_ids']/list/field[@name='total']" position="after">
+                <field name="salary_rule_account_debit" optional="hide"/>
+                <field name="salary_rule_account_credit" optional="hide"/>
+            </xpath>
         </field>
     </record>
 </odoo>

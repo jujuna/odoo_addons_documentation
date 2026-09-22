@@ -22,7 +22,6 @@ class QualityCheckSpreadsheet extends SpreadsheetMixin {
         },
     ];
 
-    dispatch_spreadsheet_message() {}
 }
 
 onRpc(
@@ -33,11 +32,16 @@ onRpc(
             data: JSON.parse(record.spreadsheet_data),
             name: record.name,
             revisions: [],
-            isReadonly: false,
+            has_write_access: true,
             quality_check_display_name: "The check name",
             quality_check_cell: record.check_cell,
         };
     }
+);
+
+onRpc(
+    "/spreadsheet/<string:res_model>/<int:res_id>/dispatch",
+    function () {}
 );
 
 export function defineQualitySpreadsheetModels() {

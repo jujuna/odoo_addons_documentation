@@ -4,8 +4,20 @@
         <field name="name">esg.database.kanban</field>
         <field name="model">esg.database</field>
         <field name="arch" type="xml">
-            <kanban class="o_hr_employee_kanban" create="0" sample="1" highlight_color="color">
+            <kanban class="o_esg_database_kanban" create="0" sample="1" highlight_color="color">
                 <templates>
+                    <t t-name="menu">
+                        <a
+                            type="object"
+                            name="action_unload_data"
+                            class="dropdown-item"
+                            role="menuitem"
+                            confirm="This action will remove all emission factors linked to that database and their sources. Emissions currently using these factors will become unassigned. Are you sure you want to continue?"
+                            confirm-label="Confirm"
+                        >
+                        Remove Database
+                        </a>
+                    </t>
                     <t t-name="card" class="flex-row">
                         <main class="d-flex flex-column justify-content-between">
                             <div>
@@ -22,7 +34,7 @@
                                     type="object" invisible="last_update or not can_be_downloaded"/>
                             </div>
                         </main>
-                        <aside class="o_kanban_aside_full o_kanban_aside_full_right">
+                        <aside class="o_card_aside_full o_kanban_aside_full_right">
                             <field name="image" widget="image" class="d-block position-relative"/>
                         </aside>
                     </t>

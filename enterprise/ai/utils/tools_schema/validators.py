@@ -3,35 +3,6 @@ from types import NoneType
 
 from odoo.exceptions import ValidationError
 
-from .param_schema_validator import ParamSchemaValidator
-
-
-def validate_input(input_schema, required_parameters):
-    if (
-        required_parameters is None
-        or not isinstance(required_parameters, list)
-    ):
-        raise ValueError(
-            "The required properties should be specified as a list. i.e. 'required': [<property1_name>, <property2_name>, ...]."
-            "If no properties are required, set required to an empty list 'required': []"
-        )
-    if any(
-        required_property not in input_schema
-        for required_property in required_parameters
-    ):
-        raise ValueError(
-            "Some properties are required but their definition is missing in the schema"
-        )
-
-
-def validate_schema(schema):
-    parameters = schema.get("properties")
-    required_parameters = schema.get("required")
-    validate_input(parameters, required_parameters)
-    for param_name, param_definition in parameters.items():
-        param_validator = ParamSchemaValidator(param_name, param_definition)
-        param_validator._validate()
-
 
 def validate_params_llm_values_with_schema(instance, schema, required_parameters, env):
     JSON_SCHEMA_TO_PYTHON_TYPE = {
@@ -56,11 +27,44 @@ def validate_params_llm_values_with_schema(instance, schema, required_parameters
         if name not in required_parameters and value is None:
             continue
 
-        if schema[name]['type'] not in JSON_SCHEMA_TO_PYTHON_TYPE or not isinstance(value, JSON_SCHEMA_TO_PYTHON_TYPE[schema[name]['type']]):
+        # Handle anyOf schemas - try each schema option until one succeeds
+        if 'anyOf' in schema[name]:
+            validated = False
+            for schema_option in schema[name]['anyOf']:
+                try:
+                    result = validate_params_llm_values_with_schema({name: value}, {name: schema_option}, [name], env)
+                    instance[name] = result[name]  # Extract the validated value from the result dict
+                    validated = True
+                    break
+                except ValidationError:
+                    continue
+
+            if not validated:
+                raise ValidationError(env._(
+                    "The value of parameter '%(name)s' doesn't match any of the expected schemas.",
+                    name=name,
+                ))
+            continue  # resume with the remaining values
+
+        param_type = schema[name]['type']
+        invalid_type = (
+            param_type not in JSON_SCHEMA_TO_PYTHON_TYPE
+            or not isinstance(value, JSON_SCHEMA_TO_PYTHON_TYPE[param_type])
+            or (param_type in ('integer', 'number') and isinstance(value, bool))
+        )
+        if invalid_type:
             raise ValidationError(env._(
                 "The type of the parameter '%(name)s' is incorrect. It should be '%(expected_param_type)s'.",
                 name=name,
-                expected_param_type=schema[name]['type'],
+                expected_param_type=param_type,
+            ))
+
+        minimum = schema[name].get('minimum')
+        if param_type in ('integer', 'number') and minimum is not None and value < minimum:
+            raise ValidationError(env._(
+                "The value of the parameter '%(name)s' must be at least %(minimum)s.",
+                name=name,
+                minimum=minimum,
             ))
 
         expected_pattern = schema[name]['type'] == 'string' and schema[name].get('pattern')

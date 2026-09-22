@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import logging
-import pdb
 
 from odoo.addons.l10n_ch_hr_payroll.tests.common import TestSwissdecCommon
 from odoo.tests.common import tagged, TransactionCase
@@ -33,7 +32,7 @@ class TestSwissdecMinorCommon(TestSwissdecCommon):
             cls.env.user.tz = 'Europe/Zurich'
 
             # Generate Location Units
-            LocationUnit = cls.env['l10n.ch.location.unit'].with_context(tracking_disable=True)
+            LocationUnit = cls.env['l10n.ch.location.unit']
 
             cls.location_unit_1 = LocationUnit.create({
                 "company_id": cls.muster_ag_company.id,

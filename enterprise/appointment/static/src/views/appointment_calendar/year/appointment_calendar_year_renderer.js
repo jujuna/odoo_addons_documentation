@@ -1,11 +1,11 @@
+import { useAppointmentRendererHook } from "@appointment/views/appointment_calendar/hooks";
 import { AttendeeCalendarYearRenderer } from "@calendar/views/attendee_calendar/year/attendee_calendar_year_renderer";
 import { patch } from "@web/core/utils/patch";
-import { useAppointmentRendererHook } from "@appointment/views/appointment_calendar/hooks";
 
 patch(AttendeeCalendarYearRenderer.prototype, {
     setup() {
         super.setup(...arguments);
-        const fns = useAppointmentRendererHook(() => Object.values(this.fcs).map((fc) => fc.el));
+        const fns = useAppointmentRendererHook(Object.values(this.fcs));
         Object.assign(this, fns);
     },
 
@@ -14,8 +14,8 @@ patch(AttendeeCalendarYearRenderer.prototype, {
         if (this.getEventTimeFormat) {
             options.eventTimeFormat = this.getEventTimeFormat();
         }
-        options.eventAllow = this.onEventAllow;
-        options.selectAllow = this.isSelectionAllowed;
+        options.eventAllow = this.onEventAllow.bind(this);
+        options.selectAllow = this.isSelectionAllowed.bind(this);
         return options;
     },
 
@@ -23,7 +23,6 @@ patch(AttendeeCalendarYearRenderer.prototype, {
      * @override
      */
     mapRecordsToEvents() {
-        this.maxResId = Math.max(Object.keys(this.props.model.data.records).map((id) => Number.parseInt(id)));
         const res = [
             ...super.mapRecordsToEvents(...arguments),
             ...Object.values(this.props.model.data.slots).map((r) => this.convertSlotToEvent(r)),
@@ -37,7 +36,6 @@ patch(AttendeeCalendarYearRenderer.prototype, {
     convertSlotToEvent(record) {
         const result = {
             ...this.convertRecordToEvent(record),
-            id: this.maxResId + record.id, // Arbitrary id to avoid duplicated ids.
             slotId: record.id,
         };
         result.editable = true; // Keep slots editable
@@ -52,12 +50,7 @@ patch(AttendeeCalendarYearRenderer.prototype, {
             return super.fcEventToRecord(...arguments);
         }
         return {
-            ...super.fcEventToRecord({
-                allDay: event.allDay,
-                date: event.date,
-                start: event.start,
-                end: event.end,
-            }),
+            ...super.fcEventToRecord(...arguments),
             slotId: event.extendedProps.slotId,
         };
     },
@@ -83,12 +76,13 @@ patch(AttendeeCalendarYearRenderer.prototype, {
             const bg = el.querySelector(".fc-bg");
             if (bg) {
                 const duration = (event.end - event.start) / 3600000;
-                const iconSize = duration < 1 || event.allDay || this.props.model.scale === "month" ? "" : "h1";
+                const iconSize =
+                    duration < 1 || event.allDay || this.props.model.scale === "month" ? "" : "h1";
                 const domParser = new DOMParser();
                 const injectedContentEl = domParser.parseFromString(
                     /* xml */ `
                     <button class="close btn d-flex align-items-center justify-content-center w-100 h-100 m-0 border-0 p-0 bg-success bg-opacity-50 o_hidden">
-                        <i class='fa fa-trash ${iconSize}'></i>
+                        <i class="oi ${iconSize}" data-icon="delete"></i>
                     </button>
                 `,
                     "text/html"
@@ -101,9 +95,9 @@ patch(AttendeeCalendarYearRenderer.prototype, {
     findMatchingSlot(start, end = undefined) {
         let predicate;
         if (end) {
-            predicate = (slot) => (slot.start.equals(start) && slot.end.equals(end));
+            predicate = (slot) => slot.start.equals(start) && slot.end.equals(end);
         } else {
-            predicate = (slot) => (slot.start.equals(start));
+            predicate = (slot) => slot.start.equals(start);
         }
         return Object.values(this.props.model.data.slots).find(predicate);
     },
@@ -178,6 +172,9 @@ patch(AttendeeCalendarYearRenderer.prototype, {
         if (!this.isSlotCreationMode()) {
             return super.onEventAllow?.(...arguments) || true;
         }
-        return draggedEvent.extendedProps.slotId && luxon.DateTime.fromJSDate(dropInfo.start) > luxon.DateTime.now();
+        return (
+            draggedEvent.extendedProps.slotId &&
+            luxon.DateTime.fromJSDate(dropInfo.start) > luxon.DateTime.now()
+        );
     },
 });

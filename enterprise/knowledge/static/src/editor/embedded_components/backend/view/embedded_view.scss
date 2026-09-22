@@ -3,7 +3,7 @@
     background-color: $o-webclient-background-color;
     // makes the EV take the full width
     margin-left: calc(-1 * var(--editor-gutter-size));
-    margin-right: calc(-1 * var(--editor-gutter-size) - 2rem);
+    margin-right: calc(-1 * var(--editor-gutter-size));
 
     .o_content {
         max-height: 80vh;
@@ -78,7 +78,7 @@
         }
     }
     .o_calendar_container {
-        .o_calendar_sidebar_container {
+        .o_calendar_sidepanel_container {
             max-height: clamp(300px, 60vh, 800px);
         }
     }
@@ -94,6 +94,6 @@
 }
 .o_knowledge_body:has([data-embedded="view"]:first-child) {
     [data-embedded="view"] {
-        border-bottom: var(--ControlPanel-border-bottom, #{$o-control-panel-border-bottom});
+        border-bottom: $o-control-panel-border-bottom;
     }
 }

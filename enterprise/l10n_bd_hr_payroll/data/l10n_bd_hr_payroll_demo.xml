@@ -13,6 +13,7 @@
         <field name="zip">1000</field>
         <field name="city">Dhaka</field>
         <field name="country_id" ref="base.bd"/>
+        <field name="resource_calendar_id" ref="l10n_bd_hr_payroll.resource_calendar_def_40h"/>
     </record>
 
     <record id="base.user_admin" model="res.users">
@@ -65,62 +66,44 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_bd'))]"/>
         <field name="company_id" ref="base.demo_company_bd"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_al-image.jpg"/>
-    </record>
-
-    <record id="bd_res_bank_city" model="res.bank">
-        <field name="name">City Bank</field>
-        <field name="bic">CIBLBDDHXXX</field>
-        <field name="street">City Bank Street</field>
-        <field name="city">Dhaka</field>
-        <field name="zip">1200</field>
-        <field name="state" ref="base.state_bd_c"/>
-        <field name="country" ref="base.bd"/>
-        <field name="phone">09934-949000</field>
-    </record>
-    <record id="bd_res_bank_city" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_bd_hr_payroll.bd_res_bank_city')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="bd_res_bank_union" model="res.bank">
-        <field name="name">Union Bank</field>
-        <field name="bic">UBLDBDDHXXX</field>
-        <field name="street">Union Bank Street</field>
-        <field name="city">Dhaka</field>
-        <field name="zip">1210</field>
-        <field name="state" ref="base.state_bd_c"/>
-        <field name="country" ref="base.bd"/>
-        <field name="phone">09934-213400</field>
-    </record>
-    <record id="bd_res_bank_union" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_bd_hr_payroll.bd_res_bank_union')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.jpg"/>
     </record>
 
     <record id="res_partner_bank_account_rahmat" model="res.partner.bank">
-        <field name="acc_number">999-7624-01234678</field>
+        <field name="account_number">999-7624-01234678</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_bd_hr_payroll.bd_res_bank_city"/>
+        <field name="bank_name">City Bank</field>
+        <field name="bank_bic">CIBLBDDHXXX</field>
+        <field name="street">City Bank Street</field>
+        <field name="city">Dhaka</field>
+        <field name="zip">1200</field>
+        <field name="state_id" ref="base.state_bd_c"/>
+        <field name="country_id" ref="base.bd"/>
         <field name="partner_id" ref="l10n_bd_hr_payroll.res_partner_rahmat"/>
         <field name="company_id" ref="base.demo_company_bd"/>
-        <field name="currency_id" ref="base.BDT"/>
     </record>
 
     <record id="res_partner_bank_account_tarek" model="res.partner.bank">
-        <field name="acc_number">999-0123-987654321</field>
+        <field name="account_number">999-0123-987654321</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_bd_hr_payroll.bd_res_bank_union"/>
+        <field name="bank_name">Union Bank</field>
+        <field name="bank_bic">UBLDBDDHXXX</field>
+        <field name="street">Union Bank Street</field>
+        <field name="city">Dhaka</field>
+        <field name="zip">1210</field>
+        <field name="state_id" ref="base.state_bd_c"/>
+        <field name="country_id" ref="base.bd"/>
         <field name="partner_id" ref="l10n_bd_hr_payroll.res_partner_tarek"/>
         <field name="company_id" ref="base.demo_company_bd"/>
-        <field name="currency_id" ref="base.BDT"/>
     </record>
 
     <record id="hr_employee_rahmat" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_rahmat')).name"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_mit-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_mit-image.jpg"/>
         <field name="work_phone">09932-914693</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_rahmat')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_bd_hr_payroll.res_partner_rahmat"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_bd_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Asia/Dhaka</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_rahmat')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_rahmat')).city"/>
@@ -140,9 +123,7 @@
         <field name="emergency_phone">09932-474564</field>
         <field name="certificate">master</field>
         <field name="study_field">Engineering</field>
-        <field name="study_school">Bangladesh University of Engineering and Technology</field>
         <field name="marital">single</field>
-        <field name="l10n_bd_gazetted_war_founded_freedom_fighter">False</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_bd_hr_payroll.res_partner_bank_account_rahmat'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
         <field name="department_id" ref="l10n_bd_hr_payroll.bd_hr_department_rd"/>
@@ -153,17 +134,18 @@
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="contract_date_start" eval="datetime(2020, 3, 16).date()"/>
         <field name="date_version" eval="datetime(2020, 3, 16).date()"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="hr_employee_tarek" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_tarek')).name"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_al-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.jpg"/>
         <field name="work_phone">09932-914693</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_tarek')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_bd_hr_payroll.hr_employee_rahmat"/>
         <field name="user_id" ref="l10n_bd_hr_payroll.user_tarek"/>
         <field name="company_id" ref="base.demo_company_bd"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_bd_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Asia/Dhaka</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_tarek')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_bd_hr_payroll.res_partner_tarek')).city"/>
@@ -183,9 +165,7 @@
         <field name="emergency_phone">09947-478235</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Bangladesh University of Engineering and Technology</field>
         <field name="marital">single</field>
-        <field name="l10n_bd_gazetted_war_founded_freedom_fighter">False</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_bd_hr_payroll.res_partner_bank_account_tarek'))]"/>
         <field name="job_id" ref="hr.job_consultant"/>
         <field name="department_id" ref="l10n_bd_hr_payroll.bd_hr_department_rd"/>
@@ -195,5 +175,6 @@
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="contract_date_start" eval="datetime(2022, 6, 1).date()"/>
         <field name="date_version" eval="datetime(2022, 6, 1).date()"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 </odoo>

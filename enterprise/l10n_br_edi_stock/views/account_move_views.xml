@@ -10,7 +10,7 @@
                 <button class="oe_stat_button"
                         name="action_l10n_br_view_pickings"
                         type="object"
-                        icon="fa-truck"
+                        icon="local_shipping"
                         invisible="country_code != 'BR' or not l10n_br_edi_freight_model or l10n_br_is_service_transaction or l10n_br_picking_count == 0">
                     <field string="Delivery" name="l10n_br_picking_count" widget="statinfo"/>
                 </button>
@@ -24,7 +24,7 @@
                        widget="many2many_tags"
                        invisible="country_code != 'BR' or not l10n_br_edi_freight_model or l10n_br_is_service_transaction"
                        readonly="state in ['cancel', 'posted']"
-                       options="{'no_create': True, 'edit_tags': True}"/>
+                       options="{'no_create': True, 'on_tag_click': 'open_form'}"/>
             </field>
         </field>
     </record>

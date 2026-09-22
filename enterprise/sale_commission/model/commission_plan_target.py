@@ -20,6 +20,7 @@ class SaleCommissionPlanTarget(models.Model):
     payment_amount = fields.Monetary(compute='_compute_payment_amount', currency_field='currency_id', store=True,
                                      help="Sum of amounts paid on the same payment date")
     currency_id = fields.Many2one('res.currency', related='plan_id.currency_id')
+    target_type = fields.Selection(related='plan_id.target_type')
 
     @api.constrains('plan_id', 'date_from', 'date_to')
     def _constrains_overlapping_dates(self):

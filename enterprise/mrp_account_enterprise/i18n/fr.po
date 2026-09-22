@@ -7,15 +7,15 @@
 # Cécile Collart <cco@odoo.com>, 2022
 # Jolien De Paepe, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-12 16:50+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 03:50+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "mrp_account_enterprise/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -23,27 +23,32 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
-msgid "Average Component Cost / Unit"
-msgstr "Coût moyen des composants / unité"
+#: model:ir.module.module,description:base.module_mrp_account_enterprise
+msgid ""
+"\n"
+"Analytic Accounting in MRP\n"
+"==========================\n"
+"\n"
+"* Cost structure report\n"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
-msgid "Average Operation Cost / Unit"
-msgstr "Coût moyen des opérations / unité"
+#: model:ir.module.module,shortdesc:base.module_mrp_account_enterprise
+msgid "Accounting - MRP"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
-msgid "Average Total Cost / Unit"
-msgstr "Cout total moyen / unité"
+#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__extra_cost
+msgid "Additional cost per manufactured unit (e.g. labour, energy, packaging)"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_form_view
-msgid "Average Workcenter Cost / Unit"
-msgstr "Coût moyen par poste de travail / unité"
+#: model:ir.module.module,summary:base.module_mrp_account_enterprise
+msgid "Analytic accounting in Manufacturing"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__byproduct_cost
@@ -56,22 +61,12 @@ msgid "Company"
 msgstr "Société"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_component_cost
-msgid "Component Cost / Unit"
-msgstr "Coût des composants / Unité"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_component_cost
 msgid ""
 "Component cost per unit produced (in product UoM) of manufacturing order"
 msgstr ""
 "Coûts des composants par unité produite (dans l'unité de mesure du produit) "
 "de l'ordre de fabrication"
-
-#. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_cost
-msgid "Cost / Unit"
-msgstr "Coût / Unité"
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_cost
@@ -122,14 +117,19 @@ msgid "Expected Employee Cost / Unit"
 msgstr "Coût attendu des employés / Unité"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__expected_operation_cost_unit
-msgid "Expected Operation Cost / Unit"
-msgstr "Coût attendu des opérations / Unité"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__expected_total_cost_unit
 msgid "Expected Total Cost / Unit"
 msgstr "Coût total attendu / Unité"
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__expected_workcenter_cost_unit
+msgid "Expected Work Center Cost / Unit"
+msgstr ""
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__extra_cost
+msgid "Extra Cost"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__id
@@ -153,18 +153,9 @@ msgid "No data yet!"
 msgstr "Pas encore de données !"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_operation_cost
-msgid ""
-"Operation cost per unit produced (in product UoM) of manufacturing order"
-msgstr ""
-"Coût des opérations par unité produite (dans l'unité de mesure du produit) "
-"de l'ordre de fabrication"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_duration
-msgid "Operation duration (minutes) per unit produced of manufacturing order"
-msgstr ""
-"Durée de l'opération (en minutes) par unité produit de l'ordre de fabrication"
+msgid "Operation duration per unit produced of manufacturing order"
+msgstr "Durée d’opération par unité produite de l’ordre de fabrication"
 
 #. module: mrp_account_enterprise
 #: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
@@ -190,7 +181,6 @@ msgstr "Quantité demandée"
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__qty_produced
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
 msgid "Quantity Produced"
 msgstr "Quantité produite"
 
@@ -205,9 +195,20 @@ msgid "Total Component Cost"
 msgstr "Coût total des composants"
 
 #. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_component_cost
+msgid "Total Component Cost / Unit"
+msgstr ""
+
+#. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__total_cost
 msgid "Total Cost"
 msgstr "Coût total"
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_cost
+#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
+msgid "Total Cost / Unit"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__duration
@@ -215,19 +216,14 @@ msgid "Total Duration of Operations"
 msgstr "Durée totale des opérations"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__operation_cost
-msgid "Total Operation Cost"
-msgstr "Coût total des opérations"
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__workcenter_cost
+msgid "Total Work Center Cost"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_operation_cost
-msgid "Total Operation Cost / Unit"
-msgstr "Coût total des opérations / Unité"
-
-#. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_form_view
-msgid "Total Workcenter Cost"
-msgstr "Coût total du poste de travail"
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_workcenter_cost
+msgid "Total Work Center Cost / Unit"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__component_cost
@@ -244,14 +240,9 @@ msgstr ""
 "coût de sous-traitance)"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__operation_cost
-msgid "Total cost of operations for manufacturing order"
-msgstr "Coût total des opérations pour l'ordre de fabrication"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__duration
-msgid "Total duration (minutes) of operations for manufacturing order"
-msgstr "Durée total (en minutes) des opérations pour l'ordre de fabrication"
+msgid "Total duration of operations for manufacturing order"
+msgstr "Durée totale des opérations pour l’ordre de fabrication"
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__qty_demanded
@@ -264,131 +255,56 @@ msgid "Total quantity produced in product's UoM"
 msgstr "Quantité totale produite dans l'unité de mesure du produit"
 
 #. module: mrp_account_enterprise
+#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__workcenter_cost
+msgid "Total work center cost for manufacturing order"
+msgstr ""
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_workcenter_cost
+msgid ""
+"Work center cost per unit produced (in product UoM) of manufacturing order"
+msgstr ""
+
+#. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__yield_rate
 msgid "Yield Percentage(%)"
 msgstr "Taux de rendement (%)"
 
-#~ msgid "'Cost Analysis - %s ' % object.name"
-#~ msgstr "'Analyse des coûts - %s ' % object.name"
+#~ msgid "Average Component Cost / Unit"
+#~ msgstr "Coût moyen des composants / unité"
 
-#~ msgid "'Cost Structure Analysis - %s' % object.name"
-#~ msgstr "'Analyse de la structure de coût - %s' % object.name"
+#~ msgid "Average Operation Cost / Unit"
+#~ msgstr "Coût moyen des opérations / unité"
 
-#~ msgid ", from"
-#~ msgstr ", de"
+#~ msgid "Average Total Cost / Unit"
+#~ msgstr "Cout total moyen / unité"
 
-#~ msgid "<span class=\"o_stat_text\">Cost Analysis</span>"
-#~ msgstr "<span class=\"o_stat_text\">Analyse des coûts</span>"
+#~ msgid "Average Workcenter Cost / Unit"
+#~ msgstr "Coût moyen par poste de travail / unité"
 
-#~ msgid "<span>Avg Cost of Components Per Unit</span>"
-#~ msgstr "<span>Coût moyen des composantes par unité</span>"
+#~ msgid "Component Cost / Unit"
+#~ msgstr "Coût des composants / Unité"
 
-#~ msgid "<span>Avg Cost of Operations Per Unit</span>"
-#~ msgstr "<span>Coût moyen des operations par unité</span>"
+#~ msgid "Cost / Unit"
+#~ msgstr "Coût / Unité"
 
-#~ msgid "<span>Avg Total Cost Per Unit</span>"
-#~ msgstr "<span>Coût moyen total par unité</span>"
+#~ msgid "Expected Operation Cost / Unit"
+#~ msgstr "Coût attendu des opérations / Unité"
 
-#~ msgid "<span>Components</span>"
-#~ msgstr "<span>Composants</span>"
-
-#~ msgid "<span>Cost/hour</span>"
-#~ msgstr "<span>Coût/heure</span>"
-
-#~ msgid "<span>Operation</span>"
-#~ msgstr "<span>Opération</span>"
-
-#~ msgid "<span>Product</span>"
-#~ msgstr "<span>Produit</span>"
-
-#~ msgid "<span>Quantity</span>"
-#~ msgstr "<span>Quantité</span>"
-
-#~ msgid "<span>Resource</span>"
-#~ msgstr "<span>Ressource</span>"
-
-#~ msgid "<span>Scraps</span>"
-#~ msgstr "<span>Rebuts</span>"
-
-#~ msgid "<span>Total Cost</span>"
-#~ msgstr "<span>Coût total</span>"
-
-#~ msgid "<span>Unit Cost</span>"
-#~ msgstr "<span>Coût unitaire</span>"
-
-#~ msgid "<span>Unit of Measure</span>"
-#~ msgstr "<span>Unité de mesure</span>"
-
-#~ msgid "<span>Working Time</span>"
-#~ msgstr "<span>Temps de travail</span>"
-
-#~ msgid "<strong>Total Cost of Components</strong>"
-#~ msgstr "<strong>Coût total des composants</strong>"
-
-#~ msgid "<strong>Total Cost of Operations</strong>"
-#~ msgstr "<strong>Coût total des opérations</strong>"
-
-#~ msgid "<strong>Total Cost of Scraps</strong>"
-#~ msgstr "<strong>Coût total des rebuts</strong>"
-
-#~ msgid "<strong>Total Production Cost</strong>"
-#~ msgstr "<strong>Coût total de la production</strong>"
-
-#~ msgid "By product(s)"
-#~ msgstr "Par produit(s)"
-
-#~ msgid "Cost Analysis"
-#~ msgstr "Analyse des coûts"
-
-#~ msgid "Cost Analysis Report"
-#~ msgstr "Rapport d'analyse des coûts"
-
-#~ msgid "Cost Breakdown of Products"
-#~ msgstr "Répartition des coûts des produits"
-
-#~ msgid "Cost Structure Analysis"
-#~ msgstr "Analyse de la structure des coûts"
-
-#~ msgid "Cost of Components"
-#~ msgstr "Couts des composants"
-
-#~ msgid "Cost of Components per unit (in"
-#~ msgstr "Coût des composants par unité (en"
-
-#~ msgid "Cost of Operations"
-#~ msgstr "Coût des opérations"
-
-#~ msgid "Cost of Operations per unit (in"
-#~ msgstr "Coût des opérations par unité (en"
-
-#~ msgid "Cost of Scraps"
-#~ msgstr "Coût des rebuts"
-
-#~ msgid "Group by"
-#~ msgstr "Regrouper par"
-
-#~ msgid "ID"
-#~ msgstr "ID"
-
-#~ msgid "MRP Cost Structure Report"
-#~ msgstr "Rapport sur la structure des coûts du MRP"
-
-#~ msgid "Product Template Cost Structure Report"
-#~ msgstr "Rapport de la structure de coût du modèle de produit"
-
-#~ msgid "Product Variant"
-#~ msgstr "Variante de produit"
-
-#~ msgid "Some of the Manufacturing Order(s) selected are not done yet"
+#~ msgid ""
+#~ "Operation cost per unit produced (in product UoM) of manufacturing order"
 #~ msgstr ""
-#~ "Certains des ordres de fabrication sélectionnés ne sont pas encore "
-#~ "terminés."
+#~ "Coût des opérations par unité produite (dans l'unité de mesure du "
+#~ "produit) de l'ordre de fabrication"
 
-#~ msgid "Total Cost per unit (in"
-#~ msgstr "Cout total par unité (en"
+#~ msgid "Total Operation Cost"
+#~ msgstr "Coût total des opérations"
 
-#~ msgid "hours"
-#~ msgstr "heures"
+#~ msgid "Total Operation Cost / Unit"
+#~ msgstr "Coût total des opérations / Unité"
 
-#~ msgid "manufacturing order(s)."
-#~ msgstr "ordre(s) de fabrications."
+#~ msgid "Total Workcenter Cost"
+#~ msgstr "Coût total du poste de travail"
+
+#~ msgid "Total cost of operations for manufacturing order"
+#~ msgstr "Coût total des opérations pour l'ordre de fabrication"

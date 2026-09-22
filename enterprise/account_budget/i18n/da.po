@@ -13,40 +13,48 @@
 # Martin Trigaux, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:23+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:13+0000\n"
+"Last-Translator: \"Kira Petersen François (peti)\" <peti@odoo.com>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "account_budget/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_budget
+#: model:ir.module.module,description:base.module_account_budget
+msgid ""
+"\n"
+"Use budgets to compare actual with expected revenues and costs\n"
+"--------------------------------------------------------------\n"
+msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
 msgid ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Period\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Period\"/>"
 msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid "<span class=\"o_stat_text\">Budget Report</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Budgetrapport</span>"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__achieved_amount
@@ -56,12 +64,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_pivot
 msgid "Achieved"
-msgstr "Resultat"
+msgstr "Opnået"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__achieved_percentage
 msgid "Achieved (%)"
-msgstr ""
+msgstr "Opnået (%)"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_needaction
@@ -79,6 +87,11 @@ msgid "Activity Exception Decoration"
 msgstr "Markering af undtagelsesaktivitet"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_plans_ids
+msgid "Activity Plans"
+msgstr "Aktivitetsplaner"
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_state
 msgid "Activity State"
 msgstr "Aktivitetsstatus"
@@ -91,7 +104,7 @@ msgstr "Aktivitetstypeikon"
 #. module: account_budget
 #: model:ir.model.fields,help:account_budget.field_budget_line__achieved_amount
 msgid "Amount Billed/Invoiced."
-msgstr ""
+msgstr "Afregnet/faktureret beløb."
 
 #. module: account_budget
 #: model:ir.model.fields,help:account_budget.field_budget_line__theoritical_amount
@@ -99,6 +112,8 @@ msgid ""
 "Amount supposed to be Billed/Invoiced, formula = (Budget Amount / Budget "
 "Days) x Budget Days Completed"
 msgstr ""
+"Beløb, der skal faktureres. Formel = (budgetbeløb/budgetdage) x afsluttede "
+"budgetdage"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_account_analytic_account
@@ -110,12 +125,22 @@ msgstr "Omkostningssted"
 #. module: account_budget
 #: model:ir.ui.menu,name:account_budget.menu_act_budget_analytic_view
 msgid "Analytic Budget"
+msgstr "Budget for omkostningssted"
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_analytic_plan_fields_mixin
+msgid "Analytic Plan Fields"
 msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__analytical_plan_ids
 msgid "Analytic Plans"
-msgstr "Omkostningsplaner"
+msgstr "Analytiske kontoplaner"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_attachment_count
@@ -134,7 +159,6 @@ msgstr "Begge"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_analytic
-#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_report__line_type__budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -149,18 +173,21 @@ msgstr "Budget"
 #. odoo-python
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 msgid "Budget %s"
-msgstr ""
+msgstr "Budget %s"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_account_bank_statement_line__budget_analytic_ids
+#: model:ir.model.fields,field_description:account_budget.field_account_move__budget_analytic_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_analytic_id
 msgid "Budget Analytic"
-msgstr ""
+msgstr "Budgetanalyse"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budget Line"
 msgstr "Budgetlinje"
 
@@ -179,6 +206,11 @@ msgid "Budget Lines"
 msgstr "Budgetlinjer"
 
 #. module: account_budget
+#: model:ir.module.module,shortdesc:base.module_account_budget
+msgid "Budget Management"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__name
 msgid "Budget Name"
@@ -195,41 +227,42 @@ msgstr "Budgetnavn"
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_tree
 msgid "Budget Report"
-msgstr ""
+msgstr "Budgetrapport"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_split_wizard
 msgid "Budget Split Wizard"
-msgstr ""
+msgstr "Assistent til budgetopdeling"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_state
 msgid "Budget State"
-msgstr "Budget tilstand"
+msgstr "Budgetstatus"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__budget_type
 msgid "Budget Type"
-msgstr ""
+msgstr "Budgettype"
 
 #. module: account_budget
 #. odoo-python
 #: code:addons/account_budget/models/budget_analytic.py:0
 msgid "Budget end date may not be before the starting date."
-msgstr ""
+msgstr "Budgetperiodens slutdato må ikke ligge før startdatoen."
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budgeted"
-msgstr ""
+msgstr "Budgetteret"
 
 #. module: account_budget
 #. odoo-python
+#: code:addons/account_budget/models/account_move.py:0
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 #: model:ir.actions.act_window,name:account_budget.act_budget_analytic_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_account_analytic_account_form_inherit_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:account_budget.view_move_form_inherit_budget
 msgid "Budgets"
 msgstr "Budgetter"
 
@@ -239,14 +272,9 @@ msgid "Budgets Analysis"
 msgstr "Budgetanalyse"
 
 #. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "Cancel"
-msgstr "Annullér"
-
-#. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid "Cancel Budget"
-msgstr "Annuller budget"
+msgstr "Annullér budget"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_analytic__state__canceled
@@ -257,6 +285,13 @@ msgstr "Annulleret"
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Click to create a new budget."
 msgstr "Klik her for at oprette et nyt budget."
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
+#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
+msgid "Commitment"
+msgstr "Forpligtelse"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -287,6 +322,7 @@ msgstr "Valuta"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
 msgid "Date"
 msgstr "Dato"
@@ -295,7 +331,7 @@ msgstr "Dato"
 #. odoo-python
 #: code:addons/account_budget/models/budget_analytic.py:0
 msgid "Deletion is only allowed in the Draft and Canceled stages."
-msgstr ""
+msgstr "Det er kun tilladt at slette i faserne \"Kladde\" og \"Annulleret\"."
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__description
@@ -304,12 +340,15 @@ msgstr "Beskrivelse"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_move__display_name
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__res_id
@@ -326,7 +365,7 @@ msgstr "Udført"
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_analytic__state__draft
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Draft"
-msgstr "Udkast"
+msgstr "Kladde"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
@@ -338,12 +377,12 @@ msgstr "Kladdebudgetter"
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__date_to
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__date_to
 msgid "End Date"
-msgstr "Slut dato"
+msgstr "Slutdato"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_analytic__budget_type__expense
 msgid "Expense"
-msgstr "Udgift"
+msgstr "Omkostning"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_follower_ids
@@ -354,16 +393,6 @@ msgstr "Følgere"
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Følgere (partnere)"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font Awesome-ikon, f.eks. fa-opgaver"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "From"
-msgstr "Fra"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
@@ -379,7 +408,7 @@ msgstr "Generér"
 #: model:ir.actions.act_window,name:account_budget.budget_split_wizard_action
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 msgid "Generate Budget"
-msgstr ""
+msgstr "Generér budget"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__has_message
@@ -388,6 +417,9 @@ msgstr "Har besked"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:account_budget.field_account_move__id
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__id
@@ -420,7 +452,7 @@ msgstr ""
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "In a Budget"
-msgstr ""
+msgstr "I et budget"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__is_above_budget
@@ -431,6 +463,11 @@ msgstr "Er ovenstående budget"
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_is_follower
 msgid "Is Follower"
 msgstr "Er følger"
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_account_move
+msgid "Journal Entry"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__write_uid
@@ -450,6 +487,17 @@ msgstr "Sidst opdateret den"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Late Activities"
 msgstr "Forfaldne aktiviteter"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__liquidation_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__liquidation
+msgid "Liquidation"
+msgstr "Likvidation"
+
+#. module: account_budget
+#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_error
@@ -485,7 +533,7 @@ msgstr "Deadline på mine aktiviteter"
 #. odoo-python
 #: code:addons/account_budget/models/budget_analytic.py:0
 msgid "New revision"
-msgstr ""
+msgstr "Ny revision"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_calendar_event_id
@@ -541,7 +589,7 @@ msgstr "Åben"
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Open Budget"
-msgstr ""
+msgstr "Åbent budget"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__period
@@ -552,7 +600,7 @@ msgstr "Periode"
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_graph
 msgid "Practical amount"
-msgstr "Praktisk mængde"
+msgstr "Faktisk beløb"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__account_id
@@ -588,27 +636,27 @@ msgstr "Ansvarlig bruger"
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_analytic__budget_type__revenue
 msgid "Revenue"
-msgstr "Indtægter"
+msgstr "Omsætning"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid "Revise"
-msgstr ""
+msgstr "Revidere"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_analytic__state__revised
 msgid "Revised"
-msgstr ""
+msgstr "Revideret"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__parent_id
 msgid "Revision Of"
-msgstr ""
+msgstr "Revideret af"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__children_ids
 msgid "Revisions"
-msgstr ""
+msgstr "Revideringer"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_sms_error
@@ -623,7 +671,7 @@ msgstr "Sekvens"
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Show all records whose next activity date is past"
-msgstr "Vis alle poster med en næste aktivitetsdato, der er før i dag"
+msgstr "Vis alle poster, hvis næste aktivitetsdato er før i dag"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
@@ -635,7 +683,7 @@ msgstr "Del"
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__date_from
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__date_from
 msgid "Start Date"
-msgstr "Start dato"
+msgstr "Startdato"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__state
@@ -659,19 +707,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_budget/models/budget_line.py:0
 msgid "The 'End Date' must be greater than or equal to 'Start Date'."
-msgstr ""
+msgstr "'Slutdatoen' skal være større end eller lig med 'startdatoen'."
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__theoritical_amount
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__theoretical
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid "Theoretical"
-msgstr ""
+msgstr "Teoretisk"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__theoritical_percentage
 msgid "Theoretical (%)"
-msgstr ""
+msgstr "Teoretisk (%)"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
@@ -686,7 +734,7 @@ msgstr "Opnået i alt"
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_tree
 msgid "Total Budget"
-msgstr ""
+msgstr "Budget i alt"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__line_type
@@ -703,24 +751,14 @@ msgstr "Type registreret undtagelsesaktivitet."
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Use budgets to compare actual with expected revenues and costs"
 msgstr ""
-"Brug budgetter til at sammenligne faktiske med forventede indtægter og "
-"omkostninger"
+"Brug budgetter til at sammenligne faktiske indtægter og omkostninger med de "
+"forventede"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__user_id
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "User"
 msgstr "Bruger"
-
-#. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__website_message_ids
-msgid "Website Messages"
-msgstr "Beskeder fra hjemmesiden"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__website_message_ids
-msgid "Website communication history"
-msgstr "Hjemmesidens kommunikationshistorik"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__year
@@ -731,18 +769,18 @@ msgstr "År"
 #. odoo-python
 #: code:addons/account_budget/models/budget_analytic.py:0
 msgid "You cannot create recursive revision of budget."
-msgstr ""
+msgstr "Det er ikke muligt at oprette en rekursiv revision af budgettet."
 
 #. module: account_budget
 #. odoo-python
 #: code:addons/account_budget/models/budget_analytic.py:0
 msgid "budget_analytic_id"
-msgstr ""
+msgstr "budget_analytic_id"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid "e.g. Budget 2023"
-msgstr ""
+msgstr "f.eks. budget 2023"
 
 #. module: account_budget
 #. odoo-python
@@ -750,132 +788,8 @@ msgstr ""
 msgid "id"
 msgstr "ID"
 
-#~ msgid ""
-#~ "\"End Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "\"Slut dato\" på budget linjen skal være inkluderet i perioden for "
-#~ "budgettet"
+msgid "Website Messages"
+msgstr "Beskeder fra hjemmesiden"
 
-#~ msgid ""
-#~ "\"Start Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "\"Start dato\" på budget linjen skal være inkluderet i perioden for "
-#~ "budgettet"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Periode\" "
-#~ "title=\"Periode\"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Pil\"/>"
-
-#~ msgid "Accounts"
-#~ msgstr "Konti"
-
-#~ msgid "Achievement"
-#~ msgstr "Resultater"
-
-#~ msgid "Amount really earned/spent."
-#~ msgstr "Faktisk tjent/brugt mængde."
-
-#~ msgid "Amount you are supposed to have earned/spent at this date."
-#~ msgstr "Mængde du bør have tjent/brugt ved denne dato."
-
-#~ msgid ""
-#~ "Amount you plan to earn/spend. Record a positive amount if it is a "
-#~ "revenue and a negative amount if it is a cost."
-#~ msgstr ""
-#~ "Mængde du planlægger at tjene/bruge. Registrer en positiv mængde hvis det "
-#~ "er en indtægt, og en negativ mængde hvis det er en omkostning."
-
-#~ msgid "Approve"
-#~ msgstr "Godkend"
-
-#~ msgid "Budget Items"
-#~ msgstr "Budgetposter"
-
-#~ msgid "Budgetary Position"
-#~ msgstr "Budgetposition"
-
-#~ msgid "Budgetary Positions"
-#~ msgstr "Budgetpositioner"
-
-#~ msgid "Cancelled"
-#~ msgstr "Annulleret"
-
-#~ msgid ""
-#~ "Comparison between practical and theoretical amount. This measure tells "
-#~ "you if you are below or over budget."
-#~ msgstr ""
-#~ "Sammenligning mellem praktisk og teoretisk mængde. Dette mål fortæller "
-#~ "dig, om du er over eller under budgettet."
-
-#~ msgid "Confirm"
-#~ msgstr "Bekræft"
-
-#~ msgid "Confirmed"
-#~ msgstr "Bekræftet"
-
-#~ msgid "Entries..."
-#~ msgstr "Posteringer..."
-
-#~ msgid "Group By"
-#~ msgstr "Sortér efter"
-
-#~ msgid "Name"
-#~ msgstr "Navn"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Antal meddelser der kræver handling"
-
-#~ msgid "Paid Date"
-#~ msgstr "Betalingsdato"
-
-#~ msgid "Planned Amount"
-#~ msgstr "Budgetteret beløb"
-
-#~ msgid "Planned amount"
-#~ msgstr "Planlagt mængde"
-
-#~ msgid "Practical Amount"
-#~ msgstr "Realiseret beløb"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Vis alle poster, hvor den næste aktivitetsdato er før i dag"
-
-#~ msgid "The budget must have at least one account."
-#~ msgstr "Budgettet skal have mindst én konto."
-
-#~ msgid "Theoretical Amount"
-#~ msgstr "Teoretisk beløb"
-
-#~ msgid "Theoretical amount"
-#~ msgstr "Teoretisk beløb"
-
-#~ msgid "To"
-#~ msgstr "Til"
-
-#~ msgid "To Approve"
-#~ msgstr "Til godkendelse"
-
-#~ msgid "To Approve Budgets"
-#~ msgstr "Til budgetgodkendelse"
-
-#~ msgid "Validated"
-#~ msgstr "Valideret"
-
-#~ msgid ""
-#~ "You have to enter at least a budgetary position or analytic account on a "
-#~ "budget line."
-#~ msgstr ""
-#~ "Du skal mindst angive en budget position eller analytisk konto på en "
-#~ "budgetlinje."
+msgid "Website communication history"
+msgstr "Hjemmesidens kommunikationshistorik"

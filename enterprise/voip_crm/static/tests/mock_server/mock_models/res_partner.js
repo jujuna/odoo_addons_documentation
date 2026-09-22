@@ -2,7 +2,8 @@ import { ResPartner as MailResPartner } from "@voip/../tests/mock_server/mock_mo
 
 export class ResPartner extends MailResPartner {
     /** @override */
-    _voip_get_store_fields() {
-        return ["opportunity_count", ...super._voip_get_store_fields()];
+    _store_voip_fields(res) {
+        super._store_voip_fields(res);
+        res.attr("commercial_partner_opportunity_count");
     }
 }

@@ -8,6 +8,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 @tagged('post_install', '-at_install')
 class TestSubscriptionPlan(TestSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_check_count_of_subscription_items_on_plan(self):
 
         # Create a subscription plan
@@ -85,3 +87,23 @@ class TestSubscriptionPlan(TestSubscriptionCommon):
             order_form.plan_id = self.plan_week
 
         self.assertEqual(order_1.plan_id, self.plan_week)
+
+    def test_productless_plan_count(self):
+        """
+        Test that a subscription with no product lines is correctly counted in the subscription plan.
+        """
+        subscription = self.env['sale.order'].create({
+            'name': 'Subscription 1',
+            'plan_id': self.plan_month.id,
+            'partner_id': self.user_portal.partner_id.id,
+            'order_line': [
+                Command.create({
+                    'name': "Productless Line",
+                    'price_unit': 100,
+                    'product_uom_qty': 1,
+                }),
+            ]
+        })
+
+        subscription.action_confirm()
+        self.assertEqual(subscription.plan_id.subscription_line_count, 1)

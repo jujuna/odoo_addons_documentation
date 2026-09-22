@@ -3,7 +3,6 @@
 # See LICENSE file for full copyright and licensing details.
 {
     'name': 'Lithuania - Accounting Reports',
-    'version': '1.0.0',
     'description': """
 Accounting reports for Lithuania
 
@@ -11,7 +10,6 @@ Contains Balance Sheet, Profit/Loss reports
     """,
     'license': 'OEEL-1',
     'author': "Focusate",
-    'website': "http://www.focusate.eu",
     'category': 'Accounting/Localizations/Reporting',
     'depends': [
         'account_reports',
@@ -23,10 +21,9 @@ Contains Balance Sheet, Profit/Loss reports
         'data/account_return_data.xml',
         'data/iSAF_template.xml',
         'data/tax_report.xml',
-        'security/ir.model.access.csv',
         'wizard/ec_sales_list_submission_wizard.xml',
         'wizard/vat_return_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': ['l10n_lt', 'account_reports'],
-    'installable': True,
 }

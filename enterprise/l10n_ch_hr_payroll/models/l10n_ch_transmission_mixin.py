@@ -1,9 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
+from datetime import UTC
+
 from odoo.exceptions import ValidationError
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from pytz import utc
 
 
 class L10nCHSwissdecTransmitter(models.AbstractModel):
@@ -25,7 +25,7 @@ class L10nCHSwissdecTransmitter(models.AbstractModel):
 
     active = fields.Boolean(default=True)
     name = fields.Char(required=True, default=_get_default_name)
-    year = fields.Integer(string="Year", required=True, default=lambda self: fields.Date.today().year)
+    year = fields.Integer(string="Year", required=True, default=lambda self: fields.Date.context_today(self).year)
     month = fields.Selection(string="Month", selection=[
         ('1', 'January'),
         ('2', 'February'),
@@ -39,7 +39,7 @@ class L10nCHSwissdecTransmitter(models.AbstractModel):
         ('10', 'October'),
         ('11', 'November'),
         ('12', 'December'),
-    ], required=True, default=lambda self: str((fields.Date.today()).month))
+    ], required=True, default=lambda self: str((fields.Date.context_today(self)).month))
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company, domain="[('partner_id.country_id.code', '=', 'CH')]")
 
     l10n_ch_declare_salary_data = fields.Json()
@@ -75,7 +75,7 @@ class L10nCHSwissdecTransmitter(models.AbstractModel):
                 res_field = missing_dict.get("res_field")
                 employee_id = missing_dict.get("employee_id")
                 if res_model and res_id:
-                    field_description = self.env[res_model]._fields[res_field].string
+                    field_description = self.env[res_model]._fields[res_field].get_description(self.env, ["string"])["string"]
 
                     if res_model == 'hr.version' and employee_id:
                         record = self.env['hr.employee'].browse(employee_id)
@@ -102,7 +102,8 @@ class L10nCHSwissdecTransmitter(models.AbstractModel):
             raise ValidationError(_("Declaration data is not valid, some payslips were validated with missing information, please recompute them with valid employee information"))
 
     def action_prepare_data(self):
-        if self.year < fields.Date.today().year - 1 or self.year > fields.Date.today().year:
+        today = fields.Date.context_today(self)
+        if self.year < today.year - 1 or self.year > today.year:
             raise ValidationError(_("You can only transmit data for the current or previous year."))
 
     @api.depends("l10n_ch_swissdec_declaration_ids")
@@ -128,7 +129,7 @@ class L10nCHSwissdecTransmitter(models.AbstractModel):
 
         if response:
             job_key = response['JobKey']
-            timestamp = fields.Datetime.from_string(response['ResponseContext']['TransmissionDate']).astimezone(utc).replace(tzinfo=None)
+            timestamp = fields.Datetime.from_string(response['ResponseContext']['TransmissionDate']).astimezone(UTC).replace(tzinfo=None)
             declaration = self.env["l10n.ch.swissdec.declaration"].create({
                 "name": f"{self.name} - {response['ResponseContext']['DeclarationID']}",
                 "res_id": self.id,
@@ -142,14 +143,14 @@ class L10nCHSwissdecTransmitter(models.AbstractModel):
             })
             attachment_request = self.env['ir.attachment'].create({
                 'name': _("Declaration_%s_request.xml", response['ResponseContext']['DeclarationID']),
-                'datas': base64.encodebytes(message_archive.encode()),
+                'raw': message_archive.encode(),
                 'res_id': declaration.id,
                 'res_model': declaration._name,
             })
 
             attachment_response = self.env['ir.attachment'].create({
                 'name': _("Declaration_%s_response.xml", response['ResponseContext']['DeclarationID']),
-                'datas': base64.encodebytes(response_archive.encode()),
+                'raw': response_archive.encode(),
                 'res_id': declaration.id,
                 'res_model': declaration._name,
             })

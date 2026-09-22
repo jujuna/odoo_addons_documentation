@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from unittest.mock import patch
+
 from odoo.addons.social.tests import common
 from odoo.addons.social.tests.tools import mock_void_external_calls
+from odoo.fields import Domain
 from odoo.exceptions import AccessError
 from odoo.tests import tagged
 from odoo.tests.common import users
@@ -10,6 +13,7 @@ from odoo.tools import mute_logger
 
 
 @tagged('security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestAccess(common.SocialCase):
     @classmethod
     def setUpClass(cls):
@@ -39,12 +43,13 @@ class TestAccess(common.SocialCase):
                 'stream_id': cls.social_stream.id,
             })
 
-            cls.social_stream_post_image = cls.env['social.stream.post.image'].create({
+            cls.social_stream_post_image = cls.env['social.stream.post.attachment'].create({
+                'attachment_content_type': 'image',
+                'content_url': 'dummy.png',
                 'stream_post_id': cls.social_stream_post.id,
-                'image_url': 'dummy.png'
             })
 
-    @mute_logger('odoo.addons.base.models.ir_model')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('user_emp')
     @mock_void_external_calls()
     def test_access_social_employee(self):
@@ -64,7 +69,11 @@ class TestAccess(common.SocialCase):
         with self.assertRaises(AccessError):
             self.env['social.stream.post'].create({'message': 'A stream post'})
         with self.assertRaises(AccessError):
-            self.env['social.stream.post.image'].create({'image_url': 'dummy.png'})
+            self.env['social.stream.post.attachment'].create({
+                'content_url': 'dummy.png',
+                'attachment_content_type': 'image',
+                'stream_post_id': self.social_stream_post.id,
+            })
 
         # Read: not allowed
         with self.assertRaises(AccessError):
@@ -120,7 +129,7 @@ class TestAccess(common.SocialCase):
         with self.assertRaises(AccessError):
             self.social_stream_post_image.with_user(self.env.user).unlink()
 
-    @mute_logger('odoo.addons.base.models.ir_model')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('social_user')
     @mock_void_external_calls()
     def test_access_social_social_user(self):
@@ -150,18 +159,21 @@ class TestAccess(common.SocialCase):
         with self.assertRaises(AccessError):
             self.env['social.stream.post'].create({'message': 'A stream post'})
         with self.assertRaises(AccessError):
-            self.env['social.stream.post.image'].create({'image_url': 'dummy.png'})
+            self.env['social.stream.post.attachment'].create({
+                'attachment_content_type': 'image',
+                'content_url': 'dummy.png',
+                'stream_post_id': self.social_stream_post.id,
+            })
 
         # Can post
-        new_post.action_post()
+        new_post.action_post_now()
 
         # Read: allowed. They can read all posts
         new_post.with_user(self.env.user).read(['message'])
         self.social_post.with_user(self.env.user).read(['message'])
 
         new_live_post.with_user(self.env.user).read(['post_id'])
-        with self.assertRaises(AccessError):
-            self.social_live_post.with_user(self.env.user).read(['post_id'])
+        self.social_live_post.with_user(self.env.user).read(['post_id'])
 
         self.social_account.with_user(self.env.user).read(['name'])
         self.social_media.with_user(self.env.user).read(['name'])
@@ -177,8 +189,7 @@ class TestAccess(common.SocialCase):
         # can now write on the 'state' field
         new_post.with_user(self.env.user).write({'state': 'scheduled'})
         new_live_post.with_user(self.env.user).write({'post_id': self.social_post.id})
-        with self.assertRaises(AccessError):
-            self.social_live_post.with_user(self.env.user).write({'post_id': self.social_post.id})
+        self.social_live_post.with_user(self.env.user).write({'post_id': self.social_post.id})
 
         with self.assertRaises(AccessError):
             self.social_account.with_user(self.env.user).write({'name': 'New Name'})
@@ -214,7 +225,66 @@ class TestAccess(common.SocialCase):
         with self.assertRaises(AccessError):
             self.social_stream_post_image.with_user(self.env.user).unlink()
 
-    @mute_logger('odoo.addons.base.models.ir_model')
+        # Test that we cannot read any attachment by abusing `social.post.image`
+        restricted_record = self.env["ir.config_parameter"].sudo().create({
+            "key": "social.test_restricted_attachment",
+            "value": "test",
+        })
+        attachment = self.env["ir.attachment"].sudo().create(
+            {"res_model": restricted_record._name, "res_id": restricted_record.id, "name": "test", "raw": b"original"}
+        ).with_user(self.env.user)
+        self.env.invalidate_all()
+        with self.assertRaises(AccessError):
+            attachment.name
+        with self.assertRaises(AccessError):
+            self.env["social.post.image"].create({"attachment_id": attachment.id})
+        with self.assertRaises(AccessError):
+            self.env["social.post.image"].onchange(
+                {"attachment_id": attachment.id},
+                ["attachment_id"],
+                {"raw": {}},
+            )
+        with self.assertRaises(AccessError):
+            self.env["social.post.image"].with_context(
+                default_attachment_id=attachment.id,
+            ).onchange(
+                {},
+                [],
+                {"attachment_id": {}, "raw": {}},
+            )
+
+        self.env["ir.default"].set(
+            "social.post.image",
+            "attachment_id",
+            attachment.id,
+            user_id=True,
+        )
+        with self.assertRaises(AccessError):
+            self.env["social.post.image"].onchange(
+                {},
+                [],
+                {"attachment_id": {}, "raw": {}},
+            )
+        image = self.env["social.post.image"].sudo().create({"attachment_id": attachment.id}).sudo(False)
+        self.env.invalidate_all()
+        self.assertEqual(image.raw.content, b"original", "Should be able to read image created by other users")
+        with self.assertRaises(AccessError):
+            image.raw = b'updated'
+        self.env.flush_all()
+        self.env.invalidate_all()
+        self.assertEqual(attachment.sudo().raw.content, b"original", "Cannot update the attachment using the social image")
+
+        def attachment_access_domain(rec, operation):
+            # can read but not write the attachment
+            return Domain.TRUE if operation == "read" else Domain.FALSE
+
+        with patch.object(self.env.registry['ir.attachment'], '_access_domain', attachment_access_domain):
+            self.env["social.post.image"].create({"attachment_id": attachment.id})
+
+            with self.assertRaises(AccessError):
+                self.env["social.post.image"].create({"attachment_id": attachment.id, 'name': 'test name'})
+
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('social_manager')
     @mock_void_external_calls()
     def test_access_social_social_manager(self):
@@ -228,7 +298,11 @@ class TestAccess(common.SocialCase):
             'account_id': self.social_account.id
         })
         self.env['social.stream.post'].create({'message': 'A stream post', 'stream_id': self.social_stream.id})
-        self.env['social.stream.post.image'].create({'image_url': 'dummy.png'})
+        self.env['social.stream.post.attachment'].create({
+            'attachment_content_type': 'image',
+            'content_url': 'dummy.png',
+            'stream_post_id': self.social_stream_post.id,
+        })
 
         with self.assertRaises(AccessError):
             self.env['social.media'].create({'name': 'A media'})
@@ -236,7 +310,7 @@ class TestAccess(common.SocialCase):
             self.env['social.stream.type'].create({'name': 'A stream type'})
 
         # Can post
-        new_post.action_post()
+        new_post.action_post_now()
 
         # Read: allowed
         self.social_post.with_user(self.env.user).read(['message'])

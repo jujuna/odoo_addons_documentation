@@ -1,36 +1,36 @@
+import { Component, proxy, signal, t, usePlugin, useProps } from "@odoo/owl";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useSortable } from "@web/core/utils/sortable_owl";
-
-import { Component, useRef, useState } from "@odoo/owl";
 
 export class SelectionContentDialog extends Component {
     static components = {
         Dialog,
     };
-    static defaultProps = {
-        defaultChoices: [],
-    };
-    static props = {
-        defaultChoices: { type: Array, optional: true },
-        onConfirm: { type: Function },
-        close: { type: Function },
-    };
+    props = useProps({
+        defaultChoices: t.array().optional([]),
+        onConfirm: t.function(),
+        close: t.function(),
+        showValue: t.boolean().optional(true),
+    });
     static template = "web_studio.SelectionContentDialog";
 
+    itemsListRef = signal.ref();
+    debugMode = usePlugin(DebugModePlugin);
+
     setup() {
-        this.state = useState({
+        this.state = proxy({
             choices: this.props.defaultChoices,
         });
-        this.localState = useState({
+        this.localState = proxy({
             _newItem: [],
             editedItem: null,
         });
 
-        const itemsList = useRef("itemsList");
         useSortable({
             enable: () => !this.editedItem,
             handle: ".o-draggable-handle",
-            ref: itemsList,
+            ref: this.itemsListRef,
             elements: ".o-draggable",
             cursor: "move",
             onDrop: (params) => this.resequenceItems(params),
@@ -71,16 +71,16 @@ export class SelectionContentDialog extends Component {
 
     get selectionToItems() {
         const inEdition = !!this.editedItem;
-        return this.selection.map((sel, index) => {
-            return this.selectionToItem(sel, {
+        return this.selection.map((sel, index) =>
+            this.selectionToItem(sel, {
                 id: index,
                 key: inEdition ? index : sel[0],
                 isInEdition:
                     this.editedItem?.id === this.selection.indexOf(sel) && !this.shouldFullEdit,
                 isDraggable: !inEdition,
                 isRemovable: !inEdition,
-            });
-        });
+            })
+        );
     }
 
     get newItem() {
@@ -92,7 +92,7 @@ export class SelectionContentDialog extends Component {
     }
 
     get shouldFullEdit() {
-        return Boolean(this.env.debug);
+        return this.debugMode.isActive();
     }
 
     ensureUnique(item) {

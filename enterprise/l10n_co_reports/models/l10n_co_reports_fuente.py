@@ -16,26 +16,18 @@ class L10n_CoFuenteReportHandler(models.AbstractModel):
 
     def _get_query_results(self, report, options, domain, expanded=False):
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             query = report._get_report_query(column_group_options, 'strict_range', domain=domain)
             origin_tax_id_expression = SQL('tax.id')
             lang = self.env.user.lang or get_lang(self.env).code
             origin_tax_desc_expression = SQL("COALESCE(tax.description->>%s,tax.description->>'en_US')", lang)
             origin_tax_desc_expression = SQL("REGEXP_REPLACE(%s, '(<([^>]+)>)', '', 'g')", origin_tax_desc_expression)
             expanded_columns = SQL('%s AS origin_tax_id, %s AS origin_tax_desc,', origin_tax_id_expression if expanded else '', origin_tax_desc_expression if expanded else '')
-            tax_base_amount_select = SQL("""
-                SUM(CASE
-                    WHEN account_move_line.credit > 0
-                        THEN account_move_line.tax_base_amount
-                    WHEN account_move_line.debit > 0
-                        THEN account_move_line.tax_base_amount * -1
-                    ELSE 0
-                    END)
-            """)
+            tax_base_amount_select = SQL("SUM(account_move_line.tax_base_amount)")
             queries.append(SQL(
                 """
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     SUM(account_move_line.credit - account_move_line.debit) AS balance,
                     %(tax_base_amount_select)s AS tax_base_amount,
                     %(expanded_columns)s
@@ -48,7 +40,7 @@ class L10n_CoFuenteReportHandler(models.AbstractModel):
                 GROUP BY rp.id %(expanded_groupby)s
                 %(having_clause)s
                 """,
-                column_group_key=column_group_key,
+                column_group_index=column_group_index,
                 tax_base_amount_select=tax_base_amount_select,
                 expanded_columns=expanded_columns,
                 table_references=query.from_clause,
@@ -68,7 +60,7 @@ class L10n_CoFuenteReportHandler(models.AbstractModel):
             domain += [('tax_line_id.l10n_co_edi_type.code', '=', '06')]
         return domain
 
-    def _report_expand_unfoldable_line_fuente(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_fuente(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         report = self.env['account.report'].browse(options['report_id'])
         domain = self._get_domain(report, options, line_dict_id=line_dict_id)
         query_results = self._get_query_results(report, options, domain, expanded=True)

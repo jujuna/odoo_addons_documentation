@@ -3,12 +3,18 @@ import {
     StateChangeManager,
     useEmbeddedState,
 } from "@html_editor/others/embedded_component_utils";
-import { ReadonlyFoldableSection } from "@knowledge/editor/embedded_components/core/readonly_foldable_section/readonly_foldable_section";
+import {
+    ReadonlyFoldableSection,
+    readonlyFoldableSectionProps,
+} from "@knowledge/editor/embedded_components/core/readonly_foldable_section/readonly_foldable_section";
+import { t, useProps } from "@odoo/owl";
 
 export class FoldableSection extends ReadonlyFoldableSection {
-    static props = {
-        host: Object,
-    };
+    props = useProps({
+        ...readonlyFoldableSectionProps,
+        host: t.object(),
+    });
+
     setup() {
         super.setup();
         this.state = useEmbeddedState(this.props.host);

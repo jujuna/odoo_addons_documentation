@@ -31,22 +31,28 @@
                     <t t-foreach="filtered_buttons" t-as="button">
                         <span t-attf-class="o_whatsapp_message_link d-block text-center my-3">
                             <t t-if="button.button_type == 'phone_number'">
-                                <i t-attf-class="fa fs-5 fa-phone"/>
+                                <i class="oi oi-filled fs-5" data-icon="phone"/>
                             </t>
                             <t t-elif="button.button_type == 'url'">
-                                <i t-attf-class="fa fs-5 fa-external-link"/>
+                                <i class="oi fs-5" data-icon="open_in_new"/>
                             </t>
                             <t t-else="">
-                                <i t-attf-class="fa fs-5 fa-reply"/>
+                                <i class="oi fs-5" data-icon="reply"/>
                             </t>
                             <t t-out="button.name"/>
                         </span>
                     </t>
                     <t t-if="show_all_options_button">
                         <span t-attf-class="o_whatsapp_message_link d-block text-center my-3">
-                            <i t-attf-class="fa fs-5  fa-list-ul"/> See all options
+                            <i class="oi fs-5" data-icon="format_list_bulleted"/> See all options
                         </span>
                     </t>
+                </div>
+                <div class="o_whatsapp_message_links cursor-default px-2" t-if="interactive_list_btn_label">
+                    <hr class="position-relative w-100 m-0"/>
+                    <span t-attf-class="o_whatsapp_message_link d-block text-center my-3">
+                        <i class="oi fs-5" data-icon="format_list_bulleted"/> <t t-out="interactive_list_btn_label"/>
+                    </span>
                 </div>
             </div>
         </div>

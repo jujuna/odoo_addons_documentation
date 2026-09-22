@@ -1,5 +1,5 @@
 import { expect, test } from "@odoo/hoot";
-import { contains, webModels } from "@web/../tests/web_test_helpers";
+import { contains, onRpc, webModels } from "@web/../tests/web_test_helpers";
 import { patch } from "@web/core/utils/patch";
 import {
     defineWebsiteModels,
@@ -71,6 +71,8 @@ patch(webModels.IrModel.prototype, {
 defineWebsiteModels();
 
 test("change action to More models", async () => {
+    onRpc("get_authorized_fields", () => ({}));
+
     await setupWebsiteBuilder(
         `<section class="s_website_form"><form data-model_name="mail.mail">
             <div class="s_website_form_field"><label class="s_website_form_label" for="contact1">Name</label><input id="contact1" class="s_website_form_input"/></div>
@@ -82,7 +84,7 @@ test("change action to More models", async () => {
     );
 
     await contains(":iframe section").click();
-    await contains("div:has(>span:contains('Action')) + div button").click();
+    await contains(".hb-row[data-label='Action'] button").click();
     await contains("div.o-dropdown-item:contains('More models')").click();
     await contains(".o_data_cell:contains('Custom stuff')").click();
     expect(":iframe form .s_website_form_field").toHaveCount(0);
@@ -90,6 +92,8 @@ test("change action to More models", async () => {
 });
 
 test("form access is in history", async () => {
+    onRpc("get_authorized_fields", () => ({}));
+
     await setupWebsiteBuilder(
         `<section class="s_website_form"><form data-model_name="website_studio.custom_stuff">
             <div class="s_website_form_submit">
@@ -109,16 +113,16 @@ test("form access is in history", async () => {
     expect.verifySteps(['webSave 123 {"website_form_access":true}']);
     expect("[data-action-id='studioToggleFormAccess'] input:checked").toHaveCount(1);
     // Check history
-    await contains(".fa-undo").click();
+    await contains("[data-icon='undo']").click();
     expect.verifySteps(['webSave 123 {"website_form_access":false}']);
     expect("[data-action-id='studioToggleFormAccess'] input:not(:checked)").toHaveCount(1);
-    await contains(".fa-undo").click();
+    await contains("[data-icon='undo']").click();
     expect.verifySteps(['webSave 123 {"website_form_access":true}']);
     expect("[data-action-id='studioToggleFormAccess'] input:checked").toHaveCount(1);
-    await contains(".fa-repeat").click();
+    await contains("[data-icon='redo']").click();
     expect.verifySteps(['webSave 123 {"website_form_access":false}']);
     expect("[data-action-id='studioToggleFormAccess'] input:not(:checked)").toHaveCount(1);
-    await contains(".fa-repeat").click();
+    await contains("[data-icon='redo']").click();
     expect("[data-action-id='studioToggleFormAccess'] input:checked").toHaveCount(1);
     expect.verifySteps(['webSave 123 {"website_form_access":true}']);
 });

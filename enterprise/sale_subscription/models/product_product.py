@@ -1,25 +1,23 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models
+from odoo import api, models
 
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    subscription_rule_ids = fields.One2many(
-        string="Subscription Pricings",
-        comodel_name='product.pricelist.item',
-        inverse_name='product_id',
-        compute='_compute_subscription_rule_ids',
-        readonly=False,
-    )
+    @api.onchange('recurring_invoice')
+    def _onchange_recurring_invoice(self):
+        """
+        Raise a warning if the user has checked 'Subscription Product'
+        while the product has already been sold.
+        In this case, the 'Subscription Product' field is automatically
+        unchecked.
+        """
+        return self.product_tmpl_id._onchange_recurring_invoice()
 
-    @api.depends('product_tmpl_id')
-    def _compute_subscription_rule_ids(self):
-        for product in self:
-            if not product.id:
-                product.subscription_rule_ids = False
-                continue
-            product.subscription_rule_ids = product.product_tmpl_id.subscription_rule_ids.filtered(
-                lambda rule: not rule.product_id or rule.product_id == product.id
-            )
+    def _has_multiple_uoms(self):
+        # multi-uoms doesn't work with subscription (for now)
+        if self.recurring_invoice:
+            return False
+        return super()._has_multiple_uoms()

@@ -6,6 +6,7 @@ from odoo.tests.common import tagged, users
 from odoo.exceptions import AccessError
 
 @tagged('knowledge_comments')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleThreadPermissions(KnowledgeArticlePermissionsCase):
 
     @classmethod
@@ -99,35 +100,37 @@ class TestKnowledgeArticleThreadPermissions(KnowledgeArticlePermissionsCase):
         base_thread.write({'is_resolved': True})
         self.assertTrue(base_thread.is_resolved)
 
-    @users('portal_test')
-    def test_message_post_as_portal(self):
-        base_thread = self.private_thread.with_env(self.env)
+    def test_message_post_on_thread(self):
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         with self.assertRaises(AccessError):
-            base_thread.message_post(body="It raises an error because of no access")
+            self.private_thread.with_user(self.user_portal).message_post(body="It raises an error because of no access")
 
         self.private_article.sudo().invite_members(self.partner_portal, 'read')
+        self.private_article.sudo().invite_members(self.partner_employee, 'read')
 
-        self.assertMembers(self.private_article, 'none', {self.partner_employee_manager: 'write', self.env.user.partner_id: 'read'})
+        self.assertMembers(self.private_article, 'none', {self.partner_employee_manager: 'write', self.partner_portal: 'read', self.partner_employee: 'read'})
 
-        recipients = self.env.user.partner_id  # get only accessible partners
-        message = base_thread.message_post(body="Hello Everyone", partner_ids=recipients.ids, tracking_value_ids=[1, 2, 3])
-        self.assertEqual(len(base_thread.sudo().message_ids), 2, "Portal user should be able to post a message")
-        self.assertListEqual(message.sudo().tracking_value_ids.ids, [], "Tracking values should have been filltered")
-
-    @users('employee')
-    def test_message_post_as_employee(self):
-        base_thread = self.shared_article.with_env(self.env)
-
-        self.assertEqual(len(base_thread.message_ids), 1)
-        base_thread.message_post(body="Hello Friend")
-        self.assertEqual(len(base_thread.message_ids), 2, "A message should have been posted")
-
-        # Access token is generated for the attachment when a user posts a message
-        base_thread = self.workspace_thread.with_env(self.env)
-        attachment = self.env['ir.attachment'].create({
-            'name': 'Test attachment',
-            'raw': b'Attachment',
-            'res_model': 'mail.compose.message',
-        })
-        message = base_thread.message_post(body="Hello Dear!", attachment_ids=attachment.ids)
-        self.assertTrue(message.attachment_ids[0].access_token)
+        for test_user, exp_values in [
+            (self.user_portal, {'message_type': 'comment', 'tracking_values': []}),
+            (self.user_employee, {'message_type': 'tracking', 'tracking_values': [
+                ('article_anchor_text', 'text', 'Old', 'New', {'html_string': 'Anchor Text'}),
+            ]}),
+        ]:
+            with self.subTest(test_user=test_user.name):
+                recipients = test_user.partner_id  # get only accessible partners
+                with self.mock_mail_gateway(), self.mock_mail_app():
+                    _message = self.private_thread.with_user(test_user).message_post(
+                        body="Hello Everyone",
+                        partner_ids=recipients.ids,
+                        tracking_values=[
+                            self.private_thread._create_mail_tracking_values(
+                                'Old', 'New', 'article_anchor_text', {'string': 'Anchor Text', 'type': 'text'},
+                            )
+                        ],
+                        message_type='tracking',
+                    )
+                # tracking values should have been filtered, or not, depending on user
+                self.assertMessageFields(self._new_msgs, {
+                    'author_id': test_user.partner_id,
+                    **exp_values,
+                })

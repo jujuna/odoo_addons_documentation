@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_basic_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.BASIC"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
         <field name="name">Basic Salary</field>
         <field name="sequence">1</field>
         <field name="code">BASIC</field>
+        <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = payslip.paid_amount
+result = payslip._get_basic_salary()
 result_rate = version.l10n_in_basic_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_hra" model="hr.salary.rule">
         <field name="code">HRA</field>
         <field name="name">House Rent Allowance</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="sequence" eval="16"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_hra_percentage)</field>
@@ -25,13 +29,16 @@ result_rate = version.l10n_in_basic_percentage * 100
 result = categories['BASIC']
 result_rate = version.l10n_in_hra_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_std" model="hr.salary.rule">
         <field name="code">STD</field>
         <field name="name">Standard Allowance</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="sequence" eval="20"/>
         <field name="quantity">1</field>
         <field name="condition_select">python</field>
@@ -41,13 +48,16 @@ result_rate = version.l10n_in_hra_percentage * 100
 result = categories['BASIC']
 result_rate = version.l10n_in_standard_allowance_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_p_bonus" model="hr.salary.rule">
         <field name="code">P_BONUS</field>
         <field name="name">Performance Bonus</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="sequence" eval="24"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_performance_bonus_percentage)</field>
@@ -56,13 +66,16 @@ result_rate = version.l10n_in_standard_allowance_percentage * 100
 result = categories['BASIC']
 result_rate = version.l10n_in_performance_bonus_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_lta" model="hr.salary.rule">
         <field name="code">LTA</field>
         <field name="name">Leave Travel Allowance</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="sequence" eval="26"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_leave_travel_percentage)</field>
@@ -71,13 +84,16 @@ result_rate = version.l10n_in_performance_bonus_percentage * 100
 result = categories['BASIC']
 result_rate = version.l10n_in_leave_travel_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_spl" model="hr.salary.rule">
         <field name="code">SPL</field>
         <field name="name">Fixed Allowance</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="sequence" eval="31"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_fixed_allowance_percentage)</field>
@@ -86,27 +102,33 @@ result_rate = version.l10n_in_leave_travel_percentage * 100
 result = categories['BASIC']
 result_rate = version.l10n_in_fixed_allowance_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_phone" model="hr.salary.rule">
         <field name="code">MOB</field>
         <field name="name">Phone Subscription</field>
         <field name="sequence" eval="32"/>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_phone_subscription)</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = version.l10n_in_phone_subscription
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_internet" model="hr.salary.rule">
         <field name="code">INT</field>
         <field name="name">Internet Subscription</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="sequence" eval="34"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_internet_subscription)</field>
@@ -114,51 +136,64 @@ result = version.l10n_in_phone_subscription
         <field name="amount_python_compute">
 result = version.l10n_in_internet_subscription
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_meal_vouchers" model="hr.salary.rule">
         <field name="code">MEAL</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="name">Meal vouchers</field>
         <field name="sequence" eval="36"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_meal_voucher_amount)</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">result = version.l10n_in_meal_voucher_amount</field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_company_transport" model="hr.salary.rule">
         <field name="code">CAR</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="name">Company Transport</field>
         <field name="sequence" eval="38"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_company_transport)</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">result = version.l10n_in_company_transport</field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_gross_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.GROSS"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
         <field name="name">Taxable Salary</field>
         <field name="sequence">100</field>
         <field name="code">GROSS</field>
+        <field name="appears_on_employee_cost_dashboard" eval="True"/>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW']</field>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_pt" model="hr.salary.rule">
         <field name="code">PT</field>
         <field name="name">Professional Tax</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="sequence" eval="104"/>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = bool(version.l10n_in_pt and version.pt_rule_parameter_id)</field>
+        <field name="condition_python">result = bool(version.l10n_in_pt and version.pt_rule_parameter_id and payslip._l10n_in_apply_professional_tax_deduction('PT'))</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = 0
@@ -173,13 +208,16 @@ for amount, (lower, upper) in slabs:
         result = -amount
         break
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="hr_salary_rule_pf_with_pf" model="hr.salary.rule">
         <field name="code">PF</field>
         <field name="name">Provident fund - Employee</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="sequence" eval="107"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = version.l10n_in_provident_fund and version.l10n_in_pf_employee_amount</field>
@@ -188,13 +226,16 @@ for amount, (lower, upper) in slabs:
 result = -categories['BASIC']
 result_rate = version.l10n_in_pf_employee_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="hr_salary_rule_pfe_with_pf" model="hr.salary.rule">
         <field name="code">PFE</field>
         <field name="name">Provident fund - Employer</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="sequence" eval="110"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = version.l10n_in_provident_fund and version.l10n_in_pf_employer_amount</field>
@@ -203,25 +244,31 @@ result_rate = version.l10n_in_pf_employee_percentage * 100
 result = -categories['BASIC']
 result_rate = version.l10n_in_pf_employer_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payslip_rule_med" model="hr.salary.rule">
         <field name="code">MED</field>
         <field name="name">Medical Insurance</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="sequence" eval="113"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_medical_insurance_total)</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">result = -version.l10n_in_medical_insurance_total</field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payslip_rule_gratuity" model="hr.salary.rule">
         <field name="code">GRATUITY</field>
         <field name="name">Gratuity</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="sequence" eval="112"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(version.l10n_in_gratuity)</field>
@@ -230,90 +277,113 @@ result_rate = version.l10n_in_pf_employer_percentage * 100
 result = -categories['BASIC']
 result_rate = version.l10n_in_gratuity_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payslip_rule_employee_esics" model="hr.salary.rule">
         <field name="code">ESICS</field>
         <field name="name">Employee's State Insurance Corporation</field>
         <field name="sequence" eval="114"/>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
-threshold = payslip._rule_parameter('l10n_in_esicf_value')
-result = version.l10n_in_esic and version.l10n_in_esic_employee_percentage and version.l10n_in_esic_employer_percentage and categories['GROSS'] &lt;= threshold
+threshold = payslip._rule_parameter('l10n_in_esicf_pwd_value') if version.disabled else payslip._rule_parameter('l10n_in_esicf_value')
+result = version.l10n_in_esic and version.l10n_in_esic_employee_percentage and version.l10n_in_esic_employer_percentage and categories['GROSS'] &lt;= threshold and version.l10n_in_esic
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = -categories['GROSS']
 result_rate = version.l10n_in_esic_employee_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payslip_rule_employer_esicf" model="hr.salary.rule">
         <field name="code">ESICF</field>
         <field name="name">Employer's State Insurance Corporation</field>
         <field name="sequence" eval="116"/>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
-threshold = payslip._rule_parameter('l10n_in_esicf_value')
-result = version.l10n_in_esic and version.l10n_in_esic_employee_percentage and version.l10n_in_esic_employer_percentage and categories['GROSS'] &lt;= threshold
+threshold = payslip._rule_parameter('l10n_in_esicf_pwd_value') if version.disabled else payslip._rule_parameter('l10n_in_esicf_value')
+result = version.l10n_in_esic and version.l10n_in_esic_employee_percentage and version.l10n_in_esic_employer_percentage and categories['GROSS'] &lt;= threshold and version.l10n_in_esic
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = -categories['GROSS']
 result_rate = version.l10n_in_esic_employer_percentage * 100
         </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payslip_rule_lwf_employee" model="hr.salary.rule">
         <field name="code">LWFE</field>
         <field name="name">Employee's Deduction Towards State Labour Welfare Fund</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="sequence" eval="118"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = bool(version.l10n_in_labour_welfare and version.l10n_in_lwf_employee_contribution)
+result = bool(version.l10n_in_labour_welfare and version.l10n_in_lwf_employee_contribution and payslip._l10n_in_apply_lwf('LWFE'))
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">result = -version.l10n_in_lwf_employee_contribution</field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payslip_rule_lwf_employer" model="hr.salary.rule">
         <field name="code">LWF</field>
         <field name="name">Employer's Deduction Towards State Labour Welfare Fund </field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="condition_select">python</field>
         <field name="condition_python">
-result = bool(version.l10n_in_labour_welfare and version.l10n_in_lwf_employer_contribution)
+result = bool(version.l10n_in_labour_welfare and version.l10n_in_lwf_employer_contribution and payslip._l10n_in_apply_lwf('LWF'))
         </field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">result = -version.l10n_in_lwf_employer_contribution</field>
         <field name="sequence" eval="120"/>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payslip_rule_tds" model="hr.salary.rule">
         <field name="code">TDS</field>
         <field name="name">Tax Deducted at Source</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="condition_select">python</field>
-        <field name="condition_python">result = bool(version.l10n_in_tds)</field>
+        <field name="condition_python">result = payslip.env.context.get('calculate_tds', True) and payslip._l10n_in_is_tds_deduction_month()</field>
+        <field name="appears_on_payslip">non_zero</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">result = -(version.l10n_in_tds)</field>
+        <field name="amount_python_compute">
+tax_components = payslip.employee_id.l10n_in_compute_tax_declaration(version, payslip.ids, payslip.date_from)
+result = -tax_components['expected_tds']
+        </field>
         <field name="sequence" eval="140"/>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_attachment_of_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Attachment of Salary</field>
         <field name="sequence">174</field>
         <field name="code">ATTACH_SALARY</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'ATTACH_SALARY' in inputs</field>
         <field name="amount_select">code</field>
@@ -321,14 +391,18 @@ result = bool(version.l10n_in_labour_welfare and version.l10n_in_lwf_employer_co
 result = -inputs['ATTACH_SALARY'].amount
 result_name = inputs['ATTACH_SALARY'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_assignment_of_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Assignment of Salary</field>
         <field name="sequence">174</field>
         <field name="code">ASSIG_SALARY</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'ASSIG_SALARY' in inputs</field>
         <field name="amount_select">code</field>
@@ -336,13 +410,17 @@ result_name = inputs['ATTACH_SALARY'].name
 result = -inputs['ASSIG_SALARY'].amount
 result_name = inputs['ASSIG_SALARY'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_child_support" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Child Support</field>
         <field name="code">CHILD_SUPPORT</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="amount_select">code</field>
         <field name="sequence">174</field>
         <field name="condition_select">python</field>
@@ -351,29 +429,35 @@ result_name = inputs['ASSIG_SALARY'].name
 result = -inputs['CHILD_SUPPORT'].amount
 result_name = inputs['CHILD_SUPPORT'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_salary_rule_expenses_reimbursement" model="hr.salary.rule">
         <field name="name">Expenses Reimbursement</field>
         <field name="code">EXPENSES</field>
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="sequence" eval="190"/>
-        <field name="condition_select">python</field>
-        <field name="condition_python">result = inputs['EXPENSES'].amount > 0.0 if 'EXPENSES' in inputs else False</field>
-        <field name="amount_select">code</field>
-        <field name="amount_python_compute">
-result = inputs['EXPENSES'].amount
-result_name = inputs['EXPENSES'].name
-        </field>
-        <field name="struct_id" ref="l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary"/>
+        <field name="condition_select">property_input</field>
+        <field name="amount_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_deduction_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Deduction</field>
         <field name="sequence">198</field>
         <field name="code">DEDUCTION</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'DEDUCTION' in inputs</field>
         <field name="amount_select">code</field>
@@ -381,14 +465,18 @@ result_name = inputs['EXPENSES'].name
 result = -inputs['DEDUCTION'].amount
 result_name = inputs['DEDUCTION'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_reimbursement_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="name">Reimbursement</field>
         <field name="sequence">199</field>
         <field name="code">REIMBURSEMENT</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'REIMBURSEMENT' in inputs</field>
         <field name="amount_select">code</field>
@@ -396,20 +484,26 @@ result_name = inputs['DEDUCTION'].name
 result = inputs['REIMBURSEMENT'].amount
 result_name = inputs['REIMBURSEMENT'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 
     <record id="l10n_in_hr_payroll_structure_in_employee_salary_net_salary" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.NET"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
         <field name="name">Net Salary</field>
         <field name="sequence">200</field>
         <field name="code">NET</field>
-        <field name="appears_on_employee_cost_dashboard" eval="True"/>
+        <field name="appears_on_employee_cost_dashboard" eval="False"/>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = categories['BASIC'] + categories['ALW'] + categories['DED']
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_in_employee_salary"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary'),
+        ])]"/>
+        <field name="country_id" ref="base.in"/>
     </record>
 </odoo>

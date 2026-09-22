@@ -4,16 +4,32 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-09-18 18:20+0000\n"
+"PO-Revision-Date: 2026-09-18 18:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_lt_hr_payroll
+#: model:ir.module.module,description:base.module_l10n_lt_hr_payroll
+msgid ""
+"\n"
+"Lithuanian Payroll Rules.\n"
+"=========================\n"
+"\n"
+"    * Employee Details\n"
+"    * Employee Contracts\n"
+"    * Passport based Contract\n"
+"    * Allowances/Deductions\n"
+"    * Allow to configure Basic/Gross/Net Salary\n"
+"    * Employee Payslip\n"
+"    * Integrated with Leaves Management\n"
+msgstr ""
 
 #. module: l10n_lt_hr_payroll
 #: model:ir.actions.report,print_report_name:l10n_lt_hr_payroll.action_report_payslip_lt
@@ -23,12 +39,6 @@ msgstr ""
 #. module: l10n_lt_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_lt_hr_payroll.res_config_settings_view_form
 msgid "<span class=\"o_form_label\">Company Information</span>"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_lt_hr_payroll.hr_contract_template_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_lt_hr_payroll.hr_employee_view_form
-msgid "<span>/ month</span>"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
@@ -52,34 +62,13 @@ msgid "Benefit in Kind"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_employee__l10n_lt_benefits_in_kind
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_version__l10n_lt_benefits_in_kind
-msgid "Benefits in Kind"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_lt_hr_payroll.selection__hr_version__l10n_lt_working_capacity__0_25
-msgid "Between 0-25%"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_lt_hr_payroll.selection__hr_version__l10n_lt_working_capacity__30_55
-msgid "Between 30-55%"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_lt_hr_payroll.selection__hr_version__l10n_lt_working_capacity__60_100
-msgid "Between 60-100%"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
 #: model:hr.salary.rule,name:l10n_lt_hr_payroll.l10n_lt_hr_payroll_structure_lt_employee_salary_child_support
 msgid "Child Support"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
 #: model:ir.model,name:l10n_lt_hr_payroll.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
@@ -93,18 +82,21 @@ msgid "Deduction"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_employee__display_name
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_payroll_structure_type__display_name
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_payslip__display_name
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_version__display_name
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_res_company__display_name
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_res_config_settings__display_name
-msgid "Display Name"
+#: model:ir.model.fields,help:l10n_lt_hr_payroll.field_hr_employee__l10n_lt_working_capacity
+#: model:ir.model.fields,help:l10n_lt_hr_payroll.field_hr_version__l10n_lt_working_capacity
+msgid ""
+"Disability working capacity level. Determines the tax-exempt amount for "
+"permanent residents with disabilities."
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
-#: model:ir.model,name:l10n_lt_hr_payroll.model_hr_employee
-msgid "Employee"
+#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_payroll_structure_type__display_name
+#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_version__display_name
+#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_work_entry_type__display_name
+#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_res_config_settings__display_name
+msgid "Display Name"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
@@ -113,22 +105,15 @@ msgid "Employee Contract"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
-#: model:ir.model.fields,help:l10n_lt_hr_payroll.field_hr_employee__l10n_lt_pension
-#: model:ir.model.fields,help:l10n_lt_hr_payroll.field_hr_version__l10n_lt_pension
-msgid ""
-"Employees can participate in an additional pension accumulation system. "
-"Inclusion into the accumulation system is used as one of the most effective "
-"methods to induce people to accumulate for additional pension if they have "
-"not started yet. However, it is not a coercive mechanism because any "
-"employed person may refuse accumulation if she/he does not want or has some "
-"other priorities."
+#: model:hr.salary.rule,name:l10n_lt_hr_payroll.l10n_lt_hr_payroll_structure_lt_employee_salary_expenses_reimbursement
+msgid "Expenses Reimbursement"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_employee__id
 #: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_payroll_structure_type__id
 #: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_payslip__id
 #: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_version__id
+#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_work_entry_type__id
 #: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_res_config_settings__id
 msgid "ID"
@@ -140,8 +125,98 @@ msgid "LT: Payslip"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_lt_hr_payroll.l10n_lt_hr_version_form_view
+msgid "Lithuania"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:ir.module.module,shortdesc:base.module_l10n_lt_hr_payroll
+msgid "Lithuania - Payroll"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.payroll.structure.type,name:l10n_lt_hr_payroll.structure_type_employee_lt
+msgid "Lithuania: Employee"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_pit_rate_high
+msgid "Lithuania: PIT Rate High"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_pit_rate_low
+msgid "Lithuania: PIT Rate Low"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_pit_rate_sick
+msgid "Lithuania: PIT Rate Sick"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_pit_threshold
+msgid "Lithuania: PIT Threshold"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_pension_rate
+msgid "Lithuania: Pension rate"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
 #: model:hr.payroll.structure,name:l10n_lt_hr_payroll.hr_payroll_structure_lt_employee_salary
 msgid "Lithuania: Regular Pay"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_ssc_rate
+msgid "Lithuania: SSC rate"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_ssc_rate_high
+msgid "Lithuania: SSC rate high"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_sscemp_rate
+msgid "Lithuania: SSCEMP rate"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_sscemp_rate_high
+msgid "Lithuania: SSCEMP rate high"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_tax_exempt_0_25
+msgid "Lithuania: Tax Exempt 0-25% Working Capacity"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_tax_exempt_30_55
+msgid "Lithuania: Tax Exempt 30-55% Working Capacity"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_tax_exempt_basic_amount
+msgid "Lithuania: Tax Exempt Basic Amount"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_tax_exempt_high
+msgid "Lithuania: Tax Exempt High"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_tax_exempt_low
+msgid "Lithuania: Tax Exempt Low"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.rule.parameter,name:l10n_lt_hr_payroll.rule_parameter_tax_exempt_rate
+msgid "Lithuania: Tax Exempt Rate"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
@@ -157,23 +232,6 @@ msgstr ""
 #. module: l10n_lt_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_lt_hr_payroll.res_config_settings_view_form
 msgid "Offical Company Information"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_lt_hr_payroll.hr_contract_template_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_lt_hr_payroll.hr_employee_view_form
-msgid "Options"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_lt_hr_payroll.input_pit_last_year
-msgid "PIT exceeding amount (Last Year)"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_employee__l10n_lt_pension
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_version__l10n_lt_pension
-msgid "Participate to pension accumulation system"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
@@ -212,6 +270,21 @@ msgid "Reimbursement"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
+#: model:hr.salary.rule,name:l10n_lt_hr_payroll.l10n_lt_employees_salary_social_contribution_company_1
+msgid "SSCEMP.1"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.salary.rule,name:l10n_lt_hr_payroll.l10n_lt_employees_salary_social_contribution_company_2
+msgid "SSCEMP.2"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:hr.salary.rule.category,name:l10n_lt_hr_payroll.hr_salary_rule_category_ssc_employer_tmp
+msgid "SSCEMPTMP"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
 #: model:ir.model,name:l10n_lt_hr_payroll.model_hr_payroll_structure_type
 msgid "Salary Structure Type"
 msgstr ""
@@ -220,12 +293,6 @@ msgstr ""
 #: model:hr.salary.rule,name:l10n_lt_hr_payroll.l10n_lt_employees_salary_sick_amount
 #: model:hr.salary.rule.category,name:l10n_lt_hr_payroll.hr_salary_rule_category_sick_amount
 msgid "Sick Amount"
-msgstr ""
-
-#. module: l10n_lt_hr_payroll
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_employee__l10n_lt_time_limited
-#: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_version__l10n_lt_time_limited
-msgid "Signed time-limited work agreement"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
@@ -256,28 +323,33 @@ msgid "Taxable Amount"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
+#: model:hr.salary.rule,name:l10n_lt_hr_payroll.l10n_lt_employees_salary_taxable_amount_disabled
+msgid "Taxable Amount Disabled Deduction"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
 #: model:hr.salary.rule,name:l10n_lt_hr_payroll.l10n_lt_hr_payroll_structure_lt_employee_salary_gross_salary_rule
 msgid "Taxable Salary"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
-#: model:ir.model.fields,help:l10n_lt_hr_payroll.field_hr_employee__l10n_lt_benefits_in_kind
-#: model:ir.model.fields,help:l10n_lt_hr_payroll.field_hr_version__l10n_lt_benefits_in_kind
-msgid ""
-"The following payments are not considered as benefits in kind:\n"
-"\n"
-"- small value (not exceeding EUR 200) prizes, non-monetary presents received from employer;\n"
-"- compensation received from employer for health treatment when required by law;\n"
-"- working clothes, shoes, equipment and other assets given by employer to use only for work functions;\n"
-"- directly to educational institutions paid amounts for individual‘s education;\n"
-"- benefit received by an employee when an employer pays for rail and road public transport tickets which are used to travel to and from the work;\n"
-"- personal income tax, social security and compulsory health insurance contributions paid on behalf of an individual.\n"
-"\n"
-"Benefit in kind is taxed as employment income."
+#: model:hr.salary.rule.category,name:l10n_lt_hr_payroll.hr_salary_rule_category_taxable_disabled
+msgid "Taxable disabled deduction"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#: model:ir.model,name:l10n_lt_hr_payroll.model_hr_work_entry_type
+msgid "Time Type"
 msgstr ""
 
 #. module: l10n_lt_hr_payroll
 #: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_employee__l10n_lt_working_capacity
 #: model:ir.model.fields,field_description:l10n_lt_hr_payroll.field_hr_version__l10n_lt_working_capacity
 msgid "Working Capacity"
+msgstr ""
+
+#. module: l10n_lt_hr_payroll
+#. odoo-python
+#: code:addons/l10n_lt_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "month"
 msgstr ""

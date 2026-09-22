@@ -29,7 +29,7 @@ import { stepUtils } from "@web_tour/tour_utils";
 //     },
 //     {
 //         content: `go to the ${kanban} from the breadcrumb`,
-//         trigger: '.o_knowledge_header i.oi-chevron-left',
+//         trigger: '.o_knowledge_header i[data-icon="chevron_backward"]',
 //         run: "click",
 //     }, {
 //         // Open the favorite of the first kanban and check it's favorite
@@ -126,7 +126,7 @@ const embedKnowledgeKanbanViewSteps = function (article) {
 //             const items = [...document.querySelectorAll(".o_searchview_facet")];
 //             const testFacets = items.filter((el) => {
 //                 return (
-//                     el.querySelector(".o_searchview_facet_label .fa-star") &&
+//                     el.querySelector(".o_searchview_facet_label [data-icon='star'].oi-filled") &&
 //                     el.querySelector(".o_facet_values")?.innerText === "testFilter"
 //                 );
 //             });
@@ -157,7 +157,6 @@ const embedKnowledgeKanbanViewSteps = function (article) {
 // }; // TODO uncomment when OWL is ready
 
 registry.category("web_tour.tours").add("knowledge_items_search_favorites_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -166,13 +165,10 @@ registry.category("web_tour.tours").add("knowledge_items_search_favorites_tour",
             run: "click",
         },
         {
-            trigger: ".o_field_html",
-            run: function () {
-                const header = document.querySelector(".o_hierarchy_article_name input");
-                if (header.value !== "Article 1") {
-                    console.error(`Wrong article: ${header.value}`);
-                }
-            },
+            trigger: ".o_field_html ",
+        },
+        {
+            trigger: ".o_hierarchy_article_name input:value(Article 1)",
         },
         // Create the first Kanban
         {
@@ -228,7 +224,6 @@ registry.category("web_tour.tours").add("knowledge_items_search_favorites_tour",
 });
 
 registry.category("web_tour.tours").add("knowledge_search_favorites_tour", {
-    url: "/odoo",
     steps: () => [stepUtils.showAppsMenuItem(),
         // insert a first kanban view
         ...embedKnowledgeKanbanViewSteps("Article 1"),

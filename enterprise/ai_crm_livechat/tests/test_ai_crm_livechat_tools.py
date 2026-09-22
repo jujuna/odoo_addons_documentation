@@ -13,7 +13,7 @@ class TestAiCrmLivechatTools(TestAiCrmTools):
         # check that the lead is created with the origin_channel_id
         tool = self.env.ref('ai_crm.ir_actions_server_ai_create_lead').sudo()
         livechat_channel = self.env['discuss.channel'].sudo().create({'name': 'create lead ai livechat', 'channel_type': 'livechat',
-            'livechat_operator_id': self.agent.partner_id.id, 'ai_agent_id': self.agent.id})
+            'ai_agent_id': self.agent.id})
         tool.with_context({'discuss_channel': livechat_channel})._ai_tool_run(None, {
             'name': 'AI Lead',
             'contact_name': 'Frank',
@@ -23,7 +23,9 @@ class TestAiCrmLivechatTools(TestAiCrmTools):
             'priority': '1',
             'team_id': self.team_ids[1].id,
             'tag_ids': self.tag_ids.ids,
-        })
+        }, {})
         lead = self.env['crm.lead'].sudo().search([], order='id desc', limit=1)
-        self.assertEqual(1, self.agent.created_leads_count)
         self.assertEqual(livechat_channel, lead.origin_channel_id)
+        self.assertEqual(self.env['utm.mixin']._utm_ref('utm.utm_medium_website'), lead.medium_id)
+        self.assertEqual(self.env.ref('utm.utm_source_livechat'), lead.source_id)
+        self.assertEqual(self.agent.name, lead.utm_reference.name)

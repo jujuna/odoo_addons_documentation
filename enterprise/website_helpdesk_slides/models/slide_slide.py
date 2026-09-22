@@ -20,7 +20,7 @@ class SlideSlide(models.Model):
 
         extra_domain = [('is_category', '=', False)]
         if options.get('max_date'):
-            extra_domain = [('date_published', '>=', options['max_date'])] + extra_domain
+            extra_domain = [('published_date', '>=', options['max_date'])] + extra_domain
         if options.get('tag'):
             extra_domain = ['|',
                                 ('tag_ids.name', 'ilike', options['tag']),

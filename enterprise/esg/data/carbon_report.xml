@@ -2,6 +2,7 @@
 <odoo auto_sequence="1">
     <record id="carbon_report" model="account.report">
         <field name="name">Carbon Footprint</field>
+        <field name="groupby">carbon_report_source_scope, carbon_report_source_hierarchy, esg_emission_factor_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_multi_company">selector</field>
         <field name="filter_hide_0_lines">never</field>
@@ -67,12 +68,12 @@
         <field name="line_ids">
             <record id="carbon_report_line" model="account.report.line">
                 <field name="name">Carbon Footprint</field>
-                <field name="groupby">carbon_report_source_scope, carbon_report_source_hierarchy, esg_emission_factor_id</field>
+                <field name="foldability">always_unfolded</field>
                 <field name="expression_ids">
                     <record id="carbon_report_line_co2" model="account.report.expression">
                         <field name="label">co2</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">co2</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -80,7 +81,7 @@
                     <record id="carbon_report_line_ch4f" model="account.report.expression">
                         <field name="label">ch4f</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">ch4f</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -88,7 +89,7 @@
                     <record id="carbon_report_line_ch4b" model="account.report.expression">
                         <field name="label">ch4b</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">ch4b</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -96,7 +97,7 @@
                     <record id="carbon_report_line_n2o" model="account.report.expression">
                         <field name="label">n2o</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">n2o</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -104,7 +105,7 @@
                     <record id="carbon_report_line_hfc_134a" model="account.report.expression">
                         <field name="label">hfc_134a</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">CH2FCF3</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -112,7 +113,7 @@
                     <record id="carbon_report_line_hfc_23" model="account.report.expression">
                         <field name="label">hfc_23</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">hfc_23</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -120,7 +121,7 @@
                     <record id="carbon_report_line_hfc_152a" model="account.report.expression">
                         <field name="label">hfc_152a</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">CH3CHF2</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -128,7 +129,7 @@
                     <record id="carbon_report_line_cf4" model="account.report.expression">
                         <field name="label">cf4</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">cf4</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -136,7 +137,7 @@
                     <record id="carbon_report_line_c2f6" model="account.report.expression">
                         <field name="label">c2f6</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">c2f6</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -144,7 +145,7 @@
                     <record id="carbon_report_line_sf6" model="account.report.expression">
                         <field name="label">sf6</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">sf6</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>
@@ -152,7 +153,7 @@
                     <record id="carbon_report_line_co2e" model="account.report.expression">
                         <field name="label">co2e</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_carbon_report</field>
+                        <field name="formula">_report_engine_carbon_report</field>
                         <field name="subformula">co2e</field>
                         <field name="auditable" eval="False"/>
                         <field name="green_on_positive" eval="False"/>

@@ -12,36 +12,18 @@ from .account_report import _raw_phonenumber, _get_xml_export_representative_nod
 
 class L10n_BeEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_be.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'Belgian EC Sales Report Custom Handler'
 
-    def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        """
-        This method is used to get the dynamic lines of the report and adds a comparative test linked to the tax report.
-        """
-        lines = super()._dynamic_lines_generator(report, options, all_column_groups_expression_totals, warnings=warnings)
-        colname_to_idx = {col['expression_label']: idx for idx, col in enumerate(options['columns'])}
+    def _report_engine_ec_sales_report(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        results = super()._report_engine_ec_sales_report(options, date_scope, formulas_dict, current_groupby, warnings)
 
-        if lines:
-            total = lines[-1][-1]['columns'][colname_to_idx['balance']]['no_format']
-
-            # This test requires the total, so needs to be checked after the lines are computed, but before the rendering
-            # of the template. This is why we add it here even if it's not an option per se.
-            if warnings is not None and not self.total_consistent_with_tax_report(options, total):
+        expressions = next(iter(formulas_dict.values()))
+        if results and isinstance(results[expressions], dict):  # Top line since no grouping keys
+            if warnings is not None and not self._total_consistent_with_tax_report(options, results[expressions]['balance']):
                 warnings['l10n_be_reports.sales_report_warning_cross_check'] = {'alert_type': 'warning'}
 
-        return lines
-
-    def _caret_options_initializer(self):
-        """
-        Add custom caret option for the report to link to the partner and allow cleaner overrides.
-        """
-        return {
-            'ec_sales': [
-                {'name': _("View Partner"), 'action': 'caret_option_open_record_form'},
-                {'name': _("Audit"), 'action': 'ec_sales_list_open_invoices', 'action_param': 'id'},
-            ],
-        }
+        return results
 
     def _custom_options_initializer(self, report, options, previous_options):
         """
@@ -51,19 +33,31 @@ class L10n_BeEcSalesReportHandler(models.AbstractModel):
         :param dict options: Report options
         :return dict: The modified options dictionary
         """
-        super()._init_core_custom_options(report, options, previous_options)
-        ec_operation_category = options.get('sales_report_taxes', {'goods': tuple(), 'triangular': tuple(), 'services': tuple()})
-        ec_operation_category.update(self._get_tax_tags_for_belgian_sales_report())
+        be_tax_tags = self._get_ec_sales_tax_tags()
+        options.update({
+            'sales_report_operation_types': {
+                'goods': {
+                    'tax_tag_ids': be_tax_tags['goods'],
+                    'name': self.env._('Goods'),
+                    'shortcut': 'L (46L)',
+                },
+                'services': {
+                    'tax_tag_ids': be_tax_tags['services'],
+                    'name': self.env._('Services'),
+                    'shortcut': 'S (44)',
+                },
+                'triangular': {
+                    'tax_tag_ids': be_tax_tags['triangular'],
+                    'name': self.env._('Triangular'),
+                    'shortcut': 'T (46T)'
+                },
+            },
+        })
 
-        # Change the names of the taxes to specific ones that are dependant to the tax type
-        ec_operation_category['operation_category'] = {
-            'goods': 'L (46L)',
-            'triangular': 'T (46T)',
-            'services': 'S (44)',
-        }
-        options.update({'sales_report_taxes': ec_operation_category})
+        super()._custom_options_initializer(report, options, previous_options)
 
-    def _get_tax_tags_for_belgian_sales_report(self):
+    def _get_ec_sales_tax_tags(self):
+        # Overrides account_reports
         report_46L_expression = self.env.ref('l10n_be.tax_report_line_46L_tag')
         report_46T_expression = self.env.ref('l10n_be.tax_report_line_46T_tag')
         report_44_expression = self.env.ref('l10n_be.tax_report_line_44_tag')
@@ -72,12 +66,12 @@ class L10n_BeEcSalesReportHandler(models.AbstractModel):
         report_48s46L_expression = self.env.ref('l10n_be.tax_report_line_48s46L_tag')
 
         return {
-            'goods': tuple((report_46L_expression + report_48s46L_expression)._get_matching_tags().ids),
-            'triangular':  tuple((report_46T_expression + report_48s46T_expression)._get_matching_tags().ids),
-            'services': tuple((report_44_expression + report_48s44_expression)._get_matching_tags().ids),
+            'goods': (report_46L_expression + report_48s46L_expression)._get_matching_tags().ids,
+            'services': (report_44_expression + report_48s44_expression)._get_matching_tags().ids,
+            'triangular':  (report_46T_expression + report_48s46T_expression)._get_matching_tags().ids,
         }
 
-    def total_consistent_with_tax_report(self, options, total):
+    def _total_consistent_with_tax_report(self, options, total):
         """ Belgian EC Sales taxes report total must match
             Tax Report lines 44 + 46L + 46T - 48s44 - 48s46L - 48s46T.
         """
@@ -107,7 +101,8 @@ class L10n_BeEcSalesReportHandler(models.AbstractModel):
         colname_to_idx = {col['expression_label']: idx for idx, col in enumerate(options.get('columns', []))}
         # Check
         company = self.env.company
-        company_vat = company.partner_id.vat
+        report = self.env['account.report'].browse(options['report_id'])
+        company_vat = report.get_vat_for_export(options)
         if not company_vat:
             raise UserError(_('No VAT number associated with your company.'))
         default_address = company.partner_id.address_get()
@@ -126,7 +121,6 @@ class L10n_BeEcSalesReportHandler(models.AbstractModel):
         ads = None
         addr = company.partner_id.address_get(['invoice'])
         phone = email = city = post_code = street = country = company_country = ''
-        report = self.env['account.report'].browse(options['report_id'])
 
         if addr.get('invoice', False):
             ads = self.env['res.partner'].browse([addr['invoice']])[0]
@@ -149,27 +143,41 @@ class L10n_BeEcSalesReportHandler(models.AbstractModel):
 
             company_country = ads.country_id.code if ads.country_id else 'BE'
 
-        options['no_format'] = True
         lines = report._get_lines(options)
+        lines_except_totals = [
+            line
+            for line in lines
+            if isinstance(report._get_markup(line.id), dict) and report._get_markup(line.id).get('groupby') == 'partner_id_and_sale_type'
+        ]
+
         data_clientinfo = ''
         seq = 0
-        for line in lines[:-1]:   # Remove total line
-            country = line['columns'][colname_to_idx['country_code']].get('name', '')
-            vat = line['columns'][colname_to_idx['vat_number']].get('name', '')
-            amount = line['columns'][colname_to_idx['balance']]['no_format']
+
+        clients = {}
+        for line in lines_except_totals:   # Remove total line
+            country = line.columns[colname_to_idx['country_code']].name or ''
+            vat = line.columns[colname_to_idx['vat_number']].name or ''
+            normalised_vat = (country + vat).replace(' ', '').upper()
+            amount = line.columns[colname_to_idx['balance']].no_format
+            code = line.columns[colname_to_idx['sale_type_shortcut']].name[:1]
             if self.env.company.currency_id.is_zero(amount):
                 continue
             if not vat:
                 raise UserError(_('No vat number defined for %s.', line['name']))
-            seq += 1
-            client = {
-                'vatnum': vat,
-                'vat': (country + vat).replace(' ', '').upper(),
-                'country': country,
-                'amount': amount,
-                'code': line['columns'][colname_to_idx['sales_type_code']]['name'][:1],
-                'seq': seq,
-            }
+            if (normalised_vat, code) in clients:
+                clients[normalised_vat, code]['amount'] += amount
+            else:
+                seq += 1
+                clients[normalised_vat, code] = {
+                    'vatnum': vat,
+                    'vat': normalised_vat,
+                    'country': country,
+                    'amount': amount,
+                    'code': code,
+                    'seq': seq,
+                }
+
+        for client in clients.values():
             data_clientinfo += Markup("""
         <ns2:IntraClient SequenceNumber="%(seq)s">
             <ns2:CompanyVATNumber issuedBy="%(country)s">%(vatnum)s</ns2:CompanyVATNumber>
@@ -177,9 +185,10 @@ class L10n_BeEcSalesReportHandler(models.AbstractModel):
             <ns2:Amount>%(amount).2f</ns2:Amount>
         </ns2:IntraClient>""") % client
 
+        total_index = -1 if self.env.company.totals_below_sections else 0
         xml_data = {
             'clientnbr': seq,
-            'amountsum': lines[-1]['columns'][colname_to_idx['balance']]['no_format'] if lines else 0,
+            'amountsum': lines[total_index].columns[colname_to_idx['balance']].no_format if lines else 0,
         }
 
         date_from = fields.Date.from_string(options['date'].get('date_from'))
@@ -235,27 +244,4 @@ class L10n_BeEcSalesReportHandler(models.AbstractModel):
             'file_name': report.get_default_report_filename(options, 'xml'),
             'file_content': data_rslt.encode('ISO-8859-1', 'ignore'),
             'file_type': 'xml',
-        }
-
-    def ec_sales_list_open_invoices(self, options, params=None):
-        ec_category, _model, res_id = self.env['account.report']._parse_line_id(params['line_id'])[-1]
-
-        domain = [
-            ('move_id.move_type', 'in', self.env['account.move'].get_sale_types(include_receipts=True)),
-            ('move_id.date', '>=', options['date']['date_from']),
-            ('move_id.date', '<=', options['date']['date_to']),
-            ('tax_tag_ids', 'in', options['sales_report_taxes'][ec_category]),
-        ]
-
-        return {
-            'name': _('EC Sales List Audit'),
-            'type': 'ir.actions.act_window',
-            'views': [[self.env.ref('account.view_move_line_tree').id, 'list'], [False, 'form']],
-            'res_model': 'account.move.line',
-            'context': {
-                'search_default_partner_id': res_id,
-                'search_default_group_by_partner': 1,
-                'expand': 1,
-            },
-            'domain': domain,
         }

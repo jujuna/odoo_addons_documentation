@@ -1,47 +1,61 @@
-import { Component, useEffect, useRef } from "@odoo/owl";
+import { useLayoutEffect } from "@web/owl2/utils";
+import { Component, useProps, signal, t } from "@odoo/owl";
 
+import { DiscussAvatar } from "@mail/core/common/discuss_avatar";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { scrollTo } from "@web/core/utils/scrolling";
 
 export class TabEntry extends Component {
-    static defaultProps = { extraClass: "", subtitleClass: "" };
-    static props = {
-        avatarUrl: { type: String },
-        extraClass: { type: String, optional: true },
-        title: { type: String },
-        subtitle: { type: String, optional: true },
-        subtitleClass: { type: String, optional: true },
-        subtitleIcon: { type: String, optional: true },
-        phoneNumber: { type: String },
-        record: Object,
+    static components = { DiscussAvatar };
+    props = useProps({
+        // Main record of the entry, should have a phone-related field. The rest
+        // of the data must be provided either explicitly or through a "contact"
+        // record (see below).
+        record: t.object(),
+        // TODO See _phone_get_number_fields, ideally this should be automatic
+        phoneNumberField: t.string().optional("phone"),
+        // Contact (res.partner) record related to the entry. Non-provided data
+        // will be retrieved from there, except for the phone number, which will
+        // only be retrieved from the main record.
+        contactRecord: t.object().optional(),
+        // If not provided, will use the contact voipName. If empty, the phone
+        // number will be used.
+        title: t.or([t.string(), t.object()]).optional(),
+
+        extraClass: t.string().optional(""),
+        subtitle: t.or([t.string(), t.object()]).optional(),
+        subtitleClass: t.string().optional(""),
+        subtitleIcon: t.string().optional(),
+        subtitleIconClass: t.string().optional(),
+        subtitleExtraIcons: t.array().optional([]),
         /**
          * The name of the section of the tab to which this entry belongs.
          */
-        section: String,
-        slots: Object,
-    };
+        section: t.string(),
+    });
     static template = "voip.TabEntry";
+
+    activeRecordRef = signal.ref();
 
     setup() {
         this.softphone = useService("voip").softphone;
-        this.activeRecordRef = useRef("active-record");
-        useEffect(
+        useLayoutEffect(
             (scrollToActiveRecord) => {
-                if (!scrollToActiveRecord || !this.activeRecordRef.el) {
+                if (!scrollToActiveRecord || !this.activeRecordRef()) {
                     return;
                 }
-                scrollTo(this.activeRecordRef.el);
+                scrollTo(this.activeRecordRef());
                 this.softphone.callSummary.scrollToActiveRecord = false;
             },
             () => [this.softphone.callSummary.scrollToActiveRecord]
         );
-        useEffect(
+        useLayoutEffect(
             (isActiveRecord) => {
-                if (!isActiveRecord || !this.activeRecordRef.el) {
+                if (!isActiveRecord || !this.activeRecordRef()) {
                     return;
                 }
-                scrollTo(this.activeRecordRef.el);
+                scrollTo(this.activeRecordRef());
             },
             () => [this.isActiveRecord]
         );
@@ -68,6 +82,9 @@ export class TabEntry extends Component {
      * @param {MouseEvent} ev
      */
     onClickSummary(ev) {
+        if (ev.target instanceof Element && ev.target.closest("button")) {
+            return;
+        }
         if (this.isActiveRecord) {
             this.softphone.activeRecord = null;
             this.softphone.activeTabSection = "";

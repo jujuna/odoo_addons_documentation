@@ -1,26 +1,14 @@
-import { _t } from "@web/core/l10n/translation";
+import { markup, onWillStart, onWillUpdateProps } from "@odoo/owl";
 import { deserializeDate } from "@web/core/l10n/dates";
+import { _t } from "@web/core/l10n/translation";
 import { GridRenderer } from "@web_grid/views/grid_renderer";
-import { onWillStart, markup } from "@odoo/owl";
 
 export class TimesheetGridRenderer extends GridRenderer {
-    static components = {
-        ...GridRenderer.components,
-    };
-
     setup() {
         super.setup();
-        onWillStart(this.onWillStart);
-    }
 
-    async onWillStart() {
-        await this._fetchLastValidatedTimesheetDate();
-    }
-
-    async onWillUpdateProps(nextProps) {
-        if (this.lastValidationDatePerEmployee === undefined) {
-            await this._fetchLastValidatedTimesheetDate(nextProps);
-        }
+        onWillStart(() => this._fetchLastValidatedTimesheetDate(this.props));
+        onWillUpdateProps((nextProps) => this._fetchLastValidatedTimesheetDate(nextProps));
     }
 
     getUnavailableClass(column, cellData = {}) {
@@ -50,9 +38,9 @@ export class TimesheetGridRenderer extends GridRenderer {
         return props;
     }
 
-    async _fetchLastValidatedTimesheetDate(props = this.props) {
-        if (!props.model.useSampleModel) {
-            await this._getLastValidatedTimesheetDate(props);
+    _fetchLastValidatedTimesheetDate(props) {
+        if (!this.lastValidationDatePerEmployee && !props.model.useSampleModel) {
+            return this._getLastValidatedTimesheetDate(props);
         }
     }
 
@@ -70,7 +58,7 @@ export class TimesheetGridRenderer extends GridRenderer {
                 const result = await props.model.orm.call(
                     "hr.employee",
                     "get_last_validated_timesheet_date",
-                    [employeeIds],
+                    [employeeIds]
                 );
                 for (const [employeeId, lastValidatedTimesheetDate] of Object.entries(result)) {
                     this.lastValidationDatePerEmployee[employeeId] =
@@ -80,15 +68,19 @@ export class TimesheetGridRenderer extends GridRenderer {
         }
     }
 
-    get displayAddLine() {
-        const res = super.displayAddLine;
+    getDisplayAddLine(row) {
+        const res = super.getDisplayAddLine(row);
         if (!res || this.props.sectionField?.name !== "employee_id") {
             return res;
         }
 
-        const employeeId = this.row.section.valuePerFieldName.employee_id[0];
+        const employeeId = row.section.valuePerFieldName.employee_id[0];
         if (employeeId in this.lastValidationDatePerEmployee) {
-            return !this.lastValidationDatePerEmployee[employeeId] || this.lastValidationDatePerEmployee[employeeId].startOf("day") < this.props.model.navigationInfo.periodEnd.startOf("day");
+            return (
+                !this.lastValidationDatePerEmployee[employeeId] ||
+                this.lastValidationDatePerEmployee[employeeId].startOf("day") <
+                    this.props.model.navigationInfo.periodEnd.startOf("day")
+            );
         }
 
         return res;
@@ -97,19 +89,22 @@ export class TimesheetGridRenderer extends GridRenderer {
     getCellColorClass(column, section) {
         const res = super.getCellColorClass(...arguments);
         const workingHours =
-            this.props.model.data.workingHours.dailyPerEmployee?.[section?.valuePerFieldName?.employee_id?.[0]];
-        if (!workingHours) {
+            this.props.model.data.workingHours.dailyPerEmployee?.[
+                section?.valuePerFieldName?.employee_id?.[0]
+            ];
+        if (
+            !workingHours ||
+            ("full_time_required_hours" in workingHours && workingHours[column.value] === 0)
+        ) {
             return res;
         }
 
         const value = workingHours[column.value];
         const cellValue = section?.cells?.[column.id]?.value;
-        if (cellValue > value) {
-            return "text-warning";
+        if (cellValue >= value) {
+            return "text-success";
         } else if (cellValue < value) {
             return "text-danger";
-        } else if (cellValue === value) {
-            return "text-success";
         }
 
         return res;
@@ -118,9 +113,9 @@ export class TimesheetGridRenderer extends GridRenderer {
     isTextDanger(row, column) {
         const params = this.props.model.searchParams;
         return (
-            !params.groupBy.length ||
-            params.groupBy[0] === "employee_id"
-        ) && (row.cells[column.id].value > 24);
+            (!params.groupBy.length || params.groupBy[0] === "employee_id") &&
+            row.cells[column.id].value > 24
+        );
     }
 
     getWorkingHours(section) {
@@ -132,7 +127,7 @@ export class TimesheetGridRenderer extends GridRenderer {
     }
 
     getSectionDailyOvertime(cell, workingHours) {
-        if (workingHours?.hasOwnProperty(cell.column.value)) {
+        if (Object.hasOwn(workingHours, cell.column.value)) {
             return cell.value - workingHours[cell.column.value];
         }
         return 0;
@@ -161,20 +156,21 @@ export class TimesheetGridRenderer extends GridRenderer {
             return hoursWorked - workingHours.full_time_required_hours;
         }
 
-        return Object.values(section.cells).reduce((overtime, cell) => overtime + this.getSectionDailyOvertime(cell, workingHours), 0);
+        return Object.values(section.cells).reduce(
+            (overtime, cell) => overtime + this.getSectionDailyOvertime(cell, workingHours),
+            0
+        );
     }
 
-    _getTotalCellBgColor(section) {
+    _getTotalCellBgColor(section, grandTotal) {
         const weeklyOvertime = this.getSectionOvertime(section);
-        const res = super._getTotalCellBgColor(section);
+        const res = super._getTotalCellBgColor(section, grandTotal);
         if (weeklyOvertime == null) {
             return res;
         } else if (weeklyOvertime < 0) {
-            return 'text-bg-danger';
-        } else if (weeklyOvertime === 0) {
-            return 'text-bg-success';
-        } else {
-            return 'text-bg-warning';
+            return "text-bg-danger";
+        } else if (weeklyOvertime >= 0) {
+            return "text-bg-success";
         }
     }
 
@@ -186,12 +182,24 @@ export class TimesheetGridRenderer extends GridRenderer {
         return res;
     }
 
+    getSectionTotalRowClass(section, grandTotal) {
+        return {
+            ...super.getSectionTotalRowClass(section, grandTotal),
+            // bg-view is declared after text-bg-* in the bundle and would hide the overtime color
+            "bg-view": this.getSectionOvertime(section) == null,
+        };
+    }
+
     getTotalCellsTextClasses(row, grandTotal) {
         const res = super.getTotalCellsTextClasses(...arguments);
         // Limit applying color when multi groupby of employees when the row is section
-        if (this.props.model.searchParams.groupBy[0] === "employee_id" && row.section.isFake) {
+        if (
+            this.props.model.searchParams.groupBy[0] === "employee_id" &&
+            row.section.isFake &&
+            this.getSectionOvertime(row) != null
+        ) {
             Object.assign(res, { [this._getTotalCellBgColor(row)]: true });
-            delete res["text-bg-200"];
+            delete res["bg-view"];
         }
         return res;
     }
@@ -199,7 +207,9 @@ export class TimesheetGridRenderer extends GridRenderer {
     /** Return grid cell action helper when no records are found */
     _getNoContentHelper() {
         const noActivitiesFound = _t("No timesheets found. Let's create one!");
-        const noContentTimesheetHelper = _t("Keep track of your working hours by project every day and bill your customers for that time.");
+        const noContentTimesheetHelper = _t(
+            "Keep track of your working hours by project every day and bill your customers for that time."
+        );
         return markup`<p class='o_view_nocontent_smiling_face'>${noActivitiesFound}</p><p>${noContentTimesheetHelper}</p>`;
     }
 }

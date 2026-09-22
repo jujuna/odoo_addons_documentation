@@ -7,22 +7,29 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-17 07:00+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 02:54+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-master/"
 "sign_itsme/mn/>\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sign_itsme
 #: model_terms:ir.ui.view,arch_db:sign_itsme.sign_request_logs_user
 msgid ""
 "<small>Name: The signatory has provided this identity through itsme®</small>"
+msgstr ""
+
+#. module: sign_itsme
+#: model:ir.module.module,description:base.module_sign_itsme
+msgid ""
+"Add support for itsme® identification when signing documents (Belgium and "
+"Netherlands only)"
 msgstr ""
 
 #. module: sign_itsme
@@ -33,6 +40,25 @@ msgid ""
 "identification step in your signature flows and ask signatories to provide "
 "their identity through the itsme®️ platform, using their mobile device. "
 "Available in Belgium and in the Netherlands."
+msgstr ""
+
+#. module: sign_itsme
+#: model:ir.model.fields,field_description:sign_itsme.field_sign_item_role__auth_method
+msgid "Authentication"
+msgstr ""
+
+#. module: sign_itsme
+#. odoo-javascript
+#: code:addons/sign_itsme/static/src/dialogs/itsme_dialog.js:0
+msgid "Confirm identity with Itsme"
+msgstr ""
+
+#. module: sign_itsme
+#. odoo-javascript
+#: code:addons/sign_itsme/static/src/dialogs/itsme_dialog.xml:0
+msgid ""
+"Confirm your identity with itsme®, then review the final documents before "
+"signing securely."
 msgstr ""
 
 #. module: sign_itsme
@@ -53,11 +79,6 @@ msgstr "Дэлгэрэнгүй нэр"
 #: code:addons/sign_itsme/static/src/components/document_signable.js:0
 msgid "Error"
 msgstr "Алдаа"
-
-#. module: sign_itsme
-#: model:ir.model.fields,field_description:sign_itsme.field_sign_item_role__auth_method
-msgid "Extra Authentication Step"
-msgstr ""
 
 #. module: sign_itsme
 #: model:ir.model.fields,help:sign_itsme.field_sign_item_role__auth_method
@@ -85,9 +106,30 @@ msgid "Identification refused"
 msgstr ""
 
 #. module: sign_itsme
+#: model:ir.model.fields.selection,name:sign_itsme.selection__sign_item_role__auth_method__itsme
+msgid "Identification via itsme®"
+msgstr ""
+
+#. module: sign_itsme
 #. odoo-javascript
 #: code:addons/sign_itsme/static/src/dialogs/itsme_dialog.xml:0
 msgid "Identify with itsme"
+msgstr ""
+
+#. module: sign_itsme
+#: model:iap.service,name:sign_itsme.iap_service_itsme_proxy
+msgid "Itsme"
+msgstr ""
+
+#. module: sign_itsme
+#: model_terms:ir.ui.view,arch_db:sign_itsme.sign_template_mail_not_enough_credits_itsme
+msgid "Itsme signer identification credits can be purchased on"
+msgstr ""
+
+#. module: sign_itsme
+#. odoo-javascript
+#: code:addons/sign_itsme/static/src/dialogs/itsme_dialog.xml:0
+msgid "Loading"
 msgstr ""
 
 #. module: sign_itsme
@@ -102,6 +144,21 @@ msgid "Please confirm your identity to finalize your signature."
 msgstr ""
 
 #. module: sign_itsme
+#: model:ir.model.fields.selection,name:sign_itsme.selection__sign_item_role__auth_method__itsme_qes
+msgid "Qualified Signature via itsme®"
+msgstr ""
+
+#. module: sign_itsme
+#: model:ir.module.module,summary:base.module_sign_itsme
+msgid "Sign documents with itsme® identification"
+msgstr ""
+
+#. module: sign_itsme
+#: model:ir.module.module,shortdesc:base.module_sign_itsme
+msgid "Sign itsme"
+msgstr ""
+
+#. module: sign_itsme
 #. odoo-python
 #: code:addons/sign_itsme/models/sign_request_item.py:0
 msgid "Sign request item is not validated yet."
@@ -111,6 +168,12 @@ msgstr ""
 #: model:ir.model,name:sign_itsme.model_sign_send_request
 msgid "Sign send request"
 msgstr "Гарын үсгийн хүсэлт илгээх"
+
+#. module: sign_itsme
+#. odoo-javascript
+#: code:addons/sign_itsme/static/src/dialogs/itsme_dialog.js:0
+msgid "Sign with itsme"
+msgstr ""
 
 #. module: sign_itsme
 #: model:ir.model,name:sign_itsme.model_sign_item_role
@@ -136,8 +199,12 @@ msgid ""
 msgstr ""
 
 #. module: sign_itsme
-#: model:ir.model.fields.selection,name:sign_itsme.selection__sign_item_role__auth_method__itsme
-msgid "Via itsme®"
+#: model_terms:ir.ui.view,arch_db:sign_itsme.sign_template_mail_completed_itsme
+msgid ""
+"This document was signed with an itsme® qualified electronic signature.\n"
+"                            To verify the signature, open it in a PDF reader "
+"such as Adobe Acrobat\n"
+"                            or another compatible PDF reader."
 msgstr ""
 
 #. module: sign_itsme
@@ -167,4 +234,9 @@ msgstr ""
 #. module: sign_itsme
 #: model:ir.model.fields,field_description:sign_itsme.field_sign_request_item__itsme_validation_hash
 msgid "itsme® Validation Token"
+msgstr ""
+
+#. module: sign_itsme
+#: model_terms:ir.ui.view,arch_db:sign_itsme.sign_template_mail_not_enough_credits_itsme
+msgid "this page"
 msgstr ""

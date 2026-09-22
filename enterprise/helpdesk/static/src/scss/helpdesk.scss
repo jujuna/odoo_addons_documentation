@@ -2,6 +2,7 @@
     .o_helpdesk_team_kanban_view_view .o_kanban_renderer {
         --KanbanGroup-width: #{map-get($grid-breakpoints, 'xl') * 0.35};
         --KanbanRecord-width: #{map-get($grid-breakpoints, 'xl') * 0.35};
+        --Kanban-padding: #{map-get($spacers, 3)};
     }
 }
 
@@ -20,7 +21,7 @@
         table-layout: fixed;
     }
 
-    .o_target_to_set:hover .fa {
+    .o_target_to_set:hover .oi {
         opacity: 1 !important;
     }
 
@@ -37,4 +38,8 @@
 
 .o_helpdesk_activity_box_title {
     min-width: 0;
+}
+
+.helpdesk_quick_create_ticket_form_group {
+    padding-bottom: 0.5rem;
 }

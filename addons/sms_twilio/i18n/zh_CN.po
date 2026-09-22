@@ -3,23 +3,32 @@
 # * sms_twilio
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:37+0000\n"
-"PO-Revision-Date: 2025-12-30 10:23+0000\n"
+"POT-Creation-Date: 2026-08-28 17:43+0000\n"
+"PO-Revision-Date: 2026-09-09 14:10+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/sms_twilio/zh_Hans/>\n"
+"projects/odoo-master/sms_twilio/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sms_twilio
+#: model:ir.module.module,description:base.module_sms_twilio
+msgid ""
+"\n"
+"This module allows using Twilio as a provider for SMS messaging.\n"
+"The user has to create an account on twilio.com and top\n"
+"up their account to start sending SMS messages.\n"
+msgstr ""
 
 #. module: sms_twilio
 #. odoo-python
@@ -32,11 +41,6 @@ msgstr "%(failure_type)s: %(failure_reason)s"
 #: code:addons/sms_twilio/tools/sms_api.py:0
 msgid "'To' and 'From' numbers cannot be the same"
 msgstr "收件人号码不可与发件人号码相同"
-
-#. module: sms_twilio
-#: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
-msgid "+1 555-123-4567"
-msgstr "+1 555-123-4567"
 
 #. module: sms_twilio
 #. odoo-python
@@ -59,7 +63,7 @@ msgstr "ACabcde12345abcde12345abcde12345ab"
 #: model:ir.model.fields,field_description:sms_twilio.field_res_company__sms_twilio_account_sid
 #: model:ir.model.fields,field_description:sms_twilio.field_sms_twilio_account_manage__sms_twilio_account_sid
 msgid "Account SID"
-msgstr ""
+msgstr "账户 SID"
 
 #. module: sms_twilio
 #. odoo-python
@@ -71,7 +75,13 @@ msgstr "读取号码时，发生错误。"
 #: model:ir.model.fields,field_description:sms_twilio.field_res_company__sms_twilio_auth_token
 #: model:ir.model.fields,field_description:sms_twilio.field_sms_twilio_account_manage__sms_twilio_auth_token
 msgid "Auth Token"
-msgstr ""
+msgstr "授权令牌"
+
+#. module: sms_twilio
+#. odoo-javascript
+#: code:addons/sms_twilio/static/src/core/notification_model.js:0
+msgid "Authentication Error"
+msgstr "身份验证错误"
 
 #. module: sms_twilio
 #: model:ir.model.fields.selection,name:sms_twilio.selection__mail_notification__failure_type__twilio_authentication
@@ -81,10 +91,6 @@ msgstr ""
 
 #. module: sms_twilio
 #: model:ir.model,name:sms_twilio.model_res_company
-msgid "Companies"
-msgstr "公司"
-
-#. module: sms_twilio
 #: model:ir.model.fields,field_description:sms_twilio.field_sms_sms__record_company_id
 #: model:ir.model.fields,field_description:sms_twilio.field_sms_twilio_account_manage__company_id
 #: model:ir.model.fields,field_description:sms_twilio.field_sms_twilio_number__company_id
@@ -129,16 +135,6 @@ msgid "Credentials"
 msgstr "授权认证"
 
 #. module: sms_twilio
-#: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
-msgid "Delete"
-msgstr "删除"
-
-#. module: sms_twilio
-#: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
-msgid "Discard"
-msgstr "丢弃"
-
-#. module: sms_twilio
 #: model:ir.model.fields,field_description:sms_twilio.field_mail_notification__display_name
 #: model:ir.model.fields,field_description:sms_twilio.field_res_company__display_name
 #: model:ir.model.fields,field_description:sms_twilio.field_res_config_settings__display_name
@@ -167,6 +163,8 @@ msgid "Failure type"
 msgstr "失败类型"
 
 #. module: sms_twilio
+#. odoo-javascript
+#: code:addons/sms_twilio/static/src/core/notification_model.js:0
 #: model:ir.model.fields.selection,name:sms_twilio.selection__mail_notification__failure_type__twilio_from_to
 #: model:ir.model.fields.selection,name:sms_twilio.selection__sms_sms__failure_type__twilio_from_to
 msgid "From / To identic"
@@ -185,6 +183,8 @@ msgid "ID"
 msgstr "识别码"
 
 #. module: sms_twilio
+#. odoo-javascript
+#: code:addons/sms_twilio/static/src/core/notification_model.js:0
 #: model:ir.model.fields.selection,name:sms_twilio.selection__mail_notification__failure_type__twilio_callback
 #: model:ir.model.fields.selection,name:sms_twilio.selection__sms_sms__failure_type__twilio_callback
 msgid "Incorrect callback URL"
@@ -223,6 +223,11 @@ msgid "Link SMS to mailing/sms tracking models"
 msgstr "将短讯连结至邮件/短讯追踪模型"
 
 #. module: sms_twilio
+#: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
+msgid "Load from Twilio"
+msgstr "从 Twilio 加载"
+
+#. module: sms_twilio
 #. odoo-python
 #: code:addons/sms_twilio/models/res_company.py:0
 #: code:addons/sms_twilio/wizard/sms_twilio_account_manage.py:0
@@ -231,10 +236,12 @@ msgstr ""
 
 #. module: sms_twilio
 #: model:ir.model,name:sms_twilio.model_mail_notification
-msgid "Message Notifications"
-msgstr "消息通知"
+msgid "Message Notification"
+msgstr ""
 
 #. module: sms_twilio
+#. odoo-javascript
+#: code:addons/sms_twilio/static/src/core/notification_model.js:0
 #: model:ir.model.fields.selection,name:sms_twilio.selection__mail_notification__failure_type__twilio_from_missing
 #: model:ir.model.fields.selection,name:sms_twilio.selection__sms_sms__failure_type__twilio_from_missing
 msgid "Missing From Number"
@@ -244,7 +251,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
 msgid ""
 "Need help ?\n"
-"                            <i class=\"fa fa-external-link\" aria-"
+"                            <i class=\"oi\" data-icon=\"open_in_new\" aria-"
 "hidden=\"true\"/>"
 msgstr ""
 
@@ -271,8 +278,9 @@ msgid "Please set the number to which you want to send a test SMS."
 msgstr ""
 
 #. module: sms_twilio
-#: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
-msgid "Reload Numbers from Twilio"
+#. odoo-python
+#: code:addons/sms_twilio/tools/sms_api.py:0
+msgid "Recheck your credentials"
 msgstr ""
 
 #. module: sms_twilio
@@ -291,6 +299,11 @@ msgstr ""
 #: model:ir.model,name:sms_twilio.model_sms_composer
 msgid "Send SMS Wizard"
 msgstr "发送短信息向导"
+
+#. module: sms_twilio
+#: model:ir.module.module,summary:base.module_sms_twilio
+msgid "Send SMS messages using Twilio"
+msgstr ""
 
 #. module: sms_twilio
 #: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
@@ -365,6 +378,7 @@ msgstr ""
 #. module: sms_twilio
 #. odoo-python
 #: code:addons/sms_twilio/wizard/sms_twilio_account_manage.py:0
+#: model:ir.module.module,shortdesc:base.module_sms_twilio
 msgid "Twilio SMS"
 msgstr ""
 
@@ -377,12 +391,20 @@ msgstr ""
 #: model:ir.model.fields,field_description:sms_twilio.field_sms_sms__sms_twilio_sid
 #: model:ir.model.fields,field_description:sms_twilio.field_sms_tracker__sms_twilio_sid
 msgid "Twilio SMS SID"
-msgstr ""
+msgstr "Twilio 短信 SID"
 
 #. module: sms_twilio
 #. odoo-python
 #: code:addons/sms_twilio/tools/sms_api.py:0
 msgid "Twilio StatusCallback URL is incorrect"
+msgstr ""
+
+#. module: sms_twilio
+#. odoo-javascript
+#: code:addons/sms_twilio/static/src/core/notification_model.js:0
+#: model:ir.model.fields.selection,name:sms_twilio.selection__mail_notification__failure_type__twilio_wrong_credentials
+#: model:ir.model.fields.selection,name:sms_twilio.selection__sms_sms__failure_type__twilio_wrong_credentials
+msgid "Twilio Wrong Credentials"
 msgstr ""
 
 #. module: sms_twilio
@@ -411,7 +433,4 @@ msgstr ""
 #. module: sms_twilio
 #: model_terms:ir.ui.view,arch_db:sms_twilio.sms_twilio_account_manage_view_form
 msgid "abcde12345abcde12345abcde12345ab"
-msgstr ""
-
-#~ msgid "Manage Twilio Connection"
-#~ msgstr "管理 Twilio 连线"
+msgstr "abcde12345abcde12345abcde12345ab"

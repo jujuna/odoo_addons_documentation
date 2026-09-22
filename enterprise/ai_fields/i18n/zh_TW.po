@@ -1,25 +1,36 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* ai_fields
+# * ai_fields
 #
 # Translators:
 # Wil Odoo, 2025
 # Tony Ng, 2025
 #
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-05-06 11:00+0000\n"
-"Last-Translator: Tony Ng, 2025\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/"
-"zh_TW/)\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-17 22:37+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-master/ai_fields/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: ai_fields
+#: model:ir.module.module,description:base.module_ai_fields
+msgid ""
+"\n"
+"The purpose of this module is to implement AI computed fields, i.e. fields "
+"that are computed\n"
+"using an AI model and a system prompt.\n"
+msgstr ""
 
 #. module: ai_fields
 #. odoo-javascript
@@ -95,11 +106,6 @@ msgid "AI Monetary"
 msgstr "AI 貨幣金額"
 
 #. module: ai_fields
-#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__system_prompt
-msgid "AI Prompt"
-msgstr "AI 提示"
-
-#. module: ai_fields
 #. odoo-javascript
 #: code:addons/ai_fields/static/src/views/fields/ai_fields/ai_fields.js:0
 msgid "AI Selection"
@@ -117,19 +123,25 @@ msgid "AI computed field"
 msgstr "AI 經計算欄位"
 
 #. module: ai_fields
-#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__ai
-msgid "AI field"
-msgstr "AI 欄位"
-
-#. module: ai_fields
 #: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__ai_domain
 msgid "AI field domain"
 msgstr "AI 欄位域"
 
 #. module: ai_fields
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__ai
+msgid "Autofill"
+msgstr ""
+
+#. module: ai_fields
 #: model:ir.model,name:ai_fields.model_base
 msgid "Base"
 msgstr "計稅基數"
+
+#. module: ai_fields
+#: model_terms:ir.ui.view,arch_db:ai_fields.view_model_fields_form
+#: model_terms:ir.ui.view,arch_db:ai_fields.view_model_form
+msgid "Describe how to compute this field, or type '/' for commands..."
+msgstr ""
 
 #. module: ai_fields
 #: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__display_name
@@ -145,7 +157,8 @@ msgstr ""
 
 #. module: ai_fields
 #: model:ir.model,name:ai_fields.model_ir_model_fields
-msgid "Fields"
+#, fuzzy
+msgid "Field"
 msgstr "欄位"
 
 #. module: ai_fields
@@ -179,6 +192,11 @@ msgid "ID"
 msgstr "識別碼"
 
 #. module: ai_fields
+#: model:ir.module.module,summary:base.module_ai_fields
+msgid "Implementation of AI computed fields"
+msgstr ""
+
+#. module: ai_fields
 #: model:ir.model,name:ai_fields.model_mail_message
 msgid "Message"
 msgstr "訊息"
@@ -196,40 +214,17 @@ msgid "My circuits didn't quite get it"
 msgstr ""
 
 #. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "No allowed values are provided in the prompt."
-msgstr ""
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, an unexpected error occurred."
-msgstr ""
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, the connection failed."
-msgstr ""
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, the request timed out."
-msgstr ""
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, the response could not be processed."
-msgstr ""
-
-#. module: ai_fields
 #. odoo-javascript
 #: code:addons/ai_fields/static/src/views/fields/properties_field_patch/properties_field_patch.xml:0
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__system_prompt
+#, fuzzy
 msgid "Prompt"
 msgstr "提示"
+
+#. module: ai_fields
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__prompt_custom
+msgid "Prompt Custom"
+msgstr ""
 
 #. module: ai_fields
 #: model:ir.model.fields,help:ai_fields.field_ir_model_fields__system_prompt
@@ -241,6 +236,11 @@ msgstr "提供給 AI 模型計算欄位值的提示"
 #: code:addons/ai_fields/static/src/views/fields/ai_fields/ai_fields.xml:0
 msgid "Refresh value"
 msgstr "更新值"
+
+#. module: ai_fields
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__supports_ai
+msgid "Supports Ai"
+msgstr ""
 
 #. module: ai_fields
 #. odoo-javascript
@@ -266,44 +266,13 @@ msgstr ""
 msgid "ai icon"
 msgstr "ai 圖示"
 
-#~ msgid "%s records"
-#~ msgstr "%s 項記錄"
+#. module: ai_fields
+#: model:ir.module.module,shortdesc:base.module_ai_fields
+msgid "ai_fields"
+msgstr ""
 
-#~ msgid "AI Prompt Tools"
-#~ msgstr "AI 提示工具"
+#~ msgid "AI Prompt"
+#~ msgstr "AI 提示"
 
-#~ msgid "Discard"
-#~ msgstr "捨棄"
-
-#~ msgid "Edit Field Prompt"
-#~ msgstr "編輯欄位提示"
-
-#~ msgid "Field Selector"
-#~ msgstr "欄位選擇器"
-
-#~ msgid "Insert"
-#~ msgstr "插入"
-
-#~ msgid "Insert a field"
-#~ msgstr "插入欄位"
-
-#~ msgid "Insert records"
-#~ msgstr "插入記錄"
-
-#~ msgid "Oops! No suitable response could be generated by the AI."
-#~ msgstr "哎唷，AI 未能產生合適的答案。"
-
-#~ msgid "Records Selector"
-#~ msgstr "記錄選擇器"
-
-#~ msgid "Save & Generate"
-#~ msgstr "儲存並產生"
-
-#~ msgid "Select a record"
-#~ msgstr "選擇一項記錄"
-
-#~ msgid "You can not use that prompt expression."
-#~ msgstr "你不可使用該提示語句。"
-
-#~ msgid "fa-hashtag"
-#~ msgstr "fa-hashtag"
+#~ msgid "AI field"
+#~ msgstr "AI 欄位"

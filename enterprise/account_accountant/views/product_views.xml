@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="account.view_partner_property_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='general']" position="attributes">
-                    <attribute name="groups">account.group_account_basic</attribute>
+                    <attribute name="groups" separator="," add="account.group_account_basic"/>
                 </xpath>
             </field>
         </record>

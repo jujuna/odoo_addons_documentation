@@ -8,9 +8,13 @@
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button name="action_budget" string="Budget" type="object"
-                        icon="fa-bar-chart" invisible="not is_analytic or is_above_budget"/>
+                        icon="bar_chart" invisible="not is_analytic or is_above_budget"
+                        groups="account.group_account_readonly"
+                    />
                 <button name="action_budget" string="Budget" type="object" class="text-danger"
-                        icon="fa-bar-chart" invisible="not is_analytic or not is_above_budget"/>
+                        icon="bar_chart" invisible="not is_analytic or not is_above_budget"
+                        groups="account.group_account_readonly"
+                    />
             </xpath>
             <xpath expr="//page[@name='products']/field[@name='order_line']/list" position="attributes">
                 <attribute name="decoration-danger">is_above_budget</attribute>

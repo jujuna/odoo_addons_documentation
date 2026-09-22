@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, _
-from odoo.exceptions import AccessError
+from odoo import fields, models
 
 
 class DigestDigest(models.Model):
@@ -12,8 +11,7 @@ class DigestDigest(models.Model):
     kpi_account_bank_cash_value = fields.Monetary(compute='_compute_kpi_account_total_bank_cash_value')
 
     def _compute_kpi_account_total_bank_cash_value(self):
-        if not self.env.user.has_group('account.group_account_user'):
-            raise AccessError(_("Do not have access, skip this data for user's digest email"))
+        self._raise_if_not_member_of('account.group_account_user')
 
         start, end, companies = self._get_kpi_compute_parameters()
         data = self.env['account.move']._read_group([
@@ -28,7 +26,9 @@ class DigestDigest(models.Model):
             company = record.company_id or self.env.company
             record.kpi_account_bank_cash_value = data.get(company)
 
-    def _compute_kpis_actions(self, company, user):
-        res = super()._compute_kpis_actions(company, user)
-        res.update({'kpi_account_bank_cash': 'account.open_account_journal_dashboard_kanban?menu_id=%s' % (self.env.ref('account.menu_finance').id)})
+    def _get_kpi_custom_settings(self, company, user):
+        res = super()._get_kpi_custom_settings(company, user)
+        menu_id = self.env.ref('account.menu_finance').id
+        res['kpi_action']['kpi_account_bank_cash'] = f'account.open_account_journal_dashboard_kanban?menu_id={menu_id}'
+        res['kpi_sequence']['kpi_account_bank_cash'] = 5550
         return res

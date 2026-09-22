@@ -13,16 +13,14 @@
             <xpath expr="//button[@name='button_finish']" position="attributes">
                 <attribute name="invisible">(
                     production_state in ('draft', 'done')
-                    or working_state == 'blocked'
                     or not is_user_working
                     or (quality_state == 'none' and test_type not in ['register_consumed_materials', 'register_byproducts', 'instructions'])
                 )</attribute>
             </xpath>
             <xpath expr="//button[@name='button_finish']" position="after">
-                <button name="button_finish" type="object" title="Done" class="btn-success px-3" icon="fa-check"
+                <button name="button_finish" type="object" title="Done" class="btn-success px-2" icon="check"
                     invisible="(
                         production_state in ('draft', 'done')
-                        or working_state == 'blocked'
                         or not is_user_working
                         or quality_state != 'none'
                         or test_type in ['register_consumed_materials', 'register_byproducts', 'instructions']

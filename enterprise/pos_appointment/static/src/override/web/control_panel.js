@@ -1,10 +1,17 @@
 import { ControlPanel } from "@web/search/control_panel/control_panel";
-import { patch } from "@web/core/utils/patch";
+import { useService } from "@web/core/utils/hooks";
+import { usePos } from "@point_of_sale/app/hooks/pos_hook";
 
-patch(ControlPanel.prototype, {
+export class PosAppointmentControlPanel extends ControlPanel {
+    static template = "pos_appointment.PosAppointmentControlPanel";
+    setup() {
+        super.setup(...arguments);
+        this.ui = useService("ui");
+        this.pos = usePos();
+    }
     switchView(viewType, newWindow) {
         const searchModel = this.env.searchModel;
-        const filterNamesToDisable = ["kanban_date_filter", "kanban_hour_filter"];
+        const filterNamesToDisable = ["date_filter", "hour_filter"];
         const filtersToDisable = Object.values(searchModel.searchItems).filter(
             (sm) =>
                 filterNamesToDisable.includes(sm.name) &&
@@ -14,5 +21,5 @@ patch(ControlPanel.prototype, {
             searchModel.toggleSearchItem(filter.id);
         }
         super.switchView(...arguments);
-    },
-});
+    }
+}

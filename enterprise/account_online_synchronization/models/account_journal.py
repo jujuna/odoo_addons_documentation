@@ -16,8 +16,8 @@ _logger = logging.getLogger(__name__)
 class AccountJournal(models.Model):
     _inherit = "account.journal"
 
-    def __get_bank_statements_available_sources(self):
-        rslt = super(AccountJournal, self).__get_bank_statements_available_sources()
+    def _get_bank_statements_available_sources(self):
+        rslt = super()._get_bank_statements_available_sources()
         rslt.append(("online_sync", _("Online Synchronization")))
         return rslt
 
@@ -25,7 +25,7 @@ class AccountJournal(models.Model):
     expiring_synchronization_date = fields.Date(related='account_online_link_id.expiring_synchronization_date')
     expiring_synchronization_due_day = fields.Integer(compute='_compute_expiring_synchronization_due_day')
     account_online_account_id = fields.Many2one('account.online.account', copy=False, ondelete='set null', index='btree_not_null')
-    account_online_link_id = fields.Many2one('account.online.link', related='account_online_account_id.account_online_link_id', readonly=True, store=True)
+    account_online_link_id = fields.Many2one('account.online.link', related='account_online_account_id.account_online_link_id', readonly=True, store=True, index='btree_not_null')
     account_online_link_state = fields.Selection(related="account_online_link_id.state", readonly=True)
     renewal_contact_email = fields.Char(related="account_online_link_id.renewal_contact_email", readonly=False)
     online_sync_fetching_status = fields.Selection(related="account_online_account_id.fetching_status", readonly=True)
@@ -49,6 +49,15 @@ class AccountJournal(models.Model):
             else:
                 record.expiring_synchronization_due_day = 0
 
+    def should_show_reconnect_button(self):
+        self.ensure_one()
+        connection_state_details = self.account_online_link_id._pop_connection_state_details(journal=self) or {}
+        return self.expiring_synchronization_date and (
+            self.expiring_synchronization_due_day <= 0
+            or self.account_online_link_state in {'error', 'disconnected'}
+            or connection_state_details.get('error_type')
+        )
+
     def _fill_bank_cash_dashboard_data(self, dashboard_data):
         super()._fill_bank_cash_dashboard_data(dashboard_data)
         # Caching data to avoid one call per journal
@@ -58,6 +67,8 @@ class AccountJournal(models.Model):
             journal_data['display_connect_bank_in_dashboard'] = journal.type in ('bank', 'credit') \
                                                                 and not journal.account_online_account_id \
                                                                 and journal.company_id.id == self.env.company.id
+            if journal.account_online_link_id:
+                journal_data['should_show_reconnect_button'] = journal.should_show_reconnect_button()
 
     @api.constrains('account_online_account_id')
     def _check_account_online_account_id(self):
@@ -77,11 +88,11 @@ class AccountJournal(models.Model):
                 # We need to rollback here otherwise the next iteration will still have the error when trying to commit
                 self.env.cr.rollback()
 
+    @api.model
     def fetch_online_sync_favorite_institutions(self):
-        company = self.sudo().company_id if len(self) == 1 else self.env.company
-        timeout = int(self.env['ir.config_parameter'].sudo().get_param('account_online_synchronization.request_timeout')) or 60
+        timeout = self.env['ir.config_parameter'].sudo().get_int('account_online_synchronization.request_timeout') or 60
         endpoint_url = self.env['account.online.link']._get_odoofin_url('/proxy/v2/get_dashboard_institutions')
-        params = {'country': company.account_fiscal_country_id.code, 'limit': 28}
+        params = {'country': self.env.company.account_fiscal_country_id.code, 'limit': 28}
         try:
             resp = requests.get(endpoint_url, params=params, timeout=timeout)
             resp_dict = resp.json()
@@ -177,6 +188,14 @@ class AccountJournal(models.Model):
             },
         )
 
+    def action_reconnect_journal(self):
+        self.ensure_one()
+        connection_state_details = self.account_online_link_id._pop_connection_state_details(journal=self) or {}
+        if connection_state_details.get('error_type') or self.account_online_link_state == 'error':
+            return self.manual_sync()
+
+        return self.action_reconnect_online_account()
+
     def action_reconnect_online_account(self):
         self.ensure_one()
         return self.account_online_link_id.action_reconnect_account()
@@ -229,6 +248,27 @@ class AccountJournal(models.Model):
         })
         return wizard._get_records_action(name=_("Find Duplicate Transactions"))
 
+    def action_open_payments_to_pay(self):
+        self.ensure_one()
+        # Use a domain instead of fixed payment IDs with _get_records_action
+        # so paid payments disappear from the list automatically.
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.env._("Payments"),
+            'res_model': 'account.payment',
+            'view_mode': 'list,form',
+            'domain': [
+                ('journal_id', '=', self.id),
+                ('could_initiate_payment', '=', True),
+                ('is_sent', '=', False),
+                ('state', '=', 'draft'),
+            ],
+            'context': {
+                'default_journal_id': self.id,
+                'default_payment_type': 'outbound',
+            },
+        }
+
     def _has_duplicate_transactions(self, date_from):
         """ Has any transaction with
                - same amount &
@@ -239,11 +279,11 @@ class AccountJournal(models.Model):
 
             :param date_from: date from with we must check for duplicates.
         """
-        self.env.cr.execute(SQL.join(SQL(''), [
+        [[exists]] = self.env.execute_query(SQL(
+            "SELECT EXISTS (%s)",
             self._get_duplicate_amount_date_account_transactions_query(date_from),
-            SQL('LIMIT 1'),
-        ]))
-        return bool(self.env.cr.rowcount)
+        ))
+        return exists
 
     def _get_duplicate_transactions(self, date_from):
         """Find all transaction with
@@ -255,12 +295,11 @@ class AccountJournal(models.Model):
 
             :param date_from: date from with we must check for duplicates.
         """
-        query = SQL.join(SQL(''), [
+        query = SQL(
+            "%s UNION %s ORDER BY ids",
             self._get_duplicate_amount_date_account_transactions_query(date_from),
-            SQL('UNION'),
             self._get_duplicate_online_transaction_identifier_transactions_query(date_from),
-            SQL('ORDER BY ids'),
-        ])
+        )
         return [res[0] for res in self.env.execute_query(query)]
 
     def _get_provider_duplicate_transactions(self, date_from):

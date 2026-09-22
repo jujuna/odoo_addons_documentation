@@ -5,14 +5,15 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-08 20:21+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 02:32+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "product_barcodelookup/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: product_barcodelookup
 #. odoo-python
@@ -33,6 +34,11 @@ msgstr ""
 "изображений."
 
 #. module: product_barcodelookup
+#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
+msgid "<i class=\"oi\" data-icon=\"east\"/> Create API Key"
+msgstr ""
+
+#. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
 msgid ""
 "<span invisible=\"nb_products_selected &lt;= 1000\">\n"
@@ -41,6 +47,11 @@ msgid ""
 "                            done tomorrow.\n"
 "                        </span>"
 msgstr ""
+"<span invisible=\"nb_products_selected &lt;= 1000\">\n"
+"                            Поскольку в день может быть обработано только 10 "
+"000 товаров, оставшиеся будут\n"
+"                            обработаны завтра.\n"
+"                        </span>"
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
@@ -49,6 +60,9 @@ msgid ""
 "                        Some images may not be royalty-free and should not "
 "be published online."
 msgstr ""
+"<strong>Примечание</strong>:\n"
+"                        Некоторые изображения могут быть защищены авторским "
+"правом, их не следует публиковать в интернете."
 
 #. module: product_barcodelookup
 #. odoo-python
@@ -57,11 +71,13 @@ msgid ""
 "A task to process products in the background is already running. Please try "
 "again later."
 msgstr ""
+"Задача по обработке товаров в фоновом режиме уже запущена. Пожалуйста, "
+"попробуйте позже."
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "API Key:"
-msgstr "Ключ API:"
+msgid "API Key"
+msgstr ""
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,field_description:product_barcodelookup.field_res_config_settings__barcodelookup_api_key
@@ -69,29 +85,14 @@ msgid "API key"
 msgstr "Ключ API"
 
 #. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "Barcode Database"
-msgstr "База данных штрихкодов"
-
-#. module: product_barcodelookup
 #: model:ir.model.fields,help:product_barcodelookup.field_res_config_settings__barcodelookup_api_key
 msgid "Barcode Lookup API Key for create product from barcode."
 msgstr "Ключ API Barcode Lookup для создания товара по штрихкоду."
 
 #. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
-msgid "Cancel"
-msgstr "Отменить"
-
-#. module: product_barcodelookup
 #: model:ir.model,name:product_barcodelookup.model_res_config_settings
 msgid "Config Settings"
 msgstr "Параметры конфигурации"
-
-#. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "Create products by scanning using"
-msgstr "Создавайте карточки товаров с помощью сканирования по"
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_fetch_image_wizard__create_uid
@@ -104,7 +105,6 @@ msgid "Created on"
 msgstr "Дата создания:"
 
 #. module: product_barcodelookup
-#: model:ir.model.fields,field_description:product_barcodelookup.field_ir_cron_trigger__display_name
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_fetch_image_wizard__display_name
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_product__display_name
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_template__display_name
@@ -117,6 +117,8 @@ msgstr "Display Name"
 msgid ""
 "Fetch product images from Barcode Lookup based on the product's barcode."
 msgstr ""
+"Извлекать изображения товаров через модуль Поиск по штрихкоду на основе "
+"штрихкода товара."
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
@@ -127,16 +129,15 @@ msgstr "Получить фотографии"
 #: model:ir.actions.act_window,name:product_barcodelookup.product_product_action_get_pic_with_barcode
 #: model:ir.actions.act_window,name:product_barcodelookup.product_template_action_get_pic_with_barcode
 msgid "Get Pictures from Barcode Lookup"
-msgstr ""
+msgstr "Получить изображения через модуль Поиск по штрихкоду"
 
 #. module: product_barcodelookup
 #. odoo-python
 #: code:addons/product_barcodelookup/wizard/product_fetch_image_wizard.py:0
 msgid "Go to Settings"
-msgstr ""
+msgstr "Перейти в настройки"
 
 #. module: product_barcodelookup
-#: model:ir.model.fields,field_description:product_barcodelookup.field_ir_cron_trigger__id
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_fetch_image_wizard__id
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_product__id
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_template__id
@@ -147,7 +148,7 @@ msgstr "ID"
 #. module: product_barcodelookup
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_product__is_image_fetch_pending
 msgid "Is Image Fetch Pending"
-msgstr ""
+msgstr "Ожидается загрузка изображений"
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_fetch_image_wizard__write_uid
@@ -177,7 +178,7 @@ msgstr "Количество выбранных продуктов"
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
 msgid "Out of"
-msgstr ""
+msgstr "Из"
 
 #. module: product_barcodelookup
 #: model:ir.model,name:product_barcodelookup.model_product_template
@@ -185,9 +186,16 @@ msgid "Product"
 msgstr "Товар"
 
 #. module: product_barcodelookup
+#: model:ir.module.module,shortdesc:base.module_product_barcodelookup
+msgid "Product Barcode Lookup"
+msgstr ""
+
+#. module: product_barcodelookup
 #: model:ir.actions.server,name:product_barcodelookup.ir_cron_fetch_image_ir_actions_server
 msgid "Product Images: Get product images from Barcode Lookup"
 msgstr ""
+"Изображения товаров: Получить изображения товаров через модуль Поиск по "
+"штрихкоду"
 
 #. module: product_barcodelookup
 #: model:ir.model,name:product_barcodelookup.model_product_product
@@ -220,6 +228,7 @@ msgstr ""
 #: code:addons/product_barcodelookup/wizard/product_fetch_image_wizard.py:0
 msgid "The API Key for Barcode Lookup must be set in the General Settings."
 msgstr ""
+"API-ключ для модуля Поиск по штрихкоду должен быть указан в Общих настройках."
 
 #. module: product_barcodelookup
 #. odoo-python
@@ -228,6 +237,8 @@ msgid ""
 "The Barcode Lookup API key is not set properly or it is invalid. Check your "
 "API key in setting and retry."
 msgstr ""
+"API-ключ для модуля Поиск по штрихкоду не настроен должным образом или "
+"недействителен. Проверьте ваш API-ключ в настройках и повторите попытку."
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,help:product_barcodelookup.field_product_fetch_image_wizard__products_to_process
@@ -246,11 +257,17 @@ msgid ""
 "Lookup\" has been deleted. Please contact your administrator to have the "
 "action restored or to reinstall the module \"product_barcodelookup\"."
 msgstr ""
+"Запланированное действие «Изображения товаров: Получить изображения товаров "
+"из модуля Поиск по штрихкоду» было удалено. Пожалуйста, обратитесь к "
+"администратору для восстановления действия или переустановки модуля «"
+"product_barcodelookup»."
 
 #. module: product_barcodelookup
-#: model:ir.model,name:product_barcodelookup.model_ir_cron_trigger
-msgid "Triggered actions"
-msgstr "Запущенные действия"
+#: model:ir.module.module,description:base.module_product_barcodelookup
+msgid ""
+"This module allows you to create products from barcode using Barcode Lookup "
+"API Key"
+msgstr ""
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,help:product_barcodelookup.field_product_product__is_image_fetch_pending
@@ -262,21 +279,6 @@ msgstr ""
 #: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_8
 msgid "age group"
 msgstr "возрастная группа"
-
-#. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "barcodelookup.com"
-msgstr "barcodelookup.com"
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_6
-msgid "brand"
-msgstr "бренд"
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_1
-msgid "color"
-msgstr "цвет"
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
@@ -294,29 +296,14 @@ msgid "manufacturer"
 msgstr "производитель"
 
 #. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_3
-msgid "material"
-msgstr "материал"
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_4
-msgid "pattern"
-msgstr "узор"
-
-#. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
 msgid "selected products,"
-msgstr ""
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_7
-msgid "size"
-msgstr "размер"
+msgstr "выбранных товаров,"
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
 msgid "will be processed."
-msgstr ""
+msgstr "будут обработаны."
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
@@ -326,3 +313,22 @@ msgid ""
 "image or\n"
 "                            lack a barcode"
 msgstr ""
+"не будут\n"
+"                            обработаны, поскольку у них либо уже есть "
+"изображение, либо\n"
+"                            отсутствует штрихкод"
+
+msgid "brand"
+msgstr "бренд"
+
+msgid "color"
+msgstr "цвет"
+
+msgid "material"
+msgstr "материал"
+
+msgid "pattern"
+msgstr "узор"
+
+msgid "size"
+msgstr "размер"

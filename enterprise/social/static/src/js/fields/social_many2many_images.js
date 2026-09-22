@@ -1,16 +1,17 @@
-import { ImagesCarouselDialog } from "../images_carousel_dialog";
+import { MediaCarouselDialog } from "../media_carousel_dialog";
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 /**
- * Component for a many2many field to <ir.attachment>, containing only images.
+ * Component for a many2many field to <social.post.image>, containing only images.
  */
 export class SocialMany2manyImages extends Component {
     static template = "social.SocialMany2manyImages";
-    static props = standardFieldProps;
+
+    props = useProps(standardFieldProps);
 
     setup() {
         super.setup();
@@ -22,10 +23,13 @@ export class SocialMany2manyImages extends Component {
     }
 
     onClickMoreImages() {
-        this.dialog.add(ImagesCarouselDialog, {
+        this.dialog.add(MediaCarouselDialog, {
             title: _t("Post Images"),
             activeIndex: 0,
-            images: this.attachmentsIds.map((attachmentId) => `/web/image/${attachmentId}`),
+            medias: this.attachmentsIds.map((attachmentId) => ({
+                type: "image",
+                url: `/web/image/social.post.image/${attachmentId}/raw`,
+            })),
         });
     }
 }
@@ -33,6 +37,7 @@ export class SocialMany2manyImages extends Component {
 export const socialMany2manyImages = {
     component: SocialMany2manyImages,
     supportedTypes: ["many2many"],
+    relatedFields: () => [{ name: "id", type: "integer" }],
 };
 
 registry.category("fields").add("social_many2many_images", socialMany2manyImages);

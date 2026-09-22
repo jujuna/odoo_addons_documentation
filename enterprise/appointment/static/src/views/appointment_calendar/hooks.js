@@ -1,75 +1,131 @@
-import { localization } from "@web/core/l10n/localization";
-import { useComponent, useEffect, useEnv, useState } from "@odoo/owl";
+import { computed, t, useEffect, useProps } from "@odoo/owl";
+import { is24HourFormat } from "@web/core/l10n/time";
+import { useEnv } from "@web/owl2/utils";
+
+const FORMAT_12_HOUR = {
+    hour: "numeric",
+    minute: "2-digit",
+    omitZeroMinute: true,
+    meridiem: "short",
+};
+const FORMAT_24_HOUR = {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: false,
+};
 
 /**
  * Common code between common and year renderer for our calendar.
+ *
+ * @param {(() => any)[]} fcInstanceGetters
  */
-export function useAppointmentRendererHook(getFcElements) {
-    const component = useComponent();
+export function useAppointmentRendererHook(fcInstanceGetters) {
     const env = useEnv();
-    useState(env.calendarState);
+    const props = useProps({ model: t.object() });
 
     /**
      * Display an overlay when using the slots selection mode that
      * encompasses the past time.
      */
-    useEffect(
-        (fcEls, calendarMode) => {
-            if (calendarMode === "slots-creation") {
-                for (const fcEl of fcEls) {
-                    const daysToDisable = fcEl.querySelectorAll(".fc-day-past:not(.fc-col-header-cell), .fc-day-today:not(.fc-col-header-cell)");
-                    fcEl.classList.add('o_calendar_slots_in_creation');
-                    for (const el of daysToDisable) {
-                        el.classList.add("o_calendar_slot_selection");
-                    }
-                    const todayColumn = fcEl.querySelectorAll(".fc-day-today:not(.fc-col-header-cell)")[1];
-                    const bgColumn = todayColumn?.querySelector(".fc-timegrid-col-bg");
-                    const nowIndicator = todayColumn?.querySelector(".fc-timegrid-now-indicator-line");
-                    // Create a block for today to have the overlay size based on the current hour
-                    if (bgColumn && nowIndicator && ['timeGridWeek', 'timeGridDay'].includes(component.fc.api.view.type)) {
-                        const height = nowIndicator.style.top.slice(0, -2);
-                        const childEl = document.createElement("div");
-                        childEl.classList.add("o_calendar_slot_selection_now", "position-absolute", "start-0", "end-0");
-                        childEl.style.height = `${height}px`;
-                        bgColumn.appendChild(childEl);
-                    }
-                }
-                return () => {
-                    for (const fcEl of fcEls) {
-                        const daysToDisable = fcEl.querySelectorAll(".fc-day-past:not(.fc-col-header-cell), .fc-day-today:not(.fc-col-header-cell)");
-                        fcEl.classList.remove('o_calendar_slots_in_creation');
-                        for (const el of daysToDisable) {
-                            el.classList.remove("o_calendar_slot_selection");
-                        }
-                        const todayColumn = fcEl.querySelectorAll(".fc-day-today:not(.fc-col-header-cell)")[1];
-                        if (todayColumn) {
-                            const childEl = todayColumn.querySelector(".o_calendar_slot_selection_now");
-                            childEl && childEl.remove();
-                        }
-                    }
-                };
+    useEffect(() => {
+        const editingAppointmentData = props.model.slotsAppointmentData();
+        if (env.calendarState.mode === "default" || !editingAppointmentData) {
+            return;
+        }
+        const appointmentStart = editingAppointmentData.startDatetime?.toLocal().toISODate();
+        const appointmentEnd = editingAppointmentData.endDatetime?.toLocal().toISODate();
+        const addedElements = [];
+        const shadedDays = [];
+        const fcElements = [];
+        for (const getFcInstance of fcInstanceGetters) {
+            const fc = getFcInstance();
+            if (!fc) {
+                continue;
             }
-        },
-        () => [getFcElements(), env.calendarState.mode],
-    );
-    return {
-        isSlotCreationMode() {
-            return env.calendarState.mode === "slots-creation";
-        },
 
-        getEventTimeFormat() {
-            const format12Hour = {
-                hour: 'numeric',
-                minute: '2-digit',
-                omitZeroMinute: true,
-                meridiem: 'short'
-            };
-            const format24Hour = {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: false,
-            };
-            return localization.timeFormat.search("HH") === 0 ? format24Hour : format12Hour;
-        },
-    }
+            // Main element
+            if (env.calendarState.mode === "slots-creation") {
+                fc.el.classList.add("o_calendar_slots_in_creation");
+            } else if (env.calendarState.mode === "slots-deletion") {
+                fc.el.classList.add("o_calendar_slots_in_deletion");
+            }
+            fcElements.push(fc.el);
+
+
+            // Days to shade
+            const daysToShade = [
+                ...fc.el.querySelectorAll(".fc-day:not(.fc-col-header-cell)"),
+            ].filter((dayColumn) => {
+                const colDate = dayColumn.dataset.date;
+                return (
+                    // before the appointment window starts if it has a start
+                    (appointmentStart && colDate < appointmentStart) ||
+                    // otherwise start = today so shade everything in the past and today
+                    (!appointmentStart && !dayColumn.classList.contains("fc-day-future")) ||
+                    // and after the appointment window ends if it has an end
+                    (appointmentEnd && colDate > appointmentEnd)
+                );
+            });
+            for (const dayToShade of daysToShade) {
+                dayToShade.classList.add("o_calendar_slot_selection");
+            }
+            shadedDays.push(...daysToShade);
+
+            // Create a block for today to have the overlay size based on the current hour
+            const todayColumn = fc.el.querySelectorAll(".fc-day-today:not(.fc-col-header-cell)")[1];
+            const bgColumn = todayColumn?.querySelector(".fc-timegrid-col-bg");
+            const nowIndicator = todayColumn?.querySelector(".fc-timegrid-now-indicator-line");
+            if (
+                daysToShade.includes(todayColumn) && // unless it's not supposed to be shaded at all
+                !appointmentStart && // unless there is a start, then it's either fully shaded or not
+                !(appointmentEnd && appointmentEnd > todayColumn.dataset.date) && // unless it is after the end
+                bgColumn &&
+                nowIndicator &&
+                ["timeGridWeek", "timeGridDay"].includes(fc.view.type)
+            ) {
+                const childEl = document.createElement("div");
+                childEl.classList.add(
+                    "o_calendar_slot_selection_now",
+                    "position-absolute",
+                    "start-0",
+                    "end-0"
+                );
+                const height = nowIndicator.style.top.slice(0, -2);
+                if (height) {
+                    childEl.style.height = `${height}px`;
+                }
+                bgColumn.appendChild(childEl);
+                addedElements.push(childEl);
+            }
+        }
+        return function cleanup() {
+            for (const fcEl of fcElements) {
+                fcEl.classList.remove("o_calendar_slots_in_creation");
+                fcEl.classList.remove("o_calendar_slots_in_deletion");
+            }
+            for (const shadedDay of shadedDays) {
+                shadedDay.classList.remove("o_calendar_slot_selection");
+            }
+            for (const childEl of addedElements) {
+                childEl.remove();
+            }
+        };
+    });
+
+    // As onEventContent depends on the mode and is not rendered by owl
+    // we must tell fc to "refetch" the events, which will force them to all rerender
+    // as is done in onPatched
+    useEffect(() => {
+        if (env.calendarState.mode) {
+            for (const getFcInstance of fcInstanceGetters) {
+                getFcInstance()?.refetchEvents();
+            }
+        }
+    });
+
+    return {
+        isSlotCreationMode: computed(() => env.calendarState.mode === "slots-creation"),
+        isSlotDeletionMode: computed(() => env.calendarState.mode === "slots-deletion"),
+        getEventTimeFormat: () => (is24HourFormat() ? FORMAT_24_HOUR : FORMAT_12_HOUR),
+    };
 }

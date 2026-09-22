@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-17 03:31+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 03:36+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "hr_recruitment_integration_base/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,18 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_recruitment_integration_base
+#: model:ir.module.module,description:base.module_hr_recruitment_integration_base
+msgid ""
+"\n"
+"Base module for recruitment integration.\n"
+"========================================\n"
+"This module provides a base for the integration of recruitment with "
+"external\n"
+"api from different job boards like indeed, monster, linkedin, etc.\n"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -78,6 +89,11 @@ msgstr "الأنشطة"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "زخرفة استثناء النشاط"
+
+#. module: hr_recruitment_integration_base
+#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_state
@@ -145,11 +161,6 @@ msgid "Avatar 512"
 msgstr "الصورة الرمزية 512"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__biweekly
-msgid "Bi-Week"
-msgstr "كل أسبوعين"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_form
 msgid "Campaign Duration"
 msgstr "مدة الحملة"
@@ -195,11 +206,6 @@ msgstr "ستبدأ الحملة في %(start_date)s"
 #: code:addons/hr_recruitment_integration_base/wizard/hr_recruitment_post.py:0
 msgid "Can't postpone posts that are already posted"
 msgstr "لا يمكن تأجيل المنشورات التي تم نشرها بالفعل"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
-msgid "Cancel"
-msgstr "إلغاء"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__company_id
@@ -251,11 +257,6 @@ msgid "Created on"
 msgstr "أنشئ في"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__currency_id
-msgid "Currency"
-msgstr "العملة"
-
-#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__api_data
 msgid "Data"
 msgstr "البيانات"
@@ -269,11 +270,6 @@ msgstr "التاريخ من"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__date_to
 msgid "Date To"
 msgstr "التاريخ إلى"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__daily
-msgid "Day"
-msgstr "اليوم"
 
 #. module: hr_recruitment_integration_base
 #. odoo-javascript
@@ -361,11 +357,6 @@ msgid "Followers (Partners)"
 msgstr "المتابعين (الشركاء)"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "أيقونة من Font awesome مثال: fa-tasks"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
 msgid "From"
 msgstr "من"
@@ -374,11 +365,6 @@ msgstr "من"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__has_message
 msgid "Has Message"
 msgstr "يحتوي على رسالة"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__hourly
-msgid "Hour"
-msgstr "ساعة"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_applicant__id
@@ -538,9 +524,9 @@ msgid "Last Updated on"
 msgstr "آخر تحديث في"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__salary_max
-msgid "Maximum Salary"
-msgstr "الحد الأقصى للراتب"
+#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_error
@@ -551,11 +537,6 @@ msgstr "خطأ في تسليم الرسائل"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_ids
 msgid "Messages"
 msgstr "الرسائل"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__salary_min
-msgid "Minimum Salary"
-msgstr "الحد الأدنى للراتب"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
@@ -571,11 +552,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__date_from
 msgid "Mission date start"
 msgstr ""
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__monthly
-msgid "Month"
-msgstr "الشهر"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__my_activity_date_deadline
@@ -683,11 +659,6 @@ msgstr "انشر الآن"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "Post on Job Boards"
-msgstr ""
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
 msgid "Posts"
 msgstr "المنشورات"
 
@@ -749,6 +720,11 @@ msgid "Recruiter"
 msgstr "موظِّف"
 
 #. module: hr_recruitment_integration_base
+#: model:ir.module.module,shortdesc:base.module_hr_recruitment_integration_base
+msgid "Recruitment Integration Base"
+msgstr ""
+
+#. module: hr_recruitment_integration_base
 #: model:ir.model,name:hr_recruitment_integration_base.model_hr_recruitment_platform
 msgid "Recruitment Platform"
 msgstr "منصة التوظيف"
@@ -759,19 +735,15 @@ msgid "Responsible User"
 msgstr "المستخدم المسؤول"
 
 #. module: hr_recruitment_integration_base
+#. odoo-javascript
+#: code:addons/hr_recruitment_integration_base/static/src/widget/integration_state_selection.js:0
+msgid "Ribbon"
+msgstr ""
+
+#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "خطأ في تسليم الرسائل النصية القصيرة"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "Salary Range"
-msgstr "حدود الراتب"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__payment_interval
-msgid "Salary Time Unit"
-msgstr "وحدة الوقت المرتبطة بالراتب"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_recruitment_post_job_wizard__apply_method__email
@@ -842,9 +814,9 @@ msgid ""
 "job             position. The Recruiter is automatically added to all "
 "meetings with the Applicant."
 msgstr ""
-"سيكون مسؤول التوظيف القيمة الافتراضية لكافة المتقدمين للوظائف في هذا "
-"المنصب            الوظيفي. تتم إضافة مسؤول التوظيف تلقائياً إلى كافة "
-"الاجتماعات مع المتقدم للوظيفة."
+"سيكون مسؤول التوظيف القيمة الافتراضية لكافة المتقدمين للوظائف في هذا المنصب"
+"            الوظيفي. تتم إضافة مسؤول التوظيف تلقائياً إلى كافة الاجتماعات مع "
+"المتقدم للوظيفة."
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__campaign_end_date
@@ -906,29 +878,9 @@ msgid "Website"
 msgstr "الموقع الإلكتروني"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__website_message_ids
-msgid "Website Messages"
-msgstr "رسائل الموقع الإلكتروني"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__website_message_ids
-msgid "Website communication history"
-msgstr "سجل تواصل الموقع الإلكتروني"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__weekly
-msgid "Week"
-msgstr "الأسبوع"
-
-#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__schedule_id
 msgid "Working Schedule"
 msgstr "جدول العمل"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__yearly
-msgid "Year"
-msgstr "السنة"
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -948,11 +900,6 @@ msgid "failure"
 msgstr "فشل"
 
 #. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "per"
-msgstr "لكل"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
 msgid "plateform icon"
 msgstr "أيقونة المنصة"
@@ -962,3 +909,9 @@ msgstr "أيقونة المنصة"
 #: code:addons/hr_recruitment_integration_base/wizard/hr_recruitment_post.py:0
 msgid "updated"
 msgstr "تم التحديث"
+
+msgid "Website Messages"
+msgstr "رسائل الموقع الإلكتروني"
+
+msgid "Website communication history"
+msgstr "سجل تواصل الموقع الإلكتروني"

@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="sale_subscription.sale_order_log_report_search"/>
         <field name="arch" type="xml">
              <field name="template_id" position="after">
-                <filter name="referer_id"/>
-                <filter name="commission_plan_id"/>
+                <field name="referrer_id"/>
+                <field name="commission_plan_id"/>
             </field>
             <filter name="group_by_plan" position="before">
                 <filter string="Referrer" name="group_by_referrer" domain="[]" context="{'group_by': 'referrer_id'}"/>

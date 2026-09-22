@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy } from "@odoo/owl";
 import { registries } from "@spreadsheet/o_spreadsheet/o_spreadsheet";
 import { CheckBox } from "@web/core/checkbox/checkbox";
 
@@ -7,10 +7,9 @@ const { topbarComponentRegistry } = registries;
 export class DashboardPublish extends Component {
     static template = "spreadsheet_edition.DashboardPublish";
     static components = { CheckBox };
-    static props = {};
 
     setup() {
-        this.state = useState({ isPublished: this.env.isDashboardPublished() });
+        this.state = proxy({ isPublished: this.env.isDashboardPublished() });
     }
 
     get isReadonly() {

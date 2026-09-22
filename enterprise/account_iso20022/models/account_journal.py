@@ -10,7 +10,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_repr, float_round
 
-from odoo.addons.base_iban.models.res_partner_bank import get_iban_part
+from odoo.tools.bank_account_number import get_iban_part
 import odoo.addons.account.tools.structured_reference as sr
 from odoo.addons.account_batch_payment.models.sepa_mapping import sanitize_communication
 from odoo.addons.account_iso20022.models.account_payment import ISO20022_CHARGE_BEARER_SELECTION, ISO20022_PRIORITY_SELECTION, ISO20022_PRIORITY_HELP
@@ -18,19 +18,6 @@ from odoo.addons.account_iso20022.models.account_payment import ISO20022_CHARGE_
 class AccountJournal(models.Model):
     _inherit = "account.journal"
 
-    sepa_pain_version = fields.Selection(
-        [
-            ('pain.001.001.03.austrian.004', 'Austrian'),
-            ('pain.001.001.03.de', 'German'),
-            ('pain.001.001.09', 'pain.001.001.09'),
-            ('pain.001.001.03', 'pain.001.001.03'),
-        ],
-        string="SEPA XML Format",
-        compute='_compute_sepa_pain_version',
-        store=True,
-        readonly=False,
-        help="SEPA version to use to generate Credit Transfer XML files from this journal",
-    )
     has_sepa_ct_payment_method = fields.Boolean(compute='_compute_has_sepa_ct_payment_method')
     iso20022_default_priority = fields.Selection(
         selection=ISO20022_PRIORITY_SELECTION,
@@ -50,35 +37,13 @@ class AccountJournal(models.Model):
     # -------------------------------------------------------------------------
     # COMPUTE METHODS
     # -------------------------------------------------------------------------
-    @api.depends('bank_acc_number', 'company_id.account_fiscal_country_id', 'company_id.country_id')
-    def _compute_sepa_pain_version(self):
-        """ Set default value for the field sepa_pain_version"""
-        pains_by_country = {
-            'DE': 'pain.001.001.03.de',
-            'AT': 'pain.001.001.03.austrian.004',
-        }
-        for rec in self:
-            if rec.bank_account_id and rec.bank_account_id.acc_type == 'iban':
-                country_code = rec.bank_acc_number[:2].upper()
-            # Then try from the company's fiscal country, and finally from the company's country
-            else:
-                country_code = rec.company_id.account_fiscal_country_id.code or rec.company_id.country_code
-            if country_code in pains_by_country:
-                rec.sepa_pain_version = pains_by_country.get(country_code)
-            else:
-                # Having a sepa_pain_version set at pain.001.001.03 means that the user changed it manually,
-                # since the default is 09. In this case, we keep the user's change.
-                rec.sepa_pain_version = 'pain.001.001.09' \
-                    if rec.sepa_pain_version != 'pain.001.001.03' \
-                    else rec.sepa_pain_version
-
     @api.depends('outbound_payment_method_line_ids.payment_method_id.code')
     def _compute_has_sepa_ct_payment_method(self):
         for rec in self:
             payment_method_codes = rec.mapped('outbound_payment_method_line_ids.payment_method_id.code')
             rec.has_sepa_ct_payment_method = (
                 'sepa_ct' in payment_method_codes
-                or 'iso20022_ch' in payment_method_codes and self.env['ir.config_parameter'].sudo().get_param('iso20022_ch_force_sepa')
+                or 'iso20022_ch' in payment_method_codes and self.env['ir.config_parameter'].sudo().get_bool('iso20022_ch_force_sepa')
             )
 
     @api.depends('outbound_payment_method_line_ids.payment_method_id.code')
@@ -110,19 +75,27 @@ class AccountJournal(models.Model):
     # DOCUMENT CREATION
     # -------------------------------------------------------------------------
 
-    def create_iso20022_credit_transfer(self, payments, payment_method_code, batch_booking=False):
+    def create_iso20022_credit_transfer(self, payments, payment_method_line, batch_booking=False):
         """Returns the content of the XML file."""
-        Document = self.create_iso20022_credit_transfer_content(payments, payment_method_code, batch_booking=batch_booking)
-        return etree.tostring(Document, pretty_print=True, xml_declaration=True, encoding='utf-8')
+        Document = self.create_iso20022_credit_transfer_content(payments, payment_method_line, batch_booking=batch_booking)
+        return etree.tostring(Document, pretty_print=True, xml_declaration=True, encoding='UTF-8')
 
-    def create_iso20022_credit_transfer_content(self, payments, payment_method_code, batch_booking=False):
+    def create_iso20022_credit_transfer_content(self, payments, payment_method_line, batch_booking=False):
         """
             Creates the body of the XML file for the ISO20022 document.
         """
+        if payment_method_line.sepa_pain_version not in payment_method_line._fields['sepa_pain_version'].get_values(self.env):
+            # Might happen because of a migration issue (fixed in https://github.com/odoo/upgrade/pull/9771).
+            payment_method_line.sepa_pain_version = 'pain.001.001.09'
+
         Document = etree.Element("Document", nsmap={
-            None: self.get_document_namespace(payment_method_code),
+            None: self.get_document_namespace(payment_method_line),
             'xsi': "http://www.w3.org/2001/XMLSchema-instance"
         })
+
+        if schema_location := self._get_schema_location(payment_method_line):
+            Document.set(schema_location[0], schema_location[1])
+
         CstmrCdtTrfInitn = etree.SubElement(Document, "CstmrCdtTrfInitn")
 
         # Create the GrpHdr XML block
@@ -139,25 +112,27 @@ class AccountJournal(models.Model):
         NbOfTxs.text = val_NbOfTxs
         CtrlSum = etree.SubElement(GrpHdr, "CtrlSum")
         CtrlSum.text = self._get_CtrlSum(payments)
-        GrpHdr.append(self._get_InitgPty(payment_method_code))
+        GrpHdr.append(self._get_InitgPty(payment_method_line))
 
         # Create one PmtInf XML block per execution date, per currency
         eur_currency = self.env.ref('base.EUR')
         chf_currency = self.env.ref('base.CHF')
         payments_date_instr_wise = defaultdict(list)
-        today = fields.Date.today()
-        iso20022_ch_force_sepa = self.env['ir.config_parameter'].sudo().get_param('iso20022_ch_force_sepa')
+        today = fields.Date.context_today(self)
+        iso20022_ch_force_sepa = self.env['ir.config_parameter'].sudo().get_bool('iso20022_ch_force_sepa')
+        iso20022_force_sepa = self.env['ir.config_parameter'].sudo().get_bool('account_iso20022.force_sepa_for_eur')
         for payment in payments:
             required_payment_date = max(payment['payment_date'], today)
             currency_id = payment['currency_id'] or self.company_id.currency_id.id
             priority = payment['iso20022_priority']
-            payments_date_instr_wise[required_payment_date, currency_id, priority].append(payment)
-        for count, ((payment_date, currency_id, priority), payments_list) in enumerate(payments_date_instr_wise.items()):
+            sepa_priority = payment.get('sepa_priority', 'std')
+            payments_date_instr_wise[required_payment_date, currency_id, priority, sepa_priority].append(payment)
+        for count, ((payment_date, currency_id, priority, sepa_priority), payments_list) in enumerate(payments_date_instr_wise.items()):
             PmtInf = etree.SubElement(CstmrCdtTrfInitn, "PmtInf")
             PmtInfId = etree.SubElement(PmtInf, "PmtInfId")
             PmtInfId.text = (val_MsgId + str(self.id) + str(count))[-30:]
             PmtMtd = etree.SubElement(PmtInf, "PmtMtd")
-            PmtMtd.text = 'TRF'
+            PmtMtd.text = 'TRF' if sepa_priority != 'sct' else 'INST'
             BtchBookg = etree.SubElement(PmtInf, "BtchBookg")
             BtchBookg.text = batch_booking and 'true' or 'false'
             NbOfTxs = etree.SubElement(PmtInf, "NbOfTxs")
@@ -165,8 +140,8 @@ class AccountJournal(models.Model):
             CtrlSum = etree.SubElement(PmtInf, "CtrlSum")
             CtrlSum.text = self._get_CtrlSum(payments_list)
 
-            group_payment_method_code = payment_method_code
-            if iso20022_ch_force_sepa and payment_method_code == 'iso20022_ch':
+            group_payment_method_code = payment_method_line.code
+            if iso20022_ch_force_sepa and group_payment_method_code == 'iso20022_ch':
                 # The Swiss ISO20022 implementation considers SEPA as a subset of what it allows (payment type S),
                 # as well as more generic ISO20022 payments (payment type X). To handle that, we change the payment_method_code
                 # dynamically when adding the grouped payments to the XML file.
@@ -174,18 +149,25 @@ class AccountJournal(models.Model):
                     group_payment_method_code = 'sepa_ct'
                 elif currency_id != chf_currency.id:
                     group_payment_method_code = 'iso20022'
+            elif iso20022_force_sepa and group_payment_method_code == 'iso20022' and currency_id == eur_currency.id:
+                # The SEPA Credit Transfer payment method is only offered on EUR journals, so a journal in
+                # another currency (like SEK, USD, GBP) that occasionally pays a SEPA-zone IBAN in EUR falls
+                # back to the generic ISO20022 payment method, which otherwise always reports a NURG service
+                # level and a SHAR charge bearer. This flag lets those EUR batches be treated
+                # as genuine SEPA Credit Transfers, like the iso20022_ch_force_sepa mechanism above.
+                group_payment_method_code = 'sepa_ct'
 
             PmtTpInf = self._get_PmtTpInf(group_payment_method_code, priority)
             if len(PmtTpInf) != 0:  # Boolean conversion from etree element triggers a deprecation warning ; this is the proper way
                 PmtInf.append(PmtTpInf)
 
-            ReqdExctnDt = self._get_ReqdExctnDt_content(payment_date, group_payment_method_code)
+            ReqdExctnDt = self._get_ReqdExctnDt_content(payment_date, payment_method_line, effective_payment_method_code=group_payment_method_code)
             PmtInf.append(ReqdExctnDt)
 
-            PmtInf.append(self._get_Dbtr(group_payment_method_code))
+            PmtInf.append(self._get_Dbtr(payment_method_line, group_payment_method_code))
             PmtInf.append(self._get_DbtrAcct(group_payment_method_code))
             DbtrAgt = etree.SubElement(PmtInf, "DbtrAgt")
-            DbtrAgt.append(self._get_FinInstnId(self.bank_account_id, group_payment_method_code, mode='DbtrAgt'))
+            DbtrAgt.append(self._get_FinInstnId(self.bank_account_id, payment_method_line, mode='DbtrAgt', effective_payment_method_code=group_payment_method_code))
             unique_chrgbr_values = {payment.get('iso20022_charge_bearer') for payment in payments_list}
             unique_chrgbr = unique_chrgbr_values.pop() if len(unique_chrgbr_values) == 1 else None
             if unique_chrgbr:
@@ -194,7 +176,7 @@ class AccountJournal(models.Model):
             # One CdtTrfTxInf per transaction
             for payment in payments_list:
                 PmtInf.append(self._get_CdtTrfTxInf(
-                    PmtInfId, payment, group_payment_method_code, include_charge_bearer=not unique_chrgbr
+                    PmtInfId, payment, payment_method_line, include_charge_bearer=not unique_chrgbr, effective_payment_method_code=group_payment_method_code,
                 ))
         return Document
 
@@ -205,9 +187,9 @@ class AccountJournal(models.Model):
         # To override per pain version
         return float_repr(float_round(sum(payment['amount'] for payment in payments), 2), 2)
 
-    def _get_InitgPty(self, payment_method_code):
+    def _get_InitgPty(self, payment_method_line):
         InitgPty = etree.Element("InitgPty")
-        InitgPty.extend(self._get_company_PartyIdentification32(postal_address=False, issr=True, payment_method_code=payment_method_code))
+        InitgPty.extend(self._get_company_PartyIdentification32(postal_address=False, issr=True, payment_method_line=payment_method_line))
         return InitgPty
 
     def _get_PmtTpInf(self, payment_method_code, priority):
@@ -231,7 +213,7 @@ class AccountJournal(models.Model):
         return PmtTpInf
 
     def _get_LclInstrm(self, payment_method_code):
-        if payment_method_code == 'iso20022' and (local_instrument_code := self.env['ir.config_parameter'].sudo().get_param('account_iso20022.local_instrument_code')):
+        if payment_method_code == 'iso20022' and (local_instrument_code := self.env['ir.config_parameter'].sudo().get_str('account_iso20022.local_instrument_code')):
             LclInstrm = etree.Element("LclInstrm")
             Cd = etree.SubElement(LclInstrm, 'Cd')
             Cd.text = local_instrument_code
@@ -246,36 +228,34 @@ class AccountJournal(models.Model):
             Cd.text = 'SALA'
             return CtgyPurp
 
-    def _get_ReqdExctnDt_content(self, payment_date, payment_method_code):
+    def _get_ReqdExctnDt_content(self, payment_date, payment_method_line, effective_payment_method_code=None):
         ReqdExctnDt = etree.Element("ReqdExctnDt")
         ReqdExctnDt.text = fields.Date.to_string(payment_date)
         return ReqdExctnDt
 
-    def _get_Dbtr(self, payment_method_code):
+    def _get_Dbtr(self, payment_method_line, effective_payment_method_code=None):
         Dbtr = etree.Element("Dbtr")
-        Dbtr.extend(self._get_company_PartyIdentification32(postal_address=True, payment_method_code=payment_method_code))
+        Dbtr.extend(self._get_company_PartyIdentification32(postal_address=True, payment_method_line=payment_method_line, effective_payment_method_code=effective_payment_method_code))
         return Dbtr
 
-    # TODO: remove payments arg in master
-    def _get_DbtrAcct(self, payment_method_code=None, payments=None):
-        if not self.bank_account_id.sanitized_acc_number:
+    def _get_DbtrAcct(self, payment_method_code=None):
+        if not self.bank_account_id.sanitized_account_number:
             raise UserError(_("This journal does not have a bank account defined."))
         DbtrAcct = etree.Element("DbtrAcct")
         Id = etree.SubElement(DbtrAcct, "Id")
-        if self.bank_account_id.acc_type != 'iban':
+        if self.bank_account_id.account_type != 'iban' or self._is_bank_account_qr_iban(self.bank_account_id):
             Id.append(self._get_DbtrAcctOthr(payment_method_code))
         else:
             IBAN = etree.SubElement(Id, "IBAN")
-            IBAN.text = self.bank_account_id.sanitized_acc_number
+            IBAN.text = self.bank_account_id.sanitized_account_number
         Ccy = etree.SubElement(DbtrAcct, "Ccy")
         Ccy.text = self.currency_id and self.currency_id.name or self.company_id.currency_id.name
         return DbtrAcct
 
-    # TODO: remove partner_acc_type arg in master
-    def _get_DbtrAcctOthr(self, payment_method_code=None, partner_acc_type=None):
+    def _get_DbtrAcctOthr(self, payment_method_code=None):
         Othr = etree.Element("Othr")
         OthrId = etree.SubElement(Othr, "Id")
-        OthrId.text = self.bank_account_id.sanitized_acc_number
+        OthrId.text = self.bank_account_id.sanitized_account_number
         return Othr
 
     def _get_ChrgBr(self, payment_method_code, forced_value):
@@ -283,14 +263,15 @@ class AccountJournal(models.Model):
         ChrgBr.text = forced_value or "SHAR"
         return ChrgBr
 
-    def _get_CdtTrfTxInf(self, PmtInfId, payment, payment_method_code, include_charge_bearer=True):
+    def _get_CdtTrfTxInf(self, PmtInfId, payment, payment_method_line, include_charge_bearer=True, effective_payment_method_code=None):
+        payment_method_code = effective_payment_method_code or payment_method_line.code
         CdtTrfTxInf = etree.Element("CdtTrfTxInf")
         PmtId = etree.SubElement(CdtTrfTxInf, "PmtId")
         if payment['name']:
             InstrId = etree.SubElement(PmtId, "InstrId")
-            InstrId.text = sanitize_communication(payment['name'], 35)
+            InstrId.text = sanitize_communication(payment['name'].replace('&', '+'), 35)
         EndToEndId = etree.SubElement(PmtId, "EndToEndId")
-        EndToEndId.text = payment.get('end_to_end_uuid') or uuid4().hex
+        EndToEndId.text = payment.get('transaction_uuid') or uuid4().hex
         Amt = etree.SubElement(CdtTrfTxInf, "Amt")
 
         journal_id = self.env['account.journal'].search([('id', '=', payment['journal_id'])], limit=1)
@@ -311,16 +292,16 @@ class AccountJournal(models.Model):
 
         partner_bank = self.env['res.partner.bank'].sudo().browse(partner_bank_id)
 
-        if not self._skip_CdtrAgt(partner_bank, payment_method_code):
-            CdtTrfTxInf.append(self._get_CdtrAgt(partner_bank, payment_method_code))
+        if not self._skip_CdtrAgt(partner_bank, payment_method_line, effective_payment_method_code):
+            CdtTrfTxInf.append(self._get_CdtrAgt(partner_bank, payment_method_line, effective_payment_method_code))
 
         Cdtr = etree.SubElement(CdtTrfTxInf, "Cdtr")
         Nm = etree.SubElement(Cdtr, "Nm")
         Nm.text = sanitize_communication((
-            partner_bank.acc_holder_name or partner.name or partner.commercial_partner_id.name or '/'
+            partner_bank.holder_name or partner.name or partner.commercial_partner_id.name or '/'
         )[:70]).strip() or '/'
 
-        PstlAdr = self._get_PstlAdr(partner, payment_method_code)
+        PstlAdr = self._get_PstlAdr(partner, payment_method_line, effective_payment_method_code)
         if PstlAdr is not None:
             Cdtr.append(PstlAdr)
 
@@ -331,33 +312,40 @@ class AccountJournal(models.Model):
             CdtTrfTxInf.append(val_RmtInf)
         return CdtTrfTxInf
 
-    def _get_CdtrAgt(self, bank_account, payment_method_code):
+    def _get_CdtrAgt(self, bank_account, payment_method_line, effective_payment_method_code=None):
         CdtrAgt = etree.Element("CdtrAgt")
-        CdtrAgt.append(self._get_FinInstnId(bank_account, payment_method_code, mode='CdtrAgt'))
+        CdtrAgt.append(self._get_FinInstnId(bank_account, payment_method_line, mode='CdtrAgt', effective_payment_method_code=effective_payment_method_code))
         return CdtrAgt
 
-    def _get_FinInstnId(self, bank_account, payment_method_code, mode=None):
+    def _get_FinInstnId(self, bank_account, payment_method_line, mode=None, effective_payment_method_code=None):
+        payment_method_code = effective_payment_method_code or payment_method_line.code
         FinInstnId = etree.Element("FinInstnId")
-        bic_code = self._get_cleaned_bic_code(bank_account, payment_method_code)
+        bic_code = self._get_cleaned_bic_code(bank_account, payment_method_line, effective_payment_method_code)
         if bic_code:
-            BIC = etree.SubElement(FinInstnId, self._get_bic_tag(payment_method_code))
+            BIC = etree.SubElement(FinInstnId, self._get_bic_tag(payment_method_line, effective_payment_method_code))
             BIC.text = bic_code
         else:
             Othr = etree.SubElement(FinInstnId, "Othr")
             Id = etree.SubElement(Othr, "Id")
             Id.text = "NOTPROVIDED"
-        if bank_account.clearing_number:
-            ClrSysMmbId = etree.SubElement(FinInstnId, "ClrSysMmbId")
-            MmbId = etree.SubElement(ClrSysMmbId, "MmbId")
-            MmbId.text = bank_account.clearing_number
+        ClrSysMmbId = self._get_ClrSysMmbId(bank_account, payment_method_code)
+        if ClrSysMmbId is not None:
+            FinInstnId.append(ClrSysMmbId)
         return FinInstnId
+
+    def _get_ClrSysMmbId(self, bank_account, payment_method_code):
+        if bank_account._get_clearing_number():
+            ClrSysMmbId = etree.Element("ClrSysMmbId")
+            MmbId = etree.SubElement(ClrSysMmbId, "MmbId")
+            MmbId.text = bank_account._get_clearing_number()
+            return ClrSysMmbId
 
     def _get_CdtrAcct(self, bank_account, payment_method_code=None):
         CdtrAcct = etree.Element("CdtrAcct")
         Id = etree.SubElement(CdtrAcct, "Id")
-        if bank_account.acc_type == 'iban':
+        if bank_account.account_type == 'iban':
             IBAN = etree.SubElement(Id, "IBAN")
-            IBAN.text = bank_account.sanitized_acc_number
+            IBAN.text = bank_account.sanitized_account_number
         else:
             Id.append(self._get_CdtrAcctIdOthr(bank_account, payment_method_code))
         return CdtrAcct
@@ -365,12 +353,12 @@ class AccountJournal(models.Model):
     def _get_CdtrAcctIdOthr(self, bank_account, payment_method_code=None):
         Othr = etree.Element("Othr")
         Id = etree.SubElement(Othr, "Id")
-        acc_number = bank_account.acc_number
+        account_number = bank_account.sanitized_account_number
 
         # CH case when we have non-unique account numbers
-        if " " in bank_account.sanitized_acc_number and " " in bank_account.acc_number:
-            acc_number = bank_account.acc_number.split(" ")[0]
-        Id.text = acc_number
+        if " " in bank_account.sanitized_account_number and " " in bank_account.account_number:
+            account_number = bank_account.account_number.split(" ")[0]
+        Id.text = account_number
         return Othr
 
     def _get_RmtInf(self, payment_method_code, payment):
@@ -379,6 +367,8 @@ class AccountJournal(models.Model):
                 return 'be'
             elif self._is_qr_iban(payment):
                 return 'ch'
+            elif partner_country_code == 'DK' and sr.is_valid_structured_reference_dk(reference):
+                return 'dk'
             elif partner_country_code == 'FI' and sr.is_valid_structured_reference_fi(reference):
                 return 'fi'
             elif partner_country_code == 'NO' and sr.is_valid_structured_reference_no_se(reference):
@@ -401,10 +391,13 @@ class AccountJournal(models.Model):
         # Check whether we have a structured communication
         else:
             Ustrd = etree.SubElement(RmtInf, "Ustrd")
-            Ustrd.text = sanitize_communication(payment['memo'])
+            Ustrd.text = sanitize_communication(payment['memo'].replace('&', '+'))
         return RmtInf
 
-    def _get_company_PartyIdentification32(self, payment_method_code, postal_address=True, nm=True, issr=True, schme_nm=False):
+    def _get_organization_id_node_text(self, payment_method_code, postal_address):
+        return self.company_id.iso20022_orgid_id
+
+    def _get_company_PartyIdentification32(self, payment_method_line, postal_address=True, nm=True, issr=True, schme_nm=False, effective_payment_method_code=None):
         """ Returns a PartyIdentification32 element identifying the current journal's company
         """
         ret = []
@@ -414,7 +407,7 @@ class AccountJournal(models.Model):
         ret.append(Nm)
 
         if postal_address:
-            PstlAdr = self._get_PstlAdr(self.company_id.partner_id, payment_method_code)
+            PstlAdr = self._get_PstlAdr(self.company_id.partner_id, payment_method_line, effective_payment_method_code=effective_payment_method_code)
             if PstlAdr is not None:
                 ret.append(PstlAdr)
 
@@ -422,13 +415,13 @@ class AccountJournal(models.Model):
             Id = etree.Element("Id")
             OrgId = etree.SubElement(Id, "OrgId")
             company = self.company_id
-            if self.sepa_pain_version != "pain.001.001.03" and company.iso20022_lei:
+            if payment_method_line.sepa_pain_version == "pain.001.001.09" and company.iso20022_lei:
                 LEI = etree.Element("LEI")
                 LEI.text = self.company_id.iso20022_lei
                 OrgId.insert(0, LEI)
             Othr = etree.SubElement(OrgId, "Othr")
             _Id = etree.SubElement(Othr, "Id")
-            _Id.text = sanitize_communication(self.company_id.iso20022_orgid_id)
+            _Id.text = sanitize_communication(self._get_organization_id_node_text(payment_method_line.code, postal_address))
             if issr and company.iso20022_orgid_issr:
                 Issr = etree.SubElement(Othr, "Issr")
                 Issr.text = sanitize_communication(company.iso20022_orgid_issr)
@@ -444,13 +437,22 @@ class AccountJournal(models.Model):
     # HELPERS/HOOKS
     # -------------------------------------------------------------------------
 
-    def get_document_namespace(self, payment_method_code):
+    def get_document_namespace(self, payment_method_line):
         namespace = 'pain.001.001.03'
-        if self.sepa_pain_version == 'pain.001.001.09':
+        if payment_method_line.sepa_pain_version == 'pain.001.001.09':
             namespace = 'pain.001.001.09'
         return "urn:iso:std:iso:20022:tech:xsd:%s" % namespace
 
-    def _get_bic_tag(self, payment_method_code):
+    def _get_schema_location(self, payment_method_line):
+        # To override
+        """
+        Retrieve the XML Schema Location attributes for the payment file for validators.
+        :return: A tuple containing the schemaInstance attribute and the location string
+        or None if we don't need a schema location.
+        """
+        return None
+
+    def _get_bic_tag(self, payment_method_line, effective_payment_method_code=None):
         # To override per pain version
         return 'BIC'
 
@@ -465,23 +467,25 @@ class AccountJournal(models.Model):
             return 'NURG'
         return None
 
-    def _get_PstlAdr(self, partner_id, payment_method_code):
-        partner_address = self.get_postal_address(partner_id, payment_method_code)
+    def _get_PstlAdr(self, partner_id, payment_method_line, effective_payment_method_code=None):
+        payment_method_code = effective_payment_method_code or payment_method_line.code
+        partner_address = self.get_postal_address(partner_id, payment_method_line, effective_payment_method_code=payment_method_code)
         if partner_address:
             PstlAdr = etree.Element("PstlAdr")
             Ctry = etree.SubElement(PstlAdr, "Ctry")
             Ctry.text = partner_address['country']
             # Some banks seem allergic to having the zip in a separate tag, so we do as before
-            if partner_address.get('street'):
+            street = ", ".join(part for part in (partner_address.get('street'), partner_address.get('street2')) if part)
+            if street:
                 AdrLine = etree.SubElement(PstlAdr, "AdrLine")
-                AdrLine.text = sanitize_communication(partner_address['street'][:70])
+                AdrLine.text = sanitize_communication(street[:70])
             if partner_address.get('zip') and partner_address.get('city'):
                 AdrLine = etree.SubElement(PstlAdr, "AdrLine")
                 AdrLine.text = sanitize_communication((partner_address['zip'] + " " + partner_address['city'])[:70])
             return PstlAdr
         return None
 
-    def get_postal_address(self, partner_id, payment_method_code):
+    def get_postal_address(self, partner_id, payment_method_line, effective_payment_method_code=None):
         pstl_addr_list = [address for address in partner_id._get_all_addr() if address['country']]
         if not pstl_addr_list:
             if partner_id.is_company:
@@ -496,13 +500,13 @@ class AccountJournal(models.Model):
                 return addr_dict
         return pstl_addr_list[0]
 
-    def _skip_CdtrAgt(self, partner_bank, payment_method_code):
-        return self.env.context.get('skip_bic', False) or not partner_bank.bank_id.bic
+    def _skip_CdtrAgt(self, partner_bank, payment_method_line, effective_payment_method_code=None):
+        return self.env.context.get('skip_bic', False) or not partner_bank.bank_bic
 
     def _get_RmtInf_content(self, ref, reference_type=''):
         return self.get_strd_tree(ref, cd='SCOR', issr='ISO')
 
-    def _get_cleaned_bic_code(self, bank_account, payment_method_code):
+    def _get_cleaned_bic_code(self, bank_account, payment_method_line, effective_payment_method_code=None):
         """
         Checks if the BIC code is matching the pattern from the XSD to avoid having files generated here that are
         refused by banks after.
@@ -510,7 +514,7 @@ class AccountJournal(models.Model):
         """
         if not bank_account.bank_bic:
             return
-        regex = self._get_regex_for_bic_code(payment_method_code)
+        regex = self._get_regex_for_bic_code(payment_method_line, effective_payment_method_code)
         if not re.match(regex, bank_account.bank_bic):
             raise UserError(_("The BIC code '%(bic_code)s' associated to the bank '%(bank)s' of bank account '%(account)s' "
                               "of partner '%(partner)s' does not respect the required convention.\n"
@@ -519,11 +523,11 @@ class AccountJournal(models.Model):
                               "- 2 letters: country code\n"
                               "- 2 letters or digits: location code\n"
                               "- 3 letters or digits: branch code, optional\n",
-                              bic_code=bank_account.bank_bic, bank=bank_account.bank_id.name,
-                              account=bank_account.sanitized_acc_number, partner=bank_account.partner_id.name))
+                              bic_code=bank_account.bank_bic, bank=bank_account.bank_name,
+                              account=bank_account.sanitized_account_number, partner=bank_account.partner_id.name))
         return bank_account.bank_bic.replace(' ', '').upper()
 
-    def _get_regex_for_bic_code(self, payment_method_code):
+    def _get_regex_for_bic_code(self, payment_method_line, effective_payment_method_code=None):
         return '[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}'
 
     def _is_qr_iban(self, payment_dict):
@@ -534,13 +538,13 @@ class AccountJournal(models.Model):
         """
         partner_bank = self.env['res.partner.bank'].browse(payment_dict['partner_bank_id'])
         company = self.env['account.journal'].browse(payment_dict['journal_id']).company_id
-        iban = partner_bank.sanitized_acc_number
-        if (
-            partner_bank.acc_type != 'iban'
-            or (partner_bank.sanitized_acc_number or '')[:2] not in ('CH', 'LI')
-            or partner_bank.company_id.id not in (False, company.id)
-            or len(iban) < 9
-        ):
+        if partner_bank.company_id.id not in (False, company.id):
+            return False
+        return self._is_bank_account_qr_iban(partner_bank)
+
+    def _is_bank_account_qr_iban(self, bank_account):
+        iban = bank_account.sanitized_account_number
+        if iban[:2] not in ('CH', 'LI') or len(iban) < 9:
             return False
         iid = get_iban_part(iban, 'bank')
         return re.match(r'\d+', iid) \

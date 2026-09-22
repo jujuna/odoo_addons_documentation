@@ -2,8 +2,10 @@
 
 import re
 
+from requests import RequestException
+
 from odoo import models, _
-from odoo.exceptions import UserError, AccessError
+from odoo.exceptions import UserError
 from odoo.tools import html2plaintext
 from odoo.addons.iap.tools import iap_tools
 
@@ -40,10 +42,8 @@ Here is the data to generate the job description:
         prompt = recruiter_ai_prompt + self._get_plain_text_description()
         try:
             IrConfigParameter = self.env['ir.config_parameter'].sudo()
-            olg_api_endpoint = IrConfigParameter.get_param(
-                'html_editor.olg_api_endpoint', DEFAULT_OLG_ENDPOINT
-            )
-            database_id = IrConfigParameter.get_param('database.uuid')
+            olg_api_endpoint = IrConfigParameter.get_str('html_editor.olg_api_endpoint') or DEFAULT_OLG_ENDPOINT
+            database_id = IrConfigParameter.get_str('database.uuid')
             response = iap_tools.iap_jsonrpc(olg_api_endpoint + "/api/olg/1/chat", params={
                 'prompt': prompt,
                 'conversation_history': [],
@@ -63,5 +63,5 @@ Here is the data to generate the job description:
                 raise UserError(_(
                     'Sorry, we could not generate a response. Please try again later.'
                 ))
-        except AccessError:
-            raise AccessError(_('Oops, it looks like our AI is unreachable!'))
+        except RequestException:
+            raise UserError(_('Oops, it looks like our AI is unreachable!'))

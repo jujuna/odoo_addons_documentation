@@ -222,24 +222,23 @@ class ProviderUSPS(models.Model):
             quotes_list.append(rates_response.get('rateOptions', []))
 
         price = 0
-        mail_class = self.usps_domestic_service if self.usps_delivery_nature == 'domestic' else self.usps_international_service
+        mail_class, rate_indicator = (self.usps_domestic_service, self.usps_domestic_rating_indicator) if self.usps_delivery_nature == 'domestic' else (self.usps_international_service, self.usps_international_rating_indicator)
         mc_exists_for_all_packages = True
         for quotes in quotes_list:
-            mc_exists = False
-            for quote in quotes:
-                if quote.get('rates')[0].get('mailClass') == mail_class:
-                    price += quote.get('totalBasePrice')
-                    mc_exists = True
-                    break
-            if not mc_exists:
+            matching_quotes = [quote for quote in quotes if (
+                quote['rates'][0]['mailClass'] == mail_class and
+                quote['rates'][0]['rateIndicator'] == rate_indicator
+            )]
+            if not matching_quotes:
                 mc_exists_for_all_packages = False
                 break
+            price += matching_quotes[0].get('totalBasePrice')
         if mc_exists_for_all_packages:
             if order.currency_id.name == 'USD':
                 return {'success': True, 'price': price, 'error_message': False, 'warning_message': False}
             else:
                 quote_currency = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
-                price = quote_currency._convert(price, order.currency_id, order.company_id, order.date_order or fields.Date.today())
+                price = quote_currency._convert(price, order.currency_id, order.company_id, order.date_order)
                 return {'success': True, 'price': price, 'error_message': False, 'warning_message': False}
         else:
             return {
@@ -255,7 +254,7 @@ class ProviderUSPS(models.Model):
         product_lines = move_lines.filtered(lambda line: line.product_id.type in ['product', 'consu'])
         for product, lines in groupby(product_lines, lambda x: x.product_id):
             unit_quantity = sum(
-                line.product_uom_id._compute_quantity(
+                line.uom_id._compute_quantity(
                     line.quantity,
                     product.uom_id)
                 for line in lines)
@@ -347,7 +346,7 @@ class ProviderUSPS(models.Model):
                 'ZIPCode': split_zip(picking.partner_id.zip)[0],
                 'ZIPPlus4': split_zip(picking.partner_id.zip)[1] or None,
                 'firstName': picking.partner_id.name or '.',
-                'lastName': picking.partner_id.company_name or '.',
+                'lastName': picking.partner_id.parent_name or '.',
             }
             if self.usps_delivery_nature == 'international':
                 to_address.update({
@@ -362,7 +361,7 @@ class ProviderUSPS(models.Model):
                 'ZIPCode': split_zip(picking.picking_type_id.warehouse_id.partner_id.zip)[0],
                 'ZIPPlus4': split_zip(picking.picking_type_id.warehouse_id.partner_id.zip)[1] or None,
                 'firstName': picking.picking_type_id.warehouse_id.partner_id.name or '.',
-                'lastName': picking.picking_type_id.warehouse_id.partner_id.company_name or '.',
+                'lastName': picking.picking_type_id.warehouse_id.partner_id.parent_name or '.',
             }
             customs_form = {
                 'AESITN': 'XYZ',

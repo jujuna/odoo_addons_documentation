@@ -22,7 +22,7 @@ export class TimesheetAnalysisPivotModel extends PivotModel {
 
         for (const [groupBy, data] of params.groupingSets.map((g, i) => [g, multiData[i]])) {
             if (groupBy.includes("employee_id")) {
-                data.forEach((res) => {
+                data.subGroups.forEach((res) => {
                     const target = this.targets[res.employee_id[0]];
                     if (target) {
                         const name = _t("%(employee_name)s (%(target)sh / month)", {

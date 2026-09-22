@@ -4,10 +4,11 @@
 from datetime import date
 
 from odoo.exceptions import AccessError, ValidationError
-from odoo.tests.common import TransactionCase, new_test_user
+from odoo.tests.common import tagged, TransactionCase, new_test_user
 from odoo.addons.mail.tests.common import MockEmail
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHrAppraisalRequest(TransactionCase, MockEmail):
 
     @classmethod
@@ -147,8 +148,7 @@ class TestHrAppraisalRequest(TransactionCase, MockEmail):
             request_as_employee.body = '<t t-out="object.sudo().name"/>'
         # The employee cannot change the template to an arbitrary template
         with self.assertRaisesRegex(ValidationError, 'Appraisal for Michaël Hawkins should be using'):
-            with self.env.cr.savepoint():
-                request_as_employee.template_id = self.env['mail.template'].search([], limit=1)
+            request_as_employee.template_id = self.env['mail.template'].search([], limit=1)
 
         # A mail template editor can put sensitive placeholders
         request_as_template_editor.body = '<t t-out="object.sudo().employee_id.name"/>'

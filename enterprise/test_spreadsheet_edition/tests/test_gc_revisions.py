@@ -2,23 +2,26 @@
 from freezegun import freeze_time
 import json
 
+from odoo.tests import tagged
+
 from odoo.addons.spreadsheet_edition.tests.spreadsheet_test_case import (
     SpreadsheetTestCase,
 )
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class SpreadsheetRevisionTest(SpreadsheetTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env["ir.config_parameter"].set_param(
+        cls.env["ir.config_parameter"].set_int(
             "spreadsheet_edition.gc_revisions_inactivity_in_days", 365
         )
 
     def test_delete_history_after_inactivity(self):
         with freeze_time("2018-01-01"):
             spreadsheet = self.env["spreadsheet.test"].create({})
-            spreadsheet.dispatch_spreadsheet_message(
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
             snapshot = {"revisionId": "next-revision"}
@@ -52,7 +55,7 @@ class SpreadsheetRevisionTest(SpreadsheetTestCase):
     def test_do_not_delete_active_revisions(self):
         with freeze_time("2018-01-01"):
             spreadsheet = self.env["spreadsheet.test"].create({})
-            spreadsheet.dispatch_spreadsheet_message(
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
             snapshot = {"revisionId": "next-revision"}
@@ -60,7 +63,7 @@ class SpreadsheetRevisionTest(SpreadsheetTestCase):
                 spreadsheet, spreadsheet.current_revision_uuid, "next-revision", snapshot
             )
             # revision after the snapshot
-            spreadsheet.dispatch_spreadsheet_message(
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
             revisions = spreadsheet.with_context(
@@ -83,7 +86,7 @@ class SpreadsheetRevisionTest(SpreadsheetTestCase):
     def test_do_not_delete_recently_renamed_revisions(self):
         with freeze_time("2018-01-01"):
             spreadsheet = self.env["spreadsheet.test"].create({})
-            spreadsheet.dispatch_spreadsheet_message(
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
             snapshot = {"revisionId": "next-revision"}
@@ -116,7 +119,7 @@ class SpreadsheetRevisionTest(SpreadsheetTestCase):
     def test_do_not_delete_with_no_snapshot(self):
         with freeze_time("2018-01-01"):
             spreadsheet = self.env["spreadsheet.test"].create({})
-            spreadsheet.dispatch_spreadsheet_message(
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
             revisions = spreadsheet.spreadsheet_revision_ids

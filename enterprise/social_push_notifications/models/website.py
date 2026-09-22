@@ -7,14 +7,7 @@ from odoo import api, fields, models
 class Website(models.Model):
     _inherit = 'website'
 
-    firebase_enable_push_notifications = fields.Boolean('Enable Web Push Notifications')
-    firebase_use_own_account = fields.Boolean('Use your own Firebase account')
-    firebase_project_id = fields.Char('Firebase Project ID')
-    firebase_web_api_key = fields.Char('Firebase Web API Key')
-    firebase_web_app_id = fields.Char('Firebase Web App ID')
-    firebase_push_certificate_key = fields.Char('Firebase Push Certificate Key')
-    firebase_sender_id = fields.Char('Firebase Sender ID')
-    firebase_admin_key_file = fields.Binary('Firebase Admin Key File', groups="social.group_social_manager")
+    enable_push_notifications = fields.Boolean('Enable Web Push Notifications')
 
     notification_request_title = fields.Char('Notification Request Title')
     notification_request_body = fields.Text('Notification Request Text')

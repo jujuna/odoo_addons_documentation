@@ -1,12 +1,13 @@
 from datetime import timedelta, datetime
-from odoo.tools.xml_utils import cleanup_xml_node
-from markupsafe import escape, Markup
-from base64 import b64encode, b64decode
-from pytz import timezone
 from time import sleep
+from zoneinfo import ZoneInfo
+
+from markupsafe import escape, Markup
 
 from odoo import api, fields, models, _
 from odoo.exceptions import LockError, UserError
+from odoo.tools import BinaryBytes
+from odoo.tools.xml_utils import cleanup_xml_node
 
 
 class StockPicking(models.Model):
@@ -96,6 +97,7 @@ class StockPicking(models.Model):
         compute='_compute_l10n_ec_is_delivery_guide',
         help="Ecuador: Allow to know when an stock picking is a Delivery Guide.",
     )
+    l10n_ec_edi_alerts = fields.Json(compute='_compute_l10n_ec_edi_alerts')
 
     @api.depends('scheduled_date')
     def _compute_l10n_ec_delivery_guide_dates(self):
@@ -152,6 +154,34 @@ class StockPicking(models.Model):
             stock_picking.l10n_ec_is_delivery_guide = stock_picking.country_code == 'EC' and \
                 stock_picking.location_id.usage == 'internal'
 
+    @api.depends('l10n_ec_is_delivery_guide', 'l10n_ec_edi_status',
+                 'picking_type_id.warehouse_id.l10n_ec_entity',
+                 'picking_type_id.warehouse_id.l10n_ec_emission',
+                 'company_id.l10n_ec_edi_provider_id.vat')
+    def _compute_l10n_ec_edi_alerts(self):
+        """
+        Warn about a software provider RUC still to be configured, from the moment the
+        picking is a delivery guide candidate until the guide has been generated.
+        """
+        for stock_picking in self:
+            warehouse = stock_picking.picking_type_id.warehouse_id
+            stock_picking.l10n_ec_edi_alerts = {}
+            if (
+                stock_picking.l10n_ec_is_delivery_guide
+                and not stock_picking.l10n_ec_edi_status
+                and warehouse.l10n_ec_entity
+                and warehouse.l10n_ec_emission
+                and not stock_picking.company_id._l10n_ec_is_provider_vat_valid()
+            ):
+                stock_picking.l10n_ec_edi_alerts = {
+                    'l10n_ec_edi_missing_provider_vat': {
+                        'level': 'warning',
+                        'message': self.env._("The contact selected in the Software Provider field must have a valid 13-digit RUC"),
+                        'action_text': self.env._("Configure"),
+                        'action': self.env.ref('account.action_account_config')._get_action_dict(),
+                    },
+                }
+
     def _l10n_ec_edi_validations(self):
         """
         Rum the validations for the delivery guide. At this time:
@@ -163,11 +193,14 @@ class StockPicking(models.Model):
         - The warehouse must have an emission point set
         """
         error_list = []
+        transporter = self.l10n_ec_transporter_id
         if self.location_id.usage != 'internal':
             error_list.append(_("The source location must be internal"))
         if not self.l10n_ec_transfer_reason:
             error_list.append(_("The transfer reason is not set. Please set it before sending the delivery guide."))
-        if not self.l10n_ec_transporter_id:
+        if not self.partner_id:
+            error_list.append(_("The partner is not set. Please set it before sending the delivery guide."))
+        if not transporter:
             error_list.append(_("The transporter is not set. Please set it before sending the delivery guide."))
         if not self.l10n_ec_plate_number:
             error_list.append(_("The plate number is not set. Please set it before sending the delivery guide."))
@@ -175,8 +208,8 @@ class StockPicking(models.Model):
             error_list.append(_("The warehouse must have an entity point set. Please set it before sending the delivery guide."))
         if not self.picking_type_id.warehouse_id.l10n_ec_emission:
             error_list.append(_("The warehouse must have an emission point set. Please set it before sending the delivery guide."))
-        if not self.l10n_ec_transporter_id.vat or not self.l10n_ec_transporter_id.l10n_latam_identification_type_id:
-            error_list.append(_("The transporter must have a defined VAT and an identification type."))
+        if transporter and not transporter._get_preferred_legal_entity_identifier_vals():
+            error_list.append(_("The transporter must have a defined VAT or Cédula."))
         if not self.company_id.vat:
             error_list.append(_("You must set a VAT number for company %s", self.company_id.display_name))
         if not self.company_id.l10n_ec_legal_name:
@@ -185,8 +218,8 @@ class StockPicking(models.Model):
             error_list.append(_("You must define an address(street) in the settings for company %s", self.company_id.name))
         if not self.picking_type_id.warehouse_id.partner_id.street:
             error_list.append(_("You must define an address(street) for warehouse %s", self.picking_type_id.warehouse_id.name))
-        if not self.partner_id.commercial_partner_id.vat:
-            error_list.append(_("You must set a VAT number for partner %s", self.partner_id.commercial_partner_id.display_name))
+        if self.partner_id and not self.partner_id.commercial_partner_id._get_preferred_legal_entity_identifier_vals().get('value', ''):
+            error_list.append(_("You must set a VAT or Cédula number for partner %s", self.partner_id.commercial_partner_id.display_name))
         if not self.partner_id.street:
             error_list.append(_("You must define an address(street) for partner %s", self.partner_id.display_name))
         if error_list:
@@ -213,7 +246,7 @@ class StockPicking(models.Model):
             signed_edi_str = account_edi_format_model._l10n_ec_generate_signed_xml(record.company_id, edi_str)
             record.write({
                 'l10n_ec_edi_status': 'to_send',
-                'l10n_ec_edi_content': b64encode(signed_edi_str.encode()),
+                'l10n_ec_edi_content': BinaryBytes(signed_edi_str.encode()),
                 'l10n_ec_delivery_guide_error': False,
             })
 
@@ -235,7 +268,7 @@ class StockPicking(models.Model):
                 raise UserError(_('Some of these electronic documents are already being processed.')) from None
             return
         for record in self.filtered(lambda x: x.l10n_ec_edi_status == 'to_send'):
-            signed_edi_str = b64decode(record.l10n_ec_edi_content).decode()
+            signed_edi_str = record.l10n_ec_edi_content.decode()
             errors, call_status, attachment = self._l10n_ec_send_xml_to_authorize(
                 record,
                 signed_edi_str
@@ -247,7 +280,7 @@ class StockPicking(models.Model):
                 record.write({
                     'l10n_ec_delivery_guide_error': False,
                     'l10n_ec_edi_status': 'sent',
-                    'l10n_ec_edi_content': attachment.datas,
+                    'l10n_ec_edi_content': attachment.raw,
                 })
 
     def l10n_ec_send_delivery_guide_to_partner(self):
@@ -261,7 +294,7 @@ class StockPicking(models.Model):
         xml_attachment = self.env['ir.attachment'].create({
             'name': f'GuíRe {self.l10n_ec_edi_document_number}.xml',
             'type': 'binary',
-            'datas': self.l10n_ec_edi_content,
+            'raw': self.l10n_ec_edi_content,
             'res_model': self._name,
             'res_id': self.id,
             'mimetype': 'application/xml',
@@ -271,7 +304,7 @@ class StockPicking(models.Model):
         pdf_attachment = self.env['ir.attachment'].create({
             'name': f'GuíRe {self.l10n_ec_edi_document_number}.pdf',
             'type': 'binary',
-            'datas': b64encode(pdf_content),
+            'raw': pdf_content,
             'res_model': self._name,
             'res_id': self.id,
             'mimetype': 'application/pdf',
@@ -284,7 +317,6 @@ class StockPicking(models.Model):
             default_use_template=True,
             default_template_id=template.id,
             default_composition_mode='comment',
-            default_email_layout_xmlid='mail.mail_notification_layout_with_responsible_signature',
             force_email=True,
         ).create({
             'attachment_ids': [(4, pdf_attachment.id), (4, xml_attachment.id)],
@@ -326,7 +358,7 @@ class StockPicking(models.Model):
             'record': self,
             'l10n_ec_production_env': '2' if self.company_id.l10n_ec_production_env else '1',
             'l10n_ec_legal_name': self.company_id.l10n_ec_legal_name,
-            'commercial_company_name': self.company_id.partner_id.commercial_company_name,
+            'parent_name': self.company_id.partner_id.parent_name,
             'company_vat': self.company_id.partner_id.vat,
             'l10n_ec_authorization_number': self.l10n_ec_authorization_number,
             'l10n_ec_entity': self.picking_type_id.warehouse_id.l10n_ec_entity,
@@ -335,16 +367,16 @@ class StockPicking(models.Model):
             'company_street': self.company_id.street,
             'warehouse_street': self.picking_type_id.warehouse_id.partner_id.street,
             'l10n_ec_transporter_name': self.l10n_ec_transporter_id.name,
-            'l10n_ec_transporter_sri_code': self.l10n_ec_transporter_id._get_sri_code_for_partner().value,
-            'l10n_ec_transporter_vat': self.l10n_ec_transporter_id.vat,
+            'l10n_ec_transporter_sri_code': self.l10n_ec_transporter_id._get_sri_code_for_partner(),
+            'l10n_ec_transporter_vat': self.l10n_ec_transporter_id._get_preferred_legal_entity_identifier_vals().get('value', ''),
             'l10n_ec_forced_accounting': 'SI' if self.company_id.l10n_ec_forced_accounting else 'NO',
             'l10n_ec_special_taxpayer_number': self.company_id.l10n_ec_special_taxpayer_number,
             'l10n_ec_delivery_start_date': self.l10n_ec_delivery_start_date.strftime('%d/%m/%Y'),
             'l10n_ec_delivery_end_date': self.l10n_ec_delivery_end_date.strftime('%d/%m/%Y'),
             'l10n_ec_plate_number': self.l10n_ec_plate_number.replace('-', ''),
-            'partner_vat': self.partner_id.commercial_partner_id.vat,
+            'partner_vat': self.partner_id.commercial_partner_id._get_preferred_legal_entity_identifier_vals().get('value', ''),
             'partner_name': self.partner_id.commercial_partner_id.name,
-            'partner_address': self.partner_id._display_address().replace('\n', ' - '),
+            'partner_address': self.partner_id._display_address(separator=' - '),
             'l10n_ec_transfer_reason': self.l10n_ec_transfer_reason,
             'lines': [{
                 'product_barcode': line.product_id.barcode or line.product_id.default_code or 'N/A', # TODO: remove in master and keep main_code
@@ -356,6 +388,7 @@ class StockPicking(models.Model):
             } for line in self.move_line_ids],
             'note': self.note.striptags().replace('\n', ' ')[:300] if self.note else None,
             'origin': self.origin or None,
+            'provider_vat': self.company_id.l10n_ec_edi_provider_id.vat or None,
         }
 
     def _l10n_ec_get_authorization_number(self):
@@ -442,7 +475,7 @@ class StockPicking(models.Model):
                 'res_id': picking.id,
                 'res_model': picking._name,
                 'type': 'binary',
-                'raw': self.env['account.edi.format']._l10n_ec_create_authorization_file_new(picking.company_id, xml_string, auth_num, auth_date),
+                'raw': self.env['account.edi.format']._l10n_ec_create_authorization_file(picking.company_id, xml_string, auth_num, auth_date),
                 'mimetype': 'application/xml',
                 'description': f"Ecuadorian electronic document generated for document {picking.display_name}."
             })
@@ -462,13 +495,13 @@ class StockPicking(models.Model):
         """
         Generates an xml attachment to simulate a response from the SRI without the need for a digital signature.
         """
-        picking.l10n_ec_authorization_date = datetime.now(tz=timezone('America/Guayaquil')).date()
+        picking.l10n_ec_authorization_date = datetime.now(tz=ZoneInfo('America/Guayaquil')).date()
         attachment = self.env['ir.attachment'].create({
             'name': f'GuíRe {picking.l10n_ec_edi_document_number}.xml',
             'res_id': picking.id,
             'res_model': picking._name,
             'type': 'binary',
-            'raw': self.env['account.edi.format']._l10n_ec_create_authorization_file_new(
+            'raw': self.env['account.edi.format']._l10n_ec_create_authorization_file(
                 picking.company_id, xml_string,
                 picking.l10n_ec_authorization_number, picking.l10n_ec_authorization_date),
             'mimetype': 'application/xml',
@@ -506,4 +539,5 @@ class StockPicking(models.Model):
             'E-mail': self.partner_id.email or '',
             'Dirección': self.partner_id.street or '',
             'Teléfono': self.partner_id.phone or '',
+            'RUC Proveedor': self.company_id.l10n_ec_edi_provider_id.vat or '',
         }

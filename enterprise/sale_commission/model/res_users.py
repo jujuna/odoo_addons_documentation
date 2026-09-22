@@ -12,7 +12,7 @@ class ResUsers(models.Model):
     def write(self, vals):
         res = super().write(vals)
         if 'sale_team_id' in vals:
-            today = fields.Date.today()
+            today = fields.Date.context_today(self)
             commission_plan_user = [{
                 'plan_id': plan.id,
                 'user_id': user.id,
@@ -23,7 +23,7 @@ class ResUsers(models.Model):
 
     @api.depends('commission_plan_users_ids')
     def _compute_filtered_commission_plan_users_ids(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         for user in self:
             user.filtered_commission_plan_users_ids = user.commission_plan_users_ids.filtered(lambda x:
                 x.date_from >= today and x.date_to <= today)

@@ -25,7 +25,7 @@ class StockMove(models.Model):
         # Groupby move by picking. Use it in order to generate missing quality checks.
         pick_moves = defaultdict(lambda: self.env['stock.move'])
         for move in self:
-            if move.picking_id and move.location_dest_usage != 'inventory':
+            if move.picking_id and not move.is_scrap:
                 pick_moves[move.picking_id] |= move
         check_vals_list = self._create_operation_quality_checks(pick_moves)
         for picking, moves in pick_moves.items():
@@ -68,6 +68,11 @@ class StockMove(models.Model):
         is_product_canceled = defaultdict(lambda: True)
         for qc in self.picking_id.sudo().check_ids:
             if qc.quality_state != 'none':
+                continue
+            if qc.measure_on == 'operation':
+                # Operation check covers the whole transfer: unlink only if all its moves are canceled.
+                if all(move.state == 'cancel' for move in qc.picking_id.move_ids):
+                    to_unlink |= qc
                 continue
             if (qc.picking_id, qc.product_id) not in is_product_canceled:
                 for move in qc.picking_id.move_ids:

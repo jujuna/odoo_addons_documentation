@@ -6,7 +6,7 @@ from odoo.tests.common import TransactionCase
 class TestAISources(TransactionCase):
     # tests the processing of rich spreadsheets indexed by `attachment_indexation`
     def _create_attachment(self, name, mimetype, content):
-        with patch.object(self.registry['ir.attachment'], '_index', lambda self, data, _type: data):
+        with patch.object(self.registry['ir.attachment'], '_index', lambda self, data, _type: data.decode() or None):
             return self.env['ir.attachment'].create({
                 'name': name,
                 'mimetype': mimetype,

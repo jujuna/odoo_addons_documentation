@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -16,8 +15,6 @@ Forecast shifts and keep an eye on the hours consumed on your plannable products
     'depends': ['sale_planning', 'sale_project', 'project_forecast'],
     'data': [
         'views/planning_slot_views.xml',
-        'views/planning_templates.xml',
-        'views/product_template_views.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

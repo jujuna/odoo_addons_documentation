@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="mail.mail_activity_type_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='category']" position="after">
-                <field name="folder_id" invisible="category != 'upload_file'" widget="documents_folder_many2one"/>
+                <field name="folder_id" invisible="category != 'upload_file'" context="{'default_type': 'folder'}"/>
                 <field name="tag_ids" widget="many2many_tags" invisible="category != 'upload_file'"/>
             </xpath>
         </field>

@@ -1,8 +1,12 @@
 import { _t } from "@web/core/l10n/translation";
 import { user } from "@web/core/user";
 
-export const DocumentsRecordMixin = (component) =>
-    class extends component {
+/**
+ * @template {typeof import("@web/model/relational_model/record").Record} T
+ * @param {T} RelationalRecord
+ */
+export const DocumentsRecordMixin = (RelationalRecord) =>
+    class extends RelationalRecord {
         setup(config, data, options = {}) {
             super.setup(...arguments);
             if (data.id === this.model.documentService.documentIdToRestore) {
@@ -49,16 +53,13 @@ export const DocumentsRecordMixin = (component) =>
         isPdf() {
             return (
                 this.data.mimetype === "application/pdf" ||
-                this.data.mimetype === "application/pdf;base64"
+                this.data.mimetype === "application/pdf;base64" ||
+                this.data?.has_embedded_pdf === true
             );
         }
 
         isRequest() {
-            return (
-                !this.data.shortcut_document_id &&
-                this.data.type === "binary" &&
-                !this.data.attachment_id
-            );
+            return !this.data.shortcut_document_id && this.data.type === "request";
         }
 
         isShortcut() {

@@ -4,7 +4,7 @@ import { useService } from "@web/core/utils/hooks";
 import { NotEditableActionError } from "../../studio_service";
 import { IconCreatorDialog } from "./icon_creator_dialog/icon_creator_dialog";
 
-import { onMounted, onWillUnmount, useRef } from "@odoo/owl";
+import { onMounted, onWillUnmount, proxy } from "@odoo/owl";
 const NEW_APP_BUTTON = {
     isNewAppButton: true,
     label: _t("New App"),
@@ -19,7 +19,6 @@ const NEW_APP_BUTTON = {
  * @extends HomeMenu
  */
 export class StudioHomeMenu extends HomeMenu {
-    static props = { apps: HomeMenu.props.apps };
     static template = "web_studio.StudioHomeMenu";
 
     /**
@@ -42,7 +41,6 @@ export class StudioHomeMenu extends HomeMenu {
         this.studio = useService("studio");
         this.notifications = useService("notification");
         this.dialog = useService("dialog");
-        this.root = useRef("root");
 
         onMounted(() => {
             this.canEditIcons = true;
@@ -107,7 +105,7 @@ export class StudioHomeMenu extends HomeMenu {
         if (!this.canEditIcons) {
             return;
         }
-        const editedAppData = {};
+        const editedAppData = proxy({});
         if (app.webIconData) {
             Object.assign(editedAppData, {
                 webIconData: app.webIconData,
@@ -117,7 +115,7 @@ export class StudioHomeMenu extends HomeMenu {
             Object.assign(editedAppData, {
                 backgroundColor: app.webIcon.backgroundColor,
                 color: app.webIcon.color,
-                iconClass: app.webIcon.iconClass,
+                icon: app.webIcon.icon,
                 type: "custom_icon",
             });
         }

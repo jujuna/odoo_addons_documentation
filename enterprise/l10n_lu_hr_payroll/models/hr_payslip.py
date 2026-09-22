@@ -28,7 +28,7 @@ class HrPayslip(models.Model):
         ('without', 'Without')],
         compute='_compute_l10n_lu_tax_classification', store=True, readonly=False)
     l10n_lu_tax_rate_no_classification = fields.Float(
-        compute="_compute_l10n_lu_tax_id_number", store=True, readonly=False)
+        compute="_compute_l10n_lu_tax_rate_no_classification", store=True, readonly=False)
 
     l10n_lu_deduction_fd_daily = fields.Monetary(
         compute="_compute_l10n_lu_deduction_fd_daily", store=True, readonly=False)
@@ -206,21 +206,14 @@ class HrPayslip(models.Model):
                 'data/hr_salary_rule_category_data.xml',
                 'data/hr_payroll_structure_type_data.xml',
                 'data/hr_payroll_structure_data.xml',
-                'data/hr_payslip_input_type_data.xml',
+                'data/salary_rules/hr_13th_month_rule_data.xml',
+                'data/salary_rules/hr_gratification_rule_data.xml',
+                'data/salary_rules/hr_salary_rule_data.xml'
             ])]
-
-    def _get_paid_amount(self):
-        self.ensure_one()
-        if self.struct_id.country_id.code == 'LU' and self.struct_id.code == 'LUX_MONTHLY' and self.version_id.wage_type == 'monthly':
-            return self.l10n_lu_prorated_wage
-        elif self.struct_id.country_id.code == 'LU' and self.struct_id.code == 'LUX_13TH_MONTH':
-            return self._get_paid_amount_l10n_lu_13th_month()
-        return super()._get_paid_amount()
 
     def _get_month_presence_prorata(self):
         self.ensure_one()
-        unpaid_codes = self.struct_id.unpaid_work_entry_type_ids.mapped('code')
-        paid_lines = self.worked_days_line_ids.filtered(lambda wd: wd.code not in unpaid_codes)
+        paid_lines = self.worked_days_line_ids.filtered(lambda wd: wd.is_paid)
         paid_hours = sum(paid_lines.mapped('number_of_hours'))
 
         # YTI TOFIX: Localise start_date/end_date according to employee.tz
@@ -258,3 +251,9 @@ class HrPayslip(models.Model):
 
     def _get_paid_amount_l10n_lu_13th_month(self):
         return self._get_yearly_simulated_gross() / 12
+
+    @api.model
+    def _issues_dependencies(self):
+        dependencies = super()._issues_dependencies()
+        dependencies.append('net_wage')
+        return dependencies

@@ -4,16 +4,27 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:06+0000\n"
-"PO-Revision-Date: 2025-12-30 19:06+0000\n"
+"POT-Creation-Date: 2026-09-18 18:19+0000\n"
+"PO-Revision-Date: 2026-09-18 18:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_ec_edi_stock
+#: model:ir.module.module,description:base.module_l10n_ec_edi_stock
+msgid ""
+"\n"
+"The delivery guide (Guía de Remisión) is needed as a proof\n"
+"that you are sending goods between A and B.\n"
+"\n"
+"It is only when a delivery order is validated that you can create the delivery\n"
+"guide.\n"
+msgstr ""
 
 #. module: l10n_ec_edi_stock
 #. odoo-python
@@ -26,16 +37,6 @@ msgstr ""
 #. module: l10n_ec_edi_stock
 #: model:ir.actions.report,print_report_name:l10n_ec_edi_stock.action_delivery_guide_report_pdf
 msgid "'GuíRe %s' % (object.l10n_ec_edi_document_number or 's/n')"
-msgstr ""
-
-#. module: l10n_ec_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_ec_edi_stock.view_l10n_ec_edi_stock_view_warehouse_form
-msgid "001"
-msgstr ""
-
-#. module: l10n_ec_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_ec_edi_stock.sri_delivery_guide
-msgid "06"
 msgstr ""
 
 #. module: l10n_ec_edi_stock
@@ -101,6 +102,11 @@ msgstr ""
 #. module: l10n_ec_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_ec_edi_stock.report_delivery_guide_lang
 msgid "<span>Quantity</span>"
+msgstr ""
+
+#. module: l10n_ec_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_ec_edi_stock.custom_header
+msgid "<strong id=\"inv_tax_id_label\">RUC/Cédula:</strong>"
 msgstr ""
 
 #. module: l10n_ec_edi_stock
@@ -202,6 +208,12 @@ msgstr ""
 #. module: l10n_ec_edi_stock
 #: model:ir.model.fields.selection,name:l10n_ec_edi_stock.selection__stock_picking__l10n_ec_edi_status__cancelled
 msgid "Cancelled"
+msgstr ""
+
+#. module: l10n_ec_edi_stock
+#. odoo-python
+#: code:addons/l10n_ec_edi_stock/models/stock_picking.py:0
+msgid "Configure"
 msgstr ""
 
 #. module: l10n_ec_edi_stock
@@ -353,6 +365,11 @@ msgid "Ecuador: Transporter of the goods."
 msgstr ""
 
 #. module: l10n_ec_edi_stock
+#: model:ir.module.module,shortdesc:base.module_l10n_ec_edi_stock
+msgid "Ecuadorian Delivery Guide"
+msgstr ""
+
+#. module: l10n_ec_edi_stock
 #. odoo-python
 #: code:addons/l10n_ec_edi_stock/models/stock_picking.py:0
 msgid ""
@@ -416,6 +433,11 @@ msgid "Is Delivery Guide"
 msgstr ""
 
 #. module: l10n_ec_edi_stock
+#: model:ir.model.fields,field_description:l10n_ec_edi_stock.field_stock_picking__l10n_ec_edi_alerts
+msgid "L10N Ec Edi Alerts"
+msgstr ""
+
+#. module: l10n_ec_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_ec_edi_stock.custom_header
 msgid "Missing barcode for authorization number"
 msgstr ""
@@ -456,11 +478,6 @@ msgstr ""
 msgid ""
 "RIMPE Contributor Type\n"
 "                                            <br/>"
-msgstr ""
-
-#. module: l10n_ec_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_ec_edi_stock.custom_header
-msgid "RUC/Cédula"
 msgstr ""
 
 #. module: l10n_ec_edi_stock
@@ -522,6 +539,14 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ec_edi_stock
+#. odoo-python
+#: code:addons/l10n_ec_edi_stock/models/stock_picking.py:0
+msgid ""
+"The contact selected in the Software Provider field must have a valid "
+"13-digit RUC"
+msgstr ""
+
+#. module: l10n_ec_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_ec_edi_stock.view_l10n_ec_edi_stock_picking_form
 msgid "The delivery guide will soon be sent to SRI"
 msgstr ""
@@ -530,6 +555,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_ec_edi_stock/models/stock_picking.py:0
 msgid "The partner does not have an email address."
+msgstr ""
+
+#. module: l10n_ec_edi_stock
+#. odoo-python
+#: code:addons/l10n_ec_edi_stock/models/stock_picking.py:0
+msgid ""
+"The partner is not set. Please set it before sending the delivery guide."
 msgstr ""
 
 #. module: l10n_ec_edi_stock
@@ -564,7 +596,7 @@ msgstr ""
 #. module: l10n_ec_edi_stock
 #. odoo-python
 #: code:addons/l10n_ec_edi_stock/models/stock_picking.py:0
-msgid "The transporter must have a defined VAT and an identification type."
+msgid "The transporter must have a defined VAT or Cédula."
 msgstr ""
 
 #. module: l10n_ec_edi_stock
@@ -653,7 +685,7 @@ msgstr ""
 #. module: l10n_ec_edi_stock
 #. odoo-python
 #: code:addons/l10n_ec_edi_stock/models/stock_picking.py:0
-msgid "You must set a VAT number for partner %s"
+msgid "You must set a VAT or Cédula number for partner %s"
 msgstr ""
 
 #. module: l10n_ec_edi_stock

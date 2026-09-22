@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="web_studio.test_report_document" model="ir.ui.view">
+    <record id="web_studio.bad_studio_test_report_view" model="ir.ui.view">
         <field name="name">fake view</field>
         <field nae="type">qweb</field>
         <field name="arch" type="xml">
-            <p>from file</p>
+            <xpath expr="//div" position="after">
+                <p>from file</p>
+            </xpath>
         </field>
     </record>
 

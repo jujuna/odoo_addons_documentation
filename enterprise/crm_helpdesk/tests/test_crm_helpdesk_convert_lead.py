@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.helpdesk.tests import common as helpdesk_common
@@ -8,6 +7,7 @@ from odoo.tests.common import tagged, users
 
 
 @tagged('lead_manage')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestTicketConvertToLead(helpdesk_common.HelpdeskCommon):
 
     @classmethod
@@ -41,12 +41,11 @@ class TestTicketConvertToLead(helpdesk_common.HelpdeskCommon):
             'user_id': cls.helpdesk_user.id,
             'partner_name': 'My Test Customer',
             'partner_email': '"My Test Customer" <my.customer@example.com>',
-            'email_cc': '"My Test Customer" <my.customer@example.com>',
             'campaign_id': cls.test_campaign.id,
             'team_id': False,
             'medium_id': cls.test_medium.id,
             'source_id': cls.test_source.id,
-            'company_id': cls.main_company_id
+            'company_id': cls.main_company.id
         })
 
     def assertLeadTicketConvertData(self, lead, ticket, partner, crm_team, user_id):
@@ -57,7 +56,6 @@ class TestTicketConvertToLead(helpdesk_common.HelpdeskCommon):
         self.assertEqual(lead.name, ticket.name)
         self.assertEqual(lead.description, ticket.description)
         self.assertEqual(lead.partner_id, partner)
-        self.assertEqual(lead.email_cc, ticket.email_cc)
         self.assertEqual(lead.email_from, partner.email)
         self.assertEqual(lead.phone, partner.phone)
         self.assertEqual(lead.team_id, crm_team)
@@ -145,34 +143,6 @@ class TestTicketConvertToLead(helpdesk_common.HelpdeskCommon):
         self.assertTrue(all(message in lead.message_ids for message in ticket_message_ids))
         self.assertIn(msg, lead.message_ids)
 
-    @users('user_helpdesk_user')
-    def test_lead_convert_to_ticket_w_name(self):
-        """ Test matching partner based on name """
-        ticket = self.env["helpdesk.ticket"].browse(self.test_ticket.ids)
-        ticket.update({
-            'partner_id': False,
-            'partner_email': False,
-        })
-        new_partner = self.env['res.partner'].search([('email', '=', 'my.customer@example.com')])
-        self.assertTrue(len(new_partner))
-
-        # ensure basic rights on team and ticket type
-        test_crm_team = self.env['crm.team'].browse(self.test_team.ids)
-
-        # invoke wizard and apply it
-        convert = self.env['helpdesk.ticket.to.lead'].with_context({
-            'default_ticket_id': ticket.id,
-        }).create({
-            'team_id': test_crm_team.id,
-        })
-        self.assertEqual(convert.action, 'exist')
-        self.assertEqual(convert.partner_id, new_partner)
-        convert.action_convert_to_lead()
-
-        # check created lead coherency
-        lead = self.env['crm.lead'].sudo().search([('name', '=', ticket.name)])
-        self.assertLeadTicketConvertData(lead, ticket, new_partner, test_crm_team, self.env['res.users'])
-
     def test_helpdesk_ticket_to_lead(self):
         """ Test to ensure that a helpdesk ticket is converted to a lead when the user has CRM lead access. """
         self.assertTrue(self.test_ticket.active)
@@ -196,3 +166,19 @@ class TestTicketConvertToLead(helpdesk_common.HelpdeskCommon):
         self.assertFalse(self.test_ticket.active)
         lead_count = self.env['crm.lead'].search_count([('name', '=', self.test_ticket.name), ('type', '=', 'opportunity')], limit=1)
         self.assertEqual(lead_count, 1)
+
+    def test_helpdesk_ticket_to_opportunity_wizard_without_partner(self):
+        """
+        Test the helpdesk ticket to opportunity wizard when the helpdesk
+        ticket has no customer set.
+        """
+        ticket = self.env['helpdesk.ticket'].create({
+            'name': 'Test Ticket',
+        })
+        ticket_to_opportunity_wizard = self.env['helpdesk.ticket.to.lead'].with_context(
+            active_model='helpdesk.ticket', active_id=ticket.id,
+        ).new()
+
+        self.assertEqual(ticket_to_opportunity_wizard.ticket_id, ticket)
+        self.assertEqual(ticket_to_opportunity_wizard.action, 'create')
+        self.assertFalse(ticket_to_opportunity_wizard.partner_id)

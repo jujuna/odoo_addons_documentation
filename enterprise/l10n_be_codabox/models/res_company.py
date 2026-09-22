@@ -20,25 +20,25 @@ class ResCompany(models.Model):
     def _l10n_be_codabox_get_iap_common_params(self):
         self._l10n_be_codabox_verify_prerequisites()
         return {
-            "db_uuid": self.env["ir.config_parameter"].sudo().get_param("database.uuid"),
+            "db_uuid": self.env["ir.config_parameter"].sudo().get_str('database.uuid'),
             "company_vat": self.l10n_be_codabox_company_vat,
             "fidu_vat": self.l10n_be_codabox_fiduciary_vat,
         }
 
     def _compute_l10n_be_codabox_company_vat(self):
         for company in self:
-            if company.vat and company.vat != "/":
+            if company.has_vat:
                 company.l10n_be_codabox_company_vat = company.vat
             else:
-                company.l10n_be_codabox_company_vat = company.company_registry
+                company.l10n_be_codabox_company_vat = company.partner_id._get_additional_identifier('BE_EN')
             company.l10n_be_codabox_company_vat = re.sub(r"[^0-9]", "", company.l10n_be_codabox_company_vat or "")
 
     def _compute_l10n_be_codabox_fiduciary_vat(self):
         for company in self:
-            if codabox_contract_sys_param := self.env['ir.config_parameter'].sudo().get_param("l10n_be_codabox.codabox_contract"):
+            if codabox_contract_sys_param := self.env['ir.config_parameter'].sudo().get_str("l10n_be_codabox.codabox_contract"):
                 company.l10n_be_codabox_fiduciary_vat = codabox_contract_sys_param
             elif company.account_representative_id:
-                company.l10n_be_codabox_fiduciary_vat = company.account_representative_id.vat or company.company_registry
+                company.l10n_be_codabox_fiduciary_vat = company.account_representative_id.vat or company.partner_id._get_additional_identifier('BE_EN')
             else:
                 company.l10n_be_codabox_fiduciary_vat = company.l10n_be_codabox_company_vat
             company.l10n_be_codabox_fiduciary_vat = re.sub(r"[^0-9]", "", company.l10n_be_codabox_fiduciary_vat or "")
@@ -67,7 +67,10 @@ class ResCompany(models.Model):
         return result
 
     def _l10n_be_codabox_verify_prerequisites(self):
-        self.check_access('write')
+        if self.env.context.get("read_only"):
+            self.check_access('read')
+        else:
+            self.check_access('write')
         self.ensure_one()
         if not self.l10n_be_codabox_company_vat:
             raise UserError(_("The company VAT/ID number is not set."))

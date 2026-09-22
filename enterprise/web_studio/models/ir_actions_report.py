@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.fields import Domain
 
 
 class IrActionsReport(models.Model):
     _name = 'ir.actions.report'
     _inherit = ['studio.mixin', 'ir.actions.report']
+
+    name = fields.Char(copy=True)
 
     def _read_paper_format_measures(self, paperformat_fields=None):
         if paperformat_fields is None:
@@ -37,16 +38,20 @@ class IrActionsReport(models.Model):
             'xml_id': '%s_copy_%s' % (new.xml_id, copy_no),
             'name': '%s copy(%s)' % (new.name, copy_no),
             'report_name': '%s_copy_%s' % (new.report_name, copy_no),
-            'report_file': new_view.key,  # TODO: are we sure about this?
         })
 
     def _get_rendering_context(self, report, docids, data):
-        ctx = super()._get_rendering_context(report, docids, data)
-        if self.env.context.get("studio") and not ctx.get("docs"):
-            # TODO or not ?: user inputed values in data ?
-            doc = self.env[report.model].new({})
-            ctx["docs"] = doc
-        return ctx
+        if self.env.context.get("studio"):
+            try:
+                ctx = super()._get_rendering_context(report, docids, data)
+            except Exception:  # noqa: BLE001
+                ctx = {}
+            if not ctx.get("docs"):
+                # TODO or not ?: user inputed values in data ?
+                doc = self.env[report.model].new({})
+                ctx["docs"] = doc
+            return ctx
+        return super()._get_rendering_context(report, docids, data)
 
     @api.model
     def _get_rendering_context_model(self, report):
@@ -68,7 +73,10 @@ class IrActionsReport(models.Model):
         action_data = super(IrActionsReport, self).associated_view()
         if action_data is not False:
             view_name = self.report_name.split('.')[1].split('_copy_')[0]
-            action_data['domain'] = Domain(action_data['domain']) | (
+            action_data_domain = action_data.get('domain')
+            if action_data_domain is None:
+                action_data_domain = False
+            action_data['domain'] = Domain(action_data_domain) | (
                 Domain('name', 'ilike', view_name) & Domain('type', '=', 'qweb')
             )
         return action_data

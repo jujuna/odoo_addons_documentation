@@ -2,13 +2,12 @@ import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 import { SocialPostFormatterMixin } from "../social_post_formatter_mixin";
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 
 export class PostFormatterField extends SocialPostFormatterMixin(Component) {
     static template = "social.PostFormatterField";
-    static props = {
-        ...standardFieldProps,
-    };
+
+    props = useProps(standardFieldProps);
 
     get formattedPost() {
         return this._formatPost(this.props.record.data[this.props.name] || "");

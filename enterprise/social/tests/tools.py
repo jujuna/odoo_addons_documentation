@@ -58,10 +58,14 @@ def mock_void_external_calls():
 
 @contextmanager
 def mock_void_external_calls_facebook():
+
+    def _post_facebook(live_post, __):
+        live_post.state = 'posted'
+
     if is_facebook_module_installed:
         with patch.object(SocialAccountFacebook, '_compute_statistics', lambda x: None), \
              patch.object(SocialAccountFacebook, '_create_default_stream_facebook', lambda *args, **kwargs: None), \
-             patch.object(SocialLivePostFacebook, '_post_facebook', lambda x: None), \
+             patch.object(SocialLivePostFacebook, '_post_facebook', _post_facebook), \
              patch.object(SocialStreamFacebook, '_fetch_stream_data', lambda x: None):
             yield
     else:
@@ -92,10 +96,14 @@ def mock_void_external_calls_linkedin():
 
 @contextmanager
 def mock_void_external_calls_twitter():
+
+    def _post_twitter(live_post):
+        live_post.state = 'posted'
+
     if is_twitter_module_installed:
         with patch.object(SocialAccountTwitter, '_compute_statistics', lambda x: None), \
              patch.object(SocialAccountTwitter, '_create_default_stream_twitter', lambda *args, **kwargs: None), \
-             patch.object(SocialLivePostTwitter, '_post_twitter', lambda x: None), \
+             patch.object(SocialLivePostTwitter, '_post_twitter', _post_twitter), \
              patch.object(SocialStreamTwitter, '_fetch_stream_data', lambda x: None):
             yield
     else:

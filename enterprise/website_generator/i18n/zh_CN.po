@@ -4,31 +4,106 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:48+0000\n"
-"PO-Revision-Date: 2025-11-13 13:14+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-11 17:57+0000\n"
+"PO-Revision-Date: 2026-09-18 03:05+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/website_generator/zh_Hans/>\n"
+"projects/odoo-master/website_generator/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: website_generator
+#: model:ir.module.module,description:base.module_website_generator
+msgid ""
+"\n"
+"Generates a new website in Odoo, with the goal of recreating an external "
+"website as close as possible.\n"
+msgstr ""
 
 #. module: website_generator
 #: model:mail.template,body_html:website_generator.email_template_website_scrapped
 msgid ""
 "<div>\n"
-"            <p><b>Great news!</b> Your website conversion is complete and "
-"your new integrated Odoo website is now live.</p>\n"
-"            <p>Check out your new website here: <a t-att-"
-"href=\"ctx.get('website_url')\"><t t-out=\"ctx.get('website_url')\"/></a></"
+"                    <t t-if=\"ctx.get('website_url') and "
+"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 "
+"and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"generated, and <t t-out=\"ctx.get('nbr_products_created')\"/> products and "
+"<t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have been created.</"
 "p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and "
+"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
+"0\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"generated and <t t-out=\"ctx.get('nbr_products_created')\"/> product(s) have "
+"been created.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and "
+"ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"generated and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have "
+"been created.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url')\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"successfully generated.</p>\n"
+"                    </t>    \n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and "
+"ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and "
+"ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully "
+"created <t t-out=\"ctx.get('nbr_products_created')\"/> products and <t t-"
+"out=\"ctx.get('nbr_blogs_created')\"/> blog posts.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and "
+"ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully "
+"created <t t-out=\"ctx.get('nbr_products_created')\"/> product(s).</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_blogs_created') and "
+"ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully "
+"created <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog post(s).</p>\n"
+"                    </t>\n"
+"                    <t t-else=\"\">\n"
+"                        <p><b>Update:</b> We were unable to generate your "
+"website or products this time.</p>\n"
+"                        <p>This may happen for a variety of reasons, such as:"
+"</p>\n"
+"                        <ul>\n"
+"                            <li>Protection mechanisms on your website "
+"preventing automated access,</li>\n"
+"                            <li>Temporary maintenance or limited "
+"availability on our servers,</li>\n"
+"                            <li>Custom code or configurations on your "
+"website that are not fully compatible with our process.</li>\n"
+"                        </ul>\n"
+"                        <p>Feel free to try again later or contact us if the "
+"issue persists — we’re here to help!</p>\n"
+"                    </t>\n"
+"\n"
+"            <t t-if=\"ctx.get('website_url')\">\n"
+"                <p>You can access your website by clicking the button below:"
+"</p>\n"
+"                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('website_url')\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        Go to Website\n"
+"                    </a>\n"
+"                </div>\n"
+"            </t>\n"
+"            \n"
 "            <p>Thank you for choosing Odoo for your web integration!</p>\n"
 "            <p>Best regards,</p>\n"
 "            <br/>\n"
@@ -37,16 +112,131 @@ msgid ""
 "            "
 msgstr ""
 "<div>\n"
-"            <p><b>好消息！</b>您的网站已完成转换，已整合的新 Odoo 网站现已上"
-"线。</p>\n"
-"            <p>您可在这里查看新网站： <a t-att-href=\"ctx.get('website_url')"
-"\"><t t-out=\"ctx.get('website_url')\"/></a></p>\n"
-"            <p>感谢你选择 Odoo 进行网站整合！</p>\n"
-"            <p>谨致问候，</p>\n"
+"                    <t t-if=\"ctx.get('website_url') and ctx.get"
+"('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 and "
+"ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                       <p><b> 好消息！</b> 您的网站已生成，并且已创建<t t-"
+"out=\"ctx.get('nbr_products_created')\"/> 产品和<t t-out=\"ctx.get"
+"('nbr_blogs_created')\"/> 博客文章。</p>\n"
+"                    </t>\n"
+"                   <t t-elif=\"ctx.get('website_url') and ctx.get"
+"('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p> <b> 好消息！</b> 您的网站已生成，并且已创建<t t-"
+"out=\"ctx.get('nbr_products_created')\"/> 产品。</p>\n"
+"                    </t>\n"
+"                   <t t-elif=\"ctx.get('website_url') and ctx.get"
+"('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p> <b> 好消息！</b> 您的网站已生成，并且已创建<t t-"
+"out=\"ctx.get('nbr_blogs_created')\"/> 博客文章。</p>\n"
+"                    </t>\n"
+"                   <t t-elif=\"ctx.get('website_url')\">\n"
+"                        <p> <b> 好消息！</b> 您的网站已成功生成。</p>\n"
+"                    </t>   \n"
+"                   <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
+"('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and ctx.get"
+"('nbr_blogs_created') &gt; 0\">\n"
+"                        <p> <b> 好消息！</b> 导入工具已成功创建<t t-"
+"out=\"ctx.get('nbr_products_created')\"/> 产品和<t t-out=\"ctx.get"
+"('nbr_blogs_created')\"/> 博客文章。</p>\n"
+"                    </t>\n"
+"                   <t t-elif=\"ctx.get('nbr_products_created') and ctx.get"
+"('nbr_products_created') &gt; 0\">\n"
+"                        <p> <b> 好消息！</b> 导入工具已成功创建<t t-"
+"out=\"ctx.get('nbr_products_created')\"/> 产品。</p>\n"
+"                    </t>\n"
+"                   <t t-elif=\"ctx.get('nbr_blogs_created') and ctx.get"
+"('nbr_blogs_created') &gt; 0\">\n"
+"                        <p> <b> 好消息！</b> 导入工具已成功创建<t t-"
+"out=\"ctx.get('nbr_blogs_created')\"/> 博客文章。</p>\n"
+"                    </t>\n"
+"                   <t t-else=\"\">\n"
+"                        <p> <b> 更新：</b> 本次我们无法生成您的网站或产品。</"
+"p>\n"
+"                        <p>这可能由多种原因导致，例如：</p>\n"
+"                        <ul>\n"
+"                           <li> 您的网站防护机制限制了自动化访问，</li>\n"
+"                            <li>我们的服务器临时维护或服务暂不可用，</li>\n"
+"                            <li>网站自定义代码或配置与当前生成流程存在兼容性"
+"问题。</li>\n"
+"                        </ul>\n"
+"                       <p> 请稍后重试，若问题仍未解决，欢迎联系我们——我们随时"
+"为您提供帮助！</p>\n"
+"                    </t>\n"
+"\n"
+"           <t t-if=\"ctx.get('website_url')\">\n"
+"                <p> 您可点击下方按钮访问您的网站：</p>\n"
+"                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"                   <a t-att-href=\"ctx.get('website_url')\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\"> \n"
+"                        访问网站\n"
+"                   </a>\n"
+"                </div> \n"
+"           </t>\n"
+"            \n"
+"            <p> 感谢您选择 Odoo 进行网站集成！</p>\n"
+"            <p>此致，</p>\n"
 "            <br/>\n"
-"            <p>Odoo - 最好的开源网站建立工具。</p>\n"
+"           <p> Odoo - 最佳开源网站构建工具。</p>\n"
 "            </div>\n"
 "            "
+
+#. module: website_generator
+#: model_terms:ir.ui.view,arch_db:website_generator.res_config_settings_view_form
+msgid ""
+"<i class=\"oi me-1\" data-icon=\"download\" aria-hidden=\"true\"/>Import "
+"Website"
+msgstr "<i class=\"oi me-1\" data-icon=\"download\" aria-hidden=\"true\"/>导入网站"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "API Check failed"
+msgstr "API 检查失败"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "API Key is not valid"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "API Key is valid."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "API authentication not setup"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"API key has either expired, is invalid or there is no content to extract. "
+"Please provide a new API key."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Adapting building blocks."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Add your Ghost API key here"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Add your PrestaShop API key here"
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__additional_urls
@@ -54,26 +244,44 @@ msgid "Additional URLs"
 msgstr "额外网址"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "All"
+msgstr "全部"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Already connected on"
+msgstr ""
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "An error occurred"
 msgstr "发生错误"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Attachment not found"
 msgstr "找不到附件"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Authorization"
+msgstr "授权"
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Banned url"
 msgstr "禁止的网址"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid ""
 "By clicking \"Import my website\", you confirm that you are the owner of the "
 "website and all associated components (such as images and other content), "
@@ -84,10 +292,34 @@ msgstr ""
 "的所有者，并对其使用和任何潜在的法律后果承担全部责任。"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Click to authenticate with WooCommerce."
+msgstr "点击通过 WooCommerce 进行身份验证。"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Connect via WooCommerce"
+msgstr "通过 WooCommerce 连接"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Copying your text."
+msgstr ""
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Could not fetch result, invalid output uuid or result expired"
 msgstr "无法获取结果，无效的输出 uid 或结果过期"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Could not generate WooCommerce URL"
+msgstr "无法生成 WooCommerce 链接"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__create_uid
@@ -100,7 +332,14 @@ msgid "Created on"
 msgstr "创建日期"
 
 #. module: website_generator
-#: model:ir.model.fields,field_description:website_generator.field_ir_http__display_name
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"Creates a new website and imports the foreign website pages onto this "
+"website."
+msgstr ""
+
+#. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website__display_name
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__display_name
 #: model:ir.model.fields,field_description:website_generator.field_website_page__display_name
@@ -109,23 +348,40 @@ msgstr "显示名称"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Done, website generated"
 msgstr "完成，网站已创建"
 
 #. module: website_generator
-#. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
-msgid "Error"
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Draft, record created but request not yet accepted by the server"
 msgstr ""
 
 #. module: website_generator
-#: model:ir.model,name:website_generator.model_ir_http
-msgid "HTTP Routing"
-msgstr "HTTP 路由"
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Error"
+msgstr "错误"
 
 #. module: website_generator
-#: model:ir.model.fields,field_description:website_generator.field_ir_http__id
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__generation_progress
+msgid "Generation Progress"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Ghost API Key"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Ghost API detected, please provide an API key. For more info, visit:"
+msgstr ""
+
+#. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website__id
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__id
 #: model:ir.model.fields,field_description:website_generator.field_website_page__id
@@ -134,27 +390,48 @@ msgstr "ID"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "If you require more, you can contact us at"
-msgstr "如需更多信息，请通过以下方式联系我们"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import Blogs"
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Import Products"
 msgstr "导入产品"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import Website"
+msgstr "导入网站"
+
+#. module: website_generator
+#: model:ir.actions.client,name:website_generator.action_open_website_import_form
+msgid "Import Your Pages and Products"
+msgstr ""
+
+#. module: website_generator
+#: model:ir.module.module,summary:base.module_website_generator
+msgid "Import a pre-existing website"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_website_cog_menu/import_website_cog_menu.xml:0
+msgid "Import from website"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Import my website"
 msgstr "导入我的网站"
 
 #. module: website_generator
-#. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "Import your"
-msgstr "导入您的"
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__import_website
+msgid "Import website"
+msgstr "导入网站"
 
 #. module: website_generator
 #. odoo-javascript
@@ -171,30 +448,44 @@ msgstr ""
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
-msgid "Importing your website."
-msgstr "导入您的网站。"
+msgid "Importing your colors and design."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"Imports products found on the website into your Odoo database. This means "
+"potentially installing the ecommerce app and creating products."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Imports the blogs. This means potentially installing the blogs app."
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid dbuuid"
 msgstr "无效资料库识别码 dbuuid"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid import products"
 msgstr "导入产品无效"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid token"
 msgstr "无效令牌"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid url"
 msgstr "无效网址"
 
@@ -210,24 +501,53 @@ msgstr "上次更新日期"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Loading..."
 msgstr ""
 
 #. module: website_generator
-#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__notified
-msgid "Notified"
-msgstr "已通知"
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Make sure that you have set the website URL first."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"No blog platform detected. Please select at least Import Website or Import "
+"Products to continue."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"No supported API platform detected, we will search the pages for products "
+"metadata."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "No supported blog API found."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "No supported blog API platform detected. No blogs will be imported."
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Number of allowed requests exhausted"
 msgstr "已耗尽的允许请求数"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Number of concurrent requests exceeded"
 msgstr "超过并发请求数"
 
@@ -235,6 +555,17 @@ msgstr "超过并发请求数"
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__page_count
 msgid "Number of pages"
 msgstr "页数"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Odoo's website import documentation"
+msgstr ""
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__out_json_attachment_id
+msgid "Out Json Attachment"
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__uuid
@@ -248,33 +579,78 @@ msgstr "页"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "Pages"
-msgstr "页面"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Please make sure the URL is correct and try again."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"Please select at least one option: Import Website, Import Products or Import "
+"Blogs."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Please wait for the API check to finish."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "PrestaShop API Key"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"PrestaShop API detected, please provide an API key. For more info, visit:"
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Processing"
 msgstr "处理中"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "Products"
-msgstr "产品"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Reconnect via WooCommerce"
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Request is still processing, result not available yet"
 msgstr "请求仍在处理中，结果尚未可用"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Select the website of which you want to create the products/blogs for."
+msgstr "选择需创建产品/博客的网站。"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Sending request..."
+msgstr ""
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Server is currently under maintenance. Please retry later"
 msgstr "服务器当前正在维护中。请稍后再试"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Shopify API detected."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
@@ -284,9 +660,23 @@ msgstr "出了问题"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
-msgid "Something went wrong while importing your website."
-msgstr "导入您的网站时出现问题。"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"Something went wrong applying your API key. Please check your API key and "
+"try again."
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Something went wrong during the import"
+msgstr "导入过程中出现错误"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Something went wrong while importing your website"
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__status
@@ -299,64 +689,66 @@ msgid "Status Message"
 msgstr "状态消息"
 
 #. module: website_generator
+#. odoo-javascript
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Success"
 msgstr "成功"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The URL is not reachable."
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The URL is reachable."
+msgstr "该 URL 可用。"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The number of pages is limited. If you need more, contact us at"
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/systray_items/generator_request.js:0
-msgid "The import of your website has started!"
-msgstr "您的网站导入已经开始！"
-
-#. module: website_generator
-#. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "The maximum number of pages is 200 by default."
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "The provided URL is empty"
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "The provided URL is not allowed"
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "The provided URL is not reachable"
 msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "The request asks for too many pages"
 msgstr "请求请求的页面太多"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid ""
 "The requested url redirected to another url, try again with the redirected "
 "url"
-msgstr ""
+msgstr "请求的 URL 已重定向至另一个 URL，请使用重定向后的 URL 重试"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid ""
 "The requested url took too long to load and is probably unreachable from the "
 "server"
@@ -364,7 +756,7 @@ msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid ""
 "The same request has just been made, please wait before sending another "
 "identical request"
@@ -372,13 +764,25 @@ msgstr "刚刚发出了相同的请求，请稍候再发送另一个相同的请
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
-msgid "This can take a few minutes."
-msgstr "这可能需要几分钟的时间。"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The search for blogs API is done."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The search for products API is done."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "This can take a few minutes."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Too many requests"
 msgstr ""
 
@@ -390,14 +794,26 @@ msgstr "网站顶级菜单 %s"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "URL redirection"
-msgstr ""
+msgstr "URL 重定向"
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__target_url
 msgid "URL to scrape"
 msgstr "要抓取的URL"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "URL unreachable"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Uploading your images."
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__version
@@ -406,13 +822,13 @@ msgstr "版本"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Version is unsupported"
 msgstr "版本不支持"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Waiting for the server to process the request"
 msgstr "等待服务器处理请求"
 
@@ -424,11 +840,7 @@ msgstr "我们无法转换您的网站，请稍后再试"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/systray_items/generator_request.js:0
-msgid "We will notify %(email)s when everything is ready."
-msgstr "一切准备就绪后，我们将通知%(email)s。"
-
-#. module: website_generator
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 #: model:ir.model,name:website_generator.model_website
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__website_id
 msgid "Website"
@@ -436,6 +848,7 @@ msgstr "网站"
 
 #. module: website_generator
 #: model:ir.actions.client,name:website_generator.website_generator_screen
+#: model:ir.module.module,shortdesc:base.module_website_generator
 msgid "Website Generator"
 msgstr "网站生成器"
 
@@ -450,6 +863,11 @@ msgid "Website Generator Request"
 msgstr "网站生成工具请求"
 
 #. module: website_generator
+#: model:ir.actions.server,name:website_generator.cron_generate_site_ir_actions_server
+msgid "Website Generator: Create the website"
+msgstr ""
+
+#. module: website_generator
 #: model:ir.actions.server,name:website_generator.cron_get_result_ir_actions_server
 msgid "Website Generator: Get website scraper results"
 msgstr "网站生成器: 获得网站刮板结果"
@@ -461,56 +879,148 @@ msgstr "网站已抓取"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Website URL"
-msgstr "网址"
+msgstr "网站 URL"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Website blocked or unreachable"
 msgstr "网站被封锁或未能连接"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Website not supported"
 msgstr "网站不被支持"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
-msgid "You will be redirected once your website is ready."
-msgstr "一旦您的网站准备就绪，您将被重定向。"
-
-#. module: website_generator
-#. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "You'll be able to create additional pages later on."
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"WooCommerce API detected, please authenticate to import WooCommerce Products."
 msgstr ""
 
 #. module: website_generator
-#: model:mail.template,subject:website_generator.email_template_website_scrapped
-msgid "Your Odoo Website is Ready!"
-msgstr "您的 Odoo 网站已准备就绪！"
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "WordPress Blog API detected."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "and"
-msgstr "and"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "You must add a Ghost API key before trying to import Ghost Blogs."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"You must add a PrestaShop API key before trying to import PrestaShop "
+"products."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"You must authenticate the WooCommerce API before trying to import "
+"WooCommerce Products."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "You will be redirected once your website is ready."
+msgstr "网站部署完成后将自动跳转页面。"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "You will receive an"
+msgstr "您将收到一份"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your blogs have been imported!"
+msgstr "您的博客已导入！"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new blogs and products are ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website and blogs are ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website and products are ready!"
+msgstr "您的新网站和产品已准备就绪！"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website is ready!"
+msgstr "您的新网站已准备就绪！"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website, blogs and products are ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your products have been imported!"
+msgstr "您的产品已导入！"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Your request has been submitted!"
+msgstr "您的请求已提交！"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Your website, now customizable effortless."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "email notification"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "https://www.odoo.com/"
 msgstr "https://www.odoo.com/"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "odoo.com/help"
 msgstr "odoo.com/help"
 
-#~ msgid "support@odoo.com"
-#~ msgstr "support@odoo.com"
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "once your website and/or products are ready."
+msgstr ""
+
+#. module: website_generator
+#: model:mail.template,subject:website_generator.email_template_website_scrapped
+msgid "{{ ctx.get('subject') }}"
+msgstr ""

@@ -9,7 +9,6 @@ class ResCompany(models.Model):
     _inherit = 'res.company'
 
     invoicing_switch_threshold = fields.Date(string="Invoicing Switch Threshold", help="Every payment and invoice before this date will receive the 'From Invoicing' status, hiding all the accounting entries related to it. Use this option after installing Accounting if you were using only Invoicing before, before importing all your actual accounting data in to Odoo.")
-    predict_bill_product = fields.Boolean(string="Predict Bill Product")
 
     sign_invoice = fields.Boolean(string='Display signing field on invoices')
     signing_user = fields.Many2one(comodel_name='res.users')
@@ -35,9 +34,18 @@ class ResCompany(models.Model):
     deferred_expense_amount_computation_method = fields.Selection(
         string="Deferred Expense Based on",
         selection=[
-            ('day', 'Days'),
-            ('month', 'Months'),
-            ('full_months', 'Full Months'),
+            ('day', 'By Days'),
+            ('month', 'By Months'),
+            ('full_months', 'By Full Months'),
+        ],
+        default='month',
+        required=True,
+    )
+    deferred_expense_periodicity = fields.Selection(
+        string="Deferred Expense Periodicity",
+        selection=[
+            ('month', "Monthly"),
+            ('year', "Yearly"),
         ],
         default='month',
         required=True,
@@ -55,7 +63,7 @@ class ResCompany(models.Model):
     generate_deferred_revenue_entries_method = fields.Selection(
         string="Generate Deferred Revenue Entries",
         selection=[
-            ('on_validation', 'On bill validation'),
+            ('on_validation', 'On invoice validation'),
             ('manual', 'Manually & Grouped'),
         ],
         default='on_validation',
@@ -64,9 +72,18 @@ class ResCompany(models.Model):
     deferred_revenue_amount_computation_method = fields.Selection(
         string="Deferred Revenue Based on",
         selection=[
-            ('day', 'Days'),
-            ('month', 'Months'),
-            ('full_months', 'Full Months'),
+            ('day', 'By Days'),
+            ('month', 'By Months'),
+            ('full_months', 'By Full Months'),
+        ],
+        default='month',
+        required=True,
+    )
+    deferred_revenue_periodicity = fields.Selection(
+        string="Deferred Revenue Periodicity",
+        selection=[
+            ('month', "Monthly"),
+            ('year', "Yearly"),
         ],
         default='month',
         required=True,
@@ -157,19 +174,28 @@ class ResCompany(models.Model):
         self.ensure_one()
         date_str = current_date.strftime(DEFAULT_SERVER_DATE_FORMAT)
 
+        cache = self.env.cr.cache.setdefault('cached_fiscalyears_by_company', {})
+        company_cache = cache.setdefault(self.id, [])
+
+        for fiscalyear in company_cache:
+            if fiscalyear['date_from'] <= current_date <= fiscalyear['date_to']:
+                return fiscalyear
+
         # Search a fiscal year record containing the date.
         # If a record is found, then no need further computation, we get the dates range directly.
-        fiscalyear = self.env['account.fiscal.year'].search([
+        fiscalyear = self.env['account.fiscal.year'].sudo().search([
             ('company_id', '=', self.id),
             ('date_from', '<=', date_str),
             ('date_to', '>=', date_str),
         ], limit=1)
         if fiscalyear:
-            return {
+            res = {
                 'date_from': fiscalyear.date_from,
                 'date_to': fiscalyear.date_to,
                 'record': fiscalyear,
             }
+            company_cache.append(res)
+            return res
 
         date_from, date_to = date_utils.get_fiscal_year(
             current_date, day=self.fiscalyear_last_day, month=int(self.fiscalyear_last_month))
@@ -182,7 +208,7 @@ class ResCompany(models.Model):
         # E.g. two fiscal year records: 2017-01-01 -> 2017-02-01 and 2017-03-01 -> 2017-12-31.
         # => The period 2017-02-02 - 2017-02-30 is not covered by a fiscal year record.
 
-        fiscalyear_from = self.env['account.fiscal.year'].search([
+        fiscalyear_from = self.env['account.fiscal.year'].sudo().search([
             ('company_id', '=', self.id),
             ('date_from', '<=', date_from_str),
             ('date_to', '>=', date_from_str),
@@ -190,15 +216,16 @@ class ResCompany(models.Model):
         if fiscalyear_from:
             date_from = fiscalyear_from.date_to + timedelta(days=1)
 
-        fiscalyear_to = self.env['account.fiscal.year'].search([
+        fiscalyear_to = self.env['account.fiscal.year'].sudo().search([
             ('company_id', '=', self.id),
             ('date_from', '<=', date_to_str),
             ('date_to', '>=', date_to_str),
         ], limit=1)
         if fiscalyear_to:
             date_to = fiscalyear_to.date_from - timedelta(days=1)
-
-        return {'date_from': date_from, 'date_to': date_to}
+        res = {'date_from': date_from, 'date_to': date_to}
+        company_cache.append(res)
+        return res
 
     def _get_unreconciled_statement_lines_redirect_action(self, unreconciled_statement_lines):
         # OVERRIDE account

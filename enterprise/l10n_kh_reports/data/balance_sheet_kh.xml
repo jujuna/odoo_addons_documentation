@@ -22,7 +22,6 @@
                 <field name="name">A0. Assets</field>
                 <field name="code">KH_BS_A</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="False"/>
                 <field name="expression_ids">
                     <record id="l10n_kh_balance_sheet_kh_bs_a_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -36,7 +35,7 @@
                         <field name="code">KH_BS_NCA</field>
                         <field name="hierarchy_level">1</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="False"/>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="l10n_kh_balance_sheet_kh_bs_nca_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -50,7 +49,7 @@
                         <field name="code">KH_BS_CA</field>
                         <field name="hierarchy_level">1</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="False"/>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="l10n_kh_balance_sheet_kh_bs_ca_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -65,7 +64,6 @@
                 <field name="name">A28. Equity and Liabilities</field>
                 <field name="code">KH_BS_EL</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="False"/>
                 <field name="expression_ids">
                     <record id="l10n_kh_balance_sheet_kh_bs_el_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -79,7 +77,7 @@
                         <field name="code">KH_BS_E</field>
                         <field name="hierarchy_level">1</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="False"/>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="l10n_kh_balance_sheet_kh_bs_e_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -92,20 +90,18 @@
                         <field name="name">Unallocated Earnings</field>
                         <field name="code">KH_BS_UAE</field>
                         <field name="hierarchy_level">1</field>
-                        <field name="foldable" eval="False"/>
                         <field name="children_ids">
                             <record id="l10n_kh_balance_sheet_kh_bs_cyue" model="account.report.line">
                                 <field name="name">Current Year Unallocated Earnings</field>
                                 <field name="code">KH_BS_CYUE</field>
                                 <field name="hierarchy_level">3</field>
-                                <field name="foldable" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_kh_balance_sheet_kh_bs_cyue_pnl" model="account.report.expression">
                                         <field name="label">pnl</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">KH_PL_NEP.balance</field>
                                         <field name="date_scope">from_fiscalyear</field>
-                                        <field name="subformula">cross_report(l10n_kh_reports.l10n_kh_profit_and_loss)</field>
+                                        <field name="subformula">cross_report(l10n_kh_reports.l10n_kh_profit_and_loss, force_date_scope)</field>
                                     </record>
                                     <record id="l10n_kh_balance_sheet_kh_bs_cyue_alloc" model="account.report.expression">
                                         <field name="label">alloc</field>
@@ -124,7 +120,6 @@
                                 <field name="name">Previous Years Unallocated Earnings</field>
                                 <field name="code">KH_BS_PYUE</field>
                                 <field name="hierarchy_level">3</field>
-                                <field name="foldable" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_kh_balance_sheet_kh_bs_pyue_allocated_earnings" model="account.report.expression">
                                         <field name="label">allocated_earnings</field>
@@ -137,7 +132,7 @@
                                         <field name="engine">aggregation</field>
                                         <field name="formula">KH_PL_NEP.balance</field>
                                         <field name="date_scope">from_beginning</field>
-                                        <field name="subformula">cross_report(l10n_kh_reports.l10n_kh_profit_and_loss)</field>
+                                        <field name="subformula">cross_report(l10n_kh_reports.l10n_kh_profit_and_loss, force_date_scope)</field>
                                     </record>
                                     <record id="l10n_kh_balance_sheet_kh_bs_pyue_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -152,13 +147,11 @@
                         <field name="name">Retained Earnings</field>
                         <field name="code">KH_BS_RE</field>
                         <field name="hierarchy_level">1</field>
-                        <field name="foldable" eval="False"/>
                         <field name="children_ids">
                             <record id="l10n_kh_balance_sheet_kh_bs_cyre" model="account.report.line">
                                 <field name="name">Current Year Retained Earnings</field>
                                 <field name="code">KH_BS_CYRE</field>
                                 <field name="hierarchy_level">3</field>
-                                <field name="foldable" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_kh_balance_sheet_kh_bs_cyre_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -172,7 +165,6 @@
                                 <field name="name">Previous Years Retained Earnings</field>
                                 <field name="code">KH_BS_PYRE</field>
                                 <field name="hierarchy_level">3</field>
-                                <field name="foldable" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_kh_balance_sheet_kh_bs_pyre_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -189,7 +181,7 @@
                         <field name="code">KH_BS_NCL</field>
                         <field name="hierarchy_level">1</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="False"/>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="l10n_kh_balance_sheet_kh_bs_ncl_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -203,7 +195,7 @@
                         <field name="code">KH_BS_CL</field>
                         <field name="hierarchy_level">1</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="False"/>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="l10n_kh_balance_sheet_kh_bs_cl_balance" model="account.report.expression">
                                 <field name="label">balance</field>

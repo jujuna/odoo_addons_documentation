@@ -9,6 +9,8 @@ from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCom
 @tagged('post_install', 'post_install_l10n', '-at_install', 'payslips_validation')
 class TestPayslipValidation(TestPayslipValidationCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestPayslipValidationCommon.setup_country('pl')
     def setUpClass(cls):
@@ -19,9 +21,9 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             country=cls.env.ref('base.pl'),
             structure=cls.env.ref('l10n_pl_hr_payroll.hr_payroll_structure_pl_employee_salary'),
             structure_type=cls.env.ref('l10n_pl_hr_payroll.structure_type_employee_pl'),
-            contract_fields={
+            version_fields={
                 'wage': 7000.0,
-            }
+            },
         )
 
     def test_payslip_1(self):

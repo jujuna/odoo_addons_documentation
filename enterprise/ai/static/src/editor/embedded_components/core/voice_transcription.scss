@@ -1,5 +1,19 @@
+.ai-icon-sm {
+  width: 1rem;
+}
+
 [data-embedded="voice-transcription"] {
   $rounding: 4px;
+
+  blockquote {
+    font-style: normal;
+    border-width: 2px;
+    padding-left: 0.5rem;
+  }
+
+  blockquote::after {
+    padding-left: 0.5rem;
+  }
 
   .transcript-block {
     padding: 0.5em 0.5em 0;
@@ -25,12 +39,8 @@
 
   .transcript-block[open]>summary {
     border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0.5em;
+    margin-bottom: 0.8em;
     border-radius: $rounding $rounding 0 0;
-  }
-
-  .ai-icon-sm {
-    width: 1rem;
   }
 
   .o-ai-summary-processing * {

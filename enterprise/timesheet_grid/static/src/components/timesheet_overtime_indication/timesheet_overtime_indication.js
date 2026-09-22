@@ -1,12 +1,16 @@
+import { useProps, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
-import { EmployeeOvertimeIndication } from "../employee_overtime_indication/employee_overtime_indication";
+import {
+    EmployeeOvertimeIndication,
+    employeeOvertimeIndicationProps,
+} from "../employee_overtime_indication/employee_overtime_indication";
 
 export class TimesheetOvertimeIndication extends EmployeeOvertimeIndication {
     static template = "timesheet_grid.TimesheetOvertimeIndication";
-    static props = {
-        ...EmployeeOvertimeIndication.props,
-        name: String,
-    };
+    props = useProps({
+        ...employeeOvertimeIndicationProps,
+        name: t.string(),
+    });
 
     get colorClasses() {
         if (!this.shouldShowHours) {
@@ -26,17 +30,23 @@ export class TimesheetOvertimeIndication extends EmployeeOvertimeIndication {
 
     get title() {
         if (this.props.name === "project_id") {
-            return _t("Difference between the allocated %(uom)s (%(allocated_hours)s) and the %(uom)s spent (%(worked_hours)s) on the project", {
-                uom: this.props.uom,
-                allocated_hours: this.props.allocated_hours,
-                worked_hours: this.props.worked_hours,
-            });
+            return _t(
+                "Difference between the allocated %(uom)s (%(allocated_hours)s) and the %(uom)s spent (%(worked_hours)s) on the project",
+                {
+                    uom: this.props.uom,
+                    allocated_hours: this.props.allocated_hours,
+                    worked_hours: this.props.worked_hours,
+                }
+            );
         } else if (this.props.name === "task_id") {
-            return _t("Difference between the allocated %(uom)s (%(allocated_hours)s) and the %(uom)s spent (%(worked_hours)s) on the task", {
-                uom: this.props.uom,
-                allocated_hours: this.props.allocated_hours,
-                worked_hours: this.props.worked_hours,
-            });
+            return _t(
+                "Difference between the allocated %(uom)s (%(allocated_hours)s) and the %(uom)s spent (%(worked_hours)s) on the task",
+                {
+                    uom: this.props.uom,
+                    allocated_hours: this.props.allocated_hours,
+                    worked_hours: this.props.worked_hours,
+                }
+            );
         } else {
             return _t("Difference between the time allocated and the time recorded");
         }

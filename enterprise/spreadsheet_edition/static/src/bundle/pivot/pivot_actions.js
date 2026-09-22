@@ -78,9 +78,9 @@ export const REINSERT_PIVOT_CELL_CHILDREN = (env) =>
                 const pivot = env.model.getters.getPivot(pivotId);
                 await pivot.load();
             }
-            env.model.dispatch("PIVOT_START_PRESENCE_TRACKING", { pivotId });
-            env.model.dispatch("EVALUATE_CELLS");
             const { sheetId, col, row } = env.model.getters.getActivePosition();
+            env.model.dispatch("PIVOT_START_PRESENCE_TRACKING", { pivotId, sheetId });
+            env.model.dispatch("EVALUATE_CELLS");
             const closeDialog = env.services.dialog.add(PivotMissingCellDialog, {
                 model: env.model,
                 pivotId,

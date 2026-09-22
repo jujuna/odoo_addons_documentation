@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_basic_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.BASIC"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
         <field name="name">Basic Gratification</field>
         <field name="sequence">1</field>
         <field name="code">BASIC</field>
-        <field name="condition_select">none</field>
-        <field name="amount_select">input</field>
-        <field name="amount_other_input_id" ref="input_gratification"/>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="condition_select">property_input</field>
+        <field name="input_usage_payslip" eval="True"/>
+        <field name="input_section" ref="l10n_lu_other_inputs_salary_rule_section"/>
+        <field name="appears_on_payslip">non_zero</field>
+        <field name="input_usage_employee" eval="False"/>
+        <field name="input_default_value" eval="0.0"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_employees_gratification_health_fund" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="name">Health Fund</field>
         <field name="code">HEALTH_FUND</field>
         <field name="sequence">5</field>
@@ -20,11 +26,15 @@
         <field name="amount_select">percentage</field>
         <field name="amount_percentage_base">BASIC</field>
         <field name="amount_percentage">-2.8</field>
-        <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification"/>
+        <field name="quantity">1.0</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_employees_gratification_retirement_fund" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="name">Retirement Fund</field>
         <field name="code">RETIREMENT_FUND</field>
         <field name="sequence">10</field>
@@ -32,11 +42,15 @@
         <field name="amount_select">percentage</field>
         <field name="amount_percentage_base">BASIC</field>
         <field name="amount_percentage">-8.0</field>
-        <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification"/>
+        <field name="quantity">1.0</field>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_employees_gratification_dependency_insurance" model="hr.salary.rule">
-    <field name="category_id" ref="hr_payroll.ALW"/>
+    <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
     <field name="name">Dependency Insurance</field>
     <field name="code">DEPENDENCY_INSURANCE</field>
     <field name="sequence">15</field>
@@ -45,45 +59,54 @@
     <field name="amount_python_compute">
 min_social_pay = payslip._rule_parameter('l10n_lu_min_social_pay')
 hours_per_month = payslip._rule_parameter('l10n_lu_hours_per_month')
-worked_hours = payslip._get_worked_days_line_number_of_hours('WORK100')
+worked_hours = payslip._get_worked_days_line_number_of_hours('002.00')
 
 prorata = 1 if payslip.l10n_lu_is_monthly else worked_hours / hours_per_month
 result = max(categories['BASIC'] - min_social_pay / 4 * prorata, 0)
 result_rate = -payslip._rule_parameter('l10n_lu_dependency_insurance_tax')
     </field>
-    <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification"/>
-</record>
+    <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
+    </record>
 
     <record id="l10n_lu_employees_gratification_gross_gratification" model="hr.salary.rule">
-        <field name="category_id" ref="hr_salary_rule_category_gratification"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_salary_rule_category_gratification')])]"/>
         <field name="name">Gross Gratification</field>
         <field name="code">GROSS_GRATIFICATION</field>
         <field name="sequence">20</field>
-        <field name="appears_on_payslip" eval="False"/>
+        <field name="appears_on_payslip">never</field>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = result_rules['BASIC']['total'] + categories['ALW']
         </field>
-        <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_employees_gratification_gross_gratification_rounding" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="name">Gross Gratification Rounding</field>
         <field name="code">GROSS_GRATIFICATION_ROUNDING</field>
         <field name="sequence">25</field>
-        <field name="appears_on_payslip" eval="False"/>
+        <field name="appears_on_payslip">never</field>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = - (result_rules['GROSS_GRATIFICATION']['total'] % 5)
         </field>
-        <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_gross_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.GROSS"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
         <field name="name">Gross Gratification</field>
         <field name="sequence">100</field>
         <field name="code">GROSS</field>
@@ -92,11 +115,14 @@ result = - (result_rules['GROSS_GRATIFICATION']['total'] % 5)
         <field name="amount_python_compute">
 result = categories['BASIC'] + categories['ALW']
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_employees_gratification_tax_on_non_period_revenue" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Tax On Non Period Revenue</field>
         <field name="code">TAX_ON_NON_PERIOD_REVENUE</field>
         <field name="sequence">105</field>
@@ -157,18 +183,21 @@ def get_l10n_lu_grat_tax(annual_salary, gratification):
     tax -= tax % 0.1
     return -tax
 
-
 annual_salary = contract.wage * 12
 result = get_l10n_lu_grat_tax(annual_salary, result_rules['GROSS']['total'])
         </field>
-        <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_attachment_of_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Attachment of Salary</field>
         <field name="sequence">174</field>
         <field name="code">ATTACH_SALARY</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'ATTACH_SALARY' in inputs</field>
         <field name="amount_select">code</field>
@@ -176,14 +205,18 @@ result = get_l10n_lu_grat_tax(annual_salary, result_rules['GROSS']['total'])
 result = -inputs['ATTACH_SALARY'].amount
 result_name = inputs['ATTACH_SALARY'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_assignment_of_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Assignment of Salary</field>
         <field name="sequence">174</field>
         <field name="code">ASSIG_SALARY</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'ASSIG_SALARY' in inputs</field>
         <field name="amount_select">code</field>
@@ -191,13 +224,17 @@ result_name = inputs['ATTACH_SALARY'].name
 result = -inputs['ASSIG_SALARY'].amount
 result_name = inputs['ASSIG_SALARY'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_child_support" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Child Support</field>
         <field name="code">CHILD_SUPPORT</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="amount_select">code</field>
         <field name="sequence">174</field>
         <field name="condition_select">python</field>
@@ -206,14 +243,18 @@ result_name = inputs['ASSIG_SALARY'].name
 result = -inputs['CHILD_SUPPORT'].amount
 result_name = inputs['CHILD_SUPPORT'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_deduction_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
         <field name="name">Deduction</field>
         <field name="sequence">198</field>
         <field name="code">DEDUCTION</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'DEDUCTION' in inputs</field>
         <field name="amount_select">code</field>
@@ -221,14 +262,18 @@ result_name = inputs['CHILD_SUPPORT'].name
 result = -inputs['DEDUCTION'].amount
 result_name = inputs['DEDUCTION'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_reimbursement_salary_rule" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
         <field name="name">Reimbursement</field>
         <field name="sequence">199</field>
         <field name="code">REIMBURSEMENT</field>
+        <field name="input_usage_payslip" eval="True"/>
         <field name="condition_select">python</field>
         <field name="condition_python">result = 'REIMBURSEMENT' in inputs</field>
         <field name="amount_select">code</field>
@@ -236,11 +281,14 @@ result_name = inputs['DEDUCTION'].name
 result = inputs['REIMBURSEMENT'].amount
 result_name = inputs['REIMBURSEMENT'].name
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 
     <record id="l10n_lu_hr_payroll_structure_lux_employee_gratification_net_salary" model="hr.salary.rule">
-        <field name="category_id" ref="hr_payroll.NET"/>
+        <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
         <field name="name">Net Gratification</field>
         <field name="sequence">200</field>
         <field name="code">NET</field>
@@ -250,6 +298,9 @@ result_name = inputs['REIMBURSEMENT'].name
         <field name="amount_python_compute">
 result = categories['BASIC'] + categories['ALW'] + categories['DED']
         </field>
-        <field name="struct_id" ref="hr_payroll_structure_lux_employee_gratification"/>
+        <field name="struct_ids" eval="[(6, 0, [
+            ref('l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_gratification'),
+        ])]"/>
+        <field name="country_id" ref="base.lu"/>
     </record>
 </odoo>

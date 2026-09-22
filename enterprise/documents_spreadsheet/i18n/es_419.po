@@ -3,29 +3,23 @@
 # * documents_spreadsheet
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025.
-# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025.
+# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025, 2026.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-10-08 02:40+0000\n"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 02:07+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/documents_spreadsheet/es_419/>\n"
+"odoo-master/documents_spreadsheet/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
-msgid " file preview"
-msgstr " previsualización del archivo"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -34,10 +28,12 @@ msgid "\"%s\" saved as template"
 msgstr "Se guardó \"%s\" como plantilla"
 
 #. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
-msgid "%s (copy)"
-msgstr "%s (copia)"
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/external_share_function.js:0
+msgid "%(function_name)s is not available in spreadsheets shared externally."
+msgstr ""
+"%(function_name)s no está disponible en las hojas de cálculo compartidas de "
+"forma externa."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -56,6 +52,11 @@ msgid "A frozen spreadsheet can not be editable"
 msgstr "Una hoja de cálculo congelada no puede editarse"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__group_ids
+msgid "Access Groups"
+msgstr ""
+
+#. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Actuals vs Target"
@@ -65,7 +66,7 @@ msgstr "Reales y objetivos"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Actuals vs Target status"
-msgstr "Estados reales vs objetivos"
+msgstr "Estados reales y objetivos"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -79,8 +80,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/documents_spreadsheet/wizard/documents_sharing.py:0
 msgid "Can edit the spreadsheet, including structure and content."
-msgstr ""
-"Pueden editar la hoja de cálculo, incluyendo su estructura y contenido."
+msgstr "Pueden editar la hoja de cálculo, incluyendo su estructura y contenido."
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -89,9 +89,9 @@ msgid "Can view the spreadsheet. Cannot make changes."
 msgstr "Pueden ver la hoja de cálculo. No pueden hacer cambios."
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
-msgid "Cancel"
-msgstr "Cancelar"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__comma
+msgid "Comma"
+msgstr "Coma"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -103,6 +103,11 @@ msgstr "Confirmar"
 #: model:ir.ui.menu,name:documents_spreadsheet.menu_technical_spreadsheet_contributor
 msgid "Contributors"
 msgstr "Contribuidores"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_documents_import_to_spreadsheet
+msgid "Convert XLSX and CSV files to Odoo Spreadsheet"
+msgstr "Convertir archivos XLSX a Hojas de cálculo de Odoo"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -117,6 +122,7 @@ msgid "Create a Spreadsheet or select a Template"
 msgstr "Cree una hoja de cálculo o elija una plantilla"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_uid
@@ -124,6 +130,7 @@ msgid "Created by"
 msgstr "Creado por"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_date
@@ -138,8 +145,22 @@ msgid "Current Revision Uuid"
 msgstr "UUID de revisión actual"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__custom
+msgid "Custom"
+msgstr "Personalizado"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__csv_separator
+msgid "Custom separator"
+msgstr "Separador personalizado"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__auto_detect
+msgid "Detect automatically"
+msgstr "Detectar de forma automática"
+
+#. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_template/template_dialog.xml:0
 msgid "Discard"
 msgstr "Descartar"
@@ -147,8 +168,10 @@ msgstr "Descartar"
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_access__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_sharing__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_http__display_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__display_name
@@ -165,6 +188,7 @@ msgstr "Mostrar miniatura"
 
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
 msgid "Document"
@@ -179,6 +203,13 @@ msgstr "Documento / Contacto"
 #: model:ir.model,name:documents_spreadsheet.model_documents_sharing
 msgid "Documents Sharing"
 msgstr "Uso compartido de documentos"
+
+#. module: documents_spreadsheet
+#: model:ir.module.module,description:base.module_documents_spreadsheet
+#: model:ir.module.module,shortdesc:base.module_documents_spreadsheet
+#: model:ir.module.module,summary:base.module_documents_spreadsheet
+msgid "Documents Spreadsheet"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -205,6 +236,17 @@ msgstr "Ingresos esperados por etapa"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
 msgid "File Name"
 msgstr "Nombre del archivo"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.xml:0
+msgid "File is in trash"
+msgstr "El archivo está en la papelera"
+
+#. module: documents_spreadsheet
+#: model:ir.actions.act_window,name:documents_spreadsheet.import_to_spreadsheet_action
+msgid "File preview"
+msgstr "Previsualización del archivo"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -265,8 +307,10 @@ msgstr "Administrador"
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_access__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_sharing__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_http__id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__id
@@ -275,6 +319,12 @@ msgid "ID"
 msgstr "ID"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__is_csv
+msgid "Is Csv"
+msgstr "Es CSV"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_uid
@@ -282,6 +332,7 @@ msgid "Last Updated by"
 msgstr "Última actualización por"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_date
@@ -305,6 +356,16 @@ msgid "Make a copy"
 msgstr "Hacer una copia"
 
 #. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_ui_menu
+msgid "Menu"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__archive_document
+msgid "Move source file to trash"
+msgstr "Mover el archivo origen a la papelera"
+
+#. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
 msgid "Move to trash"
@@ -315,6 +376,12 @@ msgstr "Mover a la papelera"
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_template/spreadsheet_template_dialog.js:0
 msgid "My Drive"
 msgstr "Mi unidad"
+
+#. module: documents_spreadsheet
+#: model:ir.actions.act_window,name:documents_spreadsheet.spreadsheet_my_template_action
+#: model:ir.ui.menu,name:documents_spreadsheet.menu_technical_my_spreadsheet_template
+msgid "My Spreadsheet Templates"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_search
@@ -332,8 +399,7 @@ msgid "New spreadsheet"
 msgstr "Nueva hoja de cálculo"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
 msgid "Open with Odoo Spreadsheet"
 msgstr "Abrir con Hojas de cálculo de Odoo"
 
@@ -396,10 +462,14 @@ msgid "Select one and only one spreadsheet"
 msgstr "Seleccione solo una hoja de cálculo"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
-msgid "Send source file to trash"
-msgstr "Enviar archivo de origen a la papelera"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__semicolon
+msgid "Semicolon"
+msgstr "Punto y coma"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__csv_separator_type
+msgid "Separator"
+msgstr "Separador"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__sequence
@@ -412,6 +482,17 @@ msgstr "Secuencia"
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_share/spreadsheet_share.xml:0
 msgid "Share"
 msgstr "Compartir"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__is_shared_externally
+msgid "Shared Externally"
+msgstr "Compartido de forma externa"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_share/spreadsheet_share.xml:0
+msgid "Shared externally"
+msgstr "Compartido de forma externa"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -440,6 +521,13 @@ msgstr "Datos de la hoja de cálculo"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
 msgstr "Nombre del archivo de la hoja de cálculo"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr "Imagen de la hoja de cálculo"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_document_view_kanban
@@ -495,8 +583,8 @@ msgid ""
 "Spreadsheet files cannot be handled from the Trash. Would you like to "
 "restore this document?"
 msgstr ""
-"Los archivos de hoja de cálculo no se pueden gestionar desde la papelera. "
-"¿Desea restaurar este documento?"
+"Los archivos de hoja de cálculo no se pueden gestionar desde la papelera. ¿"
+"Desea restaurar este documento?"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -512,12 +600,15 @@ msgid "Spreadsheets"
 msgstr "Hojas de cálculo"
 
 #. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/documents_access.py:0
-msgid "Spreadsheets can not be shared in edit mode to non-internal users."
-msgstr ""
-"Las hojas de cálculo no se pueden compartir en modo edición para usuarios "
-"externos."
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__tab
+msgid "Tab"
+msgstr "Tabulación"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.xml:0
+msgid "Take out of trash"
+msgstr "Sacar de la papelera"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
@@ -554,21 +645,23 @@ msgid "The xlsx file is too big"
 msgstr "El archivo xlsx es muy pesado"
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
-msgid "This spreadsheet contains live data, only internal users can view it."
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
+msgid ""
+"This file type can't be opened directly in Odoo. Convert it to an Odoo "
+"Spreadsheet to view or edit it."
 msgstr ""
-"Esta hoja de cálculo contiene datos reales y actualizados, solo pueden verla "
-"los usuarios internos."
+"Este tipo de archivo no se puede abrir directamente en Odoo. Conviértelo en "
+"una hoja de cálculo de Odoo para verlo o editarlo."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
 msgid ""
-"This type of file cannot be previewed or edited directly in Odoo. Opening "
-"your file with Odoo Spreadsheet will allow you to do so."
+"This file will be deleted forever in %(deletion_delay)s days. You can still "
+"download it."
 msgstr ""
-"Este tipo de archivo no se puede previsualizar o editar en Odoo, tiene que "
-"abrir las Hojas de cálculo de Odoo."
+"El archivo se eliminará de forma permanente en %(deletion_delay)s días. "
+"Todavía lo puedes descargar."
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
@@ -578,11 +671,16 @@ msgid "Thumbnail"
 msgstr "Miniatura"
 
 #. module: documents_spreadsheet
-#: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
-msgid "To share a spreadsheet in edit mode, add the user in the accesses"
-msgstr ""
-"Para compartir una hoja de cálculo en modo edición, agregue un usuario en "
-"los permisos de acceso."
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
+msgid "To access this file, contact the owner to take it out of the trash."
+msgstr "Para acceder a este archivo, contacta al dueño o sácalo de la papelera."
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
+msgid "To access this file, take it out of the trash."
+msgstr "Para acceder al archivo, deberás sacarlo de la papelera."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -627,7 +725,46 @@ msgstr "No puede congelar una hoja de cálculo que ya está congelada"
 
 #. module: documents_spreadsheet
 #. odoo-python
-#: code:addons/documents_spreadsheet/wizard/documents_sharing.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You cannot modify this spreadsheet because it is in the trash."
+msgstr ""
+"No puedes modificar esta hoja de cálculo ya que se encuentra en la papelera."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid ""
+"You cannot restore this version because the spreadsheet is in the trash."
+msgstr ""
+"No es posible restaurar esta versión ya que la hoja de cálculo se encuentra "
+"en la papelera."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You don't have access to this document"
+msgstr "No tiene acceso a este documento"
+
+#. module: documents_spreadsheet
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
+msgid "e.g. ; or |"
+msgstr "Por ejemplo, ; o |"
+
+msgid "Spreadsheets can not be shared in edit mode to non-internal users."
+msgstr ""
+"Las hojas de cálculo no se pueden compartir en modo edición para usuarios "
+"externos."
+
+msgid "This spreadsheet contains live data, only internal users can view it."
+msgstr ""
+"Esta hoja de cálculo contiene datos reales y actualizados, solo pueden verla "
+"los usuarios internos."
+
+msgid "To share a spreadsheet in edit mode, add the user in the accesses"
+msgstr ""
+"Para compartir una hoja de cálculo en modo edición, agregue un usuario en "
+"los permisos de acceso."
+
 msgid ""
 "You can not share spreadsheet(s) in edit mode (%(document_names)s) to non-"
 "internal users."
@@ -635,17 +772,8 @@ msgstr ""
 "No puedes compartir hojas de cálculo en modo edición (%(document_names)s) "
 "con usuarios no internos."
 
-#. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/wizard/documents_sharing.py:0
 msgid ""
 "You cannot share spreadsheet(s) via link in edit mode (%(document_names)s)."
 msgstr ""
 "No puedes compartir hojas de cálculo a través del enlace en el modo edición "
 "(%(document_names)s)."
-
-#. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/documents_document.py:0
-msgid "You don't have access to this document"
-msgstr "No tiene acceso a este documento"

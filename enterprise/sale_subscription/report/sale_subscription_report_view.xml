@@ -174,7 +174,7 @@
                 <separator/>
                 <filter name="filter_to_renew" string="To renew" domain="[('next_invoice_date', '&lt;', 'today')]"/>
                 <separator/>
-                <filter string="Recurring" name="recurring" domain="[('product_tmpl_id.recurring_invoice', '=', True)]"/>
+                <filter string="Recurring" name="recurring" domain="['|', ('product_tmpl_id.recurring_invoice', '=', True), '&amp;', ('product_id', '=', False), ('plan_id', '!=', False)]"/>
                 <filter string="Non-recurring" name="non_recurring" domain="[('product_tmpl_id.recurring_invoice', '!=', True)]"/>
                 <separator/>
                 <filter name="filter_first_contract_date" date="first_contract_date"/>

@@ -19,3 +19,5 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.timesheet_mail_interval', readonly=False)
     timesheet_min_duration = fields.Integer('Minimal Duration', default=15, config_parameter='timesheet_grid.timesheet_min_duration')
     timesheet_rounding = fields.Integer('Round up', default=15, config_parameter='timesheet_grid.timesheet_rounding')
+
+    group_timesheet_assistant = fields.Boolean('Timesheets Assistant', implied_group='timesheet_grid.group_timesheet_assistant')

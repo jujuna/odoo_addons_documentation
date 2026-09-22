@@ -1,15 +1,17 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { click, animationFrame } from "@odoo/hoot-dom";
 import { user } from "@web/core/user";
-import { patchWithCleanup, getService, onRpc } from "@web/../tests/web_test_helpers";
+import { patchWithCleanup, getService, onRpc, defineModels } from "@web/../tests/web_test_helpers";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { createDocumentWebClient } from "./action_utils";
 import { browser } from "@web/core/browser/browser";
+import { SignTemplate, SignTemplateTag, SignRequest } from "./sign_test_helpers";
 
 const tag = "sign.Document";
 
 describe.current.tags("desktop");
 defineMailModels();
+defineModels([SignTemplate, SignTemplateTag, SignRequest]);
 
 test("simple rendering", async () => {
     patchWithCleanup(user, { userId: 1 });
@@ -38,13 +40,8 @@ test("simple rendering", async () => {
     expect.verifySteps(["getDataFromHTML"]);
 
     expect(".o_sign_document").toHaveText("def", { message: "should display text from server" });
-    expect(".o_sign_resend_access_button").toHaveCount(2);
-    expect(".o_sign_resend_access_button:eq(0)").toHaveText("Resend");
-    expect(".o_sign_resend_access_button:eq(1)").toHaveText("Send");
-    expect(".o_sign_sign_directly").toHaveCount(1);
-
-    // click on resend
-    await click(".o_sign_resend_access_button");
+    expect(".o_sign_resend_icon").toHaveCount(1);
+    await click(".o_sign_resend_icon:eq(0)");
     expect.verifySteps(["send_messages"]);
 });
 
@@ -62,9 +59,7 @@ test("render shared document", async () => {
     await animationFrame();
 
     expect(".o_sign_document").toHaveText("def", { message: "should display text from server" });
-
-    expect(".o_sign_resend_access_button").toHaveCount(0);
-    expect(".o_sign_sign_directly").toHaveCount(1);
+    expect(".o_sign_resend_icon").toHaveCount(0);
 });
 
 test("do not crash when leaving the action", async () => {

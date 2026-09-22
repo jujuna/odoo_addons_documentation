@@ -1,34 +1,22 @@
-import base64
-
 from .common import TestBankRecWidgetCommon
 from odoo import Command, fields
+from odoo.exceptions import ValidationError
 from odoo.tests import tagged
+from odoo.tests.common import Like
+
+from odoo.addons.mail.tests.common import mail_new_test_user
 
 
 @tagged('post_install', '-at_install')
 class TestAccountBankStatement(TestBankRecWidgetCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.company_data_2 = cls.setup_other_company()
         cls.account_revenue_1 = cls.company_data['default_account_revenue']
-        cls.account_revenue_1.reconcile = True
-
-        cls.early_payment_term = cls.env['account.payment.term'].create({
-            'name': "Early_payment_term",
-            'company_id': cls.company_data['company'].id,
-            'discount_percentage': 10,
-            'discount_days': 10,
-            'early_discount': True,
-            'line_ids': [
-                Command.create({
-                    'value': 'percent',
-                    'value_amount': 100,
-                    'nb_days': 20,
-                }),
-            ],
-        })
 
         cls.default_tax = cls.env['account.tax'].create({
             'name': 'default_tax',
@@ -61,13 +49,63 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         statement_line = self._create_st_line(amount=150, update_create_date=False)
         self.assertEqual(len(statement_line.move_id.line_ids), 2)
 
-        move_line_1 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}])
-        move_line_2 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 50.0}])
+        move_line_1 = self._create_invoice_one_line_reco(price_unit=100.0)
+        move_line_2 = self._create_invoice_one_line_reco(price_unit=50.0)
 
         statement_line.set_line_bank_statement_line([move_line_1.id, move_line_2.id])
 
         self.assertEqual(len(statement_line.move_id.line_ids), 3)
         self.assertNotEqual(statement_line.move_id.line_ids[-1].account_id, statement_line.journal_id.suspense_account_id)
+
+    def test_internal_transfer_branch_reconcile_model(self):
+        """ Test that an internal transfer between a branch and its parent
+            company can be completed without raising User Errors, even when the
+            branch line was processed by a branch-only reconciliation model.
+        """
+        company = self.company_data['company']
+        branch = self.env['res.company'].create({
+            'name': "Branch Co",
+            'parent_id': company.id,
+            'account_journal_suspense_account_id': company.account_journal_suspense_account_id.id,
+        })
+        self.env.user.company_ids = [Command.link(branch.id)]
+        branch_bank_journal = self.env['account.journal'].with_company(branch).create({
+            'name': "Bank Branch",
+            'type': 'bank',
+            'code': 'BNKBR',
+            'company_id': branch.id,
+        })
+        reconcile_model = self.env['account.reconcile.model'].with_company(branch).create({
+            'name': "Internal transfer",
+            'company_id': branch.id,
+            'line_ids': [Command.create({
+                'account_id': company.transfer_account_id.id,
+                'amount_type': 'percentage',
+                'amount_string': '100',
+                'label': "Internal transfer",
+            })],
+        })
+
+        # Branch statement line reconciled through the branch reconcile model.
+        branch_st_line = self._create_st_line(
+            amount=-100.0, journal_id=branch_bank_journal.id, update_create_date=False,
+        )
+        reconcile_model.with_company(branch).trigger_reconciliation_model(branch_st_line.ids)
+        transfer_line = branch_st_line.move_id.line_ids.filtered(
+            lambda line: line.account_id == company.transfer_account_id and not line.reconciled
+        )
+        self.assertTrue(branch_st_line.is_reconciled)
+        self.assertEqual(transfer_line.reconcile_model_id, reconcile_model)
+
+        # Parent company statement line reconciled against the branch transfer line (internal transfer).
+        company_st_line = self._create_st_line(amount=100.0, update_create_date=False)
+        company_st_line.set_line_bank_statement_line(transfer_line.ids)
+
+        self.assertTrue(company_st_line.is_reconciled)
+        new_transfer_line = company_st_line.move_id.line_ids.filtered(
+            lambda line: line.account_id == company.transfer_account_id
+        )
+        self.assertFalse(new_transfer_line.reconcile_model_id)
 
     def test_set_line_bank_statement_line_with_open_balance(self):
         """Test that an open balance entry is created when the move lines don't fully cover the statement balance."""
@@ -75,7 +113,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         self.assertEqual(len(statement_line.move_id.line_ids), 2)
 
         # Create a move line with only 150
-        move_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 150.0}])
+        move_line = self._create_invoice_one_line_reco(price_unit=150.0)
         statement_line.set_line_bank_statement_line(move_line.id)
 
         # Expecting 3 lines: statement line (200) + move line (150) + suspense line
@@ -106,7 +144,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         self.assertEqual(len(statement_line.move_id.line_ids), 2)
 
         # Create a move line that exceeds the statement amount
-        move_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 250.0}])
+        move_line = self._create_invoice_one_line_reco(price_unit=250.0)
 
         statement_line.set_line_bank_statement_line(move_line.id)
 
@@ -139,7 +177,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         self.assertEqual(len(statement_line.move_id.line_ids), 2)
 
         # Create a move line that exceeds the statement amount
-        move_line = self._create_invoice_line('in_invoice', invoice_line_ids=[{'price_unit': 250.0}])
+        move_line = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=250.0)
 
         statement_line.set_line_bank_statement_line(move_line.id)
 
@@ -170,8 +208,8 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         """Test removing a move line when a suspense account exists"""
         statement_line = self._create_st_line(amount=200, update_create_date=False)
 
-        move_line_1 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 150.0}])
-        move_line_2 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 50.0}])
+        move_line_1 = self._create_invoice_one_line_reco(price_unit=150.0)
+        move_line_2 = self._create_invoice_one_line_reco(price_unit=50.0)
         statement_line.set_line_bank_statement_line([move_line_1.id, move_line_2.id])
         self.assertRecordValues(
             statement_line.move_id.line_ids,
@@ -221,10 +259,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
             {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
         ])
-        inv_line = self._create_invoice_line(
-            'out_invoice',
-            invoice_line_ids=[{'price_unit': 1000.0, 'tax_ids': []}],
-        )
+        inv_line = self._create_invoice_one_line_reco(price_unit=1000.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
@@ -237,10 +272,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
             {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
         ])
-        inv_line = self._create_invoice_line(
-            'in_invoice',
-            invoice_line_ids=[{'price_unit': 1000.0, 'tax_ids': []}],
-        )
+        inv_line = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=1000.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
@@ -297,7 +329,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': payment.outstanding_account_id.id, 'balance': -100.0, 'reconciled': True},
         ])
         # Only 100 is paid on the payment for now, he's not fully reconciled yet
-        self.assertEqual(payment.state, 'in_process')
+        self.assertEqual(payment.state, 'paid')
         statement_line_2 = self._create_st_line(amount=100, payment_ref="pay_AretqwwXerereE", update_create_date=False)
         statement_line_2._try_auto_reconcile_statement_lines()
         self.assertRecordValues(statement_line_2.line_ids, [
@@ -305,7 +337,41 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': payment.outstanding_account_id.id, 'balance': -100.0, 'reconciled': True},
         ])
         # Now the payment should be fully reconciled and marked as paid
-        self.assertEqual(payment.state, 'paid')
+        self.assertEqual(payment.state, 'reconciled')
+
+    def test_multiple_reconcile_with_foreign_currency(self):
+        """Create a payment, then create 2 st_lines matching the payment."""
+        payment = self._create_and_post_payment(amount=400, memo="pay_AretqwwXerereE", currency_id=self.other_currency.id)
+        statement_line_1 = self._create_st_line(amount=200, payment_ref="pay_AretqwwXerereE", update_create_date=False)
+        statement_line_1._try_auto_reconcile_statement_lines()
+        self.assertRecordValues(statement_line_1.line_ids, [
+            {'account_id': statement_line_1.journal_id.default_account_id.id, 'balance': 200.0, 'reconciled': False},
+            {'account_id': payment.outstanding_account_id.id, 'balance': -200.0, 'reconciled': True},
+        ])
+
+        inv_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            invoice_date='2017-01-01',
+            price_unit=2000.0,
+        )
+        statement_line_2 = self._create_st_line(amount=1000, payment_ref=inv_line.name, update_create_date=False)
+        statement_line_2._try_auto_reconcile_statement_lines()
+        self.assertRecordValues(statement_line_2.line_ids, [
+            {'account_id': statement_line_2.journal_id.default_account_id.id, 'balance': 1000.0, 'reconciled': False},
+            {'account_id': inv_line.account_id.id, 'balance': -1000.0, 'reconciled': True},
+        ])
+        foreign_inv_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            currency_id=self.other_currency.id,
+            invoice_date='2017-01-01',
+            price_unit=2000.0,
+        )
+        statement_line_3 = self._create_st_line(amount=1000, payment_ref=foreign_inv_line.name, update_create_date=False)
+        statement_line_3._try_auto_reconcile_statement_lines()
+        self.assertRecordValues(statement_line_3.line_ids, [
+            {'account_id': statement_line_2.journal_id.default_account_id.id, 'balance': 1000.0, 'reconciled': False},
+            {'account_id': statement_line_2.journal_id.suspense_account_id.id, 'balance': -1000.0, 'reconciled': False},
+        ])
 
     def test_unreconciliation_base_case_invoice(self):
         st_line = self._create_st_line(1000.0, update_create_date=False)
@@ -313,10 +379,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
             {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
         ])
-        inv_line = self._create_invoice_line(
-            'out_invoice',
-            invoice_line_ids=[{'price_unit': 1000.0, 'tax_ids': []}],
-        )
+        inv_line = self._create_invoice_one_line_reco(price_unit=1000.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
@@ -341,10 +404,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
             {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
         ])
-        inv_line = self._create_invoice_line(
-            'in_invoice',
-            invoice_line_ids=[{'price_unit': 1000.0, 'tax_ids': []}],
-        )
+        inv_line = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=1000.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
@@ -424,17 +484,35 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -500.0, 'currency_id': self.company_data['currency'].id, 'balance': -500.0, 'reconciled': False},
         ])
 
+    def test_manual_edit_change_currency(self):
+        self.account_current_assets_1 = self.company_data['default_account_deferred_expense']
+        st_line = self._create_st_line(1000.0, update_create_date=False)
+
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
+        ])
+
+        st_line.set_account_bank_statement_line(st_line.line_ids[-1].id, self.account_current_assets_1.id)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
+            {'account_id': self.account_current_assets_1.id, 'amount_currency': -1000.0, 'currency_id': self.company_data['currency'].id, 'balance': -1000.0, 'reconciled': False},
+        ])
+
+        st_line.edit_reconcile_line(st_line.line_ids[1].id, {'balance': -500, 'amount_currency': -500, 'currency_id': self.other_currency.id})
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': self.company_data['currency'].id, 'balance': 1000.0, 'reconciled': False},
+            {'account_id': self.account_current_assets_1.id, 'amount_currency': -500.0, 'currency_id': self.other_currency.id, 'balance': -500.0, 'reconciled': False},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -500.0, 'currency_id': self.company_data['currency'].id, 'balance': -500.0, 'reconciled': False},
+        ])
+
     def test_res_partner_bank_find_create_multi_account(self):
         """ Make sure that we can save multiple bank accounts for a partner. """
         partner = self.env['res.partner'].create({'name': "Zitycard"})
 
         for acc_number in ("123456789", "123456780"):
             st_line = self._create_st_line(100.0, account_number=acc_number, update_create_date=False)
-            inv_line = self._create_invoice_line(
-                'out_invoice',
-                partner_id=partner.id,
-                invoice_line_ids=[{'price_unit': 100.0, 'tax_ids': []}],
-            )
+            inv_line = self._create_invoice_one_line_reco(partner_id=partner.id, price_unit=1000.0)
             st_line.set_line_bank_statement_line(inv_line.id)
 
         bank_accounts = self.env['res.partner.bank'].sudo().with_context(active_test=False).search([
@@ -445,11 +523,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
     def test_early_payment_discount_basic_case(self):
         st_line = self._create_st_line(90.0, date='2017-01-10', update_create_date=False)
         early_pay_acc = self.env.company.account_journal_early_pay_discount_loss_account_id
-        inv_line_with_epd = self._create_invoice_line(
-            'out_invoice',
+        inv_line_with_epd = self._create_invoice_one_line_reco(
             date='2017-01-04',
             invoice_payment_term_id=self.early_payment_term.id,
-            invoice_line_ids=[{'price_unit': 100.0}],
+            price_unit=100.0,
         )
         st_line.set_line_bank_statement_line(inv_line_with_epd.id)
         self.assertRecordValues(st_line.line_ids, [
@@ -459,11 +536,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
     def test_early_payment_discount_basic_case_after_date(self):
-        inv_line_with_epd = self._create_invoice_line(
-            'out_invoice',
+        inv_line_with_epd = self._create_invoice_one_line_reco(
             date='2017-01-10',
             invoice_payment_term_id=self.early_payment_term.id,
-            invoice_line_ids=[{'price_unit': 100.0}],
+            price_unit=100.0,
         )
         st_line = self._create_st_line(90.0, date='2017-02-10', update_create_date=False)
         st_line.set_line_bank_statement_line(inv_line_with_epd.id)
@@ -475,11 +551,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
     def test_early_payment_discount_basic_case_smaller_amount(self):
         early_pay_acc = self.env.company.account_journal_early_pay_discount_loss_account_id
         st_line = self._create_st_line(100.0, date='2017-01-10', update_create_date=False)
-        inv_line_with_epd = self._create_invoice_line(
-            'out_invoice',
+        inv_line_with_epd = self._create_invoice_one_line_reco(
             date='2017-01-10',
             invoice_payment_term_id=self.early_payment_term.id,
-            invoice_line_ids=[{'price_unit': 90.0}],
+            price_unit=90.0,
         )
         st_line.set_line_bank_statement_line(inv_line_with_epd.id)
         self.assertRecordValues(st_line.line_ids, [
@@ -488,6 +563,38 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': early_pay_acc.id, 'amount_currency': 9.0, 'currency_id': self.company_data['currency'].id, 'balance': 9.0, 'reconciled': False},
             {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -19.0, 'currency_id': self.company_data['currency'].id, 'balance': -19.0, 'reconciled': False},
         ])
+
+    def test_early_payment_discount_batch_reconcile_merges_tax_lines(self):
+        """Batch-reconciling invoices sharing a tax with an EPD keeps one discount base line
+        per invoice but merges their tax lines into one, so the tax report base is not doubled."""
+        self.early_payment_term.early_pay_discount_computation = 'included'
+        invoice_lines = self.env['account.move.line']
+        for price in (100.0, 200.0):
+            invoice_lines += self._create_invoice_one_line_reco(
+                date='2017-01-04',
+                invoice_payment_term_id=self.early_payment_term.id,
+                price_unit=price,
+                tax_ids=self.tax_sale_a,
+            )
+        st_line = self._create_st_line(310.5, date='2017-01-10', update_create_date=False)
+        st_line.set_line_bank_statement_line(invoice_lines.ids)
+
+        tax_acc = self.company_data['default_account_tax_sale']
+        early_pay_acc = self.env.company.account_journal_early_pay_discount_loss_account_id
+        self.assertRecordValues(st_line.line_ids.sorted('balance'), [
+            {'account_id': invoice_lines.account_id.id,                 'balance': -230.0, 'reconciled': True},
+            {'account_id': invoice_lines.account_id.id,                 'balance': -115.0, 'reconciled': True},
+            {'account_id': tax_acc.id,                                  'balance': 4.5,    'reconciled': False},
+            {'account_id': early_pay_acc.id,                            'balance': 10.0,   'reconciled': False},
+            {'account_id': early_pay_acc.id,                            'balance': 20.0,   'reconciled': False},
+            {'account_id': st_line.journal_id.default_account_id.id,    'balance': 310.5,  'reconciled': False},
+        ])
+
+        # Removing the larger discount recomputes the merged tax line from 4.5 to 1.5.
+        epd_base_line = st_line.line_ids.filtered(lambda l: l.account_id == early_pay_acc and l.tax_ids).sorted('balance')[-1]
+        st_line.delete_reconciled_line(epd_base_line.id)
+        epd_tax_line = st_line.line_ids.filtered(lambda l: l.tax_line_id == self.tax_sale_a)
+        self.assertEqual(epd_tax_line.balance, 1.5)
 
     def test_exchange_diff_basic_case(self):
         self.other_currency.rate_ids = [Command.create({
@@ -500,12 +607,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             update_create_date=False,
         )
         # 100.0 curr2 == 50.0 comp_curr
-        inv_line = self._create_invoice_line(
-            'out_invoice',
-            currency_id=self.other_currency.id,
-            invoice_date='2017-01-01',
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
+        inv_line = self._create_invoice_one_line_reco(currency_id=self.other_currency.id, price_unit=100.0)
 
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
@@ -530,18 +632,9 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             update_create_date=False,
         )
 
-        inv_line_1 = self._create_invoice_line(
-            'out_invoice',
-            invoice_date='2017-01-01',
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
+        inv_line_1 = self._create_invoice_one_line_reco(price_unit=100.0)
         # 100.0 curr2 == 50.0 comp_curr
-        inv_line_2 = self._create_invoice_line(
-            'out_invoice',
-            currency_id=self.other_currency.id,
-            invoice_date='2017-01-01',
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
+        inv_line_2 = self._create_invoice_one_line_reco(currency_id=self.other_currency.id, price_unit=100.0)
 
         st_line.set_line_bank_statement_line((inv_line_1 + inv_line_2).ids)
         self.assertRecordValues(st_line.line_ids, [
@@ -563,7 +656,6 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         entry and the lines will directly be exigible, so we want to use the final tax account directly.
         """
         tax_account = self.company_data['default_account_tax_sale']
-        tax_account.reconcile = True
 
         caba_tax = self.env['account.tax'].create({
             'name': "CABA",
@@ -610,7 +702,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_multicurrency_flows_all_same_currency(self):
         st_line = self._create_st_line(250.0, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}])
+        inv_line = self._create_invoice_one_line_reco(price_unit=100.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.company_data['currency'].id, 'balance': 250.0, 'reconciled': False},
@@ -619,7 +711,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
         st_line = self._create_st_line(250.0, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 500.0}])
+        inv_line = self._create_invoice_one_line_reco(price_unit=500.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.company_data['currency'].id, 'balance': 250.0, 'reconciled': False},
@@ -628,7 +720,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_multicurrency_flows_currency_transaction_different(self):
         st_line = self._create_st_line(250.0, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}], currency_id=self.other_currency.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=100.0, currency_id=self.other_currency.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.company_data['currency'].id, 'balance': 250.0, 'reconciled': False},
@@ -637,7 +729,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
         st_line = self._create_st_line(250.0, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 500.0}], currency_id=self.other_currency.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=500.0, currency_id=self.other_currency.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.company_data['currency'].id, 'balance': 250.0, 'reconciled': False},
@@ -653,7 +745,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         })
 
         st_line = self._create_st_line(250.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}])
+        inv_line = self._create_invoice_one_line_reco(price_unit=100.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.other_currency.id, 'balance': 125.0, 'reconciled': False},
@@ -662,7 +754,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
         st_line = self._create_st_line(250.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 500.0}])
+        inv_line = self._create_invoice_one_line_reco(price_unit=500.0)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.other_currency.id, 'balance': 125.0, 'reconciled': False},
@@ -677,7 +769,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             'currency_id': self.other_currency.id,
         })
         st_line = self._create_st_line(250.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}], currency_id=self.other_currency.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=100.0, currency_id=self.other_currency.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.other_currency.id, 'balance': 125.0, 'reconciled': False},
@@ -686,7 +778,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
         st_line = self._create_st_line(250.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 500.0}], currency_id=self.other_currency.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=500.0, currency_id=self.other_currency.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.other_currency.id, 'balance': 125.0, 'reconciled': False},
@@ -694,7 +786,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
     def test_multicurrency_flows_triple_currency(self):
-        currency_yen = self.setup_other_currency('JPY', rounding=0.001, rates=[('2017-01-01', 10.0)])
+        currency_yen = self.setup_other_currency('JPY', rounding=0.001, rates=[('2016-12-31', 10.0)])
         new_journal = self.env['account.journal'].create({
             'name': 'test',
             'code': 'TBNK',
@@ -702,7 +794,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             'currency_id': self.other_currency.id,
         })
         st_line = self._create_st_line(250.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}], currency_id=currency_yen.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=100.0, currency_id=currency_yen.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.other_currency.id, 'balance': 125.0, 'reconciled': False},
@@ -711,7 +803,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
         st_line = self._create_st_line(250.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 500.0}], currency_id=currency_yen.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=500.0, currency_id=currency_yen.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.other_currency.id, 'balance': 125.0, 'reconciled': False},
@@ -720,7 +812,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
         st_line = self._create_st_line(250.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 5000.0}], currency_id=currency_yen.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=5000.0, currency_id=currency_yen.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 250.0, 'currency_id': self.other_currency.id, 'balance': 125.0, 'reconciled': False},
@@ -730,7 +822,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
     def test_retrieve_partner_from_account_number(self):
         st_line = self._create_st_line(1000.0, partner_id=None, account_number="014 474 8555")
         bank_account = self.env['res.partner.bank'].create({
-            'acc_number': '0144748555',
+            'account_number': '0144748555',
             'partner_id': self.partner_a.id,
         })
         st_line.partner_id = False
@@ -739,7 +831,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
         # Can't retrieve the partner since the bank account is used by multiple partners.
         self.env['res.partner.bank'].create({
-            'acc_number': '0144748555',
+            'account_number': '0144748555',
             'partner_id': self.partner_b.id,
         })
         st_line.partner_id = False
@@ -761,14 +853,13 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_retrieve_partner_from_account_number_in_other_company(self):
         st_line = self._create_st_line(1000.0, partner_id=None, account_number="014 474 8555", update_create_date=False)
-        self.env['res.partner.bank'].create({
-            'acc_number': '0144748555',
+        bank_acc = self.env['res.partner.bank'].create({
+            'account_number': '0144748555',
             'partner_id': self.partner_a.id,
         })
 
         # Bank account is owned by another company.
-        new_company = self.env['res.company'].create({'name': "test_retrieve_partner_from_account_number_in_other_company"})
-        self.partner_a.company_id = new_company
+        bank_acc.company_id = self.env['res.company'].create({'name': "test_retrieve_partner_from_account_number_in_other_company"})
         st_line._retrieve_partner()
         self.assertEqual(st_line.partner_id, self.env['res.partner'])
 
@@ -798,6 +889,18 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         st_line._retrieve_partner()
         self.assertFalse(st_line.partner_id)
 
+    def test_retrieve_partner_from_partner_name_odoobot(self):
+        """This test ensure that OdooBot is not set on a statement line with the retrieve partner"""
+        odoobot = self.env.ref('base.partner_root')
+        odoobot.company_id = self.env.company.id
+        st_line = self._create_st_line(
+            1000.0,
+            partner_id=None,
+            partner_name="ODOO",
+            update_create_date=False,
+        )
+        self.assertNotEqual(st_line.partner_id, odoobot)
+
     def test_retrieve_partner_from_previous_reconciled_st_line(self):
         """Test the retrieve partner from a previous reconciled st-line."""
         # Use 2 partner with the same name, so we can't retrieve it from the partner name
@@ -809,7 +912,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         st_line = self._create_st_line(1000.0, partner_id=None, partner_name="Turlututu", update_create_date=False)
         # This st_line should be the one we retrieve the partner from
         st_line_2 = self._create_st_line(1000.0, partner_id=partner_b.id, partner_name="Turlututu", update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 1000.0}])
+        inv_line = self._create_invoice_one_line_reco(price_unit=1000.0)
         st_line_2.set_line_bank_statement_line(inv_line.id)
 
         st_line._retrieve_partner()
@@ -823,12 +926,12 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'name': "Turlututu tsoin tsoin"},
         ])
         bank_account = self.env['res.partner.bank'].create({
-            'acc_number': '0144748555',
+            'account_number': '0144748555',
             'partner_id': self.partner_a.id,
         })
 
         st_line_1 = self._create_st_line(1000.0, partner_id=partner_b.id, partner_name="Turlututu", update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 1000.0}])
+        inv_line = self._create_invoice_one_line_reco(price_unit=1000.0)
         st_line_1.set_line_bank_statement_line(inv_line.id)
 
         st_line_2 = self._create_st_line(1000.0, partner_id=None, partner_name="Turlututu", update_create_date=False)
@@ -850,7 +953,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'name': 'Turlututu'},
         ])
         bank_account = self.env['res.partner.bank'].create({
-            'acc_number': '123456789',
+            'account_number': '123456789',
             'partner_id': partner_a.id,
         })
         st_line = self._create_st_line(1000.0, partner_id=None, account_number="123456789", partner_name="Turlututu", update_create_date=False)
@@ -864,7 +967,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         partner = self.env['res.partner'].create({
             'name': "Zitycard",
             'bank_ids': [Command.create({
-                'acc_number': "123456789",
+                'account_number': "123456789",
                 'active': False,
             })],
         })
@@ -875,11 +978,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             account_number="123456789",
             update_create_date=False,
         )
-        inv_line = self._create_invoice_line(
-            'out_invoice',
-            partner_id=partner.id,
-            invoice_line_ids=[{'price_unit': 100.0, 'tax_ids': []}],
-        )
+        inv_line = self._create_invoice_one_line_reco(partner_id=partner.id, price_unit=100.0)
         st_line.set_line_bank_statement_line(inv_line.id)
 
         # Should not trigger the error.
@@ -891,7 +990,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         """
         partner = self.env['res.partner'].create({
             'name': "Zitycard",
-            'bank_ids': [Command.create({'acc_number': "123456789"})],
+            'bank_ids': [Command.create({'account_number': "123456789"})],
         })
         partner.bank_ids.company_id = self.company_data_2['company']
         self.env.user.company_ids = self.env.company
@@ -902,11 +1001,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             account_number="123456789",
             update_create_date=False,
         )
-        inv_line = self._create_invoice_line(
-            'out_invoice',
-            partner_id=partner.id,
-            invoice_line_ids=[{'price_unit': 100.0, 'tax_ids': []}],
-        )
+        inv_line = self._create_invoice_one_line_reco(partner_id=partner.id, price_unit=100.0)
         st_line.set_line_bank_statement_line(inv_line.id)
 
         # Should not trigger the error.
@@ -914,11 +1009,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_validation_exchange_difference_draft_invoice(self):
         # 240.0 curr2 == 80.0 comp_curr
-        inv_line = self._create_invoice_line(
-            'out_invoice',
+        inv_line = self._create_invoice_one_line_reco(
             currency_id=self.other_currency.id,
             invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 240.0}],
+            price_unit=240.0,
         )
         inv_line.move_id.button_draft()
         self.assertEqual(inv_line.move_id.state, 'draft')
@@ -1018,11 +1112,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             update_create_date=False,
         )
         # 1800.0 comp_curr = 3600.0 foreign_curr in 2017 (rate 1:2)
-        inv_line = self._create_invoice_line(
-            'out_invoice',
+        inv_line = self._create_invoice_one_line_reco(
             currency_id=self.other_currency.id,
             invoice_date='2017-01-01',
-            invoice_line_ids=[{'price_unit': 3600.0}],
+            price_unit=3600.0,
         )
 
         st_line.set_line_bank_statement_line(inv_line.id)
@@ -1047,11 +1140,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             update_create_date=False,
         )
         # 1200.0 comp_curr = 3600.0 foreign_curr in 2016 (rate 1:3)
-        inv_line = self._create_invoice_line(
-            'out_invoice',
+        inv_line = self._create_invoice_one_line_reco(
             currency_id=self.other_currency.id,
             invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 3600.0}],
+            price_unit=3600.0,
         )
 
         st_line.set_line_bank_statement_line(inv_line.id)
@@ -1068,7 +1160,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_validation_exchange_diff_multiple(self):
         income_exchange_account = self.env.company.income_currency_exchange_account_id
-        foreign_currency = self.setup_other_currency('AED', rates=[('2016-01-01', 6.0), ('2017-01-01', 5.0)])
+        foreign_currency = self.setup_other_currency('AED', rates=[('2015-12-31', 6.0), ('2016-12-31', 5.0)])
 
         # 6000.0 curr2 == 1200.0 comp_curr (bank rate 5:1 instead of the odoo rate 6:1)
         st_line = self._create_st_line(
@@ -1079,25 +1171,22 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             update_create_date=False,
         )
         # 1000.0 foreign_curr == 166.67 comp_curr (rate 6:1)
-        inv_line_1 = self._create_invoice_line(
-            'out_invoice',
+        inv_line_1 = self._create_invoice_one_line_reco(
             currency_id=foreign_currency.id,
             invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 1000.0}],
+            price_unit=1000.0,
         )
         # 2000.00 foreign_curr == 400.0 comp_curr (rate 5:1)
-        inv_line_2 = self._create_invoice_line(
-            'out_invoice',
+        inv_line_2 = self._create_invoice_one_line_reco(
             currency_id=foreign_currency.id,
             invoice_date='2017-01-01',
-            invoice_line_ids=[{'price_unit': 2000.0}],
+            price_unit=2000.0,
         )
         # 3000.0 foreign_curr == 500.0 comp_curr (rate 6:1)
-        inv_line_3 = self._create_invoice_line(
-            'out_invoice',
+        inv_line_3 = self._create_invoice_one_line_reco(
             currency_id=foreign_currency.id,
             invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 3000.0}],
+            price_unit=3000.0,
         )
 
         st_line.set_line_bank_statement_line((inv_line_1 + inv_line_2 + inv_line_3).ids)
@@ -1204,23 +1293,21 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             update_create_date=False,
         )
 
-        inv1 = self._create_invoice_line(
-            'out_invoice',
+        inv1 = self._create_invoice_one_line_reco(
             currency_id=self.other_currency.id,
             invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 2400.0}],
+            price_unit=2400.0,
         )
-        inv2 = self._create_invoice_line(
-            'out_invoice',
+        inv2 = self._create_invoice_one_line_reco(
             currency_id=self.other_currency.id,
             invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 600.0}],
+            price_unit=600.0,
         )
-        refund = self._create_invoice_line(
-            'out_refund',
+        refund = self._create_invoice_one_line_reco(
+            move_type='out_refund',
             currency_id=self.other_currency.id,
             invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 1200.0}],
+            price_unit=1200.0,
         )
         st_line.set_line_bank_statement_line(inv1.id)
 
@@ -1279,12 +1366,12 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             'company_id': branch.id,
         })
 
-        aml_branch = self._create_invoice_line(
-            'out_invoice',
+        aml_branch = self._create_invoice_one_line_reco(
             company_id=branch.id,
             partner_id=partner_branch.id,
             invoice_date='2019-01-01',
-            invoice_line_ids=[{'name': 'Test reco', 'quantity': 1, 'price_unit': 1000}],
+            price_unit=1000,
+            name='Test reco',
         )
         st_line_main = self._create_st_line(
             1000.0,
@@ -1331,11 +1418,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             date='2017-01-01',
             update_create_date=False,
         )
-        inv1 = self._create_invoice_line(
-            'out_invoice',
-            invoice_date='2016-01-01',
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
+        inv1 = self._create_invoice_one_line_reco(invoice_date='2016-01-01', price_unit=100.0)
         st_line_1.set_line_bank_statement_line(inv1.id)
         self.assertRecordValues(st_line_1.line_ids, [
             {'account_id': st_line_1.journal_id.default_account_id.id, 'amount_currency': 20.0, 'currency_id': self.company_data['currency'].id, 'balance': 20.0, 'reconciled': False},
@@ -1364,11 +1447,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             date='2017-01-01',
             update_create_date=False,
         )
-        inv1 = self._create_invoice_line(
-            'out_invoice',
+        inv1 = self._create_invoice_one_line_reco(
             currency_id=self.other_currency.id,
             invoice_date='2017-01-01',
-            invoice_line_ids=[{'price_unit': 100.0}],
+            price_unit=100.0,
         )
         st_line_1.set_line_bank_statement_line(inv1.id)
         self.assertRecordValues(st_line_1.line_ids, [
@@ -1390,9 +1472,9 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
     def test_adding_multiple_invoice_at_once(self):
         """ In this test we will create a statement line positive and try to add multiple invoice at once. """
         statement_line = self._create_st_line(amount=160, update_create_date=False)
-        move_line_1 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 25.0}])
-        move_line_2 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 50.0}])
-        move_line_3 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}])
+        move_line_1 = self._create_invoice_one_line_reco(price_unit=25.0)
+        move_line_2 = self._create_invoice_one_line_reco(price_unit=50.0)
+        move_line_3 = self._create_invoice_one_line_reco(price_unit=100.0)
 
         statement_line.set_line_bank_statement_line((move_line_1 + move_line_2 + move_line_3).ids)
         self.assertRecordValues(statement_line.line_ids, [
@@ -1405,9 +1487,9 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
     def test_adding_multiple_bill_at_once(self):
         """ In this test we will create a statement line negative and try to add multiple bill at once."""
         statement_line = self._create_st_line(amount=-160, update_create_date=False)
-        move_line_1 = self._create_invoice_line('in_invoice', invoice_line_ids=[{'price_unit': 25.0}])
-        move_line_2 = self._create_invoice_line('in_invoice', invoice_line_ids=[{'price_unit': 50.0}])
-        move_line_3 = self._create_invoice_line('in_invoice', invoice_line_ids=[{'price_unit': 100.0}])
+        move_line_1 = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=25.0)
+        move_line_2 = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=50.0)
+        move_line_3 = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=100.0)
 
         statement_line.set_line_bank_statement_line((move_line_1 + move_line_2 + move_line_3).ids)
         self.assertRecordValues(statement_line.line_ids, [
@@ -1423,10 +1505,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             We will have a suspense line, now we add a line that as a bigger amount to see if the partial works correctly.
         """
         statement_line = self._create_st_line(amount=160, update_create_date=False)
-        move_line_1 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 25.0}])
-        move_line_2 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 50.0}])
-        move_line_3 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}])
-        move_line_4 = self._create_invoice_line('in_invoice', invoice_line_ids=[{'price_unit': 25.0}])
+        move_line_1 = self._create_invoice_one_line_reco(price_unit=25.0)
+        move_line_2 = self._create_invoice_one_line_reco(price_unit=50.0)
+        move_line_3 = self._create_invoice_one_line_reco(price_unit=100.0)
+        move_line_4 = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=25.0)
 
         statement_line.set_line_bank_statement_line((move_line_1 + move_line_2 + move_line_3 + move_line_4).ids)
         self.assertRecordValues(statement_line.line_ids, [
@@ -1438,7 +1520,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': statement_line.journal_id.suspense_account_id.id, 'amount_currency': -10.0, 'currency_id': self.company_data['currency'].id, 'balance': -10.0, 'reconciled': False},
         ])
 
-        move_line_5 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 20.0}])
+        move_line_5 = self._create_invoice_one_line_reco(price_unit=20.0)
         statement_line.set_line_bank_statement_line(move_line_5.id)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': 160.0, 'currency_id': self.company_data['currency'].id, 'balance': 160.0, 'reconciled': False},
@@ -1451,10 +1533,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_adding_multiple_moves_and_then_more_multi_currencies(self):
         statement_line = self._create_st_line(amount=160, update_create_date=False)
-        move_line_1 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 25.0}])
-        move_line_2 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}], currency_id=self.other_currency.id)
-        move_line_3 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}])
-        move_line_4 = self._create_invoice_line('in_invoice', invoice_line_ids=[{'price_unit': 50.0}], currency_id=self.other_currency.id)
+        move_line_1 = self._create_invoice_one_line_reco(price_unit=25.0)
+        move_line_2 = self._create_invoice_one_line_reco(price_unit=100.0, currency_id=self.other_currency.id)
+        move_line_3 = self._create_invoice_one_line_reco(price_unit=100.0)
+        move_line_4 = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=50.0, currency_id=self.other_currency.id)
         statement_line.set_line_bank_statement_line((move_line_1 + move_line_2 + move_line_3 + move_line_4).ids)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': 160.0, 'currency_id': self.company_data['currency'].id, 'balance': 160.0, 'reconciled': False},
@@ -1466,13 +1548,8 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
 
     def test_partial_auto_tolerance(self):
-        self.env['ir.config_parameter'].set_param('account_accountant.bank_rec_payment_tolerance', '0.03')
-        inv1 = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-01',
-            invoice_line_ids=[{'price_unit': 500.0}],
-        )
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_payment_tolerance', 0.03)
+        inv1 = self._create_invoice_one_line_reco(invoice_date='2020-01-01', price_unit=500.0)
         st_line = self._create_st_line(
             450.0,
             date='2020-01-05',
@@ -1500,12 +1577,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         reco_model = self.env.ref(f'account.account_reco_model_fee_{st_line.journal_id.id}', raise_if_not_found=False)
         self.assertTrue(reco_model, "A new reco model for fees should have been created")
 
-        self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-01',
-            invoice_line_ids=[{'price_unit': 500.0}],
-        )
+        self._create_invoice_one_line_reco(invoice_date='2020-01-01', price_unit=500.0)
         st_line = self._create_st_line(
             490.0,
             date='2020-01-05',
@@ -1520,13 +1592,8 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         )
 
     def test_partial_auto_tolerance_different_amount(self):
-        self.env['ir.config_parameter'].set_param('account_accountant.bank_rec_payment_tolerance', '0.05')
-        inv = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-01',
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_payment_tolerance', 0.05)
+        inv = self._create_invoice_one_line_reco(invoice_date='2020-01-01', price_unit=100.0)
         st_line = self._create_st_line(
             90.0,
             date='2020-01-05',
@@ -1538,12 +1605,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line.journal_id.default_account_id.id, 'balance': 90.0, 'reconciled': False},
             {'account_id': inv.account_id.id, 'balance': -90.0, 'reconciled': True},
         ])
-        inv = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-01',
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
+        inv = self._create_invoice_one_line_reco(invoice_date='2020-01-01', price_unit=100.0)
         st_line = self._create_st_line(
             96.0,
             date='2020-01-05',
@@ -1563,12 +1625,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         reco_model = self.env.ref(f'account.account_reco_model_fee_{st_line.journal_id.id}', raise_if_not_found=False)
         self.assertTrue(reco_model, "A new reco model for fees should have been created")
 
-        inv = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-01',
-            invoice_line_ids=[{'price_unit': 500.0}],
-        )
+        inv = self._create_invoice_one_line_reco(invoice_date='2020-01-01', price_unit=500.0)
         st_line = self._create_st_line(
             490.0,
             date='2020-01-05',
@@ -1583,14 +1640,12 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         )
 
     def test_partial_auto_tolerance_multicurrency(self):
-        self.env['ir.config_parameter'].set_param('account_accountant.bank_rec_payment_tolerance', '0.03')
-        other_currency = self.setup_other_currency('JPY', rates=[('2020-01-01', 10.0), ('2020-01-20', 9.9)])
-        inv1 = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_payment_tolerance', 0.03)
+        other_currency = self.setup_other_currency('JPY', rates=[('2019-12-31', 10.0), ('2020-01-19', 9.9)])
+        inv1 = self._create_invoice_one_line_reco(
             currency_id=other_currency.id,
             invoice_date='2020-01-20',
-            invoice_line_ids=[{'price_unit': 4950.0}],
+            price_unit=4950.0,
         )
         st_line = self._create_st_line(
             485.0,
@@ -1611,12 +1666,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         st_line.set_account_bank_statement_line(st_line.line_ids[-1].id, self.account_revenue_1.id)
         reco_model = self.env.ref(f'account.account_reco_model_fee_{st_line.journal_id.id}', raise_if_not_found=False)
         self.assertTrue(reco_model, "A new reco model for fees should have been created")
-        inv1 = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
+        inv1 = self._create_invoice_one_line_reco(
             currency_id=other_currency.id,
             invoice_date='2020-01-20',
-            invoice_line_ids=[{'price_unit': 4950.0}],
+            price_unit=4950.0,
         )
         st_line = self._create_st_line(
             485.0,
@@ -1633,14 +1686,9 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         )
 
     def test_partial_auto_tolerance_st_line_foreign_currency(self):
-        self.env['ir.config_parameter'].set_param('account_accountant.bank_rec_payment_tolerance', '0.03')
-        other_currency = self.setup_other_currency('JPY', rates=[('2020-01-01', 9.5)])
-        inv1 = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-20',
-            invoice_line_ids=[{'price_unit': 495.0}],
-        )
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_payment_tolerance', 0.03)
+        other_currency = self.setup_other_currency('JPY', rates=[('2019-12-31', 9.5)])
+        inv1 = self._create_invoice_one_line_reco(invoice_date='2020-01-20', price_unit=495.0)
         st_line = self._create_st_line(
             485.0,
             date='2020-01-01',
@@ -1664,13 +1712,8 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         self.assertTrue(reco_model, "A new reco model for fees should have been created")
 
     def test_do_not_tolerate_if_rec_from_invoice(self):
-        self.env['ir.config_parameter'].set_param('account_accountant.bank_rec_payment_tolerance', '0.03')
-        inv_line = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-01',
-            invoice_line_ids=[{'price_unit': 500.0}],
-        )
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_payment_tolerance', '0.03')
+        inv_line = self._create_invoice_one_line_reco(price_unit=500.0, invoice_date='2020-01-01')
         move = inv_line.move_id
         st_line = self._create_st_line(
             490.0,
@@ -1682,12 +1725,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         self.assertEqual(move.status_in_payment, 'partial')
         # Since we don't have the payment tolerance, we have a residual amount on the line and can be added to the statement
         self.assertEqual(10, inv_line.amount_residual)
-        inv_line = self._create_invoice_line(
-            'out_invoice',
-            partner_id=self.partner_a.id,
-            invoice_date='2020-01-01',
-            invoice_line_ids=[{'price_unit': 500.0}],
-        )
+        inv_line = self._create_invoice_one_line_reco(price_unit=500.0, invoice_date='2020-01-01')
         move = inv_line.move_id
         st_line = self._create_st_line(
             490.0,
@@ -1698,12 +1736,23 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertEqual(move.status_in_payment, 'paid')
 
+    def test_auto_match_multiple_candidates_tolerance(self):
+        move_line = self._create_invoice_one_line_reco(price_unit=149.5, invoice_date='2017-01-10')
+        statement_line = self._create_st_line(amount=150, partner_id=self.partner_a.id, date='2017-01-08', update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+        self.assertFalse(statement_line.line_ids.reconciled_lines_ids)
+
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_payment_tolerance', 0.03)
+        statement_line = self._create_st_line(amount=150, partner_id=self.partner_a.id, date='2017-01-08', update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+        self.assertEqual(statement_line.line_ids.reconciled_lines_ids, move_line)
+
     def test_exchange_diff_single_currency(self):
         """
         This test will create a new journal with another currencies as the one from the company with a rounding of 1. Then do a
         statement line in that currency and adding an invoice in that currency aswell, it should not create an exchange diff move
         """
-        currency_yen = self.setup_other_currency('JPY', rounding=1.0, rates=[('2017-01-01', 133.62)])
+        currency_yen = self.setup_other_currency('JPY', rounding=1.0, rates=[('2016-12-31', 133.62)])
         new_journal = self.env['account.journal'].create({
             'name': 'test',
             'code': 'TBNK',
@@ -1711,7 +1760,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             'currency_id': currency_yen.id,
         })
         st_line = self._create_st_line(50.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}], currency_id=currency_yen.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=100.0, currency_id=currency_yen.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 50.0, 'currency_id': currency_yen.id, 'balance': 0.37, 'reconciled': False},
@@ -1720,7 +1769,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         self.assertFalse(st_line.line_ids[1].matched_debit_ids.exchange_move_id)
 
     def test_multi_currency_with_foreign(self):
-        currency_yen = self.setup_other_currency('JPY', rounding=1.0, rates=[('2017-01-01', 10.00)])
+        currency_yen = self.setup_other_currency('JPY', rounding=1.0, rates=[('2016-12-31', 10.00)])
         new_journal = self.env['account.journal'].create({
             'name': 'test',
             'code': 'TBNK',
@@ -1733,14 +1782,14 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             update_create_date=False,
             foreign_currency_id=self.company_data['currency'].id,
         )
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 100.0}], currency_id=self.other_currency.id)
+        inv_line = self._create_invoice_one_line_reco(price_unit=100.0, currency_id=self.other_currency.id)
         st_line.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': currency_yen.id, 'balance': 100.0, 'reconciled': False},
             {'account_id': inv_line.account_id.id, 'amount_currency': -100.0, 'currency_id': self.other_currency.id, 'balance': -50.0, 'reconciled': True},
             {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -50.0, 'currency_id': self.company_data['currency'].id, 'balance': -50.0, 'reconciled': False},
         ])
-        inv_line2 = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 50.0}], currency_id=self.company_data['currency'].id)
+        inv_line2 = self._create_invoice_one_line_reco(price_unit=50.0, currency_id=self.company_data['currency'].id)
         st_line.set_line_bank_statement_line(inv_line2.id)
         self.assertRecordValues(st_line.line_ids, [
             {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 1000.0, 'currency_id': currency_yen.id, 'balance': 100.0, 'reconciled': False},
@@ -1847,9 +1896,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
             -> The invoice should be fully reconciled.
         """
-        self.env['ir.config_parameter'].set_param('account_accountant.bank_rec_payment_tolerance', '0.03')
-        currency_brasilian_real = self.setup_other_currency('BRL', rounding=0.01, rates=[('2017-01-01', 5.421327349)])
-        receivable_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 143.62}], currency_id=currency_brasilian_real.id)
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_foreign_currency_tolerance', 0.00)  # sets the foreign currency tolerance to 0.00 to ensure that the test is not affected by any other tolerance settings
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_payment_tolerance', 0.03)
+        currency_brasilian_real = self.setup_other_currency('BRL', rounding=0.01, rates=[('2016-12-31', 5.421327349)])
+        receivable_line = self._create_invoice_one_line_reco(price_unit=143.62, currency_id=currency_brasilian_real.id)
         self.assertEqual(receivable_line.balance, 26.49)
         st_line = self._create_st_line(amount=26.05)
         st_line.set_line_bank_statement_line(receivable_line.ids)
@@ -1883,10 +1933,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         Test reconcile invoice with bank statement line. with foreign currency on both invoice and statement line.
         """
         foreign_curr = self.setup_other_currency('EUR', rates=[
-            ('2019-06-28', 2.0),
-            ('2019-06-24', 3.0),
+            ('2019-06-27', 2.0),
+            ('2019-06-23', 3.0),
         ])
-        invoice = self._create_invoice_line(move_type='out_invoice', invoice_date='2019-06-24', currency_id=foreign_curr.id, invoice_line_ids=[{'price_unit': 6000.0}]).move_id
+        invoice = self._create_invoice_one_line_reco(move_type='out_invoice', invoice_date='2019-06-24', currency_id=foreign_curr.id, price_unit=6000.0).move_id
         invoice_rec_line = invoice.line_ids.filtered(lambda x: x.account_id.account_type == 'asset_receivable')
         statement_line = self._create_st_line(amount=2000, amount_currency=1000, foreign_currency_id=foreign_curr.id, journal_id=self.company_data['default_journal_bank'].id, partner_id=self.partner_a.id, update_create_date=False)
         statement_line_rec_line = statement_line.move_id.line_ids.filtered(lambda x: x.account_id.account_type == 'asset_cash')
@@ -1926,11 +1976,15 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'amount_residual': 1666.67, 'amount_residual_currency': 5000, 'reconciled': False},
             {'amount_residual': 0.0, 'amount_residual_currency': 0.0, 'reconciled': True},
         ])
-
-        self.assert_invoice_outstanding_reconciled_widget(invoice, {
-            statement_line.move_id.id: 1000.0,
-            partials.exchange_move_id.id: 1666.67,
-        })
+        receivable_exch_lines = partials.exchange_move_id.line_ids.filtered(lambda l: l.account_type == 'asset_receivable')
+        self.assert_invoice_outstanding_reconciled_widget(
+            invoice=invoice,
+            expected_amounts={statement_line.move_id.id: 1000.0},
+            expected_exchange_info={
+                'line_ids': receivable_exch_lines.ids,
+                'exchange_amount': 1666.67
+            }
+        )
         statement_line.set_account_bank_statement_line(statement_line.line_ids[-1].id, self.company_data['default_account_revenue'].id)
         self.assertFalse(invoice.invoice_outstanding_credits_debits_widget, "Only statement lines with suspense account should be considered")
 
@@ -1946,12 +2000,9 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             'amount': 10.0,
             'type_tax_use': 'purchase',
         })
+
         self.default_tax_account.tax_ids = tax
-        bill = self._create_invoice_line(
-            move_type='in_invoice',
-            invoice_date='2019-06-24',
-            invoice_line_ids=[{'price_unit': 2000.00, 'tax_ids': tax.ids}]
-        ).move_id
+        bill = self._create_invoice_one_line(price_unit=2000.0, tax_ids=tax, move_type='in_invoice', invoice_date='2019-06-24')
         bill_rec_line = bill.line_ids.filtered(lambda x: x.account_id.account_type == 'liability_payable')
         statement_line = self._create_st_line(amount=-2530, partner_id=self.partner_a.id)
         statement_line.set_line_bank_statement_line(bill_rec_line.ids)
@@ -1973,10 +2024,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         Test reconcile refund with bank statement line. with foreign currency on the refund.
         """
         foreign_curr = self.setup_other_currency('EUR', rates=[
-            ('2019-06-28', 2.0),
-            ('2019-06-24', 3.0),
+            ('2019-06-27', 2.0),
+            ('2019-06-23', 3.0),
         ])
-        refund = self._create_invoice_line(move_type='in_invoice', invoice_date='2019-06-24', currency_id=foreign_curr.id, invoice_line_ids=[{'price_unit': 6000.0}]).move_id
+        refund = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_date='2019-06-24', currency_id=foreign_curr.id, price_unit=6000.0).move_id
         refund_rec_line = refund.line_ids.filtered(lambda x: x.account_id.account_type == 'liability_payable')
         statement_line = self._create_st_line(amount=-2000, date='2019-06-28', journal_id=self.company_data['default_journal_bank'].id, partner_id=self.partner_a.id, update_create_date=False)
         statement_line_rec_line = statement_line.move_id.line_ids.filtered(lambda x: x.account_id.account_type == 'asset_cash')
@@ -2018,10 +2069,15 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'amount_residual': 0.0, 'amount_residual_currency': 0.0, 'reconciled': True},
         ])
 
-        self.assert_invoice_outstanding_reconciled_widget(refund, {
-            statement_line.move_id.id: 3999.99,
-            partials.exchange_move_id.id: 666.67,
-        })
+        refund_exch_lines = partials.exchange_move_id.line_ids.filtered(lambda l: l.account_type == 'liability_payable')
+        self.assert_invoice_outstanding_reconciled_widget(
+            invoice=refund,
+            expected_amounts={statement_line.move_id.id: 3999.99},
+            expected_exchange_info={
+                'line_ids': refund_exch_lines.ids,
+                'exchange_amount': -666.67
+            }
+        )
 
     def test_currency_rate_with_cron(self):
         """
@@ -2061,7 +2117,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_reconcile_payment_widget_vals_partials(self):
         foreign_curr = self.setup_other_currency('EUR', rates=[
-            ('2019-06-28', 2.0),
+            ('2019-06-27', 2.0),
         ])
         foreign_currency_journal = self.company_data['default_journal_bank'].copy({'currency_id': foreign_curr.id})
         statement_line = self.env['account.bank.statement.line'].create({
@@ -2101,6 +2157,40 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         # invoice_2 is still reconciled
         self.assert_invoice_outstanding_reconciled_widget(invoice_2, {
             statement_line.move_id.id: 100,
+        })
+
+    def test_reconcile_payment_widget_remove_partials(self):
+        statement_line_1 = self.env['account.bank.statement.line'].create({
+            'name': 'test_statement',
+            'date': '2019-06-28',
+            'payment_ref': 'line_1',
+            'partner_id': self.partner_a.id,
+            'amount': 50.0,
+        })
+        statement_line_2 = self.env['account.bank.statement.line'].create({
+            'name': 'test_statement',
+            'date': '2019-06-28',
+            'payment_ref': 'line_2',
+            'partner_id': self.partner_a.id,
+            'amount': 50.0,
+        })
+
+        invoice = self.init_invoice(move_type='out_invoice', invoice_date='2019-06-24', amounts=[100],
+                                      partner=self.partner_a, post=True)
+
+        for line in (statement_line_1, statement_line_2):
+            statement_line_rec_line = line.move_id.line_ids.filtered(
+                lambda x: x.account_id.account_type == 'asset_cash')
+            invoice.js_assign_outstanding_line(statement_line_rec_line.id)
+
+        partial_id = invoice._get_all_reconciled_invoice_partials()[0].get('partial_id')
+
+        statement_line_rec_line = statement_line_1.move_id.line_ids.filtered(lambda x: x.account_id.account_type == 'asset_cash')
+        statement_line_rec_line.move_id.js_remove_outstanding_partial(partial_id)
+
+        # statement_line_2 is still reconciled
+        self.assert_invoice_outstanding_reconciled_widget(invoice, {
+            statement_line_2.move_id.id: 50.0,
         })
 
     def test_remove_partner_from_set_account_line(self):
@@ -2196,6 +2286,33 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
         early_payment_line = statement.line_ids.filtered(lambda p: p.balance == 2.0)
         self.assertTrue(early_payment_line.analytic_distribution)
+
+    def test_edit_account_id_analytic(self):
+        analytic_plan = self.env['account.analytic.plan'].create({'name': 'Plan Test'})
+        analytic_account_1 = self.env['account.analytic.account'].create({
+            'name': 'analytic_account_1',
+            'plan_id': analytic_plan.id,
+        })
+        analytic_distribution = self.env['account.analytic.distribution.model'].create({
+            'analytic_distribution': {analytic_account_1.id: 100},
+        })
+        account = self.env['account.account'].create({
+            'name': "test account",
+            'code': "60001",
+            'account_type': "expense",
+        })
+        st_line = self._create_st_line(amount=100, update_create_date=False)
+        st_line.edit_reconcile_line(st_line.line_ids[-1].id, {
+            'analytic_distribution': analytic_distribution.analytic_distribution,
+        })
+        old_analytic_line = st_line.line_ids[1].analytic_line_ids
+        self.assertEqual(len(old_analytic_line), 1)
+        self.assertTrue(old_analytic_line)
+        st_line.edit_reconcile_line(st_line.line_ids[-1].id, {
+            'account_id': account.id,
+        })
+        self.assertNotEqual(old_analytic_line, st_line.line_ids[1].analytic_line_ids)
+        self.assertEqual(len(st_line.line_ids[1].analytic_line_ids), 1)
 
     def test_reconciliation_without_payment_account(self):
         """Test reconciliation when there is no payment account on the payment method."""
@@ -2520,11 +2637,12 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         </Invoice>
         """
 
+        # Negative amount → vendor bill (in_invoice)
         statement_line = self._create_st_line(amount=-100, update_create_date=False)
         attachment = self.env['ir.attachment'].create({
             'name': 'test_file',
             'mimetype': 'text/xml',
-            'datas': base64.b64encode(xml),
+            'raw': xml,
         })
         self.env['account.bank.statement.line'].with_context(
             statement_line_id=statement_line.id
@@ -2533,6 +2651,20 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': self.company_data['default_journal_bank'].default_account_id.id, 'balance': -100.0, 'reconciled': False},
             {'account_id': self.company_data['default_account_payable'].id, 'balance': 100.0, 'reconciled': True},
         ])
+
+        # Positive amount → vendor credit note (in_refund).
+        statement_line_refund = self._create_st_line(amount=100, update_create_date=False)
+        attachment_refund = self.env['ir.attachment'].create({
+            'name': 'test_refund_file.pdf',
+            'mimetype': 'application/pdf',
+        })
+        invoices = self.env['account.bank.statement.line'].with_context(
+            statement_line_id=statement_line_refund.id,
+            type='in_refund',
+        ).create_document_from_attachment(attachment_refund.ids)
+        created_move = self.env['account.move'].browse(invoices['res_id'])
+        self.assertEqual(created_move.move_type, 'in_refund',
+            "Upload Refund from positive transaction must create a vendor credit note (in_refund), not a customer credit note (out_refund)")
 
     def test_auto_activate_currency_with_xml_file(self):
         xml = b"""<?xml version='1.0' encoding='UTF-8'?>
@@ -2659,9 +2791,9 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         attachment = self.env['ir.attachment'].create({
             'name': 'test_file',
             'mimetype': 'text/xml',
-            'datas': base64.b64encode(xml),
+            'raw': xml,
         })
-        test_currency = self.setup_other_currency('INR', rates=[('2025-01-01', 1.00)], active=False)
+        test_currency = self.setup_other_currency('INR', rates=[('2024-12-31', 1.00)], active=False)
         self.assertFalse(test_currency.active)
         self.env['account.bank.statement.line'].with_context(
             statement_line_id=statement_line.id,
@@ -2671,6 +2803,65 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': self.company_data['default_account_payable'].id, 'balance': 100.0, 'reconciled': True},
         ])
         self.assertTrue(test_currency.active)
+
+    def test_reconcile_epd_with_exchange_diff(self):
+        """ When setting an invoice containing an early payment discount that should also apply an exchange difference,
+            a payment with move is created to correctly handle the EPD + exchange différence, as we don't want any
+            exchange difference line in the bank rec widget.
+        """
+        chf_currency = self.setup_other_currency('CHF', rates=[('2015-12-31', 2.0), ('2016-06-19', 4.0)])
+        invoice_line = self._create_invoice_one_line_reco(
+            invoice_date='2016-06-15',
+            invoice_payment_term_id=self.early_payment_term,
+            price_unit=100.0,
+            currency_id=chf_currency,
+        )
+        st_line = self._create_st_line(22.5, date='2016-06-21', update_create_date=False, foreign_currency_id=chf_currency.id)
+        st_line.set_line_bank_statement_line(invoice_line.ids)
+        payment_move = invoice_line.move_id.matched_payment_ids.move_id
+        self.assertTrue(payment_move)
+        outstanding_line = payment_move.line_ids.filtered(lambda line: line.account_type == 'asset_current')
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id,    'partner_id': self.partner_a.id,   'balance': 22.5,    'amount_currency': 22.5,  'reconciled': False},
+            {'account_id': outstanding_line.account_id.id,              'partner_id': self.partner_a.id,   'balance': -22.5,   'amount_currency': -90.0, 'reconciled': True},
+        ])
+
+    def test_reconcile_epd_with_partial(self):
+        """ When reconciling an invoice with an early payment discount on a statement line
+            with an amount smaller than the invoice's one (even after applying the EPD),
+            the line should still be a partial.
+        """
+        st_line = self._create_st_line(70.0, date='2017-01-10', update_create_date=False)
+        inv_line_with_epd = self._create_invoice_one_line_reco(
+            date='2017-01-04',
+            invoice_payment_term_id=self.early_payment_term.id,
+            price_unit=100.0,
+        )
+        st_line.set_line_bank_statement_line(inv_line_with_epd.id)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id,    'balance': 70.0,    'reconciled': False},
+            {'account_id': inv_line_with_epd.account_id.id,             'balance': -70.0,   'reconciled': True},
+        ])
+
+    def test_reconcile_bill_epd_with_larger_statement_line(self):
+        """ Tests a basic case of applying an early payment discount on a vendor bill.
+            When adding it on a statement line that has a larger amount, it should still apply the EPD
+        """
+        st_line = self._create_st_line(-200.0, date='2017-01-10', update_create_date=False)
+        early_pay_acc = self.env.company.account_journal_early_pay_discount_gain_account_id
+        bill_line_with_epd = self._create_invoice_one_line_reco(
+            move_type='in_invoice',
+            date='2017-01-04',
+            invoice_payment_term_id=self.early_payment_term.id,
+            price_unit=100.0,
+        )
+        st_line.set_line_bank_statement_line(bill_line_with_epd.id)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id,    'balance': -200.0,  'reconciled': False},
+            {'account_id': bill_line_with_epd.account_id.id,            'balance': 100.0,   'reconciled': True},
+            {'account_id': early_pay_acc.id,                            'balance': -10.0,    'reconciled': False},
+            {'account_id': st_line.journal_id.suspense_account_id.id,   'balance': 110.0,  'reconciled': False},
+        ])
 
     def test_reconciliation_with_payment_terms(self):
         """ Test the scenario where a transaction is already fully consumed before the last installment of the payment term.
@@ -2706,7 +2897,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
         # Case 1: No installments
         statement_line = self._create_st_line(amount=-90, update_create_date=False)
-        move_line_1 = self._create_invoice_line('in_invoice', invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_1 = self._create_invoice_one_line_reco(move_type='in_invoice', price_unit=200.0)
         statement_line.set_line_bank_statement_line(move_line_1.ids)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': -90.0, 'currency_id': self.company_data['currency'].id, 'balance': -90.0, 'reconciled': False},
@@ -2716,7 +2907,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         # Case 2: 2 installments
         ## Case 2.1: Adding from the bank rec widget
         statement_line = self._create_st_line(amount=-90, update_create_date=False)
-        move_line_1 = self._create_invoice_line('in_invoice', invoice_payment_term_id=payment_term_2.id, invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_1 = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_payment_term_id=payment_term_2.id, price_unit=200.0)
         statement_line.set_line_bank_statement_line(move_line_1.ids)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': -90.0, 'currency_id': self.company_data['currency'].id, 'balance': -90.0, 'reconciled': False},
@@ -2726,7 +2917,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
         ## Case 2.2: Adding from the invoice
         statement_line = self._create_st_line(amount=-90, update_create_date=False)
-        move_line_1 = self._create_invoice_line('in_invoice', invoice_payment_term_id=payment_term_2.id, invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_1 = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_payment_term_id=payment_term_2.id, price_unit=200.0)
         move_line_1.move_id.js_assign_outstanding_line(statement_line.line_ids[0].id)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': -90.0, 'currency_id': self.company_data['currency'].id, 'balance': -90.0, 'reconciled': False},
@@ -2734,7 +2925,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
         ## Case 2.3: Adding from the invoice, with just enough for the first installment to be fully paid
         statement_line = self._create_st_line(amount=-100, update_create_date=False)
-        move_line_1 = self._create_invoice_line('in_invoice', invoice_payment_term_id=payment_term_2.id, invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_1 = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_payment_term_id=payment_term_2.id, price_unit=200.0)
         move_line_1.move_id.js_assign_outstanding_line(statement_line.line_ids[0].id)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': -100.0, 'currency_id': self.company_data['currency'].id, 'balance': -100.0, 'reconciled': False},
@@ -2744,7 +2935,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         # Case 3: 3 installments
         ## Case 3.1: Adding from the bank rec widget
         statement_line = self._create_st_line(amount=-90, update_create_date=False)
-        move_line_1 = self._create_invoice_line('in_invoice', invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_1 = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_payment_term_id=payment_term.id, price_unit=200.0)
         statement_line.set_line_bank_statement_line(move_line_1.ids)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': -90.0, 'currency_id': self.company_data['currency'].id, 'balance': -90.0, 'reconciled': False},
@@ -2755,7 +2946,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
         ## Case 3.2: Adding from the invoice
         statement_line = self._create_st_line(amount=-90, update_create_date=False)
-        move_line_1 = self._create_invoice_line('in_invoice', invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_1 = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_payment_term_id=payment_term.id, price_unit=200.0)
         move_line_1.move_id.js_assign_outstanding_line(statement_line.line_ids[0].id)
         self.assertRecordValues(statement_line.line_ids, [
             {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': -90.0, 'currency_id': self.company_data['currency'].id, 'balance': -90.0, 'reconciled': False},
@@ -2766,7 +2957,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         # Case 4:  3 installments with foreign currency on invoice
         ## Case 4.1: Adding from the bank rec widget
         statement_line_2 = self._create_st_line(amount=-90, update_create_date=False)
-        move_line_2 = self._create_invoice_line('in_invoice', currency_id=self.other_currency.id, invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 400.0}])
+        move_line_2 = self._create_invoice_one_line_reco(move_type='in_invoice', currency_id=self.other_currency, invoice_payment_term_id=payment_term, price_unit=400.0)
         statement_line_2.set_line_bank_statement_line(move_line_2.ids)
         self.assertRecordValues(statement_line_2.line_ids, [
             {'account_id': statement_line_2.journal_id.default_account_id.id, 'amount_currency': -90.0, 'currency_id': self.company_data['currency'].id, 'balance': -90.0, 'reconciled': False},
@@ -2777,7 +2968,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
         ## Case 4.2: Adding from the invoice
         statement_line_2 = self._create_st_line(amount=-90, update_create_date=False)
-        move_line_2 = self._create_invoice_line('in_invoice', currency_id=self.other_currency.id, invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 400.0}])
+        move_line_2 = self._create_invoice_one_line_reco(move_type='in_invoice', currency_id=self.other_currency, invoice_payment_term_id=payment_term, price_unit=400.0)
         move_line_2.move_id.js_assign_outstanding_line(statement_line_2.line_ids[0].id)
         self.assertRecordValues(statement_line_2.line_ids, [
             {'account_id': statement_line_2.journal_id.default_account_id.id, 'amount_currency': -90.0, 'currency_id': self.company_data['currency'].id, 'balance': -90.0, 'reconciled': False},
@@ -2795,7 +2986,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         suspense_account_other = new_journal.suspense_account_id
         ## Case 5.1: Adding from the bank rec widget
         statement_line_3 = self._create_st_line(amount=-180, journal_id=new_journal.id, update_create_date=False)
-        move_line_3 = self._create_invoice_line('in_invoice', invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_3 = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_payment_term_id=payment_term, price_unit=200.0)
         statement_line_3.set_line_bank_statement_line(move_line_3.ids)
         self.assertRecordValues(statement_line_3.line_ids, [
             {'account_id': statement_line_3.journal_id.default_account_id.id, 'amount_currency': -180.0, 'currency_id': self.other_currency.id, 'balance': -90.0, 'reconciled': False},
@@ -2806,7 +2997,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
         ## Case 5.2: Adding from the invoice
         statement_line_3 = self._create_st_line(amount=-180, journal_id=new_journal.id, update_create_date=False)
-        move_line_3 = self._create_invoice_line('in_invoice', invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 200.0}])
+        move_line_3 = self._create_invoice_one_line_reco(move_type='in_invoice', invoice_payment_term_id=payment_term, price_unit=200.0)
         move_line_3.move_id.js_assign_outstanding_line(statement_line_3.line_ids[0].id)
         self.assertRecordValues(statement_line_3.line_ids, [
             {'account_id': statement_line_3.journal_id.default_account_id.id, 'amount_currency': -180.0, 'currency_id': self.other_currency.id, 'balance': -90.0, 'reconciled': False},
@@ -2817,7 +3008,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         # Case 6: 3 installments with foreign currency on both invoice and statement line
         ## Case 6.1: Adding from the bank rec widget
         statement_line_4 = self._create_st_line(amount=-180, journal_id=new_journal.id, update_create_date=False)
-        move_line_4 = self._create_invoice_line('in_invoice', currency_id=self.other_currency.id, invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 400.0}])
+        move_line_4 = self._create_invoice_one_line_reco(move_type='in_invoice', currency_id=self.other_currency, invoice_payment_term_id=payment_term, price_unit=400.0)
         statement_line_4.set_line_bank_statement_line(move_line_4.ids)
         self.assertRecordValues(statement_line_4.line_ids, [
             {'account_id': statement_line_4.journal_id.default_account_id.id, 'amount_currency': -180.0, 'currency_id': self.other_currency.id, 'balance': -90.0, 'reconciled': False},
@@ -2828,7 +3019,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         ])
         ## Case 6.2: Adding from the invoice
         statement_line_4 = self._create_st_line(amount=-180, journal_id=new_journal.id, update_create_date=False)
-        move_line_4 = self._create_invoice_line('in_invoice', currency_id=self.other_currency.id, invoice_payment_term_id=payment_term.id, invoice_line_ids=[{'price_unit': 400.0}])
+        move_line_4 = self._create_invoice_one_line_reco(move_type='in_invoice', currency_id=self.other_currency, invoice_payment_term_id=payment_term, price_unit=400.0)
         move_line_4.move_id.js_assign_outstanding_line(statement_line_4.line_ids[0].id)
         self.assertRecordValues(statement_line_4.line_ids, [
             {'account_id': statement_line_4.journal_id.default_account_id.id, 'amount_currency': -180.0, 'currency_id': self.other_currency.id, 'balance': -90.0, 'reconciled': False},
@@ -2866,38 +3057,9 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
         # Reconciliation rule created succesfully with the escaped common substring
         rule = self.env['account.reconcile.model'].search([
-            ('match_label_param', '=', 'TEST\\ REFERENCE\\ TO\\ NORMALIZE\\ '),
+            ('match_label_param', '=', 'TEST REFERENCE TO NORMALIZE'),
         ], limit=1)
         self.assertTrue(rule)
-
-    def test_auto_match_multiple_candidates_select_closer_prior_date(self):
-        self._create_invoice_line('out_invoice', invoice_date='2017-01-10', invoice_line_ids=[{'price_unit': 150}])
-        move_line_2 = self._create_invoice_line('out_invoice', invoice_date='2017-01-08', invoice_line_ids=[{'price_unit': 150}])
-        self._create_invoice_line('out_invoice', invoice_date='2017-01-06', invoice_line_ids=[{'price_unit': 150}])
-        statement_line = self._create_st_line(amount=150, partner_id=self.partner_a.id, date='2017-01-08', update_create_date=False)
-        statement_line._try_auto_reconcile_statement_lines()
-        # move_line_2 will be selected because it's the one with the closer prior or equal date.
-        self.assertEqual(statement_line.line_ids[-1].reconciled_lines_ids, move_line_2)
-
-    def test_set_partner_on_statement_line_reconciles_with_move_line_missing_invoice_date(self):
-        """Test that setting a partner on statement line reconciles it with a move line missing an
-        invoice_date."""
-        # Draft invoice (no invoice_date set)
-        draft_move = self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': self.partner_a.id,
-            'invoice_line_ids': [Command.create({'name': 'line', 'price_unit': 100})],
-        })
-        self.assertFalse(draft_move.line_ids[0].invoice_date)
-
-        prior_move_line = self._create_invoice_line(
-            'out_invoice', invoice_date='2017-01-08', invoice_line_ids=[{'price_unit': 100}]
-        )
-        statement_line = self._create_st_line(100.0, date='2017-01-10')
-        statement_line.set_partner_bank_statement_line(self.partner_a.id)
-
-        self.assertEqual(statement_line.partner_id, self.partner_a)
-        self.assertEqual(statement_line.line_ids[-1].reconciled_lines_ids, prior_move_line)
 
     def test_edit_statement_line_with_exchange_diff(self):
         """ When editing a bank statement line with an exchange diff, like setting the invoice
@@ -2918,10 +3080,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             'code': 'TBCHF',
             'currency_id': chf_currency.id,
         })
-        invoice_line = self._create_invoice_line(
-            'out_invoice',
+        invoice_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
             invoice_date='2016-06-15',
-            invoice_line_ids=[{'price_unit': 1000.0}],
+            price_unit=1000.0,
             currency_id=chf_currency.id,
         )
         st_line = self._create_st_line(950.0, date='2016-06-21', update_create_date=False, foreign_currency_id=chf_currency.id, journal_id=chf_journal.id)
@@ -2932,67 +3094,6 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'balance': 950.0,      'reconciled': False},
             {'balance': -1000.0,    'reconciled': True},
             {'balance': 50.0,       'reconciled': False},
-        ])
-
-    def test_reconcile_epd_with_exchange_diff(self):
-        """ When setting an invoice containing an early payment discount that should also apply an exchange difference,
-            a payment with move is created to correctly handle the EPD + exchange différence, as we don't want any
-            exchange difference line in the bank rec widget.
-        """
-        chf_currency = self.setup_other_currency('CHF', rates=[('2016-01-01', 2.0), ('2016-06-20', 4.0)])
-        invoice_line = self._create_invoice_line(
-            'out_invoice',
-            invoice_date='2016-06-15',
-            invoice_payment_term_id=self.early_payment_term.id,
-            invoice_line_ids=[{'price_unit': 100.0}],
-            currency_id=chf_currency.id,
-        )
-        st_line = self._create_st_line(22.5, date='2016-06-21', update_create_date=False, foreign_currency_id=chf_currency.id)
-        st_line.set_line_bank_statement_line(invoice_line.ids)
-        payment_move = invoice_line.move_id.matched_payment_ids.move_id
-        self.assertTrue(payment_move)
-        outstanding_line = payment_move.line_ids.filtered(lambda line: line.account_type == 'asset_current')
-        self.assertRecordValues(st_line.line_ids, [
-            {'account_id': st_line.journal_id.default_account_id.id,    'partner_id': self.partner_a.id,   'balance': 22.5,    'amount_currency': 22.5,  'reconciled': False},
-            {'account_id': outstanding_line.account_id.id,              'partner_id': self.partner_a.id,   'balance': -22.5,   'amount_currency': -90.0, 'reconciled': True},
-        ])
-
-    def test_reconcile_epd_with_partial(self):
-        """ When reconciling an invoice with an early payment discount on a statement line
-            with an amount smaller than the invoice's one (even after applying the EPD),
-            the line should still be a partial.
-        """
-        st_line = self._create_st_line(70.0, date='2017-01-10', update_create_date=False)
-        inv_line_with_epd = self._create_invoice_line(
-            'out_invoice',
-            date='2017-01-04',
-            invoice_payment_term_id=self.early_payment_term.id,
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
-        st_line.set_line_bank_statement_line(inv_line_with_epd.id)
-        self.assertRecordValues(st_line.line_ids, [
-            {'account_id': st_line.journal_id.default_account_id.id,    'balance': 70.0,    'reconciled': False},
-            {'account_id': inv_line_with_epd.account_id.id,             'balance': -70.0,   'reconciled': True},
-        ])
-
-    def test_reconcile_bill_epd_with_larger_statement_line(self):
-        """ Tests a basic case of applying an early payment discount on a vendor bill.
-            When adding it on a statement line that has a larger amount, it should still apply the EPD
-        """
-        st_line = self._create_st_line(-200.0, date='2017-01-10', update_create_date=False)
-        early_pay_acc = self.env.company.account_journal_early_pay_discount_gain_account_id
-        bill_line_with_epd = self._create_invoice_line(
-            'in_invoice',
-            date='2017-01-04',
-            invoice_payment_term_id=self.early_payment_term.id,
-            invoice_line_ids=[{'price_unit': 100.0}],
-        )
-        st_line.set_line_bank_statement_line(bill_line_with_epd.id)
-        self.assertRecordValues(st_line.line_ids, [
-            {'account_id': st_line.journal_id.default_account_id.id,    'balance': -200.0,  'reconciled': False},
-            {'account_id': bill_line_with_epd.account_id.id,            'balance': 100.0,   'reconciled': True},
-            {'account_id': early_pay_acc.id,                            'balance': -10.0,    'reconciled': False},
-            {'account_id': st_line.journal_id.suspense_account_id.id,   'balance': 110.0,  'reconciled': False},
         ])
 
     def test_line_computation_on_edit_line(self):
@@ -3008,16 +3109,16 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             'currency_id': eur_currency.id,
         })
         st_line = self._create_st_line(5000, date='2017-01-10', update_create_date=False, journal_id=eur_journal.id)
-        eur_invoice_line = self._create_invoice_line(
-            'out_invoice',
+        eur_invoice_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
             invoice_date='2017-01-10',
-            invoice_line_ids=[{'price_unit': 1000.0}],
+            price_unit=1000.0,
             currency_id=eur_currency.id,
         )
-        usd_invoice_line = self._create_invoice_line(
-            'out_invoice',
+        usd_invoice_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
             invoice_date='2017-01-10',
-            invoice_line_ids=[{'price_unit': 1000.0}],
+            price_unit=1000.0,
             currency_id=usd_currency.id,
         )
         st_line.set_line_bank_statement_line(usd_invoice_line.id)
@@ -3040,7 +3141,7 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         st_line_300 = self._create_st_line(300.0, update_create_date=False)
         st_line_400 = self._create_st_line(400.0, update_create_date=False)
         st_line_500 = self._create_st_line(500.0, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 1000.0}])
+        inv_line = self._create_invoice_one_line_reco(price_unit=1000.0)
 
         st_line_50.set_line_bank_statement_line(inv_line.id)
         self.assertRecordValues(st_line_50.line_ids, [
@@ -3067,11 +3168,53 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line_500.journal_id.suspense_account_id.id,   'balance': -250.0,  'reconciled': False},
         ])
 
+    def test_auto_match_multiple_candidates_select_closer_prior_date(self):
+        self._create_invoice_one_line_reco(price_unit=150.0, invoice_date='2017-01-08')
+        self._create_invoice_one_line_reco(price_unit=150.0, invoice_date='2017-01-06')
+        statement_line = self._create_st_line(amount=150, partner_id=self.partner_a.id, date='2017-01-08', update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+        # Nothing will be selected since we have 2 candidates with a prior date
+        self.assertFalse(statement_line.line_ids[-1].reconciled_lines_ids)
+
+    def test_auto_match_one_canditate_selected_prior_date(self):
+        self._create_invoice_one_line_reco(price_unit=150.0, invoice_date='2017-01-10')
+        move_line_2 = self._create_invoice_one_line_reco(price_unit=150.0, invoice_date='2017-01-08')
+        statement_line = self._create_st_line(amount=150, partner_id=self.partner_a.id, date='2017-01-08', update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+        # move_line_2 will be selected because it's the one with the closer prior or equal date.
+        self.assertEqual(statement_line.line_ids[-1].reconciled_lines_ids, move_line_2)
+
+    def test_auto_match_no_canditate_selected_prior_date(self):
+        self._create_invoice_one_line_reco(price_unit=150.0, invoice_date='2017-01-10')
+        self._create_invoice_one_line_reco(price_unit=150.0, invoice_date='2017-01-09')
+        statement_line = self._create_st_line(amount=150, partner_id=self.partner_a.id, date='2017-01-08', update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+        # Nothing will be selected since we have 0 candidates with a prior date
+        self.assertFalse(statement_line.line_ids[-1].reconciled_lines_ids)
+
+    def test_set_partner_on_statement_line_reconciles_with_move_line_missing_invoice_date(self):
+        """Test that setting a partner on statement line reconciles it with a move line missing an
+        invoice_date."""
+        # Draft invoice (no invoice_date set)
+        draft_move = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [Command.create({'name': 'line', 'price_unit': 100})],
+        })
+        self.assertFalse(draft_move.line_ids[0].invoice_date)
+
+        prior_move_line = self._create_invoice_one_line_reco(price_unit=100.0, invoice_date='2017-01-08')
+        statement_line = self._create_st_line(100.0, date='2017-01-10')
+        statement_line.set_partner_bank_statement_line(self.partner_a.id)
+
+        self.assertEqual(statement_line.partner_id, self.partner_a)
+        self.assertEqual(statement_line.line_ids[-1].reconciled_lines_ids, prior_move_line)
+
     def test_full_amount_switch_html_multi_statements(self):
         """ Test full_amount_switch_html is computed only for move lines related to statement lines """
         st_line_50 = self._create_st_line(50.0, update_create_date=False)
         st_line_300 = self._create_st_line(300.0, update_create_date=False)
-        inv_line = self._create_invoice_line('out_invoice', invoice_line_ids=[{'price_unit': 350.0}])
+        inv_line = self._create_invoice_one_line_reco(move_type='out_invoice', price_unit=350.0)
 
         st_line_50.set_line_bank_statement_line(inv_line.id)
         st_line_300.set_line_bank_statement_line(inv_line.id)
@@ -3082,11 +3225,10 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
 
     def test_apply_full_amount_html_currencies(self):
         st_line = self._create_st_line(50.0, update_create_date=False)
-        invoice_line = self._create_invoice_line(
-            'out_invoice',
+        invoice_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
             invoice_date='2017-01-1',
-            invoice_payment_term_id=self.early_payment_term.id,
-            invoice_line_ids=[{'price_unit': 150.0}],
+            price_unit=150.0,
             currency_id=self.other_currency.id,
         )
         st_line.set_line_bank_statement_line(invoice_line.id)
@@ -3099,4 +3241,1168 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': st_line.journal_id.default_account_id.id, 'balance': 50.0, 'amount_currency': 50.0, 'reconciled': False},
             {'account_id': invoice_line.account_id.id, 'balance': -150.0, 'amount_currency': -300.0, 'reconciled': False},
             {'account_id': st_line.journal_id.suspense_account_id.id, 'balance': 100.0, 'amount_currency': 100.0, 'reconciled': False},
+        ])
+
+    def test_edit_reconcile_line_with_positive_balance(self):
+        """Editing a reconciled bank statement line with a positive balance should update the line
+           and create a suspense line."""
+        st_line = self._create_st_line(50.0, update_create_date=False)
+        invoice_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            invoice_date='2017-01-1',
+            invoice_payment_term_id=self.early_payment_term.id,
+            price_unit=150.0,
+            currency_id=self.other_currency.id,
+        )
+        st_line.set_line_bank_statement_line(invoice_line.id)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 50.0, 'amount_currency': 50.0, 'reconciled': False},
+            {'account_id': invoice_line.account_id.id, 'balance': -50.0, 'amount_currency': -100.0, 'reconciled': True},
+        ])
+        st_line.edit_reconcile_line(st_line.line_ids[-1].id, {'balance': 150, 'amount_currency': 300})
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 50.0, 'amount_currency': 50.0, 'reconciled': False},
+            {'account_id': invoice_line.account_id.id, 'balance': 150.0, 'amount_currency': 300.0, 'reconciled': False},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'balance': -200.0, 'amount_currency': -200.0, 'reconciled': False},
+        ])
+
+    def test_set_partner_multiple_statement_line(self):
+        invoice_1 = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            invoice_date='2017-01-1',
+            partner_id=self.partner_a.id,
+            price_unit=1000.0,
+        )
+        invoice_2 = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            invoice_date='2017-01-1',
+            partner_id=self.partner_a.id,
+            price_unit=1500.0,
+        )
+        statement_line_1 = self._create_st_line(amount=100, update_create_date=False, partner_id=False)
+        statement_line_2 = self._create_st_line(1000.0, partner_name='xyz', payment_ref=invoice_1.move_id.name, update_create_date=False)
+        statement_line_3 = self._create_st_line(1500.0, partner_name='xyz', payment_ref=invoice_2.move_id.name, update_create_date=False)
+        self.env.cr.flush()  # force tracking message
+
+        (statement_line_1 + statement_line_2).set_partner_bank_statement_line(self.partner_a.id)
+        self.env.cr.flush()  # force tracking message
+
+        self.assertEqual(statement_line_1.partner_id, self.partner_a)
+        self.assertEqual(statement_line_2.partner_id, self.partner_a)
+        self.assertEqual(statement_line_3.partner_id, self.partner_a)
+
+    def test_set_account_multiple_statement_lines(self):
+        st_line_1 = self._create_st_line(500.0, update_create_date=False)
+        st_line_2 = self._create_st_line(500.0, update_create_date=False)
+
+        (st_line_1 + st_line_2).set_account_bank_statement_line([st_line_1.line_ids[-1].id, st_line_2.line_ids[-1].id], self.account_revenue_1.id)
+        self.assertRecordValues(st_line_1.line_ids, [
+            {'account_id': st_line_1.journal_id.default_account_id.id, 'amount_currency': 500.0, 'balance': 500.0, 'reconciled': False},
+            {'account_id': self.company_data['default_account_revenue'].id, 'amount_currency': -500.0, 'balance': -500.0, 'reconciled': False},
+        ])
+        self.assertRecordValues(st_line_2.line_ids, [
+            {'account_id': st_line_2.journal_id.default_account_id.id, 'amount_currency': 500.0, 'balance': 500.0, 'reconciled': False},
+            {'account_id': self.company_data['default_account_revenue'].id, 'amount_currency': -500.0, 'balance': -500.0, 'reconciled': False},
+        ])
+
+    def test_reco_model_empty_space_at_the_end(self):
+        st_line_1 = self._create_st_line(amount=100, payment_ref="Pret                            ", update_create_date=False)
+        st_line_2 = self._create_st_line(amount=100, payment_ref="Course                            ", update_create_date=False)
+
+        st_line_1.set_account_bank_statement_line(st_line_1.line_ids[-1].id, self.account_revenue_1.id)
+        st_line_2.set_account_bank_statement_line(st_line_2.line_ids[-1].id, self.account_revenue_1.id)
+
+        # No reco model should be created
+        reco_model = self.env['account.reconcile.model'].search([
+            ('match_label', '=', 'match_regex'),
+            ('match_label_param', '=', '\\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ '),
+        ])
+        self.assertFalse(reco_model.exists())
+
+    def test_remove_epd_with_tax(self):
+        """ When adding an invoice with an eligible early payment discount, with a tax on its line,
+            an EPD line as well as a tax line for that EPD will be added. When removing the EPD line,
+            the tax line should be deleted aswell (but not the invoice line)
+        """
+        tax = self.env['account.tax'].create({
+            'name': 'new_tax',
+            'amount_type': 'percent',
+            'amount': 20.0,
+            'type_tax_use': 'sale',
+        })
+        suspense_account = self.company_data['default_journal_bank'].suspense_account_id
+        early_pay_acc = self.env.company.account_journal_early_pay_discount_loss_account_id
+
+        statement_line = self._create_st_line(amount=200, date='2017-01-10', update_create_date=False)
+        move_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            date='2017-01-04',
+            invoice_payment_term_id=self.early_payment_term.id,
+            price_unit=100.0,
+            tax_ids=tax,
+        )
+        statement_line.set_line_bank_statement_line(move_line.ids)
+
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': 200.0, 'currency_id': self.company_data['currency'].id, 'balance': 200.0, 'reconciled': False},
+            {'account_id': move_line.account_id.id, 'amount_currency': -120.0, 'currency_id': self.company_data['currency'].id, 'balance': -120.0, 'reconciled': True},
+            {'account_id': early_pay_acc.id, 'amount_currency': 10.0, 'currency_id': self.company_data['currency'].id, 'balance': 10.0, 'reconciled': False},
+            {'account_id': self.account_revenue_1.id, 'amount_currency': 2.0, 'currency_id': self.company_data['currency'].id, 'balance': 2.0, 'reconciled': False},
+            {'account_id': suspense_account.id, 'amount_currency': -92.0, 'currency_id': self.company_data['currency'].id, 'balance': -92.0, 'reconciled': False},
+        ])
+
+        epd_line = statement_line.line_ids.filtered(lambda line: line.account_id == early_pay_acc)
+        statement_line.delete_reconciled_line(epd_line.ids)
+
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': 200.0, 'currency_id': self.company_data['currency'].id, 'balance': 200.0, 'reconciled': False},
+            {'account_id': move_line.account_id.id, 'amount_currency': -120.0, 'currency_id': self.company_data['currency'].id, 'balance': -120.0, 'reconciled': True},
+            {'account_id': suspense_account.id, 'amount_currency': -80.0, 'currency_id': self.company_data['currency'].id, 'balance': -80.0, 'reconciled': False},
+        ])
+
+    def test_delete_reconciled_line_with_tax_reconcile_account(self):
+        """Test removing a move line when the tax account is reconcilable"""
+        self.account_revenue_1.reconcile = True
+        inv_line = self._create_invoice_one_line_reco(price_unit=150.0, tax_ids=self.default_tax.ids)
+        tax_line = inv_line.move_id.line_ids.filtered(lambda l: l.tax_line_id)
+        st_line = self._create_st_line(-200.0, update_create_date=False)
+        st_line.set_line_bank_statement_line([tax_line.id])
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'tax_ids': [], 'tax_line_id': False, 'balance': -200.0, 'reconciled': False},
+            {'account_id': tax_line.account_id.id, 'tax_ids': [], 'tax_line_id': tax_line.tax_line_id.id, 'balance': 10.0, 'reconciled': True},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'tax_ids': [], 'tax_line_id': False, 'balance': 190.0, 'reconciled': False},
+        ])
+        st_line.delete_reconciled_line(st_line.line_ids[-2].id)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'tax_ids': [], 'tax_line_id': False, 'balance': -200.0, 'reconciled': False},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'tax_ids': [], 'tax_line_id': False, 'balance': 200.0, 'reconciled': False},
+        ])
+
+    def test_reconciliation_model_user_has_higher_priority_than_odoobot(self):
+        user_rule = self.env['account.reconcile.model'].create({
+            'name': 'test reco model user',
+            'sequence': 2,
+            'match_journal_ids': [Command.set([self.company_data['default_journal_bank'].id])],
+            'match_label': 'contains',
+            'match_label_param': 'blblbl',
+            'line_ids': [Command.create({'account_id': self.company_data['default_account_revenue'].id})],
+        })
+
+        self.env['account.reconcile.model'].create({
+            'name': 'test reco model odoobot',
+            'sequence': 1,
+            'created_automatically': True,
+            'match_journal_ids': [Command.set([self.company_data['default_journal_bank'].id])],
+            'match_label': 'contains',
+            'match_label_param': 'blblbl',
+            'line_ids': [Command.create({'account_id': self.company_data['default_account_revenue'].id})],
+        })
+
+        st_line = self._create_st_line(
+            1000.0,
+            date='2025-08-06',
+            payment_ref='blblbl',
+            partner_id=self.partner_a.id,
+            update_create_date=False,
+        )
+
+        models_per_line = self.env['account.reconcile.model'].with_context(lang='en_US').get_available_reconcile_model_per_statement_line(
+            (st_line).ids,
+        )
+
+        self.assertEqual(
+            models_per_line[st_line.id][0],
+            {'id': user_rule.id, 'display_name': "test reco model user"},
+            "Does not prioritize user models over odoobot models",
+        )
+
+    def test_auto_reconciliation_model_user_has_higher_priority_than_odoobot(self):
+        user_rule = self.env['account.reconcile.model'].create({
+            'name': 'test reco model user',
+            'sequence': 2,
+            'match_journal_ids': [Command.set([self.company_data['default_journal_bank'].id])],
+            'match_label': 'contains',
+            'match_label_param': 'blblbl',
+            'line_ids': [Command.create({'account_id': self.company_data['default_account_revenue'].id})],
+        })
+
+        self.env['account.reconcile.model'].create({
+            'name': 'test reco model odoobot',
+            'sequence': 1,
+            'created_automatically': True,
+            'match_journal_ids': [Command.set([self.company_data['default_journal_bank'].id])],
+            'match_label': 'contains',
+            'match_label_param': 'blblbl',
+            'line_ids': [Command.create({'account_id': self.company_data['default_account_revenue'].id})],
+        })
+
+        self._create_and_post_payment(amount=100)
+        st_line = self._create_st_line(amount=100, update_create_date=False, payment_ref='blblbl')
+        st_line._try_auto_reconcile_statement_lines()
+        self.assertEqual(
+            st_line.line_ids[-1].reconcile_model_id,
+            user_rule,
+            "Does not prioritize user models over odoobot models",
+        )
+
+    def test_auto_reconcile_wizard_invoice_first(self):
+        bank_journal = self.company_data['default_journal_bank']
+
+        invoice_before = self._create_invoice_one_line_reco(price_unit=100.0)
+        invoice_after = self._create_invoice_one_line_reco(price_unit=100.0)
+
+        st_line_before = self._create_st_line(
+            100,
+            date='2019-01-01',
+            payment_ref=invoice_before.move_name,
+            partner_id=self.partner_a.id,
+            journal_id=bank_journal.id,
+        )
+        st_line_after = self._create_st_line(
+            100,
+            date='2019-04-01',
+            payment_ref=invoice_after.move_name,
+            partner_id=self.partner_a.id,
+            journal_id=bank_journal.id,
+        )
+
+        self.assertFalse(st_line_before.is_reconciled)
+        self.assertFalse(st_line_after.is_reconciled)
+
+        self.env['bank.rec.auto.reconcile.wizard'].create({
+            'date': '2019-03-01',
+            'journal_id': bank_journal.id,
+        }).action_auto_reconcile()
+
+        self.assertFalse(st_line_before.is_reconciled)
+        self.assertTrue(st_line_after.is_reconciled)
+
+    def test_reconciling_when_no_statement_lines_exists_raises_warning_notification(self):
+        bank_journal = self.company_data['default_journal_bank']
+
+        result = self.env['bank.rec.auto.reconcile.wizard'].create({
+            'date': '2019-03-01',
+            'journal_id': bank_journal.id,
+        }).action_auto_reconcile()
+
+        self.assertEqual(result['params']['type'], 'warning')
+        self.assertEqual(result['params']['message'], 'Nothing to reconcile.')
+
+    def test_auto_reconcile_wizard_statement_line_first(self):
+        bank_journal = self.company_data['default_journal_bank']
+
+        st_line_before = self._create_st_line(
+            100,
+            date='2019-01-01',
+            payment_ref='INV/BEFORE',
+            partner_id=self.partner_a.id,
+            journal_id=bank_journal.id,
+        )
+        st_line_after = self._create_st_line(
+            100,
+            date='2019-04-01',
+            payment_ref='INV/AFTER',
+            partner_id=self.partner_a.id,
+            journal_id=bank_journal.id,
+        )
+
+        self._create_invoice_one_line_reco(price_unit=100.0, move_name='INV/BEFORE')
+        self._create_invoice_one_line_reco(price_unit=100.0, move_name='INV/AFTER')
+
+        self.assertFalse(st_line_before.is_reconciled)
+        self.assertFalse(st_line_after.is_reconciled)
+
+        self.env['bank.rec.auto.reconcile.wizard'].create({
+            'date': '2019-03-01',
+            'journal_id': bank_journal.id,
+        }).action_auto_reconcile()
+
+        self.assertFalse(st_line_before.is_reconciled)
+        self.assertTrue(st_line_after.is_reconciled)
+
+    def test_credit_warning_excludes_unreconciled_bank_statement_line(self):
+        """Credit warning must account for outstanding bank statement lines."""
+        self.env.company.account_use_credit_limit = True
+        self.partner_a.credit_limit = 1000.0
+        inv_line = self._create_invoice_one_line_reco(price_unit=2000.0)
+        invoice = inv_line.move_id
+        invoice.button_draft()  # warning only shows on draft invoices
+        self.assertTrue(invoice.partner_credit_warning)
+
+        # An unreconciled bank statement line for the partner
+        # should reduce the effective outstanding exposure.
+        self._create_st_line(
+            amount=1500.0,
+            date='2017-01-01',
+            partner_id=self.partner_a.id,
+        )
+        invoice.invalidate_recordset(['partner_credit_warning'])
+        self.assertFalse(invoice.partner_credit_warning)
+
+    def test_credit_warning_excludes_reconciled_bank_statement_line(self):
+        """Credit warning must account for bank statement lines already matched to the invoice."""
+        self.env.company.account_use_credit_limit = True
+        self.partner_a.credit_limit = 1000.0
+        inv_line = self._create_invoice_one_line_reco(price_unit=2000.0)
+        invoice = inv_line.move_id
+        invoice.button_draft()  # warning only shows on draft invoices
+        self.assertTrue(invoice.partner_credit_warning)
+
+        st_line = self._create_st_line(
+            amount=1500.0,
+            date='2017-01-01',
+            partner_id=self.partner_a.id,
+        )
+        invoice.action_post()  # reconciliation requires a posted move
+        bank_cash_line = st_line.move_id.line_ids.filtered(
+            lambda l: l.account_id.account_type == 'asset_cash'
+        )
+        invoice.js_assign_outstanding_line(bank_cash_line.id)
+        invoice.button_draft()  # warning only shows on draft invoices
+        self.assertFalse(invoice.partner_credit_warning)
+
+    def test_tax_base_amount_bank_fees_reconciliation(self):
+        """Test tax_base_amount value is correctly updated after reconciliation."""
+
+        journal_entry = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': fields.Date.context_today(self),
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'line_ids': [
+                Command.create({
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'credit': 1000.0,
+                    'tax_ids': [Command.set(self.tax_sale_a.ids)],
+                }),
+                Command.create({
+                    'account_id': self.company_data['default_journal_bank'].default_account_id.id,
+                    'debit': 1150.0,
+                }),
+            ]
+        })
+        journal_entry.action_post()
+
+        reco_model = self.env['account.reconcile.model'].search([
+            ('name', '=', 'Bank Fees'),
+            ('company_id', '=', self.company_data['company'].id)
+        ], limit=1)
+        reco_model.line_ids.write({'tax_ids': [Command.set(self.tax_sale_a.ids)]})
+
+        st_line = self._create_st_line(
+            amount=-2000.0,
+            payment_ref='bank fees',
+            update_create_date=False,
+        )
+        reco_model._trigger_reconciliation_model(st_line)
+        st_tax_line = st_line.line_ids.filtered(lambda l: l.tax_line_id == self.tax_sale_a)
+        self.assertEqual(st_tax_line.tax_base_amount, 1739.13)
+
+    def test_try_auto_reconcile_retry_after_error(self):
+        """Ensures the lines of a failing batch will be retried during the next run of _try_auto_reconcile_statement_lines"""
+        original_method = self.env.registry['account.bank.statement.line']._try_auto_reconcile_statement_lines
+        has_failed = False
+
+        def patched_try_auto_reconcile(self_model, company_id=None):
+            nonlocal has_failed
+            if not has_failed:
+                has_failed = True
+                raise ValidationError("Simulating a validation error")
+            return original_method(self_model, company_id)
+
+        payment = self._create_and_post_payment(amount=100, memo="pay_AretqwwXerereE")
+        statement_line = self._create_st_line(amount=100, payment_ref="pay_AretqwwXerereE", update_create_date=False)
+
+        self.patch(self.env.registry['account.bank.statement.line'], '_try_auto_reconcile_statement_lines', patched_try_auto_reconcile)
+
+        with self.assertLogs('odoo.addons.account_accountant.models.account_bank_statement') as log_catcher:
+            self.env['account.bank.statement.line']._cron_try_auto_reconcile_statement_lines(batch_size=50)
+
+        self.assertEqual(
+            [
+                Like('...found 1 statement lines...'),
+                Like('...Simulating a validation error...'),
+                Like('...found 0 statement lines...'),
+                Like('...the cron will be triggered again...'),
+            ],
+            log_catcher.output,
+            "The first run should have failed. The cron should retry to process the failed line"
+        )
+
+        with self.assertLogs('odoo.addons.account_accountant.models.account_bank_statement') as log_catcher:
+            self.env['account.bank.statement.line']._cron_try_auto_reconcile_statement_lines(batch_size=50)
+
+        self.assertEqual(
+            [
+                Like('...found 1 statement lines...'),
+                Like('...set line...'),
+                Like('...found 0 statement lines...'),
+            ],
+            log_catcher.output,
+            "The second run should have been succesfull."
+        )
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'balance': 100.0, 'reconciled': False},
+            {'account_id': payment.outstanding_account_id.id, 'balance': -100.0, 'reconciled': True},
+        ])
+
+    def test_try_auto_reconcile_drop_after_many_errors(self):
+        """Ensures the lines that fails twice won't be retried again"""
+        original_method = self.env.registry['account.bank.statement.line']._try_auto_reconcile_statement_lines
+        has_failed = 0
+
+        def patched_try_auto_reconcile(self_model, company_id=None):
+            nonlocal has_failed
+            if has_failed < 2:
+                has_failed = has_failed + 1
+                raise ValidationError("Simulating a validation error")
+            return original_method(self_model, company_id)
+
+        self._create_and_post_payment(amount=100, memo="pay_AretqwwXerereE")
+        statement_line = self._create_st_line(amount=100, payment_ref="pay_AretqwwXerereE", update_create_date=False)
+
+        self.patch(self.env.registry['account.bank.statement.line'], '_try_auto_reconcile_statement_lines', patched_try_auto_reconcile)
+
+        with self.assertLogs('odoo.addons.account_accountant.models.account_bank_statement') as log_catcher:
+            self.env['account.bank.statement.line']._cron_try_auto_reconcile_statement_lines(batch_size=50)
+
+        self.assertEqual(
+            [
+                Like('...found 1 statement lines...'),
+                Like('...Simulating a validation error...'),
+                Like('...found 0 statement lines...'),
+                Like('...the cron will be triggered again...'),
+            ],
+            log_catcher.output,
+            "The first run should have failed. The cron should retry to process the failed line"
+        )
+
+        with self.assertLogs('odoo.addons.account_accountant.models.account_bank_statement') as log_catcher:
+            self.env['account.bank.statement.line']._cron_try_auto_reconcile_statement_lines(batch_size=50)
+
+        self.assertEqual(
+            [
+                Like('...found 1 statement lines...'),
+                Like('...Simulating a validation error...'),
+                Like('...found 0 statement lines...'),
+            ],
+            log_catcher.output,
+            "The second run should have failed too."
+        )
+
+        with self.assertLogs('odoo.addons.account_accountant.models.account_bank_statement') as log_catcher:
+            self.env['account.bank.statement.line']._cron_try_auto_reconcile_statement_lines(batch_size=50)
+
+        self.assertEqual([Like('...found 0 statement lines...')], log_catcher.output, "We shouldn't find any new line.")
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'balance': 100.0, 'reconciled': False},
+            {'account_id': statement_line.journal_id.suspense_account_id.id, 'balance': -100.0, 'reconciled': False},
+        ])
+
+    def test_try_auto_reconcile_multiple_batches(self):
+        """Ensure one batch failing and retried later on doesn't interfer with other batch"""
+        original_method = self.env.registry['account.bank.statement.line']._try_auto_reconcile_statement_lines
+        count = 0
+
+        def patched_try_auto_reconcile(self_model, company_id=None):
+            nonlocal count
+            count = count + 1
+            if count % 2:
+                raise ValidationError("Simulating a validation error")
+            return original_method(self_model, company_id)
+
+        self._create_and_post_payment(amount=100, memo="line #1")
+        statement_line_1 = self._create_st_line(amount=100, payment_ref="line #1", update_create_date=False)
+        payment = self._create_and_post_payment(amount=100, memo="line #2")
+        statement_line_2 = self._create_st_line(amount=100, payment_ref="line #2", update_create_date=False)
+
+        self.patch(self.env.registry['account.bank.statement.line'], '_try_auto_reconcile_statement_lines', patched_try_auto_reconcile)
+
+        with self.assertLogs('odoo.addons.account_accountant.models.account_bank_statement') as log_catcher:
+            self.env['account.bank.statement.line']._cron_try_auto_reconcile_statement_lines(batch_size=1)
+
+        self.assertEqual(
+            [
+                Like('...found 2 statement lines...'),
+                Like('...Simulating a validation error...'),
+                Like('...found 1 statement lines...'),
+                Like('...set line...'),
+                Like('...found 0 statement lines...'),
+                Like('...the cron will be triggered again...'),
+            ],
+            log_catcher.output,
+            "The first run should have found 2 batch of 1 line, fail one of them and succesfully process the other. The cron should retry to process the failed line"
+        )
+
+        with self.assertLogs('odoo.addons.account_accountant.models.account_bank_statement') as log_catcher:
+            self.env['account.bank.statement.line']._cron_try_auto_reconcile_statement_lines(batch_size=1)
+
+        self.assertEqual(
+            [
+                Like('...found 1 statement lines...'),
+                Like('...Simulating a validation error...'),
+                Like('...found 0 statement lines...'),
+            ],
+            log_catcher.output,
+            "The second run should have failed."
+        )
+        self.assertRecordValues(statement_line_1.line_ids, [
+            {'account_id': statement_line_1.journal_id.default_account_id.id, 'balance': 100.0, 'reconciled': False},
+            {'account_id': statement_line_1.journal_id.suspense_account_id.id, 'balance': -100.0, 'reconciled': False},
+        ])
+        self.assertRecordValues(statement_line_2.line_ids, [
+            {'account_id': statement_line_2.journal_id.default_account_id.id, 'balance': 100.0, 'reconciled': False},
+            {'account_id': payment.outstanding_account_id.id, 'balance': -100.0, 'reconciled': True},
+        ])
+
+    def test_reconcile_tolerance_multicurrency(self):
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_foreign_currency_tolerance', 0.03)
+        other_currency = self.setup_other_currency('JPY', rates=[('2019-12-31', 10.0), ('2020-01-19', 9.9)])
+        inv1 = self._create_invoice_one_line_reco(
+            currency_id=other_currency.id,
+            invoice_date='2020-01-20',
+            price_unit=4950.0,
+        )
+        st_line = self._create_st_line(
+            485.0,
+            date='2020-01-01',
+            partner_id=self.partner_a.id,
+            update_create_date=False,
+        )
+        st_line.set_line_bank_statement_line([inv1.id])
+
+        # with the exchange diff, it's not 500 but 495 that is reconciled. And so the invoice is fully paid
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 485.0, 'currency_id': self.company_data['currency'].id, 'balance': 485.0, 'reconciled': False},
+            {'account_id': inv1.account_id.id, 'amount_currency': -4950.0, 'currency_id': other_currency.id, 'balance': -495.0, 'reconciled': True},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': 10.0, 'currency_id': self.company_data['currency'].id, 'balance': 10.0, 'reconciled': False},
+        ])
+        self.assertEqual(inv1.amount_residual, 0)
+
+        inv1 = self._create_invoice_one_line_reco(
+            currency_id=other_currency.id,
+            invoice_date='2020-01-20',
+            price_unit=4752.0,
+        )
+        st_line = self._create_st_line(
+            485.0,
+            date='2020-01-01',
+            partner_id=self.partner_a.id,
+            update_create_date=False,
+        )
+        st_line.set_line_bank_statement_line([inv1.id])
+
+        # with the exchange diff, it's not 480 but 475.2 that is reconciled. And so the invoice is fully paid
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 485.0, 'currency_id': self.company_data['currency'].id, 'balance': 485.0, 'reconciled': False},
+            {'account_id': inv1.account_id.id, 'amount_currency': -4752.0, 'currency_id': other_currency.id, 'balance': -475.2, 'reconciled': True},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'amount_currency': -9.8, 'currency_id': self.company_data['currency'].id, 'balance': -9.8, 'reconciled': False},
+        ])
+        self.assertEqual(inv1.amount_residual, 0)
+
+    def test_reconcile_exceed_tolerance_multicurrency(self):
+        self.env['ir.config_parameter'].set_float('account_accountant.bank_rec_foreign_currency_tolerance', 0.03)
+        other_currency = self.setup_other_currency('JPY', rates=[('2019-12-31', 10.0), ('2020-01-19', 9.9)])
+        inv1 = self._create_invoice_one_line_reco(
+            currency_id=other_currency.id,
+            invoice_date='2020-01-20',
+            price_unit=5049.0,
+        )
+        st_line = self._create_st_line(
+            485.0,
+            date='2020-01-01',
+            partner_id=self.partner_a.id,
+            update_create_date=False,
+        )
+        st_line.set_line_bank_statement_line([inv1.id])
+
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 485.0, 'currency_id': self.company_data['currency'].id, 'balance': 485.0, 'reconciled': False},
+            {'account_id': inv1.account_id.id, 'amount_currency': -4850.0, 'currency_id': other_currency.id, 'balance': -485.0, 'reconciled': True},
+        ])
+        self.assertEqual(inv1.amount_residual, 20.1)
+
+    def test_common_substring(self):
+        """Test finding longest common substring in fake payment_ref"""
+
+        # Fake Creditor Reference
+        payment_ref1 = "RF33 4434 5675 9111 4543 8787"
+        payment_ref2 = "RF13 4434 5675 9111 4512 7777"
+        payment_ref3 = "RF67 3791 6912 4434 5675 9132"
+        non_matching_ref = "ABCDEFG"
+        BankStatementLine = self.env['account.bank.statement.line']
+
+        self.assertEqual(BankStatementLine._get_common_substring([payment_ref1, payment_ref2]), '3 4434 5675 9111 45')
+        self.assertEqual(BankStatementLine._get_common_substring([payment_ref1, payment_ref2, payment_ref3]), '4434 5675 91')
+        self.assertIsNone(BankStatementLine._get_common_substring([payment_ref1, non_matching_ref]))
+        self.assertIsNone(BankStatementLine._get_common_substring([payment_ref1, payment_ref2, non_matching_ref]))
+
+    def test_action_to_review(self):
+        demo_user = mail_new_test_user(
+            self.env,
+            name='Demo user',
+            login='userdemo',
+            email='test@example.com',
+            groups='account.group_account_basic',  # Invoicing & banks group
+        )
+        self.company.set_to_review_documents = True
+        st_line = self._create_st_line(-100.0, update_create_date=False)
+        # This will also test the reco models, payable and receivable action
+        st_line.with_user(demo_user).set_account_bank_statement_line(st_line.line_ids[-1].id, self.account_revenue_1.id)
+        self.assertEqual(st_line.review_state, 'todo')
+
+        st_line = self._create_st_line(-100.0, update_create_date=False)
+        move_line_1 = self._create_invoice_one_line_reco(price_unit=100.0)
+
+        st_line.with_user(demo_user).set_line_bank_statement_line(move_line_1.ids)
+        self.assertEqual(st_line.review_state, 'todo')
+
+    def test_bank_account_unlinked_when_unreconciled_or_deleted(self):
+        """
+        Test that the bank account created by a bank statement line (at reconciliation)
+        is unlinked if the user unreconcile (or delete) the bank statement line.
+        The bank account should be unlinked only if it's the only place it's used.
+        """
+        # create a transaction without partner
+        bank_line = self._create_st_line(-100, '2026-07-01', account_number='1234')
+        # create 2 moves with 2 different partners
+        move_a, move_b = self.env['account.move'].create([
+            {
+                'move_type': 'in_invoice',
+                'partner_id': self.partner_a.id,
+                'invoice_date': '2026-07-01',
+                'line_ids': [Command.create({
+                    'journal_id': self.company_data['default_journal_purchase'].id,
+                    'price_unit': 100,
+                    'quantity': 1,
+                })],
+            },
+            {
+                'move_type': 'in_invoice',
+                'partner_id': self.partner_b.id,
+                'invoice_date': '2026-07-01',
+                'line_ids': [Command.create({
+                    'journal_id': self.company_data['default_journal_purchase'].id,
+                    'price_unit': 100,
+                    'quantity': 1,
+                })],
+            },
+        ])
+        (move_a + move_b).action_post()
+
+        # reconcile move A with bank statement line
+        bank_line.set_line_bank_statement_line(
+            move_a.line_ids.filtered(lambda line: line.account_id.account_type == 'liability_payable').ids)
+
+        PartnerBank = self.env['res.partner.bank']
+        domain = [('account_number', '=', '1234')]
+        bank = PartnerBank.search(domain)
+        self.assertEqual(bank.partner_id, self.partner_a)
+        self.assertEqual(move_a.payment_state, 'paid')
+        self.assertRecordValues(bank_line, [{
+            'partner_id': self.partner_a.id,
+            'partner_bank_id': bank.id,
+        }])
+
+        # Undo reconciliation: should delete the bank account
+        bank_line.action_undo_reconciliation()
+        self.assertFalse(PartnerBank.search(domain))
+        self.assertRecordValues(bank_line, [{
+            'partner_bank_id': False,
+            'account_number': '1234',
+        }])
+
+        # reset partner_id on bank statement line: design choice
+        bank_line.partner_id = False
+
+        # reconcile move B with bank statement line
+        bank_line.set_line_bank_statement_line(
+            move_b.line_ids.filtered(lambda line: line.account_id.account_type == 'liability_payable').ids)
+        bank = PartnerBank.search(domain)
+        self.assertEqual(bank.partner_id, self.partner_b)
+        self.assertEqual(move_b.payment_state, 'paid')
+        self.assertRecordValues(bank_line, [{
+            'partner_id': self.partner_b.id,
+            'partner_bank_id': bank.id,
+        }])
+
+        # delete the statement line -> bank account should be deleted
+        bank_line.unlink()
+        self.assertFalse(PartnerBank.search(domain))
+
+        # reconcile and create another move using the bank account -> when unreconcile, shouldn't delete the bank account
+        bank_line = self._create_st_line(-100, '2026-07-01', account_number='1234')
+        bank_line.set_line_bank_statement_line(
+            move_b.line_ids.filtered(lambda line: line.account_id.account_type == 'liability_payable').ids)
+        bank = PartnerBank.search(domain)
+        move_c = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.partner_b.id,
+            'invoice_date': '2026-07-01',
+            'partner_bank_id': bank.id,
+            'line_ids': [Command.create({
+                'journal_id': self.company_data['default_journal_purchase'].id,
+                'price_unit': 100,
+                'quantity': 1,
+            })],
+        })
+        move_c.action_post()
+
+        bank_line.action_undo_reconciliation()
+        self.assertTrue(PartnerBank.search(domain))
+
+        # Company bank accounts should NEVER be deleted
+        company_partner_id = self.company_data['company'].partner_id.id
+        bank = self.env['res.partner.bank'].create({
+            'partner_id': company_partner_id,
+            'account_number': '5678',
+        })
+        bank_line = self._create_st_line(-100, '2026-07-01', account_number='5678')
+        move = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': company_partner_id,
+            'invoice_date': '2026-07-01',
+            'line_ids': [Command.create({
+                'journal_id': self.company_data['default_journal_purchase'].id,
+                'price_unit': 100,
+                'quantity': 1,
+            })],
+        })
+        move.action_post()
+        bank_line.set_line_bank_statement_line(
+            move.line_ids.filtered(lambda line: line.account_id.account_type == 'liability_payable').ids)
+        self.assertRecordValues(bank_line, [{
+            'partner_id': company_partner_id,
+            'partner_bank_id': bank.id,
+        }])
+        bank_line.action_undo_reconciliation()
+        self.assertTrue(bank.exists())
+        self.assertRecordValues(bank_line, [{
+            'partner_id': company_partner_id,
+            'partner_bank_id': bank.id,
+        }])
+
+    def test_set_account_with_single_line_at_zero_amount(self):
+        # This test will use the new set_multiple_account_bank_statement_line and add only one line at zero
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+        account = self.company_data['default_account_revenue']
+        wizard_line = self.env['account.select.account.line'].create([{
+            'account_id': account.id,
+            'name': account.name,
+            'code': account.code,
+            'description': account.description,
+            'account_type': account.account_type,
+            'currency_id': st_line.currency_id.id,
+        }])
+        st_line.set_multiple_account_bank_statement_line(wizard_line.ids)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -100.0},
+        ])
+
+    def test_set_account_with_single_line_at_partial_amount(self):
+        # This test will use the new set_multiple_account_bank_statement_line and add only one line with a partial amount
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+        account = self.company_data['default_account_revenue']
+        wizard_line = self.env['account.select.account.line'].create([{
+            'account_id': account.id,
+            'name': account.name,
+            'code': account.code,
+            'description': account.description,
+            'account_type': account.account_type,
+            'currency_id': st_line.currency_id.id,
+            'amount': 50,
+        }])
+        st_line.set_multiple_account_bank_statement_line(wizard_line.ids)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -50.0},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'balance': -50.0},
+        ])
+
+    def test_set_multiple_accounts_with_multiple_lines_at_zero_amount(self):
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+        account = self.company_data['default_account_revenue']
+        account_2 = self.env['account.account'].create({
+            'name': "test account",
+            'code': "40001",
+            'account_type': "income",
+        })
+        wizards = self.env['account.select.account.line'].create([
+            {
+                'account_id': account.id,
+                'name': account.name,
+                'code': account.code,
+                'description': account.description,
+                'account_type': account.account_type,
+                'currency_id': st_line.currency_id.id,
+            },
+            {
+                'account_id': account_2.id,
+                'name': account_2.name,
+                'code': account_2.code,
+                'description': account_2.description,
+                'account_type': account_2.account_type,
+                'currency_id': st_line.currency_id.id,
+            },
+        ])
+
+        st_line.set_multiple_account_bank_statement_line(wizards.ids)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -50.0},
+            {'account_id': account_2.id, 'balance': -50.0},
+        ])
+
+    def test_set_multiple_accounts_with_mixed_line_partial_and_zero_amount(self):
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+        account = self.company_data['default_account_revenue']
+        account_2 = self.env['account.account'].create({
+            'name': "test account",
+            'code': "40001",
+            'account_type': "income",
+        })
+        wizards = self.env['account.select.account.line'].create([
+            {
+                'account_id': account.id,
+                'name': account.name,
+                'code': account.code,
+                'description': account.description,
+                'account_type': account.account_type,
+                'currency_id': st_line.currency_id.id,
+                'amount': 50,
+            },
+            {
+                'account_id': account_2.id,
+                'name': account_2.name,
+                'code': account_2.code,
+                'description': account_2.description,
+                'account_type': account_2.account_type,
+                'currency_id': st_line.currency_id.id,
+            },
+        ])
+
+        st_line.set_multiple_account_bank_statement_line(wizards.ids)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -50.0},
+            {'account_id': account_2.id, 'balance': -50.0},
+        ])
+
+    def test_set_multiple_accounts_with_multiple_lines_at_matching_amounts(self):
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+        account = self.company_data['default_account_revenue']
+        account_2 = self.env['account.account'].create({
+            'name': "test account",
+            'code': "40001",
+            'account_type': "income",
+        })
+
+        wizards = self.env['account.select.account.line'].create([
+            {
+                'account_id': account.id,
+                'name': account.name,
+                'code': account.code,
+                'description': account.description,
+                'account_type': account.account_type,
+                'currency_id': st_line.currency_id.id,
+                'amount': 50,
+            },
+            {
+                'account_id': account_2.id,
+                'name': account_2.name,
+                'code': account_2.code,
+                'description': account_2.description,
+                'account_type': account_2.account_type,
+                'currency_id': st_line.currency_id.id,
+                'amount': 50,
+            },
+        ])
+
+        st_line.set_multiple_account_bank_statement_line(wizards.ids)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -50.0},
+            {'account_id': account_2.id, 'balance': -50.0},
+        ])
+
+    def test_set_multiple_accounts_with_partial_and_multiple_zero_amounts(self):
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+
+        account = self.company_data['default_account_revenue']
+        account_2, account_3 = self.env['account.account'].create([
+            {
+                'name': 'Test account 2',
+                'code': '40001',
+                'account_type': 'income',
+            },
+            {
+                'name': 'Test account 3',
+                'code': '40002',
+                'account_type': 'income',
+            },
+        ])
+
+        wizards = self.env['account.select.account.line'].create([
+            {
+                'account_id': account.id,
+                'name': account.name,
+                'code': account.code,
+                'description': account.description,
+                'account_type': account.account_type,
+                'currency_id': st_line.currency_id.id,
+                'amount': 40,
+            },
+            {
+                'account_id': account_2.id,
+                'name': account_2.name,
+                'code': account_2.code,
+                'description': account_2.description,
+                'account_type': account_2.account_type,
+                'currency_id': st_line.currency_id.id,
+            },
+            {
+                'account_id': account_3.id,
+                'name': account_3.name,
+                'code': account_3.code,
+                'description': account_3.description,
+                'account_type': account_3.account_type,
+                'currency_id': st_line.currency_id.id,
+            },
+        ])
+
+        st_line.set_multiple_account_bank_statement_line(wizards.ids)
+
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -40.0},
+            {'account_id': account_2.id, 'balance': -30.0},
+            {'account_id': account_3.id, 'balance': -30.0},
+        ])
+
+    def test_set_multiple_accounts_with_three_zero_amount_lines(self):
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+
+        accounts = self.company_data['default_account_revenue'] + self.env['account.account'].create([
+            {
+                'name': 'Test account 2',
+                'code': '40001',
+                'account_type': 'income',
+            },
+            {
+                'name': 'Test account 3',
+                'code': '40002',
+                'account_type': 'income',
+            },
+        ])
+
+        wizards = self.env['account.select.account.line'].create([
+            {
+                'account_id': account.id,
+                'name': account.name,
+                'code': account.code,
+                'description': account.description,
+                'account_type': account.account_type,
+                'currency_id': st_line.currency_id.id,
+            }
+            for account in accounts
+        ])
+
+        st_line.set_multiple_account_bank_statement_line(wizards.ids)
+
+        # In this case, we put the missing decimal in the last line
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': accounts[0].id, 'balance': -33.33},
+            {'account_id': accounts[1].id, 'balance': -33.33},
+            {'account_id': accounts[2].id, 'balance': -33.34},
+        ])
+
+    def test_set_multiple_accounts_with_three_zero_amount_lines_negative_statement_line(self):
+        st_line = self._create_st_line(
+            amount=-100.0,
+            date='2017-01-01',
+        )
+
+        accounts = self.company_data['default_account_revenue'] + self.env['account.account'].create([
+            {
+                'name': 'Test account 2',
+                'code': '40001',
+                'account_type': 'income',
+            },
+            {
+                'name': 'Test account 3',
+                'code': '40002',
+                'account_type': 'income',
+            },
+        ])
+
+        wizards = self.env['account.select.account.line'].create([
+            {
+                'account_id': account.id,
+                'name': account.name,
+                'code': account.code,
+                'description': account.description,
+                'account_type': account.account_type,
+                'currency_id': st_line.currency_id.id,
+            }
+            for account in accounts
+        ])
+
+        st_line.set_multiple_account_bank_statement_line(wizards.ids)
+
+        # In this case, we put the missing decimal in the last line
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': -100.0},
+            {'account_id': accounts[0].id, 'balance': 33.33},
+            {'account_id': accounts[1].id, 'balance': 33.33},
+            {'account_id': accounts[2].id, 'balance': 33.34},
+        ])
+
+    def test_set_multiple_accounts_with_amount_higher_than_statement_amount(self):
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+
+        account = self.company_data['default_account_revenue']
+
+        wizard = self.env['account.select.account.line'].create({
+            'account_id': account.id,
+            'name': account.name,
+            'code': account.code,
+            'description': account.description,
+            'account_type': account.account_type,
+            'currency_id': st_line.currency_id.id,
+            'amount': 150,
+        })
+
+        st_line.set_multiple_account_bank_statement_line(wizard.ids)
+
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -150.0},
+            {'account_id': st_line.journal_id.suspense_account_id.id, 'balance': 50.0},
+        ])
+
+    def test_set_multiple_accounts_with_amount_higher_than_statement_amount_and_other_line_without(self):
+        st_line = self._create_st_line(
+            amount=100.0,
+            date='2017-01-01',
+        )
+
+        account = self.company_data['default_account_revenue']
+        account_2 = self.env['account.account'].create({
+            'name': 'Test account 2',
+            'code': '40001',
+            'account_type': 'income',
+        })
+
+        wizards = self.env['account.select.account.line'].create([
+            {
+                'account_id': account.id,
+                'name': account.name,
+                'code': account.code,
+                'description': account.description,
+                'account_type': account.account_type,
+                'currency_id': st_line.currency_id.id,
+                'amount': 150,
+            },
+            {
+                'account_id': account_2.id,
+                'name': account_2.name,
+                'code': account_2.code,
+                'description': account_2.description,
+                'account_type': account_2.account_type,
+                'currency_id': st_line.currency_id.id,
+            },
+        ])
+
+        st_line.set_multiple_account_bank_statement_line(wizards.ids)
+
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0},
+            {'account_id': account.id, 'balance': -150.0},
+            {'account_id': account_2.id, 'balance': 50.0},
+        ])
+
+    def test_reconciliation_with_installments(self):
+        """
+        Test the scenario where a transaction is already fully consumed before the last installment of the payment term.
+        The auto reconcile should match the installments in order until the statement line amount is fully consumed.
+        """
+        payment_term = self.env['account.payment.term'].create({
+            'name': 'Test payment term',
+            'company_id': self.company_data['company'].id,
+            'line_ids': [
+                Command.create({
+                    'value': 'percent',
+                    'value_amount': amount,
+                    'nb_days': nb_days,
+                }) for amount, nb_days in [(30, 0), (30, 30), (40, 60)]
+            ],
+        })
+
+        move_line_1 = self._create_invoice_one_line_reco(partner_id=self.partner_a.id, invoice_payment_term_id=payment_term.id, price_unit=200.0)
+        statement_line = self._create_st_line(amount=90, partner_id=self.partner_a.id, payment_ref=move_line_1[0].move_name, update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': 90.0, 'currency_id': self.company_data['currency'].id, 'balance': 90.0, 'reconciled': False},
+            {'account_id': move_line_1.account_id.id, 'amount_currency': -60, 'currency_id': self.company_data['currency'].id, 'balance': -60, 'reconciled': True},
+            {'account_id': move_line_1.account_id.id, 'amount_currency': -30, 'currency_id': self.company_data['currency'].id, 'balance': -30, 'reconciled': True},
+        ])
+
+    def test_reconciliation_with_installments_multi_currency(self):
+        """
+        Test the scenario where a transaction is already fully consumed before the last installment of the payment term for multi currencies.
+        The auto reconcile should match the installments in order until the statement line amount is fully consumed.
+        """
+        payment_term = self.env['account.payment.term'].create({
+            'name': 'Test payment term',
+            'company_id': self.company_data['company'].id,
+            'line_ids': [
+                Command.create({
+                    'value': 'percent',
+                    'value_amount': amount,
+                    'nb_days': nb_days,
+                }) for amount, nb_days in [(30, 0), (30, 30), (40, 60)]
+            ],
+        })
+
+        move_line_1 = self._create_invoice_one_line_reco(partner_id=self.partner_a.id, invoice_payment_term_id=payment_term.id, price_unit=200.0)
+        statement_line = self._create_st_line(amount=90, partner_id=self.partner_a.id, payment_ref=move_line_1[0].move_name, update_create_date=False, foreign_currency_id=self.other_currency.id)
+        statement_line._try_auto_reconcile_statement_lines()
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': 90.0, 'currency_id': self.company_data['currency'].id, 'balance': 90.0, 'reconciled': False},
+            {'account_id': move_line_1.account_id.id, 'amount_currency': -60, 'currency_id': self.company_data['currency'].id, 'balance': -60.0, 'reconciled': True},
+            {'account_id': move_line_1.account_id.id, 'amount_currency': -30, 'currency_id': self.company_data['currency'].id, 'balance': -30.0, 'reconciled': True},
+        ])
+
+        move_line_1 = self._create_invoice_one_line_reco(partner_id=self.partner_a.id, invoice_payment_term_id=payment_term.id, price_unit=400.0, currency_id=self.other_currency.id)
+        statement_line = self._create_st_line(amount=90, partner_id=self.partner_a.id, payment_ref=move_line_1[0].move_name, update_create_date=False)
+        statement_line._try_auto_reconcile_statement_lines()
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'amount_currency': 90.0, 'currency_id': self.company_data['currency'].id, 'balance': 90.0, 'reconciled': False},
+            {'account_id': move_line_1.account_id.id, 'amount_currency': -120.0, 'currency_id': self.other_currency.id, 'balance': -60.0, 'reconciled': True},
+            {'account_id': move_line_1.account_id.id, 'amount_currency': -60.0, 'currency_id': self.other_currency.id, 'balance': -30.0, 'reconciled': True},
         ])

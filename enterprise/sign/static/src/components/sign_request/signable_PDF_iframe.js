@@ -6,6 +6,9 @@ import { startSignItemNavigator } from "./sign_item_navigator";
 import {
     SignNameAndSignatureDialog,
 } from "@sign/dialogs/dialogs";
+import { formatDate, parseDate } from "@web/core/l10n/dates";
+
+const { DateTime } = luxon;
 
 export class SignablePDFIframe extends PDFIframe {
     /**
@@ -21,6 +24,8 @@ export class SignablePDFIframe extends PDFIframe {
         this.currentRole = this.props.currentRole;
         this.currentRoleName = this.props.currentName;
         this.signerName = props.signerName;
+        this.datetimePickerService = env.services['datetime_picker'];
+        this.activeDateInput = null;
         this.frameHash =
             (this.props.frameHash && this.props.frameHash.substring(0, 10) + "...") || "";
 
@@ -79,11 +84,59 @@ export class SignablePDFIframe extends PDFIframe {
         const signItemElement = signItem.el;
         const signItemData = signItem.data;
         const signItemType = this.signItemTypesById[signItemData.type_id];
-        const { name, item_type: type, auto_value: autoValue } = signItemType;
-        if (name === _t("Date")) {
-            signItemElement.addEventListener("focus", (e) => {
-                this.fillTextSignItem(e.currentTarget, this.signInfo.get('todayFormattedDate'));
-            });
+        const { item_type: type, auto_value: autoValue } = signItemType;
+        if (type === 'date') {
+            let datePicker = null;
+            const dateFormat = this.signInfo.get("dateFormat")?.replace("mm", "MM");
+
+            if (!signItemData.constant) {
+                const handleDateFieldChange = () => {
+                    try {
+                        const rawDate = signItemElement.value.trim();
+                        // If raw date is invalid date, we clear the input.
+                        const parsed = parseDate(rawDate, { format: dateFormat });
+                        const formatted = formatDate(parsed, { format: dateFormat });
+                        signItemElement.value = formatted;
+                        if (datePicker && datePicker.isOpen()) {
+                            datePicker.close();
+                        }
+                    } catch {
+                        signItemElement.value = "";
+                    }
+                    this.handleInput();
+                }
+                signItemElement.addEventListener("change", handleDateFieldChange);
+                signItemElement.addEventListener("click", (e) => {
+                    if (!e.currentTarget.value) {
+                        // On first click of an empty date input, fill it with auto value or today's date.
+                        // On the next click, open the date picker.
+                        signItemElement.value = autoValue || this.signInfo.get("todayFormattedDate");
+                        handleDateFieldChange();
+                        if (e.currentTarget.value) {
+                            return;
+                        }
+                    }
+                    this.activeDateInput = signItemElement;
+                    datePicker = this.datetimePickerService.create({
+                        type: "date",
+                        getInputs: () => this.activeDateInput ? [this.activeDateInput] : [""],
+                        pickerProps: {
+                            type: "date",
+                            value: this.getInitialDateValue(signItemElement.value, dateFormat),
+                        },
+
+                        onApply: (value) => {
+                            if (this.activeDateInput && value) {
+                                const formatted = formatDate(value, { format: dateFormat });
+                                this.activeDateInput.value = formatted;
+                                this.handleInput();
+                            }
+                        },
+                    });
+                    datePicker.state.value = datePicker.state.value || this.getInitialDateValue(signItemElement.value, dateFormat);
+                    datePicker.open();
+                });
+            }
         } else if (type === "signature" || type === "initial") {
             signItemElement.addEventListener("click", (e) => {
                 this.handleSignatureDialogClick(e.currentTarget, signItemType);
@@ -159,9 +212,12 @@ export class SignablePDFIframe extends PDFIframe {
 
     handleInput() {
         this.checkSignItemsCompletion();
-        if(this.props.isDocumentUnsigned()) {
-            this.navigator.setTip(_t("next"));
-        }
+        this.navigator.setTip(_t("next"));
+    }
+
+    getInitialDateValue(currentValue, dateFormat) {
+        const currentFormattedDate = currentValue || this.signInfo.get("todayFormattedDate");
+        return DateTime.fromFormat(currentFormattedDate, dateFormat);
     }
 
     /**
@@ -384,7 +440,7 @@ export class SignablePDFIframe extends PDFIframe {
     getContext(signItem) {
         const context = super.getContext(signItem);
         const type = this.signItemTypesById[signItem.type_id];
-        if (type.name === _t("Date") && signItem.responsible === this.currentRole) {
+        if (type.item_type === "date" && signItem.responsible === this.currentRole) {
             context.placeholder = this.signInfo.get('dateFormat')?.toUpperCase();
         }
         return context;
@@ -411,7 +467,6 @@ export class SignablePDFIframe extends PDFIframe {
             this.signItemTypesById,
             this.env,
         );
-        this.navigator.toggle(this.props.signItems.length > 0);
         this.checkSignItemsCompletion();
 
         this.root.querySelector("#viewerContainer").addEventListener("scroll", () => {
@@ -459,7 +514,8 @@ export class SignablePDFIframe extends PDFIframe {
                     : [false, false];
 
                 if (!value) {
-                    if (item.data.required) {
+                    // Only validate required items that must be filled by the signer.
+                    if (item.data.required && !item.data.constant) {
                         return [{}, {}];
                     }
                     continue;
@@ -505,6 +561,8 @@ export class SignablePDFIframe extends PDFIframe {
                         : item.el.querySelector("input")?.value || false;
                 return value || textValue;
             },
+            // For constant date items, use textContent instead of item.el.value since it will be empty.
+            date: () => (item.el.value?.trim() || item.el.textContent?.trim() || false),
             initial: () => item.el.dataset.signature,
             signature: () => item.el.dataset.signature,
             textarea: () => textArea,

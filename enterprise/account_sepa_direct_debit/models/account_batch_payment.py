@@ -1,15 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import ast
-import base64
 import re
 from datetime import datetime, timedelta
 
 from odoo import models, fields, api, _
 from odoo.exceptions import RedirectWarning, ValidationError, UserError
-from odoo.tools import format_date
-
-from odoo.addons.account_sepa_direct_debit.models.sdd_mandate import SDD_MIN_PRENOT_PERIOD, SDD_FIRST_MIN_PRENOT_PERIOD
+from odoo.tools import BinaryBytes, format_date
+from odoo.addons.account_sepa_direct_debit.models.account_direct_debit_mandate import (
+    SDD_FIRST_MIN_PRENOT_PERIOD,
+    SDD_MIN_PRENOT_PERIOD,
+)
 
 
 class AccountBatchPayment(models.Model):
@@ -40,7 +41,7 @@ class AccountBatchPayment(models.Model):
             domain.extend([
                 '|',
                     ('payment_method_id.code', 'not in', ('sdd', 'sepa_direct_debit')),
-                    ('sdd_mandate_id.sdd_scheme', '=', batch.sdd_scheme),
+                    ('mandate_id.sdd_scheme', '=', batch.sdd_scheme),
             ])
             batch.payment_ids_domain = str(domain)
 
@@ -58,7 +59,7 @@ class AccountBatchPayment(models.Model):
                 continue
 
             minimum_offset = SDD_FIRST_MIN_PRENOT_PERIOD
-            mandates = batch.payment_ids.sdd_mandate_id
+            mandates = batch.payment_ids.mandate_id
             all_used_mandates = batch._get_all_used_mandates()
             if all(all_used_mandates.get(mandate, 0) > 0 for mandate in mandates):
                 # The minimum delay is 5 days in all cases, except when all the mandates involved were already used once
@@ -78,7 +79,7 @@ class AccountBatchPayment(models.Model):
                 batch.sdd_min_required_collection_date = False
                 continue
 
-            mandates = batch.payment_ids.sdd_mandate_id
+            mandates = batch.payment_ids.mandate_id
             all_used_mandates = batch._get_all_used_mandates()
             if all(all_used_mandates.get(mandate, 0) > 0 for mandate in mandates):
                 # The minimum delay is 5 days in all cases, except when all the mandates involved were already used once
@@ -100,7 +101,7 @@ class AccountBatchPayment(models.Model):
 
             all_used_mandates = batch._get_all_used_mandates()
             batch.sdd_first_time_payment_ids = batch.payment_ids.filtered(
-                lambda p: all_used_mandates.get(p.sdd_mandate_id, 0) == 0
+                lambda p: all_used_mandates.get(p.mandate_id, 0) == 0
             )
 
     @api.depends('payment_method_id')
@@ -122,12 +123,13 @@ class AccountBatchPayment(models.Model):
         :rtype: dict[:class:`odoo.addons.account_sepa_direct_debit.models.SDDMandate`, int]
         """
         self.ensure_one()
-        mandates = self.payment_ids.sdd_mandate_id
+        mandates = self.payment_ids.mandate_id
         return dict(self.env['account.payment']._read_group([
-            ('sdd_mandate_id', 'in', mandates.ids),
+            ('mandate_id.mandate_type', '=', 'sepa'),
+            ('mandate_id', 'in', mandates.ids),
             ('is_matched', '=', True),
             ],
-            groupby=['sdd_mandate_id'],
+            groupby=['mandate_id'],
             aggregates=['__count'],
         ))
 
@@ -160,11 +162,11 @@ class AccountBatchPayment(models.Model):
     def _check_payments_constrains(self):
         super(AccountBatchPayment, self)._check_payments_constrains()
         for record in self.filtered(lambda r: r.payment_method_code in r.payment_method_id._get_sdd_payment_method_code()):
-            all_sdd_schemes = set(record.payment_ids.mapped('sdd_mandate_id.sdd_scheme'))
+            all_sdd_schemes = set(record.payment_ids.mapped('mandate_id.sdd_scheme'))
             if len(all_sdd_schemes) > 1:
                 raise ValidationError(_("All the payments in the batch must have the same SDD scheme."))
 
-    def validate_batch(self):
+    def validate_batch(self, initiate_payment=False):
         self.ensure_one()
         if self.payment_method_code in self.payment_method_id._get_sdd_payment_method_code():
             today = fields.Date.context_today(self)
@@ -180,35 +182,7 @@ class AccountBatchPayment(models.Model):
                     button_text=_("Go to settings"),
                 )
 
-            payments_without_mandate = self.payment_ids.filtered(lambda x: not x.sdd_mandate_id)
-            if payments_without_mandate:
-                raise RedirectWarning(
-                    _("Some payments are not linked to any mandate."),
-                    action={
-                        'name': _("Payments without mandate"),
-                        'type': 'ir.actions.act_window',
-                        'res_model': 'account.payment',
-                        'views': [(self.env.ref('account.view_account_payment_tree').id, 'list')],
-                        'domain': [('id', 'in', payments_without_mandate.ids)]
-                    },
-                    button_text=_("Go to payments"),
-                )
-
-            invalid_mandates = self.payment_ids.sdd_mandate_id._update_and_partition_state_by_validity()['invalid']
-            if invalid_mandates:
-                raise RedirectWarning(
-                    _("Some payments are linked to an inactive mandate."),
-                    action={
-                        'name': _("Problematic mandates"),
-                        'type': 'ir.actions.act_window',
-                        'res_model': 'sdd.mandate',
-                        'views': [(self.env.ref('account_sepa_direct_debit.account_sepa_direct_debit_mandate_tree').id, 'list')],
-                        'domain': [('id', 'in', invalid_mandates.ids)],
-                    },
-                    button_text=_("Go to mandates"),
-                )
-
-            # Check that the pre-notification delay is good
+            # Check that the collection delay is good
             collection_date = self.sdd_required_collection_date
             min_collection_date = today + timedelta(days=SDD_MIN_PRENOT_PERIOD)
             if collection_date < min_collection_date:
@@ -220,7 +194,7 @@ class AccountBatchPayment(models.Model):
                     minimum_date=format_date(self.env, min_collection_date),
                 ))
 
-            if self.journal_id.bank_account_id.acc_type != 'iban':
+            if self.journal_id.bank_account_id.account_type != 'iban':
                 raise RedirectWarning(_(
                         "Only IBAN account numbers can receive SEPA Direct Debit payments. "
                         "Please select a journal associated to one or add an IBAN bank account to the current journal"
@@ -235,21 +209,7 @@ class AccountBatchPayment(models.Model):
                     button_text=_("Go to journal"),
                 )
 
-        return super().validate_batch()
-
-    def _check_and_post_draft_payments(self, draft_payments):
-        rslt = []
-        if self.payment_method_code in self.payment_method_id._get_sdd_payment_method_code():
-
-            drafts_without_mandate = draft_payments.filtered(lambda x: not x.get_usable_mandate())
-            if drafts_without_mandate:
-                rslt = [{'title': _("Some draft payments could not be posted because of the lack of any active mandate."),
-                         'records': drafts_without_mandate,
-                         'help': _("To solve that, you should create a mandate for each of the involved customers, valid at the moment of the payment date.")
-                }]
-                draft_payments -= drafts_without_mandate
-
-        return rslt + super()._check_and_post_draft_payments(draft_payments)
+        return super().validate_batch(initiate_payment=initiate_payment)
 
     def _generate_export_file(self):
         if self.payment_method_code in self.payment_method_id._get_sdd_payment_method_code():
@@ -258,7 +218,7 @@ class AccountBatchPayment(models.Model):
             company = self.env.company
             return {
                 'filename': 'PAIN008' + datetime.now().strftime('%Y%m%d%H%M%S') + '.xml',
-                'file': base64.encodebytes(self.payment_ids.generate_xml(company, self.sdd_required_collection_date, self.sdd_batch_booking)),
+                'file': BinaryBytes(self.payment_ids.generate_xml(company, self.sdd_required_collection_date, self.sdd_batch_booking)),
             }
 
         return super()._generate_export_file()
@@ -281,14 +241,21 @@ class AccountBatchPayment(models.Model):
         :return: None
         """
         res = super()._send_after_validation()
-        if self.env['ir.config_parameter'].sudo().get_param('account_sepa_direct_debit.disable_sdd_pre_notification'):
+        if self.env['ir.config_parameter'].sudo().get_bool('account_sepa_direct_debit.disable_sdd_pre_notification'):
             return res
 
         template = self.env.ref('account_sepa_direct_debit.email_template_sdd_pre_notification')
         sdd_codes = set(self.env['account.payment.method']._get_sdd_payment_method_code())
-        for payment in self.payment_ids.filtered(lambda payment: payment.payment_method_code in sdd_codes and payment.sdd_mandate_id):
-            mandate = payment.sdd_mandate_id
-            sanitized_acc_number = mandate.partner_bank_id.sanitized_acc_number
+        payments = self.payment_ids.filtered(lambda payment: payment.payment_method_code in sdd_codes and payment.mandate_id)
+        emails_from = template._generate_template(
+            payments.ids,
+            {'email_from'},
+        )
+
+        authorship_by_email = {}
+        for payment in payments:
+            mandate = payment.mandate_id
+            sanitized_acc_number = mandate.partner_bank_id.sanitized_account_number
             anonymized_bank_account_number = f"{re.sub(r'.', '*', sanitized_acc_number[:-4])}{sanitized_acc_number[-4:]}"
 
             ctx = {
@@ -298,7 +265,22 @@ class AccountBatchPayment(models.Model):
                 'amount': payment.amount,
                 'creditor_iban': anonymized_bank_account_number,
             }
-            payment.with_context(ctx).message_post_with_source(source_ref=template, subtype_xmlid='mail.mt_note')
+            email_from = emails_from[payment.id]['email_from']
+
+            if email_from not in authorship_by_email:
+                authorship_by_email[email_from] = (
+                    self.env['mail.thread']._message_compute_author(
+                        email_from=email_from,
+                    )
+                )
+
+            author_id, email_from = authorship_by_email[email_from]
+            payment.with_context(ctx).message_post_with_source(
+                source_ref=template,
+                subtype_xmlid='mail.mt_note',
+                author_id=author_id,
+                email_from=email_from,
+            )
         return res
 
     def check_payments_for_errors(self):
@@ -308,8 +290,8 @@ class AccountBatchPayment(models.Model):
             return rslt
 
         if len(self.payment_ids):
-            sdd_scheme = self.payment_ids[0].sdd_mandate_id.sdd_scheme
-            dif_scheme_payements = self.payment_ids.filtered(lambda x: x.sdd_mandate_id.sdd_scheme != sdd_scheme)
+            sdd_scheme = self.payment_ids[0].mandate_id.sdd_scheme
+            dif_scheme_payements = self.payment_ids.filtered(lambda x: x.mandate_id.sdd_scheme != sdd_scheme)
             if dif_scheme_payements:
                 rslt.append({
                     'title': _("All the payments in the batch must have the same SDD scheme."),

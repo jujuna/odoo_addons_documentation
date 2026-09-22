@@ -70,24 +70,25 @@ class L10n_MxReportHandler(models.AbstractModel):
             {'name': _('DPIVA (txt)'), 'sequence': 60, 'action': 'export_file', 'action_param': 'action_get_dpiva_txt', 'file_export_type': _('DPIVA')},
         ))
 
-    def _report_custom_engine_diot_report(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_diot_report(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         def build_dict(report, current_groupby, query_res):
             if not current_groupby:
-                return query_res[0] if query_res else {k: None for k in report.mapped('line_ids.expression_ids.label')}
-            return [(group_res["grouping_key"], group_res) for group_res in query_res]
+                res = query_res[0] if query_res else {k: None for k in report.mapped('line_ids.expression_ids.label')}
+                return {**res, 'has_sublines': True}
+            return [(group_res["grouping_key"], {**group_res, 'has_sublines': True}) for group_res in query_res]
 
         report = self.env['account.report'].browse(options['report_id'])
-        query_res = self._execute_query(report, current_groupby, options, offset, limit)
-        return build_dict(report, current_groupby, query_res)
+        query_res = self._execute_query(report, current_groupby, options)
+        return {next(iter(formulas_dict.values())):  build_dict(report, current_groupby, query_res)}
 
-    def _execute_query(self, report, current_groupby, options, offset, limit):
-        report._check_groupby_fields([current_groupby] if current_groupby else [])
-
+    def _execute_query(self, report, current_groupby, options):
         # This report mixes the tax_tags and custom engine.
         # The  results of the custom engine are relevant
         # only when we have a partner. Else, we default to ''.
         if current_groupby != 'partner_id':
             return []
+
+        report._check_groupby_fields([current_groupby])
 
         query = report._get_report_query(options, 'strict_range', domain=[
             ('parent_state', '=', 'posted'),
@@ -95,7 +96,6 @@ class L10n_MxReportHandler(models.AbstractModel):
         country_demonym = self.env['res.country']._field_to_sql('country', 'demonym')
         tags = report.line_ids.expression_ids._get_matching_tags()
 
-        tail_query = report._get_engine_query_tail(offset, limit)
         self.env.cr.execute(SQL(
             """
             WITH raw_results as (
@@ -128,7 +128,6 @@ class L10n_MxReportHandler(models.AbstractModel):
                 %(groupby_sql)s
             ORDER BY
                 %(groupby_sql)s
-            %(tail_query)s
             """,
             country_demonym=country_demonym,
             table_references=query.from_clause,
@@ -142,7 +141,6 @@ class L10n_MxReportHandler(models.AbstractModel):
                 raw_results.country_code,
                 raw_results.partner_nationality
             """),
-            tail_query=tail_query,
         ))
 
         return [diot_country_adapt(vals) for vals in self.env.cr.dictfetchall()]

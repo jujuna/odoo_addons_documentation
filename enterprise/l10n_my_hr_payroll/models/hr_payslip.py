@@ -11,4 +11,5 @@ class HrPayslip(models.Model):
         return super()._get_data_files_to_update() + [(
             'l10n_my_hr_payroll', [
                 'data/hr_rule_parameter_data.xml',
+                'data/hr_salary_rule_data.xml',
             ])]

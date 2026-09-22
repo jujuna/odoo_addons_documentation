@@ -1,4 +1,5 @@
 import { describe, expect, test } from "@odoo/hoot";
+import { waitFor } from "@odoo/hoot-dom";
 import { contains, makeMockServer, mountView, serverState } from "@web/../tests/web_test_helpers";
 import { serializeDateTime } from "@web/core/l10n/dates";
 import { defineSignModels } from "./mock_server/mock_models/sign_model";
@@ -38,6 +39,7 @@ test("list activity widget: sign button in dropdown", async () => {
     });
     expect(".o-mail-ListActivity-summary").toHaveText("Sign a new contract");
     await contains(".o-mail-ActivityButton").click(); // open the popover
+    await waitFor(".o-mail-ActivityListPopoverItem");
     expect(".o-mail-ActivityListPopoverItem-markAsDone").toHaveCount(0);
     expect(".o-mail-ActivityListPopoverItem-requestSign").toHaveCount(1);
 });

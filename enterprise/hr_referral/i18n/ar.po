@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-02 16:47+0000\n"
-"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:38+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "hr_referral/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +25,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_referral
 #. odoo-python
@@ -38,14 +38,21 @@ msgstr ""
 "{total} نقطة. قم بزيارة {link1} هذا الرابط {link2} لاختيار هدية!"
 
 #. module: hr_referral
+#. odoo-python
+#: code:addons/hr_referral/wizard/hr_referral_campaign_wizard.py:0
+msgid " all employees."
+msgstr ""
+
+#. module: hr_referral
+#. odoo-python
+#: code:addons/hr_referral/wizard/hr_referral_campaign_wizard.py:0
+msgid " the following employees:"
+msgstr ""
+
+#. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_recruitment_report__referral_hired
 msgid "# Hired by Referral"
 msgstr "# تم التوظيف عن طريق الإحالة"
-
-#. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_send_sms_view_form
-msgid "+1 123 456 789"
-msgstr "+1 123 456 789"
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.referral_campaign_email_body_template
@@ -70,8 +77,8 @@ msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.referral_email_body_template
-msgid "/ Job Offers"
-msgstr "/ عروض العمل"
+msgid "/ Job Opportunities"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_applicant_employee_referral_kanban
@@ -92,58 +99,90 @@ msgstr ""
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
 msgid ""
-"<i class=\"fa fa-2x fa-envelope-o\" role=\"img\" aria-label=\"Send by Mail\"/"
-">\n"
-"                                        <br/>\n"
-"                                        <span title=\"Send by Mail\">Send "
-"Email</span>"
+"<i class=\"oi oi-lg oi-filled\" data-icon=\"send\" role=\"img\" aria-"
+"label=\"Send\"/>\n"
+"                                            <span>Send</span>"
 msgstr ""
-"<i class=\"fa fa-2x fa-envelope-o\" role=\"img\" aria-label=\"Send by Mail\"/"
-">\n"
-"                                        <br/>\n"
-"                                        <span title=\"إرسال عبر البريد "
-"الإلكتروني\">إرسال بريد إلكتروني</span>"
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
 msgid ""
-"<i class=\"fa fa-2x fa-globe\" role=\"img\" aria-label=\"Job Page\"/>\n"
-"                                        <br/>\n"
+"<i class=\"oi oi-lg oi-fw me-2 text-center\" data-icon=\"smartphone\" "
+"role=\"img\" aria-label=\"Send by SMS\"/>\n"
+"                                                    Send by SMS"
+msgstr ""
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
+msgid ""
+"<i class=\"oi oi-lg oi-fw oi-filled me-2 text-center\" data-icon=\"mail\" "
+"role=\"img\" aria-label=\"Send by Email\"/>\n"
+"                                                    Send by Email"
+msgstr ""
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
+msgid ""
+"<i class=\"oi oi-lg\" data-icon=\"family_history\" role=\"img\" aria-"
+"label=\"Share\"/>\n"
+"                                            <span>Share</span>"
+msgstr ""
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
+msgid ""
+"<i class=\"oi oi-lg\" data-icon=\"public\" role=\"img\" aria-label=\"Job "
+"Page\"/>\n"
 "                                        <span title=\"More info\">Job Page</"
 "span>"
 msgstr ""
-"<i class=\"fa fa-2x fa-globe\" role=\"img\" aria-label=\"Job Page\"/>\n"
-"                                        <br/>\n"
-"                                        <span title=\"المزيد من "
-"المعلومات\">صفحة الوظائف</span>"
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_applicant_employee_referral_kanban
+msgid "<i class=\"oi text-danger\" data-icon=\"close\" title=\"Closed\"/>"
+msgstr "<i class=\"oi text-danger\" data-icon=\"close\" title=\"مغلق \"/>"
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_applicant_employee_referral_kanban
+msgid "<i class=\"oi text-success\" data-icon=\"check\" title=\"Done\"/>"
+msgstr "<i class=\"oi text-success\" data-icon=\"check\" title=\"منتهي \"/>"
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_applicant_employee_referral_kanban
+msgid "<i class=\"oi\" data-icon=\"square\" title=\"Open\"/>"
+msgstr "<i class=\"oi\" data-icon=\"square\" title=\"مفتوح \"/>"
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
 msgid ""
-"<i class=\"fa fa-2x fa-mobile\" role=\"img\" aria-label=\"Send by SMS\"/>\n"
-"                                        <br/>\n"
-"                                        <span title=\"Send by SMS\">Send "
-"SMS</span>"
+"<span class=\"d-flex align-items-center\">\n"
+"                                                        <i class=\"oi oi-lg "
+"oi-fw me-2 text-center\" data-icon=\"oi_facebook\" role=\"img\" aria-"
+"label=\"Share on Facebook\"/>\n"
+"                                                        Share on Facebook </"
+"span>"
 msgstr ""
-"<i class=\"fa fa-2x fa-mobile\" role=\"img\" aria-label=\"Send by SMS\"/>\n"
-"                                        <br/>\n"
-"                                        <span title=\"الإرسال عبر الرسائل "
-"النصية القصيرة \">إرسال رسالة نصية قصيرة</span>"
 
 #. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_applicant_employee_referral_kanban
-msgid "<i class=\"fa fa-square-o\" title=\"Open\"/>"
-msgstr "<i class=\"fa fa-square-o\" title=\"مفتوح \"/>"
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
+msgid ""
+"<span class=\"d-flex align-items-center\">\n"
+"                                                        <i class=\"oi oi-lg "
+"oi-fw me-2 text-center\" data-icon=\"oi_linkedin\" role=\"img\" aria-"
+"label=\"Share on LinkedIn\"/>\n"
+"                                                        Share on LinkedIn </"
+"span>"
+msgstr ""
 
 #. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_applicant_employee_referral_kanban
-msgid "<i class=\"text-danger fa fa-times\" title=\"Closed\"/>"
-msgstr "<i class=\"text-danger fa fa-times\" title=\"مغلق \"/>"
-
-#. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_applicant_employee_referral_kanban
-msgid "<i class=\"text-success fa fa-check\" title=\"Done\"/>"
-msgstr "<i class=\"text-success fa fa-check\" title=\"منتهي \"/>"
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
+msgid ""
+"<span class=\"d-flex align-items-center\">\n"
+"                                                        <i class=\"oi oi-lg "
+"oi-fw me-2 text-center\" data-icon=\"oi_x\" role=\"img\" aria-label=\"Share "
+"on X\"/>\n"
+"                                                        Share on X</span>"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_referral_level_form
@@ -165,38 +204,11 @@ msgstr ""
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_referral_reward_kanban
 msgid ""
-"<span title=\"Buy\"><i class=\"fa fa-shopping-basket me-3\" role=\"img\" "
-"aria-label=\"Buy\"/>Buy</span>"
+"<span title=\"Buy\"><i class=\"oi me-3\" data-icon=\"shopping_basket\" "
+"role=\"img\" aria-label=\"Buy\"/>Buy</span>"
 msgstr ""
-"<span title=\"شراء \"><i class=\"fa fa-shopping-basket me-3\" role=\"img\" "
-"aria-label=\"Buy\"/>شراء</span>"
-
-#. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
-msgid ""
-"<span title=\"Share on Facebook\">\n"
-"                                            <i class=\"fa fa-2x fa-"
-"facebook\" role=\"img\" aria-label=\"Share on facebook\"/>\n"
-"                                        </span>"
-msgstr ""
-
-#. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
-msgid ""
-"<span title=\"Share on Linkedin\">\n"
-"                                            <i class=\"fa fa-2x fa-"
-"linkedin\" role=\"img\" aria-label=\"Share on linkedin\"/>\n"
-"                                        </span>"
-msgstr ""
-
-#. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
-msgid ""
-"<span title=\"Share on Twitter\">\n"
-"                                            <i class=\"fa fa-2x fa-twitter\" "
-"role=\"img\" aria-label=\"Share on twitter\"/>\n"
-"                                        </span>"
-msgstr ""
+"<span title=\"شراء \"><i class=\"oi me-3\" data-icon=\"shopping_basket\" "
+"role=\"img\" aria-label=\"Buy\"/>شراء</span>"
 
 #. module: hr_referral
 #. odoo-python
@@ -205,8 +217,19 @@ msgid ""
 "A new alert has been added to the Referrals app! Check your <a href=%"
 "(url)s>dashboard</a> now!"
 msgstr ""
-"لقد تمت إضافة تنبيه جديد في تطبيق الإحالات! تفقد <a href=%(url)s>لوحة "
-"بياناتك</a> الآن!"
+"لقد تمت إضافة تنبيه جديد في تطبيق الإحالات! تفقد <a href=%(url)s>لوحة بياناتك</"
+"a> الآن!"
+
+#. module: hr_referral
+#. odoo-python
+#: code:addons/hr_referral/wizard/hr_referral_campaign_wizard.py:0
+msgid "A promotion email for the referral campaign (%s) has been sent to"
+msgstr ""
+
+#. module: hr_referral
+#: model:ir.model,name:hr_referral.model_res_groups
+msgid "Access Groups"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__message_needaction
@@ -228,6 +251,11 @@ msgstr "الأنشطة"
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "زخرفة استثناء النشاط"
+
+#. module: hr_referral
+#: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__activity_state
@@ -269,14 +297,9 @@ msgstr ""
 "ستظهر التنبيهات على الشاشة الرئيسية لإعطاء المعلومات أو إعادة توجيه الموظفين."
 
 #. module: hr_referral
-#: model:ir.model.fields.selection,name:hr_referral.selection__hr_referral_campaign_wizard__target__all
-msgid "All"
-msgstr "الكل"
-
-#. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_campaign_wizard_view_form
-msgid "All Employees"
-msgstr "كافة الموظفين"
+msgid "All Employee Users"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,help:hr_referral.field_hr_recruitment_stage__points
@@ -321,6 +344,16 @@ msgstr "مؤرشف"
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__message_attachment_count
 msgid "Attachment Count"
 msgstr "عدد المرفقات"
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_referral_friend_form
+msgid "Avatar Image"
+msgstr ""
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.hr_recruitment_stage_form_inherit_referral
+msgid "Award"
+msgstr ""
 
 #. module: hr_referral
 #. odoo-python
@@ -368,15 +401,6 @@ msgid "Campaign"
 msgstr "الحملة"
 
 #. module: hr_referral
-#: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_alert_mail_wizard_view_form
-#: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_campaign_wizard_view_form
-#: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_send_mail_view_form
-#: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_send_sms_view_form
-#: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_view_form_reward_purchase_dialog
-msgid "Cancel"
-msgstr "إلغاء"
-
-#. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_link_to_share__channel
 msgid "Channel"
 msgstr "القناة"
@@ -394,12 +418,6 @@ msgid "Click to level up!"
 msgstr "اضغط للانتقال إلى المستوى التالي!"
 
 #. module: hr_referral
-#. odoo-javascript
-#: code:addons/hr_referral/static/src/widgets/copy_referral_link_button.xml:0
-msgid "Click(s)"
-msgstr "الضغطات"
-
-#. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_link_to_share_view_form
 msgid "Close"
 msgstr "إغلاق"
@@ -411,10 +429,6 @@ msgstr "اجمع النقاط واستبدلها بجوائز رائعة في ا
 
 #. module: hr_referral
 #: model:ir.model,name:hr_referral.model_res_company
-msgid "Companies"
-msgstr "الشركات"
-
-#. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_alert__company_id
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_onboarding__company_id
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_points__company_id
@@ -453,10 +467,10 @@ msgid "Confirmation"
 msgstr "التأكيد"
 
 #. module: hr_referral
-#: model:ir.model.fields,field_description:hr_referral.field_hr_referral_campaign_wizard__target
-#: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_campaign_wizard_view_form
-msgid "Contacted Employees"
-msgstr "الموظفون الذي تم التواصل معهم"
+#. odoo-javascript
+#: code:addons/hr_referral/static/src/widgets/copy_referral_link_button.xml:0
+msgid "Copy Link"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__cost
@@ -522,8 +536,10 @@ msgstr "أنشئ في"
 #. module: hr_referral
 #. odoo-javascript
 #: code:addons/hr_referral/static/src/views/dashboard.js:0
+#: code:addons/hr_referral/static/src/widgets/avatar_clickable_image.js:0
 #: model:ir.actions.client,name:hr_referral.action_hr_referral_welcome_screen
 #: model:ir.ui.menu,name:hr_referral.menu_hr_applicant_employee_referral_dashboard
+#: model:ir.ui.menu,name:hr_referral.menu_hr_referral_dashboard_configuration
 msgid "Dashboard"
 msgstr "لوحة البيانات"
 
@@ -610,11 +626,13 @@ msgstr "المستخدم المفصول"
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward_report__display_name
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_send_mail__display_name
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_send_sms__display_name
+#: model:ir.model.fields,field_description:hr_referral.field_link_tracker__display_name
 #: model:ir.model.fields,field_description:hr_referral.field_res_company__display_name
 #: model:ir.model.fields,field_description:hr_referral.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:hr_referral.field_res_groups__display_name
 #: model:ir.model.fields,field_description:hr_referral.field_res_users__display_name
 #: model:ir.model.fields,field_description:hr_referral.field_utm_campaign__display_name
-#: model:ir.model.fields,field_description:hr_referral.field_utm_source__display_name
+#: model:ir.model.fields,field_description:hr_referral.field_utm_mixin__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
 
@@ -656,6 +674,11 @@ msgstr "إرسال بريد إلكتروني إلى صديق"
 #: model_terms:ir.ui.view,arch_db:hr_referral.employee_referral_reward_report_view_search
 msgid "Employee"
 msgstr "الموظف"
+
+#. module: hr_referral
+#: model:ir.module.module,shortdesc:base.module_hr_referral
+msgid "Employee Referral"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_report__employee_referral_hired
@@ -742,11 +765,6 @@ msgstr "المتابعين"
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "المتابعين (الشركاء)"
-
-#. module: hr_referral
-#: model:ir.model.fields,help:hr_referral.field_hr_referral_reward__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "أيقونة من Font awesome مثال: fa-tasks"
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_applicant__friend_id
@@ -836,31 +854,24 @@ msgstr "مرحباً"
 #. odoo-python
 #: code:addons/hr_referral/wizard/hr_referral_send_sms.py:0
 msgid ""
-"Hello! There is an amazing job offer for %(job_name)s in my company! It will "
-"be a fit for you %(referral_url)s"
+"Hello! There is an amazing job opportunity for %(job_name)s in my company! "
+"It will be a fit for you %(referral_url)s"
 msgstr ""
-"مرحباً، يوجد عرض عمل رائع لـ %(job_name)s في شركتي! سوف يكون مناسباً لك %"
-"(referral_url)s"
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.referral_email_body_template
 msgid ""
 "Hello,<br/><br/>\n"
-"                There are some amazing job offers in my company! Have a "
-"look, they can be interesting for you:"
+"                There are some amazing job opportunities in my company! Have "
+"a look, they can be interesting for you:"
 msgstr ""
-"مرحباً،<br/><br/>\n"
-"                توجد عروض عمل مذهلة في شركتي! قم بإلقاء نظرة، وقد تثير "
-"إحداها اهتمامك:"
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.referral_email_body_template
 msgid ""
 "Hello,<br/><br/>\n"
-"                There is an amazing job offer for a"
+"                There is an amazing job opportunity for a"
 msgstr ""
-"مرحباً،<br/><br/>\n"
-"                توجد وظيفة لا تفوت لمنصب"
 
 #. module: hr_referral
 #: model:ir.model.fields.selection,name:hr_referral.selection__hr_applicant__referral_state__hired
@@ -899,11 +910,13 @@ msgstr "صفحة تهيئة إحالة الموارد البشرية"
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward_report__id
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_send_mail__id
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_send_sms__id
+#: model:ir.model.fields,field_description:hr_referral.field_link_tracker__id
 #: model:ir.model.fields,field_description:hr_referral.field_res_company__id
 #: model:ir.model.fields,field_description:hr_referral.field_res_config_settings__id
+#: model:ir.model.fields,field_description:hr_referral.field_res_groups__id
 #: model:ir.model.fields,field_description:hr_referral.field_res_users__id
 #: model:ir.model.fields,field_description:hr_referral.field_utm_campaign__id
-#: model:ir.model.fields,field_description:hr_referral.field_utm_source__id
+#: model:ir.model.fields,field_description:hr_referral.field_utm_mixin__id
 msgid "ID"
 msgstr "المُعرف"
 
@@ -929,6 +942,7 @@ msgid "If checked, some messages have a delivery error."
 msgstr "إذا كان محددًا، فقد حدث خطأ في تسليم بعض الرسائل."
 
 #. module: hr_referral
+#: model:ir.model.fields,field_description:hr_referral.field_hr_applicant__image_head
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_friend__image_head
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_level__image
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_onboarding__image
@@ -969,8 +983,14 @@ msgstr "الوظيفة"
 #. module: hr_referral
 #. odoo-python
 #: code:addons/hr_referral/wizard/hr_referral_campaign_wizard.py:0
-msgid "Job Offer for a %(job_title)s at %(company_name)s"
-msgstr "عرض عمل كـ %(job_title)s في %(company_name)s"
+msgid "Job Opportunity for a %(job_title)s"
+msgstr ""
+
+#. module: hr_referral
+#. odoo-python
+#: code:addons/hr_referral/wizard/hr_referral_campaign_wizard.py:0
+msgid "Job Opportunity for a %(job_title)s at %(company_name)s"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model,name:hr_referral.model_hr_job
@@ -1037,6 +1057,12 @@ msgid "Last Valuable Stage"
 msgstr "آخر مرحلة قيّمة"
 
 #. module: hr_referral
+#: model:ir.module.module,description:base.module_hr_referral
+#: model:ir.module.module,summary:base.module_hr_referral
+msgid "Let your employees share job positions and refer their friends"
+msgstr ""
+
+#. module: hr_referral
 #: model_terms:ir.actions.act_window,help:hr_referral.action_hr_referral_reward_configuration
 msgid "Let's create Super Rewards to thank your employees."
 msgstr "فلنقم بإنشاء مكافآت رائعة لشكر الموظفين."
@@ -1080,15 +1106,16 @@ msgid "Link"
 msgstr "الرابط"
 
 #. module: hr_referral
+#: model:ir.actions.server,name:hr_referral.action_hr_referral_link_tracker
+#: model:ir.model,name:hr_referral.model_link_tracker
+#: model:ir.ui.menu,name:hr_referral.menu_hr_referral_link_tracker
+msgid "Link Tracker"
+msgstr ""
+
+#. module: hr_referral
 #: model:ir.actions.act_window,name:hr_referral.hr_referral_link_to_share_action
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_link_to_share_view_form
 msgid "Link to Share"
-msgstr "رابط المشاركة"
-
-#. module: hr_referral
-#. odoo-javascript
-#: code:addons/hr_referral/static/src/widgets/copy_referral_link_button.xml:0
-msgid "Link to share"
 msgstr "رابط المشاركة"
 
 #. module: hr_referral
@@ -1100,6 +1127,11 @@ msgstr "Linkedin"
 #: model:ir.model.fields,field_description:hr_referral.field_hr_job__linkedin_clicks
 msgid "Linkedin Clicks"
 msgstr "ضغطات LinkedIn"
+
+#. module: hr_referral
+#: model:ir.model.fields,help:hr_referral.field_hr_referral_reward__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_applicant__max_points
@@ -1149,7 +1181,7 @@ msgstr "تم منح هدية جديدة إلى %s"
 #. odoo-javascript
 #: code:addons/hr_referral/static/src/views/dashboard.xml:0
 msgid "Next"
-msgstr "التالي"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__activity_calendar_event_id
@@ -1170,6 +1202,11 @@ msgstr "ملخص النشاط التالي"
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__activity_type_id
 msgid "Next Activity Type"
 msgstr "نوع النشاط التالي"
+
+#. module: hr_referral
+#: model:res.groups.privilege,placeholder:hr_referral.res_groups_privilege_recruitment
+msgid "No"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.actions.act_window,help:hr_referral.employee_referral_report_action
@@ -1200,6 +1237,11 @@ msgstr "لا يمكن الضغط عليه"
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_referral_filter
 msgid "Not Hired"
 msgstr "لم يتم توظيفه"
+
+#. module: hr_referral
+#: model:ir.model.fields,field_description:hr_referral.field_hr_referral_friend__number_of_friends
+msgid "Number Of Friends"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__message_needaction_counter
@@ -1349,6 +1391,12 @@ msgid "Promote"
 msgstr "ترويج"
 
 #. module: hr_referral
+#. odoo-python
+#: code:addons/hr_referral/models/hr_job.py:0
+msgid "Promotion Campaign for %(job)s"
+msgstr ""
+
+#. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__rating_ids
 msgid "Ratings"
 msgstr "التقييمات"
@@ -1365,14 +1413,24 @@ msgid "Recipient"
 msgstr "المستلم"
 
 #. module: hr_referral
+#: model:ir.ui.menu,name:hr_referral.menu_hr_referral_recruitment_configuration
+msgid "Recruitment"
+msgstr ""
+
+#. module: hr_referral
 #: model:ir.model,name:hr_referral.model_hr_recruitment_report
 msgid "Recruitment Analysis Report"
 msgstr "تقرير تحليل التوظيف"
 
 #. module: hr_referral
 #: model:ir.model,name:hr_referral.model_hr_recruitment_stage
-msgid "Recruitment Stages"
-msgstr "مراحل التوظيف"
+msgid "Recruitment Stage"
+msgstr ""
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.link_tracker_view_list
+msgid "Reference"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_report_view_form
@@ -1413,15 +1471,15 @@ msgid "Referral Campaign Wizard"
 msgstr "معالج حملة الإحالة"
 
 #. module: hr_referral
-#. odoo-python
-#: code:addons/hr_referral/models/hr_job.py:0
-msgid "Referral Campaign for %(job)s"
-msgstr "حملة الإحالة لـ %(job)s"
-
-#. module: hr_referral
 #: model:ir.model,name:hr_referral.model_hr_referral_link_to_share
 msgid "Referral Link To Share"
 msgstr "رابط الإحالة لمشاركته"
+
+#. module: hr_referral
+#. odoo-python
+#: code:addons/hr_referral/models/link_tracker.py:0
+msgid "Referral Link Tracker"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_res_users__referral_point_ids
@@ -1487,6 +1545,7 @@ msgstr "الإحالة: %s"
 #. module: hr_referral
 #. odoo-javascript
 #: code:addons/hr_referral/static/src/views/dashboard.xml:0
+#: model:ir.ui.menu,name:hr_referral.menu_hr_referral_referrals_configuration
 #: model:ir.ui.menu,name:hr_referral.menu_hr_referral_root
 #: model:res.groups.privilege,name:hr_referral.res_groups_privilege_recruitment
 #: model_terms:ir.ui.view,arch_db:hr_referral.res_config_settings_view__form
@@ -1593,18 +1652,13 @@ msgstr "البحث في الإحالات"
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.referral_email_body_template
-msgid "See Job Offer"
-msgstr "ألقِ نظرة على الوظيفة"
+msgid "See Job opportunity"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_applicant_view_form_inherit_referral
 msgid "Select the user that send us the applicant"
 msgstr "قم بتحديد المستخدم الذي قام بإرسال المتقدّم للوظيفة"
-
-#. module: hr_referral
-#: model:ir.model.fields.selection,name:hr_referral.selection__hr_referral_campaign_wizard__target__selection
-msgid "Selection"
-msgstr "قائمة خيارات"
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_alert_mail_wizard_view_form
@@ -1614,13 +1668,13 @@ msgstr "إرسال"
 
 #. module: hr_referral
 #: model:ir.actions.act_window,name:hr_referral.hr_referral_send_mail_action
-msgid "Send Job Offer by Mail"
-msgstr "إرسال عرض العمل عن طريق البريد الإلكتروني"
+msgid "Send Job Opportunity by Mail"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.actions.act_window,name:hr_referral.hr_referral_send_sms_action
-msgid "Send Job Offer by SMS"
-msgstr "إرسال عرض العمل عبر رسالة نصية قصيرة"
+msgid "Send Job Opportunity by SMS"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_send_mail_view_form
@@ -1668,27 +1722,20 @@ msgid "Share"
 msgstr "مشاركة"
 
 #. module: hr_referral
-#. odoo-javascript
-#: code:addons/hr_referral/static/src/widgets/copy_referral_link_button.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
-msgid "Share Now"
-msgstr "المشاركة الآن"
-
-#. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_applicant__shared_item_infos
 msgid "Shared Item Infos"
 msgstr "معلومات العنصر المُشارَك"
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_recruitment_stage__use_in_referral
-msgid "Show in Referrals"
-msgstr "الإظهار في الإحالات"
+msgid "Show to Referrer"
+msgstr ""
 
 #. module: hr_referral
 #. odoo-javascript
 #: code:addons/hr_referral/static/src/views/dashboard.xml:0
 msgid "Skip"
-msgstr "تخطي"
+msgstr ""
 
 #. module: hr_referral
 #. odoo-javascript
@@ -1701,12 +1748,6 @@ msgstr "التخطي والبدء"
 #: code:addons/hr_referral/wizard/applicant_refuse_reason.py:0
 msgid "Sorry, your referral %s has been refused in the recruitment process."
 msgstr "عذراً، لقد تم رفض الشخص الذي قمت بإحالته %s خلال عملية التوظيف."
-
-#. module: hr_referral
-#: model:ir.model.fields,field_description:hr_referral.field_hr_applicant__source_id
-#: model:ir.model.fields,field_description:hr_referral.field_res_users__utm_source_id
-msgid "Source"
-msgstr "المصدر"
 
 #. module: hr_referral
 #: model:ir.model.fields.selection,name:hr_referral.selection__hr_referral_alert__onclick__url
@@ -1728,7 +1769,7 @@ msgstr "بدء"
 #. odoo-javascript
 #: code:addons/hr_referral/static/src/views/dashboard.xml:0
 msgid "Start Now"
-msgstr "ابدأ الآن"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,help:hr_referral.field_hr_referral_reward__activity_state
@@ -1776,6 +1817,7 @@ msgstr ""
 "يجب أن تكون أبعادها 1024x1024px."
 
 #. module: hr_referral
+#: model:ir.model.fields,help:hr_referral.field_hr_applicant__image_head
 #: model:ir.model.fields,help:hr_referral.field_hr_referral_friend__image_head
 msgid ""
 "This field holds the image used as image for the head's friend when the user "
@@ -1794,15 +1836,6 @@ msgstr ""
 "أبعادها 1024x1024px."
 
 #. module: hr_referral
-#: model:ir.model.fields,help:hr_referral.field_hr_applicant__source_id
-msgid ""
-"This is the source of the link, e.g. Search Engine, another domain, or name "
-"of email list"
-msgstr ""
-"هذا هو مصدر الرابط، مثلًا: محرك بحث، أو نطاق آخر، أو اسم في قائمة البريد "
-"الإلكتروني"
-
-#. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.hr_referral_link_to_share_view_form
 msgid ""
 "This link contains a tracker so that people clicking on it will account to a "
@@ -1817,8 +1850,8 @@ msgid ""
 "This option is used in app 'Referrals'. If checked, the stage is displayed "
 "in 'Referrals Dashboard' and points are given to the employee."
 msgstr ""
-"يُستخدم هذا الخيار في تطبيق 'الإحالات'. إذا كان محدداً، يتم عرض المرحلة في "
-"'لوحة بيانات الإحالات' وتُمنح النقاط للموظف."
+"يُستخدم هذا الخيار في تطبيق 'الإحالات'. إذا كان محدداً، يتم عرض المرحلة في 'لوحة "
+"بيانات الإحالات' وتُمنح النقاط للموظف."
 
 #. module: hr_referral
 #: model_terms:ir.actions.act_window,help:hr_referral.employee_referral_report_action
@@ -1873,9 +1906,9 @@ msgid "UTM Campaign"
 msgstr "حملة UTM"
 
 #. module: hr_referral
-#: model:ir.model,name:hr_referral.model_utm_source
-msgid "UTM Source"
-msgstr "مصدر UTM"
+#: model:ir.model,name:hr_referral.model_utm_mixin
+msgid "UTM Mixin"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward_report__cost
@@ -1928,19 +1961,14 @@ msgid "Visit Webpage"
 msgstr "زيارة صفحة الويب"
 
 #. module: hr_referral
-#: model:ir.model.fields,field_description:hr_referral.field_hr_referral_reward__website_message_ids
-msgid "Website Messages"
-msgstr "رسائل الموقع الإلكتروني"
-
-#. module: hr_referral
-#: model:ir.model.fields,help:hr_referral.field_hr_referral_reward__website_message_ids
-msgid "Website communication history"
-msgstr "سجل تواصل الموقع الإلكتروني"
-
-#. module: hr_referral
 #: model:ir.model,name:hr_referral.model_hr_referral_onboarding
 msgid "Welcome Onboarding in Referral App"
 msgstr "الجلسة الترحيبية في تطبيق الإحالات"
+
+#. module: hr_referral
+#: model:ir.model.fields.selection,name:hr_referral.selection__hr_referral_link_to_share__channel__twitter
+msgid "X"
+msgstr ""
 
 #. module: hr_referral
 #: model:ir.model.fields,field_description:hr_referral.field_hr_job__twitter_clicks
@@ -1961,8 +1989,13 @@ msgid ""
 "of the interviewers of this application. If you think that's an error, "
 "please contact your administrator."
 msgstr ""
-"لا يُسمح لك بالوصول إلى سجل هذا التطبيق لأنك أحد القائمين على مقابلة العمل "
-"لطلب التقديم هذا. إذا كنت تظن أنه هناك خطأ ما، يُرجى التواصل مع مديرك."
+"لا يُسمح لك بالوصول إلى سجل هذا التطبيق لأنك أحد القائمين على مقابلة العمل لطلب "
+"التقديم هذا. إذا كنت تظن أنه هناك خطأ ما، يُرجى التواصل مع مديرك."
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_referral_friend_form
+msgid "You can only display 8 friends on your dashboard."
+msgstr ""
 
 #. module: hr_referral
 #. odoo-python
@@ -1972,21 +2005,9 @@ msgid ""
 "jobs in Referral:\n"
 "%(job_names)s"
 msgstr ""
-"لا يمكنك حذف حملات UTM تلك، حيث إنها مرتبطة بالوظائف التالية في تطبيق "
-"الإحالات: \n"
+"لا يمكنك حذف حملات UTM تلك، حيث إنها مرتبطة بالوظائف التالية في تطبيق الإحالات: "
+"\n"
 "%(job_names)s"
-
-#. module: hr_referral
-#. odoo-python
-#: code:addons/hr_referral/models/utm_source.py:0
-msgid ""
-"You cannot delete these UTM Sources as they are linked to the following "
-"users in Referral:\n"
-"%(employee_names)s"
-msgstr ""
-"لا يمكنك حذف مصادر UTM تلك، حيث إنها مرتبطة بالمستخدمين التالين في تطبيق "
-"الإحالات: \n"
-"%(employee_names)s"
 
 #. module: hr_referral
 #. odoo-python
@@ -2027,15 +2048,22 @@ msgid "Your referrer is hired! %(message)s"
 msgstr "لقد تم تعيين الشخص الذي قمت بإحالته! %(message)s"
 
 #. module: hr_referral
+#. odoo-javascript
+#: code:addons/hr_referral/static/src/widgets/copy_referral_link_button.xml:0
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_job_employee_referral_kanban
 msgid "click(s)"
 msgstr "الضغطات"
 
 #. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_referral_friend_form
+msgid "e.g. Hero, Adventurer, Spacewoman, Dog, Batman"
+msgstr ""
+
+#. module: hr_referral
 #. odoo-javascript
 #: code:addons/hr_referral/static/src/views/dashboard.xml:0
 msgid "has been hired!"
-msgstr "تم توظيفه"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.view_hr_referral_alert_form
@@ -2055,6 +2083,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_referral.referral_campaign_sms_template
 msgid "is hiring for a position"
 msgstr "يبحث عن مرشح لوظيفة"
+
+#. module: hr_referral
+#: model_terms:ir.ui.view,arch_db:hr_referral.hr_recruitment_stage_form_inherit_referral
+msgid "points"
+msgstr ""
 
 #. module: hr_referral
 #: model_terms:ir.ui.view,arch_db:hr_referral.referral_campaign_email_body_template
@@ -2089,94 +2122,3 @@ msgid ""
 "(new_line_code)s%(hashtag_code)sHiring %(hashtag_code)sJobOpening %"
 "(hashtag_code)sCareerOpportunity"
 msgstr ""
-"🚀 توجد فرصة مميزة لشغل وظيفة مطور برمجيات ( %(job_name)s ) في شركتي. إذا "
-"كنت تبحث عن تحدٍ جديد، فاطلع على هذه الوظيفة!👇%(new_line_code)s🔗%(short_url)"
-"s%(new_line_code)s%(hashtag_code)s يبحث عن %(hashtag_code)sJobOpening %"
-"(hashtag_code)sCareerOpportunity"
-
-#~ msgid ""
-#~ " You've gained %(gained)s points with this progress.<br/>It makes you a "
-#~ "new total of %(total)s points. Visit <a href=\"%(url)s\">this link</a> to "
-#~ "pick a gift!"
-#~ msgstr ""
-#~ " لقد اكتسبت %(gained)s نقطة مع هذا التقدم.<br/>مما يجعل المجموع الجديد %"
-#~ "(total)s نقطة. قم بزيارة <a href=\"%(url)s\">هذا الرابط</a> لاختيار هدية! "
-
-#~ msgid "<i class=\"fa fa-check me-2\" title=\"Hired\"/>"
-#~ msgstr "<i class=\"fa fa-check me-2\" title=\"تم التعيين \"/>"
-
-#~ msgid "<span title=\"More info\">More info</span>"
-#~ msgstr "<span title=\"المزيد من المعلومات \">المزيد من المعلومات</span>"
-
-#~ msgid ""
-#~ "<span title=\"My Link to Share\"><i class=\"fa fa-lg fa-link text-"
-#~ "secondary\" role=\"img\" aria-label=\"My Link to Share\"/></span>"
-#~ msgstr ""
-#~ "<span title=\"رابطي للمشاركة \"><i class=\"fa fa-lg fa-link text-"
-#~ "secondary\" role=\"img\" aria-label=\"My Link to Share\"/></span>"
-
-#~ msgid "<span title=\"Send by Mail\">Refer Friend</span>"
-#~ msgstr "<span title=\"إرسال عبر البريد الإلكتروني \">إحالة صديق</span> "
-
-#~ msgid "Avatar"
-#~ msgstr "الصورة الرمزية"
-
-#~ msgid "Group By"
-#~ msgstr "تجميع حسب"
-
-#~ msgid ""
-#~ "Hello,<br><br>There are some amazing job offers in my company! Have a "
-#~ "look, they  can be interesting for you<br><a href=\"%s\">See Job Offers</"
-#~ "a>"
-#~ msgstr ""
-#~ "مرحباً، <br><br>توجد عروض عمل مذهلة في شركتي! قم بإلقاء نظرة، وقد تثير "
-#~ "إحداها اهتمامك<br><a href=\"%s\">رؤية عروض العمل</a> "
-
-#~ msgid ""
-#~ "Hello,<br><br>There is an amazing job offer for %s in my company! It will "
-#~ "be a fit for you<br><a href=\"%s\">See Job Offer</a>"
-#~ msgstr ""
-#~ "مرحباً،<br><br>يوجد عرض عمل رائع لـ %s في شركتي! سوف يكون مناسباً لك<br><a "
-#~ "href=\"%s\">رؤية عرض العمل</a> "
-
-#~ msgid "Hr Referral Reward"
-#~ msgstr "مكافأة إحالة الموارد البشرية "
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء "
-
-#~ msgid "Open"
-#~ msgstr "فتح"
-
-#~ msgid "Positions"
-#~ msgstr "المناصب "
-
-#~ msgid "Referral"
-#~ msgstr "الإحالة "
-
-#~ msgid "Referral: %s (%s)"
-#~ msgstr "الإحالة: %s (%s) "
-
-#~ msgid "Share on {{ source.name }}"
-#~ msgstr "المشاركة على {{ source.name }} "
-
-#~ msgid "Share on {{source.name}}"
-#~ msgstr "المشاركة على {{source.name}} "
-
-#~ msgid "This report performs analysis on your employee referral."
-#~ msgstr "يُجري هذا التقرير تحليلاً في إحالة الموظف. "
-
-#~ msgid "Twitter"
-#~ msgstr "تويتر"
-
-#~ msgid "Twitter Clicks"
-#~ msgstr "ضغطات Twitter "
-
-#~ msgid "Your referrer got a step further!"
-#~ msgstr "تقدم الشخص الذي قمت بإحالته خطوة إلى الأمام! "
-
-#~ msgid "Your referrer is hired!"
-#~ msgstr "لقد تم تعيين الشخص الذي قمت بإحالته! "
-
-#~ msgid "url"
-#~ msgstr "رابط URL "

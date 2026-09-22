@@ -13,7 +13,7 @@ class AccountJournal(models.Model):
             ('payment_method_id.code', '=', 'aba_ct'),
             ('is_sent', '=', False),
             ('is_matched', '=', False),
-            ('state', '=', 'in_process'),
+            ('state', '=', 'paid'),
         ])
         return dashboard_data
 

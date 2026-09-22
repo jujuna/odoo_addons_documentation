@@ -6,3 +6,4 @@ from . import spreadsheet_contributor
 from . import spreadsheet_template
 from . import spreadsheet_cell_thread
 from . import ir_http
+from . import ir_ui_menu

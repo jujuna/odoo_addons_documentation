@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-10-08 18:45+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 01:54+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"appointment_google_reserve/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: appointment_google_reserve
 #. odoo-python
@@ -59,33 +61,43 @@ msgstr ""
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
-#, fuzzy
 msgid ""
-"<i class=\"ms-2 fa fa-info-circle\" title=\"Required for Google Reserve\"/>"
+"<i class=\"oi oi-filled ms-2\" data-icon=\"info\" title=\"Required for "
+"Google Reserve\"/>"
 msgstr ""
-"<i class=\"ms-2 fa fa-info-circle\" title=\"Google Reserve uchun zarur\"/>"
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
-#, fuzzy
 msgid ""
-"<span class=\"fa fa-check fa-fw me-1\"/>Your Google Reserve Synchronization "
-"is active."
+"<span class=\"oi me-1\" data-icon=\"hourglass_empty\"/>Synchronization with "
+"Google Reserve in progress. This can take up to 24 hours."
 msgstr ""
-"<span class=\"fa fa-check fa-fw me-1\"/>Google Reserve sinxronizatsiyangiz "
-"faol."
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
-#, fuzzy
 msgid ""
-"<span class=\"fa fa-check fa-hourglass me-1\"/>Your Appointment Type is "
-"being synchronized with Google Reserve.<br/>\n"
-"                                This can take up to 24 hours to be active."
+"<span class=\"oi oi-fw me-1\" data-icon=\"check\"/>\n"
+"                                <span>Your Google Reserve Synchronization is "
+"active. </span>"
 msgstr ""
-"<span class=\"fa fa-check fa-hourglass me-1\"/>Uchrashuv turingiz Google "
-"Reserve bilan sinxronlanmoqda.<br/> Bu jarayon faol bo‘lishi uchun 24 "
-"soatgacha vaqt ketishi mumkin."
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid ""
+"<span class=\"oi oi-fw me-1\" data-icon=\"map\"/>\n"
+"                                <span>Synchronize your establishment with "
+"Google Reserve. </span>"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "<span> if you encounter any issues.</span>"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "<span> to learn more.</span>"
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__message_needaction
@@ -98,6 +110,11 @@ msgstr "Harakat talab etiladi"
 #, fuzzy
 msgid "Address"
 msgstr "Manzil"
+
+#. module: appointment_google_reserve
+#: model:ir.module.module,shortdesc:base.module_appointment_google_reserve
+msgid "Appointment Google Reserve"
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model:ir.model,name:appointment_google_reserve.model_appointment_resource
@@ -154,6 +171,16 @@ msgid "Calendar Event"
 msgstr "Taqvim hodisasi"
 
 #. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "Click here"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__name
+msgid "Company Name"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,help:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
 #, fuzzy
 msgid "Configure your company data for Google Reserve"
@@ -205,6 +232,11 @@ msgid "Enable Google Booking"
 msgstr "Google Booking-ni yoqish"
 
 #. module: appointment_google_reserve
+#: model:ir.module.module,description:base.module_appointment_google_reserve
+msgid "Enable a link between your appointment type and the google API"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,help:appointment_google_reserve.field_google_reserve_merchant__phone_sanitized
 #, fuzzy
 msgid ""
@@ -239,16 +271,21 @@ msgid "Google Booking Pending Synchronization"
 msgstr "Google Booking sinxronizatsiyasi kutilmoqda"
 
 #. module: appointment_google_reserve
+#: model:ir.ui.menu,name:appointment_google_reserve.menu_appointment_google_reserve_merchants
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 #, fuzzy
 msgid "Google Bookings"
 msgstr "Google Bookings"
 
 #. module: appointment_google_reserve
-#: model:ir.ui.menu,name:appointment_google_reserve.menu_appointment_google_reserve_merchants
-#, fuzzy
-msgid "Google Reserve"
-msgstr "Google Reserve"
+#: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
+msgid "Google Maps Profile"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model:ir.actions.act_window,name:appointment_google_reserve.google_reserve_merchant_action
+msgid "Google Maps Profiles"
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_access_token
@@ -258,16 +295,9 @@ msgstr "Google Reserve kirish tokeni"
 
 #. module: appointment_google_reserve
 #: model:ir.model,name:appointment_google_reserve.model_google_reserve_merchant
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
 #, fuzzy
 msgid "Google Reserve Merchant"
 msgstr "Google Reserve savdogari"
-
-#. module: appointment_google_reserve
-#: model:ir.actions.act_window,name:appointment_google_reserve.google_reserve_merchant_action
-#, fuzzy
-msgid "Google Reserve Merchants"
-msgstr "Google Reserve savdogarlari"
 
 #. module: appointment_google_reserve
 #. odoo-python
@@ -367,12 +397,6 @@ msgid "Last Updated on"
 msgstr "Oxirgi yangilanish sanasi"
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__name
-#, fuzzy
-msgid "Merchant Name"
-msgstr "Savdogar nomi"
-
-#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__message_has_error
 #, fuzzy
 msgid "Message Delivery error"
@@ -452,6 +476,12 @@ msgid "Phone Number"
 msgstr "Telefon raqami"
 
 #. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.google_reserve_merchant_view_form
+msgid ""
+"Please fill in the information exactly as it is displayed on Google Maps"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__rating_ids
 #, fuzzy
 msgid "Ratings"
@@ -500,6 +530,11 @@ msgstr "Sinxronlashni to‘xtatish"
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "Synchronize"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 #, fuzzy
 msgid "Synchronize with Google Reserve"
 msgstr "Google Reserve bilan sinxronlash"
@@ -523,25 +558,38 @@ msgstr ""
 "foydalaniladi."
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
-
-#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__website_url
 #, fuzzy
 msgid "Website URL"
 msgstr "Veb-sayt URL manzili"
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,help:appointment_google_reserve.field_google_reserve_merchant__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt aloqa tarixi"
+#. odoo-python
+#: code:addons/appointment_google_reserve/models/google_reserve_merchant.py:0
+msgid ""
+"You cannot delete this merchant as it is used in '%(appointment_name)s' to "
+"synchronize with Google Maps Reserve.\n"
+"Turn off the integration first."
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.google_reserve_merchant_view_form
 #, fuzzy
 msgid "e.g Restaurant"
 msgstr "masalan, restoran"
+
+#, fuzzy
+msgid "Website Messages"
+msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+msgid "Website communication history"
+msgstr "Veb-sayt aloqa tarixi"
+
+#, fuzzy
+msgid ""
+"<span class=\"fa fa-check fa-fw me-1\"/>Your Google Reserve Synchronization "
+"is active."
+msgstr ""
+"<span class=\"fa fa-check fa-fw me-1\"/>Google Reserve sinxronizatsiyangiz "
+"faol."

@@ -45,7 +45,6 @@
                 <field name="sla_deadline_hours" widget="float_time"/>
                 <field name="color" invisible="1"/>
                 <field name="answered_customer_message_count" invisible="1"/>
-                <field name="stage_id_color" invisible="1"/>
                 <field name="total_response_hours" invisible="1" widget="float_time"/>
             </graph>
         </field>
@@ -62,7 +61,6 @@
                 <field name="assign_hours" string="Working Hours to Assign" widget="float_time"/>
                 <field name="color" invisible="1"/>
                 <field name="answered_customer_message_count" invisible="1"/>
-                <field name="stage_id_color" invisible="1"/>
                 <field name="total_response_hours" invisible="1"/>
             </pivot>
         </field>
@@ -75,61 +73,49 @@
         <field name="arch" type="xml">
             <search string="Tickets Search">
                 <field name="name" string="Ticket" filter_domain="['|', ('name', 'ilike', self), ('ticket_ref', 'ilike', self)]"/>
-                <field name="tag_ids"/>
                 <field name="user_id"/>
+                <field name="tag_ids"/>
                 <field name="partner_id" filter_domain="['|', '|', '|', ('partner_id', 'ilike', self), ('partner_email', 'ilike', self), ('partner_phone', 'ilike', self), ('partner_name', 'ilike', self)]"/>
                 <field name="team_id" invisible="context.get('default_team_id', False)"/>
                 <field name="stage_id"/>
-                <field name="sla_ids" groups="helpdesk.group_use_sla"/>
-                <field name="priority" invisible="1"/>
-                <field name="company_id" groups="base.group_multi_company" invisible="context.get('default_team_id', False)"/>
 
                 <filter string="My Tickets" domain="[('user_id','=',uid)]" name="my_ticket"/>
                 <filter string="Followed" domain="[('message_is_follower', '=', True)]" name="my_follow_ticket"/>
                 <filter string="Unassigned" domain="[('user_id','=',False)]" name="unassigned"/>
                 <separator/>
-                <filter string="Urgent" domain="[('priority', '=', 3)]" name="urgent_priority"/>
-                <filter string="High Priority" domain="[('priority', '=', 2)]" name="high_priority"/>
-                <filter string="Medium Priority" domain="[('priority', '=', 1)]" name="medium_priority"/>
-                <filter string="Low Priority" domain="[('priority', '=', 0)]" name="low_priority"/>
-                <separator groups="helpdesk.group_use_sla"/>
-                <filter string="SLA Success" domain="[('sla_success', '=', True)]" name="sla_success" groups="helpdesk.group_use_sla"/>
-                <filter string="SLA in Progress" domain="[('sla_status_ids.status', '=', 'ongoing')]" name="sla_inprogress" groups="helpdesk.group_use_sla"/>
-                <filter string="SLA Failed" domain="[('sla_fail', '=', True)]" name="sla_failed" groups="helpdesk.group_use_sla"/>
-                <separator/>
                 <filter string="Open" domain="[('stage_id.fold', '=', False)]" name="is_open"/>
                 <filter string="Closed" domain="[('stage_id.fold', '=', True)]" name="is_close"/>
                 <filter name="closed_on" string="Closed On" date="close_date">
                     <filter name="closed_on_today" string="Today" domain="[('close_date', '&gt;=', 'today')]"/>
-                    <filter name="closed_on_last_7_days" string="Last 7 Days" domain="[('close_date', '&gt;=', 'today -7d +1d')]"/>
-                    <filter name="closed_on_last_30_days" string="Last 30 Days" domain="[('close_date', '&gt;=', 'today -30d +1d')]"/>
-                    <filter name="closed_on_last_365_days" string="Last 365 Days" domain="[('close_date', '&gt;=', 'today -365d +1d')]"/>
+                    <filter name="closed_on_last_7_days" string="Last 7 Days" domain="[('close_date', '&gt;=', 'today -7d'), ('close_date', '&lt;', 'today')]"/>
+                    <filter name="closed_on_last_30_days" string="Last 30 Days" domain="[('close_date', '&gt;=', 'today -30d'), ('close_date', '&lt;', 'today')]"/>
+                    <filter name="closed_on_last_365_days" string="Last 365 Days" domain="[('close_date', '&gt;=', 'today -365d'), ('close_date', '&lt;', 'today')]"/>
                 </filter>
-                <separator />
-                <filter name="rating_satisfied" string="Happy" domain="[('rating_avg', '&gt;', 3.66)]" groups="helpdesk.group_use_rating"/>
-                <filter name="rating_okay" string="Neutral" domain="[('rating_avg', '&lt;', 3.66), ('rating_avg', '&gt;=', 2.33)]" groups="helpdesk.group_use_rating"/>
-                <filter name="dissatisfied" string="Unhappy" domain="[('rating_avg', '&lt;', 2.33), ('rating_last_value', '!=', 0.0)]" groups="helpdesk.group_use_rating"/>
+                <separator/>
+                <filter name="priority" string="Priority">
+                    <filter string="Urgent" domain="[('priority', '=', '3')]" name="urgent_priority"/>
+                    <filter string="High" domain="[('priority', '=', '2')]" name="high_priority"/>
+                    <filter string="Medium" domain="[('priority', '=', '1')]" name="medium_priority"/>
+                    <filter string="Low" domain="[('priority', '=', '0')]" name="low_priority"/>
+                </filter>
+                <separator groups="helpdesk.group_use_sla"/>
+                <filter string="SLA Status">
+                    <filter string="Success" domain="[('sla_success', '=', True)]" name="sla_success" groups="helpdesk.group_use_sla"/>
+                    <filter string="In Progress" domain="[('sla_status_ids.status', '=', 'ongoing')]" name="sla_inprogress" groups="helpdesk.group_use_sla"/>
+                    <filter string="Failed" domain="[('sla_fail', '=', True)]" name="sla_failed" groups="helpdesk.group_use_sla"/>
+                </filter>
                 <separator/>
                 <filter string="Creation Date" date="create_date" name="creation_date">
-                    <filter name="create_date_today" string="Today" domain="[('create_date', '&gt;=', 'today')]"/>
-                    <filter name="create_date_last_7_days" string="Last 7 Days" domain="[('create_date', '&gt;=', 'today -7d +1d')]"/>
-                    <filter name="create_date_last_30_days" string="Last 30 Days" domain="[('create_date', '&gt;=', 'today -30d +1d')]"/>
-                    <filter name="create_date_last_365_days" string="Last 365 Days" domain="[('create_date', '&gt;=', 'today -365d +1d')]"/>
+                    <filter name="create_date_last_7_days" string="Last 7 Days" domain="[('create_date', '&gt;=', 'today -7d'), ('create_date', '&lt;', 'today')]"/>
+                    <filter name="create_date_last_30_days" string="Last 30 Days" domain="[('create_date', '&gt;=', 'today -30d'), ('create_date', '&lt;', 'today')]"/>
+                    <filter name="create_date_last_365_days" string="Last 365 Days" domain="[('create_date', '&gt;=', 'today -365d'), ('create_date', '&lt;', 'today')]"/>
                 </filter>
-                <separator/>
-                <filter string="Archived" domain="[('active', '=', False)]" name="archive"/>
                 <group>
                     <filter string="Assigned to" name="assignee" context="{'group_by':'user_id'}"/>
-                    <filter string="Helpdesk Team" name="team" context="{'group_by':'team_id'}" invisible="context.get('default_team_id', False)"/>
-                    <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>
-                    <filter string="Status" name="state" context="{'group_by': 'kanban_state'}"/>
-                    <filter string="SLA" name="sla_ids" context="{'group_by': 'sla_ids'}" groups="helpdesk.group_use_sla"/>
-                    <filter string="Tags" name="tag" context="{'group_by': 'tag_ids'}"/>
                     <filter string="Priority" name="priority" context="{'group_by': 'priority'}"/>
-                    <filter string="Customer" name="partner" context="{'group_by': 'partner_id'}"/>
-                    <filter string="Company" name="company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
-                    <filter string="Create Date" name="created_by" context="{'group_by': 'create_date'}"/>
                     <filter string="SLA Deadline" name="sla_deadline" context="{'group_by': 'sla_deadline'}" groups="helpdesk.group_use_sla"/>
+                    <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>
+                    <filter string="Helpdesk Team" name="team" context="{'group_by':'team_id'}" invisible="context.get('default_team_id', False)"/>
                 </group>
             </search>
         </field>
@@ -142,21 +128,22 @@
         <field name="inherit_id" ref="helpdesk_tickets_view_search_base"/>
         <field name="priority">15</field>
         <field name="arch" type="xml">
-            <field name="company_id" position="after">
+            <field name="stage_id" position="after">
                 <field name="properties"/>
             </field>
-            <filter name="sla_deadline" position="after">
+            <filter name="team" position="after">
                 <separator/>
                 <filter string="Properties" name="group_by_properties" context="{'group_by': 'properties'}"/>
+            </filter>
+            <filter name="is_open" position="before">
+                <separator/>
+                <filter string="Unanswered" name="unanswered" domain="[('unanswered', '=', True)]"/>
+                <separator/>
             </filter>
             <filter name="is_open" position="after">
                 <filter string="Rotting" name="filter_rotting" domain="[('is_rotting', '=', True)]"/>
             </filter>
-            <filter name="archive" position="before">
-                <filter string="Unread Messages" name="message_needaction" domain="[('message_needaction', '=', True)]" groups="mail.group_mail_notification_type_inbox"/>
-                <separator/>
-            </filter>
-            <filter name="archive" position="after">
+            <filter name="creation_date" position="after">
                 <separator invisible="1"/>
                 <filter invisible="1" string="My Activities" name="filter_activities_my"
                     domain="[('activity_user_id', '=', uid)]"/>
@@ -216,25 +203,22 @@
                 <field name="company_id" column_invisible="True"/>
                 <field name="use_sla" column_invisible="True"/>
                 <field name="fold" column_invisible="True"/>
-                <field name="legend_normal" column_invisible="True"/>
-                <field name="legend_blocked" column_invisible="True"/>
-                <field name="legend_done" column_invisible="True"/>
                 <field name="ticket_ref" string="ID" readonly="1" optional="show"/>
                 <field name="priority" optional="show" widget="priority"/>
                 <field name="name" string="Name"/>
                 <field name="team_id" optional="show" readonly="1" column_invisible="context.get('default_team_id', False)"/>
                 <field name="team_id" optional="hide" readonly="1" column_invisible="not context.get('default_team_id', False)"/>
                 <field name="user_id" optional="show" widget="many2one_avatar_user"/>
-                <field name="partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" optional="show" options="{'no_open': True}"/>
+                <field name="partner_id" optional="show" options="{'no_open': True}"/>
                 <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1" column_invisible="context.get('default_team_id', False)"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1" column_invisible="not context.get('default_team_id', False)"/>
                 <field name="activity_ids" widget="list_activity" optional="show"/>
-                <field name="my_activity_date_deadline" string="My Deadline" widget="remaining_days" optional="hide"/>
-                <field name="sla_status_ids" widget="helpdesk_sla_many2many_tags" options="{'color_field': 'color'}" string="SLAs" optional="hide" readonly="1" invisible="not use_sla"/>
-                <field name="sla_deadline" invisible="not use_sla or fold" optional="show" widget="remaining_days"/>
+                <field name="my_activity_date_deadline" string="My Deadline" widget="relative_date" optional="hide"/>
+                <field name="sla_status_ids" widget="helpdesk_sla_many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" string="SLAs" optional="hide" readonly="1" invisible="not use_sla"/>
+                <field name="sla_deadline" invisible="not use_sla or fold" optional="show" widget="relative_date"/>
                 <field name="create_date" optional="hide" readonly="1" string="Creation Date"/>
                 <field name="write_date" optional="hide" readonly="1"/>
-                <field name="tag_ids" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="tag_ids" optional="hide" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 <field name="properties"/>
                 <field name="rating_avg_text" string="Rating" decoration-danger="rating_avg_text == 'ko'"
                     decoration-warning="rating_avg_text == 'ok'" decoration-success="rating_avg_text == 'top'"
@@ -243,8 +227,7 @@
                 <field name="kanban_state" nolabel="1" width="20px" optional="show" widget="state_selection"/>
                 <field name="is_rotting" column_invisible="True"/>
                 <field name="rotting_days" column_invisible="True"/>
-                <field name="stage_id_color" column_invisible="1"/>
-                <field name="stage_id" optional="show" widget="badge_rotting" options="{'no_open': True}"/>
+                <field name="stage_id" optional="show" widget="rotting" options="{'no_open': True}"/>
             </list>
         </field>
     </record>
@@ -280,7 +263,8 @@
         <field name="priority">1000</field>
         <field name="arch" type="xml">
             <form>
-                <group>
+                <group class="helpdesk_quick_create_ticket_form_group">
+                    <field name="company_id" invisible="1"/>
                     <field name="stage_id" invisible="1"/>
                     <field name="team_id" invisible="1"/>
                     <field name="legend_normal" invisible="1"/>
@@ -306,7 +290,6 @@
                 <field name="activity_ids"/>
                 <field name="activity_state"/>
                 <field name="team_id"/>
-                <field name="use_rating"/>
                 <field name="rating_count"/>
                 <field name="rating_avg"/>
                 <field name="fold"/>
@@ -322,11 +305,11 @@
                             <field name="name"/> (#<field name="ticket_ref"/>)
                         </div>
                         <field name="commercial_partner_id"/>
-                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" invisible="not tag_ids"/>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" invisible="not tag_ids"/>
                         <div t-if="record.sla_deadline.raw_value &amp;&amp; record.use_sla.raw_value &amp;&amp; !record.fold.raw_value">
                             <t t-if="luxon.DateTime.fromISO(record.sla_deadline.raw_value) &lt; luxon.DateTime.local()" t-set="red" t-value="'text-danger fw-bold'"/>
                             <span t-attf-class="{{red}}">
-                                <field name="sla_deadline" widget="remaining_days"/>
+                                <field name="sla_deadline" widget="relative_date"/>
                             </span>
                         </div>
                         <field name="properties" widget="properties"/>
@@ -334,15 +317,15 @@
                             <div class="d-flex align-items-center">
                                 <field name="priority" widget="priority"/>
                                 <field name="activity_ids" widget="kanban_activity" class="ms-2"/>
-                                <b t-if="record.use_rating.raw_value and record.rating_count.raw_value &gt; 0" groups="helpdesk.group_use_rating" class="ms-2">
-                                    <strong class="fa fa-fw fa-smile-o fa-lg text-success fw-bolder" t-if="record.rating_avg.raw_value &gt;= 3.66" title="Average Rating: Happy" role="img" aria-label="Happy face"/>
-                                    <strong class="fa fa-fw fa-meh-o fa-lg text-warning fw-bolder" t-elif="record.rating_avg.raw_value &gt;= 2.33" title="Average Rating: Neutral" role="img" aria-label="Neutral face"/>
-                                    <strong class="fa fa-fw fa-frown-o fa-lg text-danger fw-bolder" t-else="" title="Average Rating: Unhappy" role="img" aria-label="Unhappy face"/>
+                                <b t-if="record.rating_count.raw_value &gt; 0" class="ms-2">
+                                    <strong class="oi oi-fw oi-lg text-success fw-bolder" data-icon="sentiment_satisfied" t-if="record.rating_avg.raw_value &gt;= 3.66" title="Average Rating: Happy" role="img" aria-label="Happy face"/>
+                                    <strong class="oi oi-fw oi-lg text-warning fw-bolder" data-icon="sentiment_neutral" t-elif="record.rating_avg.raw_value &gt;= 2.33" title="Average Rating: Neutral" role="img" aria-label="Neutral face"/>
+                                    <strong class="oi oi-fw oi-lg text-danger fw-bolder" data-icon="sentiment_dissatisfied" t-else="" title="Average Rating: Unhappy" role="img" aria-label="Unhappy face"/>
                                 </b>
                             </div>
                             <div class="d-flex align-items-center ms-auto">
                                 <field name="is_rotting" invisible="1"/>
-                                <field name="rotting_days" widget="rotting"/>
+                                <field name="rotting_days" widget="rotting_days"/>
                                 <field name="user_id" widget="many2one_avatar_user" class="ms-1"/>
                                 <field name="kanban_state" widget="state_selection" groups="base.group_user" class="ms-1"/>
                             </div>
@@ -359,30 +342,27 @@
         <field name="arch" type="xml">
             <form string="Helpdesk Ticket" js_class="form_description_expander">
                 <header>
-                    <field name="stage_id" widget="rotting_statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}"/>
+                    <field name="stage_id" class="o_field_statusbar_duration"
+                        widget="helpdesk_rotting_statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}"/>
                 </header>
                 <sheet>
-                    <field name="legend_blocked" invisible="1"/>
-                    <field name="legend_normal" invisible="1"/>
-                    <field name="legend_done" invisible="1"/>
                     <field name="rating_count" invisible="1"/>
-                    <field name="use_rating" invisible="1"/>
                     <field name="rating_avg" invisible="1"/>
                     <field name="company_id" invisible="1"/>
                     <field name="team_privacy_visibility" invisible="1"/>
                     <field name="is_rotting" invisible="1"/>
                     <field name="rotting_days" invisible="1"/>
                     <div class="oe_button_box" name="button_box" groups="base.group_user">
-                        <button name="action_open_ratings" type="object" class="oe_stat_button" icon="" invisible="not use_rating or rating_count == 0" groups="helpdesk.group_use_rating">
-                            <i class="fa fa-fw o_button_icon fa-smile-o text-success" invisible="rating_avg &lt; 3.66" title="Happy"/>
-                            <i class="fa fa-fw o_button_icon fa-meh-o text-warning" invisible="rating_avg &lt; 2.33 or rating_avg &gt;= 3.66" title="Neutral"/>
-                            <i class="fa fa-fw o_button_icon fa-frown-o text-danger" invisible="rating_avg &gt;= 2.33" title="Unhappy"/>
+                        <button name="action_open_ratings" type="object" class="oe_stat_button" icon="" invisible="rating_count == 0">
+                            <i class="oi oi-fw o_button_icon text-success" data-icon="sentiment_satisfied" invisible="rating_avg &lt; 3.66" title="Happy"/>
+                            <i class="oi oi-fw o_button_icon text-warning" data-icon="sentiment_neutral" invisible="rating_avg &lt; 2.33 or rating_avg &gt;= 3.66" title="Neutral"/>
+                            <i class="oi oi-fw o_button_icon text-danger" data-icon="sentiment_dissatisfied" invisible="rating_avg &gt;= 2.33" title="Unhappy"/>
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value"><field name="rating_avg_text" nolabel="1"/></span>
                                 <span class="o_stat_text">Rating</span>
                             </div>
                         </button>
-                        <button class="oe_stat_button" type="object" name="action_open_helpdesk_ticket" icon="fa-life-ring" invisible="not partner_id or partner_ticket_count == 0">
+                        <button class="oe_stat_button" type="object" name="action_open_helpdesk_ticket" icon="support" invisible="not partner_id or partner_ticket_count == 0">
                             <div class="o_field_widget o_stat_info">
                                 <div class="d-flex align-items-baseline gap-1">
                                     <span class="o_stat_value order-1">
@@ -407,10 +387,10 @@
                         <h1><field name="name" options="{'line_breaks': False}" widget="text" class="field_name" placeholder="e.g. Product arrived damaged"/></h1>
                     </div>
                     <div class="d-flex mb-4" invisible="not sla_status_ids" groups="helpdesk.group_use_sla">
-                        <field name="sla_status_ids" widget="helpdesk_sla_many2many_tags" invisible="not use_sla" options="{'color_field': 'color', 'no_edit_color': True}" class="mb-0" readonly="1" groups="helpdesk.group_use_sla"/>
+                        <field name="sla_status_ids" widget="helpdesk_sla_many2many_tags" invisible="not use_sla" options="{'color_field': 'color'}" class="mb-0" readonly="1" groups="helpdesk.group_use_sla"/>
                         <div invisible="not sla_deadline or not use_sla" groups="helpdesk.group_use_sla" class="mx-2 text-muted d-inline-flex align-items-center h-100">
-                            <i class="fa fa-lg fa-clock-o me-2 mt-1" aria-label="Sla Deadline" title="Sla Deadline"/>
-                            <field name="sla_deadline" class="mb-0" widget="remaining_days"/>
+                            <i class="oi oi-lg me-2 mt-1" data-icon="schedule" aria-label="Sla Deadline" title="Sla Deadline"/>
+                            <field name="sla_deadline" class="mb-0" widget="relative_date"/>
                         </div>
                     </div>
                     <group class="mb-0 mt-4">
@@ -420,18 +400,17 @@
                             <field name="user_id" class="field_user_id" domain="['&amp;', ('id', 'in', domain_user_ids), ('share', '=', False)]" widget="many2one_avatar_user"/>
                             <field name="domain_user_ids" invisible="1"/>
                             <field name="priority" widget="priority"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color', 'no_create_edit': True}"/>
                         </group>
                         <group>
-                            <field name="partner_id" class="field_partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" context="{'default_phone': partner_phone}"/>
+                            <field name="partner_id" class="field_partner_id" widget="res_partner_many2one" context="{'default_phone': partner_phone}"/>
                             <field name="is_partner_phone_update" invisible="1"/>
                             <label for="partner_phone" string="Phone"/>
                             <div class="o_row o_row_readonly">
                                 <field name="partner_phone" widget="phone" string="Phone"/>
-                                <span class="fa fa-exclamation-triangle text-warning oe_edit_only"
+                                <span class="oi text-warning oe_edit_only" data-icon="warning"
                                 title="By saving this change, the customer phone number will also be updated." invisible="not is_partner_phone_update"/>
                             </div>
-                            <field name="email_cc" groups="base.group_no_one"/>
                         </group>
                     </group>
                     <div class="d-flex">
@@ -470,7 +449,6 @@
         <field name="arch" type="xml">
             <cohort string="Tickets" date_start="create_date" date_stop="close_date" interval="day" sample="1">
                 <field name="color" invisible="1"/>
-                <field name="stage_id_color" invisible="1"/>
             </cohort>
         </field>
     </record>
@@ -946,7 +924,6 @@
                 <field name="name"/>
                 <field name="close_hours" type="measure"/>
                 <field name="color" invisible="1"/>
-                <field name="stage_id_color" invisible="1"/>
             </pivot>
         </field>
     </record>
@@ -956,7 +933,6 @@
         <field name="model">helpdesk.ticket</field>
         <field name="arch" type="xml">
             <graph string="Performance Analysis" sample="1">
-                <field name="stage_id_color" invisible="1"/>
                 <field name="stage_id"/>
                 <field name="team_id"/>
                 <field name="close_hours" type="measure"/>

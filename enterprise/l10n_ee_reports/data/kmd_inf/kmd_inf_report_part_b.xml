@@ -48,47 +48,48 @@
             <record id="kmd_inf_report_b" model="account.report.line">
                 <field name="name">Part B - Invoices Received</field>
                 <field name="groupby">move_id</field>
+                <field name="foldability">always_unfolded</field>
                 <field name="expression_ids">
                     <record id="kmd_inf_report_b_seller_reg_code" model="account.report.expression">
                         <field name="label">seller_reg_code</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_kmd_inf_b</field>
+                        <field name="formula">_report_engine_kmd_inf_b</field>
                         <field name="subformula">seller_reg_code</field>
                     </record>
                     <record id="kmd_inf_report_b_seller_name" model="account.report.expression">
                         <field name="label">seller_name</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_kmd_inf_b</field>
+                        <field name="formula">_report_engine_kmd_inf_b</field>
                         <field name="subformula">seller_name</field>
                     </record>
                     <record id="kmd_inf_report_b_invoice_number" model="account.report.expression">
                         <field name="label">invoice_number</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_kmd_inf_b</field>
+                        <field name="formula">_report_engine_kmd_inf_b</field>
                         <field name="subformula">invoice_number</field>
                     </record>
                     <record id="kmd_inf_report_b_invoice_date" model="account.report.expression">
                         <field name="label">invoice_date</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_kmd_inf_b</field>
+                        <field name="formula">_report_engine_kmd_inf_b</field>
                         <field name="subformula">invoice_date</field>
                     </record>
                     <record id="kmd_inf_report_b_invoice_sum_vat" model="account.report.expression">
                         <field name="label">invoice_sum_vat</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_kmd_inf_b</field>
+                        <field name="formula">_report_engine_kmd_inf_b</field>
                         <field name="subformula">invoice_sum_vat</field>
                     </record>
                     <record id="kmd_inf_report_b_vat_in_period" model="account.report.expression">
                         <field name="label">vat_in_period</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_kmd_inf_b</field>
+                        <field name="formula">_report_engine_kmd_inf_b</field>
                         <field name="subformula">vat_in_period</field>
                     </record>
                     <record id="kmd_inf_report_b_comments" model="account.report.expression">
                         <field name="label">comments</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_kmd_inf_b</field>
+                        <field name="formula">_report_engine_kmd_inf_b</field>
                         <field name="subformula">comments</field>
                     </record>
                 </field>

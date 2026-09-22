@@ -23,10 +23,15 @@ class StockWarehouse(models.Model):
         ):
             return super()._create_or_update_route()
         warehouse_rental_route.active = True
-        rental_rules = self.env['stock.rule'].with_context(active_test=False).search([
-            ('route_id', '=', warehouse_rental_route.id),
-            ('warehouse_id', 'in', self.ids)
-        ])
+        rental_rules = (
+            self
+            .env['stock.rule']
+            .with_context(active_test=False)
+            .search([
+                ('route_id', '=', warehouse_rental_route.id),
+                ('warehouse_id', 'in', self.ids),
+            ])
+        )
         rule_by_warehouse = {rule.warehouse_id.id: rule for rule in rental_rules}
         for warehouse in self:
             rule = rule_by_warehouse.get(warehouse.id)
@@ -36,7 +41,9 @@ class StockWarehouse(models.Model):
                 rule.active = True
                 continue
             self.env['stock.rule'].create({
-                'name': warehouse._format_rulename(source_location, destination_location, f'rental-{warehouse.code}-'),
+                'name': warehouse._format_rulename(
+                    source_location, destination_location, f'rental-{warehouse.code}-'
+                ),
                 'route_id': warehouse_rental_route.id,
                 'location_src_id': source_location.id,
                 'location_dest_id': destination_location.id,

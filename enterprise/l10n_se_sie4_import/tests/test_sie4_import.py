@@ -1,14 +1,14 @@
-import base64
-
 from odoo import fields, Command
 from odoo.exceptions import UserError
 from odoo.tests import tagged
-from odoo.tools import file_open
+from odoo.tools import BinaryBytes
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
 @tagged('-at_install', 'post_install_l10n', 'post_install')
 class AccountTestSIE4Import(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -17,7 +17,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         cls.company_id = cls.setup_other_company(name='SIE 4 Test Company')['company']
         cls.wizard = cls.env['l10n_se_sie4_import.wizard'].create({
             'company_id': cls.company_id.id,
-            'attachment_file': base64.b64encode(b''),  # empty required attachment; to be replaced in the tests
+            'attachment_file': BinaryBytes(b''),  # empty required attachment; to be replaced in the tests
             'import_opening_balance': True,
             'update_account_data': True,
         })
@@ -50,14 +50,17 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
     # --------------------------------------------------------------------------
 
     def test_sie4_import_file(self):
-        file_content = file_open('l10n_se_sie4_import/tests/test_files/sie4_import.se').read()
+        file_content = self.file_read('l10n_se_sie4_import/tests/test_files/sie4_import.se')
         self.wizard.write({
-            'attachment_file': base64.b64encode(file_content.encode()),
+            'attachment_file': BinaryBytes(file_content.decode().encode(encoding='cp437')),
             'company_id': self.company_id.id,
             'update_account_data': False,
             'import_opening_balance': False,
         })
         self.wizard.action_import_sie4()
+
+        # Ensure character from cp437 (non ASCII) are correctly imported
+        self.assertEqual(self.company_id.display_name, "Övningsbolaget AB")
 
         # Ensure all 18 moves from `sie4_import.se` are imported correctly
         test_date_format = '%y%m%d'
@@ -74,7 +77,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
     # --------------------------------------------------------------------------
 
     def test_sie4_import_identification(self):
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #SIETYP 4
             #FNAMN "Swedish Series"
             #ORGNR 555555-5555
@@ -99,7 +102,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         self.wizard.write({
             'import_opening_balance': True,
         })
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #SIETYP 4
             #FNAMN "Swedish Series"
             #ORGNR 555555-5555
@@ -140,7 +143,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         )
 
     def test_sie4_import_identification_with_missing_element_in_adress(self):
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #SIETYP 4
             #FNAMN "Swedish Series"
             #ORGNR 555555-5555
@@ -164,7 +167,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         )
 
     def test_sie4_import_chart_of_account(self):
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #KONTO 1060 Hyresrtt
             #KTYP 1060 I
             #KONTO 1070 Goodwill
@@ -193,7 +196,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         ])
 
     def test_sie4_import_opening_balance(self):
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #RAR -1 20200101 20201231
             #RAR  0 20210101 20211231
             #IB   0 1030 200.0
@@ -249,7 +252,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
             ],
         })
 
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #RAR -1 20200101 20201231
             #RAR  0 20210101 20211231
             #IB   0 1030 200.0
@@ -269,7 +272,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         )
 
     def test_sie4_import_opening_balance_with_unbalanced_ib(self):
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #RAR -1 20200101 20201231
             #RAR  0 20210101 20211231
             #IB   0 1030 200.0
@@ -286,7 +289,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         """
         Ensure the imported moves are assigned a sequence name sorted by their date.
         """
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #VER A 1 20240107 "1st item"
             {
                 #TRANS 1060 {} 300.0
@@ -321,7 +324,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
 
     def test_sie4_import_move_with_tabs_instead_of_spaces(self):
         """ Ensure the imported moves with tabulations instead of spaces are correctly imported. """
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #VER A 1 20240107 "item with tabs and spaces"
             {
                 #TRANS\t1060\t{}\t300.0
@@ -347,7 +350,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
         self.assertSequenceEqual(imported_moves.line_ids.mapped("balance"), (300.0, -300.0))
 
     def test_sie4_import_move_with_several_objects_in_object_list(self):
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #VER A 1 20240104 "move 1"
             {
                 #TRANS 1060 {8 "204498" 10 "93425"} 100.0
@@ -381,7 +384,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
 
     def test_sie4_import_move_with_btrans_and_rtrans_transactions(self):
         """ Ensure the imported moves with BTRANS/RTRANS transactions only are not imported. """
-        self.wizard.attachment_file = base64.b64encode(b"""
+        self.wizard.attachment_file = BinaryBytes(b"""
             #VER A 1 20240107 "item btrans"
             {
                 #BTRANS 1060 {} 300.0
@@ -456,6 +459,7 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
             ],
         )
 
+        currency_id = self.ref('base.SEK')
         self.assertDictEqual(data_map['account.move'], {
             'test.move_sie4_20210105A1': {
                 'company_id': self.company_id.id,
@@ -463,9 +467,9 @@ class AccountTestSIE4Import(AccountTestInvoicingCommon):
                 'journal_id': data_map['journal_misc_id'],
                 'ref': "Imported from SIE4",
                 'line_ids': [
-                    Command.create({'account_id': 'test.account_1910', 'amount_currency': -195.0, 'currency_id': 18}),
-                    Command.create({'account_id': 'test.account_2641', 'amount_currency': 20.88, 'currency_id': 18}),
-                    Command.create({'account_id': 'test.account_7690', 'amount_currency': 74.12, 'currency_id': 18}),
+                    Command.create({'account_id': 'test.account_1910', 'amount_currency': -195.0, 'currency_id': currency_id}),
+                    Command.create({'account_id': 'test.account_2641', 'amount_currency': 20.88, 'currency_id': currency_id}),
+                    Command.create({'account_id': 'test.account_7690', 'amount_currency': 74.12, 'currency_id': currency_id}),
                 ],
             },
         })

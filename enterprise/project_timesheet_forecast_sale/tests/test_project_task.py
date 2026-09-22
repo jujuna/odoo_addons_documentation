@@ -2,13 +2,18 @@
 
 from datetime import date, timedelta
 
+from odoo.tests import tagged
+
 from odoo.addons.sale_planning.tests.common import TestCommonSalePlanning
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestProjectTask(TestCommonSalePlanning):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # a sale order needs to be confirmed to make planning slots
+        cls.plannable_so.action_confirm()
         cls.project = cls.env['project.project'].create({
             'name': 'Project 1',
             'allow_timesheets': True,

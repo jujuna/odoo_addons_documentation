@@ -20,11 +20,21 @@ class AccountMoveLine(models.Model):
         store=True,
         readonly=False,
     )
+    l10n_mx_edi_factoring_type = fields.Selection(
+        string="Factoring Type",
+        selection=[
+            ('compensation', "Compensation Line"),
+            ('factoring_cost', "Factoring Cost Line"),
+        ],
+        copy=False,
+    )
 
-    @api.depends('tax_ids', 'move_id.company_id', 'move_id.l10n_mx_edi_cfdi_to_public', 'move_id.l10n_mx_edi_is_cfdi_needed', 'move_id.partner_id')
+    @api.depends('price_unit', 'tax_ids', 'move_id.company_id', 'move_id.l10n_mx_edi_cfdi_to_public', 'move_id.l10n_mx_edi_is_cfdi_needed', 'move_id.partner_id')
     def _compute_l10n_mx_edi_tax_object(self):
         L10nMxEdiDocument = self.env['l10n_mx_edi.document']
         for move, lines in self.grouped('move_id').items():
+            if move._l10n_mx_edi_is_cfdi_bill():
+                continue
             lines.l10n_mx_edi_tax_object = None
             if not move._l10n_mx_edi_is_cfdi_invoice():
                 continue
@@ -68,6 +78,13 @@ class AccountMoveLine(models.Model):
             if self in self._get_downpayment_lines()
             else self.product_uom_id.unspsc_code_id.code
         )
+
+    def _get_aml_values(self, **kwargs):
+        # EXTENDS account
+        return {
+            **super()._get_aml_values(**kwargs),
+            'l10n_mx_edi_factoring_type': self.l10n_mx_edi_factoring_type,
+        }
 
     def _filter_aml_lot_valuation(self):
         # EXTENDS account

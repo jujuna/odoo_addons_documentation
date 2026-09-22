@@ -12,7 +12,10 @@ from odoo import Command
 _logger = logging.getLogger(__name__)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestQualityCheckWorkorder(TestMrpCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_01_quality_check_with_component_consumed_in_operation(self):
         """ Test quality check on a production with a component consumed in one operation
@@ -76,7 +79,7 @@ class TestQualityCheckWorkorder(TestMrpCommon):
                 'product_ids': [Command.link(finished.id)],
                 'picking_type_ids': [Command.link(self.picking_type_manu.id)],
                 'test_type_id': type_register_materials.id,
-                'component_id': component.id,
+                'bom_line_id': self.bom_4.bom_line_ids.id,
                 'bom_id': self.bom_4.id,
                 'measure_on': 'operation',
             })]
@@ -92,8 +95,7 @@ class TestQualityCheckWorkorder(TestMrpCommon):
         mo_form.lot_producing_ids.set(finished_sn)
         mo = mo_form.save()
 
-        self.assertEqual(mo.workorder_ids.finished_lot_ids, finished_sn)
-        self.assertEqual(mo.workorder_ids.current_quality_check_id.lot_ids, component_sn)
+        self.assertEqual(mo.workorder_ids.current_quality_check_id.lot_ids, finished_sn)
 
         mo.workorder_ids.current_quality_check_id.action_next()
         mo.workorder_ids.do_finish()
@@ -102,69 +104,6 @@ class TestQualityCheckWorkorder(TestMrpCommon):
         self.assertRecordValues(mo.move_raw_ids.move_line_ids + mo.move_finished_ids.move_line_ids, [
             {'quantity': 1, 'lot_id': component_sn.id},
             {'quantity': 1, 'lot_id': finished_sn.id},
-        ])
-
-    def test_register_consumed_materials_split_production(self):
-        """
-        Process an MO based on a BoM with one operation. That operation has one
-        step: register the used component. The component is tracked. Split the
-        production MO -> MO-001 + MO-002, the component registrations should
-        update the appropriate backorder.
-        """
-        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
-        finished = self.bom_4.product_id
-        component = self.bom_4.bom_line_ids.product_id
-        component.write({
-            'is_storable': True,
-            'tracking': 'serial',
-        })
-
-        lots = self.env['stock.lot'].create([{
-            'name': f"SN00{i + 1}",
-            'product_id': component.id,
-            'company_id': self.env.company.id,
-        } for i in range(4)])
-        for lot in lots:
-            self.env['stock.quant']._update_available_quantity(component, warehouse.lot_stock_id, 1, lot_id=lot)
-
-        type_register_materials = self.env.ref('mrp_workorder.test_type_register_consumed_materials')
-        operation = self.env['mrp.routing.workcenter'].create({
-            'name': 'Super Operation',
-            'bom_id': self.bom_4.id,
-            'workcenter_id': self.workcenter_2.id,
-            'quality_point_ids': [Command.create({
-                'product_ids': [Command.link(finished.id)],
-                'picking_type_ids': [Command.link(warehouse.manu_type_id.id)],
-                'test_type_id': type_register_materials.id,
-                'component_id': component.id,
-                'bom_id': self.bom_4.id,
-                'measure_on': 'product',
-            })]
-        })
-        self.bom_4.operation_ids = [Command.set(operation.ids)]
-
-        mo_form = Form(self.env['mrp.production'])
-        mo_form.bom_id = self.bom_4
-        mo_form.product_qty = 2
-        mo = mo_form.save()
-        mo.action_confirm()
-
-        self.assertEqual(mo.move_raw_ids.lot_ids, lots[:2])
-        # Split the MO in 2
-        action = mo.action_split()
-        wizard = Form.from_action(self.env, action)
-        wizard.max_batch_size = 1
-        action = wizard.save().action_split()
-        # Should have 2 mos /w 1 sn each
-        self.assertEqual(len(mo.production_group_id.production_ids), 2)
-        # Check that the assigned lots didn't change
-        self.assertEqual(mo.production_group_id.production_ids[0].workorder_ids.current_quality_check_id.lot_ids, lots[0])
-        self.assertEqual(mo.production_group_id.production_ids[1].workorder_ids.current_quality_check_id.lot_ids, lots[1])
-        # Register sn3 on mo 1 and check that it is reflected on the associated move line
-        component_move = mo.workorder_ids.current_quality_check_id.move_id
-        component_move.action_add_from_quant(self.env['stock.quant'].search([('lot_id', '=', lots[2].id), ('location_id', '=', warehouse.lot_stock_id.id)], limit=1).id)
-        self.assertRecordValues(mo.move_raw_ids, [
-            {'quantity': 1.0, 'lot_ids': lots[2].ids},
         ])
 
     def test_backorder_cancelled_workorder_quality_check(self):
@@ -191,13 +130,13 @@ class TestQualityCheckWorkorder(TestMrpCommon):
         self.env['stock.quant'].create([
             {
                 'product_id': self.product_3.id,
-                'product_uom_id': self.uom_unit.id,
+                'uom_id': self.uom_unit.id,
                 'location_id': self.shelf_1.id,
                 'quantity': 4,
             },
             {
                 'product_id': self.product_2.id,
-                'product_uom_id': self.uom_unit.id,
+                'uom_id': self.uom_unit.id,
                 'location_id': self.shelf_1.id,
                 'quantity': 6,
             },
@@ -282,6 +221,7 @@ class TestQualityCheckWorkorder(TestMrpCommon):
         mo.button_mark_done()
         self.assertEqual(mo.state, 'done')
         self.assertEqual(finished_sn.quality_check_qty, 1)
+        self.assertEqual(mo.check_ids.lot_ids, mo.lot_producing_ids)
         # use the finished product as component in another mo
         bom_2 = self.env['mrp.bom'].create({
             'product_id': self.product_3.id,
@@ -300,7 +240,7 @@ class TestQualityCheckWorkorder(TestMrpCommon):
             'operation_id': bom_2.operation_ids.id,
             'measure_on': 'product',
             'test_type_id': self.env.ref('mrp_workorder.test_type_register_consumed_materials').id,
-            'component_id': self.product_2.id,
+            'bom_line_id': bom_2.bom_line_ids.id,
         })
         mo = self.env['mrp.production'].create({
             'product_id': self.product_3.id,
@@ -315,13 +255,98 @@ class TestQualityCheckWorkorder(TestMrpCommon):
         quality_check = mo.workorder_ids.check_ids
         self.assertEqual(quality_check.component_id, self.product_2)
         self.assertEqual(quality_check.move_id.quantity, 1)
-        self.assertEqual(finished_sn.quality_check_qty, 2)
-        domain_sn_qc = ['|', ('lot_ids', 'in', finished_sn.ids), ('finished_lot_ids', 'in', finished_sn.ids)]
-        self.assertEqual(list(finished_sn.action_open_quality_checks()['domain']), domain_sn_qc)
+        self.assertFalse(quality_check.lot_ids)
+        self.assertEqual(list(finished_sn.action_open_quality_checks()['domain']), [('lot_ids', 'in', finished_sn.ids)])
+
+    def test_merge_mo_from_orderpoints_2(self):
+        """
+        Ensure that triggering a manufacturing reordering rule:
+        - Updates an existing MO if none of its quality check has been performed yet
+        - Creates a new MO if the last MO's product_qty cannot be updated due to a performed quality check
+        """
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
+        warehouse_2 = self.env['stock.warehouse'].create({'name': 'WH 2', 'code': 'WH2'})
+        orderpoints = self.env['stock.warehouse.orderpoint'].create([{
+            'product_id': self.product_1.id,
+            'warehouse_id': warehouse.id,
+            'product_min_qty': 0,
+            'product_max_qty': 0,
+            'trigger': 'auto',
+        } for warehouse in (warehouse, warehouse_2)])
+
+        self.bom = self.env['mrp.bom'].create({
+            'product_id': self.product_1.id,
+            'product_tmpl_id': self.product_1.product_tmpl_id.id,
+            'uom_id': self.product_1.uom_id.id,
+            'product_qty': 1.0,
+            'operation_ids': [
+                Command.create({'name': 'Assembly', 'workcenter_id': self.workcenter_1.id, 'time_cycle': 15, 'sequence': 1}),
+                Command.create({'name': 'Assembly2', 'workcenter_id': self.workcenter_1.id})
+            ],
+            'type': 'normal',
+            'bom_line_ids': [
+                Command.create({'product_id': self.product_2.id, 'product_qty': 1})
+            ]
+        })
+        self.env['quality.point'].create([
+            {
+                'title': 'Operation QP',
+                'measure_on': 'operation',
+                'product_ids': [Command.link(self.product_1.id)],
+                'operation_id': self.bom.operation_ids[1].id,
+                'test_type_id': self.env.ref('quality.test_type_instructions').id,
+            },
+            {
+                'title': 'Production QP',
+                'measure_on': 'product',
+                'picking_type_ids': [(Command.link(warehouse_2.manu_type_id.id))],
+                'product_ids': [Command.link(self.product_1.id)],
+            }
+        ])
+        reference = self.env['stock.reference'].create({'name': "lovely reference"})
+        deliveries = self.env['stock.picking'].create([{
+            'name': f"Lovely {wh.code} Delivery {i}",
+            'location_id': wh.lot_stock_id.id,
+            'location_dest_id': self.ref('stock.stock_location_customers'),
+            'picking_type_id': wh.out_type_id.id,
+            'move_ids': [Command.create({
+                'location_id': wh.lot_stock_id.id,
+                'location_dest_id': self.ref('stock.stock_location_customers'),
+                'product_id': self.product_1.id,
+                'product_uom_qty': 1,
+                'reference_ids': [Command.set(reference.ids)],
+            })]
+        } for i in range(1, 4) for wh in (warehouse, warehouse_2)])
+
+        deliveries[:2].action_confirm()
+        mos = self.env['mrp.production'].search([('orderpoint_id', 'in', orderpoints.ids)], limit=2, order='warehouse_id.id')
+        self.assertRecordValues(mos, [
+            {'product_qty': 1.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+            {'product_qty': 1.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse_2.id},
+        ])
+
+        deliveries[2:4].action_confirm()
+        self.assertRecordValues(mos, [
+            {'product_qty': 2.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+            {'product_qty': 2.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse_2.id},
+        ])
+
+        mos[0].workorder_ids[1].current_quality_check_id.action_next()
+        mos[1].check_ids[0].do_pass()
+        deliveries[4:].action_confirm()
+        mos = self.env['mrp.production'].search([('orderpoint_id', 'in', orderpoints.ids)], limit=4, order='warehouse_id.id, id')
+        self.assertRecordValues(mos, [
+            {'product_qty': 2.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+            {'product_qty': 1.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+            {'product_qty': 2.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse_2.id},
+            {'product_qty': 1.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse_2.id},
+        ])
 
 
 @tagged('post_install', '-at_install')
 class TestPickingWorkorderClientActionQuality(test_tablet_client_action.TestWorkorderClientActionCommon, HttpCase):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_measure_quality_check(self):
         self.env['quality.point'].create({

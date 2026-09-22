@@ -24,24 +24,24 @@ class ResConfigSettings(models.TransientModel):
     def _compute_twitter_consumer_key(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                record.twitter_consumer_key = self.env['ir.config_parameter'].sudo().get_param('social.twitter_consumer_key')
+                record.twitter_consumer_key = self.env['ir.config_parameter'].sudo().get_str('social.twitter_consumer_key')
             else:
-                record.twitter_consumer_key = None
+                record.twitter_consumer_key = False
 
     def _inverse_twitter_consumer_key(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                self.env['ir.config_parameter'].sudo().set_param('social.twitter_consumer_key', record.twitter_consumer_key)
+                self.env['ir.config_parameter'].sudo().set_str('social.twitter_consumer_key', record.twitter_consumer_key)
 
     @api.depends('twitter_use_own_account')
     def _compute_twitter_consumer_secret_key(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                record.twitter_consumer_secret_key = self.env['ir.config_parameter'].sudo().get_param('social.twitter_consumer_secret_key')
+                record.twitter_consumer_secret_key = self.env['ir.config_parameter'].sudo().get_str('social.twitter_consumer_secret_key') or False
             else:
-                record.twitter_consumer_secret_key = None
+                record.twitter_consumer_secret_key = False
 
     def _inverse_twitter_consumer_secret_key(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                self.env['ir.config_parameter'].sudo().set_param('social.twitter_consumer_secret_key', record.twitter_consumer_secret_key)
+                self.env['ir.config_parameter'].sudo().set_str('social.twitter_consumer_secret_key', record.twitter_consumer_secret_key)

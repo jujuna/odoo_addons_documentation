@@ -1,10 +1,9 @@
-import base64
-
 from odoo import _, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import BinaryBytes
 from odoo.tools.float_utils import float_round
 from odoo.addons.l10n_it_riba.tools.riba import file_export
-from odoo.addons.base_iban.models.res_partner_bank import get_iban_part
+from odoo.tools.bank_account_number import get_iban_part
 
 
 class AccountBatchPayment(models.Model):
@@ -22,10 +21,10 @@ class AccountBatchPayment(models.Model):
         bank_account = self.journal_id.bank_account_id
         if not bank_account:
             errors.append(_("Journal '%s' has no associated bank account.", self.journal_id.name))
-        elif (not bank_account.acc_number or bank_account.acc_type != 'iban'):
+        elif (not bank_account.account_number or bank_account.account_type != 'iban'):
             errors.append(_("The bank account associated with the journal '%s' has no IBAN.", self.journal_id.name))
-        elif bank_account.acc_number[:2] != 'IT':
-            errors.append(_("Only bank accounts with an Italian IBAN are allowed to use Ri.Ba. payments"))
+        elif bank_account.account_number[:2] not in ['IT', 'SM']:
+            errors.append(_("Only bank accounts with an Italian or San Marino IBAN are allowed to use Ri.Ba. payments"))
         errors += self.payment_ids._l10n_it_riba_check()
         return errors
 
@@ -41,7 +40,7 @@ class AccountBatchPayment(models.Model):
         content = file_export(values)
         return {
             'filename': f"riba_{self.name.replace('/', '_')}_{fields.Datetime.now():%Y%m%d_%H%M%S}.txt",
-            'file': base64.encodebytes(content.encode())
+            'file': BinaryBytes(content.encode())
         }
 
     def _l10n_it_riba_get_values(self):
@@ -49,17 +48,16 @@ class AccountBatchPayment(models.Model):
         abs_rounded_amount = int(float_round(abs(amount), 0))
         creditor = self.journal_id.company_id
         creditor_bank_account = self.journal_id.bank_account_id
-        creditor_bank = self.journal_id.bank_id
 
         common = {
             'creditor_sia_code': creditor.l10n_it_sia_code,
-            'creditor_abi': get_iban_part(creditor_bank_account.acc_number, "bank"),
+            'creditor_abi': get_iban_part(creditor_bank_account.account_number, "bank"),
             'support_name': self.name,
         }
 
         records = (
             [{'record_type': 'IB', **common}]
-            + self.payment_ids._l10n_it_riba_get_values(creditor, creditor_bank, creditor_bank_account)
+            + self.payment_ids._l10n_it_riba_get_values(creditor, creditor_bank_account)
             + [{
                 'record_type': 'EF',
                 **common,

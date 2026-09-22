@@ -3,23 +3,31 @@ import { _t } from "@web/core/l10n/translation";
 /* global html2canvas */
 
 import { Dialog } from "@web/core/dialog/dialog";
-import { user } from "@web/core/user";
 import { loadJS } from "@web/core/assets";
-import { Component, onWillStart, useRef, useState } from "@odoo/owl";
+import { Component, onWillStart, useProps, proxy, signal, t } from "@odoo/owl";
 import { localization } from "@web/core/l10n/localization";
 import { NameAndSignature } from "@web/core/signature/name_and_signature";
 
 export class SignNameAndSignature extends NameAndSignature {
     static template = "sign.NameAndSignature";
-    static props = {
-        ...NameAndSignature.props,
-        activeFrame: Boolean,
-        defaultFrame: String,
-        frame: { type: Object, optional: true },
-        hash: String,
-        onNameChange: Function,
-        onSignatureChange: { type: Function, optional: true },
-    };
+    // Inline copy of NameAndSignature's schema (no exported const in web)
+    props = useProps({
+        signature: t.object(),
+        defaultFont: t.string().optional(""),
+        displaySignatureRatio: t.number().optional(3.0),
+        fontColor: t.string().optional("DarkBlue"),
+        signatureType: t.string().optional("signature"),
+        noInputName: t.boolean().optional(false),
+        mode: t.string().optional(),
+        activeFrame: t.boolean(),
+        defaultFrame: t.string(),
+        frame: t.object().optional(),
+        hash: t.string(),
+        onNameChange: t.function(),
+        onSignatureChange: t.function().optional(() => () => {}),
+    });
+
+    signFrameRef = signal.ref();
 
     setup() {
         super.setup();
@@ -29,18 +37,17 @@ export class SignNameAndSignature extends NameAndSignature {
             this.state.activeFrame = this.props.activeFrame || false;
             this.frame = this.props.defaultFrame;
 
-            this.signFrame = useRef("signFrame");
             this.props.frame.updateFrame = () => {
                 if (this.state.activeFrame) {
                     this.props.signature.signatureChanged = true;
                     const xOffset = localization.direction === "rtl" ? 0.75 : 0.06; // magic numbers
-                    this.signFrame.el.classList.toggle("active", true);
-                    return html2canvas(this.signFrame.el, {
+                    this.signFrameRef().classList.toggle("active", true);
+                    return html2canvas(this.signFrameRef(), {
                         backgroundColor: null,
-                        width: this.signatureRef.el.width,
-                        height: this.signatureRef.el.height,
-                        x: -this.signatureRef.el.width * xOffset,
-                        y: -this.signatureRef.el.height * 0.09,
+                        width: this.signatureRef().width,
+                        height: this.signatureRef().height,
+                        x: -this.signatureRef().width * xOffset,
+                        y: -this.signatureRef().height * 0.09,
                     }).then((canvas) => {
                         this.frame = canvas.toDataURL("image/png");
                     });
@@ -48,19 +55,12 @@ export class SignNameAndSignature extends NameAndSignature {
                 return Promise.resolve(false);
             };
 
-            this.props.frame.getFrameImageSrc = () => {
-                return this.state.activeFrame ? this.frame : false;
-            };
+            this.props.frame.getFrameImageSrc = () => (this.state.activeFrame ? this.frame : false);
         }
 
         onWillStart(() => {
             if (this.props.frame) {
-                return Promise.all([
-                    user.hasGroup("base.group_user").then((isSystemUser) => {
-                        this.showFrameCheck = isSystemUser;
-                    }),
-                    loadJS("/sign/static/lib/html2canvas.js"),
-                ]);
+                return loadJS("/sign/static/lib/html2canvas.js");
             }
         });
     }
@@ -110,29 +110,31 @@ export class SignNameAndSignature extends NameAndSignature {
 }
 
 export class SignNameAndSignatureDialog extends Component {
-    static props = {
-        signature: Object,
-        frame: { type: Object, optional: true },
-        signatureType: { type: String, optional: true },
-        displaySignatureRatio: Number,
-        activeFrame: Boolean,
-        defaultFrame: { type: String, optional: true },
-        mode: { type: String, optional: true },
-        signatureImage: { type: String, optional: true },
-        hash: String,
-        onConfirm: Function,
-        onConfirmAll: { type: Function, optional: true },
-        close: Function,
-    };
     static template = "sign.SignNameAndSignatureDialog";
     static components = {
         Dialog,
         SignNameAndSignature,
     };
 
+    props = useProps({
+        signature: t.object(),
+        frame: t.object().optional(),
+        signatureType: t.string().optional(),
+        displaySignatureRatio: t.number(),
+        activeFrame: t.boolean(),
+        defaultFrame: t.string().optional(),
+        mode: t.string().optional(),
+        signatureImage: t.string().optional(),
+        hash: t.string(),
+        onConfirm: t.function(),
+        onConfirmAll: t.function().optional(),
+        close: t.function(),
+    });
+
     setup() {
-        this.footerState = useState({
-            signButtonDisabled: !this.props.signature.name || !this.props.signature.signatureChanged,
+        this.footerState = proxy({
+            signButtonDisabled:
+                !this.props.signature.name || !this.props.signature.signatureChanged,
             signAllButtonsDisabled: !this.props.signature.name,
         });
     }
@@ -168,13 +170,13 @@ export class SignNameAndSignatureDialog extends Component {
 
     onSignatureChange(signMode) {
         const { name, isSignatureEmpty, signatureChanged } = this.props.signature;
-        const isAutoMode = signMode === "auto"
+        const isAutoMode = signMode === "auto";
         // Disable Sign all button if:
         // - Name is missing or empty
         //   - In "auto" mode, the name is only whitespace
         //   - In any other mode, the signature is empty
-        const buttonsDisabled = !name || isAutoMode ? !name.trim() : isSignatureEmpty
-        if (this.footerState.signAllButtonsDisabled !== buttonsDisabled){
+        const buttonsDisabled = !name || isAutoMode ? !name.trim() : isSignatureEmpty;
+        if (this.footerState.signAllButtonsDisabled !== buttonsDisabled) {
             this.footerState.signAllButtonsDisabled = buttonsDisabled;
         }
         // Disable Sign button if:

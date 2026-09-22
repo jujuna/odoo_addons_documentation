@@ -4,6 +4,7 @@
         <field name="name">IMB - Intermediate management balances</field>
         <field name="name@fr">SIG - Soldes intermédiaires de gestion</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="country_id" ref="base.fr"/>
@@ -46,8 +47,6 @@
                                 <field name="name">Sale of goods</field>
                                 <field name="name@fr">Ventes de marchandises</field>
                                 <field name="code">l10n_fr_imb_sale_of_goods</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_fr_pl_imb_sale_of_goods_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -60,8 +59,6 @@
                                 <field name="name">Purchase cost of goods sold</field>
                                 <field name="name@fr">Cout d'achat des marchandises vendues</field>
                                 <field name="code">l10n_fr_imb_purchase_cost_of_goods_sold</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_fr_pl_imb_purchase_cost_of_goods_sold_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -89,8 +86,6 @@
                                 <field name="name">Production sold</field>
                                 <field name="name@fr">Production vendue</field>
                                 <field name="code">l10n_fr_imb_production_sold</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_fr_pl_imb_production_sold_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -117,7 +112,6 @@
                                 <field name="name@fr">Production (dé)stockée</field>
                                 <field name="code">l10n_fr_imb_de_stocked_production</field>
                                 <field name="groupby" eval="False"/>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                      <record id="l10n_fr_pl_imb_de_stocked_production_code" model="account.report.expression">
                                         <field name="label">code</field>
@@ -147,8 +141,6 @@
                                 <field name="name">Capitalized production</field>
                                 <field name="name@fr">Production immobilisée</field>
                                 <field name="code">l10n_fr_imb_capitalized_production</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_fr_pl_imb_capitalized_production_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -163,8 +155,6 @@
                         <field name="name">Consumption during the year from third parties (III)</field>
                         <field name="name@fr">Consommations de l'exercice en provenance de tiers (III)</field>
                         <field name="code">l10n_fr_imb_consumption_during_the_year_from_third_parties</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_consumption_during_the_year_from_third_parties_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -193,8 +183,6 @@
                         <field name="name">Operating subsidies (a)</field>
                         <field name="name@fr">Subventions d'exploitation (a)</field>
                         <field name="code">l10n_fr_imb_operation_subsidies</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_operation_subsidies_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -207,8 +195,6 @@
                         <field name="name">Taxes and similar payments (b)</field>
                         <field name="name@fr">Impots, taxes et versements assimilés (b)</field>
                         <field name="code">l10n_fr_imb_taxes_and_similar_payments</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_taxes_and_similar_payments_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -222,8 +208,6 @@
                         <field name="name">Personnel costs (c)</field>
                         <field name="name@fr">Charges de personnel (c)</field>
                         <field name="code">l10n_fr_imb_personnel_costs</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_personnel_cost_balances" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -252,8 +236,6 @@
                         <field name="name">Other operating income (d)</field>
                         <field name="name@fr">Autre produits d'exploitation (d)</field>
                         <field name="code">l10n_fr_imb_other_operating_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_other_operating_income_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -266,8 +248,6 @@
                         <field name="name">Reversals of depreciations and operating provisions (e)</field>
                         <field name="name@fr">Reprises sur dépreciations et provisions d'exploitations (e)</field>
                         <field name="code">l10n_fr_imb_reversals_of_depreciations_and_operation_provisions</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_reversals_of_depreciations_and_operation_provisions_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -305,8 +285,6 @@
                         <field name="name">Amortization, depreciation and operating provisions (h)</field>
                         <field name="name@fr">Dotations aux amort., dépréciations et provisions d'exploitation (h)</field>
                         <field name="code">l10n_fr_imb_amortization_depreciation_and_operating_provisions</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_amortization_depreciation_and_operating_provisions_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -320,8 +298,6 @@
                         <field name="name">Other expenses (i)</field>
                         <field name="name@fr">Autres charges (i)</field>
                         <field name="code">l10n_fr_imb_other_expenses</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_other_expenses_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -362,8 +338,6 @@
                         <field name="name">Share of profit on joint operations (k)</field>
                         <field name="name@fr">Quote-part de résultat sur opérations faites en commun (k)</field>
                         <field name="code">l10n_fr_imb_share_of_profit_on_joint_operations</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_share_of_profit_on_joint_operations_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -376,8 +350,6 @@
                         <field name="name">Financial income (l)</field>
                         <field name="name@fr">Produits financiers (l)</field>
                         <field name="code">l10n_fr_imb_financial_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_financial_income_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -390,8 +362,6 @@
                         <field name="name">Share of profit from joint operations (m)</field>
                         <field name="name@fr">Quote-part de résultat sur opérations faites en commun (m)</field>
                         <field name="code">l10n_fr_imb_share_of_profit_from_joint_operations</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_share_of_profit_from_joint_operations_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -405,8 +375,6 @@
                         <field name="name">Financial charges (n)</field>
                         <field name="name@fr">Charges financières (n)</field>
                         <field name="code">l10n_fr_imb_financial_charges</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_financial_charges_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -435,8 +403,6 @@
                         <field name="name">Extraordinary income (o)</field>
                         <field name="name@fr">Produits exceptionnels (o)</field>
                         <field name="code">l10n_fr_imb_extraordinary_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_extraordinary_income_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -449,8 +415,6 @@
                         <field name="name">Exceptional expenses (p)</field>
                         <field name="name@fr">Charges exceptionnelles (p)</field>
                         <field name="code">l10n_fr_imb_exceptional_expenses</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_exceptional_expenses_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -479,8 +443,6 @@
                         <field name="name">Employee participation (q)</field>
                         <field name="name@fr">Participation des salariés (q)</field>
                         <field name="code">l10n_fr_imb_employee_participation</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_employee_participation_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -494,8 +456,6 @@
                         <field name="name">Income tax (r)</field>
                         <field name="name@fr">Impôt sur les bénéfices (r)</field>
                         <field name="code">l10n_fr_imb_income_tax</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_fr_pl_imb_income_tax_balance" model="account.report.expression">
                                 <field name="label">balance</field>

@@ -1,3 +1,4 @@
+import { useSubEnv } from "@web/owl2/utils";
 import {
     ReadonlyEmbeddedViewComponent,
     readonlyViewEmbedding,
@@ -12,7 +13,6 @@ import { ItemCalendarPropsDialog } from "@knowledge/components/item_calendar_pro
 import { PromptEmbeddedViewNameDialog } from "@knowledge/components/prompt_embedded_view_name_dialog/prompt_embedded_view_name_dialog";
 import { useBus, useService } from "@web/core/utils/hooks";
 import { uuid } from "@web/core/utils/strings";
-import { useSubEnv } from "@odoo/owl";
 
 export class EmbeddedViewComponent extends ReadonlyEmbeddedViewComponent {
     setup() {

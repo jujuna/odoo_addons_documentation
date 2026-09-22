@@ -1,4 +1,4 @@
-import { KanbanCompiler } from "@web/views/kanban/kanban_compiler";
+import { CardCompiler } from "@web/views/card/card_compiler";
 import { computeXpath, applyInvisible } from "../xml_utils";
 import { createElement, getTag } from "@web/core/utils/xml";
 import { isComponentNode } from "@web/views/view_compiler";
@@ -39,7 +39,7 @@ function setElementXpath(el, xpath) {
     }
 }
 
-export class KanbanEditorCompiler extends KanbanCompiler {
+export class KanbanEditorCompiler extends CardCompiler {
     applyInvisible(invisible, compiled, params) {
         return applyInvisible(invisible, compiled, params);
     }
@@ -84,7 +84,9 @@ export class KanbanEditorCompiler extends KanbanCompiler {
             }
             return !["aside"].includes(e.tagName);
         });
-        return createElement("main", elementsToWrap);
+        const mainEl = createElement("div", elementsToWrap);
+        mainEl.setAttribute("class", "o_record_main");
+        return mainEl;
     }
 
     compile(key, params = {}) {
@@ -105,7 +107,7 @@ export class KanbanEditorCompiler extends KanbanCompiler {
     }
 
     compileCard(node, params) {
-        const mainNode = node.querySelector("main");
+        const mainNode = node.querySelector("div[class='o_record_main']");
         if (!mainNode) {
             // to ease the addition of studio hooks in the UI, we make sure the kanban card contains a <main> node,
             // which wraps the content of the card, even if the original template didn't compile this node
@@ -116,7 +118,7 @@ export class KanbanEditorCompiler extends KanbanCompiler {
         const asideNode = node.querySelector("aside");
         const ribbonNode = node.querySelector("widget[name='web_ribbon']");
         const compiledCard = super.compileNode(node, params);
-        const compiledMain = compiledCard.querySelector("main");
+        const compiledMain = compiledCard.querySelector("div[class='o_record_main']");
         if (!ribbonNode) {
             this.addStudioHook(compiledMain, "ribbon", "kanbanRibbon");
         }
@@ -205,7 +207,7 @@ export class KanbanEditorCompiler extends KanbanCompiler {
             compiled.classList.add("o_inner_section");
             compiled.classList.add("o-web-studio-editor--element-clickable");
             this.compileInnerSection(compiled);
-        } else if (getTag(node) === "main") {
+        } else if (getTag(node) === "div" && node.classList.contains("o_record_main")) {
             this.compileInnerSection(compiled);
             if (!compiled.querySelector("footer")) {
                 const footerHook = createElement("StudioHook", {

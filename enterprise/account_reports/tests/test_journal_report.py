@@ -8,6 +8,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestJournalReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -67,7 +69,7 @@ class TestJournalReport(TestAccountReportsCommon):
         cls.move_sales_0.action_post()
 
         # Invoice in 2017 for company_1, with foreign currency to test a sale journal at current date.
-        cls.other_currency = cls.setup_other_currency('EUR', rounding=0.001, rates=[('2016-01-01', 2.0), ('2017-01-01', 2.0)])
+        cls.other_currency = cls.setup_other_currency('EUR', rounding=0.001, rates=[('2015-12-31', 2.0), ('2016-12-31', 2.0)])
 
         cls.move_sales_1 = cls.env['account.move'].create({
             'move_type': 'out_invoice',
@@ -100,7 +102,6 @@ class TestJournalReport(TestAccountReportsCommon):
             })],
         })
         cls.move_sales_2.action_post()
-        cls.move_sales_2.payment_reference = ''
 
         # Set up a tax report, tax report line, and all needed to get a tax with a grid.
         cls.company_data['company'].country_id = cls.env.ref('base.us')
@@ -166,7 +167,7 @@ class TestJournalReport(TestAccountReportsCommon):
 
     def _filter_tax_section_lines(self, lines, exclude):
         def filter_condition(line):
-            markup = self.report._get_markup(line['id'])
+            markup = self.report._get_markup(line.id)
             return exclude ^ (isinstance(markup, str) and markup.startswith('tax_report_section'))
 
         return list(filter(filter_condition, lines))
@@ -192,12 +193,12 @@ class TestJournalReport(TestAccountReportsCommon):
         lines_2016 = self.report._get_lines(options_2016)
         self.assertLinesValues(
             self._filter_tax_section_lines(lines_2016, True),
-            [   1,                 4,          5,          6],
+            [   0,                               3,          4,          5],
             [
-                ('',              '',         '',         ''),
-                ('BNK1',         100,        100,         ''),
-                ('101401',       100,          0,        100),
-                ('400000',         0,        100,       -100),
+                ('Name',                        '',         '',         ''),
+                ('Bank',                       100,        100,         ''),
+                ('101401 Bank',                100,          0,        100),
+                ('400000 Product Sales',         0,        100,       -100),
             ],
             options_2016,
         )
@@ -208,23 +209,23 @@ class TestJournalReport(TestAccountReportsCommon):
         lines_2017 = self.report._get_lines(options_2017)
         self.assertLinesValues(
             self._filter_tax_section_lines(lines_2017, True),
-            [   1,                 4,          5,          6],
+            [   0,                                    3,          4,          5],
             [
-                ('',              '',         '',         ''),
-                ('INV',         7150,       7150,         ''),
-                ('121000',      7150,          0,       7150),
-                ('400000',         0,       7150,      -7150),
-                ('BNK1',         200,        200,         ''),
-                ('101401',       200,          0,        200),
-                ('400000',         0,        200,       -200),
+                ('Name',                             '',         '',         ''),
+                ('Sales',                          7150,       7150,         ''),
+                ('121000 Accounts Receivable',     7150,          0,       7150),
+                ('400000 Product Sales',              0,       7150,      -7150),
+                ('Bank',                            200,        200,         ''),
+                ('101401 Bank',                     200,          0,        200),
+                ('400000 Product Sales',              0,        200,       -200),
             ],
             options_2017,
         )
         tax_summary_lines_2017 = self._filter_tax_section_lines(lines_2017, False)
         tax_tag = self.tax_report.line_ids.expression_ids._get_matching_tags()
         self.assertDictEqual(
-            tax_summary_lines_2017[0]['tax_grid_summary_lines'],
-            {'United States': {'c10': {
+            tax_summary_lines_2017[0].get_custom()['tax_grid_summary_lines'],
+            {'US': {'c10': {
                 'tag_ids': tax_tag.ids,
                 'balance': '$\xa0150.00',
                 'balance_no_format': 150.0,
@@ -235,10 +236,10 @@ class TestJournalReport(TestAccountReportsCommon):
                 'impact': '$\xa0150.00',
             }}}
         )
-        self.assertEqual(tax_summary_lines_2017[1]['name'], "Global Tax Summary")
+        self.assertEqual(tax_summary_lines_2017[1].name, "Global Tax Summary")
         self.assertDictEqual(
-            tax_summary_lines_2017[2]['tax_grid_summary_lines'],
-            {'United States': {'c10': {
+            tax_summary_lines_2017[2].get_custom()['tax_grid_summary_lines'],
+            {'US': {'c10': {
                 'tag_ids': tax_tag.ids,
                 'balance': '$\xa0150.00',
                 'balance_no_format': 150.0,
@@ -254,22 +255,22 @@ class TestJournalReport(TestAccountReportsCommon):
         lines_global = self.report._get_lines(options_global)
         self.assertLinesValues(
             self._filter_tax_section_lines(lines_global, True),
-            [   1,                 4,          5,          6],
+            [   0,                                    3,          4,          5],
             [
-                ('',              '',         '',         ''),
-                ('INV',         7150,       7150,         ''),
-                ('121000',      7150,          0,       7150),
-                ('400000',         0,       7150,      -7150),
-                ('BNK1',         300,        300,         ''),
-                ('101401',       300,          0,        300),
-                ('400000',         0,        300,       -300),
+                ('Name',                             '',         '',         ''),
+                ('Sales',                          7150,       7150,         ''),
+                ('121000 Accounts Receivable',     7150,          0,       7150),
+                ('400000 Product Sales',              0,       7150,      -7150),
+                ('Bank',                            300,        300,         ''),
+                ('101401 Bank',                     300,          0,        300),
+                ('400000 Product Sales',              0,        300,       -300),
             ],
             options_global,
         )
         tax_summary_lines_global = self._filter_tax_section_lines(lines_global, False)
         self.assertDictEqual(
-            tax_summary_lines_global[0]['tax_grid_summary_lines'],
-            {'United States': {'c10': {
+            tax_summary_lines_global[0].get_custom()['tax_grid_summary_lines'],
+            {'US': {'c10': {
                 'tag_ids': tax_tag.ids,
                 'balance': '$\xa0150.00',
                 'balance_no_format': 150.0,
@@ -280,10 +281,10 @@ class TestJournalReport(TestAccountReportsCommon):
                 'impact': '$\xa0150.00',
             }}}
         )
-        self.assertEqual(tax_summary_lines_global[1]['name'], "Global Tax Summary")
+        self.assertEqual(tax_summary_lines_global[1].name, "Global Tax Summary")
         self.assertDictEqual(
-            tax_summary_lines_global[2]['tax_grid_summary_lines'],
-            {'United States': {'c10': {
+            tax_summary_lines_global[2].get_custom()['tax_grid_summary_lines'],
+            {'US': {'c10': {
                 'tag_ids': tax_tag.ids,
                 'balance': '$\xa0150.00',
                 'balance_no_format': 150.0,
@@ -300,19 +301,19 @@ class TestJournalReport(TestAccountReportsCommon):
         Check the journal report lines of the default bank journal with payments included
         """
         options_no_payment = self._generate_options(self.report, '2017-01-01', '2017-01-31', default_options={'unfold_all': True, 'show_payment_lines': False})
-        outstanding_account_code = self.env['account.payment']._get_outstanding_account(payment_type='inbound').code
+        outstanding_account_code = self.env['account.payment']._get_outstanding_account(payment_type='inbound').display_name
 
         self.assertLinesValues(
             self._filter_tax_section_lines(self.report._get_lines(options_no_payment), True),
-            [   1,                 4,          5,          6],
+            [   0,                                    3,          4,          5],
             [
-                ('',              '',         '',         ''),
-                ('INV',         7150,       7150,         ''),
-                ('121000',      7150,          0,       7150),
-                ('400000',         0,       7150,      -7150),
-                ('BNK1',         200,        200,         ''),
-                ('101401',       200,          0,        200),
-                ('400000',         0,        200,       -200),
+                ('Name',                             '',         '',         ''),
+                ('Sales',                          7150,       7150,         ''),
+                ('121000 Accounts Receivable',     7150,          0,       7150),
+                ('400000 Product Sales',              0,       7150,      -7150),
+                ('Bank',                            200,        200,         ''),
+                ('101401 Bank',                     200,          0,        200),
+                ('400000 Product Sales',              0,        200,       -200),
             ],
             options_no_payment,
         )
@@ -320,16 +321,16 @@ class TestJournalReport(TestAccountReportsCommon):
         options_show_payment = self._generate_options(self.report, '2017-01-01', '2017-01-31', default_options={'unfold_all': True, 'show_payment_lines': True})
         self.assertLinesValues(
             self._filter_tax_section_lines(self.report._get_lines(options_show_payment), True),
-            [   1,                                 4,          5,          6],
+            [   0,                                    3,          4,          5],
             [
-                ('',                              '',         '',         ''),
-                ('INV',                         7150,       7150,         ''),
-                ('121000',                      7150,          0,       7150),
-                ('400000',                         0,       7150,      -7150),
-                ('BNK1',                         570,        570,         ''),
-                ('101401',                       200,          0,        200),
-                (outstanding_account_code,       370,          0,        370),
-                ('400000',                         0,        570,       -570),
+                ('Name',                             '',         '',         ''),
+                ('Sales',                          7150,       7150,         ''),
+                ('121000 Accounts Receivable',     7150,          0,       7150),
+                ('400000 Product Sales',              0,       7150,      -7150),
+                ('Bank',                            570,        570,         ''),
+                ('101401 Bank',                     200,          0,        200),
+                (outstanding_account_code,          370,          0,        370),
+                ('400000 Product Sales',              0,        570,       -570),
             ],
             options_show_payment,
         )
@@ -537,14 +538,17 @@ class TestJournalReport(TestAccountReportsCommon):
 
         # Get tax summary lines with default formatting
         lines = report._get_lines(options)
-        tax_lines = list(filter(lambda line: line.get('is_tax_section_line'), lines))
+        client_lines = [l.as_dict() for l in lines]
+        tax_lines = list(filter(lambda line: line.get('is_tax_section_line'), client_lines))
 
-        default_balance = tax_lines[0]['tax_grid_summary_lines']['United States']['c10']['+']
+        default_balance = tax_lines[0]['tax_grid_summary_lines']['US']['c10']['+']
         self.assertEqual(default_balance, '$\xa0150.00')  # Default: $150.00
 
         # Test with thousands rounding unit, call via dispatch_report_action like the frontend does
         options['rounding_unit'] = 'thousands'
-        report.dispatch_report_action(options, 'format_column_values_from_client', lines)
+        thousands_client_lines = [l.as_dict() for l in report.dispatch_report_action(options, 'format_column_values_from_client', client_lines)]
 
-        thousands_balance = tax_lines[0]['tax_grid_summary_lines']['United States']['c10']['+']
-        self.assertEqual(thousands_balance, '$\xa00')  # Thousands: $0 (150/1000 = 0.15 rounded to 0)
+        tax_lines = list(filter(lambda line: line.get('is_tax_section_line'), thousands_client_lines))
+
+        thousands_balance = tax_lines[0]['tax_grid_summary_lines']['US']['c10']['+']
+        self.assertEqual(thousands_balance, '$\xa00k')  # Thousands: $0k (150/1000 = 0.15 rounded to 0)

@@ -2,7 +2,7 @@
 <templates>
     <t t-name="account_reports.account_return_dashboard_list">
         <table>
-            <t t-foreach="accountReturns" t-as="accountReturn" t-key="accountReturn.id">
+            <t t-foreach="this.state.accountReturns" t-as="accountReturn" t-key="accountReturn.id">
                 <tr>
                     <td class="px-1 text-start">
                         <a t-att-title="accountReturn.name"
@@ -13,7 +13,7 @@
                             t-out="accountReturn.name"/>
                     </td>
                     <td class="px-1 text-end" t-att-class="accountReturn.deadlineClass">
-                        <t t-out="accountReturn.deadlineDisplay"/>
+                        <t t-out="accountReturn.deadline"/>
                     </td>
                 </tr>
             </t>

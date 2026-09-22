@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates>
-    <div t-name="spreadsheet_edition.SelectionFilterEditorSidePanel" class="o_spreadsheet_filter_editor_side_panel">
+    <div t-name="spreadsheet_edition.SelectionFilterEditorSidePanel" class="o_spreadsheet_filter_editor_side_panel" data-id="selection-filter-panel">
         <Section title.translate="Label">
             <TextInput
-                placeholder="store.labelPlaceholder"
-                class="'o_global_filter_label' + (store.missingLabelError ? ' o_field_invalid' : '')"
-                value="store.filter.label"
-                onChange.bind="setLabel"
+                placeholder="this.store.labelPlaceholder"
+                class="'o_global_filter_label' + (this.store.missingLabelError ? ' o_field_invalid' : '')"
+                value="this.store.filter.label"
+                onChange.bind="this.setLabel"
                 autofocus="true"
             />
         </Section>
-        <t t-if="store.isValid">
+        <t t-if="this.store.isValid">
             <Section title.translate="Selection field" class="'o-selection-model-field'">
                 <div class="o-section-subtitle">Model</div>
                 <ModelSelector
-                    value="store.selectionModelLabel"
-                    onModelSelected.bind="store.onSelectionModelSelected"
+                    value="this.store.selectionModelLabel"
+                    onModelSelected.bind="this.store.onSelectionModelSelected"
                 />
-                <t t-if="store.filter.resModel">
+                <t t-if="this.store.filter.resModel">
                     <div class="o-section-subtitle">Field</div>
                     <ModelFieldSelector
-                        path="store.filter.selectionField"
-                        resModel="store.filter.resModel"
+                        path="this.store.filter.selectionField"
+                        resModel="this.store.filter.resModel"
                         readonly="false"
                         allowEmpty="false"
-                        isDebugMode="!!env.debug"
-                        update.bind="store.onSelectionFieldSelected"
-                        filter.bind="filterSelectionsFields"
+                        isDebugMode="this.debugMode.isActive()"
+                        update.bind="this.store.onSelectionFieldSelected"
+                        filter.bind="this.filterSelectionsFields"
                     />
                 </t>
             </Section>
-            <Section title.translate="Filter value" t-if="store.filter.resModel and store.filter.selectionField">
+            <Section title.translate="Filter value" t-if="this.store.filter.resModel and this.store.filter.selectionField">
                 <div class="o-section-subtitle">Default value</div>
-                <SelectionFilterValue
-                    resModel="store.filter.resModel"
-                    field="store.filter.selectionField"
-                    value="store.filter.defaultValue?.selectionValues ?? []"
-                    onValueChanged.bind="updateSelectionDefaultValue"
+                <GlobalFilterInput
+                    filter="this.store.filter"
+                    setGlobalFilterValue.bind="this.updateDefaultValue"
+                    updateOperator.bind="this.updateOperator"
+                    globalFilterValue="this.store.filter.defaultValue"
                 />
             </Section>
-            <t t-if="store.shouldDisplayFieldMatching">
-                <SidePanelCollapsible isInitiallyCollapsed="!store.isNew" title.translate="Field matching">
+            <t t-if="this.store.shouldDisplayFieldMatching">
+                <SidePanelCollapsible isInitiallyCollapsed="!this.store.isNew" title.translate="Field matching">
                     <t t-set-slot="content">
                         <Section class="'pt-0'">
                             <FilterEditorFieldMatching
-                                fieldMatchings="store.fieldsMatching"
-                                selectField.bind="store.updateFieldMatching"
-                                filterModelFieldSelectorField="store.filterModelFieldSelectorField"
+                                fieldMatchings="this.store.fieldsMatching"
+                                selectField.bind="this.store.updateFieldMatching"
+                                filterModelFieldSelectorField="this.store.filterModelFieldSelectorField"
                             />
                         </Section>
                     </t>
@@ -54,8 +54,8 @@
             </t>
         </t>
         <Section t-else="1">
-            <ValidationMessages messages="[invalidModel]" msgType="'error'"/>
+            <ValidationMessages messages="[this.invalidModel]" msgType="'error'"/>
         </Section>
-        <GlobalFilterFooter t-props="footerProps"/>
+        <GlobalFilterFooter t-props="this.footerProps"/>
     </div>
 </templates>

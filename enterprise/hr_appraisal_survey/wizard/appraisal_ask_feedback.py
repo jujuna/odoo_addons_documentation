@@ -40,8 +40,7 @@ class AppraisalAskFeedback(models.TransientModel):
     allowed_survey_template_ids = fields.Many2many('survey.survey', compute='_compute_allowed_survey_template_ids')
     survey_template_id = fields.Many2one('survey.survey', required=True, compute='_compute_survey_template_id', compute_sudo=False, store=True,
                                          readonly=False, domain="[('id', 'in', allowed_survey_template_ids)]")
-    employee_ids = fields.Many2many(
-        'hr.employee', string="Recipients", required=True)
+    partner_ids = fields.Many2many('res.partner', string="Recipients", required=True)
     deadline = fields.Date(string="Answer Deadline", required=True, compute='_compute_deadline', store=True, readonly=False)
     user_body = fields.Html('User Contents')
 
@@ -61,10 +60,10 @@ class AppraisalAskFeedback(models.TransientModel):
                 options={'post_process': True}
             )[wizard_su.appraisal_id.id]
 
-    @api.depends('template_id', 'employee_ids')
+    @api.depends('template_id', 'partner_ids')
     def _compute_body(self):
         for wizard in self:
-            langs = set(wizard.employee_ids.user_partner_id.mapped('lang')) - {False}
+            langs = set(wizard.partner_ids.mapped('lang')) - {False}
             if len(langs) == 1:
                 wizard = wizard.with_context(lang=langs.pop())
             super(AppraisalAskFeedback, wizard)._compute_body()
@@ -83,65 +82,31 @@ class AppraisalAskFeedback(models.TransientModel):
 
     @api.depends('appraisal_id.date_close')
     def _compute_deadline(self):
-        date_in_month = fields.Date.today() + relativedelta(months=1)
         for wizard in self:
-            # allow "last day" feedback fill by adding 1 day
-            wizard.deadline = min(date_in_month, wizard.appraisal_id.date_close + relativedelta(days=1))
-
-    @api.onchange('employee_ids')
-    def _onchange_employee_ids(self):
-        emailless_employees = self.employee_ids.filtered(lambda e: not (e.work_email or e.user_id.partner_id.email))
-        if emailless_employees:
-            warning = {
-                'title': _('Missing email'),
-                'message': _('The following employees do not have any email: \n%s',
-                        ', '.join(emailless_employees.mapped('name'))),
-                'type': 'notification',
-            }
-            self.employee_ids = self.employee_ids - emailless_employees
-            return {'warning': warning}
+            wizard.deadline = wizard.appraisal_id.date_close
 
     @api.onchange('template_id')
     def _onchange_template_id(self):
         self.attachment_ids = self.template_id.attachment_ids
 
-    def _prepare_survey_anwers(self, employees):
-        answers = self.env['survey.user_input']
-        employees_info = employees.mapped(lambda employee: {
-            'id': employee.id,
-            'email': employee.work_email or employee.user_id.partner_id.email,
-            'partner_id': employee.work_contact_id or employee.user_id.partner_id,
-        })
-        emails = [e['email'] for e in employees_info]
-        partner_ids = [e['partner_id']['id'] for e in employees_info]
-
-        existing_answers = self.env['survey.user_input'].search([
+    def _prepare_survey_answers(self, partners):
+        answers = self.env['survey.user_input'].search([
             '&', '&',
             ('survey_id', '=', self.survey_template_id.id),
             ('appraisal_id', '=', self.appraisal_id.id),
             '|',
-            '&', ('partner_id', 'in', partner_ids), ('partner_id', '!=', False),
-            '&', ('email', 'in', emails), ('email', '!=', False),
+            '&', ('partner_id', 'in', partners.ids), ('partner_id', '!=', False),
+            '&', ('email', 'in', partners.mapped('email')), ('email', '!=', False),
         ])
-        employees_done = []
-        if existing_answers:
-            existing_answer_emails = existing_answers.filtered('email').mapped('email')
-            existing_answer_partners_id = existing_answers.filtered('partner_id').mapped('partner_id')
-            for employee_data in employees_info:
-                if employee_data.get('email') in existing_answer_emails or employee_data.get('partner_id') in existing_answer_partners_id:
-                    employees_done.append(employee_data)
-            existing_answers = existing_answers.sorted(lambda answer: answer.create_date, reverse=True)
-            for employee_done in employees_done:
-                answers |= existing_answers\
-                    .filtered(lambda a:
-                        (a.partner_id and a.partner_id == employee_done.get('partner_id'))
-                        or (a.email and a.email == employee_done.get('email'))
-                    )[:1]
+        new_or_updated_answers = answers.filtered(lambda l: l.deadline.date() != self.deadline)
 
-        for new_employee in filter(lambda e: e['id'] not in [e['id'] for e in employees_done], employees_info):
-            answers |= self.survey_template_id.sudo()._create_answer(
-                partner=new_employee['partner_id'], email=new_employee['email'], check_attempts=False, deadline=self.deadline)
-        return answers
+        for new_partner in (partners - answers.partner_id):
+            created_answer = self.survey_template_id.sudo()._create_answer(
+                partner=new_partner, email=new_partner.email, check_attempts=False, deadline=self.deadline)
+            new_or_updated_answers |= created_answer
+
+        new_or_updated_answers.sudo().write({'appraisal_id': self.appraisal_id.id, 'deadline': self.deadline})
+        return new_or_updated_answers
 
     def _send_mail(self, answer):
         """ Create mail specific for recipient containing notably its access token """
@@ -176,25 +141,25 @@ class AppraisalAskFeedback(models.TransientModel):
     def action_send(self):
         self.ensure_one()
 
-        if fields.Date.today() > self.deadline:
+        if fields.Date.context_today(self) > self.deadline:
             raise UserError(_("Please set an Answer Deadline in the future"))
 
-        answers = self._prepare_survey_anwers(self.employee_ids)
-        answers.sudo().write({'appraisal_id': self.appraisal_id.id, 'deadline': self.deadline})
-        for answer in answers:
-            self._send_mail(answer)
+        new_or_updated_answers = self._prepare_survey_answers(self.partner_ids)
 
-        for employee in self.employee_ids.filtered(lambda e: e.user_id and e.user_id.has_group('hr_appraisal.group_hr_appraisal_user')):
-            answer = answers.filtered(lambda l: l.partner_id and l.partner_id in [employee.user_id.partner_id, employee.work_contact_id])
+        for survey_input in new_or_updated_answers:
+            self._send_mail(survey_input)
+
+        for partner in self.partner_ids.filtered(lambda p: p.employee and p.user_id and p.user_id.has_group('hr_appraisal.group_hr_appraisal_user')):
+            answer = new_or_updated_answers.filtered(lambda l: l.partner_id == partner)
             if answer:
                 self.appraisal_id.with_context(mail_activity_quick_update=True).activity_schedule(
                     'mail.mail_activity_data_todo', self.deadline,
                     summary=_('Fill the feedback form on survey'),
                     note=_('An appraisal feedback was requested. Please take time to fill the <a href="%s" target="_blank">survey</a>',
                         answer.get_start_url()),
-                    user_id=employee.user_id.id)
+                    user_id=partner.user_id.id)
 
-        self.appraisal_id.employee_feedback_ids |= self.employee_ids
+        self.appraisal_id.partner_feedback_ids |= self.partner_ids
         self.appraisal_id.survey_ids |= self.survey_template_id
         return {'type': 'ir.actions.act_window_close'}
 

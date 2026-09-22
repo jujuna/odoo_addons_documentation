@@ -1,185 +1,160 @@
-import { useService } from "@web/core/utils/hooks";
+import { onMounted, onWillStart, proxy, signal, status, useEffect } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
+import { useBus, useService } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { listView } from "@web/views/list/list_view";
 import { ListController } from "@web/views/list/list_controller";
-import { _t } from "@web/core/l10n/translation";
-import { onWillStart, onWillRender, useState, markup } from "@odoo/owl";
-import { PayRunCard } from "../../components/payrun_card/payrun_card";
-import { Record } from "@web/model/record";
 import { PayslipListRenderer } from "./hr_payslip_list_renderer";
-import { parseXML } from "@web/core/utils/xml";
-import { useViewCompiler } from "@web/views/view_compiler";
-import { PayRunKanbanCompiler } from "../payslip_run_kanban/hr_payslip_run_kanban_compiler";
+import { PayrunNewDropdown } from "@hr_payroll/views/payslip_run_new_dropdown/payslip_run_new_dropdown";
+import { PayRunLayout } from "@hr_payroll/search/payrun_layout";
 
 export class PayslipListController extends ListController {
     static template = "hr_payroll.PayslipListView";
     static components = {
-        ...ListController.components,
-        PayRunCard,
-        Record,
+        ...PayslipListController.components,
+        PayrunNewDropdown,
+        Layout: PayRunLayout,
     };
-
-    static KANBAN_CARD_ATTRIBUTE = "card";
-    static KANBAN_MENU_ATTRIBUTE = "menu";
-
     setup() {
         super.setup();
+
+        this.rootRef = this.rootRef ?? signal.ref();
+
+        let _resolvePayRun;
+        this.isPayRunReady = new Promise((resolve) => {
+            _resolvePayRun = resolve;
+        });
+        const self = this;
+        this.payRunReactive = proxy({
+            _payRunId: this.props.context?.payrun_id ?? null,
+            get payRunId() {
+                return this._payRunId;
+            },
+            set payRunId(value) {
+                this._payRunId = value;
+                if (value) {
+                    _resolvePayRun(value);
+                } else {
+                    self.isPayRunReady = new Promise((resolve) => {
+                        _resolvePayRun = resolve;
+                    });
+                }
+            },
+        });
+
+        useSubEnv({
+            payRunReactive: this.payRunReactive,
+            isPayRunReady: this.isPayRunReady,
+            rootRef: this.rootRef,
+        });
+        if (this.payRunReactive.payRunId) {
+            const id = this.payRunReactive.payRunId;
+            onWillStart(async () => {
+                _resolvePayRun(id);
+            });
+        }
+
+        let prevPayRunId = this.payRunReactive.payRunId;
+        useEffect(() => {
+            const currentId = this.payRunReactive.payRunId;
+            if (currentId !== prevPayRunId) {
+                prevPayRunId = currentId;
+                if (currentId) {
+                    this.env.bus.trigger("HR_PAYROLL:UPDATE_PAYRUN");
+                }
+            }
+        });
+
         this.orm = useService("orm");
         this.viewService = useService("view");
+        this.actionService = useService("action");
         this.notificationService = useService("notification");
-        this.state = useState({});
-        this.revId = 0;
-        const viewRegistry = registry.category("views");
-
-        onWillStart(async () => {
-            const resModel = "hr.payslip.run";
-            const { relatedModels, views } = await this.viewService.loadViews({
-                resModel: resModel,
-                views: [[false, "kanban"]],
-            });
-            const { ArchParser } = viewRegistry.get("kanban");
-            const xmlDoc = parseXML(views["kanban"].arch);
-            const archInfo = new ArchParser().parse(xmlDoc, relatedModels, resModel);
-            const { templateDocs: templates } = archInfo;
-
-            this.templates = useViewCompiler(PayRunKanbanCompiler, templates);
-
-            this.payRunArchInfo = archInfo;
-            this.props.archInfo.fieldNodes = {
-                ...this.props.archInfo.fieldNodes,
-                ...archInfo.fieldNodes,
-            };
-            this.state.payRunInfo = {
-                id:
-                    this.env.searchModel.domain.find(
-                        ([field, operator]) => field === "payslip_run_id" && operator === "="
-                    )?.[2] ?? null,
-            };
-        });
-
-        onWillRender(async () => {
-            this.state.payRunInfo.id =
-                this.env.searchModel.domain.find(
-                    ([field, operator]) => field === "payslip_run_id" && operator === "="
-                )?.[2] ?? null;
-        });
+        this.state = proxy({});
 
         this.displayHeaderButtonsTransitions = {
-            draft: "action_validate",
-            validated: "action_payslip_paid",
-            paid: "action_payslip_draft",
+            draft: ["action_refresh_from_work_entries", "action_validate"],
+            validated: ["action_payslip_paid"],
+            paid: ["action_payslip_draft"],
         };
+
+        const syncPayRunFromDomain = () => {
+            const newId =
+                this.env.searchModel.domain.find(
+                    ([field, operator]) => field === "payslip_run_id" && operator === "="
+                )?.[2] || null;
+            if (newId !== this.payRunReactive.payRunId) {
+                this.payRunReactive.payRunId = newId;
+            }
+        };
+        onMounted(syncPayRunFromDomain);
+        useBus(this.env.searchModel, "update", syncPayRunFromDomain);
     }
 
-    get payrunId() {
-        return this.state.payRunInfo.id;
+    get modelParams() {
+        const params = super.modelParams;
+        const superOnRootLoaded = params.hooks?.onRootLoaded;
+        params.hooks = {
+            ...params.hooks,
+            onRootLoaded: (root) => {
+                superOnRootLoaded?.(root);
+                if (status(this) === "mounted") {
+                    this.env.bus.trigger("HR_PAYROLL:UPDATE_PAYRUN");
+                }
+            },
+        };
+        return params;
+    }
+
+    /**
+     * @override
+     */
+    async reload() {
+        await this.model.root.load();
+    }
+
+    getSelectionFields() {
+        return ["state"];
     }
 
     async onSelectionChanged() {
         await super.onSelectionChanged();
         let selection;
         if ((selection = await this.model.root.getResIds(true))) {
-            this.state.selectionStates = await this.orm.read("hr.payslip", selection, ["state"]);
+            this.state.selectionStates = await this.orm.read("hr.payslip", selection, this.getSelectionFields());
         }
     }
 
     displayButton(button) {
-        if (!Object.values(this.displayHeaderButtonsTransitions).includes(button.clickParams.name)) {
+        const stateButtons = Object.values(this.displayHeaderButtonsTransitions).flat();
+        const btnName = button.clickParams.name;
+
+        if (!stateButtons.includes(btnName)) {
             return true;
         }
-        if (
-            !this.state.selectionStates
-                ?.map((s) => s.state)
-                .every((state, i, array) => state === array[0])
-        ) {
-            return false;
-        }
-        return (
-            button.clickParams.name ===
-            this.displayHeaderButtonsTransitions[this.state.selectionStates[0]?.state]
-        );
+        const states = (this.state.selectionStates || []).map((s) => s.state);
+
+        const effectiveState = states.includes("draft")
+            ? "draft"
+            : states.includes("validated")
+            ? "validated"
+            : "paid";
+
+        return (this.displayHeaderButtonsTransitions[effectiveState] || []).includes(btnName);
+    }
+
+    afterExecuteActionButton() {
+        // a payrun action button may change the payrun state, so we need to
+        // rerender the buttons to match it
+        this.env.bus.trigger("HR_PAYROLL:UPDATE_PAYRUN");
+        return super.afterExecuteActionButton(...arguments);
+    }
+
+    createNewPayslip() {
+        return this.actionService.doAction("hr_payroll.action_hr_payslip_new");
     }
 
     createNewPayRun() {
         return this.actionService.doAction("hr_payroll.action_hr_payslip_run_create");
-    }
-
-    async selectEmployees() {
-        const employeeListAction = await this.orm.call(
-            "hr.payslip.run",
-            "action_payroll_hr_version_list_view_payrun",
-            [[this.payrunId]]
-        );
-        return this.actionService.doAction({
-            ...employeeListAction,
-            help: markup(employeeListAction.help),
-            context: {
-                active_id: this.payrunId,
-            },
-        });
-    }
-
-    async onReload() {
-        return this.actionService.doAction({ type: "ir.actions.client", tag: "soft_reload" });
-    }
-
-    async onClose() {
-        return this.actionService.doAction({ type: "ir.actions.act_window_close" });
-    }
-
-    async addPayslips() {
-        const slipIds = await this.model.root.getResIds(true);
-        await this.orm.write("hr.payslip", slipIds, {
-            payslip_run_id: this.model.config.context.active_id,
-        });
-        await this.env.model.root.load();
-        this.notificationService.add(_t("The payslips(s) are now added to the batch"), {
-            type: "success",
-        });
-        await this.onClose();
-        await this.onReload();
-    }
-
-    get recordComponentProps() {
-        return {
-            resModel: "hr.payslip.run",
-            resId: this.payrunId,
-            fieldNames: Object.values(this.payRunArchInfo.fieldNodes).map((f) => f.name),
-            context: this.props.context,
-            mode: "readonly",
-        };
-    }
-
-    async beforeExecuteActionButton(clickParams) {
-        if (clickParams.name !== "unlink") {
-            this.revId++;
-        }
-        return super.beforeExecuteActionButton(...arguments);
-    }
-
-    async afterExecuteActionButton(clickParams) {
-        if (clickParams.name === "unlink") {
-            const payrun = await this.orm.search("hr.payslip.run", [["id", "=", this.payrunId]]);
-            if (!payrun.length) {
-                this.env.config.historyBack();
-            }
-        }
-        return super.afterExecuteActionButton(...arguments);
-    }
-
-    get actionMenuProps() {
-        const res = super.actionMenuProps;
-        const oldOnActionExecuted = res.onActionExecuted;
-        res.onActionExecuted = () => {
-            this.revId++;
-            oldOnActionExecuted?.call(res);
-        };
-        return res;
-    }
-
-    onDeleteSelectedRecords() {
-        super.onDeleteSelectedRecords();
-        this.revId++;
     }
 }
 

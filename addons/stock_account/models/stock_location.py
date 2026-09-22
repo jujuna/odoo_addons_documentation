@@ -12,30 +12,24 @@ class StockLocation(models.Model):
         'account.account', 'Stock Valuation Account',
         domain=[('account_type', 'not in', ('asset_receivable', 'liability_payable', 'asset_cash', 'liability_credit_card'))],
         help="Expense account used to re-qualify products removed from stock and sent to this location")
-    is_valued_internal = fields.Boolean('Is valued inside the company', compute="_compute_is_valued", search="_search_is_valued")
-    is_valued_external = fields.Boolean('Is valued outside the company', compute="_compute_is_valued")
+    is_valued = fields.Boolean('Is valued inside the company', compute="_compute_is_valued", search="_search_is_valued")
 
     def _search_is_valued(self, operator, value):
         if operator not in ['=', '!=']:
             raise NotImplementedError(self.env._("Invalid search operator or value"))
         positive_operator = (operator == '=' and value) or (operator == '!=' and not value)
-        domain = Domain([('company_id', '!=', False), ('usage', 'in', ['internal', 'transit'])])
+        domain = Domain([('company_id', 'in', self.env.companies.ids), ('usage', 'in', ['internal', 'transit'])])
         if positive_operator:
             return domain
         return ~domain
 
     def _compute_is_valued(self):
         for location in self:
-            if location._should_be_valued():
-                location.is_valued_internal = True
-                location.is_valued_external = False
-            else:
-                location.is_valued_internal = False
-                location.is_valued_external = True
+            location.is_valued = location._should_be_valued()
 
     def _should_be_valued(self):
         """ This method returns a boolean reflecting whether the products stored in `self` should
         be considered when valuating the stock of a company.
         """
         self.ensure_one()
-        return bool(self.company_id) and self.usage in ['internal', 'transit']
+        return bool(self.company_id) and self.company_id == self.env.company and self.usage in ['internal', 'transit']

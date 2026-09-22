@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import date
+from freezegun import freeze_time
 
 from odoo.tests import tagged
 from .common import TestPayrollCommon
@@ -10,7 +11,7 @@ class TestRegularPayslip(TestPayrollCommon):
 
     @classmethod
     def setUpClass(cls):
-        super(TestRegularPayslip, cls).setUpClass()
+        super().setUpClass()
         cls.default_payroll_structure = cls.env.ref("l10n_au_hr_payroll.hr_payroll_structure_au_regular")
         cls.tax_treatment_category = 'R'
 
@@ -35,7 +36,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -54,7 +55,7 @@ class TestRegularPayslip(TestPayrollCommon):
                 ('SUPER', 555.5),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_gross_director_fee').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_gross_director_fee').id,
                 'amount': 50,
             }]
         )
@@ -79,7 +80,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -117,7 +118,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -154,7 +155,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -193,7 +194,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -234,7 +235,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 5, 38, 1250),
+                (self.work_entry_types['002.00'].id, 5, 38, 1250),
             ],
             expected_lines=[
                 # (code, total)
@@ -277,7 +278,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -311,7 +312,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 22, 167.2, 5000),
+                (self.work_entry_types['002.00'].id, 22, 167.2, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -361,7 +362,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 22, 167.2, 5000),
+                (self.work_entry_types['002.00'].id, 22, 167.2, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -412,7 +413,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -454,7 +455,7 @@ class TestRegularPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 5, 38, 2608.36),
+                (self.work_entry_types['002.00'].id, 5, 38, 2608.36),
             ],
             expected_lines=[
                 # (code, total)
@@ -470,4 +471,279 @@ class TestRegularPayslip(TestPayrollCommon):
             ],
             payslip_date_from=date(2025, 9, 29),
             payslip_date_to=date(2025, 10, 3)
+        )
+
+    def test_partial_period_uses_hourly_wage_and_worked_hours(self):
+        """
+        Partial period attendance amount should use hourly wage with worked hours only.
+        amount = hourly_wage * worked_hours * amount_rate
+        """
+        employee, contract = self._create_employee(contract_info={
+            'employee': 'Test Partial Period',
+            'wage_type': 'hourly',
+            'hourly_wage': 10,
+        })
+        attendance_work_entry_type = self.work_entry_types['002.00']
+        attendance_work_entry_type.amount_rate = 1.5
+        payslip = self.env["hr.payslip"].create({
+            "employee_id": employee.id,
+            "version_id": contract.id,
+            "struct_id": self.default_payroll_structure.id,
+            "date_from": date(2026, 5, 1),
+            "date_to": date(2026, 5, 15),
+        })
+        payslip.action_refresh_from_work_entries()
+        attendance_worked_day = payslip.worked_days_line_ids.filtered(
+            lambda w: w.work_entry_type_id == attendance_work_entry_type
+        )
+        self.assertTrue(attendance_worked_day)
+        self.assertAlmostEqual(attendance_worked_day.number_of_days, 11)
+        self.assertAlmostEqual(attendance_worked_day.number_of_hours, 83.6, 2)
+        self.assertAlmostEqual(attendance_worked_day.amount, 1254, 2)  # amount = 83.6 * 10 * 1.5 = 1254
+
+    def test_work_entry_rate_with_leave_loading_casual_loading(self):
+        """
+        Case 1: Attendance work entry with casual loading.
+            amount = hourly_wage * hours * (amount_rate + casual_loading)
+
+        Case 2: AU.PT leave loading.
+            amount = hourly_wage * hours * (1 + leave_loading_rate / 100)
+            Continue after leave loading calculation (skip casual loading).
+
+        Case 3: STP code 'T' overtime work entry.
+            Casual loading must not be applied.
+            amount = hourly_wage * hours * amount_rate
+        """
+        employee, contract = self._create_employee(contract_info={
+            'employee': 'Test Mixed AU Case',
+            'wage_type': 'hourly',
+            'hourly_wage': 10,
+            'casual_loading': 0.25,
+            'leave_loading': 'regular',
+            'leave_loading_rate': 17.5,
+        })
+        attendance_work_entry_type = self.work_entry_types['002.00']
+        au_pt_leave_type = self.env.ref('hr_work_entry.l10n_au_work_entry_type_annual_leave')
+        overtime_work_entry_type = self.env.ref('hr_work_entry.l10n_au_work_entry_type_public_holiday_week_day')
+        attendance_work_entry_type.amount_rate = 1.5
+        au_pt_leave_type.with_context(install_mode=True).write({
+            'amount_rate': 1.5,
+            'requires_allocation': False,
+        })
+        overtime_work_entry_type.with_context(install_mode=True).write({
+            'amount_rate': 1.5,
+            'requires_allocation': False,
+            'count_as': 'absence',
+            'l10n_au_work_stp_code': 'T',
+        })
+        self.env['hr.leave'].create([
+            {
+                'name': 'AU PT Leave',
+                'employee_id': employee.id,
+                'work_entry_type_id': au_pt_leave_type.id,
+                'request_date_from': date(2026, 5, 11),
+                'request_date_to': date(2026, 5, 11),
+            },
+            {
+                'name': '1d Overtime',
+                'employee_id': employee.id,
+                'work_entry_type_id': overtime_work_entry_type.id,
+                'request_date_from': date(2026, 5, 6),
+                'request_date_to': date(2026, 5, 6),
+            },
+        ])._action_validate()
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': contract.id,
+            'struct_id': self.default_payroll_structure.id,
+            'date_from': date(2026, 5, 1),
+            'date_to': date(2026, 5, 31),
+        })
+        payslip.action_refresh_from_work_entries()
+
+        attendance_worked_day = payslip.worked_days_line_ids.filtered(
+            lambda w: w.work_entry_type_id == attendance_work_entry_type
+        )
+        self.assertTrue(attendance_worked_day)
+        self.assertAlmostEqual(attendance_worked_day.number_of_days, 19)
+        self.assertAlmostEqual(attendance_worked_day.number_of_hours, 144.4, 2)
+        self.assertAlmostEqual(attendance_worked_day.amount, 2527, 2)  # amount = 144.4 * 10 * (1.5 + 0.25) = 2527
+
+        au_pt_worked_day = payslip.worked_days_line_ids.filtered(
+            lambda w: w.work_entry_type_id == au_pt_leave_type
+        )
+        self.assertTrue(au_pt_worked_day)
+        self.assertAlmostEqual(au_pt_worked_day.number_of_days, 1)
+        self.assertAlmostEqual(au_pt_worked_day.number_of_hours, 7.6)
+        self.assertAlmostEqual(au_pt_worked_day.amount, 89.3, 2)  # amount = 7.6 * 10 * 1.175 = 89.3
+
+        overtime_worked_day = payslip.worked_days_line_ids.filtered(
+            lambda w: w.work_entry_type_id == overtime_work_entry_type
+        )
+        self.assertTrue(overtime_worked_day)
+        self.assertAlmostEqual(overtime_worked_day.number_of_days, 1)
+        self.assertAlmostEqual(overtime_worked_day.number_of_hours, 7.6)
+        self.assertAlmostEqual(overtime_worked_day.amount, 114, 2)  # amount = 7.6 * 10 * 1.5 = 114
+
+    def test_regular_11_qualifying_earnings(self):
+        # There will be a new line QE on the paslip from 1st July 2026
+        employee, contract = self._create_employee(contract_info={
+            'employee': 'Test Employee',
+            'employment_basis_code': 'F',
+            'wage_type': 'monthly',
+            'schedule_pay': 'weekly',
+            'wage': 2608.36,
+            'l10n_au_training_loan': True,
+            'l10n_au_tax_free_threshold': True})
+
+        self._test_payslip(
+            employee,
+            contract,
+            expected_worked_days=[
+                # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
+                (self.work_entry_types['002.00'].id, 5, 38, 2608.36),
+            ],
+            expected_lines=[
+                # (code, total)
+                ('BASIC', 2608.36),
+                ('OTE', 2608.36),
+                ('GROSS', 2608.36),
+                ('WITHHOLD', -659),
+                ('WITHHOLD.STUDY', -202),
+                ('MEDICARE', 0),
+                ('WITHHOLD.TOTAL', -861),
+                ('NET', 1747.32),
+                ('SUPER', 313),
+            ],
+            payslip_date_from=date(2026, 6, 1),
+            payslip_date_to=date(2026, 6, 7)
+        )
+
+        self._test_payslip(
+            employee,
+            contract,
+            expected_worked_days=[
+                # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
+                (self.work_entry_types['002.00'].id, 5, 38, 2608.36),
+            ],
+            expected_lines=[
+                # (code, total)
+                ('BASIC', 2608.36),
+                ('OTE', 2608.36),
+                ('GROSS', 2608.36),
+                ('QE', 2608.36),
+                ('WITHHOLD', -654),
+                ('WITHHOLD.STUDY', -193),
+                ('MEDICARE', 0),
+                ('WITHHOLD.TOTAL', -847),
+                ('NET', 1761.36),
+                ('SUPER', 313),
+            ],
+            payslip_date_from=date(2026, 7, 1),
+            payslip_date_to=date(2026, 7, 7)
+        )
+
+    @freeze_time('2026-07-15')
+    def test_regular_12_super_cap(self):
+        """ From 1 July 2026 the Super Guarantee is computed on the Qualifying Earnings
+        (QE) at the 12% rate, but only up to the yearly maximum contribution base (cap).
+        Once the cumulative QE of the financial year reaches the cap (270830) no further
+        super is accrued. Driven by ``rule_parameter_super_2026``: {"rate": 12, "cap": 270830}.
+        """
+        employee, contract = self._create_employee(contract_info={
+            'employee': 'Test Employee',
+            'employment_basis_code': 'F',
+            'wage_type': 'monthly',
+            'wage': 100000,
+            'l10n_au_training_loan': False,
+            'l10n_au_tax_free_threshold': True,
+        })
+
+        # Month 1: well below the cap -> full 12% on QE.
+        self._test_payslip(
+            employee,
+            contract,
+            expected_worked_days=[
+                (self.work_entry_types['002.00'].id, 23, 174.8, 100000),
+            ],
+            expected_lines=[
+                ('BASIC', 100000),
+                ('OTE', 100000),
+                ('GROSS', 100000),
+                ('QE', 100000),
+                ('WITHHOLD', -44157),
+                ('MEDICARE', 0),
+                ('WITHHOLD.TOTAL', -44157),
+                ('NET', 55843),
+                ('SUPER', 12000),  # 100000 * 12%
+            ],
+            payslip_date_from=date(2026, 7, 1),
+            payslip_date_to=date(2026, 7, 31),
+        )
+
+        # Month 2: cumulative QE = 200000, still below the cap -> full 12%.
+        self._test_payslip(
+            employee,
+            contract,
+            expected_worked_days=[
+                (self.work_entry_types['002.00'].id, 21, 159.6, 100000),
+            ],
+            expected_lines=[
+                ('BASIC', 100000),
+                ('OTE', 100000),
+                ('GROSS', 100000),
+                ('QE', 100000),
+                ('WITHHOLD', -44157),
+                ('MEDICARE', 0),
+                ('WITHHOLD.TOTAL', -44157),
+                ('NET', 55843),
+                ('SUPER', 12000),  # 100000 * 12%
+            ],
+            payslip_date_from=date(2026, 8, 1),
+            payslip_date_to=date(2026, 8, 31),
+        )
+
+        # Month 3: cumulative QE crosses the cap. Only 70830 (270830 - 200000) of QE
+        # remains eligible -> super is capped.
+        self._test_payslip(
+            employee,
+            contract,
+            expected_worked_days=[
+                (self.work_entry_types['002.00'].id, 22, 167.2, 100000),
+            ],
+            expected_lines=[
+                ('BASIC', 100000),
+                ('OTE', 100000),
+                ('GROSS', 100000),
+                ('QE', 100000),
+                ('WITHHOLD', -44157),
+                ('MEDICARE', 0),
+                ('WITHHOLD.TOTAL', -44157),
+                ('NET', 55843),
+                ('SUPER', 8499.6),  # 70830 * 12%
+            ],
+            payslip_date_from=date(2026, 9, 1),
+            payslip_date_to=date(2026, 9, 30),
+        )
+
+        # Month 4: cap already reached -> no super accrued.
+        self._test_payslip(
+            employee,
+            contract,
+            expected_worked_days=[
+                (self.work_entry_types['002.00'].id, 22, 167.2, 100000),
+            ],
+            expected_lines=[
+                ('BASIC', 100000),
+                ('OTE', 100000),
+                ('GROSS', 100000),
+                ('QE', 100000),
+                ('WITHHOLD', -44157),
+                ('MEDICARE', 0),
+                ('WITHHOLD.TOTAL', -44157),
+                ('NET', 55843),
+                ('SUPER', 0),  # cap reached
+            ],
+            payslip_date_from=date(2026, 10, 1),
+            payslip_date_to=date(2026, 10, 31),
         )

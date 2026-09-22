@@ -134,9 +134,6 @@
                 <filter string="Helpdesk Team" name="res_team" context="{'group_by':'parent_res_name'}"/>
                 <filter name="rating_text" position="move"/>
             </filter>
-            <filter name="rated_on_last_7_days" position="before">
-                <filter name="rated_on_today" string="Today" domain="[('rated_on', '&gt;=', 'today')]"/>
-            </filter>
         </field>
     </record>
 
@@ -172,9 +169,15 @@
             <field name="feedback" position="attributes">
                 <attribute name="readonly">1</attribute>
             </field>
-            <field name="rated_on" position="after">
-                <field name="is_internal" position="move"/>
+            <field name="is_internal" position="attributes">
+                <attribute name="invisible">1</attribute>
             </field>
+            <xpath expr="//label[@for='publisher_comment']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='publisher_comment']/parent::div" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <div name="rating_image_container" position="replace">
                 <label for="rating_text"/>
                 <div name="rating_image_container">

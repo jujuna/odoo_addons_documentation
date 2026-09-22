@@ -10,15 +10,14 @@ class ResCompany(models.Model):
     l10n_at_pos_is_tax_exempted = fields.Boolean(string="Tax exempted?", default=False, copy=False)
     l10n_at_pos_test_mode = fields.Boolean(string="Test Fiskaly", default=False, copy=False)
     # Fiskaly api fields
-    l10n_at_fiskaly_api_key = fields.Char(string="Fiskaly API Key (AUT)", copy=False)
-    l10n_at_fiskaly_api_secret = fields.Char(string="Fiskaly API Secret (AUT)", copy=False)
-    l10n_at_fiskaly_access_token = fields.Char(string="API Access Token", copy=False)
+    l10n_at_fiskaly_api_key = fields.Char(string="Fiskaly API Key (AUT)", groups="base.group_system", copy=False)
+    l10n_at_fiskaly_api_secret = fields.Char(string="Fiskaly API Secret (AUT)", groups="base.group_system", copy=False)
+    l10n_at_fiskaly_access_token = fields.Char(string="API Access Token", groups="base.group_system", copy=False)
     l10n_at_fiskaly_organization_id = fields.Char(string="Fiskaly organization identifier", copy=False)
-    l10n_at_is_odoo_managed_org = fields.Boolean(string="Managed By Odoo", default=True, copy=False)
     # FON fields
     l10n_at_fon_participant_id = fields.Char(string="Participation Identifier", copy=False)
     l10n_at_fon_user_id = fields.Char(string="User Identifier", copy=False)
-    l10n_at_fon_user_pin = fields.Char(string="User Pin", copy=False)
+    l10n_at_fon_user_pin = fields.Char(string="User Pin", groups="base.group_system", copy=False)
     l10n_at_is_fon_authenticated = fields.Boolean(string="FON Authenticated?", copy=False)
     # Company SCU
     l10n_at_pos_company_scuid = fields.Char(string="Fiskaly SCU id (uuid)", readonly=True, copy=False)
@@ -37,7 +36,7 @@ class ResCompany(models.Model):
 
     def _l10n_at_create_organization_payload(self):
         self._l10n_at_check_required_fiskaly_fields()
-        db_uuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
         data = {
             'name': f'{self.name} [#{db_uuid}]',  # To make sure the name is always unique
             'vat_id': self.vat,
@@ -76,20 +75,27 @@ class ResCompany(models.Model):
             msg = _("FON user id should NOT be shorter than 5 characters, please enter correct user id")
         if vals.get('l10n_at_fon_user_pin') and len(vals.get('l10n_at_fon_user_pin')) < 5:
             msg = _("FON user id should NOT be shorter than 5 characters, please verify your pin")
+        if vals.get('country_id') and any(company.sudo().l10n_at_fiskaly_access_token for company in self):
+            msg = _("You cannot change the country as it's linked to Fiskaly.")
+
         if msg:
             raise UserError(msg)
 
-        # If necessary fields are removed, need to authenticate again
-        if any(key in vals for key in ('l10n_at_fiskaly_api_key', 'l10n_at_fiskaly_api_secret')) and self.l10n_at_fiskaly_access_token:
-            vals.update({"l10n_at_fiskaly_access_token": ""})
-
-        if any(key in vals for key in ('l10n_at_fon_participant_id', 'l10n_at_fon_user_id', 'l10n_at_fon_user_pin')) and self.l10n_at_is_fon_authenticated:
-            # If any necessary fields are removed, need authentication again
-            vals.update({"l10n_at_is_fon_authenticated": False})
-
         companies = super().write(vals)
         for company in self:
-            if company.country_code == 'AT' and company.l10n_at_fiskaly_organization_id and company.l10n_at_is_odoo_managed_org:
+            # If necessary fields are removed, need to authenticate again
+            if any(key in vals for key in ('l10n_at_fiskaly_api_key', 'l10n_at_fiskaly_api_secret')) and company.sudo().l10n_at_fiskaly_access_token:
+                company.write({"l10n_at_fiskaly_access_token": ""})
+                # New API key/secret means a new organization, so the old SCU and registers
+                # no longer exist for it. Clear them to recreate on re-auth.
+                company.write({"l10n_at_pos_company_scuid": False})
+                self.env['pos.config'].search([('company_id', '=', company.id)]).l10n_at_cash_regid = False
+
+            if any(key in vals for key in ('l10n_at_fon_participant_id', 'l10n_at_fon_user_id', 'l10n_at_fon_user_pin')) and company.l10n_at_is_fon_authenticated:
+                # If any necessary fields are removed, need authentication again
+                company.write({"l10n_at_is_fon_authenticated": False})
+
+            if company.country_code == 'AT' and company.l10n_at_fiskaly_organization_id:
                 on_change_fields = ['name', 'street', 'street2', 'zip', 'city', 'vat', 'state_id', 'email']
                 if set(on_change_fields) & set(vals):
                     params = company._l10n_at_create_organization_payload()
@@ -98,18 +104,18 @@ class ResCompany(models.Model):
 
     def action_l10n_at_authenticate_fon_credentials(self):
         self.ensure_one()
-        fiskaly_client = FiskalyClient(self, self.l10n_at_fiskaly_api_key, self.l10n_at_fiskaly_api_secret)
+        fiskaly_client = FiskalyClient(self, self.sudo().l10n_at_fiskaly_api_key, self.sudo().l10n_at_fiskaly_api_secret)
         if open_sessions := self.env['pos.session'].search([('company_id', '=', self.id), ('state', '!=', 'closed')]):
             raise UserError(_('Please close and validate the following open PoS Sessions before authenticating FON.\n'
                             'Open sessions: %s', (' '.join(open_sessions.mapped('name')),)))
 
-        fiskaly_client = FiskalyClient(self, self.l10n_at_fiskaly_api_key, self.l10n_at_fiskaly_api_secret)
+        fiskaly_client = FiskalyClient(self, self.sudo().l10n_at_fiskaly_api_key, self.sudo().l10n_at_fiskaly_api_secret)
         fiskaly_client.fon_auth(
             bearer_token=self.l10n_at_fiskaly_access_token,
             data={
                 "fon_participant_id": self.l10n_at_fon_participant_id,
                 "fon_user_id": self.l10n_at_fon_user_id,
-                "fon_user_pin": self.l10n_at_fon_user_pin,
+                "fon_user_pin": self.sudo().l10n_at_fon_user_pin,
             }
         )
         self.l10n_at_is_fon_authenticated = True
@@ -118,17 +124,9 @@ class ResCompany(models.Model):
         pos_configs = self.env['pos.config'].search([('company_id', '=', self.id), ('l10n_at_cash_regid', '=', False)])
         for pos_config in pos_configs:
             pos_config._configure_register()
-        return self._notify("success", _("FON Authenticated Successfully!"))
 
     def action_generate_fiskaly_credentials(self):
         self.ensure_one()
-        # Force to be managed by Odoo
-        if not self.l10n_at_is_odoo_managed_org:
-            self.write({
-                'l10n_at_is_odoo_managed_org': True,
-                'l10n_at_fiskaly_api_key': False,
-                'l10n_at_fiskaly_api_secret': False,
-            })
         params = self._l10n_at_create_organization_payload()
         response = fiskaly_iap_rpc(self, '/register', params)
         self.write({
@@ -137,22 +135,16 @@ class ResCompany(models.Model):
             'l10n_at_fiskaly_api_secret': response[0]['l10n_at_fiskaly_api_secret'],
         })
 
-        return self.action_auth_fiskaly_credentials()
-
-    def action_auth_fiskaly_credentials(self, refresh=False):
-        self.auth_fiskaly_credentials(refresh=refresh)
-        return self._notify("success", _("Fiskaly Authentication Successful!"))
-
     def auth_fiskaly_credentials(self, refresh=False):
         """Authenticate with Fiskaly and store the access token."""
         self.ensure_one()
         fiskaly_client = FiskalyClient(self, self.l10n_at_fiskaly_api_key, self.l10n_at_fiskaly_api_secret)
-        self.l10n_at_fiskaly_access_token = fiskaly_client.auth()
+        self.sudo().l10n_at_fiskaly_access_token = fiskaly_client.auth()
 
     def _verify_required_fields(self):
         missing_fields_by_company = {}
         for company in self:
-            if company.l10n_at_fiskaly_access_token:
+            if company.sudo().l10n_at_fiskaly_access_token:
                 missing_fields = [label for field, label in [
                         (company.vat, _("VAT")),
                         (company.street, _("Street")),
@@ -171,14 +163,3 @@ class ResCompany(models.Model):
         # Austria vat format check
         if not re.match(r"^ATU\d{8}$", self.vat):
             raise UserError(_("Please enter a valid Austrian VAT number in the format ATU12345678"))
-
-    def _notify(self, notification_type, message=""):
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'type': notification_type,
-                'message': message,
-                'next': {'type': 'ir.actions.act_window_close'},
-            }
-        }

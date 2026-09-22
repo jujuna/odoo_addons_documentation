@@ -24,7 +24,8 @@ class StockForecasted_Product_Product(models.AbstractModel):
         domain = [
             ('state', '=', 'sale'),
             ('product_template_id.recurring_invoice', '=', True),
-            ('order_id.subscription_state', 'not in', SUBSCRIPTION_CLOSED_STATE)
+            ('order_id.subscription_state', 'not in', SUBSCRIPTION_CLOSED_STATE),
+            ('order_id.plan_id', '!=', False)
         ]
         if product_template_ids:
             domain += [('product_template_id', 'in', product_template_ids)]

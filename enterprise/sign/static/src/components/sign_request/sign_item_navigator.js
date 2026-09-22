@@ -51,21 +51,23 @@ export function startSignItemNavigator(parent, target, types, env) {
         });
         if (signItemsToComplete.length > 0) {
             scrollToSignItem(signItemsToComplete[0]);
+        } else {
+            scrollToValidate();
         }
     }
 
     /**
      * Sets the entire radio set on focus.
-     * @param {Number} radio_set_id 
+     * @param {Number} radio_set_id
      */
-    function highligtRadioSet(radio_set_id) {
+    function highlightRadioSet(radio_set_id) {
         parent.checkSignItemsCompletion().filter((item) => item.data.radio_set_id === radio_set_id).forEach(item => {
             item.el.classList.add("ui-selected");
         });
     }
 
     function scrollToSignItem({ el: item, data }) {
-        _scrollToSignItemPromise(item).then(() => {
+        _scrollToSignItem(item).then(() => {
             const type = types[data.type_id];
             if (type.item_type === "text" && item.querySelector("input")) {
                 item.value = item.querySelector("input").value;
@@ -78,12 +80,12 @@ export function startSignItemNavigator(parent, target, types, env) {
             parent.refreshSignItems();
             if (data.type === "radio") {
                 //we need to highligt the entire radio set items
-                highligtRadioSet(data.radio_set_id);                
+                highlightRadioSet(data.radio_set_id);
             } else {
                 item.focus();
                 item.classList.add("ui-selected");
             }
-            if (["signature", "initial"].includes(type.item_type)) {
+            if (["signature", "initial", "date"].includes(type.item_type)) {
                 if (item.dataset.hasFocus) {
                     const clickableElement = data.isSignItemEditable
                         ? item.querySelector(".o_sign_item_display")
@@ -97,7 +99,12 @@ export function startSignItemNavigator(parent, target, types, env) {
         });
     }
 
-    function _scrollToSignItemPromise(item) {
+    /**
+     * Scrolls the target container to bring the given sign item into view
+     * and positions the navigator indicator aligned to the item.
+     *  @param { HTMLElement } item
+     */
+    function _scrollToSignItem(item) {
         state.isScrolling = true;
         const viewer = target.querySelector("#viewer");
         const containerHeight = target.offsetHeight;
@@ -116,6 +123,44 @@ export function startSignItemNavigator(parent, target, types, env) {
             navigator.offsetHeight / 2 +
             item.getBoundingClientRect().height / 2;
 
+        return _scrollToNextPromise(scrollTop, scrollOffset);
+    }
+
+    /**
+     * Scrolls to the bottom and points the navigator at the validate/next-document button.
+     */
+    function scrollToValidate() {
+        // Pick the currently visible banner (validate or next document)
+        const banners = [
+            document.querySelector(".o_sign_validate_banner"),
+            document.querySelector(".o_sign_next_document_banner"),
+        ];
+        const validateBanner = banners.find(
+            (el) => el && getComputedStyle(el).display !== "none"
+        );
+        // Find the action button inside the visible banner to navigate to it
+        const button = validateBanner.querySelector(".o_validate_button, .o_next_document_button");
+
+        const iframeEl = target.ownerDocument.defaultView.frameElement;
+        // distance from browser viewport top to iframe top edge
+        const iframeTop = iframeEl ? iframeEl.getBoundingClientRect().top : 0;
+        const buttonRect = button.getBoundingClientRect();
+
+        // button position from top of iframe
+        const buttonTopInIframe = buttonRect.top - iframeTop;
+        const buttonCenter = buttonTopInIframe + buttonRect.height / 2;
+        const scrollOffset = buttonCenter - navigator.offsetHeight / 2;
+        // scroll PDF to the bottom
+        const scrollTop = target.scrollHeight;
+
+        _scrollToNextPromise(scrollTop, scrollOffset).then(() => {
+            setTip(_t("Send it"));
+            // replace click handler so next click submits/next document
+            navigator.onclick = () => button.click();
+        });
+    }
+
+    function _scrollToNextPromise(scrollTop, scrollOffset) {
         const duration = Math.max(
             Math.min(
                 1000,
@@ -141,15 +186,9 @@ export function startSignItemNavigator(parent, target, types, env) {
         });
     }
 
-    function toggle(force) {
-        navigator.style.display = force ? "" : "none";
-        navLine.style.display = force ? "" : "none";
-    }
-
     return {
         setTip,
         goToNextSignItem,
-        toggle,
         state,
     };
 }

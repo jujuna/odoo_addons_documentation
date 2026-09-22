@@ -1,46 +1,39 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from lxml import etree
-from odoo import _, fields, models
-from odoo.exceptions import UserError
+from odoo import fields, models
+from odoo.tools.business_data import street_split
+
 from odoo.addons.account_batch_payment.models.sepa_mapping import sanitize_communication
 
 
 class AccountJournal(models.Model):
     _inherit = "account.journal"
 
-    def create_iso20022_credit_transfer(self, payments, payment_method_code, batch_booking=False):
-        if (payments and payment_method_code == 'sepa_ct'
-                and self.sepa_pain_version == "pain.001.001.09"
-                and any(not payment['iso20022_uetr'] for payment in payments)):
-            raise UserError(_("Some payments are missing a value for 'UETR', required for the SEPA Pain.001.001.09 format."))
-        return super().create_iso20022_credit_transfer(payments, payment_method_code, batch_booking=batch_booking)
-
-    def _get_ReqdExctnDt_content(self, payment_date, payment_method_code):
-        force_iso_20022_pain_09 = bool(self.env['ir.config_parameter'].sudo().get_param('account_iso20022.force_iso_20022_pain_09'))
-        ReqdExctnDt = etree.Element("ReqdExctnDt")
-        use_pain_09 = (
-                (payment_method_code == 'sepa_ct' and self.sepa_pain_version == "pain.001.001.09") or
-                (payment_method_code == 'iso20022' and force_iso_20022_pain_09)
+    def _should_use_pain_09(self, payment_method_line, effective_payment_method_code=None):
+        payment_method_code = effective_payment_method_code or payment_method_line.code
+        force_iso_20022_pain_09 = bool(self.env['ir.config_parameter'].sudo().get_bool('account_iso20022.force_iso_20022_pain_09'))
+        return (
+            (payment_method_code in {'sepa_ct', 'iso20022_ch', 'iso20022_se'} and payment_method_line.sepa_pain_version == "pain.001.001.09") or
+            (payment_method_code == 'iso20022' and force_iso_20022_pain_09)
         )
-        if use_pain_09:
+
+    def _get_ReqdExctnDt_content(self, payment_date, payment_method_line, effective_payment_method_code=None):
+        ReqdExctnDt = etree.Element("ReqdExctnDt")
+        if self._should_use_pain_09(payment_method_line, effective_payment_method_code):
             Dt = etree.SubElement(ReqdExctnDt, "Dt")
             Dt.text = fields.Date.to_string(payment_date)
             return ReqdExctnDt
-        return super()._get_ReqdExctnDt_content(payment_date, payment_method_code)
+        return super()._get_ReqdExctnDt_content(payment_date, payment_method_line, effective_payment_method_code=effective_payment_method_code)
 
-    def _skip_CdtrAgt(self, partner_bank, payment_method_code):
-        if payment_method_code == 'sepa_ct' and self.sepa_pain_version == "pain_de":
+    def _skip_CdtrAgt(self, partner_bank, payment_method_line, effective_payment_method_code=None):
+        payment_method_code = effective_payment_method_code or payment_method_line.code
+        if payment_method_code == 'sepa_ct' and payment_method_line.sepa_pain_version == "pain_de":
             return False
-        return super()._skip_CdtrAgt(partner_bank, payment_method_code)
+        return super()._skip_CdtrAgt(partner_bank, payment_method_line, effective_payment_method_code=effective_payment_method_code)
 
-    def _get_CdtrAgt(self, bank_account, payment_method_code):
-        CdtrAgt = super()._get_CdtrAgt(bank_account, payment_method_code)
-        force_iso_20022_pain_09 = bool(self.env['ir.config_parameter'].sudo().get_param('account_iso20022.force_iso_20022_pain_09'))
-        use_pain_09 = (
-                (payment_method_code == 'sepa_ct' and self.sepa_pain_version == "pain.001.001.09") or
-                (payment_method_code == 'iso20022' and force_iso_20022_pain_09)
-        )
-        if use_pain_09:
+    def _get_CdtrAgt(self, bank_account, payment_method_line, effective_payment_method_code=None):
+        CdtrAgt = super()._get_CdtrAgt(bank_account, payment_method_line, effective_payment_method_code=effective_payment_method_code)
+        if self._should_use_pain_09(payment_method_line):
             FinInstnId = CdtrAgt.find(".//FinInstnId")
             partner_lei = bank_account.partner_id.iso20022_lei
             if partner_lei:
@@ -57,32 +50,32 @@ class AccountJournal(models.Model):
             return ChrgBr
         return super()._get_ChrgBr(payment_method_code, forced_value)
 
-    def _get_PstlAdr(self, partner_id, payment_method_code):
-        force_iso_20022_pain_09 = bool(self.env['ir.config_parameter'].sudo().get_param('account_iso20022.force_iso_20022_pain_09'))
-        use_pain_09 = (
-                (payment_method_code == 'sepa_ct' and self.sepa_pain_version == "pain.001.001.09") or
-                (payment_method_code == 'iso20022' and force_iso_20022_pain_09)
-        )
-        if use_pain_09:
-            postal_address = self.get_postal_address(partner_id, payment_method_code)
+    def _get_PstlAdr(self, partner_id, payment_method_line, effective_payment_method_code=None):
+        if self._should_use_pain_09(payment_method_line):
+            postal_address = self.get_postal_address(partner_id, payment_method_line, effective_payment_method_code)
             if postal_address is not None:
                 PstlAdr = etree.Element("PstlAdr")
-                for node_name, attr, size in [('StrtNm', 'street', 70), ('PstCd', 'zip', 140), ('TwnNm', 'city', 140), ('Ctry', 'country', 2)]:
+                street_details = street_split(postal_address['street'])
+                if street_name := street_details.get('street_name'):
+                    address_element = etree.SubElement(PstlAdr, 'StrtNm')
+                    address_element.text = sanitize_communication(street_name, 70)
+                if street_number := street_details.get('street_number'):
+                    address_element = etree.SubElement(PstlAdr, 'BldgNb')
+                    address_element.text = sanitize_communication(street_number, 16)
+
+                for node_name, attr, size in [('PstCd', 'zip', 140), ('TwnNm', 'city', 140), ('Ctry', 'country', 2)]:
                     if postal_address[attr]:
                         address_element = etree.SubElement(PstlAdr, node_name)
                         address_element.text = sanitize_communication(postal_address[attr], size)
                 return PstlAdr
-        return super()._get_PstlAdr(partner_id, payment_method_code)
+        return super()._get_PstlAdr(partner_id, payment_method_line, effective_payment_method_code)
 
-    def _get_CdtTrfTxInf(self, PmtInfId, payment, payment_method_code, include_charge_bearer=True):
-        CdtTrfTxInf = super()._get_CdtTrfTxInf(PmtInfId, payment, payment_method_code, include_charge_bearer)
-        force_iso_20022_pain_09 = bool(self.env['ir.config_parameter'].sudo().get_param('account_iso20022.force_iso_20022_pain_09'))
-        use_pain_09 = (
-                (payment_method_code == 'sepa_ct' and self.sepa_pain_version == "pain.001.001.09") or
-                (payment_method_code == 'iso20022' and force_iso_20022_pain_09)
-        )
+    def _get_CdtTrfTxInf(self, PmtInfId, payment, payment_method_line, include_charge_bearer=True, effective_payment_method_code=None):
+        CdtTrfTxInf = super()._get_CdtTrfTxInf(PmtInfId, payment, payment_method_line, include_charge_bearer, effective_payment_method_code)
+        payment_method_code = effective_payment_method_code or payment_method_line.code
+        force_iso_20022_pain_09 = self.env['ir.config_parameter'].sudo().get_bool('account_iso20022.force_iso_20022_pain_09')
         partner = self.env['res.partner'].sudo().browse(payment['partner_id'])
-        if use_pain_09 and payment.get("iso20022_uetr"):
+        if payment_method_code == 'iso20022' and force_iso_20022_pain_09 and payment.get("iso20022_uetr"):
             PmtId = CdtTrfTxInf.find(".//PmtId")
             UETR = etree.SubElement(PmtId, "UETR")
             UETR.text = payment["iso20022_uetr"]
@@ -92,14 +85,14 @@ class AccountJournal(models.Model):
             PstlAdr = Cdtr.find(".//PstlAdr")
             if PstlAdr is not None:
                 Cdtr.remove(PstlAdr)
-            Cdtr.append(self._get_PstlAdr(partner, payment_method_code))
+            Cdtr.append(self._get_PstlAdr(partner, payment_method_line, effective_payment_method_code))
         return CdtTrfTxInf
 
     def _get_RmtInf_content(self, ref, reference_type=''):
         if reference_type == 'be':
             return self.get_strd_tree(ref, cd='SCOR', issr='BBA')
         elif reference_type == 'ch':
-            ref = ref.rjust(27, '0')
+            ref = sanitize_communication(ref).rjust(27, '0')
             return self.get_strd_tree(ref, prtry='QRR')
         elif reference_type in ('fi', 'no', 'se'):
             return self.get_strd_tree(ref, cd='SCOR')
@@ -134,25 +127,17 @@ class AccountJournal(models.Model):
             return RmtInf
         return super()._get_RmtInf(payment_method_code, payment)
 
-    def _get_bic_tag(self, payment_method_code):
-        force_iso_20022_pain_09 = bool(self.env['ir.config_parameter'].sudo().get_param('account_iso20022.force_iso_20022_pain_09'))
-        use_pain_09 = (
-                (payment_method_code == 'sepa_ct' and self.sepa_pain_version == "pain.001.001.09") or
-                (payment_method_code == 'iso20022' and force_iso_20022_pain_09)
-        )
-        if use_pain_09:
+    def _get_bic_tag(self, payment_method_line, effective_payment_method_code=None):
+        payment_method_code = effective_payment_method_code or payment_method_line.code
+        use_pain_09 = payment_method_code == 'iso20022_se' and payment_method_line.sepa_pain_version == "pain.001.001.09"
+        if use_pain_09 or self._should_use_pain_09(payment_method_line, effective_payment_method_code):
             return 'BICFI'
         return super()._get_bic_tag(payment_method_code)
 
-    def _get_regex_for_bic_code(self, payment_method_code):
-        force_iso_20022_pain_09 = bool(self.env['ir.config_parameter'].sudo().get_param('account_iso20022.force_iso_20022_pain_09'))
-        use_pain_09 = (
-                (payment_method_code == 'sepa_ct' and self.sepa_pain_version == "pain.001.001.09") or
-                (payment_method_code == 'iso20022' and force_iso_20022_pain_09)
-        )
-        if use_pain_09:
+    def _get_regex_for_bic_code(self, payment_method_line, effective_payment_method_code=None):
+        if self._should_use_pain_09(payment_method_line, effective_payment_method_code):
             return '[A-Z0-9]{4,4}[A-Z]{2,2}[A-Z0-9]{2,2}([A-Z0-9]{3,3}){0,1}'
-        return super()._get_regex_for_bic_code(payment_method_code)
+        return super()._get_regex_for_bic_code(payment_method_line, effective_payment_method_code)
 
     def _get_SvcLvlText(self, payment_method_code):
         if payment_method_code == 'sepa_ct':

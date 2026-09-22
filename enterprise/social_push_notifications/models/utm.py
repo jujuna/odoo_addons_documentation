@@ -61,3 +61,13 @@ class UtmCampaign(models.Model):
     def _get_social_media_accounts_domain(self):
         domain = Domain(super()._get_social_media_accounts_domain())
         return domain & Domain('media_type', '!=', 'push_notifications')
+
+
+class UtmMixin(models.AbstractModel):
+    _inherit = 'utm.mixin'
+
+    @property
+    def SELF_REQUIRED_UTM_REF(self):
+        return super().SELF_REQUIRED_UTM_REF | {
+            'social_push_notifications.utm_source_push_notification': ('Push Notification', 'utm.source'),
+        }

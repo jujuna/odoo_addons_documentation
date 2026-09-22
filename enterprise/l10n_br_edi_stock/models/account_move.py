@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models, fields, _, api, Command
+from odoo import _, api, fields, models
 from odoo.tools import float_round
 
 
@@ -25,7 +25,7 @@ class AccountMove(models.Model):
             invoice.l10n_br_related_package_ids = self.env["stock.package"]
 
             # Only consider the last validated pickings in each chain.
-            for picking in self._l10n_br_get_pickings():
+            for picking in invoice._l10n_br_get_pickings():
                 if picking.state != "done":
                     continue
 
@@ -88,3 +88,16 @@ class AccountMove(models.Model):
         }
 
         return res
+
+    def _l10n_br_edi_send(self):
+        """ Override: Automatically link the picking to the invoice after it's accepted. """
+        if api_errors := super()._l10n_br_edi_send():
+            return api_errors
+        for invoice in self.filtered(lambda move: move.l10n_br_last_edi_status == 'accepted'):
+            potential_pickings = invoice._l10n_br_get_pickings().filtered(
+                lambda pick: not pick.l10n_br_related_move_id
+                    and pick.picking_type_code == "outgoing"
+                    and pick.state != "cancel",
+            )
+            potential_pickings.sudo().l10n_br_related_move_id = invoice
+        return None

@@ -27,11 +27,6 @@ registry.category("web_tour.tours").add("test_multiple_worksheet_checks", {
             run: "edit 1.0",
         },
         {
-            content: "Choose fail location",
-            trigger: ".modal:not(.o_inactive_modal) .o_selection_badge",
-            run: "click",
-        },
-        {
             content: "Confirm failed check",
             trigger: '.modal:not(.o_inactive_modal) button[name="confirm_fail"]',
             run: "click",
@@ -41,7 +36,7 @@ registry.category("web_tour.tours").add("test_multiple_worksheet_checks", {
         },
         {
             content: "Mark the next worksheet as passed",
-            trigger: '.modal:not(.o_inactive_modal):contains(Test Product) div[name="x_passed"] .form-check-input',
+            trigger: '.modal:not(.o_inactive_modal):contains(Test Product) div:contains("Valid worksheet") .form-check-input',
             run: "click",
         },
         {

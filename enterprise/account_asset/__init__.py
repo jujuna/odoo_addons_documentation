@@ -4,29 +4,21 @@
 from . import models
 from . import wizard
 from . import controller
+from . import demo
 
 
-def post_init_hook(env):
-    for company in env['res.company'].search([('chart_template', '!=', False), ('parent_id', '=', False)]):
-        ChartTemplate = env['account.chart.template'].with_company(company)
-        accounts = {
-                xmlid: filtered_vals
-                for xmlid, vals in ChartTemplate._get_account_account(company.chart_template).items()
-                if (filtered_vals := {
-                    fname: value
-                    for fname, value in vals.items()
-                    if fname in ['create_asset', 'asset_model_ids']
-                }) and ChartTemplate.ref(xmlid, raise_if_not_found=False)
-            }
-        assets = {
-                xmlid: filtered_vals
-                for xmlid, vals in ChartTemplate._get_account_asset(company.chart_template).items()
-                if (filtered_vals := {
-                    fname: value
-                    for fname, value in vals.items()
-                    if fname not in ['account_asset_id', 'account_depreciation_id', 'account_depreciation_expense_id']
-                    or value in accounts
-                    or ChartTemplate.ref(value, raise_if_not_found=False)
-                })
-            }
-        ChartTemplate._load_data({'account.asset': assets, 'account.account': accounts})
+def _post_init_hook(env):
+    env['account.chart.template']._load_pre_defined_data({
+        'account.account': {
+            'depreciation_model_id',
+            'asset_depreciation_account_id',
+            'asset_expense_account_id',
+        },
+        'account.depreciation.model': {
+            'method',
+            'method_number',
+            'method_period',
+            'method_progress_factor',
+            'company_id',
+        },
+    })

@@ -1,10 +1,11 @@
-import { Component, useState, useEffect, onPatched, markup } from "@odoo/owl";
+import { Component, onPatched, markup, useEffect, proxy } from "@odoo/owl";
 import { DocTable, TABLE_TYPES } from "@api_doc/components/doc_table";
 import { getCrudMethodsExamples } from "@api_doc/utils/doc_model_utils";
 import { DocMethod } from "@api_doc/components/doc_method";
 import { DocLoadingIndicator } from "@api_doc/components/doc_loading_indicator";
 import { useDocUI } from "@api_doc/utils/doc_ui_store";
 import { DocErrorDialog } from "@api_doc/components/doc_error_dialog";
+import { localeCompare } from "@web/core/l10n/utils";
 
 const TYPE_COLORS = {
     "text-success": ["integer", "char", "boolean", "selection", "float"],
@@ -49,10 +50,9 @@ export class DocModel extends Component {
         DocLoadingIndicator,
         DocErrorDialog,
     };
-    static props = {};
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             model: undefined,
             modelData: { items: [] },
             crudMethods: [],
@@ -67,36 +67,27 @@ export class DocModel extends Component {
         });
 
         this.ui = useDocUI();
-        this.modelStore = useState(this.env.modelStore);
+        this.modelStore = proxy(this.env.modelStore);
         this.update();
 
-        useEffect(
-            () => {
-                this.update();
-            },
-            () => [
-                this.modelStore.activeModel,
-                this.modelStore.activeMethod,
-                this.modelStore.activeField,
-            ],
-        );
+        useEffect(() => {
+            this.update();
+        });
 
-        let lastFocusedElement = null
-        onPatched(
-            () => {
-                let el = null;
-                if (this.modelStore.activeMethod) {
-                    el = document.getElementById(this.modelStore.activeMethod);
-                }
-                if (this.modelStore.activeField) {
-                    el = document.getElementById(this.modelStore.activeField);
-                }
-                if (el && el != lastFocusedElement) {
-                    lastFocusedElement = el;
-                    el.scrollIntoView({ behavior: "smooth" });
-                }
+        let lastFocusedElement = null;
+        onPatched(() => {
+            let el = null;
+            if (this.modelStore.activeMethod) {
+                el = document.getElementById(this.modelStore.activeMethod);
             }
-        );
+            if (this.modelStore.activeField) {
+                el = document.getElementById(this.modelStore.activeField);
+            }
+            if (el && el != lastFocusedElement) {
+                lastFocusedElement = el;
+                el.scrollIntoView({ behavior: "smooth" });
+            }
+        });
     }
 
     get modelName() {
@@ -169,7 +160,7 @@ export class DocModel extends Component {
         Object.values(model.methods).forEach((m) => m.module && modules.add(m.module));
 
         modules = [...modules];
-        modules.sort((a, b) => (a === "core" ? -1 : b === "core" ? 1 : a.localeCompare(b)));
+        modules.sort((a, b) => (a === "core" ? -1 : b === "core" ? 1 : localeCompare(a, b)));
         this.state.modules = modules;
     }
 
@@ -211,7 +202,7 @@ export class DocModel extends Component {
             } else if (bIndex >= 0) {
                 return 1;
             }
-            return a.name.localeCompare(b.name)
+            return localeCompare(a.name, b.name)
         });
         this.state.methods = methods;
     }
@@ -242,7 +233,7 @@ export class DocModel extends Component {
                     },
                     {
                         type: TABLE_TYPES.Tooltip,
-                        value: fieldData.help,
+                        value: fieldData.help || "",
                     },
                     {
                         type: TABLE_TYPES.Code,
@@ -251,7 +242,7 @@ export class DocModel extends Component {
                 ]
             });
 
-        fields.sort((a, b) => a[0].value.localeCompare(b[0].value));
+        fields.sort((a, b) => localeCompare(a[0].value, b[0].value));
 
         this.state.fields = {
             activeIndex,
@@ -286,5 +277,16 @@ export class DocModel extends Component {
 
     toggleAllModules(select) {
         this.setActiveModules(this.state.modules, select);
+    }
+
+    isDocTableLoaded() {
+        return this.state.fields.data
+            && this.state.model
+            && this.state.model.fields != null;
+    }
+
+    isDocMethodLoaded() {
+        return this.state.methods
+            && this.state.methods.length > 0;
     }
 }

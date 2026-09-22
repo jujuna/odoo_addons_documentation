@@ -6,6 +6,7 @@ from odoo.tests import tagged
 
 
 @tagged('wa_message')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppAPI(WhatsAppCommon, MockIncomingWhatsApp):
 
     def test_receive_attachment_with_debug_requests(self):

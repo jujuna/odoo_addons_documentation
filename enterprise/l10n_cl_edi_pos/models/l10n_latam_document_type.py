@@ -14,8 +14,8 @@ class L10n_LatamDocumentType(models.Model):
             return ['name']
         return result
 
-    def _load_pos_data_domain(self, data, config):
-        result = super()._load_pos_data_domain(data, config)
+    def _load_pos_data_domain(self, data):
+        result = super()._load_pos_data_domain(data)
         if self.env.company.country_id.code == 'CL':
             return False
         return result

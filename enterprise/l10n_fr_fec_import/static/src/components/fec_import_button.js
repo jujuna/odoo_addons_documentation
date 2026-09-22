@@ -1,6 +1,6 @@
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { useImportModel } from "@base_import/import_model";
 import { useFECParser } from "@l10n_fr_fec_import/hooks/fec_parser_hook";
@@ -9,14 +9,15 @@ import { ImportDataProgress } from "@base_import/import_data_progress/import_dat
 
 class FecImportButton extends Component {
     static template = "l10n_fr_fec_import.FecImportButton";
-    static props = standardWidgetProps;
+
+    props = useProps(standardWidgetProps);
 
     setup() {
-        this.fecFileState = useState(this.env.fecFileState);
+        this.fecFileState = proxy(this.env.fecFileState);
         this.action = useService("action");
         this.orm = useService("orm");
         this.notification = useService("notification");
-        this.importState = useState({
+        this.importState = proxy({
             totalChunks: 0,
             importProgress: {
                 value: 0,

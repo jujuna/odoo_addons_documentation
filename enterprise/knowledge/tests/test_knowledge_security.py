@@ -9,6 +9,7 @@ from odoo.tools import mute_logger
 
 
 @tagged('knowledge_acl')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
     """ Tests ACLs and low level access on models. Do not test the internals
     of permission computation as those are done in another test suite. Here
@@ -30,7 +31,7 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
             signature='--\nEmmanuel'
         )
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('user_public')
     def test_models_as_public(self):
         # ARTICLE
@@ -49,7 +50,7 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
         with self.assertRaises(exceptions.AccessError, msg='ACLs: no cover access to public'):
             self.env['knowledge.cover'].search([])
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('portal_test')
     def test_models_as_portal(self):
         article_root = self.article_roots[0].with_env(self.env)
@@ -81,7 +82,7 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
         })
         self.assertTrue(new_article)
 
-        self.env.ref("knowledge.access_knowledge_article_portal").sudo().write({"perm_create": False})
+        self.env.ref("knowledge.rule_knowledge_article_users_write").sudo().operation = 'u'
         with self.assertRaises(exceptions.AccessError):
             self.env["knowledge.article"].create({
                 "name": "New Article",
@@ -222,7 +223,7 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
         self.assertEqual(cover.attachment_url, '/')
         cover.unlink()
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_models_as_user(self):
         article_roots = self.article_roots.with_env(self.env)
@@ -253,7 +254,7 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
         })
         self.assertTrue(new_article)
 
-        self.env.ref("knowledge.access_knowledge_article_user").sudo().write({"perm_create": False})
+        self.env.ref("knowledge.rule_knowledge_article_users_write_1").sudo().operation = 'u'
         with self.assertRaises(exceptions.AccessError):
             self.env["knowledge.article"].create({
                 "name": "New Article",
@@ -303,7 +304,7 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
         self.assertEqual(cover.attachment_url, '/')
         cover.unlink()
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_models_as_user_copy(self):
         article_hidden = self.article_read_contents[3].with_env(self.env)

@@ -37,7 +37,7 @@ test("No locale icon if user locale matched spreadsheet locale", async function 
         },
     }));
     await createSpreadsheet();
-    expect(".o-spreadsheet-topbar .fa-globe").not.toHaveCount();
+    expect(".o-spreadsheet-topbar [data-icon='public']").not.toHaveCount();
 });
 
 test("No locale icon if no user locale is given", async function () {
@@ -48,7 +48,7 @@ test("No locale icon if no user locale is given", async function () {
         },
     }));
     await createSpreadsheet();
-    expect(".o-spreadsheet-topbar .fa-globe").not.toHaveCount();
+    expect(".o-spreadsheet-topbar [data-icon='public']").not.toHaveCount();
 });
 
 test("Different locales between user and spreadsheet: display icon as info", async function () {
@@ -60,7 +60,7 @@ test("Different locales between user and spreadsheet: display icon as info", asy
         },
     }));
     await createSpreadsheet();
-    expect(".o-spreadsheet-topbar .fa-globe.text-info").toHaveProperty(
+    expect(".o-spreadsheet-topbar [data-icon='public'].text-info").toHaveProperty(
         "title",
         "Difference between user locale (fr_FR) and spreadsheet locale (en_US). This spreadsheet is using the formats below:\n" +
             "- dates: m/d/yyyy\n" +
@@ -77,20 +77,21 @@ test("no warning with different locale codes but same formats", async function (
         },
     }));
     await createSpreadsheet();
-    expect(".o-spreadsheet-topbar .fa-globe").not.toHaveCount();
+    expect(".o-spreadsheet-topbar [data-icon='public']").not.toHaveCount();
 });
 
 test("changing spreadsheet locale to user locale: remove icon", async function () {
     onRpc("/spreadsheet/data/*", () => ({
         name: "Untitled spreadsheet",
         user_locale: en_US,
+        has_write_access: true,
         data: {
             settings: { locale: fr_FR },
         },
     }));
     const { model } = await createSpreadsheet();
-    expect(".o-spreadsheet-topbar .fa-globe").toHaveCount(1);
+    expect(".o-spreadsheet-topbar [data-icon='public']").toHaveCount(1);
     model.dispatch("UPDATE_LOCALE", { locale: en_US });
     await animationFrame();
-    expect(".o-spreadsheet-topbar .fa-globe").not.toHaveCount();
+    expect(".o-spreadsheet-topbar [data-icon='public']").not.toHaveCount();
 });

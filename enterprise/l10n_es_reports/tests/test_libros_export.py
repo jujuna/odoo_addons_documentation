@@ -7,6 +7,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestLibrosExport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('es')
     def setUpClass(cls):
@@ -43,7 +45,7 @@ class TestLibrosExport(TestAccountReportsCommon):
 
     def get_libros_sheet_line_vals(self):
         report = self.env.ref('l10n_es_reports.l10n_es_vat_books_report')
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
         domain = report._get_options_domain(options, 'strict_range') + [('move_type', '!=', 'entry')]
         lines = self.env['account.move.line'].search(domain)
         return self.env['l10n_es.vat.books.report.handler']._l10n_es_libros_get_sheet_line_vals(lines)
@@ -68,7 +70,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             'invoice_number': 'INV/2019/00001', 'invoice_series': '', 'invoice_type': 'F1', 'operation_code': '01',
             'operation_exempt': '', 'operation_qualification': 'S1', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
-            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '4T', 'property_reference': '',
+            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '10', 'property_reference': '',
             'property_situation': '', 'surcharge_fee': 0.0, 'surcharge_type': 0.0, 'tax_rate': 21.0,
             'taxed_amount': 210.0, 'total_amount': 1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0,
             'year': 2019,
@@ -82,7 +84,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             'expense_series_number': 'test ref', 'external_reference': '', 'investment_good': 'N',
             'invoice_type': 'F1', 'isp_taxable': 'N', 'operation_code': '01', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
-            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '2T', 'property_reference': '',
+            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '06', 'property_reference': '',
             'property_situation': '', 'reception_number': 'BILL/2019/06/0001', 'reception_number_final': '', 'surcharge_fee': 0.0,
             'surcharge_type': 0.0, 'tax_deductible': 210.0, 'tax_rate': 21.0, 'taxed_amount': 210.0,
             'total_amount': 1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0, 'year': 2019,
@@ -169,7 +171,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             'expense_series_number': 'test ref', 'external_reference': '', 'investment_good': 'N',
             'invoice_type': 'F5', 'isp_taxable': 'N', 'operation_code': '01', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
-            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '1T', 'property_reference': '',
+            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '01', 'property_reference': '',
             'property_situation': '', 'reception_number': 'BILL/2019/01/0001', 'reception_number_final': '', 'surcharge_fee': 0.0,
             'surcharge_type': 0.0, 'tax_deductible': 50.0, 'tax_rate': 10.0, 'taxed_amount': 50.0,
             'total_amount': 550.0, 'withholding_amount': 0.0, 'withholding_type': 0.0, 'year': 2019,
@@ -186,10 +188,10 @@ class TestLibrosExport(TestAccountReportsCommon):
             'activity_code': 'A', 'activity_group': '6533', 'activity_type': '03', 'base_amount': -1000.0,
             'billing_agreement': '', 'date_expedition': '01/01/2019', 'date_transaction': '', 'external_reference': '',
             'income_computable': -1000.0, 'income_concept': 'I01', 'invoice_final_number': '',
-            'invoice_number': 'RINV/2019/00001', 'invoice_series': '', 'invoice_type': 'R1', 'operation_code': '01',
+            'invoice_number': 'RINV/2019/00001', 'invoice_series': '', 'invoice_type': 'R4', 'operation_code': '01',
             'operation_exempt': '', 'operation_qualification': 'S1', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
-            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '1T', 'property_reference': '',
+            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '01', 'property_reference': '',
             'property_situation': '', 'surcharge_fee': 0.0, 'surcharge_type': 0.0, 'tax_rate': 21.0,
             'taxed_amount': -210.0, 'total_amount': -1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0,
             'year': 2019,
@@ -201,7 +203,7 @@ class TestLibrosExport(TestAccountReportsCommon):
             'invoice_number': 'INV/2019/00001', 'invoice_series': '', 'invoice_type': 'F1', 'operation_code': '01',
             'operation_exempt': '', 'operation_qualification': 'S1', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
-            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '1T', 'property_reference': '',
+            'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '01', 'property_reference': '',
             'property_situation': '', 'surcharge_fee': 0.0, 'surcharge_type': 0.0, 'tax_rate': 21.0,
             'taxed_amount': 210.0, 'total_amount': 1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0,
             'year': 2019,
@@ -221,8 +223,8 @@ class TestLibrosExport(TestAccountReportsCommon):
         self.assertEqual(len(line_vals_list), 1)
         amount_vals = self.get_amount_vals(line_vals_list[0])
         self.assertDictEqual(amount_vals, {
-            'expense_deductible': 1000.0, 'total_amount': 1000.0, 'base_amount': 1000.0, 'tax_rate': 21.0,
-            'taxed_amount': 0.0, 'tax_deductible': 0.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
+            'expense_deductible': 1000.0, 'total_amount': 1210.0, 'base_amount': 1000.0, 'tax_rate': 21.0,
+            'taxed_amount': 210.0, 'tax_deductible': 210.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
             'withholding_type': 0.0, 'withholding_amount': 0.0,
         })
 
@@ -382,13 +384,61 @@ class TestLibrosExport(TestAccountReportsCommon):
         self.assertEqual(line_vals_list[1]['withholding_type'], 15.0)
         self.assertEqual(line_vals_list[1]['withholding_amount'], 30.0)
 
+    def test_libros_operation_code_17_oss_sale(self):
+        """Customer invoice with an OSS (no_sujeto_loc) tax should produce operation_code '17'."""
+        oss_tag = self.env.ref('l10n_eu_oss.tag_oss', raise_if_not_found=False)
+        if not oss_tag:
+            oss_tag = self.env['account.account.tag'].create({'name': 'OSS', 'applicability': 'taxes'})
+            self.env['ir.model.data'].create({
+                'module': 'l10n_eu_oss',
+                'name': 'tag_oss',
+                'model': 'account.account.tag',
+                'res_id': oss_tag.id,
+            })
+        pt_partner = self.env['res.partner'].create({'name': 'PT Customer', 'country_id': self.env.ref('base.pt').id})
+        oss_tax = self.env['account.tax'].create({
+            'name': '23% PT VAT OSS',
+            'amount': 23.0,
+            'l10n_es_type': 'no_sujeto_loc',
+            # Real OSS taxes get this stamped at creation time by `l10n_eu_oss.EU_FIELD_MAP`.
+            'l10n_es_regime_code': '17',
+            'invoice_repartition_line_ids': [
+                Command.create({'repartition_type': 'base', 'tag_ids': oss_tag.ids}),
+                Command.create({'repartition_type': 'tax'}),
+            ],
+            'refund_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({'repartition_type': 'tax'}),
+            ],
+        })
+        self._create_invoice_one_line(move_type='out_invoice', partner_id=pt_partner, price_unit=1000, tax_ids=oss_tax, post=True, invoice_date=fields.Date.from_string('2019-01-01'))
+        inc_line_vals = self.get_libros_sheet_line_vals()[0]
+        line_vals_list = [inc_line_vals[m][t] for m in inc_line_vals for t in inc_line_vals[m]]
+        self.assertEqual(len(line_vals_list), 1)
+        self.assertEqual(line_vals_list[0]['operation_code'], '17')
+
+    def test_libros_operation_code_09_intracomm_bill(self):
+        """Vendor bill with an intra-community tax (mod_303 casilla 10) should produce operation_code '09'."""
+        company_id = self.company_data['company'].id
+        tax_ic_21 = self.env.ref(f'account.{company_id}_account_tax_template_p_iva21_ic_bc')
+        be_partner = self.env['res.partner'].create({
+            'country_id': self.env.ref('base.be').id,
+            'name': 'Belgian Partner',
+            'vat': 'BE0477472701',
+        })
+        self._create_invoice_one_line(move_type='in_invoice', partner_id=be_partner, price_unit=1000, tax_ids=tax_ic_21, post=True, invoice_date=fields.Date.from_string('2019-01-01'))
+        exp_line_vals = self.get_libros_sheet_line_vals()[1]
+        line_vals_list = [exp_line_vals[m][t] for m in exp_line_vals for t in exp_line_vals[m]]
+        self.assertEqual(len(line_vals_list), 1)
+        self.assertEqual(line_vals_list[0]['operation_code'], '09')
+
     def test_export_libros_de_iva_missing_iae_group(self):
         """Test that RedirectWarning is raised when IAE Group is not configured."""
         # Remove IAE group from company
         self.company_data['company'].l10n_es_reports_iae_group = False
 
         report = self.env.ref('account.generic_tax_report')
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
 
         with self.assertRaisesRegex(RedirectWarning, "Please configure the \"IAE Group or Heading\" of your company."):
             self.env['l10n_es.vat.books.report.handler'].export_libros_de_iva(options)

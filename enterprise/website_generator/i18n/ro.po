@@ -3,14 +3,15 @@
 # * website_generator
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:48+0000\n"
-"PO-Revision-Date: 2025-11-13 13:14+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:57+0000\n"
+"PO-Revision-Date: 2026-09-18 03:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "website_generator/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -18,17 +19,91 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: website_generator
+#: model:ir.module.module,description:base.module_website_generator
+msgid ""
+"\n"
+"Generates a new website in Odoo, with the goal of recreating an external "
+"website as close as possible.\n"
+msgstr ""
 
 #. module: website_generator
 #: model:mail.template,body_html:website_generator.email_template_website_scrapped
 msgid ""
 "<div>\n"
-"            <p><b>Great news!</b> Your website conversion is complete and "
-"your new integrated Odoo website is now live.</p>\n"
-"            <p>Check out your new website here: <a t-att-"
-"href=\"ctx.get('website_url')\"><t t-out=\"ctx.get('website_url')\"/></a></"
+"                    <t t-if=\"ctx.get('website_url') and "
+"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 "
+"and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"generated, and <t t-out=\"ctx.get('nbr_products_created')\"/> products and "
+"<t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have been created.</"
 "p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and "
+"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; "
+"0\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"generated and <t t-out=\"ctx.get('nbr_products_created')\"/> product(s) have "
+"been created.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and "
+"ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"generated and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have "
+"been created.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url')\">\n"
+"                        <p><b>Great news!</b> Your website has been "
+"successfully generated.</p>\n"
+"                    </t>    \n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and "
+"ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and "
+"ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully "
+"created <t t-out=\"ctx.get('nbr_products_created')\"/> products and <t t-"
+"out=\"ctx.get('nbr_blogs_created')\"/> blog posts.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and "
+"ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully "
+"created <t t-out=\"ctx.get('nbr_products_created')\"/> product(s).</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_blogs_created') and "
+"ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully "
+"created <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog post(s).</p>\n"
+"                    </t>\n"
+"                    <t t-else=\"\">\n"
+"                        <p><b>Update:</b> We were unable to generate your "
+"website or products this time.</p>\n"
+"                        <p>This may happen for a variety of reasons, such as:"
+"</p>\n"
+"                        <ul>\n"
+"                            <li>Protection mechanisms on your website "
+"preventing automated access,</li>\n"
+"                            <li>Temporary maintenance or limited "
+"availability on our servers,</li>\n"
+"                            <li>Custom code or configurations on your "
+"website that are not fully compatible with our process.</li>\n"
+"                        </ul>\n"
+"                        <p>Feel free to try again later or contact us if the "
+"issue persists — we’re here to help!</p>\n"
+"                    </t>\n"
+"\n"
+"            <t t-if=\"ctx.get('website_url')\">\n"
+"                <p>You can access your website by clicking the button below:"
+"</p>\n"
+"                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('website_url')\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        Go to Website\n"
+"                    </a>\n"
+"                </div>\n"
+"            </t>\n"
+"            \n"
 "            <p>Thank you for choosing Odoo for your web integration!</p>\n"
 "            <p>Best regards,</p>\n"
 "            <br/>\n"
@@ -36,18 +111,63 @@ msgid ""
 "            </div>\n"
 "            "
 msgstr ""
-"<div>\n"
-"            <p><b>Vești bune!</b> Conversia site-ului dvs. este completă, "
-"iar noul dvs. site Odoo integrat este acum online.</p>\n"
-"            <p>Vedeți noul dvs. site aici: <a t-att-"
-"href=\"ctx.get('website_url')\"><t t-out=\"ctx.get('website_url')\"/></a></"
-"p>\n"
-"            <p>Vă mulțumim că ați ales Odoo pentru integrarea web!</p>\n"
-"            <p>Cu stimă,</p>\n"
-"            <br/>\n"
-"            <p>Odoo - Cel mai bun constructor de site-uri open source.</p>\n"
-"            </div>\n"
-"            "
+
+#. module: website_generator
+#: model_terms:ir.ui.view,arch_db:website_generator.res_config_settings_view_form
+msgid ""
+"<i class=\"oi me-1\" data-icon=\"download\" aria-hidden=\"true\"/>Import "
+"Website"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "API Check failed"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "API Key is not valid"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "API Key is valid."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "API authentication not setup"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"API key has either expired, is invalid or there is no content to extract. "
+"Please provide a new API key."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Adapting building blocks."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Add your Ghost API key here"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Add your PrestaShop API key here"
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__additional_urls
@@ -55,26 +175,44 @@ msgid "Additional URLs"
 msgstr "URL-uri suplimentare"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "All"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Already connected on"
+msgstr ""
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "An error occurred"
 msgstr "A fost generată o eroare"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Attachment not found"
 msgstr "Atașamentul nu a fost găsit"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Authorization"
+msgstr ""
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Banned url"
 msgstr "Url interzis"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid ""
 "By clicking \"Import my website\", you confirm that you are the owner of the "
 "website and all associated components (such as images and other content), "
@@ -83,11 +221,35 @@ msgid ""
 msgstr ""
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Click to authenticate with WooCommerce."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Connect via WooCommerce"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Copying your text."
+msgstr ""
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Could not fetch result, invalid output uuid or result expired"
 msgstr ""
 "Nu s-a putut prelua rezultatul, uuid de ieșire invalid sau rezultat expirat"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Could not generate WooCommerce URL"
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__create_uid
@@ -100,7 +262,14 @@ msgid "Created on"
 msgstr "Creat la"
 
 #. module: website_generator
-#: model:ir.model.fields,field_description:website_generator.field_ir_http__display_name
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"Creates a new website and imports the foreign website pages onto this "
+"website."
+msgstr ""
+
+#. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website__display_name
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__display_name
 #: model:ir.model.fields,field_description:website_generator.field_website_page__display_name
@@ -109,23 +278,40 @@ msgstr "Nume afișat"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Done, website generated"
 msgstr "Gata, site-ul web generat"
 
 #. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Draft, record created but request not yet accepted by the server"
+msgstr ""
+
+#. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Error"
 msgstr ""
 
 #. module: website_generator
-#: model:ir.model,name:website_generator.model_ir_http
-msgid "HTTP Routing"
-msgstr "Rutare HTTP"
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__generation_progress
+msgid "Generation Progress"
+msgstr ""
 
 #. module: website_generator
-#: model:ir.model.fields,field_description:website_generator.field_ir_http__id
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Ghost API Key"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Ghost API detected, please provide an API key. For more info, visit:"
+msgstr ""
+
+#. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website__id
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__id
 #: model:ir.model.fields,field_description:website_generator.field_website_page__id
@@ -134,27 +320,48 @@ msgstr "ID"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "If you require more, you can contact us at"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import Blogs"
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Import Products"
 msgstr "Importă produse"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import Website"
+msgstr ""
+
+#. module: website_generator
+#: model:ir.actions.client,name:website_generator.action_open_website_import_form
+msgid "Import Your Pages and Products"
+msgstr ""
+
+#. module: website_generator
+#: model:ir.module.module,summary:base.module_website_generator
+msgid "Import a pre-existing website"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_website_cog_menu/import_website_cog_menu.xml:0
+msgid "Import from website"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Import my website"
 msgstr "Importă site-ul meu"
 
 #. module: website_generator
-#. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "Import your"
-msgstr "Importă-ți"
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__import_website
+msgid "Import website"
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
@@ -171,30 +378,44 @@ msgstr ""
 #. module: website_generator
 #. odoo-javascript
 #: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
-msgid "Importing your website."
-msgstr "Se importă site-ul dvs."
+msgid "Importing your colors and design."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"Imports products found on the website into your Odoo database. This means "
+"potentially installing the ecommerce app and creating products."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Imports the blogs. This means potentially installing the blogs app."
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid dbuuid"
 msgstr "Dbuuid invalid"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid import products"
 msgstr "Import produse invalid"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid token"
 msgstr "Token invalid"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Invalid url"
 msgstr "Url invalid"
 
@@ -210,24 +431,53 @@ msgstr "Ultima actualizare la"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Loading..."
 msgstr ""
 
 #. module: website_generator
-#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__notified
-msgid "Notified"
-msgstr "Notificat"
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Make sure that you have set the website URL first."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"No blog platform detected. Please select at least Import Website or Import "
+"Products to continue."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"No supported API platform detected, we will search the pages for products "
+"metadata."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "No supported blog API found."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "No supported blog API platform detected. No blogs will be imported."
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Number of allowed requests exhausted"
 msgstr "Numărul de cereri permise este epuizat"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Number of concurrent requests exceeded"
 msgstr "Numărul de cereri concurente depășit"
 
@@ -235,6 +485,17 @@ msgstr "Numărul de cereri concurente depășit"
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__page_count
 msgid "Number of pages"
 msgstr "Numărul de pagini"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Odoo's website import documentation"
+msgstr ""
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__out_json_attachment_id
+msgid "Out Json Attachment"
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__uuid
@@ -248,35 +509,80 @@ msgstr "Pagină"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "Pages"
-msgstr "Pagini"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Please make sure the URL is correct and try again."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"Please select at least one option: Import Website, Import Products or Import "
+"Blogs."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Please wait for the API check to finish."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "PrestaShop API Key"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"PrestaShop API detected, please provide an API key. For more info, visit:"
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Processing"
 msgstr "Se procesează"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "Products"
-msgstr "Produse"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Reconnect via WooCommerce"
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Request is still processing, result not available yet"
 msgstr ""
 "Cererea este încă în curs de procesare, rezultatul nu este încă disponibil"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Select the website of which you want to create the products/blogs for."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Sending request..."
+msgstr ""
+
+#. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Server is currently under maintenance. Please retry later"
 msgstr ""
 "Serverul este în prezent în întreținere. Vă rugăm să încercați mai târziu"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Shopify API detected."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
@@ -286,9 +592,23 @@ msgstr "Ceva n-a mers bine"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
-msgid "Something went wrong while importing your website."
-msgstr "A apărut o problemă la importarea site-ului dvs."
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"Something went wrong applying your API key. Please check your API key and "
+"try again."
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Something went wrong during the import"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Something went wrong while importing your website"
+msgstr ""
 
 #. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__status
@@ -301,56 +621,58 @@ msgid "Status Message"
 msgstr "Mesaj Status"
 
 #. module: website_generator
+#. odoo-javascript
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Success"
 msgstr "Succes"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The URL is not reachable."
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "The URL is reachable."
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/systray_items/generator_request.js:0
-msgid "The import of your website has started!"
-msgstr "Importul site-ului dvs. a început!"
-
-#. module: website_generator
-#. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "The maximum number of pages is 200 by default."
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The number of pages is limited. If you need more, contact us at"
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "The provided URL is empty"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "The provided URL is not allowed"
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "The provided URL is not reachable"
 msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "The request asks for too many pages"
 msgstr "Cererea solicită prea multe pagini"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid ""
 "The requested url redirected to another url, try again with the redirected "
 "url"
@@ -358,7 +680,7 @@ msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid ""
 "The requested url took too long to load and is probably unreachable from the "
 "server"
@@ -366,7 +688,7 @@ msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid ""
 "The same request has just been made, please wait before sending another "
 "identical request"
@@ -374,13 +696,25 @@ msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
-msgid "This can take a few minutes."
-msgstr "Aceasta poate dura câteva minute."
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The search for blogs API is done."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The search for products API is done."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "This can take a few minutes."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "Too many requests"
 msgstr ""
 
@@ -392,7 +726,7 @@ msgstr "Top Meniu pentru site-ul Web %s"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.js:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
 msgid "URL redirection"
 msgstr ""
 
@@ -402,19 +736,31 @@ msgid "URL to scrape"
 msgstr "URL de ras"
 
 #. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "URL unreachable"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Uploading your images."
+msgstr ""
+
+#. module: website_generator
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__version
 msgid "Version"
 msgstr "Version"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Version is unsupported"
 msgstr "Versiunea nu este suportată"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Waiting for the server to process the request"
 msgstr "Așteptarea ca serverul să proceseze cererea"
 
@@ -427,11 +773,7 @@ msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/systray_items/generator_request.js:0
-msgid "We will notify %(email)s when everything is ready."
-msgstr "Vă vom notifica la %(email)s când totul este gata."
-
-#. module: website_generator
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 #: model:ir.model,name:website_generator.model_website
 #: model:ir.model.fields,field_description:website_generator.field_website_generator_request__website_id
 msgid "Website"
@@ -439,6 +781,7 @@ msgstr "Pagină web"
 
 #. module: website_generator
 #: model:ir.actions.client,name:website_generator.website_generator_screen
+#: model:ir.module.module,shortdesc:base.module_website_generator
 msgid "Website Generator"
 msgstr "Generator Website"
 
@@ -453,6 +796,11 @@ msgid "Website Generator Request"
 msgstr "Cerere Generator Website"
 
 #. module: website_generator
+#: model:ir.actions.server,name:website_generator.cron_generate_site_ir_actions_server
+msgid "Website Generator: Create the website"
+msgstr ""
+
+#. module: website_generator
 #: model:ir.actions.server,name:website_generator.cron_get_result_ir_actions_server
 msgid "Website Generator: Get website scraper results"
 msgstr "Generator Website : Obțineți rezultatele scraper-ului"
@@ -464,53 +812,160 @@ msgstr "Site web ras"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "Website URL"
-msgstr "URL website"
+msgstr ""
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Website blocked or unreachable"
 msgstr "Site blocat sau inaccesibil"
 
 #. module: website_generator
 #. odoo-python
-#: code:addons/website_generator/models/generator.py:0
+#: code:addons/website_generator/utils/constants.py:0
 msgid "Website not supported"
 msgstr "Site web nu este acceptat"
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
-msgid "You will be redirected once your website is ready."
-msgstr "Veți fi redirecționat când site-ul dvs. este gata."
-
-#. module: website_generator
-#. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "You'll be able to create additional pages later on."
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid ""
+"WooCommerce API detected, please authenticate to import WooCommerce Products."
 msgstr ""
 
 #. module: website_generator
-#: model:mail.template,subject:website_generator.email_template_website_scrapped
-msgid "Your Odoo Website is Ready!"
-msgstr "Site-ul dvs. Odoo este gata!"
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "WordPress Blog API detected."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
-msgid "and"
-msgstr "și"
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "You must add a Ghost API key before trying to import Ghost Blogs."
+msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"You must add a PrestaShop API key before trying to import PrestaShop "
+"products."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid ""
+"You must authenticate the WooCommerce API before trying to import "
+"WooCommerce Products."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "You will be redirected once your website is ready."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "You will receive an"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your blogs have been imported!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new blogs and products are ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website and blogs are ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website and products are ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website is ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website, blogs and products are ready!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your products have been imported!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Your request has been submitted!"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Your website, now customizable effortless."
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "email notification"
+msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "https://www.odoo.com/"
 msgstr ""
 
 #. module: website_generator
 #. odoo-javascript
-#: code:addons/website_generator/static/src/client_actions/configurator/configurator.xml:0
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
 msgid "odoo.com/help"
 msgstr ""
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "once your website and/or products are ready."
+msgstr ""
+
+#. module: website_generator
+#: model:mail.template,subject:website_generator.email_template_website_scrapped
+msgid "{{ ctx.get('subject') }}"
+msgstr ""
+
+#~ msgid "HTTP Routing"
+#~ msgstr "Rutare HTTP"
+
+#~ msgid "Notified"
+#~ msgstr "Notificat"
+
+#~ msgid "The import of your website has started!"
+#~ msgstr "Importul site-ului dvs. a început!"
+
+#~ msgid "We will notify %(email)s when everything is ready."
+#~ msgstr "Vă vom notifica la %(email)s când totul este gata."

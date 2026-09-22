@@ -1,19 +1,37 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
+from odoo.tools import format_datetime, get_lang
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    @api.model
+    def default_get(self, fields):
+        res = super().default_get(fields)
+        if 'origin' in fields and (planning_slot_id := self.env.context.get('create_for_planning_slot_id')):
+            shift = self.env['planning.slot'].browse(planning_slot_id)
+            shift_start_date = format_datetime(self.env, shift.start_datetime, dt_format='MMM d', tz=self.env.tz or 'UTC', lang_code=get_lang(self.env).code)
+            res['origin'] = self.env._('[Planning] Shift - %(planning_shift_start_date)s', planning_shift_start_date=shift_start_date)
+        return res
+
     planning_hours_planned = fields.Float(compute='_compute_planning_hours', export_string_translation=False)
     planning_hours_to_plan = fields.Float(compute='_compute_planning_hours', export_string_translation=False)
     planning_first_sale_line_id = fields.Many2one('sale.order.line', compute='_compute_planning_first_sale_line_id', export_string_translation=False)
     planning_initial_date = fields.Date(compute='_compute_planning_initial_date', export_string_translation=False)
+
+    @api.depends('partner_id.commercial_partner_id')
+    @api.depends_context('sale_show_commercial_partner')
+    def _compute_display_name(self):
+        super()._compute_display_name()
+        if self.env.context.get('sale_show_commercial_partner'):
+            for order in self:
+                if (commercial_partner := order.partner_id.commercial_partner_id):
+                    order.display_name = f"{order.display_name} - {commercial_partner.name}"
 
     @api.depends('order_line.planning_hours_to_plan', 'order_line.planning_hours_planned', 'order_line.product_id.planning_enabled')
     def _compute_planning_hours(self):
@@ -51,11 +69,12 @@ class SaleOrder(models.Model):
             ('sale_order_id', 'in', self.ids)
         ], ['sale_order_id'], ['start_datetime:min'])
         mapped_data = {sale_order.id: start_datetime_min for sale_order, start_datetime_min in group_data}
+        today = fields.Date.context_today(self)
         for order in self:
             if mapped_data.get(order.id):
                 order.planning_initial_date = mapped_data[order.id].date()
             else:
-                order.planning_initial_date = fields.Date.today()
+                order.planning_initial_date = today
 
     @api.constrains('company_id')
     def _check_company_id(self):
@@ -75,6 +94,17 @@ class SaleOrder(models.Model):
                 order_name=order.name,
                 slots_names=[slot.display_name for slot in different_company_slots],
             ))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        sale_orders = super().create(vals_list)
+        planning_slot = self.env['planning.slot'].browse(self.env.context.get('create_for_planning_slot_id'))
+        if planning_slot:
+            service_sol = next((sol for sol in sale_orders.order_line if sol.is_service), self.env['sale.order.line'])
+            if planning_slot and not planning_slot.sale_line_id:
+                planning_slot.sale_line_id = service_sol
+            sale_orders.with_context(generate_planning_slot=False).action_confirm()
+        return sale_orders
 
     # -----------------------------------------------------------------
     # Action methods
@@ -96,15 +126,24 @@ class SaleOrder(models.Model):
         action = self.env["ir.actions.actions"]._for_xml_id("planning.planning_action_schedule_by_resource")
         action.update({
             'name': _('View Planning'),
-            'domain': [('role_id', 'in', self.order_line.product_template_id.planning_role_id.ids)],
+            'domain': [
+                ('start_datetime', '!=', False),
+                ('end_datetime', '!=', False),
+            ],
             'context': {
                 'default_sale_line_id': self.planning_first_sale_line_id.id,
                 'search_default_group_by_resource': 1,
+                'search_default_role_ids': self.order_line.product_template_id.planning_role_id.ids,
+                'filter_resource_ids': self.order_line.product_template_id.planning_role_id.resource_ids.ids,
                 'initialDate': self.planning_initial_date,
-                'planning_gantt_active_sale_order_id': self.id}
+                'planning_gantt_active_sale_order_id': self.id,
+            },
+            'views': [
+                (self.env.ref('planning.planning_view_gantt_no_sample').id, view_type) if view_type == 'gantt' else (view_id, view_type) for view_id, view_type in action['views']
+            ],
         })
         return action
 
     def _unplanned_shift_deletion(self):
-        unplanned_shift = self.env['planning.slot'].search([('sale_order_id', 'in', self.ids), '|', ('start_datetime', '=', False), ('resource_id', '=', False)])
+        unplanned_shift = self.env['planning.slot'].search([('sale_order_id', 'in', self.ids), '|', ('start_datetime', '=', False), ('resource_ids', '=', False)])
         unplanned_shift.unlink()

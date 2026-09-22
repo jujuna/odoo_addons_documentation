@@ -31,17 +31,16 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         account_lines = []
         account_ids = []
         for line in lines:
-            model, account_id = report._parse_line_id(line['id'])[-1][1:]
-            if model != 'account.account':
+            model, account_id = report._parse_line_id(line.id)[-1][1:]
+            if not (model == 'account.account' and account_id):
                 continue
             account_lines.append(line)
             account_ids.append(account_id)
         accounts = self.env['account.account'].browse(account_ids).grouped('id')
 
         # As we export for the current period, only the first column group is relevant
-        column_group = list(options.get('column_groups', {}).keys())[0]
         columns = options.get('columns', [])
-        column_name_to_index = {col['expression_label']: idx for idx, col in enumerate(columns) if col['column_group_key'] == column_group}
+        column_name_to_index = {col['expression_label']: idx for idx, col in enumerate(columns) if col['column_group_index'] == 0}
 
         def _get_account_name_in_lang(account, lang_code):
             ''' Get the account name in the specified language.
@@ -57,10 +56,10 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         etree.SubElement(root, "Versie").text = "1.0"
         accounts_el = etree.SubElement(root, "Rekeningen")
         for line in account_lines:
-            __, account_id = report._get_model_info_from_id(line['id'])
+            __, account_id = report._get_model_info_from_id(line.id)
             account = accounts.get(account_id)
-            debit = str(line['columns'][column_name_to_index['debit']]['no_format'])
-            credit = str(line['columns'][column_name_to_index['credit']]['no_format'])
+            debit = str(line.columns[column_name_to_index['debit']].no_format)
+            credit = str(line.columns[column_name_to_index['credit']].no_format)
 
             account_el = etree.SubElement(accounts_el, "Rekening")
             etree.SubElement(account_el, "DiverseOperatie").text = ""

@@ -3,9 +3,12 @@ from freezegun import freeze_time
 
 from odoo.exceptions import ValidationError
 
+from odoo.tests import tagged
+
 from .sign_request_common import SignRequestCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSignRequestShare(SignRequestCommon):
 
     def test_shared_sign_request_validity_cannot_be_set_in_the_past(self):

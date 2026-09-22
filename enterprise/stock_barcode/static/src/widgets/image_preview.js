@@ -1,14 +1,15 @@
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ImageField } from "@web/views/fields/image/image_field";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class FullScreenImage extends Component {
     static template = "stock_barcode.FullScreenImage";
-    static props = {
-        src: { type: String },
-        close: Function,
-    };
+
+    props = useProps({
+        src: t.string(),
+        close: t.function(),
+    });
 }
 
 export class ImagePreviewField extends ImageField {

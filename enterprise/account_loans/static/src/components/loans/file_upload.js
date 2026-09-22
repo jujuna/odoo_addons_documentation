@@ -1,8 +1,7 @@
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
 import { FileUploader } from "@web/views/fields/file_handler";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 
 export class NewLoanComponent extends Component {
@@ -10,14 +9,15 @@ export class NewLoanComponent extends Component {
     static components = {
         FileUploader,
     };
-    static props = {
+
+    props = useProps({
         ...standardWidgetProps,
-        record: { type: Object, optional: true },
-    };
+        record: t.object().optional(),
+    });
 
     setup() {
-        this.orm = useService("orm");
-        this.action = useService("action");
+        this.orm = this.env.services.orm;
+        this.action = this.env.services.action;
     }
 
     async onFileUploaded(file) {
@@ -27,7 +27,7 @@ export class NewLoanComponent extends Component {
         const att_data = {
             name: file.name,
             mimetype: file.type,
-            datas: file.data,
+            raw: file.data,
         };
         const [att_id] = await this.orm.create("ir.attachment", [att_data]);
         const action = await this.orm.call("account.loan", "action_upload_amortization_schedule", [this.props.record?.resId, att_id]);

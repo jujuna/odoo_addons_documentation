@@ -1,8 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from contextlib import contextmanager
 from datetime import datetime, timedelta
-from freezegun import freeze_time
 from unittest.mock import patch
 from itertools import zip_longest
 
@@ -69,7 +67,7 @@ class TestWhatsappSchedule(EventCase, WhatsAppCommon):
             ],
             'name': 'Test Event',
         })
-        with cls.mock_datetime_and_now(cls, cls.reference_now):
+        with cls.mock_datetime_and_now(cls.reference_now):
             cls.test_attendees = cls.env["event.registration"].create([
                 {
                     "event_id": cls.test_event.id,
@@ -78,15 +76,6 @@ class TestWhatsappSchedule(EventCase, WhatsAppCommon):
                     "phone": f"+324560000{idx}{idx}",
                 } for idx in range(2)
             ])
-
-    @contextmanager
-    def mock_datetime_and_now(self, mock_dt):
-        """ Used when synchronization date (using env.cr.now()) is important
-        in addition to standard datetime mocks. Used mainly to detect sync
-        issues. """
-        with freeze_time(mock_dt), \
-             patch.object(self.env.cr, 'now', lambda: mock_dt):
-            yield
 
     @users('user_eventmanager')
     def test_assert_initial_values(self):

@@ -9,6 +9,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 @tagged('post_install', '-at_install')
 class TestSaleSubscriptionConfigurators(HttpCase, TestSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_sale_subscription_product_configurator(self):
         optional_product = self._create_product(
             name="Optional product",
@@ -25,7 +27,7 @@ class TestSaleSubscriptionConfigurators(HttpCase, TestSubscriptionCommon):
                 Command.create({'plan_id': self.plan_2_month.id, 'fixed_price': 15}),
             ],
         )
-        self.start_tour('/', 'sale_subscription_product_configurator', login='salesman')
+        self.start_tour('/odoo', 'sale_subscription_product_configurator', login='salesman')
 
     def test_sale_subscription_combo_configurator(self):
         combo = self.env['product.combo'].create({
@@ -44,4 +46,4 @@ class TestSaleSubscriptionConfigurators(HttpCase, TestSubscriptionCommon):
                 Command.create({'plan_id': self.plan_2_month.id, 'fixed_price': 15}),
             ],
         )
-        self.start_tour('/', 'sale_subscription_combo_configurator', login='salesman')
+        self.start_tour('/odoo', 'sale_subscription_combo_configurator', login='salesman')

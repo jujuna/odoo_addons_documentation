@@ -1,5 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 from lxml import etree
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
@@ -17,6 +16,8 @@ from odoo.addons.l10n_au_hr_payroll.tests.test_unused_leaves import TestPayrollU
 
 @tagged("post_install_l10n", "post_install", "-at_install", "l10n_au_hr_payroll")
 class TestSingleTouchPayroll(L10nPayrollAccountCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -38,19 +39,21 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
                 "zip": "2000",
                 'l10n_au_branch_code': '100'
         })
-        cls.long_service = cls.env['hr.leave.type'].create({
+        cls.long_service = cls.env['hr.work.entry.type'].create({
             'name': 'Long Service Leave',
-            'company_id': cls.company.id,
-            'l10n_au_leave_type': 'long_service',
+            'code': 'Long Service Leave',
+            'l10n_au_work_entry_type': 'long_service',
             'leave_validation_type': 'no_validation',
-            'work_entry_type_id': cls.env.ref('hr_work_entry.l10n_au_work_entry_type_long_service_leave').id,
+            'unit_of_measure': 'day',
+            'count_as': 'absence',
         })
-        cls.annual = cls.env['hr.leave.type'].create({
+        cls.annual = cls.env['hr.work.entry.type'].create({
             'name': 'Annual Leave',
-            'company_id': cls.company.id,
-            'l10n_au_leave_type': 'annual',
+            'code': 'Annual Leave',
+            'l10n_au_work_entry_type': 'annual',
             'leave_validation_type': 'no_validation',
-            'work_entry_type_id': cls.env.ref('hr_work_entry.l10n_au_work_entry_type_paid_time_off').id,
+            'unit_of_measure': 'day',
+            'count_as': 'absence',
         })
 
     allocate_leaves = TestPayrollUnusedLeaves.create_leaves
@@ -58,22 +61,23 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
     # ==================== HELPERS ====================
 
     def create_leave(self, date_from=None, amount=None, name="", work_entry_type=None, employee_id=False):
-        holiday_leave_types = self.env['hr.leave.type'].create([{
+        holiday_work_entry_types = self.env['hr.work.entry.type'].create([{
             'name': 'Paid Time Off',
             'requires_allocation': False,
             'allocation_validation_type': 'no_validation',
             'leave_validation_type': 'no_validation',
             'request_unit': 'hour',
+            'unit_of_measure': 'hour',
             'work_entry_type_id': work_entry_type.id,
         }])
         duration = amount / self.contract_2.hourly_wage
         return self.env['hr.leave'].create({
             'name': name or 'Holiday!!!',
             'employee_id': employee_id.id,
-            'holiday_status_id': holiday_leave_types.id,
+            'work_entry_type_id': holiday_work_entry_types.id,
             'request_date_from': date_from,
             'request_date_to': date_from + relativedelta(hours=duration),
-            'request_unit_hours': duration,
+            'work_entry_type_request_unit': 'hour',
             # 'number_of_hours': duration,
         }).with_context(leave_fast_create=True).action_validate()
 
@@ -104,7 +108,6 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
                         input_line.ytd_amount = val
                     else:
                         raise MissingError(f"Input line {key} not found in YTD rule {rule.name}")
-        self.cr.savepoint()
         if without_stp:
             return
         stp_update = self.env["l10n_au.stp"].search([("company_id", "=", self.company.id)])
@@ -267,6 +270,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         )
         self._submit_stp(stp_update)
 
+    @freeze_time("2024-03-31")
     @mock_skip_stp_api_calls()
     def test_out_of_cycle_termination(self):
         self.contract_1.write({"l10n_au_salary_sacrifice_superannuation": 100})
@@ -281,13 +285,12 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
             },
         )
         payslip = self.env["hr.payslip"].create({
-                "name": "payslip",
                 "employee_id": self.employee_1.id,
                 "version_id": self.contract_1.id,
                 "date_from": "2024-05-01",
                 "date_to": "2024-05-31",
                 "input_line_ids": [(0, 0, {
-                    'input_type_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
+                    'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
                     'amount': 250,
                 })],
                 "l10n_au_termination_type": 'normal',
@@ -321,6 +324,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         self.assertEqual(rendering_data[1][0]["EmploymentEndD"], fields.Date.from_string("2024-05-31"))
         self._submit_stp(stp)
 
+    @freeze_time("2024-10-31")
     @mock_skip_stp_api_calls()
     def test_out_of_cycle_termination_genuine(self):
         self.contract_1.write({
@@ -339,13 +343,12 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
             },
         )
         payslip = self.env["hr.payslip"].create({
-                "name": "payslip",
                 "employee_id": self.employee_1.id,
                 "version_id": self.contract_1.id,
                 "date_from": "2024-10-28",
                 "date_to": "2024-11-01",
                 "input_line_ids": [(0, 0, {
-                    'input_type_id': self.env.ref('l10n_au_hr_payroll.input_genuine_redundancy').id,
+                    'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_genuine_redundancy').id,
                     'amount': 110000,
                 })],
                 "l10n_au_termination_type": 'genuine',
@@ -466,8 +469,9 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
             ]
         )
 
-        def create_work_entry(work_entry_type, start, duration, state="draft"):
-            work_entry = self.env["hr.work.entry"].create([{
+        def create_leave(work_entry_type, start, duration, state="draft"):
+            # Previously work entry, should create leave once the fix is adapted
+            leave = self.env["hr.leave"].create([{
                 "name": f"Work Entry {self.env.ref(work_entry_type).name}",
                 "work_entry_type_id": self.env.ref(work_entry_type).id,
                 "employee_id": self.employee_2.id,
@@ -476,18 +480,18 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
                 "duration": duration,
                 "state": state,
             }])
-            work_entry.action_validate()
+            leave.action_approve()
 
-        self.env.ref("hr_work_entry.work_entry_type_overtime").write({
-            "is_extra_hours": True,
+        self.env.ref("hr_work_entry.au_work_entry_type_overtime").write({
+            "category_ids": [Command.link(self.env.ref('hr_payroll.EXTRA_HOURS').id)],
         })
 
-        # Work Entries, For simplicty, Leaves handled as work entries
-        create_work_entry("hr_work_entry.work_entry_type_overtime", date(2024, 10, 1), 3)
-        create_work_entry("hr_work_entry.l10n_au_work_entry_type_other", date(2024, 10, 3), 4, "validated")
-        create_work_entry("hr_work_entry.l10n_au_work_entry_type_parental", date(2024, 10, 4), 3, "validated")
-        create_work_entry("hr_work_entry.l10n_au_work_entry_type_compensation", date(2024, 10, 5), 4)
-        create_work_entry("hr_work_entry.l10n_au_work_entry_type_defence", date(2024, 10, 6), 3, "validated")
+        # Create leaves
+        create_leave("hr_work_entry.au_work_entry_type_overtime", date(2024, 10, 1), 3)
+        create_leave("hr_work_entry.l10n_au_work_entry_type_annual_leave", date(2024, 10, 3), 4, "validated")
+        create_leave("hr_work_entry.l10n_au_work_entry_type_parental", date(2024, 10, 4), 3, "validated")
+        create_leave("hr_work_entry.l10n_au_work_entry_type_compensation", date(2024, 10, 5), 4)
+        create_leave("hr_work_entry.l10n_au_work_entry_type_defence", date(2024, 10, 6), 3, "validated")
 
         input_lines = [
             ('l10n_au_hr_payroll.input_leaves_cashed_out_in_service', 200.2),
@@ -545,17 +549,16 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
                 "version_id": self.employee_2.version_id.id,
                 "date_from": datetime(2024, 10, 1),
                 "date_to":  datetime(2024, 10, 31),
-                "name": "OCT Payslip Test",
                 "struct_id": self.default_payroll_structure.id,
                 "input_line_ids": [(0, 0, {
-                    'input_type_id': self.env.ref(input_id).id,
+                    'salary_rule_id': self.env.ref(input_id).id,
                     'amount': amount,
                 }) for input_id, amount in input_lines]
             })
         # Add a lump sum E with date
         self.env['hr.payslip.input'].create({
             'payslip_id': slip.id,
-            'input_type_id': self.env.ref('l10n_au_hr_payroll.l10n_au_lumpsum_e').id,
+            'salary_rule_id': self.env.ref('l10n_au_hr_payroll.l10n_au_lumpsum_e').id,
             'amount': 40.4,
             'name': '2023'
         })
@@ -564,8 +567,8 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         self.assertAlmostEqualRecordValues(
             slip.worked_days_line_ids,
             [
-                {'code': 'WORK100', 'amount': 4629.24, 'ytd': 25000 + 4629.24},
-                {'code': 'OVERTIME', 'amount': 79.45, 'ytd': 140 + 79.45},
+                {'code': '002.00', 'amount': 4629.24, 'ytd': 25000 + 4629.24},
+                {'code': '040.00', 'amount': 79.45, 'ytd': 140 + 79.45},
                 {'code': 'AU.O', 'amount': 105.93, 'ytd': 130 + 105.93},
                 {'code': 'AU.P', 'amount': 79.45, 'ytd': 120 + 79.45},
                 {'code': 'AU.W', 'amount': 105.93, 'ytd': 110 + 105.93},
@@ -646,7 +649,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         expected_payeventemp_roots = parsed_expected.findall("{http://www.sbr.gov.au/ato/payevntemp}PAYEVNTEMP")
 
         # Actual XML
-        xml_root = etree.fromstring(b"<data>" + base64.b64decode(stp.xml_file) + b"</data>")
+        xml_root = etree.fromstring(b"<data>" + stp.xml_file.content + b"</data>")
         actual_payevent_root = xml_root.find("{http://www.sbr.gov.au/ato/payevnt}PAYEVNT")
         actual_payeventemp_roots = xml_root.findall("{http://www.sbr.gov.au/ato/payevntemp}PAYEVNTEMP")
 
@@ -668,7 +671,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         self._submit_stp(stp)
         # Pay the payslips and validate the batch
         batch.slip_ids.move_id.action_post()
-        payments = self._register_payment(batch)
+        payments = self._register_payment_hr_payroll(batch)
         batch.l10n_au_payment_batch_id.validate_batch()
         self.assertTrue(all(payslip.state == 'paid' for payslip in batch.slip_ids), "All payslips must be marked paid!")
         self.assertTrue(all(p.is_reconciled for p in payments), "All payments should be reconciled!")
@@ -684,7 +687,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         self.assertTrue(all(not p.is_reconciled for p in payments), "All payments should be unreconciled!")
         # Add an extra input to the payslip
         payslip_to_update.write({
-            "input_line_ids": [(0, 0, {"input_type_id": self.env.ref("l10n_au_hr_payroll.input_laundry_2").id, "amount": 100})]
+            "input_line_ids": [(0, 0, {"salary_rule_id": self.env.ref("l10n_au_hr_payroll.input_laundry_2").id, "amount": 100})]
         })
         batch.slip_ids.compute_sheet()
         batch.action_validate()
@@ -698,7 +701,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         self.assertNotEqual(ffr.xml_file, stp.xml_file, "The Replacement STP should not be the same as the original STP")
 
         # Register new payments
-        new_payments = self._register_payment(batch)
+        new_payments = self._register_payment_hr_payroll(batch)
         new_payment_amount = _get_payment_amount(payslip_to_update.move_id)
         self.assertTrue(all(payslip.state == 'paid' for payslip in batch.slip_ids), "All payslips must be marked paid!")
         self.assertEqual(new_payments.amount, new_payment_amount - original_payment_amount, "The payment amount should account for the difference in payslip amounts!")
@@ -742,25 +745,16 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
         data_2 = stp_2._get_complex_rendering_data()
         remuneration_collection = data_2[self.employee_1.id]["Remuneration"]
         remuneration_collection = sorted(remuneration_collection, key=lambda x: x["IncomeStreamTypeC"])
-        self.assertEqual(len(remuneration_collection), 2)
+        self.assertEqual(len(remuneration_collection), 1)
         self.assertStpTupleEqual(
             remuneration_collection[0],
             {
-                "GrossA": 12000,
-                "IncomeStreamTypeC": "SAW",
-                "IncomeTaxPayAsYouGoWithholdingTaxWithheldA": 3402.0,
+                "GrossA": 17000.0,
+                "IncomeStreamTypeC": "WHM",
+                "IncomeTaxPayAsYouGoWithholdingTaxWithheldA": 4368.0,
 
             }
         )
-        self.assertStpTupleEqual(
-            remuneration_collection[1],
-            {
-                "GrossA": 5000,
-                "IncomeStreamTypeC": "WHM",
-                "IncomeTaxPayAsYouGoWithholdingTaxWithheldA": 966.0,
-            }
-        )
-        self.assertStpTupleEqual(remuneration_collection[0], data[self.employee_1.id]["Remuneration"][0])
         self._submit_stp(stp_2)
 
     @mock_skip_stp_api_calls()
@@ -827,7 +821,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
             self.create_ytd_opening_balances(
                 self.employee_2,
                 [
-                    ("BASIC", {"Attendance": 50000,
+                    ("BASIC", {"Work": 50000,
                                 }),
                     ("WITHHOLD.TOTAL", -5753.8),
                     ("SUPER", 3355.55),
@@ -894,7 +888,6 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
 
         with self.assertRaises(UserError):
             payslip = self.env["hr.payslip"].create({
-                "name": "payslip",
                 "employee_id": self.employee_1.id,
                 "version_id": self.contract_1.id,
                 "date_from": "2024-05-01",
@@ -916,7 +909,7 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
     @mock_skip_stp_api_calls()
     def test_payslip_after_opening_balances(self):
         opening_values = [
-            ("BASIC", {"Attendance": 50000,
+            ("BASIC", {"Work": 50000,
                         }),
             ("WITHHOLD.TOTAL", -5753.8),
             ("SUPER", 3355.55),
@@ -947,3 +940,192 @@ class TestSingleTouchPayroll(L10nPayrollAccountCommon):
 
         seq_2 = stp_sequence.next_by_id()
         self.assertNotEqual(seq_2, seq_1, "The sequence should be unique")
+
+    @mock_skip_stp_api_calls()
+    def test_missed_reporting(self):
+        # Payrun for January
+        with freeze_time("2024-01-31"):
+            self.env.cr._now = datetime.now()
+            batch = self._prepare_payslip_run(employee_ids=self.employee_1 + self.employee_2, start_date="2024-01-01", end_date="2024-01-31")
+            stp = self.env["l10n_au.stp"].search([("payslip_batch_id", "=", batch.id)])
+            self.assertEqual(stp.payevent_type, "submit", "The STP record should be an Submit type")
+            self._submit_stp(stp)
+
+        # Payrun for March without submitting the STP for February (Payment date set in the next pay period)
+        with freeze_time("2024-03-31"):
+            self.env.cr._now = datetime.now()
+            batch = self._prepare_payslip_run(employee_ids=self.employee_1 + self.employee_2, start_date="2024-03-01", end_date="2024-03-31")
+            stp = self.env["l10n_au.stp"].search([("payslip_batch_id", "=", batch.id)])
+            self.assertEqual(stp.payevent_type, "submit", "The STP record should be an Submit type")
+            stp.submit_date = date(2024, 4, 1)
+            self._submit_stp(stp)
+
+        # Payslip for February, created at a later time. This should create an update STP
+        with freeze_time("2024-04-01"):
+            self.env.cr._now = datetime.now()
+            batch = self._prepare_payslip_run(employee_ids=self.employee_1 + self.employee_2, start_date="2024-02-01", end_date="2024-02-29")
+            self.assertTrue(all(slip._is_past_period() for slip in batch.slip_ids))
+            stp = batch.slip_ids._get_payslip_stp()[batch.slip_ids[0].id]
+            self.assertEqual(stp.payevent_type, "update", "The STP record should be an update type")
+            self._submit_stp(stp)
+
+        # Overlaping payment date on STP should not create an update action for April
+        with freeze_time("2024-04-30"):
+            self.env.cr._now = datetime.now()
+            batch = self._prepare_payslip_run(employee_ids=self.employee_1 + self.employee_2, start_date="2024-04-01", end_date="2024-04-30")
+            stp = batch.slip_ids._get_payslip_stp()[batch.slip_ids[0].id]
+            self.assertEqual(stp.payevent_type, "submit", "The STP record should be an Submit type")
+            self._submit_stp(stp)
+
+    def test_get_payslip_stp(self):
+        # _compute_stp_count calls _get_payslip_stp, so we can test both with the same assertions
+        batch = self._prepare_payslip_run(employee_ids=self.employee_1 + self.employee_2)
+        self.assertEqual(batch.l10n_au_stp_count, 1, "There should be 1 STP record for the 2 employees")
+
+        # Deleting the payslips
+        batch.action_draft()
+        batch.slip_ids.unlink()
+        self.assertEqual(batch.l10n_au_stp_count, 0, "There should be no STP record as there is no payslip")
+
+    @freeze_time("2026-07-31")
+    @mock_skip_stp_api_calls()
+    def test_stp_qe(self):
+        self.employee_1.write({
+            'l10n_au_child_support_garnishee_amount': 0.15,
+            'l10n_au_child_support_deduction': 120,
+            'contract_date_end': "2026-12-31",
+            'contract_date_start': "2026-01-01",
+            'l10n_au_salary_sacrifice_superannuation': 100,
+        })
+
+        self.employee_2.write({
+            'contract_date_end': "2026-12-31",
+            'contract_date_start': "2026-01-01",
+        })
+
+        batch = self._prepare_payslip_run(
+            self.employee_1 + self.employee_2,
+            {
+                "l10n_au_hr_payroll.input_child_support_garnishee_lump_sum": 1000,
+                "l10n_au_hr_payroll.input_bonus_commissions": 7000,
+                "l10n_au_hr_payroll.input_bonus_commissions_overtime": 1000,
+            },
+                start_date="2026-07-02",
+                end_date="2026-08-01",
+        )
+
+        self.assertTrue(
+            all(state == "ready" for state in batch.slip_ids.mapped("l10n_au_stp_status")),
+            "All payslips should be ready to be sent to STP"
+        )
+
+        stp = self.env["l10n_au.stp"].search([("payslip_batch_id", "=", batch.id)])
+        stp.submit_date = date.today()
+        data = stp._get_complex_rendering_data()
+        # Gross remains the same.
+        self.assertEqual(data[self.employee_1.id]["Remuneration"][0]["GrossA"], 5000)
+        self.assertEqual(data[self.employee_2.id]["Remuneration"][0]["GrossA"], 7000)
+        # Remuneration G should be a little bit more as QE is bigger.
+        self.assertListEqual(
+            data[self.employee_1.id]["Deduction"],
+            [
+                {"RemunerationTypeC": "G", "RemunerationA": 2266.3},
+                {"RemunerationTypeC": "D", "RemunerationA": 120.0},
+            ],
+        )
+        self.assertEqual(data[self.employee_1.id]["contributions"][0]["EntitlementTypeC"], "Q")
+        self.assertEqual(data[self.employee_1.id]["contributions"][0]["EmployerContributionsYearToDateA"], 13000)
+        self._submit_stp(stp)
+
+    def test_stp_without_payslips_and_employees(self):
+        stp = self.env["l10n_au.stp"].create({
+            "company_id": self.company.id,
+            "payevent_type": "submit",
+        })
+        with self.assertRaisesRegex(ValidationError, "There are no payslips for STP submission."):
+            stp.submit()
+
+        stp.payevent_type = "update"
+        with self.assertRaisesRegex(ValidationError, "There are no employees for STP submission."):
+            stp.submit()
+
+    @mock_skip_stp_api_calls()
+    @freeze_time("2026-07-31")
+    def test_stp_deductions(self):
+        self.employee_2.l10n_au_child_support_garnishee_amount = 0.15
+        self.employee_2.l10n_au_child_support_deduction = 120
+        self.contract_2.l10n_au_salary_sacrifice_superannuation = 100
+        self.contract_2.l10n_au_salary_sacrifice_other = 200
+
+        # Create a pre-tax deduction input rule
+        pre_tax_rule = self.env["hr.salary.rule"].create({
+            "name": "Pre-tax Deduction Other",
+            "code": "SS.O",
+            "sequence": 0,
+            "appears_on_payslip": "never",
+            "condition_select": "python",
+            "condition_python": "result = False",
+            "amount_select": "code",
+            "amount_python_compute": "result = 0",
+            "input_usage_payslip": True,
+            "l10n_au_payment_type": "deduction",
+            "l10n_au_superannuation_treatment": "ote",
+            "struct_ids": [(6, 0, [self.default_payroll_structure.id])],
+        })
+
+        # Payrun for July with pre-tax deductions
+        batch = self.env["hr.payslip.run"].create(
+            {
+                "date_start": "2026-07-01",
+                "date_end": "2026-07-31",
+                "name": "July Batch",
+                "company_id": self.company.id,
+                "structure_id": self.default_payroll_structure.id,
+            }
+        )
+        batch._generate_payslips()
+        batch.slip_ids.write({"input_line_ids": [
+            (0, 0, {
+                "salary_rule_id": pre_tax_rule.id,
+                "amount": 100,
+            }),
+        ]})
+        batch.slip_ids.compute_sheet()
+        self.assertAlmostEqual(batch.slip_ids.net_wage, 4362.9)
+
+        # Add a post-tax deduction input type - net wage should be reduced by 300
+        batch.slip_ids.write({"input_line_ids": [
+            (0, 0, {
+                "salary_rule_id": self.env.ref("l10n_au_hr_payroll.l10n_au_hr_payroll_structure_au_regular_post_tax_deduction").id,
+                "amount": -300,
+            })
+        ]})
+        batch.slip_ids.compute_sheet()
+        batch.action_validate()
+        self.assertAlmostEqual(batch.slip_ids.net_wage, 4062.9)
+
+        # Validate STP data
+        stp = batch.slip_ids._get_payslip_stp()[batch.slip_ids.id]
+        stp.submit_date = date.today()
+        data = stp._get_complex_rendering_data()
+        # Post tax not to be reported
+        self.assertEqual(data[self.employee_2.id]["Remuneration"][0]["GrossA"], 7000)
+        self.assertListEqual(
+            sorted(data[self.employee_2.id]["Deduction"], key=lambda x: x["RemunerationTypeC"]),
+            [
+                {"RemunerationTypeC": "D", "RemunerationA": 120.0},
+                {"RemunerationTypeC": "G", "RemunerationA": 791.1},
+            ],
+            "Post tax deductions should not be reported in STP."
+        )
+
+        # Pre-tax deductions to be reported under salary sacrifice other
+        self.assertListEqual(
+            sorted(data[self.employee_2.id]["Remuneration"][0]["SalarySacrificeCollection"], key=lambda x: x["TypeC"]),
+            [
+                {'TypeC': 'O', 'PaymentA': 300.0},
+                {'TypeC': 'S', 'PaymentA': 100.0},
+            ],
+            "Pre-tax deductions should be reported under salary sacrifice other in STP."
+        )
+        self._submit_stp(stp)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, _, api
-from odoo.addons.iap import jsonrpc
+from odoo.addons.iap.tools import iap_tools
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools.urls import urljoin as url_join
 import requests
@@ -42,11 +42,11 @@ class ResCompany(models.Model):
 
     @api.model
     def _l10n_de_fiskaly_kassensichv_url(self):
-        return self.env['ir.config_parameter'].sudo().get_param('l10n_de_fiskaly_kassensichv_url', 'https://kassensichv-middleware.fiskaly.com')
+        return self.env['ir.config_parameter'].sudo().get_str('l10n_de_fiskaly_kassensichv_url') or 'https://kassensichv-middleware.fiskaly.com'
 
     @api.model
     def _l10n_de_fiskaly_dsfinvk_api_url(self):
-        return self.env['ir.config_parameter'].sudo().get_param('l10n_de_fiskaly_dsfinvk_url', 'https://dsfinvk.fiskaly.com')
+        return self.env['ir.config_parameter'].sudo().get_str('l10n_de_fiskaly_dsfinvk_url') or 'https://dsfinvk.fiskaly.com'
 
     def _l10n_de_fiskaly_kassensichv_auth(self, version):
         """
@@ -126,9 +126,9 @@ class ResCompany(models.Model):
             raise UserError(_("There are some connection issues between us and Fiskaly, try again later."))
 
     def _l10n_de_fiskaly_iap_rpc(self, path, params, version=1):
-        endpoint = self.env['ir.config_parameter'].sudo().get_param('l10n_de_fiskaly_iap.endpoint', DEFAULT_ENDPOINT)
+        endpoint = self.env['ir.config_parameter'].sudo().get_str('l10n_de_fiskaly_iap.endpoint') or DEFAULT_ENDPOINT
         base_url = '%s/%s' % (endpoint, version)
-        response = jsonrpc(base_url + path, params=params)
+        response = iap_tools.iap_jsonrpc(base_url + path, params=params, raise_user_error=True)
         if 'error' in response:
             raise UserError(response['error'])
         return response
@@ -148,7 +148,7 @@ class ResCompany(models.Model):
 
     def _l10n_de_create_db_payload(self):
         params = {
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             'company_id': self.id,
         }
         if self.l10n_de_fiskaly_organization_id:
@@ -157,7 +157,7 @@ class ResCompany(models.Model):
 
     def _l10n_de_create_organization_payload(self):
         self._l10n_de_check_required_fiskaly_fields()
-        db_uuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
         data = {
             'name': '{0} [#{1}]'.format(self.name, db_uuid),  # To make sure the name is always unique
             'address_line1': self.street,
@@ -188,14 +188,14 @@ class ResCompany(models.Model):
                         'l10n_de_fiskaly_api_key': response['api_key'],
                         'l10n_de_fiskaly_api_secret': response['api_secret'],
                     })
+                    self.l10n_de_update_vat_export_data()
+                    self._check_vat_definition_export_id()
                 else:   # the request to create credentials failed but the company was still well registered
                     self.l10n_de_fiskaly_organization_id = response['organization_id']
-                self.l10n_de_update_vat_export_data()
-                self._check_vat_definition_export_id()
 
     def _check_vat_definition_export_id(self):
         self.ensure_one()
-        self.env['account.tax'].search([*self._check_company_domain(self), ('l10n_de_vat_definition_export_identifier', '=', 0)]).get_vat_definition_export_id()
+        self.env['account.tax'].search([*self._check_company_domain(self), ('l10n_de_vat_definition_export_identifier', '=', 0)])._get_vat_definition_export_id()
 
     def l10n_de_action_fiskaly_create_new_keys(self):
         self.ensure_one()
@@ -206,6 +206,8 @@ class ResCompany(models.Model):
             'l10n_de_fiskaly_api_key': response['api_key'],
             'l10n_de_fiskaly_api_secret': response['api_secret'],
         })
+        if not self.l10n_de_vat_export_data:
+            self.l10n_de_update_vat_export_data()
 
     def l10n_de_update_vat_export_data(self):
         """Fetch and update the VAT definition export IDs for the company's taxes from Fiskaly."""

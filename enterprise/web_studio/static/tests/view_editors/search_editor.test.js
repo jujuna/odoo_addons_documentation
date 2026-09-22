@@ -1,7 +1,14 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
-import { contains, defineModels, fields, models, onRpc } from "@web/../tests/web_test_helpers";
+import {
+    contains,
+    defineModels,
+    fields,
+    models,
+    onRpc,
+    serverState,
+} from "@web/../tests/web_test_helpers";
 import { pick } from "@web/core/utils/objects";
 import { editView, mountViewEditor } from "../view_editor_tests_utils";
 
@@ -217,7 +224,10 @@ test("existing field section should be unfolded by default in search", async () 
         arch: `<search><field name='display_name'/></search>`,
     });
 
-    expect(".o_web_studio_existing_fields_header i").toHaveClass(["fa-caret-down"]);
+    expect(".o_web_studio_existing_fields_header i").toHaveAttribute(
+        "data-icon",
+        "arrow_drop_down"
+    );
     expect(".o_web_studio_existing_fields_section").toBeVisible();
 });
 
@@ -366,4 +376,126 @@ test("integer field can be dropped in 'Group by' sections", async () => {
 
     expect.verifySteps(["edit_view"]);
     expect(".o-web-studio-search--groupbys [data-studio-xpath]").toHaveCount(1);
+});
+
+test("check invisible modifiers properties", async () => {
+    await mountViewEditor({
+        type: "search",
+        resModel: "partner",
+        arch: `
+            <search>
+                <field name='display_name'/>
+                <filter string='My Filter'
+                    name='my_name'
+                    domain='[("display_name","=",Woof)]'
+                />
+                <group expand='0' string='Group By'>
+                    <filter string="My Groupby" name='groupby_display_name'
+                    domain='[]' context="{'group_by':'display_name'}"/>
+                </group>
+            </search>`,
+    });
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        expect.step("edit_view");
+        const { params } = await request.json();
+        expect(params.operations[0].new_attrs).toEqual({ invisible: "True" });
+    });
+
+    // Filter
+    await contains(".o-web-studio-search--filters .o-web-studio-editor--element-clickable").click();
+    expect(".o_web_studio_sidebar input[name='invisible']").toBeVisible();
+    expect(".o_web_studio_sidebar input[name='label']").toHaveValue("My Filter");
+    expect(".o_web_studio_sidebar input[name='domain']").toHaveValue('[("display_name","=",Woof)]');
+
+    await contains(".o_web_studio_sidebar input[name='invisible']").click();
+    expect.verifySteps(["edit_view"]);
+
+    // GroupBy
+    await contains(
+        ".o-web-studio-search--groupbys .o-web-studio-editor--element-clickable"
+    ).click();
+    expect(".o_web_studio_sidebar input[name='invisible']").toBeVisible();
+    expect(".o_web_studio_sidebar input[name='label']").toHaveValue("My Groupby");
+
+    await contains(".o_web_studio_sidebar input[name='invisible']").click();
+    expect.verifySteps(["edit_view"]);
+});
+
+test("invisible fields are made visible with hatched bg", async () => {
+    await mountViewEditor({
+        type: "search",
+        resModel: "partner",
+        arch: `
+            <search>
+                <field name='display_name'/>
+                <filter string='You can see me'
+                    name='my_name'
+                    domain='[("display_name","=",Woof)]'
+                />
+                <filter string='You cannot see me'
+                    name='my_name'
+                    invisible='true'
+                    domain='[("display_name","=",Woof)]'
+                />
+            </search>`,
+    });
+    expect(".o-web-studio-search--filters .o-web-studio-editor--element-clickable").toHaveCount(1);
+    await contains(".o_web_studio_sidebar .o_notebook_headers .nav-link:contains(View)").click();
+    await contains(".o_web_studio_sidebar #show_invisible").click();
+    expect(".o-web-studio-search--filters .o-web-studio-editor--element-clickable").toHaveCount(2);
+    expect(".o-web-studio-search--filters .o_web_studio_show_invisible").toHaveCount(1);
+});
+
+test("check modifiers simple dialog", async () => {
+    // The expression is in readonly if not in debug mode
+    serverState.debug = "1";
+    await mountViewEditor({
+        type: "search",
+        resModel: "partner",
+        arch: `
+            <search>
+                <field name='display_name'/>
+                <filter string='My Filter'
+                    name='my_name'
+                    domain='[("display_name","=",Woof)]'
+                />
+            </search>`,
+    });
+    onRpc("/web_studio/edit_view", async (request) => {
+        expect.step("edit_view");
+        const { params } = await request.json();
+        expect(params.operations[0].new_attrs).toEqual({ invisible: "True" });
+    });
+    await contains(".o-web-studio-search--filters .o-web-studio-editor--element-clickable").click();
+    await contains(".o_web_studio_sidebar a[role='button']").click();
+    expect(".o_dialog h4").toHaveText("Edit Condition");
+
+    // '1' should be evaluated to 'True'
+    await contains(".o_dialog main input").edit("1");
+
+    await contains(".o_dialog footer button:first-child").click();
+    expect.verifySteps(["edit_view"]);
+});
+
+test("autocompletion container does not contain the searchpanel fields", async () => {
+    Partner._fields.age = fields.Integer();
+    await mountViewEditor({
+        type: "search",
+        resModel: "partner",
+        arch: `
+        <search>
+            <field name='display_name'/>
+            <searchpanel>
+                <field name='age'/>
+            </searchpanel>
+        </search>`,
+    });
+
+    expect(
+        ".o_web_studio_search_autocompletion_container .o-web-studio-editor--element-clickable"
+    ).toHaveCount(1);
+    expect(
+        ".o_web_studio_search_autocompletion_container .o-web-studio-editor--element-clickable"
+    ).toHaveText("Display name");
 });

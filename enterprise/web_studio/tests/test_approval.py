@@ -1,15 +1,18 @@
+
+from datetime import datetime
 from psycopg2 import IntegrityError
 
 from odoo import Command
-from odoo.addons.mail.tests.common import mail_new_test_user
+from odoo.addons.mail.tests.common import mail_new_test_user, MailCase
 from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.tests import freeze_time
 from odoo.tests.common import TransactionCase
 from odoo.tools import mute_logger
 from odoo.tests import tagged
 
 
 @tagged('post_install', '-at_install', 'mail_activity')
-class TestStudioApproval(TransactionCase):
+class TestStudioApproval(MailCase):
 
     @classmethod
     def setUpClass(cls):
@@ -35,6 +38,7 @@ class TestStudioApproval(TransactionCase):
         cls.manager = mail_new_test_user(
             cls.env, login='Manager',
             groups="base.group_user,base.group_partner_manager", context=creation_context)
+        cls.user_admin = cls.env.ref('base.user_admin')
         cls.user.write({
             'group_ids': [(4, cls.group_user.id)]
         })
@@ -172,6 +176,7 @@ class TestStudioApproval(TransactionCase):
         rule = self.rule_with_domain
         rule.active = True
         matching_record = self.env.ref('base.main_company').partner_id
+        matching_record.vat = "0123456789"  # Making is_company True for the rule
         non_matching_record = self.record
         approval_result = self.env['studio.approval.rule'].with_user(self.user).check_approval(
             model=self.MODEL,
@@ -539,6 +544,76 @@ class TestStudioApproval(TransactionCase):
         rule = all_approvals["all_rules"][approval_header_get["rules"][0]]
         self.assertEqual(rule["message"], "You didn't say the magic word 2!")
 
+    def test_17_approval_rule_tracking(self):
+        """ Changing approver_ids or approver_log_ids should anyway track approvers. """
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
+        self.flush_tracking()
+        test_rule = self.rule.with_user(self.user_admin)
+
+        # direct update of approvers
+        with self.mock_mail_gateway(), self.mock_mail_app():
+            test_rule.active = True
+            test_rule.approval_group_id = self.group_user.id
+            test_rule.approver_ids = [(4, self.manager.id)]
+            self.flush_tracking()
+        self.assertMessageFields(self._new_msgs, {
+            'author_id': self.user_admin.partner_id,
+            'body': f'<p>{self.user_admin.name} has set approval rights from no one to {self.manager.name}</p>',
+            'message_type': 'tracking',
+            'model': test_rule._name,
+            'res_id': test_rule.id,
+            'subject': False,
+            'subtype_id': self.env.ref('mail.mt_note'),
+            'tracking_values': [
+                ('approval_group_id', 'many2one', self.group_manager, self.group_user),
+                ('approver_ids', 'many2many', '', f'{self.manager.name}'),
+            ]
+        })
+
+        # user sub-model (rule log) -> track higher level changes on approver_ids
+        with self.mock_mail_gateway(), self.mock_mail_app():
+            test_rule.approval_group_id = self.group_manager.id
+            test_rule.approver_log_ids = [
+                (0, 0, {'user_id': self.user_admin.id}),
+                (0, 0, {'user_id': self.user.id}),
+                (3, test_rule.approver_log_ids[0].id),
+            ]
+            self.flush_tracking()
+        self.assertMessageFields(self._new_msgs, {
+            'author_id': self.user_admin.partner_id,
+            'body': f'<p>{self.user_admin.name} has set approval rights from {self.manager.name} to '
+                    f'{self.user.name} and {self.user_admin.name}</p>',
+            'message_type': 'tracking',
+            'model': test_rule._name,
+            'res_id': test_rule.id,
+            'subject': False,
+            'subtype_id': self.env.ref('mail.mt_note'),
+            'tracking_values': [
+                ('approval_group_id', 'many2one', self.group_user, self.group_manager),
+                ('approver_ids', 'many2many', f'{self.manager.name}', f'{self.user.name}, {self.user_admin.name}'),
+            ]
+        })
+
+        # check custom log when using '_delegate_to'
+        delegate_date_to = datetime(2026, 4, 4, 18, 30, 0)
+        with self.mock_mail_gateway(), self.mock_mail_app(), freeze_time(datetime(2026, 3, 3, 12, 30, 0)):
+            test_rule._delegate_to(self.manager + self.user_admin, delegate_date_to)
+            self.flush_tracking()
+        self.assertMessageFields(self._new_msgs, {
+            'author_id': self.user_admin.partner_id,
+            'body': f'<p>{self.user_admin.name} delegated approval rights to {self.manager.name}, '
+                    f'{self.user_admin.name} until {delegate_date_to.date()}</p>',
+            'message_type': 'tracking',
+            'model': test_rule._name,
+            'res_id': test_rule.id,
+            'subject': False,
+            'subtype_id': self.env.ref('mail.mt_note'),
+            'tracking_values': [
+                ('approver_ids', 'many2many', f'{self.user.name}, {self.user_admin.name}', f'{self.user_admin.name}, {self.manager.name}'),
+            ]
+        })
+
+
 @tagged('post_install', '-at_install')
 class TestStudioApprovalPost(TransactionCase):
     # patching is done when the registry is ready, so post-install is needed
@@ -615,7 +690,7 @@ class TestStudioApprovalPost(TransactionCase):
         partner = self.env['res.partner'].with_user(self.user).search([])[0]
         user_result = partner.with_user(self.user).open_commercial_entity()
         self.assertTrue(user_result.get('type') == 'ir.actions.client' and user_result.get('tag') == 'display_notification', 'The patched method should return a notification action')
-        self.assertEqual(user_result.get('params', {}).get('message'), "An approval is missing", 'The notification contains the corresponding message')
+        self.assertEqual(user_result.get('params', {}).get('message'), "An approval is missing.", 'The notification contains the corresponding message')
         self.assertEqual(user_result.get('params', {}).get('type'), 'warning', 'The notification should be a warning')
 
         # the manager can indeed execute this method

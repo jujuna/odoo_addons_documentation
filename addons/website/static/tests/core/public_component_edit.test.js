@@ -11,8 +11,6 @@ const publicComponentRegistryEdit = registry.category("public_components.edit");
 test(`owl components are neutered in edit mode`, async () => {
     class MyPublicComp extends Component {
         static template = xml`<div>hello</div>`;
-        static props = ["*"];
-        setup() {}
     }
     publicComponentRegistry.add("my_public_comp", MyPublicComp);
 
@@ -50,8 +48,6 @@ test(`owl components are neutered in edit mode`, async () => {
 test(`edit owl components are not neutered in edit mode`, async () => {
     class MyPublicComp extends Component {
         static template = xml`<div>hello</div>`;
-        static props = ["*"];
-        setup() {}
     }
     publicComponentRegistry.add("my_public_comp", MyPublicComp);
     publicComponentRegistryEdit.add("my_public_comp", MyPublicComp);

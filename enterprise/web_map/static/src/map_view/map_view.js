@@ -1,4 +1,3 @@
-import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { MapArchParser } from "./map_arch_parser";
 import { MapModel } from "./map_model";
@@ -17,26 +16,23 @@ export const mapView = {
 
     props: (genericProps, view, config) => {
         let modelParams = genericProps.state;
+        const { arch, resModel, fields, context, limit } = genericProps;
+        const archInfo = new view.ArchParser().parse(arch);
         if (!modelParams) {
-            const { arch, resModel, fields, context } = genericProps;
-            const parser = new view.ArchParser();
-            const archInfo = parser.parse(arch);
             const views = config.views || [];
             modelParams = {
-                allowResequence: archInfo.allowResequence || false,
+                canEdit: archInfo.activeActions.edit,
                 context,
                 defaultOrder: archInfo.defaultOrder,
                 fieldNames: archInfo.fieldNames,
-                fieldNamesMarkerPopup: archInfo.fieldNamesMarkerPopup,
+                popoverFieldNodes: archInfo.popoverFieldNodes,
+                popoverNode: archInfo.popoverNode,
                 fields,
                 hasFormView: views.some((view) => view[1] === "form"),
                 hideAddress: archInfo.hideAddress || false,
                 hideName: archInfo.hideName || false,
-                hideTitle: archInfo.hideTitle || false,
-                limit: archInfo.limit || 80,
-                numbering: archInfo.routing || false,
+                limit: archInfo.limit || limit || 80,
                 offset: 0,
-                panelTitle: archInfo.panelTitle || config.getDisplayName() || _t("Items"),
                 resModel,
                 resPartnerField: archInfo.resPartnerField,
                 routing: archInfo.routing || false,
@@ -45,6 +41,7 @@ export const mapView = {
 
         return {
             ...genericProps,
+            archInfo,
             Model: view.Model,
             modelParams,
             Renderer: view.Renderer,

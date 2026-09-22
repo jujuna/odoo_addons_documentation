@@ -12,18 +12,6 @@ class DocumentsDocument(models.Model):
     # for folders
     project_ids = fields.One2many('project.project', 'documents_folder_id', string="Projects")
 
-    def _prepare_create_values(self, vals_list):
-        vals_list = super()._prepare_create_values(vals_list)
-        folder_ids = {folder_id for v in vals_list if (folder_id := v.get('folder_id')) and not v.get('res_id')}
-        folder_id_values = {
-            folder_id: self.browse(folder_id)._get_link_to_project_values()
-            for folder_id in folder_ids
-        }
-        for vals in vals_list:
-            if (folder_id := vals.get('folder_id')) and vals.get('type') != 'folder' and not vals.get('res_id'):
-                vals.update({k: v for k, v in folder_id_values[folder_id].items() if k not in vals})
-        return vals_list
-
     @api.model
     def _search_display_name(self, operator, value):
         domain = super()._search_display_name(operator, value)

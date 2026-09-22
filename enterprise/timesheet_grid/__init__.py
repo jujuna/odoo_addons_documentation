@@ -1,3 +1,4 @@
+from . import controllers
 from . import models
 from . import wizard
 from . import report
@@ -23,6 +24,9 @@ def uninstall_hook(env):
     when uninstalling timesheet_grid, here we clean the view_mode
     manually.
     """
+    if rule := env.ref('hr_timesheet.timesheet_line_rule_user', raise_if_not_found=False):
+        rule.active = True
+
     root_menu = env.ref('hr_timesheet.timesheet_menu_root', raise_if_not_found=False)
     if root_menu and root_menu.active:
         root_menu.write({'active': False})

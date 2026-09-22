@@ -7,11 +7,15 @@ patch(BarcodePickingModel.prototype, {
 
     get displayOnDemandQualityCheckButton() {
         const { record } = this;
-        return record && record.id;
+        return record && record.id && this.groups.group_user_regular;
     },
 
     get hasQualityChecksTodo() {
         return this.record && this.record.quality_check_todo;
+    },
+
+    get highlightValidateButton() {
+        return this.hasQualityChecksTodo ? false : super.highlightValidateButton;
     },
 
     async checkQuality() {
@@ -20,7 +24,7 @@ patch(BarcodePickingModel.prototype, {
             this.resModel,
             this.openQualityChecksMethod,
             [this.resId || this.record.id],
-            { context: { barcode_trigger: true } }
+            { context: { barcode_view: true } }
         );
         if (typeof res === "object" && res !== null) {
             return this.action.doAction(res, {
@@ -38,7 +42,7 @@ patch(BarcodePickingModel.prototype, {
                 },
             });
         } else {
-            this.notification.add(_t("All the quality checks have been done"));
+            this.notification(_t("All the quality checks have been done"));
         }
     },
 
@@ -49,7 +53,7 @@ patch(BarcodePickingModel.prototype, {
             "action_open_on_demand_quality_check",
             [[this.resId]],
             {
-                context: { from_barcode: true },
+                context: { barcode_view: true },
             }
         );
         if (typeof res === "object" && res !== null) {
@@ -63,7 +67,7 @@ patch(BarcodePickingModel.prototype, {
     async _closeValidate(ev) {
         super._closeValidate(ev);
         // When going from draft to assign, need to reload JS to show quality check button
-        if (this.record.state === "draft") {
+        if (this.record.state === "draft" || this.hasQualityChecksTodo) {
             this.trigger("refresh", { recordId: this.record.id });
         }
     },

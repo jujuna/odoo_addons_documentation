@@ -9,7 +9,8 @@
                     <group>
                         <field name="code"/>
                         <field name="name"/>
-                        <field name="ex"/>
+                        <field name="is_service"/>
+                        <field name="ex" invisible="is_service"/>
                         <field name="l10n_br_cnae_code_id"/>
                     </group>
                 </sheet>
@@ -25,16 +26,30 @@
                 <field name="code"/>
                 <field name="name"/>
                 <field name="ex"/>
+                <field name="is_service" optional="show"/>
             </list>
         </field>
     </record>
 
+    <record id="l10n_br_ncm_code_view_search" model="ir.ui.view">
+        <field name="name">l10n_br_avatax.l10n_br.ncm.code.search</field>
+        <field name="model">l10n_br.ncm.code</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="goods" string="Goods (NCM)" domain="[('is_service', '=', False)]"/>
+                <filter name="services" string="Services (LC)" domain="[('is_service', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
     <record id="l10n_br_ncm_code_action" model="ir.actions.act_window">
-        <field name="name">NCM Codes</field>
+        <field name="name">NCM / LC Codes</field>
         <field name="res_model">l10n_br.ncm.code</field>
         <field name="view_mode">list,form</field>
         <field name="view_id" ref="l10n_br_ncm_code_view_list"/>
     </record>
 
-    <menuitem id="ncm_codes_menu" name="NCM Codes" action="l10n_br_ncm_code_action" parent="l10n_br.brazilian_accounting_menu"/>
+    <menuitem id="ncm_codes_menu" name="NCM / LC Codes" action="l10n_br_ncm_code_action" parent="l10n_br.brazilian_accounting_menu"/>
 </odoo>

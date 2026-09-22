@@ -16,6 +16,6 @@ class TestUi(HttpCase):
 
     def test_checkout_address(self):
         # set current company's fiscal country to italy
-        website = self.env['website'].get_current_website()
+        website = self.env.ref('base.default_website')
         website.company_id.account_fiscal_country_id = website.company_id.country_id = self.env.ref('base.it')
-        self.start_tour("/", 'shop_checkout_address')
+        self.start_tour("/shop", 'shop_checkout_address')

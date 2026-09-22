@@ -8,11 +8,13 @@ from odoo.addons.partner_commission.tests.setup import TestCommissionsSetup
 
 @tagged('commission_sale', 'post_install', '-at_install')
 class TestSaleOrder(TestCommissionsSetup):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_referrer_commission_plan_changed(self):
         """When the referrer's commission plan changes, its new commission plan should be set on the sale order."""
         self.referrer.commission_plan_id = self.gold_plan
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         so = form.save()
@@ -27,7 +29,7 @@ class TestSaleOrder(TestCommissionsSetup):
         """When the referrer's grade changes, its new commission plan should be set on the sale order."""
         self.referrer.grade_id = self.gold
         self.referrer._onchange_grade_id()
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         so = form.save()
@@ -41,8 +43,12 @@ class TestSaleOrder(TestCommissionsSetup):
         """Some data should be forwarded from the sale order to the subscription."""
         self.referrer.commission_plan_id = self.gold_plan
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True),
-                    view=self.env.ref('sale_subscription.sale_subscription_primary_form_view'))
+        form = Form(
+            self.env['sale.order']
+                .with_user(self.salesman)
+                .with_context(default_subscription_state='1_draft'),
+            view=self.env.ref('sale_subscription.sale_subscription_primary_form_view')
+        )
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         # form.commission_plan_frozen = False
@@ -65,7 +71,7 @@ class TestSaleOrder(TestCommissionsSetup):
         """Some data should be forwarded from the sale order to the invoice."""
         self.referrer.commission_plan_id = self.gold_plan
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         # We test the non recurring flow: recurring_invoice is False on the product
@@ -85,7 +91,7 @@ class TestSaleOrder(TestCommissionsSetup):
     def test_compute_commission(self):
         self.referrer.commission_plan_id = self.gold_plan
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         # We test the non recurring flow: recurring_invoice is False on the product
@@ -105,7 +111,7 @@ class TestSaleOrder(TestCommissionsSetup):
         """Referrer_id should be the same in the new created invoice"""
         self.referrer.commission_plan_id = self.gold_plan
         self.worker.recurring_invoice = False # test on a non recurring SO
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
 
@@ -117,7 +123,7 @@ class TestSaleOrder(TestCommissionsSetup):
         so = form.save()
         so.action_confirm()
 
-        invoice_wizard = self.env['sale.advance.payment.inv'].with_context(tracking_disable=True).create({
+        invoice_wizard = self.env['sale.advance.payment.inv'].create({
             'advance_payment_method': 'fixed',
             'sale_order_ids': [Command.set(so.ids)],
             'fixed_amount': 100,
@@ -174,7 +180,7 @@ class TestSaleOrder(TestCommissionsSetup):
             ],
         })
         self.referrer.commission_plan_id = plan
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
 
@@ -209,7 +215,7 @@ class TestSaleOrder(TestCommissionsSetup):
             'partner_id': self.customer.id,
             'product_tmpl_id': self.worker.product_tmpl_id.id,
         })
-        self.worker.write({'type': 'service', 'service_to_purchase': True, 'recurring_invoice': False})
+        self.worker.write({'type': 'service', 'service_tracking': 'subcontract', 'recurring_invoice': False})
         sale_orders = self.env['sale.order'].create([
             {
                 'partner_id': self.customer.id,
