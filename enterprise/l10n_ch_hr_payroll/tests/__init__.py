@@ -11,5 +11,6 @@ from . import test_payslip_entry_date
 from . import test_iso20022_communication
 from . import test_payslip_name
 from . import test_leave_constraints
+from . import test_net_compensation
 from . import test_swiss_leaves
 from . import test_swiss_master_data_report

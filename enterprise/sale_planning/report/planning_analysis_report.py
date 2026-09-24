@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, api
+from odoo.fields import Domain
 from odoo.tools import SQL
 
 
@@ -20,6 +20,8 @@ class PlanningAnalysisReport(models.Model):
             slot.partner_id = slot.sale_order_id.partner_id
 
     def _search_partner_id(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
         return [('sale_order_id.partner_id', operator, value)]
 
     def _compute_role_product_ids(self):
@@ -28,6 +30,8 @@ class PlanningAnalysisReport(models.Model):
 
     @api.model
     def _search_role_product_ids(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
         return [('role_id.product_ids', operator, value)]
 
     @property

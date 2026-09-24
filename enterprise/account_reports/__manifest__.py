@@ -58,6 +58,7 @@ Accounting Reports
         'views/account_tax_views.xml',
         'views/account_return_check_template_views.xml',
         'views/account_audit_views.xml',
+        'views/account_report_snapshot_views.xml',
         'data/account_return_audit_cycle.xml',
         'data/account_return_data.xml',
         'data/menuitems.xml',

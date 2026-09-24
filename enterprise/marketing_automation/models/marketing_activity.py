@@ -187,6 +187,9 @@ class MarketingActivity(models.Model):
         "A log note activity should always have a note to log on the record",
     )
 
+    def _get_allowed_triggering_activity_types(self):
+        return ['mail']
+
     @api.constrains('parent_id')
     def _check_parent_id(self):
         if self._has_cycle():
@@ -204,9 +207,11 @@ class MarketingActivity(models.Model):
 
     @api.constrains('triggering_activity_id')
     def _check_triggering_activity_id(self):
-        for activity in self:
-            if activity.triggering_activity_id and activity.triggering_activity_id.activity_type == 'structure':
+        for activity in self.filtered('triggering_activity_id'):
+            if activity.triggering_activity_id.activity_type == 'structure':
                 raise ValidationError(_("The triggering activity mustn't be a structure activity."))
+            if activity.triggering_activity_id.activity_type not in activity._get_allowed_triggering_activity_types():
+                raise ValidationError(_("You are trying to set an incorrect activity as the triggering of another one. Please change the triggering activity."))
             is_cycle = activity.filtered_domain([('id', 'parent_of', activity.triggering_activity_id.id)])
             if is_cycle:
                 raise ValidationError(_("No cycle on triggers."))

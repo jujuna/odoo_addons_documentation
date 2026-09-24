@@ -95,10 +95,23 @@ class PlanningSlot(models.Model):
                 break
         if self.role_sync_shift_rental:
             if order.rental_start_date != self.start_datetime or order.rental_return_date != self.end_datetime:
-                self.write({
-                    'start_datetime': order.rental_start_date,
-                    'end_datetime': order.rental_return_date,
-                })
+                try:
+                    self.write({
+                        'start_datetime': order.rental_start_date,
+                        'end_datetime': order.rental_return_date,
+                    })
+                except ValidationError as err:
+                    if self.env.context.get('is_rental_shift_new'):
+                        self.unlink()
+                        return {
+                            'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'type': 'danger',
+                                'message': str(err),
+                            },
+                        }
+                    raise ValidationError(err)
         new_sale_line = False
         if not self.sale_line_id:
             sale_line = order.order_line.filtered(

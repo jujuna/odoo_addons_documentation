@@ -6,6 +6,7 @@ import { useVoiceRecorder } from "@mail/discuss/voice_message/common/voice_recor
 import { proxy } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
 import { getDataURLFromFile } from "@web/core/utils/urls";
@@ -25,7 +26,10 @@ patch(Composer.prototype, {
                     const base64Audio = dataUrl.split(",")[1];
                     const response = await rpc(
                         "/ai/transcription",
-                        { audio_base64: base64Audio },
+                        {
+                            audio_base64: base64Audio,
+                            language: user.lang?.replace("-", "_").split("_")[0],
+                        },
                         { silent: true },
                     );
                     if (response["status"] === "success") {

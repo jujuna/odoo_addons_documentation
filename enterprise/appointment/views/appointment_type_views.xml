@@ -176,7 +176,7 @@
                             <field string="Bookings" name="appointment_count" widget="statinfo"/>
                         </button>
                         <button class="oe_stat_button" type="object" name="action_edit_custom_slots" icon="event_available"
-                            invisible="not user_can_manage_slots">
+                            invisible="not user_can_manage_slots or category != 'custom'">
                             <field string="Time Slots" name="slot_count" widget="statinfo"/>
                         </button>
                         <button type="object" class="oe_stat_button"
@@ -280,10 +280,11 @@
                                 <list editable="bottom" class="o_appointment_slots_list">
                                     <control>
                                         <create string="Add Slot"/>
+                                        <!--we use slot_count here specifically because it reflects "virtual ids" count, not just real DB-stored ids-->
                                         <button name="action_clone_last_slot" type="object" string="Repeat Slot" class="btn-link"
-                                            invisible="parent.category != 'custom'"/>
+                                            invisible="parent.category != 'custom' or not parent.slot_count"/>
                                         <button name="action_clone_last_day_slots" type="object" string="Add Weekday" class="btn-link"
-                                            invisible="parent.category != 'custom'"/>
+                                            invisible="parent.category != 'custom' or not parent.slot_count"/>
                                     </control>
                                     <field name="weekday" string="Every"
                                         column_invisible="parent.category == 'custom'"/>
@@ -452,7 +453,7 @@
         <field name="name">appointment.type.view.form.quick.edit.slot</field>
         <field name="model">appointment.type</field>
         <field name="arch" type="xml">
-            <form string="Share Time Slots">
+            <form string="Share Time Slots" js_class="appointment_type_form_view">
                 <field name="category" force_save="1" invisible="1"/><!--needed to save the result of category_slot_scheduling onchange-->
                 <field name="slot_ids" force_save="1" invisible="1"><!--needed to save default slots during onchange when switching category-->
                     <list>
@@ -506,30 +507,24 @@
                         <label for="slot_creation_interval" class="w-auto col-auto" string="Create every"/>
                         <field name="slot_creation_interval" class="col-2 o_input_7ch" widget="float_time" nolabel="1"/>
                     </div>
-                    <div class="row justify-content-start align-items-center" invisible="category_slot_scheduling != 'weekly'" style="--fieldWidget-margin-bottom: 0;">
-                        <div class="col-1 d-flex justify-content-center align-items-center">
-                            <i class="oi oi-filled text-muted" data-icon="calendar_today" aria-label="Date range"/>
-                        </div>
-                        <field name="category_time_display" class="col-auto my-0" nolabel="1"/>
-                        <field name="max_schedule_days" class="col-2 my-0" nolabel="1"
-                            invisible="category_time_display == 'punctual_fields'"/>
-                        <label for="max_schedule_days" class="w-auto col-auto" string="days"
-                            invisible="category_time_display == 'punctual_fields'"/>
-                    </div>
                     <div class="row justify-content-start align-items-center" invisible="category_slot_scheduling != 'weekly' or category_time_display != 'punctual_fields'" style="--fieldWidget-margin-bottom: 0;">
                         <div class="col-1"/>
                         <field name="start_datetime" class="col my-0" placeholder="Start" nolabel="1" required="category == 'punctual'"/>
                         <field name="end_datetime" class="col my-0" placeholder="End" nolabel="1" required="category =='punctual'"/>
                     </div>
-                    <div class="row justify-content-center align-items-center">
+                    <div class="row justify-content-start align-items-center">
                         <div class="col-1 d-flex justify-content-center align-items-center">
                             <i class="oi oi-filled text-muted" data-icon="location_on" aria-label="Location"/>
                         </div>
-                        <field name="location_id" context="{'default_is_company': True}"
-                            domain="[('is_company', '=', True)]" placeholder="Online Meeting" class="col my-0"
-                        />
+                        <div class="col d-flex gap-2">
+                            <field name="location_id" context="{'default_is_company': True}"
+                                domain="[('is_company', '=', True)]" placeholder="Online Meeting" class="my-1 col"
+                            />
+                            <button name="add_videocall_source" type="button" class="btn btn-link col-auto"
+                                invisible="event_videocall_source" icon="videocam" string="Add Video"/>
+                        </div>
                     </div>
-                    <div class="row justify-content-center align-items-center">
+                    <div class="row justify-content-center align-items-center" invisible="not event_videocall_source">
                         <div class="col-1 d-flex justify-content-center align-items-center">
                             <i class="oi oi-filled text-muted" data-icon="videocam" aria-label="Video Call Source"/>
                         </div>
@@ -537,9 +532,17 @@
                     </div>
                 </div>
                 <footer>
-                    <button special="save" class="btn btn-primary">Pick Slots</button>
-                    <button special="cancel" class="btn btn-secondary">Discard</button>
-                    <button type="object" name="action_open_form" class="btn btn-secondary ms-auto">More Options</button>
+                    <button special="save" class="btn btn-primary">Save &amp; Pick Slots</button>
+                    <button special="cancel" class="btn btn-secondary" invisible="id">Discard</button>
+                    <span class="ms-auto"/><!--invisible separator to avoid making ms/me-auto conditional-->
+                    <button type="object" name="action_archive" class="btn btn-secondary" invisible="not id or not active"
+                        close="1" confirm="Existing invitations will cease working. Archive anyways?">
+                        <i class="oi" data-icon="archive"/> Archive
+                    </button>
+                    <button type="object" name="action_unarchive" class="btn btn-secondary" invisible="not id or active">
+                        <i class="oi" data-icon="unarchive"/> Unarchive
+                    </button>
+                    <button type="object" name="action_open_form" class="btn btn-secondary">More Options</button>
                 </footer>
             </form>
         </field>
@@ -552,7 +555,6 @@
         <field name="view_id" ref="appointment_type_view_form_quick_edit_slot"/>
         <field name="context">{
             'default_event_videocall_source': False,
-            'default_category': 'custom',
             'default_staff_user_ids': [uid],
             'dialog_size': 'small',
         }</field>

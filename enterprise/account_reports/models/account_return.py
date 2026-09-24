@@ -2517,7 +2517,9 @@ class AccountReturn(models.Model):
     def _check_suite_common_vat_report(self, check_codes_to_ignore):
         checks = []
         # check company configuration
-        if 'check_company_data' not in check_codes_to_ignore:
+        exists_check_company_data = self.check_ids.filtered(lambda c: c.code == 'check_company_data')
+        invalid_fields_count = sum(1 for field in self._get_company_required_fields() if not field)
+        if 'check_company_data' not in check_codes_to_ignore and (invalid_fields_count or exists_check_company_data):
             review_action = {
                 'type': 'ir.actions.act_window',
                 'name': _('Set your company data'),
@@ -2526,13 +2528,13 @@ class AccountReturn(models.Model):
                 'views': [(self.env.ref('account.res_company_form_view_onboarding').id, "form")],
                 'target': 'new',
             }
-            invalid_fields_count = sum(1 for field in self._get_company_required_fields() if not field)
 
             checks.append({
                 'name': _lt("Company data"),
                 'message': _lt(
-                    "Missing company details (like VAT number or country) can cause errors in your report, "
-                    "such as using the wrong VAT rate, wrongly exempting transactions."
+                    "Missing company details (like %(vat_label)s or country) can cause errors in your report, "
+                    "such as using the wrong tax rate, wrongly exempting transactions.",
+                    vat_label=self.company_id.partner_id.vat_label,
                 ),
                 'code': 'check_company_data',
                 'records_count': invalid_fields_count,
@@ -2544,7 +2546,7 @@ class AccountReturn(models.Model):
             checks.append(self._check_match_all_bank_entries(
                     code='check_match_all_bank_entries',
                     name=_lt("Bank Matching"),
-                    message=_lt("Bank transactions are reconciled to avoid any missing VAT invoices or bills."),
+                    message=_lt("Bank reconciliation helps identify missing invoices or bills that may affect taxes."),
                 )
             )
 
@@ -2561,7 +2563,7 @@ class AccountReturn(models.Model):
             checks.append(self._check_draft_entries(
                     code='check_draft_entries',
                     name=_lt("Drafts & Reviews"),
-                    message=_lt("Review Abnormal/To Review invoices and bills, and post drafts."),
+                    message=_lt("Review invoices, bills and entries which are either in draft or marked as Anomaly/To Review."),
                     exclude_entries=True,
                 )
             )
@@ -2648,9 +2650,9 @@ class AccountReturn(models.Model):
             }
 
             checks.append({
-                'name': _lt("Taxes and countries matching"),
+                'name': _lt("Tax Rate & Country Consistency"),
                 'code': 'check_tax_countries',
-                'message': _lt("Ensure the taxes on invoices and bills match the customer’s country."),
+                'message': _lt("Ensures that applied taxes and fiscal positions match the customer or vendor country location."),
                 'records_count': country_error_moves_count,
                 'records_model': self.env['ir.model']._get('account.move').id,
                 'action': review_action if country_error_move_ids else None,
@@ -2698,17 +2700,22 @@ class AccountReturn(models.Model):
                 'res_model': 'account.move.line',
                 'view_mode': 'pivot',
                 'views': [(False, 'pivot')],
-                'domain': [('move_type', 'in', ('out_invoice', 'out_receipt', 'out_refund'))],
                 'context': {
                     'active_test': False,
-                    'pivot_row_groupby': ['tax_tag_ids', 'account_id'],
+                    'pivot_row_groupby': ['tax_ids', 'account_id'],
                     'pivot_column_groupby': ['fiscal_position_id', 'commercial_partner_country'],
+                    'search_default_posted': True,
+                    'search_default_sales': True,
+                    'search_default_purchases': True,
+                    'search_default_date_between': True,
+                    'date_from': self.date_from,
+                    'date_to': self.date_to,
                 },
             }
 
             checks.append({
-                'name': _lt("VAT Reconciliation"),
-                'message': _lt("Audit journal items and accounts to ensure they are correctly assigned to tax grids."),
+                'name': _lt("Tax Reconciliation"),
+                'message': _lt("Audit journal items and accounts to ensure they are correctly assigned to taxes."),
                 'code': 'check_vat_reconciliation',
                 'result': 'todo',
                 'action': action,
@@ -3170,7 +3177,11 @@ class AccountReturn(models.Model):
             ('date', '>=', fields.Date.to_string(self.date_from)),
         ]
         if exclude_entries:
-            domain += [('move_type', '!=', 'entry')]
+            domain += [
+                '|',
+                ('move_type', '!=', 'entry'),
+                ('line_ids.tax_ids', '!=', False)
+            ]
         draft_entries_count = self.env['account.move'].sudo().search_count(domain, limit=LIMIT_CHECK_ENTRIES)
 
         review_action = {

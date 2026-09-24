@@ -72,6 +72,17 @@
                                 name="action_download_xlsx_accounts_coverage_report" type="object" string="Accounts Coverage Report"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <field name="snapshot_ids" invisible="1"/>
+                            <button
+                                string="Snapshots"
+                                class="oe_stat_button"
+                                name="action_open_snapshots"
+                                type="object"
+                                icon="history"
+                                invisible="snapshot_ids.length == 0"
+                            />
+                        </div>
                         <div class="oe_title">
                             <h1>
                                 <field name="name" placeholder="Report Name"/>
@@ -159,6 +170,7 @@
                                         <field name="filter_period_comparison"/>
                                         <field name="integer_rounding" placeholder="None"/>
                                         <field name="currency_translation" required="1" groups="base.group_multi_currency"/>
+                                        <field name="enable_snapshots"/>
                                     </group>
                                     <group string="Filters" class="oe_edit_only">
                                         <field name="filter_account_type"/>

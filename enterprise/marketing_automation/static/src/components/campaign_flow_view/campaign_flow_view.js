@@ -355,43 +355,71 @@ export class CampaignFlowView extends FlowViewMixin(X2ManyField) {
             });
             await this.action.doAction(action, {
                 props: {
-                    removeRecord: () =>
-                        this.onDelete(activityId, stepType).then(() =>
-                            this.action.doAction({ type: "ir.actions.act_window_close" })
-                        ),
+                    /** @param {Object} activity */
+                    saveRecord: async (activity) => {
+                        await activity.save();
+                        await this.action.doAction({ type: "ir.actions.act_window_close" });
+                        await this.refresh();
+                    },
+                    removeRecord: async () => {
+                        await this.onDelete(activityId, stepType);
+                        await this.action.doAction({ type: "ir.actions.act_window_close" });
+                        await this.refresh();
+                    },
                     buttonDialogTemplate: "marketing_automation.CampaignFlow.buttonDialogTemplate",
                 },
-                onClose: () => this.refresh(),
             });
         }
     }
 
+    /**
+     * @param {integer} activityId
+     * @param {string} stepType
+     * @returns {Promise}
+     */
     async onDelete(activityId, stepType) {
-        const { promise, resolve } = Promise.withResolvers();
-        const confirm = async (cascadeDelete = false) =>
-            this.orm
-                .call("marketing.activity", "action_delete_step", [
-                    activityId,
-                    stepType,
-                    cascadeDelete,
-                ])
-                .then(() => resolve());
-        const record = this.props.record.data.marketing_activity_ids.records.find(
-            (rec) => rec.resId === activityId
-        );
-        if (["begin", "collect_reply"].includes(record.data.trigger_type)) {
-            this.dialog.add(ConfirmationDialog, {
-                body: _t(
-                    "Removing this activity will remove a full marketing flow. \nAre you sure?"
-                ),
-                confirm: confirm.bind(this, true),
+        /** @returns {Promise} */
+        const deleteStep = () => {
+            return this.orm.call("marketing.activity", "action_delete_step", [
+                activityId,
+                stepType,
+            ]);
+        };
+        const openWarningBeforeDeletingStep = () => {
+            const close = this.dialog.add(ConfirmationDialog, {
+                body: _t("Removing this node will remove all checkpoint nodes that come after it. Are you sure?"),
+                confirm: async () => {
+                    await deleteStep();
+                    close();
+                    await this.refresh();
+                },
                 confirmLabel: _t("Sure"),
                 cancelLabel: _t("Cancel"),
             });
-        } else {
-            confirm();
-        }
-        return promise;
+        };
+        const activity = this.props.record.data.marketing_activity_ids.records.find(
+            (rec) => rec.resId === activityId
+        );
+        if (["begin", "collect_reply"].includes(activity.data.trigger_type)) {
+            const isDeletingLastNodeFromMarketingActivity = (
+                (stepType === "trigger"
+                    && !this.hasDelayNode(activity)
+                    && !this.hasActivityNode(activity))
+                || (stepType === "delay"
+                    && !this.hasTriggerNode(activity)
+                    && !this.hasActivityNode(activity))
+                || (!["delay", "trigger"].includes(stepType)
+                    && !this.hasDelayNode(activity)
+                    && !this.hasTriggerNode(activity)));
+            if (isDeletingLastNodeFromMarketingActivity) {
+                for (const child of this.getChildrenMarketingActivity(activity)) {
+                    if (child.data.trigger_type !== "activity") {
+                        return openWarningBeforeDeletingStep();
+                    }
+                }
+            }
+        };
+        return deleteStep();
     }
 
     // Marketing Campaign Builder
@@ -622,7 +650,7 @@ export class CampaignFlowView extends FlowViewMixin(X2ManyField) {
             await record.save();
         }
         await this.orm.call("marketing.campaign", "action_sort_steps", [this.props.record.resId]);
-        await this.props.record.model.load();
+        await this.refresh();
     }
 
     // Pointer Listeners
@@ -791,7 +819,12 @@ export class CampaignFlowView extends FlowViewMixin(X2ManyField) {
     addPointerListenerOnReplyTrigger(campaign, e1) {
         e1.stopPropagation();
         /** @param {Event} e2 */
-        const onReplyTriggerClick = (e2) => {};
+        const onReplyTriggerClick = async (e2) => {
+            const action = "marketing_automation.marketing_campaign_create_reply_trigger";
+            await this.action.doAction(action, {
+                props: { resId: this.props.record.resId },
+            });
+        };
         /** @param {Event} e2 */
         const onReplyTriggerMove = (e2) => {
             e2.stopPropagation();
@@ -829,7 +862,11 @@ export class CampaignFlowView extends FlowViewMixin(X2ManyField) {
             const action = "marketing_automation.marketing_campaign_create_trigger";
             await this.action.doAction(action, {
                 props: { resId: this.props.record.resId },
-                onClose: () => this.props.record.load(),
+                onClose: ({ noReload } = {}) => {
+                    if (!noReload) {
+                        return this.props.record.load();
+                    }
+                },
             });
         };
         /** @param {Event} e2 */
@@ -1309,7 +1346,7 @@ export class CampaignFlowView extends FlowViewMixin(X2ManyField) {
 export const campaignFlowView = {
     ...x2ManyField,
     component: CampaignFlowView,
-    additionalClasses: ["d-flex", "flex-grow-1", "m-0"],
+    additionalClasses: ["d-flex", "flex-column", "flex-grow-1", "flex-basis-0", "m-0"],
     fieldDependencies: [
         { name: "model_id", type: "many2one" },
         { name: "enroll_type", type: "selection" },

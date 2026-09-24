@@ -1,6 +1,6 @@
 import { formatText } from "@mail/js/emojis_mixin";
 
-import { markup } from "@odoo/owl";
+import { markup, useProps, t } from "@odoo/owl";
 
 import { htmlReplace } from "@web/core/utils/html";
 
@@ -37,14 +37,19 @@ export const SocialPostFormatterMixinBase = {
     },
 
     _getMediaType() {
-        return this.props && this.props.mediaType ||
-            this.props.record && this.props.record.data.media_type ||
+        return this.spfProps && this.spfProps.mediaType ||
+            this.spfProps.record && this.spfProps.record.data.media_type ||
             this.originalPost && this.originalPost.media_type.raw_value || '';
     }
 
 };
 
 export const SocialPostFormatterMixin = (T) => class extends T {
+    spfProps = useProps({
+        mediaType: t.any().optional(),
+        record: t.any().optional(),
+    });
+
     _formatPost() {
         return SocialPostFormatterMixinBase._formatPost.call(this, ...arguments);
     }

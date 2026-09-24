@@ -77,7 +77,12 @@ export class AiWebsiteBuilderPlugin extends Plugin {
         for (const [eventName, handler] of Object.entries(this.busHandlers)) {
             bus.subscribe(eventName, handler);
         }
-        this.onBusConnected = () => this.recoverScraperResults();
+        // Skip when a recovery is already scheduled
+        this.onBusConnected = () => {
+            if (!this.scraperRecoveryTimer) {
+                this.recoverScraperResults();
+            }
+        };
         for (const event of ["BUS:CONNECT", "BUS:RECONNECT"]) {
             bus.addEventListener(event, this.onBusConnected);
         }

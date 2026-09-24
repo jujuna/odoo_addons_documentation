@@ -11,10 +11,10 @@ const scriptCleanupMap = new Map();
 let observerEntry = null;
 
 /**
- * @param {AiScriptsRuntime} runtime
+ * @param {AiScriptsManager} manager
  * @returns {{observer: MutationObserver, handleRecords: Function}}
  */
-function getObserverEntry(runtime) {
+function getObserverEntry(manager) {
     if (!observerEntry) {
         const handleRecords = (mutations, isAIChange) => {
             for (const mutation of mutations) {
@@ -25,18 +25,18 @@ function getObserverEntry(runtime) {
             observer: new MutationObserver((records) => handleRecords(records, false)),
             handleRecords,
         };
-        runtime.observerEntries.add(observerEntry);
+        manager.observerEntries.add(observerEntry);
     }
     return observerEntry;
 }
 
 /**
- * @param {AiScriptsRuntime} runtime
+ * @param {AiScriptsManager} manager
  */
-function stopObserving(runtime) {
+function stopObserving(manager) {
     if (observerEntry) {
         observerEntry.observer.disconnect();
-        runtime.observerEntries.delete(observerEntry);
+        manager.observerEntries.delete(observerEntry);
         observerEntry = null;
     }
 }
@@ -83,7 +83,7 @@ function parseClassSet(classStr) {
     return new Set((classStr || "").split(/\s+/).filter(Boolean));
 }
 
-Object.assign(window.__aiScriptsManager__.runtime, {
+Object.assign(window.__aiScriptsManager__.manager, {
     trackElement(element, scriptEl) {
         if (!element) {
             return;

@@ -112,7 +112,7 @@ class L10nUSTaxreportHandler(models.AbstractModel):
         amounts = {}
         for column_group_index, cg_options in report._split_options_per_column_group(options).items():
             query = report._get_report_query(cg_options, 'strict_range')
-            tax_details = self.env['account.move.line']._get_query_tax_details(query.from_clause, query.where_clause)
+            tax_details = self.env['account.move.line']._get_query_tax_details(query)
 
             self.env.cr.execute(SQL(
                 '''

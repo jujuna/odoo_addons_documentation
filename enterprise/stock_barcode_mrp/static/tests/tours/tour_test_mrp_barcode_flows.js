@@ -1639,7 +1639,7 @@ registry.category("web_tour.tours").add("test_barcode_production_settings", {
         { trigger: "body", run: "scan compo01" },
         { trigger: "[data-barcode='compo01'].o_selected button.o_edit:not(:disabled)" },
         {
-            trigger: "[data-barcode='compo01'].o_selected button.o_add_remaining_quantity",
+            trigger: "[data-barcode='compo01'].o_selected button.o_add_quantity",
             run: "click",
         },
         // Compo Serial buttons should become clickable only once a SN was scanned.
@@ -2016,7 +2016,7 @@ registry.category("web_tour.tours").add("test_quant_selection_mrp", {
             },
         },
         { trigger: ".o_save", run: "click" },
-        { trigger: "button.o_add_remaining_quantity", run: "click" },
+        { trigger: "button.o_add_quantity.btn.btn-light", run: "click" },
 
         // Add Component
         { trigger: ".btn.o_add_line", run: "click" },

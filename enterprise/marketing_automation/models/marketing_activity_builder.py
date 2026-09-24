@@ -6,16 +6,11 @@ from odoo import models
 class MarketingActivity(models.Model):
     _inherit = 'marketing.activity'
 
-    def action_delete_step(self, step_type, cascade_delete=False):
-        if cascade_delete and self.child_ids:
-            self.child_ids.action_delete_step(step_type, cascade_delete)
-            return self._unlink_activity()
-        elif cascade_delete:
-            return self._unlink_activity()
+    def action_delete_step(self, step_type):
         if step_type == 'delay':
             self._delete_delay()
         elif step_type == 'trigger':
-            self._delete_interaction()
+            self._delete_trigger()
         else:
             self._delete_marketing_activity()
 
@@ -36,7 +31,7 @@ class MarketingActivity(models.Model):
             })
         (self - activities_to_keep)._unlink_activity()
 
-    def _delete_interaction(self):
+    def _delete_trigger(self):
         """
             Used to remove the trigger node off the tree in the campaign flow view.
             To do that we set its trigger_type back to activity or begin, depending if the activity has a parent or not.
@@ -97,21 +92,59 @@ class MarketingActivity(models.Model):
 
     def _unlink_activity(self):
         """
-            Used to delete an activity and all its fake nodes.
-            The method updates the flag position of the new leaf nodes and
-            reconnects the nodes so that the children of the node being deleted
-            are connected to the parent of that node.
+            Used to delete a marketing activity. This method removes the nodes
+            associated with the specified activities, unlinks the newly invalid
+            root nodes (activity triggers), and updates the position flag of the
+            new leaf nodes.
         """
-        for activity_to_unlink in self:
-            campaign = activity_to_unlink.campaign_id
-            # Step 1: Update the flags
+        activities_to_unlink = self
 
+        # Step 1: Removes activity triggers that end up as root activities when
+        #         the given activities are deleted.
+
+        # When deleting a root node, its children are promoted to root nodes.
+        # Since activity interaction types (`mail_open`, etc.) are stored in the
+        # `trigger_type` field, and root nodes must have a `trigger_type` of
+        # `begin` or `collect_reply`, activity interactions can not be kept on
+        # the new root nodes and should therefore be removed.
+
+        for root_activity_to_unlink in self.filtered(lambda activity: not activity.parent_id):
+            descendants = root_activity_to_unlink.child_ids
+            while descendants:
+                activity = descendants[-1]
+                descendants = descendants - activity
+                if not activity._has_delay_node() and not activity._has_activity_node():
+                    activities_to_unlink |= activity
+                    descendants = descendants + activity.child_ids
+                else:
+                    coordinates = activity.view_coordinates or {}
+                    coordinates.pop('trigger', None)
+                    activity.write({
+                        'parent_id': False,
+                        'trigger_type': root_activity_to_unlink.trigger_type,
+                        'triggering_activity_id': False,
+                        'wait_value_domain': False,
+                        'view_coordinates': coordinates,
+                    })
+
+        # Step 2: Relocate the END flags when deleting a leaf activity
+
+        # The position of the END flags is stored on the activities
+        # (see `view_coordinates`). When deleting a leaf activity, a flag
+        # position should be assigned to the new leaf activity to prevent
+        # the flag from being misplaced.
+
+        for activity_to_unlink in activities_to_unlink:
+            campaign = activity_to_unlink.campaign_id
             if activity_to_unlink.parent_id:
-                # Update the flag position of the yes/no branches:
+                if activity_to_unlink.parent_id in activities_to_unlink:
+                    continue
+                # Update the flag position of the parent's yes/no branches:
                 if activity_to_unlink.parent_id.activity_type == 'split' and not activity_to_unlink.child_ids:
                     split_node = activity_to_unlink.parent_id
-                    remaining_children = split_node.child_ids.filtered(
-                        lambda activity: activity not in self and activity.is_split_no == activity_to_unlink.is_split_no)
+                    remaining_children = split_node.child_ids.filtered(lambda activity:
+                        activity not in activities_to_unlink
+                        and activity.is_split_no == activity_to_unlink.is_split_no)
                     if not remaining_children:
                         if activity_to_unlink._has_trigger_node() and 'trigger' in activity_to_unlink.view_coordinates:
                             first_node_coordinates = activity_to_unlink.view_coordinates['trigger']
@@ -134,7 +167,7 @@ class MarketingActivity(models.Model):
                 # Update the flag position of the parent node:
                 elif not activity_to_unlink.child_ids:
                     parent_node = activity_to_unlink.parent_id
-                    remaining_cousin_nodes = parent_node.child_ids - self
+                    remaining_cousin_nodes = parent_node.child_ids - activities_to_unlink
                     if not remaining_cousin_nodes:
                         # When the parent marketing activity will become a leaf:
                         last_visible_node_coordinates = campaign._get_last_visible_node_coordinates(parent_node)
@@ -153,7 +186,7 @@ class MarketingActivity(models.Model):
                 if activity_to_unlink.trigger_type == 'collect_reply':
                     # Update the flag position of the reply trigger:
                     remaining_root_nodes_triggered_by_reply_trigger = campaign.marketing_activity_ids.filtered(lambda activity:
-                        activity not in self
+                        activity not in activities_to_unlink
                         and not activity.parent_id
                         and activity.trigger_type == 'collect_reply')
                     if not remaining_root_nodes_triggered_by_reply_trigger:
@@ -169,7 +202,7 @@ class MarketingActivity(models.Model):
                 else:
                     # Update the flag position of the main trigger:
                     remaining_root_nodes_triggered_by_main_trigger = campaign.marketing_activity_ids.filtered(lambda activity:
-                        activity not in self
+                        activity not in activities_to_unlink
                         and not activity.parent_id
                         and activity.trigger_type != 'collect_reply')
                     if not remaining_root_nodes_triggered_by_main_trigger:
@@ -183,21 +216,32 @@ class MarketingActivity(models.Model):
                             'view_coordinates': campaign_coordinates
                         })
 
-            # Step 2: Connect the children of the node to be deleted to the parent of that node
-            if activity_to_unlink.parent_id:
-                for child in activity_to_unlink.child_ids:
-                    child.write({
-                        'parent_id': activity_to_unlink.parent_id.id,
-                    })
-            else:
-                for child in activity_to_unlink.child_ids:
-                    child.write({
-                        'parent_id': False,
-                        'trigger_type': activity_to_unlink.trigger_type
-                            if child.trigger_type == 'activity' else child.trigger_type
-                    })
+        # Step 3: Relink the activities to skip the activities to unlink
 
-        self.unlink()
+        # When an activity is deleted, its child activity would still reference
+        # the deleted activity (see: `parent_id`). We therefore need to update
+        # the child's `parent_id` to reference the first ancestor in the
+        # hierarchy that is not being deleted.
+
+        for activity_to_unlink in activities_to_unlink:
+            activity = activity_to_unlink
+            parent_activity = activity.parent_id
+
+            while parent_activity and parent_activity in activities_to_unlink:
+                activity = parent_activity
+                parent_activity = activity.parent_id
+
+            if parent_activity:
+                activity_to_unlink.child_ids.write({
+                    'parent_id': parent_activity.id,
+                })
+            else:
+                activity_to_unlink.child_ids.write({
+                    'parent_id': False,
+                    'trigger_type': activity.trigger_type
+                        if activity.trigger_type in ['begin', 'collect_reply'] else 'begin'
+                })
+        activities_to_unlink.unlink()
 
     def _has_delay_node(self):
         return bool(self.interval_number)

@@ -100,7 +100,7 @@ class SocialLivePost(models.Model):
         self.ensure_one()
         payload = {
             'icon': f'/social_push_notifications/social_post/{self.post_id.id}/push_notification_image'
-                if self.post_id.push_notification_image else '/mail/static/src/img/odoobot_transparent.png',
+                if self.post_id.push_notification_image else '/mail/static/src/img/odoobot_transparent.webp',
             'title': self.post_id.push_notification_title or _('New Message'),
             'body': self.message
         }

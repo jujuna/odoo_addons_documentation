@@ -46,8 +46,6 @@ export function useAppointmentRendererHook(fcInstanceGetters) {
             // Main element
             if (env.calendarState.mode === "slots-creation") {
                 fc.el.classList.add("o_calendar_slots_in_creation");
-            } else if (env.calendarState.mode === "slots-deletion") {
-                fc.el.classList.add("o_calendar_slots_in_deletion");
             }
             fcElements.push(fc.el);
 
@@ -101,7 +99,6 @@ export function useAppointmentRendererHook(fcInstanceGetters) {
         return function cleanup() {
             for (const fcEl of fcElements) {
                 fcEl.classList.remove("o_calendar_slots_in_creation");
-                fcEl.classList.remove("o_calendar_slots_in_deletion");
             }
             for (const shadedDay of shadedDays) {
                 shadedDay.classList.remove("o_calendar_slot_selection");
@@ -112,20 +109,19 @@ export function useAppointmentRendererHook(fcInstanceGetters) {
         };
     });
 
-    // As onEventContent depends on the mode and is not rendered by owl
-    // we must tell fc to "refetch" the events, which will force them to all rerender
-    // as is done in onPatched
     useEffect(() => {
-        if (env.calendarState.mode) {
-            for (const getFcInstance of fcInstanceGetters) {
-                getFcInstance()?.refetchEvents();
+        // force render on selection change to update opacity
+        props.model.selectedAppointmentTypeId();
+        for (const fcGetter of fcInstanceGetters) {
+            const fc = fcGetter();
+            if (fc) {
+                fc.render();
             }
         }
     });
 
     return {
         isSlotCreationMode: computed(() => env.calendarState.mode === "slots-creation"),
-        isSlotDeletionMode: computed(() => env.calendarState.mode === "slots-deletion"),
         getEventTimeFormat: () => (is24HourFormat() ? FORMAT_24_HOUR : FORMAT_12_HOUR),
     };
 }

@@ -62,7 +62,7 @@ class AiSession(models.Model):
         and the generated-image ceiling, with every single message."""
         context = super()._get_context_input(rag_context)
         if self._is_website_builder_session():
-            state = "ON" if self.env['ai.website.service']._ai_scripts_allowed() else "OFF"
+            state = "ON" if self.env['ai.website.service']._ai_scripts_allowed(self.state or {}) else "OFF"
             brand_kit = self.env['ai.website.service']._get_current_brand_kit()
             return context.replace(
                 "</odoo_current_context>",

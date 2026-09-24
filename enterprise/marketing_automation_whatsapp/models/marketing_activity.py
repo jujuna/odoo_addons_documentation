@@ -53,6 +53,11 @@ class MarketingActivity(models.Model):
     trigger_category_ui = fields.Selection(selection_add=[('whatsapp', 'WhatsApp')], compute='_compute_trigger_category_ui')
     whatsapp_error = fields.Boolean('Whatsapp Error', compute="_compute_whatsapp_error", store=True)
 
+    def _get_allowed_triggering_activity_types(self):
+        allowed_triggering_activity_types = super()._get_allowed_triggering_activity_types()
+        allowed_triggering_activity_types.append('whatsapp')
+        return allowed_triggering_activity_types
+
     @api.depends('activity_type')
     def _compute_mass_mailing_id(self):
         whatsapp_activities = self.filtered(lambda activity: activity.activity_type == 'whatsapp')

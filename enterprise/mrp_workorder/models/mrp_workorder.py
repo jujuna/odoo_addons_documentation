@@ -883,6 +883,7 @@ class MrpWorkorder(models.Model):
             action['context'] = {
                 'show_workcenter_status': True,
                 'search_default_filter_planned': True,
+                'search_default_draft': True,
                 'search_default_ready': True,
                 'search_default_blocked': True,
                 'search_default_progress': True,
@@ -897,6 +898,7 @@ class MrpWorkorder(models.Model):
             (self.env.ref(gantt_view).id, 'gantt'),
         ] + [(id, kind) for id, kind in action['views'] if kind not in ['kanban', 'gantt']]
         action["context"] = {
+            'search_default_draft': True,
             "search_default_ready": True,
             "search_default_blocked": True,
             "search_default_filter_planned": True,

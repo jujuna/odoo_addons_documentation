@@ -38,10 +38,10 @@ export class AiScriptPlugin extends Plugin {
     };
 
     setup() {
-        this.aiScriptsRuntime = this.window.__aiScriptsManager__?.runtime;
+        this.aiScriptsManager = this.window.__aiScriptsManager__?.manager;
         this.domObserver = this.dependencies.domObserver;
-        if (this.aiScriptsRuntime) {
-            this.aiScriptsRuntime.runCallback = (fn, args, { scriptEl }) => {
+        if (this.aiScriptsManager) {
+            this.aiScriptsManager.runCallback = (fn, args, { scriptEl }) => {
                 try {
                     return this.domObserver.ignore(() => fn(...args));
                 } catch (error) {
@@ -64,7 +64,7 @@ export class AiScriptPlugin extends Plugin {
     }
 
     destroy() {
-        this.aiScriptsRuntime?.disposeAll();
+        this.aiScriptsManager?.disposeAll();
         super.destroy();
     }
 
@@ -80,12 +80,12 @@ export class AiScriptPlugin extends Plugin {
         const scriptEl = this.document.createElement("script");
         scriptEl.dataset.aiScriptId = scriptId;
         scriptEl.textContent = scriptContent;
-        const protectedInsert = this.aiScriptsRuntime.protectMutations(() => {
+        const protectedInsert = this.aiScriptsManager.protectMutations(() => {
             const existingScriptEl = parentEl.querySelector(
-                `script[data-ai-script-id=${scriptId}]`
+                `script[data-ai-script-id="${scriptId}"]`
             );
             if (existingScriptEl) {
-                this.aiScriptsRuntime.disposeScript(existingScriptEl);
+                this.aiScriptsManager.disposeScript(existingScriptEl);
                 existingScriptEl.remove();
             }
             parentEl.appendChild(scriptEl);
@@ -104,7 +104,7 @@ export class AiScriptPlugin extends Plugin {
         let currentScriptEl = el;
 
         const removeCurrentScript = () => {
-            this.aiScriptsRuntime.disposeScript(currentScriptEl);
+            this.aiScriptsManager.disposeScript(currentScriptEl);
             currentScriptEl.remove();
         };
         this.domObserver.stageCustomMutation({
@@ -114,7 +114,6 @@ export class AiScriptPlugin extends Plugin {
             },
         });
         removeCurrentScript();
-        this.dependencies.history.commit();
     }
 
     stopScripts(rootEl = this.editable) {
@@ -125,7 +124,7 @@ export class AiScriptPlugin extends Plugin {
     }
 
     stopScript(scriptEl) {
-        this.domObserver.ignore(() => this.aiScriptsRuntime.disposeScript(scriptEl));
+        this.domObserver.ignore(() => this.aiScriptsManager.disposeScript(scriptEl));
         scriptEl.setAttribute("data-ai-script-stopped", "1");
         this.trigger("on_ai_script_update_handlers");
     }
@@ -161,7 +160,7 @@ export class AiScriptPlugin extends Plugin {
     cleanAiMutations(rootEl = this.editable) {
         rootEl.querySelectorAll("[data-ai-temp]").forEach((el) => el.remove());
         rootEl.querySelectorAll("[data-ai-tracked]").forEach((el) => {
-            this.aiScriptsRuntime.restoreElement(el);
+            this.aiScriptsManager.restoreElement(el);
         });
         rootEl.querySelectorAll("[data-ai-script-stopped]").forEach((el) => {
             delete el.dataset.aiScriptStopped;

@@ -53,8 +53,6 @@ class GSTR1SpreadsheetGenerator:
             if not handler:
                 continue
             handler(self.gstr1_json.get(sheet, {}), workbook, cell_formats)
-        # self._prepare_supeco_sheet(gstr1_json.get('supeco', {}), 'clttx', workbook, cell_formats) # Table 14(a) u/s 52(TCS)
-        # self._prepare_supeco_sheet(gstr1_json.get('supeco', {}), 'paytx', workbook, cell_formats) # Table 14 (b) u/s 9(5)
 
     def generate(self):
         output = io.BytesIO()
@@ -535,66 +533,6 @@ class GSTR1SpreadsheetGenerator:
             totals_row_data['total_cgst']['val'] += item['camt']
             totals_row_data['total_sgst']['val'] += item['samt']
             totals_row_data['total_cess']['val'] += item['csamt']
-            row_count += 1
-        self._set_spreadsheet_row(worksheet, totals_row_data, totals_val_row, cell_formats.get('regular'))
-
-    def _prepare_supeco_sheet(self, supeco_json, section_key, workbook, cell_formats):
-        primary_header_row = 2
-        secondary_header_row = 4
-        totals_val_row = 3
-        row_count = 5
-        primary_header_val = {
-            'clttx': 'Summary For Supplies on which ECO is liable to collect tax u/s 52(14A)',
-            'paytx': 'Summary For Supplies on which ECO is liable to pay tax u/s 9(5)(14B)'
-        }
-        primary_headers = [
-           {'val': 'No. of ETIN', 'column': 'A'},
-           {'val': 'Net Supplier Value', 'column': 'B'},
-           {'val': 'Total Integrated Tax', 'column': 'C'},
-           {'val': 'Total Central Tax', 'column': 'D'},
-           {'val': 'Total State/UT Tax', 'column': 'E'},
-           {'val': 'Total Cess', 'column': 'F'},
-        ]
-        secondary_headers = [
-            {'val': 'Ecommerce Operator GSTIN', 'column': 'A'},
-            {'val': 'Supplier Value', 'column': 'B'},
-            {'val': 'Integrated Tax Amount', 'column': 'C'},
-            {'val': 'Central Tax Amount', 'column': 'D'},
-            {'val': 'State/UT Tax Amount', 'column': 'E'},
-            {'val': 'Cess Amount', 'column': 'F'},
-        ]
-        totals_row_data = {
-            'total_etin': {'val': 0, 'column': 'A', 'row': 3},
-            'total_supply_val': {'val': 0, 'column': 'B', 'row': 3, 'format': cell_formats.get('number')},
-            'total_igst': {'val': 0, 'column': 'C', 'row': 3, 'format': cell_formats.get('number')},
-            'total_cgst': {'val': 0, 'column': 'D', 'row': 3, 'format': cell_formats.get('number')},
-            'total_sgst': {'val': 0, 'column': 'E', 'row': 3, 'format': cell_formats.get('number')},
-            'total_cess': {'val': 0, 'column': 'F', 'row': 3, 'format': cell_formats.get('number')},
-        }
-        worksheet = workbook.add_worksheet('eco_%s' % section_key)
-        worksheet.write('A1', primary_header_val[section_key], cell_formats.get('primary_header'))
-        self._set_spreadsheet_row(worksheet, primary_headers, primary_header_row)
-        self._set_spreadsheet_row(worksheet, secondary_headers, secondary_header_row)
-        worksheet.set_row(primary_header_row - 1, None, cell_formats.get('primary_header'))
-        worksheet.set_row(secondary_header_row - 1, None, cell_formats.get('secondary_header'))
-        worksheet.set_column('A:A', 40)
-        worksheet.set_column('B:J', 20)
-        for eco_vals in supeco_json[section_key]:
-            row_data = [
-                {'val': eco_vals['etin'], 'column': 'A'},
-                {'val': eco_vals['suppval'], 'column': 'B', 'format': cell_formats.get('number')},
-                {'val': eco_vals['igst'], 'column': 'C', 'format': cell_formats.get('number')},
-                {'val': eco_vals['cgst'], 'column': 'D', 'format': cell_formats.get('number')},
-                {'val': eco_vals['sgst'], 'column': 'E', 'format': cell_formats.get('number')},
-                {'val': eco_vals['cess'], 'column': 'F', 'format': cell_formats.get('number')},
-            ]
-            self._set_spreadsheet_row(worksheet, row_data, row_count, cell_formats.get('regular'))
-            totals_row_data['total_etin']['val'] += 1
-            totals_row_data['total_supply_val']['val'] += eco_vals['suppval']
-            totals_row_data['total_igst']['val'] += eco_vals['igst']
-            totals_row_data['total_sgst']['val'] += eco_vals['sgst']
-            totals_row_data['total_cgst']['val'] += eco_vals['cgst']
-            totals_row_data['total_cess']['val'] += eco_vals['cess']
             row_count += 1
         self._set_spreadsheet_row(worksheet, totals_row_data, totals_val_row, cell_formats.get('regular'))
 

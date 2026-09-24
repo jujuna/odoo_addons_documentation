@@ -95,6 +95,23 @@ class TestPosPreparationDisplay(TestPoSCommon):
         self.assertEqual(prep_line.stage_id, final_stage)
         self.assertNotEqual(order_line.service_time, -1)
 
+    def test_invoiced_order_sent_to_preparation(self):
+        self.env['pos.prep.display'].create({
+            'name': 'Preparation Display',
+            'pos_config_ids': [Command.link(self.config.id)],
+        })
+        self.open_new_session()
+        order = next(iter(self._create_orders([{
+            'pos_order_lines_ui_args': [(self.product, 1)],
+            'pos_order_ui_args': {'state': 'paid'},
+            'customer': self.customer,
+            'is_invoiced': True,
+        }]).values()))
+        self.assertTrue(order.account_move)
+        prep_line = order.prep_order_ids.prep_line_ids
+        self.assertEqual(prep_line.product_id, self.product)
+        self.assertEqual(prep_line.quantity, 1)
+
 
 @tagged('post_install', '-at_install')
 class TestPdisCategorySelection(TestPreparationDisplayHttpCommon):

@@ -271,11 +271,12 @@ export const FlowViewMixin = (T) =>
             const dw = x2 - x1;
             const dh = y2 - y1;
 
-            // Apply scale and center:
-            const scale = Math.max(
-                0.25,
-                Math.min(1, editor.offsetWidth / dw, editor.offsetHeight / dh)
-            );
+            // Apply scale and center, clear of the editor edges:
+            const FIT_MARGIN = 48;
+            const width = editor.offsetWidth - 2 * FIT_MARGIN;
+            const height = editor.offsetHeight - 2 * FIT_MARGIN;
+            const scale = Math.max(0.25, Math.min(1, width / dw, height / dh));
+
             this.state.scale = scale;
             this.state.origin.x = (editor.offsetWidth - scale * dw) / 2 - x1 * scale;
             this.state.origin.y = (editor.offsetHeight - scale * dh) / 2 - y1 * scale;

@@ -40,13 +40,13 @@ class L10nInTestGstrIffReturn(L10nInTestAccountReportsCommon):
         m1_credit_note_missed.l10n_in_gstr_iff_exclude = True
 
         self._init_inv(partner=self.consumer_partner, taxes=self.sgst_sale_18, invoice_date=date(2026, 1, 11))
-        self._init_inv(partner=self.partner_foreign, taxes=self.comp_igst_18, invoice_date=date(2026, 1, 12))
+        self._init_inv(partner=self.partner_foreign, taxes=self.igst_sale_18_exp, invoice_date=date(2026, 1, 12))
 
         # Generate monthly GSTR IFF JSON
         iff_m1 = _create_return(self.gstr_iff_return_type, date(2026, 1, 1), date(2026, 1, 31))
         iff_m1_json = iff_m1._get_l10n_in_gstr1_json()
 
-        self.assertDictEqual(iff_m1_json, self._read_mock_json('gstr_iff_month1_expected_json.json'))
+        self.compare_dict_ignoring_list_order(iff_m1_json, self._read_mock_json('gstr_iff_month1_expected_json.json'))
         iff_m1.l10n_in_gstr1_status = 'sent'
 
         self.assertTrue(m1_b2b_reported.l10n_in_iff_reported)
@@ -66,4 +66,4 @@ class L10nInTestGstrIffReturn(L10nInTestAccountReportsCommon):
         gstr1_quarterly = _create_return(self.gstr1_return_type, date(2026, 1, 1), date(2026, 3, 31))
         gstr1_quarterly_json = gstr1_quarterly._get_l10n_in_gstr1_json()
 
-        self.assertDictEqual(gstr1_quarterly_json, self._read_mock_json('gstr1_quarterly_expected_json.json'))
+        self.compare_dict_ignoring_list_order(gstr1_quarterly_json, self._read_mock_json('gstr1_quarterly_expected_json.json'))

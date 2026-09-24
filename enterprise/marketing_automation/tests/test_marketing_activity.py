@@ -19,6 +19,9 @@ class MarketingActivityCommon(MarketingAutomationCommon):
                 'interval_number': 0,
                 'interval_type': 'hours',
                 'trigger_type': 'begin',
+                'view_coordinates': {
+                    'activity': {'x': 350, 'y': 0},
+                },
             },
         )
 
@@ -193,6 +196,11 @@ class TestMarketingActivity(MarketingActivityCommon):
             new_activity_wait_domain = self._create_activity(campaign, activity_type='structure', trigger_type='wait_value', wait_value_domain=[('email', 'ilike', '%contact.20%')], parent_id=self.activity.id)
             new_activity_interaction_click = self._create_activity(campaign, activity_type='structure', trigger_type='mail_click', parent_id=self.activity.id)
             new_activity_interaction_open = self._create_activity(campaign, activity_type='structure', trigger_type="mail_open", parent_id=new_activity_interaction_click.id, triggering_activity_id=self.activity.id)
+            new_activity_log_note = self._create_activity_log_note(campaign, "This shouldn't be used as triggering", {'parent_id': self.activity.id, 'trigger_type': 'activity'})
+
+            with self.assertRaises(ValidationError):
+                # Check that we cannot set a non-authorized activity as a triggering one
+                new_activity_interaction_click.write({'triggering_activity_id': new_activity_log_note.id})
 
             self._launch_campaign(campaign)
             with self.mock_mail_gateway(), self.mock_datetime_and_now(self.date_reference):
@@ -328,8 +336,83 @@ class TestMarketingActivityBuilder(MarketingActivityCommon):
         activity_to_delete.action_delete_step('delay')
         self.assertFalse(activity_to_delete.exists())
 
-        root_activity.action_delete_step('activity', True)
-        self.assertFalse(grand_children_activities.exists())
+    def test_action_delete_step_cascading_root_activity(self):
+        """ Check that deleting the root node also deletes child nodes
+            that cannot become root nodes, such as "mail interaction"
+            and "wait for value" nodes. """
+
+        #     / mail_open - log_note
+        # mail
+        #     \ mail_click - wait_for_value - log_note
+
+        campaign = self.campaign.with_env(self.env)
+        activity_begin = self.activity.with_env(self.env)
+
+        # First branch:
+        activity_1_1_log_note = self._create_activity_log_note(campaign,
+            log_note_body='Hi there!',
+            act_values={
+                'parent_id': activity_begin.id,
+                # Add a trigger node on the activity:
+                'trigger_type': 'mail_open',
+                'triggering_activity_id': activity_begin.id,
+                'view_coordinates': {
+                    'trigger': {'x': 700, 'y': -100},
+                    'activity': {'x': 1050, 'y': -100},
+                    'flag': {'x': 1400, 'y': -100}
+                },
+            })
+
+        # Second branch:
+        activity_2_1_mail_click = self._create_activity(campaign,
+            activity_type='structure',
+            parent_id=activity_begin.id,
+            trigger_type='mail_click',
+            triggering_activity_id=activity_begin.id,
+            view_coordinates={
+                'activity': {'x': 700, 'y': 100},
+            })
+        activity_2_2_wait_value = self._create_activity(campaign,
+            activity_type='structure',
+            parent_id=activity_2_1_mail_click.id,
+            trigger_type='wait_value',
+            wait_value_domain='[]',
+            view_coordinates={
+                'activity': {'x': 1050, 'y': 100},
+            })
+        activity_2_3_log_note = self._create_activity_log_note(campaign,
+            log_note_body='Hello world!',
+            act_values={
+                'parent_id': activity_2_2_wait_value.id,
+                'trigger_type': 'activity',
+                'view_coordinates': {
+                    'activity': {'x': 1400, 'y': 100},
+                    'flag': {'x': 1750, 'y': 100},
+                },
+            })
+
+        activity_begin.action_delete_step('mail')
+
+        self.assertEqual(len(campaign.marketing_activity_ids), 2)
+        self.assertEqual(campaign.marketing_activity_ids[0], activity_1_1_log_note)
+        self.assertEqual(campaign.marketing_activity_ids[0].trigger_type, 'begin')
+        self.assertEqual(campaign.marketing_activity_ids[0].activity_type, 'log_note')
+        self.assertEqual(campaign.marketing_activity_ids[0].log_note_body, 'Hi there!')
+        self.assertFalse(campaign.marketing_activity_ids[0].triggering_activity_id)
+        self.assertEqual(campaign.marketing_activity_ids[0].view_coordinates, {
+            'activity': {'x': 1050, 'y': -100},
+            'flag': {'x': 1400, 'y': -100},
+        })
+
+        self.assertEqual(campaign.marketing_activity_ids[1], activity_2_3_log_note)
+        self.assertEqual(campaign.marketing_activity_ids[1].trigger_type, 'begin')
+        self.assertEqual(campaign.marketing_activity_ids[1].activity_type, 'log_note')
+        self.assertEqual(campaign.marketing_activity_ids[1].log_note_body, 'Hello world!')
+        self.assertFalse(campaign.marketing_activity_ids[1].triggering_activity_id)
+        self.assertEqual(campaign.marketing_activity_ids[1].view_coordinates, {
+            'activity': {'x': 1400, 'y': 100},
+            'flag': {'x': 1750, 'y': 100},
+        })
 
 
 @tagged('ma_activity')

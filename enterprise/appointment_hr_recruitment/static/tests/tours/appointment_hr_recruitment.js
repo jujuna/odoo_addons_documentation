@@ -16,7 +16,10 @@ registry.category("web_tour.tours").add('appointment_hr_recruitment_tour', {
         trigger: 'button[name="action_create_meeting"]',
         run: 'click',
     }, {
-        trigger: 'button:contains("Share my calendar")',
+        trigger: 'button:contains("Share")',
+        run: 'click',
+    }, {
+        trigger: 'span:contains("My availabilities")',
         async run(helpers) {
             // Patch clipboard write to check the applicant_code is included, then
             // navigate to the url to book an appointment from there.

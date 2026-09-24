@@ -3,8 +3,10 @@ from odoo import _, models
 from odoo.tools import SQL
 from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
-VAT_8_PURCHASE_TAGS = ['form_01_gtgt_report_C_I_1_balance_8', 'form_01_gtgt_report_C_I_a_balance_8']
-VAT_8_SALE_TAGS = ['form_01_gtgt_report_C_II_c_amount_untaxed_8', 'form_01_gtgt_report_C_II_c_balance_8']
+VAT_8_PURCHASE_BASE_TAGS = ['form_01_gtgt_report_C_I_1_amount_untaxed_8', 'form_01_gtgt_report_C_I_a_amount_untaxed_8']
+VAT_8_PURCHASE_TAX_TAGS = ['form_01_gtgt_report_C_I_1_balance_8', 'form_01_gtgt_report_C_I_a_balance_8']
+VAT_8_SALE_BASE_TAGS = ['form_01_gtgt_report_C_II_c_amount_untaxed_8']
+VAT_8_SALE_TAX_TAGS = ['form_01_gtgt_report_C_II_c_balance_8']
 
 
 class L10n_VnTaxReportHandler(models.AbstractModel):
@@ -53,8 +55,8 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         if warnings is None:
             warnings = {}
 
-        purchases_data, total_base_purchases, total_vat_purchases = self._get_month_data(report, options, VAT_8_PURCHASE_TAGS, False)
-        sales_data, total_base_sales, total_vat_sales = self._get_month_data(report, options, VAT_8_SALE_TAGS, True)
+        purchases_data, total_base_purchases, total_vat_purchases = self._get_month_data(report, options, VAT_8_PURCHASE_BASE_TAGS, VAT_8_PURCHASE_TAX_TAGS, False)
+        sales_data, total_base_sales, total_vat_sales = self._get_month_data(report, options, VAT_8_SALE_BASE_TAGS, VAT_8_SALE_TAX_TAGS, True)
         report_lines = []
         if not purchases_data and not sales_data:
             warnings['l10n_vn_reports.no_data_warning'] = {
@@ -134,18 +136,23 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         streamlined_res = [lines_dict[x] for x in lines_dict]
         return streamlined_res, total_base, total_vat
 
-    def _get_month_data(self, report, options, tags_refs, is_sale):
+    def _get_month_data(self, report, options, base_tags_refs, tax_tags_refs, is_sale):
         # tags_ref = list of xml-ids referencing account.report.expression
         queries = []
+        base_grids = self.env['account.report.expression']
+        for tag_ref in base_tags_refs:
+            base_grids |= self.env.ref('l10n_vn.' + tag_ref)
+        base_tags = base_grids._get_matching_tags()
+
         tax_grids = self.env['account.report.expression']
-        for tag_ref in tags_refs:
+        for tag_ref in tax_tags_refs:
             tax_grids |= self.env.ref('l10n_vn.' + tag_ref)
-        tags = tax_grids._get_matching_tags()
+        tax_tags = tax_grids._get_matching_tags()
 
         for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
-            query = report._get_report_query(column_group_options, date_scope="strict_range")
-            tmp_tax_query = report._get_report_query(options, date_scope="strict_range", domain=[('tax_tag_ids', 'in', tags.ids)])
-            tax_details_query = self.env['account.move.line']._get_query_tax_details(tmp_tax_query.from_clause, tmp_tax_query.where_clause)
+            query = report._get_report_query(column_group_options, date_scope="strict_range", domain=[('tax_tag_ids', 'in', base_tags.ids)])
+            tax_details_base_query = report._get_report_query(column_group_options, date_scope="strict_range", domain=[('tax_tag_ids', 'in', (base_tags | tax_tags).ids)])
+            tax_details_query = self.env['account.move.line']._get_query_tax_details(tax_details_base_query)
 
             user_lang = self.env.user.lang or 'en_US'
             select = SQL("""

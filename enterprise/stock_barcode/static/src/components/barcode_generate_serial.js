@@ -13,8 +13,8 @@ export class BarcodeGenerateDialog extends Component {
         model: t.object(),
         move: t.object(),
         line: t.object(),
-        generationMode: t.string(),
-        nextCustomSerialNumber: t.object(),
+        nextCustomSerialNumber: t.string(),
+        close: t.function(),
     });
 
     nextSerial = signal.ref();

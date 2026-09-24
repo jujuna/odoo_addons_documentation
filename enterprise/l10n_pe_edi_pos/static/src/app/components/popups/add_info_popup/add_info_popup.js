@@ -1,10 +1,17 @@
-import { Dialog } from "@web/core/dialog/dialog";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
-import { Component, proxy } from "@odoo/owl";
+import { PosOrder } from "@point_of_sale/app/models/pos_order";
+import { Dialog } from "@web/core/dialog/dialog";
 
 export class AddInfoPopup extends Component {
     static template = "l10n_pe_edi_pos.AddInfoPopup";
     static components = { Dialog };
+
+    props = useProps({
+        close: t.function(),
+        getPayload: t.function(),
+        order: t.instanceOf(PosOrder),
+    });
 
     setup() {
         this.pos = usePos();

@@ -1152,10 +1152,11 @@ class TestFinancialReport(TestAccountReportsCommon):
         c2_moves = self.env['account.move'].with_company(c2).create(c2_move_data)
         c2_moves.action_post()
 
-        options = self._generate_options(report, '2020-01-01', '2020-12-31', default_options={'selected_horizontal_group_id': horizontal_group.id, 'is_opening_report': True})
-        options['selected_journal_groups'] = c1_c2_sale_ledger
-        # As the default selected journals are all that are not linked to a group, select all journals
-        self._press_journal_filter(options, (c1_sale + c2_sale))
+        ledgers = c1_c2_sale_ledger + self.env['account.journal.group'].browse(['local_gaap'])
+        options = self._generate_options(report, '2020-01-01', '2020-12-31', default_options={
+            'selected_horizontal_group_id': horizontal_group.id,
+            'journals': [{'id': j.id, 'selected': True} for j in ledgers.included_journal_ids],
+        })
 
         self.assertLinesValues(
             report._get_lines(options),

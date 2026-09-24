@@ -8,6 +8,9 @@
 This bridge module is auto-installed when the modules stock_barcode and quality_control are installed.
     """,
     'depends': ['stock_barcode', 'quality_control'],
+    'data': [
+        'security/ir.access.csv',
+    ],
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

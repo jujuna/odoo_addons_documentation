@@ -1,6 +1,6 @@
 import { expect, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
-import { Component, Plugin, providePlugins, xml } from "@odoo/owl";
+import { Component, Plugin, providePlugins, useProps, xml } from "@odoo/owl";
 import { defineModels, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { mailModels } from "@mail/../tests/mail_test_helpers";
 
@@ -27,6 +27,7 @@ function makeControllerWrapper(lines) {
     class SearchBarWrapper extends Component {
         static template = xml`<AccountReportSearchBar t-props="this.props"/>`;
         static components = { AccountReportSearchBar };
+        props = useProps();
         setup() {
             providePlugins([AccountReportController]);
         }

@@ -287,8 +287,11 @@ LEFT JOIN
     account_tax AS nt
     ON account_move_line.tax_line_id = nt.id
 LEFT JOIN
+    -- Tax lines carry their subsequent taxes in tax_ids when a tax affects the base of
+    -- the next ones (e.g. ISC): only base lines may feed the base_* columns
     account_move_line_account_tax_rel AS account_move_linetr
     ON account_move_line.id = account_move_linetr.account_move_line_id
+    AND account_move_line.tax_line_id IS NULL
 LEFT JOIN
     -- bt = base tax
     account_tax AS bt

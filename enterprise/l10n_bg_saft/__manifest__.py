@@ -15,6 +15,7 @@ Bulgarian SAF-T is standard file format for exporting various types of accountin
         'l10n_bg_ledger',
         'account_saft',
         'account_intrastat',
+        'accountant',
     ],
     'data': [
         'data/uom.uom.csv',
@@ -33,7 +34,10 @@ Bulgarian SAF-T is standard file format for exporting various types of accountin
     ],
 
     'post_init_hook': 'post_init_hooks',
-    'auto_install': ['l10n_bg'],
+    'auto_install': [
+        'l10n_bg',
+        'accountant',
+    ],
 
 
 }

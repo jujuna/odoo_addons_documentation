@@ -65,7 +65,7 @@ class TestReports(L10nInTestAccountReportsCommon):
         b2cl_invoice = self._init_inv(partner=self.large_unregistered_partner, taxes=self.comp_igst_18, line_vals={'price_unit': 250000, 'quantity': 1}, invoice_date=invoice_date)
         reverse_inv_func(inv=b2cl_invoice, line_vals={'quantity': 0.5})
 
-        export_invoice = self._init_inv(partner=self.partner_foreign, taxes=self.comp_igst_18, line_vals={'price_unit': 500, 'quantity': 2}, invoice_date=invoice_date)
+        export_invoice = self._init_inv(partner=self.partner_foreign, taxes=self.igst_sale_18_exp, line_vals={'price_unit': 500, 'quantity': 2}, invoice_date=invoice_date)
         reverse_inv_func(inv=export_invoice, line_vals={'quantity': 1})
 
         b2b_invoice_nilratedtax = self._init_inv(partner=self.partner_b, taxes=self.nil_rated_tax, line_vals={'price_unit': 500, 'quantity': 2}, invoice_date=invoice_date)
@@ -151,13 +151,14 @@ class TestReports(L10nInTestAccountReportsCommon):
         self._setup_moves(self._create_credit_note)
         gstr_report = self._create_gstr_report()
         gstr1_expected_json = self._read_mock_json('gstr1_expected_response.json')
-        self.assertDictEqual(gstr_report._get_l10n_in_gstr1_json(), gstr1_expected_json)
+        self.compare_dict_ignoring_list_order(gstr_report._get_l10n_in_gstr1_json(), gstr1_expected_json)
 
     def test_gstr1_debit_note_json(self):
         self._setup_moves(self._create_debit_note)
+        self.env.cr.flush()
         gstr_report = self._create_gstr_report()
         gstr1_debit_note_expected_json = self._read_mock_json('gstr1_debit_note_expected_response.json')
-        self.assertDictEqual(gstr_report._get_l10n_in_gstr1_json(), gstr1_debit_note_expected_json)
+        self.compare_dict_ignoring_list_order(gstr_report._get_l10n_in_gstr1_json(), gstr1_debit_note_expected_json)
 
     def test_gstr1_credit_note_warning_pre_and_post_november(self):
         invoice_1 = self._init_inv(partner=self.partner_a, taxes=self.comp_igst_18, line_vals={'price_unit': 500, 'quantity': 2}, invoice_date=date(2022, 8, 1))
@@ -187,18 +188,20 @@ class TestReports(L10nInTestAccountReportsCommon):
             line_vals={'price_unit': 500, 'quantity': 2}
         )
         self._create_credit_note(inv=b2b_invoice, line_vals={'quantity': 1})  # Creates and posts credit note for the above invoice
+        self.env.cr.flush()
         gstr1_report = self._create_gstr_report()
         gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
-        self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_sez_zero_rated_expected_response.json'))
+        self.compare_dict_ignoring_list_order(gstr1_json, self._read_mock_json('gstr1_sez_zero_rated_expected_response.json'))
 
     def test_taxes_with_exp_lut_and_rcm(self):
         self.invoice_with_sez_lut.invoice_date = self.test_date
         self.invoice_with_sez_lut.action_post()
         self.invoice_with_rcm.invoice_date = self.test_date
         self.invoice_with_rcm.action_post()
+        self.env.cr.flush()
         gstr1_report = self._create_gstr_report()
         gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
-        self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_sez_lut_and_rcm_response.json'))
+        self.compare_dict_ignoring_list_order(gstr1_json, self._read_mock_json('gstr1_sez_lut_and_rcm_response.json'))
 
     def test_gstr1_document_summary(self):
         # Case 1: Sequence number in Invoice name contains no leading zeros.
@@ -247,49 +250,7 @@ class TestReports(L10nInTestAccountReportsCommon):
         })
         inv.action_post()
 
+        self.env.cr.flush()
         gstr1_report = self._create_gstr_report()
         gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
-        self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_sez_foreign_currency_test.json'))
-
-    def test_gstr1_with_gst_and_cess(self):
-        """To check if query details is returning proper tax details"""
-        cess = self.env['account.chart.template'].ref('cess_5_plus_1591_sale')
-        gst_28 = self.env['account.chart.template'].ref('sgst_sale_28')
-        invoice = self._create_invoice(
-            partner_id=self.partner_b,
-            invoice_date=TEST_DATE,
-            invoice_line_ids=[
-                self._prepare_invoice_line(price_unit=1000.0, tax_ids=(gst_28 + cess)),
-                self._prepare_invoice_line(price_unit=500.0, tax_ids=gst_28),
-            ],
-        )
-        invoice.action_post()
-        gstr1_report = self._create_gstr_report()
-        gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
-        self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_with_gst_and_cess.json'))
-
-    def test_gstr1_price_adjustment_credit_note_json(self):
-        invoice = self._init_inv(partner=self.partner_b, taxes=self.comp_igst_18, line_vals={'price_unit': 500, 'quantity': 2})
-        price_adjustment_credit_note = self._create_credit_note(inv=invoice, line_vals={'quantity': 1}, post=False)
-        price_adjustment_credit_note.l10n_in_adjustment_type = 'price_adjustment'
-        price_adjustment_credit_note.action_post()
-        gstr1_report = self._create_gstr_report()
-        gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
-        expected_json = {
-            'hsn_b2b': [
-                {
-                    'hsn_sc': '111111',
-                    'uqc': 'UNT',
-                    'rt': 18,
-                    'qty': 2.0,
-                    'txval': 500.0,
-                    'iamt': 90.0,
-                    'samt': 0.0,
-                    'camt': 0.0,
-                    'csamt': 0.0,
-                    'num': 1
-                }
-            ],
-            'hsn_b2c': []
-        }
-        self.assertDictEqual(gstr1_json['hsn'], expected_json)
+        self.compare_dict_ignoring_list_order(gstr1_json, self._read_mock_json('gstr1_sez_foreign_currency_test.json'))

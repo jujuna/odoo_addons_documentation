@@ -9,6 +9,7 @@ This module enables the barcode scanning feature for the warehouse management sy
     'sequence': 255,
     'depends': ['stock', 'web_tour', 'web_mobile'],
     'data': [
+        'security/stock_barcode_security.xml',
         'views/stock_inventory_views.xml',
         'views/stock_package_type_views.xml',
         'views/stock_picking_views.xml',

@@ -75,6 +75,7 @@ class AppointmentCalendarView(http.Controller):
 
         return {
             'appointment_type': appointment_type.read([
+                'active',
                 'appointment_duration',
                 'appointment_tz',
                 'category',

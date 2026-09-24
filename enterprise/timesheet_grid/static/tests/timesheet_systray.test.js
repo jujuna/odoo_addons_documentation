@@ -726,7 +726,7 @@ test("Timer does not add elapsed seconds to a manually set duration", async () =
 });
 
 test.tags("desktop");
-test("Timesheet is prefilled with the task last visited, unless a draft already exists", async () => {
+test("Timesheet is prefilled with the task last visited", async () => {
     await mountWithCleanup(WebClient);
 
     setPreFilledFormTimesheet({ task_id: 1 });
@@ -741,20 +741,76 @@ test("Timesheet is prefilled with the task last visited, unless a draft already 
         message: "The task should be filled automatically",
     });
 
-    // Closing the systray while checked in turns the current state into a draft.
     await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
     await tick();
 
-    // Visiting a different task afterwards does not override the draft.
     setPreFilledFormTimesheet({ task_id: 2 });
 
     await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
     await waitFor(".o_timesheet_grid_popover div[name='project_id']");
-    expect("div[name='project_id'] input").toHaveValue("P1", {
-        message: "The project should be preserved",
+    expect("div[name='task_id'] input").toHaveValue("Another BS task", {
+        message: "The last visited task should replace the one the form was prefilled with",
+    });
+    expect("div[name='project_id'] input").toHaveValue("Webocalypse Now", {
+        message: "The project should follow the newly visited task",
+    });
+});
+
+test.tags("desktop");
+test("Timesheet keeps an edited draft over the task last visited", async () => {
+    await mountWithCleanup(WebClient);
+
+    setPreFilledFormTimesheet({ task_id: 1 });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await contains("div[name='ts_checkin_btn'] > button").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    await contains(".field-description textarea").edit("Half written", {
+        instantly: true,
+        confirm: "Tab",
+    });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await tick();
+
+    setPreFilledFormTimesheet({ task_id: 2 });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    expect(".field-description textarea").toHaveValue("Half written", {
+        message: "Closing the timer systray should keep the typed description as a draft",
     });
     expect("div[name='task_id'] input").toHaveValue("BS task", {
-        message: "The task should be preserved",
+        message: "Visiting another task should not discard the draft left in the timer systray",
+    });
+});
+
+test.tags("desktop");
+test("Timesheet is no longer prefilled once created from the last visited task", async () => {
+    await mountWithCleanup(WebClient);
+
+    setPreFilledFormTimesheet({ task_id: 1 });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await contains("div[name='ts_checkin_btn'] > button").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    expect("div[name='task_id'] input").toHaveValue("BS task");
+
+    await contains("button:contains('Create')").click();
+    await tick();
+
+    expect("div[name='task_id'] input").toHaveValue("", {
+        message: "The task should not be prefilled again after a timesheet was created for it",
+    });
+    expect("div[name='project_id'] input").toHaveValue("", {
+        message: "The project should not be prefilled again either",
+    });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    expect("div[name='task_id'] input").toHaveValue("BS task", {
+        message: "Reopening the timer systray prefills the last visited task again",
     });
 });
 

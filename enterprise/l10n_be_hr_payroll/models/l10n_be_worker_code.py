@@ -24,6 +24,6 @@ class L10nBeWorkerCode(models.Model):
     def _compute_display_name(self):
         for category in self:
             if self.env.context.get('formatted_display_name'):
-                category.display_name = f"{category.dmfa_code}\t--{category.name}--"
+                category.display_name = f"{category.name}\t--{category.dmfa_code}--"
             else:
-                category.display_name = category.dmfa_code or category.name
+                category.display_name = category.name or category.dmfa_code

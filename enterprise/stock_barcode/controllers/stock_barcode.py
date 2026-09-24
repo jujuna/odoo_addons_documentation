@@ -245,14 +245,14 @@ class StockBarcodeController(http.Controller):
     @http.route('/stock_barcode/rid_of_message_demo_barcodes', type='jsonrpc', auth='user')
     def rid_of_message_demo_barcodes(self, **kw):
         """ Edit the main_menu client action so that it doesn't display the 'print demo barcodes sheet' message """
-        if not request.env.user.has_group('stock.group_stock_user'):
+        if not request.env.user.has_group('stock_barcode.group_barcode_user'):
             return request.not_found()
         action = request.env.ref('stock_barcode.stock_barcode_action_main_menu')
         action and action.sudo().write({'params': {'message_demo_barcodes': False}})
 
     @http.route('/stock_barcode/print_inventory_commands', type='http', auth='user')
     def print_inventory_commands(self, barcode_type=False):
-        if not request.env.user.has_group('stock.group_stock_user'):
+        if not request.env.user.has_group('stock_barcode.group_barcode_user'):
             return request.not_found()
 
         # make sure we use the selected company if possible

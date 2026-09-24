@@ -54,6 +54,7 @@ class TestAIAgent(TransactionCase):
             "name": "Test Composer",
             "interface_key": "systray_ai_button",
             "ai_agent_id": agent.id,
+            "focused_model_id": self.env["ir.model"]._get("res.partner").id,
         })
         composer_channel = agent._create_ai_chat_channel("Composer Chat")
         self.env["ai.session"].sudo().create({

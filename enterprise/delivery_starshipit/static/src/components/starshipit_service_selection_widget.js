@@ -2,7 +2,7 @@ import { Component, proxy, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { registry } from "@web/core/registry";
-import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
+import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class StarshipitServiceSelectionWidget extends Component {
     static template = "delivery_starshipit.StarshipitServiceWidget";
@@ -11,7 +11,7 @@ export class StarshipitServiceSelectionWidget extends Component {
         DropdownItem,
     };
 
-    props = useProps(standardWidgetProps);
+    props = useProps(standardFieldProps);
 
     setup() {
         this.available_services = this.props.record.data.available_services;

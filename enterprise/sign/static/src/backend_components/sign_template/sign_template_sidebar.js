@@ -14,7 +14,7 @@ export class SignTemplateSidebar extends Component {
         Dropdown,
         DropdownItem,
     };
-    static props = {
+    static propsSchema = {
         canAddDocument: t.boolean().optional(),
         deleteDocument: t.function(),
         deleteRole: t.function(),
@@ -43,7 +43,7 @@ export class SignTemplateSidebar extends Component {
         updateSigners: t.function(),
     };
 
-    props = useProps(this.constructor.props);
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         this.action = useService("action");

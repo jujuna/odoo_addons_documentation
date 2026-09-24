@@ -174,6 +174,7 @@ export class TimesheetSystrayContent extends Component {
     }
 
     onSaveTimesheetForm(timesheet) {
+        this.cacheState.pre_filled_form = {};
         this.staticTimerService.clearActiveTimesheetId();
         this.staticTimerService.clearManualChange();
         this.cache.addTimesheet(timesheet.data);

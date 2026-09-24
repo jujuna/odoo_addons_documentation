@@ -169,6 +169,15 @@ class CalendarEvent(models.Model):
         if self.env.user.has_groups('appointment.group_appointment_resource_user'):
             self.filtered(lambda e: e.appointment_type_id and e.appointment_type_schedule_based_on == 'resources').user_can_edit = True
 
+    @api.depends('appointment_type_id', 'appointment_type_schedule_based_on')
+    def _compute_calendar_id(self):
+        # Never automatically assign a calendar to resource bookings.
+        # If the user manually assigns a calendar to a resource booking, do not override it.
+        resource_events = self.filtered(
+            lambda e: e.appointment_type_id and e.appointment_type_schedule_based_on == "resources"
+        )
+        super(CalendarEvent, self - resource_events)._compute_calendar_id()
+
     @api.depends('appointment_type_id')
     def _compute_location(self):
         for event in self.filtered('appointment_type_id'):

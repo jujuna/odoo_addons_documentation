@@ -125,6 +125,28 @@ class TestLuSaftReport(TestSaftReport):
         self.assertEqual(set(cm.exception.errors), {'product_duplicate_ref', 'product_missing_ref', 'undistributed_earnings'})
 
     def test_saft_report_values(self):
+        tax_8 = self.env['account.tax'].search([
+            ('company_id', '=', self.company_data['company'].id),
+            ('name', '=', '8% S'),
+            ('type_tax_use', '=', 'sale'),
+        ], limit=1)
+        ecotrel_tax = self.company_data['default_tax_sale'].copy({
+            'name': '2% Ecotrel',
+            'amount': 2.0,
+            'include_base_amount': True,
+            'sequence': min(self.company_data['default_tax_sale'].sequence, tax_8.sequence) - 1,
+        })
+        ecotrel_invoice = self.env['account.move'].create(self._l10n_lu_saft_invoice_data(
+            'out_invoice',
+            '2019-01-01',
+            self.partner_a,
+            [
+                {'product': self.product_a, 'quantity': 1.0, 'price_unit': 100.0, 'tax_ids': (ecotrel_tax + self.company_data['default_tax_sale']).ids},
+                {'product': self.product_b, 'quantity': 1.0, 'price_unit': 100.0, 'tax_ids': (ecotrel_tax + tax_8).ids},
+            ],
+        ))
+        ecotrel_invoice.action_post()
+
         with tools.file_open("l10n_lu_reports/tests/xml/expected_faia_values_2019.xml", "rb") as expected_xml:
             self.assertXmlTreeEqual(
                 self.get_xml_tree_from_string(self._l10n_lu_saft_generate_report()),

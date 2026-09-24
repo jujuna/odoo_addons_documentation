@@ -1,6 +1,6 @@
 /** @odoo-module ignore **/
 
-class AiScriptsRuntime {
+class AiScriptsManager {
     constructor() {
         this.observerEntries = new Set();
     }
@@ -29,6 +29,15 @@ class AiScriptsRuntime {
         };
     }
 
+    whenReady(fn, scriptEl) {
+        const run = this.protectMutations(fn, scriptEl);
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", run, { once: true });
+        } else {
+            run();
+        }
+    }
+
     /**
      * @param {boolean} aiChanges - whether queued mutations were made by an AI
      * script.
@@ -52,14 +61,15 @@ class AiScriptsRuntime {
     registerCleanup() {}
 }
 
-const runtime = new AiScriptsRuntime();
+const manager = new AiScriptsManager();
 
 function getApi(scriptEl) {
     return Object.freeze({
-        protectMutations: (fn) => runtime.protectMutations(fn, scriptEl),
-        trackElement: (element) => runtime.trackElement(element, scriptEl),
-        registerCleanup: (cleanupFn) => runtime.registerCleanup(cleanupFn, scriptEl),
+        protectMutations: (fn) => manager.protectMutations(fn, scriptEl),
+        trackElement: (element) => manager.trackElement(element, scriptEl),
+        registerCleanup: (cleanupFn) => manager.registerCleanup(cleanupFn, scriptEl),
+        whenReady: (fn) => manager.whenReady(fn, scriptEl),
     });
 }
 
-window.__aiScriptsManager__ = { getApi, runtime };
+window.__aiScriptsManager__ = { getApi, manager };

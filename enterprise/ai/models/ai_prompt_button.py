@@ -11,7 +11,7 @@ _logger = getLogger(__name__)
 class AIPromptButton(models.Model):
     _name = "ai.prompt.button"
     _inherit = ["mail.render.mixin"]
-    _description = "Prompt that can be attached to AI UI rules for quick access by the user."
+    _description = "Default action prompt that can be attached to AI UI rules for quick access by the user."
 
     name = fields.Char(
         "Title", help="The text shown on the button", required=True

@@ -147,3 +147,31 @@ class TestAnalyticLine(TestCommonTimesheet):
             "My Timesheets should show employee's assigned schedule public holiday")
         self.assertNotIn(company_holiday_date, my_unavailable_days,
             "My Timesheets should NOT show company default schedule holiday when employee has different schedule")
+
+    def test_grid_unavailability_does_not_include_other_company_leaves(self):
+        """ Test that public holidays from other companies are excluded in the timesheet grid view.
+
+            Test Cases:
+            ===========
+            1) Create a new company, Company B.
+            2) Create a public holiday for Company B only.
+            3) Fetch unavailability data for the employee in the current company ('YourCompany').
+            4) Verify that the holiday from Company B is not included in the result.
+        """
+
+        company_b = self.env['res.company'].create({'name': 'Test Company B'})
+
+        # Create the global holiday that belongs ONLY to Company B.
+        holiday_date = date(2025, 6, 26)
+        holiday = self.env['resource.calendar.leaves'].with_company(company_b).create({
+            'name': 'Holiday for Company B Only',
+            'count_as': 'absence',
+            'date_from': datetime.combine(holiday_date, time.min),
+            'date_to': datetime.combine(holiday_date, time.max),
+        })
+        self.assertEqual(holiday.company_id, company_b, "The holiday should belong to Company B")
+
+        analytic_line_model = self.env['account.analytic.line'].with_user(self.user_manager)
+        result = analytic_line_model.grid_unavailability('2025-06-22', '2025-06-28', 'employee_id', res_ids=[self.empl_employee.id])[False]
+
+        self.assertNotIn(holiday_date, result, "The company-wide leaves should NOT include a holiday from another company.")

@@ -69,7 +69,8 @@
                 <MrpDisplayEmployeesPanel t-if="this.groups.workorders &amp;&amp; !this.ui.isSmall" employees="this.useEmployee.employees"
                     setSessionOwner.bind="this.useEmployee.toggleSessionOwner"
                     popupAddEmployee.bind="this.popupAddEmployee"/>
-                <div class="o_mrp_display_records position-relative d-grid align-items-start align-content-start flex-grow-1 gap-3 p-3 h-auto h-md-100">
+                <div class="o_mrp_display_records d-flex flex-column flex-grow-1 gap-3 p-3 h-auto h-md-100">
+                <div class="o_mrp_display_records_grid position-relative d-grid align-items-start align-content-start gap-3">
                 <t t-set="barcodeTargetRecord" t-value="this.getBarcodeTargetRecordId()"/>
                 <t t-foreach="relevantRecords" t-as="record" t-key="record.id">
                     <MrpDisplayRecord
@@ -114,7 +115,16 @@
                         </div>
                     </div>
                 </t>
-            </div>
+                </div>
+                <div t-if="this.state.displayDemoMessage" class="o_mrp_display_demo_message sticky-bottom mt-auto" role="status">
+                    <div class="o_mrp_display_demo_message_inner mx-auto shadow-sm alert alert-info alert-dismissible">
+                        <p class="m-0">
+                            <t t-out="this.demoMessage"/>
+                        </p>
+                        <button t-on-click="this.removeDemoMessage" type="button" class="btn-close" title="Close"/>
+                    </div>
+                </div>
+                </div>
             </main>
         </div>
     </t>

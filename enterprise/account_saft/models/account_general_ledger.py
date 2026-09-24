@@ -245,7 +245,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         tax_vals_map = {}
 
         query = report._get_report_query(options, 'strict_range')
-        tax_details_query = self.env['account.move.line']._get_query_tax_details(query.from_clause, query.where_clause)
+        tax_details_query = self.env['account.move.line']._get_query_tax_details(query)
         tax_name = self.env['account.tax']._field_to_sql('tax', 'name')
         self.env.cr.execute(SQL('''
             SELECT
@@ -257,6 +257,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 %(tax_name)s AS tax_name,
                 tax.amount AS tax_amount,
                 tax.create_date AS tax_create_date,
+                tax.include_base_amount AS tax_include_base_amount,
                 SUM(tax_detail.tax_amount) AS amount,
                 SUM(tax_detail.tax_amount_currency) AS amount_currency,
                 SUM(tax_detail.base_amount) AS tax_base_amount

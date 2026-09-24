@@ -12,6 +12,7 @@ from . import stock_warehouse
 from . import product_product
 from . import product_uom
 from . import res_config_settings
+from . import res_groups
 from . import res_partner
 from . import uom_uom
 from . import epc_encoder

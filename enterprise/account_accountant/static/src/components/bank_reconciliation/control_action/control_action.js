@@ -63,15 +63,21 @@ export class BankRecControlPanel extends ControlPanel {
             return;
         }
 
-        const companyIds = this.selectedUnreconciledStatementLines.map(
-            (st_line) => st_line.data.company_id.id
-        );
+        const companyIds = [
+            ...new Set(
+                this.selectedUnreconciledStatementLines.map((st_line) => st_line.data.company_id.id)
+            ),
+        ];
         this.addDialog(SelectCreateDialog, {
             title: _t("Search: Partner"),
             noCreate: false,
             multiSelect: false,
             resModel: "res.partner",
-            domain: [["company_id", "in", [false, ...companyIds]]],
+            domain: [
+                "|",
+                ["company_id", "in", [false, ...companyIds]],
+                ["company_id", "parent_of", companyIds],
+            ],
             onSelected: async (partner) => {
                 await this.orm.call(
                     "account.bank.statement.line",

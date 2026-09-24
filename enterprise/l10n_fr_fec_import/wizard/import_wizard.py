@@ -87,38 +87,6 @@ class AccountFecImportWizard(models.TransientModel):
                 yield account_xml_id, data
         self.env['ir.model.data']._update_xmlids(new_ids.values())
 
-    def _shorten_code(self, value, max_len, cache, reserved_digits=2):
-        """ In case that given value is too long, this function shortens it like this:
-
-            PACMAN, max_len=5, reserved_digits = 2 -> PAC01
-            if PAC01 already exists                -> PAC02
-            ...
-
-            If all PACnn exist until PAC99, False is returned.
-            If a value is found, or the code isn't too long to begin with,
-            then the shortened value is returned.
-
-            If a value is found, a cache entry "mapping_<field_name>"
-            is created/updated with the mapping old_value->new_value
-        """
-
-        if len(value) <= max_len:
-            return value
-
-        code_cache = cache.setdefault("mapping_journal_code", {})
-
-        if value in code_cache:
-            return code_cache[value]
-
-        prefix = value[0:(max_len - reserved_digits)]
-        for idx in range(1, 10 ** reserved_digits):
-            new_value = ("%%s%%0%dd" % reserved_digits) % (prefix, idx)
-            if new_value not in code_cache.values():
-                code_cache[value] = new_value
-                return new_value
-
-        return False
-
     def _generator_fec_account_journal(self, rows, cache):
         """ Import the journals from fec data files """
         journals = {journal.code: journal for journal in self.env['account.journal'].search([
@@ -138,10 +106,9 @@ class AccountFecImportWizard(models.TransientModel):
                         'noupdate': True,
                     }
             else:
-                journal_code_size = self.env['account.journal']._fields['code'].size
                 data = {
                     "company_id": self.company_id.id,
-                    "code": self._shorten_code(journal_code, journal_code_size, cache),
+                    "code": journal_code,
                     "name": "FEC-%s" % (journal_name or journal_code),
                     "type": "general"
                 }

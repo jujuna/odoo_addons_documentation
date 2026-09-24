@@ -26,10 +26,8 @@ export class AddStepButton extends Component {
      * @returns {Function}
      */
     getDropdownItemProps(stepType) {
-        const props = { class: "ps-1" };
         if ((this.props.disabledStepTypes || []).includes(stepType)) {
             return {
-                ...props,
                 closingMode: "none",
                 onSelected: () => {
                     this.notification.add(_t("You cannot add this step here!"), {
@@ -39,7 +37,6 @@ export class AddStepButton extends Component {
             };
         }
         return {
-            ...props,
             onSelected: () => this.props.onSelectedStep(stepType),
         };
     }

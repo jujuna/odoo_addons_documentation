@@ -5,11 +5,20 @@ import { SocialPostFormatterMixin } from '@social/js/social_post_formatter_mixin
 import { Dialog } from '@web/core/dialog/dialog';
 import { useService } from '@web/core/utils/hooks';
 import { getFormattedRecord } from "@web/views/kanban/kanban_record";
-import { Component, proxy } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 
 export class StreamPostTwitterQuote extends SocialPostFormatterMixin(Component) {
     static template = "social_twitter.TwitterQuoteDialog";
     static components = { Dialog, StreamPostCommentsReplyTwitterQuote };
+
+    props = useProps({
+        close: t.function(),
+        mediaSpecificProps: t.any(),
+        onTwitterTweetLike: t.any().optional(),
+        originalPost: t.any(),
+        refreshStats: t.function(),
+        title: t.any(),
+    });
 
     setup() {
         super.setup();

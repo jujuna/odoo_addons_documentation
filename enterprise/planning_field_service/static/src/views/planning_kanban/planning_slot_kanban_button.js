@@ -1,11 +1,14 @@
-import { Component, markup } from "@odoo/owl";
+import { Component, markup, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
+import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 export class PlanningSlotKanbanButton extends Component {
     static template = "planning_field_service.PlanningSlotAction";
+
+    props = useProps(standardWidgetProps);
 
     setup() {
         this.orm = useService("orm");

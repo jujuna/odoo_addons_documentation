@@ -127,6 +127,10 @@ export class SpreadsheetTemplate extends models.Model {
         };
     }
 
+    has_access() {
+        return true;
+    }
+
     _records = [
         { id: 1, name: "Template 1", spreadsheet_data: "" },
         { id: 2, name: "Template 2", spreadsheet_data: "" },

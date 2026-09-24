@@ -27,6 +27,7 @@ onRpc(
         const { params } = await request.json();
         const { appointment_type_id } = params;
         const record = this.env["appointment.type"].read(appointment_type_id, [
+            "active",
             "appointment_duration",
             "appointment_tz",
             "category",

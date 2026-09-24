@@ -38,7 +38,7 @@ patch(PosStore.prototype, {
 patch(PosOrder.prototype, {
     setup(vals) {
         super.setup(...arguments);
-        if (this.company.country_id?.code == "EC") {
+        if (this.company.country_id?.code == "EC" && vals.to_invoice === undefined) {
             this.to_invoice = true;
         }
     },

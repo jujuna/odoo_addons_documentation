@@ -11,7 +11,7 @@ from odoo import _, api, fields, models, SUPERUSER_ID
 from odoo.addons.l10n_in_reports.tools.gstr1_spreadsheet_generator import GSTR1SpreadsheetGenerator
 from odoo.exceptions import UserError, AccessError, ValidationError, RedirectWarning
 from odoo.fields import Domain
-from odoo.tools import date_utils, float_is_zero, formatLang, html_escape, SQL
+from odoo.tools import config, date_utils, formatLang, html_escape, SQL
 from .irn_exception import IrnException
 
 import logging
@@ -330,149 +330,714 @@ class AccountReturn(models.Model):
     # GSTR-1
     # ===============================
 
-    def _get_tax_details(self, domain):
+    def _get_tax_details_l10n_in(self, domain, batch_size=10**4):
+        domain_query = self.env['account.move.line']._search(domain)
+        tax_details_query = SQL("""
+            SELECT base_line.id AS base_line_id,
+                ANY_VALUE(base_line.balance * -1) AS base_amount,
+                ANY_VALUE(base_line.move_id) AS move_id,
+                ANY_VALUE(base_line.l10n_in_gstr_section) AS l10n_in_gstr_section,
+                ANY_VALUE(base_line.l10n_in_hsn_code) AS l10n_in_hsn_code,
+                ANY_VALUE(base_line.quantity) AS quantity,
+                ANY_VALUE(base_line.product_uom_id) AS product_uom_id,
+                ANY_VALUE(base_line.partner_id) AS partner_id,
+                ANY_VALUE(move.name) AS invoice_number,
+                ANY_VALUE(move.move_type) AS move_type,
+                ANY_VALUE(base_line.invoice_date) AS invoice_date,
+                -- show positive Total for Invoice and Credit note both so do ABS() to avoid negative value for Credit note
+                ANY_VALUE(ABS(move.amount_total_signed)) AS amount_total_signed,
+                ANY_VALUE(move.l10n_in_adjustment_type) AS l10n_in_adjustment_type,
+                ANY_VALUE(move.l10n_in_state_id) AS l10n_in_state_id,
+                ANY_VALUE(move.l10n_in_gst_treatment) AS l10n_in_gst_treatment,
+                ANY_VALUE(move.l10n_in_transaction_type) AS l10n_in_transaction_type,
+                ANY_VALUE(move.l10n_in_shipping_bill_number) AS shipping_bill_number,
+                ANY_VALUE(move.l10n_in_shipping_bill_date) AS shipping_bill_date,
+                ANY_VALUE(%(l10n_in_iff_reported)s) AS l10n_in_iff_reported,
+                ANY_VALUE(partner.vat) AS customer_gstin,
+                ANY_VALUE(pos.l10n_in_tin) AS pos_code,
+                ANY_VALUE(uom.l10n_in_code) AS product_uom_code,
+                ANY_VALUE(port.code) AS port_code,
+                -- aggregate tax amounts
+                COALESCE(SUM(tax_details.tax_amount * -1) FILTER (WHERE tax_tag_rel.account_account_tag_id = %(igst_tag)s), 0) AS igst,
+                COALESCE(SUM(tax_details.tax_amount * -1) FILTER (WHERE tax_tag_rel.account_account_tag_id = %(cgst_tag)s), 0) AS cgst,
+                COALESCE(SUM(tax_details.tax_amount * -1) FILTER (WHERE tax_tag_rel.account_account_tag_id = %(sgst_tag)s), 0) AS sgst,
+                COALESCE(SUM(tax_details.tax_amount * -1) FILTER (WHERE tax_tag_rel.account_account_tag_id = %(cess_tag)s), 0) AS cess,
+                (
+                    COALESCE(MAX(tax.amount) FILTER (WHERE tax_tag_rel.account_account_tag_id = %(igst_tag)s), 0)
+                    + COALESCE(MAX(tax.amount) FILTER (WHERE tax_tag_rel.account_account_tag_id = %(cgst_tag)s), 0)
+                    + COALESCE(MAX(tax.amount) FILTER (WHERE tax_tag_rel.account_account_tag_id = %(sgst_tag)s), 0)
+                ) AS gst_tax_rate
+              FROM (%(tax_details_query)s) AS tax_details
+              JOIN account_move_line base_line ON base_line.id = tax_details.base_line_id
+              JOIN account_move move ON move.id = base_line.move_id
+              JOIN res_country_state pos ON pos.id = move.l10n_in_state_id
+              JOIN res_partner partner ON partner.id = base_line.partner_id
+         LEFT JOIN uom_uom uom ON uom.id = base_line.product_uom_id
+         LEFT JOIN l10n_in_port_code port ON port.id = move.l10n_in_shipping_port_code_id
+         LEFT JOIN account_tax tax ON tax.id = tax_details.tax_id
+         LEFT JOIN account_account_tag_account_tax_repartition_line_rel tax_tag_rel
+                   ON tax_tag_rel.account_tax_repartition_line_id = tax_details.tax_repartition_line_id
+                   AND tax_tag_rel.account_account_tag_id IN (%(igst_tag)s, %(cgst_tag)s, %(sgst_tag)s, %(cess_tag)s)
+             WHERE base_line.tax_repartition_line_id IS NULL
+         GROUP BY base_line.id
+            """,
+            tax_details_query=self.env['account.move.line']._get_query_tax_details(domain_query, include_without_tax_line=True),
+            l10n_in_iff_reported=self.env['account.move']._get_l10n_in_iff_reported_query('move'),
+            igst_tag=self.env.ref('l10n_in.tax_tag_igst').id,
+            cgst_tag=self.env.ref('l10n_in.tax_tag_cgst').id,
+            sgst_tag=self.env.ref('l10n_in.tax_tag_sgst').id,
+            cess_tag=self.env.ref('l10n_in.tax_tag_cess').id,
+        )
+        # Use a separate cursor for batch processing, as intermediate ORM query processing may override cursor results,
+        # but reuse the existing environment cursor during tests to maintain transaction isolation.
+        if config.get('test_enable'):
+            self.env.cr.execute(tax_details_query)
+            yield from self.env.cr.dictfetchall()
+        else:
+            with self.env.registry.cursor() as cr:
+                cr.execute(tax_details_query)
+                while tax_details := cr.dictfetchmany(batch_size):
+                    yield from tax_details
+
+    def _convert_gstr1_indexed_data_to_json(self, gstr1_index_json):
         """
+        Convert the internally indexed GSTR-1 data into the final GSTR-1
+        JSON format by removing temporary indexes and converting dictionaries
+        to the list-based structure expected by GSTR-1.
+        """
+
+        def _convert_items(invoice_data, section):
+            """
+            Convert the indexed `itms` dictionary into the GSTR-1 item format.
+
+            For B2B, B2CL, CDNR and CDNUR:
+                {18: {'rate': 18.0, ...}}
+                ->
+                [{'num': 1, 'itm_det': {'rate': 18.0, ...}}]
+
+            For EXP:
+                {18: {'rt': 18.0, ...}}
+                ->
+                [{'rt': 18.0, ...}]
+            """
+            for data in invoice_data:
+                items = data['itms'].values()
+
+                if section == 'exp':
+                    data['itms'] = list(items)
+                else:
+                    data['itms'] = [
+                        {'num': num, 'itm_det': item}
+                        for num, item in enumerate(items, start=1)
+                    ]
+
+        def _convert_invoice_section(section, section_data):
+            """
+            Convert invoice-based sections into the GSTR-1 structure.
+
+            B2B:
+                customer GSTIN -> invoices
+                {ctin: ..., inv: [...]}
+
+            B2CL:
+                POS -> invoices
+                {pos: ..., inv: [...]}
+
+            CDNR:
+                customer GSTIN -> notes
+                {ctin: ..., nt: [...]}
+
+            EXP:
+                export type -> invoices
+                {exp_typ: ..., inv: [...]}
+            """
+            for grouped_data in section_data.values():
+                _convert_items(grouped_data.values(), section)
+
+            group_key = {
+                'b2b': 'ctin',
+                'b2cl': 'pos',
+                'cdnr': 'ctin',
+                'exp': 'exp_typ',
+            }[section]
+
+            invoice_key = 'nt' if section == 'cdnr' else 'inv'
+
+            return [
+                {
+                    group_key: group_value,
+                    invoice_key: list(grouped_data.values()),
+                }
+                for group_value, grouped_data in section_data.items()
+            ]
+
+        def _convert_b2cs(section_data):
+            """
+            Convert B2CS data by removing its temporary grouping index.
+
+            Input:
+                {'24-5': {...}}
+
+            Output:
+                [{...}]
+            """
+            return list(section_data.values())
+
+        def _convert_cdnur(section_data):
+            """
+            Convert CDNUR notes from indexed dictionaries to a list and
+            convert their indexed `itms` into the standard GSTR-1 item format.
+            """
+            _convert_items(section_data.values(), 'cdnur')
+            return list(section_data.values())
+
+        def _convert_nil(section_data):
+            """
+            Convert NIL data into the GSTR-1 structure.
+
+            Input:
+                {'INTRB2B/INTRB2C/...': {...}}
+
+            Output:
+                {'inv': [{...}]}
+            """
+            return {'inv': list(section_data.values())}
+
+        def _convert_hsn(section_data):
+            """
+            Convert HSN data by removing the temporary HSN index and adding
+            the sequential `num` required by the GSTR-1 format.
+
+            Input:
+                {
+                    'hsn_b2b': {
+                        '94038900_UNT_5': {...}
+                    }
+                }
+
+            Output:
+                {
+                    'hsn_b2b': [
+                        {'num': 1, ...}
+                    ]
+                }
+            """
             return {
-                account.move(1): {
-                    account.move.line(1):{
-                        'base_amount': 100,
-                        'gst_tax_rate': 18.00,
-                        'igst': 0.00,
-                        'cgst': 9.00,
-                        'sgst': 9.00,
-                        'cess': 3.33,
+                hsn_section: [
+                    {
+                        'num': num,
+                        **hsn_data,
+                    }
+                    for num, hsn_data in enumerate(
+                        hsn_data_by_index.values(),
+                        start=1,
+                    )
+                ]
+                for hsn_section, hsn_data_by_index in section_data.items()
+            }
+
+        # Invoice-based sections.
+        for section in ('b2b', 'b2cl', 'cdnr', 'exp'):
+            if section in gstr1_index_json:
+                gstr1_index_json[section] = _convert_invoice_section(
+                    section,
+                    gstr1_index_json[section],
+                )
+
+        # B2CS contains flat records without `itms`.
+        if 'b2cs' in gstr1_index_json:
+            gstr1_index_json['b2cs'] = _convert_b2cs(
+                gstr1_index_json['b2cs'],
+            )
+
+        # CDNUR contains notes with indexed `itms`.
+        if 'cdnur' in gstr1_index_json:
+            gstr1_index_json['cdnur'] = _convert_cdnur(
+                gstr1_index_json['cdnur'],
+            )
+
+        # NIL contains flat records grouped by supply type.
+        if 'nil' in gstr1_index_json:
+            gstr1_index_json['nil'] = _convert_nil(
+                gstr1_index_json['nil'],
+            )
+
+        # HSN contains records grouped by HSN section.
+        if 'hsn' in gstr1_index_json:
+            gstr1_index_json['hsn'] = _convert_hsn(
+                gstr1_index_json['hsn'],
+            )
+
+        return gstr1_index_json
+
+    def _get_l10n_in_gstr1_json(self):
+        """
+        This method is return gstr1 json from tax_details_query
+        - B2B and CDNR it's group by gstin, invoice number and GST tax rate
+        - B2CL it's group by Place of Supply, invoice number and GST tax rate
+        - B2CS it's group by place of supply, GST tax rate
+        - CDNUR it's group by invoice number and GST tax rate
+        - EXP it's group by Export type, invoice number and GST tax rate
+        - Nil rated, exempted and non-gst supplies it's group by Base Tags
+        - HSN - it's group by GST treatment type(B2B, B2C), HSN, UQC and GST tax rate
+        """
+        section_func_map = {
+            **dict.fromkeys((
+                'sale_b2b_rcm',
+                'sale_b2b_regular',
+                'sale_deemed_export',
+                'sale_sez_wp',
+                'sale_sez_wop',
+            ), self._l10n_in_process_b2b_json),
+            'sale_b2cl': self._l10n_in_process_b2cl_json,
+            'sale_b2cs': self._l10n_in_process_b2cs_json,
+            **dict.fromkeys((
+                'sale_cdnr_rcm',
+                'sale_cdnr_regular',
+                'sale_cdnr_deemed_export',
+                'sale_cdnr_sez_wp',
+                'sale_cdnr_sez_wop',
+            ), self._l10n_in_process_cdnr_json),
+            **dict.fromkeys((
+                'sale_cdnur_b2cl',
+                'sale_cdnur_exp_wp',
+                'sale_cdnur_exp_wop',
+            ), self._l10n_in_process_cdnur_json),
+            **dict.fromkeys((
+                'sale_exp_wp',
+                'sale_exp_wop',
+            ), self._l10n_in_process_exp_json),
+            **dict.fromkeys((
+                'sale_nil_rated',
+                'sale_exempt',
+                'sale_non_gst_supplies',
+            ), self._l10n_in_process_nongst_json),
+        }
+
+        gstr1_index_json = {}
+        is_iff_return = self.type_external_id == GSTR_IFF_RETURN_TYPE
+        for tax_details in self._get_tax_details_l10n_in(self._get_tax_detail_domain(is_iff_return)):
+            if section_func := section_func_map.get(tax_details['l10n_in_gstr_section']):
+                section_func(gstr1_index_json, tax_details)
+            if not is_iff_return:
+                self._l10n_in_process_hsn_json(gstr1_index_json, tax_details)
+        # this is not set from account.move.line, we have different model for this, so we need to set it separately
+        if not is_iff_return:
+            gstr1_index_json['doc_issue'] = self._get_l10n_in_doc_issue_json()
+        gstr1_index_json['gstin'] = self.tax_unit_id.vat or self.company_id.vat
+        gstr1_index_json['fp'] = self.l10n_in_month_year
+        return self._convert_gstr1_indexed_data_to_json(gstr1_index_json)
+
+    def _l10n_in_process_b2b_json(self, gstr1_json, tax_details):
+        """
+            This method is process b2b json from tax_details
+            it's add b2b details in gstr1_json
+            Here itms is group by GST number, invoice number and GST tax rate
+            it's add in gstr1_json as below
+            {
+                'b2b': {
+                    '24AACCT6304M1ZB': {
+                        5: {
+                            'inum': 'INV/2022/00005',
+                            'idt': '01-04-2022',
+                            'val': 100.00,
+                            'pos': '24',
+                            'rchrg': 'N',
+                            'inv_typ': 'R',
+                            'etin': "34AACCT6304M1ZB",
+                            'itms': {
+                                18: {
+                                    'rate': 18.0,
+                                    'txval': 100.0,
+                                    'iamt': 0.0,
+                                    'samt': 9.0,
+                                    'camt': 9.0,
+                                    'csamt': 6.5
+                                }
+                            }
+                        }
                     }
                 }
             }
         """
-        tax_vals_map = {}
-        gst_tags = {
-            'igst': self.env.ref('l10n_in.tax_tag_igst'),
-            'cgst': self.env.ref('l10n_in.tax_tag_cgst'),
-            'sgst': self.env.ref('l10n_in.tax_tag_sgst'),
-            'cess': self.env.ref('l10n_in.tax_tag_cess'),
-        }
-        journal_items = self.env['account.move.line'].search(domain)
-        tax_details_sql = self.env['account.move.line']._get_query_tax_details_from_domain(domain=domain)
-        tax_details = self.env.execute_query_dict(tax_details_sql)
-        # Retrieve base lines and tax lines based on tax_details
-        base_lines = self.env['account.move.line'].browse([tax['base_line_id'] for tax in tax_details])
-        tax_lines = self.env['account.move.line'].browse([tax['tax_line_id'] for tax in tax_details])
-        base_lines_map = {line.id: line for line in base_lines}
-        tax_lines_map = {line.id: line for line in tax_lines}
-        seen_lines = set()
-        for tax_vals in tax_details:
-            base_line = base_lines_map[tax_vals['base_line_id']]
-            tax_line = tax_lines_map[tax_vals['tax_line_id']]
-            seen_lines.add(base_line.id)
-            seen_lines.add(tax_line.id)
-            move_id = base_line.move_id
-            tax_vals_map.setdefault(move_id, {}).setdefault(base_line, {
-                'base_amount': tax_vals['base_amount'],
-                'l10n_in_reverse_charge': False,
-                'rate_by_tax_tag': {},
-                'gst_tax_rate': 0.00,
-                'igst': 0.00,
-                'cgst': 0.00,
-                'sgst': 0.00,
-                'cess': 0.00,
-            })
-            for tax_type, tag_id in gst_tags.items():
-                if tag_id in tax_line.tax_tag_ids:
-                    tax_vals_map[move_id][base_line][tax_type] += tax_vals['tax_amount']
-                    if tax_type in ['igst', 'cgst', 'sgst']:
-                        tax_vals_map[move_id][base_line]['rate_by_tax_tag'][tax_type] = tax_line.tax_line_id.amount
-                    if tax_line.tax_line_id.l10n_in_reverse_charge:
-                        tax_vals_map[move_id][base_line]['l10n_in_reverse_charge'] = True
-            tax_vals_map[move_id][base_line]['gst_tax_rate'] = sum(tax_vals_map[move_id][base_line]['rate_by_tax_tag'].values())
-        # IF line have 0% tax or not have tax then we add it manually
-        for journal_item in self.env['account.move.line'].browse(list(set(journal_items.ids) - seen_lines)):
-            move_id = journal_item.move_id
-            tax_vals_map.setdefault(move_id, {}).setdefault(journal_item, {
-                'base_amount': journal_item.balance,
-                'l10n_in_reverse_charge': False,
-                'gst_tax_rate': 0.0,
-                'igst': 0.00,
-                'cgst': 0.00,
-                'sgst': 0.00,
-                'cess': 0.00,
-            })
-        return tax_vals_map
+        if (
+            self.type_id._get_periodicity(self.company_id) == 'trimester'
+            and self.type_external_id == GSTR1_RETURN_TYPE
+            and tax_details['l10n_in_iff_reported']
+        ):
+            return
+        gstin = tax_details['customer_gstin']
+        rate = tax_details['gst_tax_rate']
+        invoice_type = 'R'
+        if tax_details['l10n_in_gstr_section'] == 'sale_sez_wp':
+            invoice_type = 'SEWP'
+        elif tax_details['l10n_in_gstr_section'] == 'sale_sez_wop':
+            invoice_type = 'SEWOP'
+        elif tax_details['l10n_in_gstr_section'] == 'sale_deemed_export':
+            invoice_type = 'DE'
+        b2b_data = gstr1_json.setdefault('b2b', {}).setdefault(gstin, {}).setdefault(tax_details['move_id'], {
+            'inum': tax_details['invoice_number'],
+            'idt': tax_details['invoice_date'].strftime('%d-%m-%Y'),
+            'val': tax_details['amount_total_signed'],
+            'pos': tax_details['pos_code'],
+            'rchrg': 'Y' if tax_details['l10n_in_gstr_section'] == 'sale_b2b_rcm' else 'N',
+            'inv_typ': invoice_type,
+            'itms': {}
+        })
+        b2b_data['itms'].setdefault(rate, {'rt': rate, 'txval': 0.0, 'iamt': 0.0, 'camt': 0.0, 'samt': 0.0, 'csamt': 0.0})
+        b2b_data['itms'][rate]['txval'] += tax_details['base_amount']
+        b2b_data['itms'][rate]['iamt'] += tax_details['igst']
+        b2b_data['itms'][rate]['camt'] += tax_details['cgst']
+        b2b_data['itms'][rate]['samt'] += tax_details['sgst']
+        b2b_data['itms'][rate]['csamt'] += tax_details['cess']
 
-    def _get_l10n_in_gstr1_hsn_json(self, journal_items, tax_details_by_move):
-        # TO OVERRIDE on Point of sale for get details by product
+    def _l10n_in_process_b2cl_json(self, gstr1_json, tax_details):
         """
-            This method is return hsn json as below
-            Here invoice lines are grouped by GST treatment type, product HSN code, product unit code and GST tax rate.
-            {'data/hsn_b2b/hsn_b2c': [{
-                'num': 1,
-                'hsn_sc': '94038900',
-                'uqc': 'UNT',
-                'rt': 5.0,
-                'qty': 10.0,
-                'txval': 40000.0,
-                'iamt': 0.0,
-                'samt': 1000.0,
-                'camt': 1000.0,
-                'csamt': 0.0
-                }]
+            This method is process b2cl json from tax_details
+            it's add b2cl details in gstr1_json
+            Here itms is group by Place of Supply, invoice number and GST tax rate
+            it's add in gstr1_json as below
+            {
+                'b2cl': {
+                    '24': {
+                        5: {
+                            'inum': 'INV/2022/00005',
+                            'idt': '01-04-2022',
+                            'val': 100.00,
+                            'itms': {
+                                18: {
+                                    'rate': 18.0,
+                                    'txval': 100.0,
+                                    'iamt': 0.0,
+                                    'samt': 9.0,
+                                    'camt': 9.0,
+                                    'csamt': 6.5
+                                }
+                            }
+                        }
+                    }
+                }
             }
         """
-        uoms = self.env['uom.uom'].browse(journal_items.product_uom_id.ids)
-        uoms.fetch(['l10n_in_code'])
-        hsn_json = {'hsn_b2b': {}}
-        if not self.company_id.l10n_in_disable_b2c_hsn_reporting:
-            hsn_json['hsn_b2c'] = {}
-        for move_id in journal_items.mapped('move_id'):
-            # We sum value of invoice and credit note
-            # so we need positive value for invoice and nagative for credit note
-            tax_details = tax_details_by_move.get(move_id, {})
-            is_price_adjustment = move_id.l10n_in_adjustment_type == 'price_adjustment'
-            if move_id.l10n_in_gst_treatment in self.env['account.move']._l10n_in_get_b2b_gst_treatments():
-                hsn_section = 'hsn_b2b'
-            elif not move_id.company_id.l10n_in_disable_b2c_hsn_reporting:
-                hsn_section = 'hsn_b2c'
-            else:
-                continue
-            for line, line_tax_details in tax_details.items():
-                tax_rate = line_tax_details['gst_tax_rate']
-                if tax_rate.is_integer():
-                    tax_rate = int(tax_rate)
-                uqc = (
-                    uoms.browse(line.product_uom_id.id).l10n_in_code
-                    and uoms.browse(line.product_uom_id.id).l10n_in_code.split("-")[0]
-                    or "OTH"
-                )
-                hsn_code = line.l10n_in_hsn_code
-                is_service_line = self.env["account.move"]._l10n_in_is_service_hsn(hsn_code)
-                if is_service_line:
-                    # If product is service then UQC is Not Applicable (NA)
-                    uqc = "NA"
-                group_key = "%s-%s-%s" % (
-                    tax_rate, hsn_code, uqc)
-                hsn_json[hsn_section].setdefault(group_key, {
-                    "hsn_sc": self.env["account.move"]._l10n_in_extract_digits(hsn_code),
-                    "uqc": uqc,
-                    "rt": tax_rate,
-                    "qty": 0.00, "txval": 0.00, "iamt": 0.00, "samt": 0.00, "camt": 0.00, "csamt": 0.00})
-                hsn_data = hsn_json[hsn_section][group_key]
-                # Price adjustment credit / debit notes are to adjust total amounts they do not alter quantity,
-                # so they are excluded from HSN quantity calculations.
-                if not (is_service_line or is_price_adjustment):
-                    if move_id.is_refund():
-                        hsn_data['qty'] -= line.quantity
-                    else:
-                        hsn_data['qty'] += line.quantity
-                hsn_data['txval'] += line_tax_details.get('base_amount', 0.00) * -1
-                hsn_data['iamt'] += line_tax_details.get('igst', 0.00) * -1
-                hsn_data['samt'] += line_tax_details.get('cgst', 0.00) * -1
-                hsn_data['camt'] += line_tax_details.get('sgst', 0.00) * -1
-                hsn_data['csamt'] += line_tax_details.get('cess', 0.00) * -1
-        return hsn_json
+        pos = tax_details['pos_code']
+        rate = tax_details['gst_tax_rate']
+        b2cl_data = gstr1_json.setdefault('b2cl', {}).setdefault(pos, {}).setdefault(tax_details['move_id'], {
+            'inum': tax_details['invoice_number'],
+            'idt': tax_details['invoice_date'].strftime('%d-%m-%Y'),
+            'val': tax_details['amount_total_signed'],
+            'itms': {}
+        })
+        b2cl_data['itms'].setdefault(rate, {
+            'rt': rate, 'txval': 0.0, 'iamt': 0.0, 'csamt': 0.0
+        })
+        b2cl_data['itms'][rate]['txval'] += tax_details['base_amount']
+        b2cl_data['itms'][rate]['iamt'] += tax_details['igst']
+        b2cl_data['itms'][rate]['csamt'] += tax_details['cess']
 
-    def _is_l10n_in_einvoice_skippable(self, move_id):
-        # OVERRIDE
-        pass
+    def _l10n_in_process_b2cs_json(self, gstr1_json, tax_details):
+        """
+            This method is process b2cs json from tax_details
+            it's add b2cs details in gstr1_json
+            Here itms is group by Place of Supply, GST tax rate
+            it's add in gstr1_json as below
+            {
+                'b2cs': {
+                    '24-5': {
+                        'sply_ty': 'INTRA/INTER',
+                        'pos': '36',
+                        'typ': 'OE',
+                        'rt': 5.0,
+                        'txval': 100.0,
+                        'iamt': 0.0,
+                        'samt': 9.0,
+                        'camt': 9.0,
+                        'csamt': 6.5
+                    }
+                }
+            }
+        """
+        pos = tax_details['pos_code']
+        rate = tax_details['gst_tax_rate']
+        grouping_key = f"{pos}-{rate}"
+        b2cs_data = gstr1_json.setdefault('b2cs', {}).setdefault(grouping_key, {
+            'sply_ty': 'INTER' if tax_details['l10n_in_transaction_type'] == 'inter_state' else 'INTRA',
+            'typ': 'OE', 'pos': pos, 'rt': rate, 'txval': 0.0,
+            'iamt': 0.0, 'camt': 0.0, 'samt': 0.0, 'csamt': 0.0
+        })
+        b2cs_data['txval'] += tax_details['base_amount']
+        b2cs_data['iamt'] += tax_details['igst']
+        b2cs_data['camt'] += tax_details['cgst']
+        b2cs_data['samt'] += tax_details['sgst']
+        b2cs_data['csamt'] += tax_details['cess']
+
+    def _l10n_in_process_cdnr_json(self, gstr1_json, tax_details):
+        """
+            This method is process cdnr json from tax_details
+            it's add cdnr details in gstr1_json
+            Here itms is group by GST number, invoice number and GST tax rate
+            it's add in gstr1_json as below
+            {
+                'cdnr': {
+                    '24AACCT6304M1ZB': {
+                        5: {
+                            'ntty': 'C',
+                            'nt_num': 'RINV/2022/00001',
+                            'nt_dt': '02-04-2022',
+                            'val': 105296.77,
+                            'pos': '24',
+                            'rchrg': 'N',
+                            'inv_typ': 'R',
+                            'itms`: {
+                                18:{
+                                    'rt': 18.0,
+                                    'txval': 180000.0,
+                                    'iamt': 32400.0,
+                                    'csamt': 0.0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """
+        if (
+            self.type_id._get_periodicity(self.company_id) == 'trimester'
+            and self.type_external_id == GSTR1_RETURN_TYPE
+            and tax_details['l10n_in_iff_reported']
+        ):
+            return
+        gstin = tax_details['customer_gstin']
+        rate = tax_details['gst_tax_rate']
+        invoice_type = 'R'
+        if tax_details['l10n_in_gstr_section'] == 'sale_cdnr_sez_wp':
+            invoice_type = 'SEWP'
+        elif tax_details['l10n_in_gstr_section'] == 'sale_cdnr_sez_wop':
+            invoice_type = 'SEWOP'
+        elif tax_details['l10n_in_gstr_section'] == 'sale_cdnr_deemed_export':
+            invoice_type = 'DE'
+        cdnr_data = gstr1_json.setdefault('cdnr', {}).setdefault(gstin, {}).setdefault(tax_details['move_id'], {
+            'ntty': 'C' if tax_details['move_type'] == 'out_refund' else 'D',
+            'nt_num': tax_details['invoice_number'],
+            'nt_dt': tax_details['invoice_date'].strftime('%d-%m-%Y'),
+            'val': tax_details['amount_total_signed'],
+            'pos': tax_details['pos_code'],
+            'inv_typ': invoice_type,
+            'rchrg': 'Y' if tax_details['l10n_in_gstr_section'] == 'sale_cdnr_rcm' else 'N',
+            'itms': {}
+        })
+        cdnr_data['itms'].setdefault(rate, {'rt': rate, 'txval': 0.0, 'iamt': 0.0, 'camt': 0.0, 'samt': 0.0, 'csamt': 0.0})
+        sign = -1 if tax_details['move_type'] == 'out_refund' else 1
+        cdnr_data['itms'][rate]['txval'] += tax_details['base_amount'] * sign
+        cdnr_data['itms'][rate]['iamt'] += tax_details['igst'] * sign
+        cdnr_data['itms'][rate]['camt'] += tax_details['cgst'] * sign
+        cdnr_data['itms'][rate]['samt'] += tax_details['sgst'] * sign
+        cdnr_data['itms'][rate]['csamt'] += tax_details['cess'] * sign
+
+    def _l10n_in_process_cdnur_json(self, gstr1_json, tax_details):
+        """
+            This method is process cdnur json from tax_details
+            it's add cdnur details in gstr1_json
+            Here itms is group by invoice number and GST tax rate
+            it's add in gstr1_json as below
+            {
+                'cdnur': {
+                    5: {
+                        'ntty': 'C',
+                        'nt_num': 'RINV/2022/00002',
+                        'nt_dt': '02-05-2022',
+                        'val': 212400.0,
+                        'pos': '30',
+                        'typ': 'B2CL',
+                        'itms`: {
+                            18:{
+                                'rt': 18.0,
+                                'txval': 180000.0,
+                                'iamt': 32400.0,
+                                'csamt': 0.0
+                            }
+                        }
+        """
+        rate = tax_details['gst_tax_rate']
+        invoice_type = 'B2CL'
+        if tax_details['l10n_in_gstr_section'] == 'sale_cdnur_exp_wp':
+            invoice_type = 'EXPWP'
+        elif tax_details['l10n_in_gstr_section'] == 'sale_cdnur_exp_wop':
+            invoice_type = 'EXPWOP'
+        move_defaults = {
+            'ntty': 'C' if tax_details['move_type'] == 'out_refund' else 'D',
+            'nt_num': tax_details['invoice_number'],
+            'nt_dt': tax_details['invoice_date'].strftime('%d-%m-%Y'),
+            'val': tax_details['amount_total_signed'],
+            'typ': invoice_type,
+            'itms': {}
+        }
+        if invoice_type == 'B2CL':
+            move_defaults['pos'] = tax_details['pos_code']
+        cdnur_data = gstr1_json.setdefault('cdnur', {}).setdefault(tax_details['move_id'], move_defaults)
+        cdnur_data['itms'].setdefault(rate, {
+            'rt': rate, 'txval': 0.0, 'iamt': 0.0, 'csamt': 0.0
+        })
+        sign = -1 if tax_details['move_type'] == 'out_refund' else 1
+        # For Export with payment add tax values invoice total
+        if invoice_type == 'EXPWP':
+            cdnur_data['val'] += (tax_details['igst'] + tax_details['cess']) * sign
+        cdnur_data['itms'][rate]['txval'] += tax_details['base_amount'] * sign
+        cdnur_data['itms'][rate]['iamt'] += tax_details['igst'] * sign
+        cdnur_data['itms'][rate]['csamt'] += tax_details['cess'] * sign
+
+    def _l10n_in_process_exp_json(self, gstr1_json, tax_details):
+        """
+            This method is process exp json from tax_details
+            it's add exp details in gstr1_json
+            Here itms is group by Export type, invoice number and GST tax rate
+            it's add in gstr1_json as below
+            {
+                'exp': {
+                    'WPAY': {
+                        '5': {
+                            'inum': 'INV/2022/00008',
+                            'idt': '01-04-2022',
+                            'val': 283200.0,
+                            'sbnum': '999704',
+                            'sbdt': '02/04/2022',
+                            'sbpcode': 'INIXY1',
+                            'itms': {
+                                '18': {
+                                    'rt': 18.0,
+                                    'txval': 240000.0,
+                                    'iamt': 43200.0,
+                                    'csamt': 0.0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """
+        exp_type = 'WPAY' if tax_details['l10n_in_gstr_section'] == 'sale_exp_wp' else 'WOPAY'
+        rate = tax_details['gst_tax_rate']
+        move_defaults = {
+            'inum': tax_details['invoice_number'],
+            'idt': tax_details['invoice_date'].strftime('%d-%m-%Y'),
+            'val': tax_details['amount_total_signed'],
+            'itms': {}
+        }
+        if tax_details['shipping_bill_number']:
+            move_defaults['sbnum'] = tax_details['shipping_bill_number']
+        if tax_details['shipping_bill_date']:
+            move_defaults['sbdt'] = tax_details['shipping_bill_date'].strftime('%d-%m-%Y')
+        if tax_details['port_code']:
+            move_defaults['sbpcode'] = tax_details['port_code']
+        exp_data = gstr1_json.setdefault('exp', {}).setdefault(exp_type, {}).setdefault(tax_details['move_id'], move_defaults)
+        exp_data['itms'].setdefault(rate, {
+            'rt': rate, 'txval': 0.0, 'iamt': 0.0, 'csamt': 0.0
+        })
+        # If Base amount and Invoice total is same then add tax values in total for Export with payment only
+        if exp_type == 'WPAY':
+            exp_data['val'] += tax_details['igst'] + tax_details['cgst']
+        exp_data['itms'][rate]['txval'] += tax_details['base_amount']
+        exp_data['itms'][rate]['iamt'] += tax_details['igst']
+        exp_data['itms'][rate]['csamt'] += tax_details['cess']
+
+    def _l10n_in_process_nongst_json(self, gstr1_json, tax_details):
+        """
+            This method is process non-gst json from tax_details
+            it's add non-gst details in gstr1_json
+            Here itms is group by Base Tags
+            it's add in gstr1_json as below
+            {
+                'nil': {
+                    'INTRB2B/INTRB2C/INTRAB2B/INTRAB2C': {
+                        'nil_amt': 100.0,
+                        'expt_amt': 200.0,
+                        'ngsup_amt': 300.0,
+                    }
+                }
+            }
+        """
+        is_b2b = tax_details.get('l10n_in_gst_treatment') in {
+            'regular', 'composition', 'deemed_export', 'uin_holders', 'special_economic_zone'}
+        if tax_details.get('l10n_in_transaction_type') == 'inter_state':
+            supply_type = 'INTRB2B' if is_b2b else 'INTRB2C'
+        else:
+            supply_type = 'INTRAB2B' if is_b2b else 'INTRAB2C'
+
+        inv_data = gstr1_json.setdefault('nil', {}).setdefault(supply_type, {
+            'sply_ty': supply_type,
+            'nil_amt': 0.0,
+            'expt_amt': 0.0,
+            'ngsup_amt': 0.0,
+        })
+        if tax_details['l10n_in_gstr_section'] == 'sale_nil_rated':
+            inv_data['nil_amt'] += tax_details['base_amount']
+        elif tax_details['l10n_in_gstr_section'] == 'sale_exempt':
+            inv_data['expt_amt'] += tax_details['base_amount']
+        elif tax_details['l10n_in_gstr_section'] == 'sale_non_gst_supplies':
+            inv_data['ngsup_amt'] += tax_details['base_amount']
+
+    def _l10n_in_process_hsn_json(self, gstr1_json, tax_details):
+        """
+            This method is process hsn json from tax_details
+            it's add hsn details in gstr1_json
+            Here invoice lines are grouped by GST treatment type, product HSN code, product unit code and GST tax rate.
+            it's add in gstr1_json as below
+            { 'hsn': {
+                'hsn_b2b/hsn_b2c': {
+                    '94038900_UNT_5': {
+                        'num': 1,
+                        'hsn_sc': '94038900',
+                        'uqc': 'UNT',
+                        'rt': 5.0,
+                        'qty': 10.0,
+                        'txval': 40000.0,
+                        'iamt': 0.0,
+                        'samt': 1000.0,
+                        'camt': 1000.0,
+                        'csamt': 0.0
+                    }
+                }
+            }
+        """
+        if tax_details['l10n_in_gst_treatment'] in {
+            'regular', 'composition', 'deemed_export', 'uin_holders', 'special_economic_zone'}:
+            hsn_type = 'hsn_b2b'
+        elif not self.company_id.l10n_in_disable_b2c_hsn_reporting:
+            hsn_type = 'hsn_b2c'
+        else:
+            return
+        gst_rate = tax_details['gst_tax_rate']
+        uqc = (
+            tax_details['product_uom_code']
+            and tax_details['product_uom_code'].split("-")[0]
+            or "OTH"
+        )
+        if is_service_line := self.env['account.move']._l10n_in_is_service_hsn(tax_details['l10n_in_hsn_code']):
+            # If product is service then UQC is Not Applicable (NA)
+            uqc = "NA"
+        hsn_group_key = f"{tax_details['l10n_in_hsn_code']}_{uqc}_{gst_rate}"
+        hsn_data = gstr1_json.setdefault('hsn', {}).setdefault(hsn_type, {}).setdefault(hsn_group_key, {
+            'hsn_sc': tax_details['l10n_in_hsn_code'],
+            'uqc': uqc,
+            'rt': int(gst_rate) if gst_rate.is_integer() else gst_rate,
+            'qty': 0.0,
+            'txval': 0.0,
+            'iamt': 0.0,
+            'samt': 0.0,
+            'camt': 0.0,
+            'csamt': 0.0,
+        })
+        # Price adjustment credit / debit notes are to adjust total amounts they do not alter quantity,
+        # so they are excluded from HSN quantity calculations.
+        if not (is_service_line or tax_details['l10n_in_adjustment_type'] == 'price_adjustment'):
+            if tax_details['move_type'] in ('out_refund', 'in_refund'):
+                hsn_data['qty'] -= tax_details['quantity']
+            else:
+                hsn_data['qty'] += tax_details['quantity']
+        hsn_data['txval'] += tax_details['base_amount']
+        hsn_data['iamt'] += tax_details['igst']
+        hsn_data['samt'] += tax_details['cgst']
+        hsn_data['camt'] += tax_details['sgst']
+        hsn_data['csamt'] += tax_details['cess']
 
     def _get_l10n_in_doc_issue_json(self):
         """
@@ -514,596 +1079,6 @@ class AccountReturn(models.Model):
         ]
         return {'doc_det': doc_det}
 
-    def _get_l10n_in_gstr1_json(self):
-
-        def _process_hsn_data(hsn_data):
-            """Helper function to process HSN data with rounding."""
-            return [
-                {**hsn_dict, 'num': index, **{
-                    key: AccountMove._l10n_in_round_value(hsn_dict.get(key, 0))
-                    for key in ('txval', 'iamt', 'camt', 'samt', 'csamt', 'qty')
-                }}
-                for index, hsn_dict in enumerate(hsn_data.values(), start=1)
-            ]
-
-        def _get_b2b_json(journal_items):
-            """
-            This method is return b2b json as below
-            Here itms is group by of invoice line per gst tax rate
-            [{
-                'ctin': '24AACCT6304M1ZB',
-                'inv': [{
-                    'inum': 'INV/2022/00005',
-                    'idt': '01-04-2022',
-                    'val': 100.00,
-                    'pos': '24',
-                    'rchrg': 'N',
-                    'inv_typ': 'R',
-                    'etin': "34AACCT6304M1ZB",
-                    'diff_percent': 0.65,
-                    'itms': [{
-                        'num': 1,
-                        'itm_det': {
-                          'rt': 28.0,
-                          'txval': 100.0,
-                          'iamt': 0.0,
-                          'samt': 9.0,
-                          'camt': 9.0,
-                          'csamt': 6.5
-                        }
-                    }]
-                }]
-            }]
-            """
-            b2b_json = []
-            for partner, items in journal_items.grouped(lambda l: l.move_id.commercial_partner_id).items():
-                inv_json_list = []
-                for move_id in items.mapped('move_id'):
-                    if self._is_l10n_in_einvoice_skippable(move_id):
-                        continue
-                    lines_json = {}
-                    is_reverse_charge = False
-                    is_lut = False
-                    tax_details = tax_details_by_move.get(move_id, {})
-                    for line, line_tax_details in tax_details.items():
-                        # Ignore the nil rated, exempt and non gst lines
-                        if line.l10n_in_gstr_section in ['sale_nil_rated', 'sale_exempt', 'sale_non_gst_supplies']:
-                            continue
-                        tax_rate = line_tax_details['gst_tax_rate']
-                        if line_tax_details['l10n_in_reverse_charge']:
-                            is_reverse_charge = True
-                        lines_json.setdefault(tax_rate, {
-                            "rt": tax_rate, "txval": 0.00, "iamt": 0.00, "samt": 0.00, "camt": 0.00, "csamt": 0.00})
-                        if line.l10n_in_gstr_section == 'sale_sez_wop':
-                            is_lut = True
-                        lines_json[tax_rate]['txval'] += line_tax_details['base_amount'] * -1
-                        lines_json[tax_rate]['iamt'] += line_tax_details['igst'] * -1
-                        lines_json[tax_rate]['camt'] += line_tax_details['cgst'] * -1
-                        lines_json[tax_rate]['samt'] += line_tax_details['sgst'] * -1
-                        lines_json[tax_rate]['csamt'] += line_tax_details['cess'] * -1
-                    if lines_json:
-                        invoice_type = {
-                            'deemed_export': 'DE',
-                            'special_economic_zone': 'SEWOP' if is_lut else 'SEWP',
-                        }.get(move_id.l10n_in_gst_treatment, 'R')
-                        inv_json = {
-                            "inum": move_id.name,
-                            "idt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                            "val": AccountMove._l10n_in_round_value(move_id.amount_total_signed),
-                            "pos": move_id.l10n_in_state_id.l10n_in_tin,
-                            "rchrg": is_reverse_charge and "Y" or "N",
-                            "inv_typ": invoice_type,
-                            # "etin": move_id.l10n_in_reseller_partner_id.vat or "",
-                            "itms": [
-                                {"num": index, "itm_det": {
-                                    'txval': AccountMove._l10n_in_round_value(line_json.pop('txval')),
-                                    'iamt': AccountMove._l10n_in_round_value(line_json.pop('iamt')),
-                                    'camt': AccountMove._l10n_in_round_value(line_json.pop('camt')),
-                                    'samt': AccountMove._l10n_in_round_value(line_json.pop('samt')),
-                                    'csamt': AccountMove._l10n_in_round_value(line_json.pop('csamt')), **line_json}}
-                                for index, line_json in enumerate(lines_json.values(), start=1)
-                            ],
-                        }
-                        inv_json_list.append(inv_json)
-                if inv_json_list:
-                    b2b_json.append({'ctin': partner.vat, 'inv': inv_json_list})
-            return b2b_json
-
-        def _get_b2cl_json(journal_items):
-            """
-            This method is return b2cl json as below
-            Here itms is group by of invoice line per gst tax rate
-            [{
-                'pos': '30',
-                'inv': [{
-                    'inum': 'INV/2022/00005',
-                    'idt': '01-04-2022',
-                    'val': 100.00,
-                    'diff_percent': 0.65,
-                    'itms': [{
-                        'num': 1,
-                        'itm_det': {
-                          'rt': 28.0,
-                          'txval': 100.0,
-                          'iamt': 0.0,
-                          'csamt': 6.5
-                        }
-                    }]
-                }]
-            }]
-            """
-            b2cl_json = []
-            for state_id, items in journal_items.grouped(lambda l: l.move_id.l10n_in_state_id).items():
-                inv_json_list = []
-                for move_id in items.mapped('move_id'):
-                    lines_json = {}
-                    tax_details = tax_details_by_move.get(move_id, {})
-                    for line, line_tax_details in tax_details.items():
-                        if line.l10n_in_gstr_section in ['sale_nil_rated', 'sale_exempt', 'sale_non_gst_supplies']:
-                            continue
-                        tax_rate = line_tax_details.get('gst_tax_rate')
-                        lines_json.setdefault(tax_rate, {
-                            "rt": tax_rate, "txval": 0.00, "iamt": 0.00, "csamt": 0.00})
-                        lines_json[tax_rate]['txval'] += line_tax_details['base_amount'] * -1
-                        lines_json[tax_rate]['iamt'] += line_tax_details['igst'] * -1
-                        lines_json[tax_rate]['csamt'] += line_tax_details['cess'] * -1
-                    if lines_json:
-                        inv_json = {
-                            "inum": move_id.name,
-                            "idt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                            "val": AccountMove._l10n_in_round_value(move_id.amount_total_signed),
-                            # "etin": move_id.l10n_in_reseller_partner_id.vat or "",
-                            "itms": [
-                                {"num": index, "itm_det": {
-                                    'txval': AccountMove._l10n_in_round_value(line_json.pop('txval')),
-                                    'iamt': AccountMove._l10n_in_round_value(line_json.pop('iamt')),
-                                    'csamt': AccountMove._l10n_in_round_value(line_json.pop('csamt')), **line_json}}
-                                for index, line_json in enumerate(lines_json.values(), start=1)
-                            ],
-                        }
-                        inv_json_list.append(inv_json)
-                b2cl_json.append({'pos': state_id.l10n_in_tin, 'inv': inv_json_list})
-            return b2cl_json
-
-        def _get_b2cs_json(journal_items):
-            """
-            This method is return b2cs json as below
-            Here data is group by gst tax rate and place of supply
-            [{
-              'sply_ty': 'INTRA',
-              'pos': '36',
-              'typ': 'OE',
-              'rt': 5.0,
-              'txval': 100,
-              'iamt': 0.0,
-              'samt': 2.50,
-              'camt': 2.50,
-              'csamt': 0.0
-            }]
-            """
-            b2cs_json = {}
-            for move_id in journal_items.mapped('move_id'):
-                # We sum value of invoice and credit note
-                # so we need positive value for invoice and nagative for credit note
-                tax_details = tax_details_by_move.get(move_id, {})
-                for line, line_tax_details in tax_details.items():
-                    if line.l10n_in_gstr_section in ['sale_nil_rated', 'sale_exempt', 'sale_non_gst_supplies']:
-                        continue
-                    tax_rate = line_tax_details.get('gst_tax_rate')
-                    group_key = "%s-%s" % (tax_rate, move_id.l10n_in_state_id.l10n_in_tin)
-                    b2cs_json.setdefault(group_key, {
-                        "sply_ty": move_id.l10n_in_state_id == move_id.company_id.state_id and "INTRA" or "INTER",
-                        "pos": move_id.l10n_in_state_id.l10n_in_tin,
-                        "typ": "OE",
-                        "rt": tax_rate,
-                        "txval": 0.00, "iamt": 0.00, "samt": 0.00, "camt": 0.00, "csamt": 0.00})
-                    b2cs_json[group_key]['txval'] += line_tax_details['base_amount'] * -1
-                    b2cs_json[group_key]['iamt'] += line_tax_details['igst'] * -1
-                    b2cs_json[group_key]['camt'] += line_tax_details['cgst'] * -1
-                    b2cs_json[group_key]['samt'] += line_tax_details['sgst'] * -1
-                    b2cs_json[group_key]['csamt'] += line_tax_details['cess'] * -1
-            return [{
-                **d,
-                "txval": AccountMove._l10n_in_round_value(d['txval']),
-                "iamt": AccountMove._l10n_in_round_value(d['iamt']),
-                "samt": AccountMove._l10n_in_round_value(d['samt']),
-                "camt": AccountMove._l10n_in_round_value(d['camt']),
-                "csamt": AccountMove._l10n_in_round_value(d['csamt']),
-            } for d in b2cs_json.values()]
-
-        def _get_cdnr_json(journal_items):
-            """
-            This method is return cdnr json as below
-            Here itms is group by of invoice line per gst tax rate
-            [{
-                'ctin': '24AACCT6304M1ZB',
-                'nt': [{
-                    'ntty': 'C',
-                    'nt_num': 'RINV/2022/00001',
-                    'nt_dt': '02-04-2022',
-                    'val': 105296.77,
-                    'pos': '24',
-                    'rchrg': 'N',
-                    'inv_typ': 'R',
-                    'diff_percent': 0.65,
-                    'itms': [{
-                        'num': 1,
-                        'itm_det': {
-                          'rt': 28.0,
-                          'txval': 80000.0,
-                          'iamt': 0.0,
-                          'samt': 11200.0,
-                          'camt': 11200.0,
-                          'csamt': 0.0
-                        }
-                    }]
-                }]
-            }]
-            """
-            cdnr_json = []
-            for partner, items in journal_items.grouped(lambda l: l.move_id.commercial_partner_id).items():
-                inv_json_list = []
-                for move_id in items.mapped('move_id'):
-                    if self._is_l10n_in_einvoice_skippable(move_id):
-                        continue
-                    lines_json = {}
-                    is_reverse_charge = False
-                    tax_details = tax_details_by_move[move_id]
-                    is_lut = False
-                    for line, line_tax_details in tax_details.items():
-                        if line.l10n_in_gstr_section in ['sale_nil_rated', 'sale_exempt', 'sale_non_gst_supplies']:
-                            continue
-                        tax_rate = line_tax_details['gst_tax_rate']
-                        if line_tax_details['l10n_in_reverse_charge']:
-                            is_reverse_charge = True
-                        if line.l10n_in_gstr_section == 'sale_cdnr_sez_wop':
-                            is_lut = True
-                        lines_json.setdefault(tax_rate, {
-                            "rt": tax_rate, "txval": 0.00, "iamt": 0.00, "samt": 0.00, "camt": 0.00, "csamt": 0.00})
-                        lines_json[tax_rate]['txval'] += line_tax_details['base_amount']
-                        lines_json[tax_rate]['iamt'] += line_tax_details['igst']
-                        lines_json[tax_rate]['samt'] += line_tax_details['cgst']
-                        lines_json[tax_rate]['camt'] += line_tax_details['sgst']
-                        lines_json[tax_rate]['csamt'] += line_tax_details['cess']
-                    if lines_json:
-                        invoice_type = {
-                            'deemed_export': 'DE',
-                            'special_economic_zone': 'SEWOP' if is_lut else 'SEWP',
-                        }.get(move_id.l10n_in_gst_treatment, 'R')
-                        is_out_refund = move_id.move_type == "out_refund"
-                        sign = is_out_refund and 1 or -1
-                        inv_json = {
-                            "ntty": is_out_refund and "C" or "D",
-                            "nt_num": move_id.name,
-                            "nt_dt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                            "val": AccountMove._l10n_in_round_value(move_id.amount_total_signed * -sign),
-                            "pos": move_id.l10n_in_state_id.l10n_in_tin,
-                            "rchrg": is_reverse_charge and "Y" or "N",
-                            "inv_typ": invoice_type,
-                            "itms": [
-                                {"num": index, "itm_det": {
-                                    **line_json,
-                                    "txval": AccountMove._l10n_in_round_value(line_json['txval'] * sign),
-                                    "iamt": AccountMove._l10n_in_round_value(line_json['iamt'] * sign),
-                                    "samt": AccountMove._l10n_in_round_value(line_json['samt'] * sign),
-                                    "camt": AccountMove._l10n_in_round_value(line_json['camt'] * sign),
-                                    "csamt": AccountMove._l10n_in_round_value(line_json['csamt'] * sign),
-                                }} for index, line_json in enumerate(lines_json.values(), start=1)
-                            ],
-                        }
-                        inv_json_list.append(inv_json)
-                if inv_json_list:
-                    cdnr_json.append({'ctin': partner.vat, 'nt': inv_json_list})
-            return cdnr_json
-
-        def _get_cdnur_json(journal_items):
-            """
-            This method is return cdnur json as below
-            Here itms is group by of invoice line per gst tax rate
-            [{
-                'ntty': 'C',
-                'nt_num': 'RINV/2022/00002',
-                'nt_dt': '02-05-2022',
-                'val': 212400.0,
-                'pos': '30',
-                'typ': 'B2CL',
-                'diff_percent': 0.65,
-                'itms': [{
-                    'num': 1,
-                    'itm_det': {
-                      'rt': 18.0,
-                      'txval': 180000.0,
-                      'iamt': 32400.0,
-                      'csamt': 0.0
-                    }
-                }]
-            }]
-            """
-            inv_json_list = []
-            for move_id in journal_items.mapped('move_id'):
-                tax_details = tax_details_by_move.get(move_id, {})
-                lines_json = {}
-                is_lut = False
-                for line, line_tax_details in tax_details.items():
-                    if line.l10n_in_gstr_section in ['sale_nil_rated', 'sale_exempt', 'sale_non_gst_supplies']:
-                        continue
-                    if line.l10n_in_gstr_section == 'sale_cdnur_exp_wop':
-                        is_lut = True
-                    tax_rate = line_tax_details['gst_tax_rate']
-                    lines_json.setdefault(tax_rate, {
-                        "rt": tax_rate, "txval": 0.00, "iamt": 0.00, "csamt": 0.00})
-                    lines_json[tax_rate]['txval'] += line_tax_details['base_amount']
-                    lines_json[tax_rate]['iamt'] += line_tax_details['igst']
-                    lines_json[tax_rate]['csamt'] += line_tax_details['cess']
-                if lines_json:
-                    is_out_refund = move_id.move_type == "out_refund"
-                    sign = is_out_refund and 1 or -1
-                    invoice_type = 'B2CL'
-                    invoice_total = move_id.amount_total_signed * -sign
-                    if move_id.l10n_in_gst_treatment == "overseas" and is_lut:
-                        invoice_type = 'EXPWOP'
-                    elif move_id.l10n_in_gst_treatment == "overseas":
-                        invoice_type = 'EXPWP'
-                        # If Base amount and Invoice total is same then add tax values in total for Export with payment only
-                        if float_is_zero(invoice_total - sum(line['txval'] for line in lines_json.values()), precision_digits=2):
-                            invoice_total += sum(line['iamt'] + line['csamt'] for line in lines_json.values())
-                    inv_json = {
-                        "ntty": is_out_refund and "C" or "D",
-                        "nt_num": move_id.name,
-                        "nt_dt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                        "val": AccountMove._l10n_in_round_value(invoice_total),
-                        "typ": invoice_type,
-                        "itms": [
-                            {"num": index, "itm_det": {
-                                **line_json,
-                                "txval": AccountMove._l10n_in_round_value(line_json['txval'] * sign),
-                                "iamt": AccountMove._l10n_in_round_value(line_json['iamt'] * sign),
-                                "csamt": AccountMove._l10n_in_round_value(line_json['csamt'] * sign),
-                            }} for index, line_json in enumerate(lines_json.values(), start=1)
-                        ],
-                    }
-                    if invoice_type == 'B2CL':
-                        inv_json.update({"pos": move_id.l10n_in_state_id.l10n_in_tin})
-                    inv_json_list.append(inv_json)
-            return inv_json_list
-
-        def _get_exp_json(journal_items):
-            """
-            This method is return exp json as below
-            Here itms is group by of invoice line per gst tax rate
-            [{
-                'exp_typ': 'WPAY',
-                'inv': [{
-                    'inum': 'INV/2022/00008',
-                    'idt': '01-04-2022',
-                    'val': 283200.0,
-                    'sbnum': '999704',
-                    'sbdt': '02/04/2022',
-                    'sbpcode': 'INIXY1',
-                    'itms': [
-                    {
-                        'rt': 18.0,
-                        'txval': 240000.0,
-                        'iamt': 43200.0,
-                        'csamt': 0.0
-                    }]
-                }]
-            }]
-            """
-            export_json = {}
-            for move_id in journal_items.mapped('move_id'):
-                if self._is_l10n_in_einvoice_skippable(move_id):
-                    continue
-                tax_details = tax_details_by_move.get(move_id, {})
-                lines_json = {}
-                is_lut = False
-                for line, line_tax_details in tax_details.items():
-                    if line.l10n_in_gstr_section == 'sale_exp_wop':
-                        is_lut = True
-                    elif line.l10n_in_gstr_section not in ['sale_exp_wp', 'sale_exp_wop']:
-                        continue
-                    tax_rate = line_tax_details['gst_tax_rate']
-                    lines_json.setdefault(tax_rate, {"rt": tax_rate, "txval": 0.00, "iamt": 0.00, "csamt": 0.00})
-                    lines_json[tax_rate]['txval'] += line_tax_details['base_amount'] * -1
-                    lines_json[tax_rate]['iamt'] += line_tax_details['igst'] * -1
-                    lines_json[tax_rate]['csamt'] += line_tax_details['cess'] * -1
-                if lines_json:
-                    invoice_total = move_id.amount_total_signed
-                    invoice_type = 'WOPAY'
-                    if not is_lut:
-                        invoice_type = 'WPAY'
-                        # If Base amount and Invoice total is same then add tax values in total for Export with payment only
-                        if float_is_zero(invoice_total - sum(line['txval'] for line in lines_json.values()), precision_digits=2):
-                            invoice_total += sum(line['iamt'] + line['csamt'] for line in lines_json.values())
-                    export_json.setdefault(invoice_type, [])
-                    export_inv = {
-                        "inum": move_id.name,
-                        "idt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                        "val": AccountMove._l10n_in_round_value(invoice_total),
-                        "itms": [{
-                            **d,
-                            "txval": AccountMove._l10n_in_round_value(d['txval']),
-                            "iamt": AccountMove._l10n_in_round_value(d['iamt']),
-                            "csamt": AccountMove._l10n_in_round_value(d['csamt']),
-                            }
-                            for d in lines_json.values()],
-                    }
-                    if move_id.l10n_in_shipping_bill_number:
-                        export_inv.update({"sbnum": move_id.l10n_in_shipping_bill_number})
-                    if move_id.l10n_in_shipping_bill_date:
-                        export_inv.update({"sbdt": move_id.l10n_in_shipping_bill_date.strftime("%d-%m-%Y")})
-                    if move_id.l10n_in_shipping_port_code_id.code:
-                        export_inv.update({"sbpcode": move_id.l10n_in_shipping_port_code_id.code})
-                    export_json[invoice_type].append(export_inv)
-            return [{"exp_typ": invoice_type, "inv": inv_json} for invoice_type, inv_json in export_json.items()]
-
-        def _get_nil_json(journal_items):
-            """
-            This method is return nil json as below
-            Here data is grouped by supply_type and sum of base amount of diffrent type of 0% tax
-            {
-                'inv':[{
-                    'sply_ty': 'INTRB2B',
-                    'nil_amt': 100.0,
-                    'expt_amt': 200.0,
-                    'ngsup_amt': 300.0,
-                }]
-            }
-            """
-            nil_json = {}
-            for move_id in journal_items.mapped('move_id'):
-                if self._is_l10n_in_einvoice_skippable(move_id):
-                    continue
-                # We sum value of invoice and credit note
-                # so we need positive value for invoice and nagative for credit note
-                tax_details = tax_details_by_move.get(move_id, {})
-                same_state = move_id.l10n_in_state_id == move_id.company_id.state_id
-                supply_type = ""
-                if same_state:
-                    if move_id.l10n_in_gst_treatment in ('special_economic_zone', 'deemed_export', 'regular'):
-                        supply_type = "INTRAB2B"
-                    else:
-                        supply_type = "INTRAB2C"
-                else:
-                    if move_id.l10n_in_gst_treatment in ('special_economic_zone', 'deemed_export', 'regular'):
-                        supply_type = "INTRB2B"
-                    else:
-                        supply_type = "INTRB2C"
-                nil_json.setdefault(supply_type, {
-                    "sply_ty": supply_type,
-                    "nil_amt": 0.00,
-                    "expt_amt": 0.00,
-                    "ngsup_amt": 0.00,
-                })
-                for line, line_tax_detail in tax_details.items():
-                    base_line_tax_ids = line.tax_ids
-                    for tax in base_line_tax_ids:
-                        tax_type = tax.l10n_in_tax_type
-                        if tax_type == 'nil_rated':
-                            nil_json[supply_type]['nil_amt'] += line_tax_detail['base_amount'] * -1
-                        if tax_type == 'exempt':
-                            nil_json[supply_type]['expt_amt'] += line_tax_detail['base_amount'] * -1
-                        if tax_type == 'non_gst':
-                            nil_json[supply_type]['ngsup_amt'] += line_tax_detail['base_amount'] * -1
-            return nil_json and {'inv': [{
-                **d,
-                "nil_amt": AccountMove._l10n_in_round_value(d['nil_amt']),
-                "expt_amt": AccountMove._l10n_in_round_value(d['expt_amt']),
-                "ngsup_amt": AccountMove._l10n_in_round_value(d['ngsup_amt']),
-            } for d in nil_json.values()]} or {}
-
-        def _get_supeco_clttx_json(journal_items):
-            """
-            contains supeco details for section 52
-            This method is return clttx list as below
-            Here data is grouped by etin(reseller_partner_gstin) and sum of base and gst taxes (TCS 1%)
-            [{
-                    "etin": "20ALYPD6528PQC5",
-                    "suppval": 10000,
-                    "igst": 1000,
-                    "cgst": 0,
-                    "sgst": 0,
-                    "cess": 0,
-            }]
-            """
-            clttx_json = {}
-            for move_id in journal_items.mapped('move_id'):
-                tax_details = tax_details_by_move.get(move_id, {})
-                eco_gstin = move_id.l10n_in_reseller_partner_id.vat
-                for line_tax in tax_details.values():
-                    clttx_json.setdefault(eco_gstin, {
-                        "etin": eco_gstin,
-                        "suppval": 0.00,
-                        "igst": 0.00,
-                        "sgst": 0.00,
-                        "cgst": 0.00,
-                        "cess": 0.00,
-                    })
-                    clttx_json[eco_gstin]['suppval'] += line_tax['base_amount'] * -1
-                    clttx_json[eco_gstin]['cgst'] += line_tax['cgst'] * -1
-                    clttx_json[eco_gstin]['sgst'] += line_tax['sgst'] * -1
-                    clttx_json[eco_gstin]['igst'] += line_tax['igst'] * -1
-                    clttx_json[eco_gstin]['cess'] += line_tax['cess'] * -1
-            return [{
-                **d,
-                "suppval": AccountMove._l10n_in_round_value(d['suppval']),
-                "igst": AccountMove._l10n_in_round_value(d['igst']),
-                "cgst": AccountMove._l10n_in_round_value(d['cgst']),
-                "sgst": AccountMove._l10n_in_round_value(d['sgst']),
-                "cess": AccountMove._l10n_in_round_value(d['cess']),
-            } for d in clttx_json.values()]
-
-        def _get_supeco_paytx_json(journal_items):
-            """
-            contains supeco details for section 9(5)
-            This method is return paytx list as below
-            Here data is grouped by etin(reseller_partner_gstin)
-            [{
-                "etin": "20ALYPD6528PQC5",
-                "suppval": 10000,
-                "igst": 1000,
-                "cgst": 0,
-                "sgst": 0,
-                "cess": 0,
-            }]
-            """
-            paytx_json = {}
-            for move_id in journal_items.mapped('move_id'):
-                tax_details = tax_details_by_move.get(move_id, {})
-                eco_gstin = move_id.l10n_in_reseller_partner_id.vat
-                for line_tax_details in tax_details.values():
-                    paytx_json.setdefault(eco_gstin, {
-                        "etin": eco_gstin,
-                        "suppval": 0.00,
-                        "igst": 0.00,
-                        "sgst": 0.00,
-                        "cgst": 0.00,
-                        "cess": 0.00,
-                    })
-                    paytx_json[eco_gstin]['suppval'] += line_tax_details['base_amount'] * -1
-                    paytx_json[eco_gstin]['igst'] += line_tax_details['igst'] * -1
-                    paytx_json[eco_gstin]['cgst'] += line_tax_details['cgst'] * -1
-                    paytx_json[eco_gstin]['sgst'] += line_tax_details['sgst'] * -1
-                    paytx_json[eco_gstin]['cess'] += line_tax_details['cess'] * -1
-
-            return [{
-                **d,
-                "suppval": AccountMove._l10n_in_round_value(d['suppval']),
-                "igst": AccountMove._l10n_in_round_value(d['igst']),
-                "cgst": AccountMove._l10n_in_round_value(d['cgst']),
-                "sgst": AccountMove._l10n_in_round_value(d['sgst']),
-                "cess": AccountMove._l10n_in_round_value(d['cess']),
-            } for d in paytx_json.values()]
-
-        AccountMoveLine = self.env['account.move.line'].sudo()
-        AccountMove = self.env["account.move"].sudo()
-        tax_details_by_move = self._get_tax_details(self._get_section_domain('hsn'))
-        return_json = {
-            'gstin': self.tax_unit_id.vat or self.company_id.vat,
-            'fp': self.l10n_in_month_year,
-            'b2b': _get_b2b_json(AccountMoveLine.search(self._get_section_domain('b2b'))),
-            'cdnr': _get_cdnr_json(AccountMoveLine.search(self._get_section_domain('cdnr'))),
-        }
-        if self.type_external_id == GSTR_IFF_RETURN_TYPE:
-            return return_json
-        hsn_json = self._get_l10n_in_gstr1_hsn_json(AccountMoveLine.search(self._get_section_domain('hsn')), tax_details_by_move)
-        nil_json = _get_nil_json(AccountMoveLine.search(self._get_section_domain('nil')))
-        return_json.update({
-            'b2cl': _get_b2cl_json(AccountMoveLine.search(self._get_section_domain('b2cl'))),
-            'b2cs': _get_b2cs_json(AccountMoveLine.search(self._get_section_domain('b2cs'))),
-            'cdnur': _get_cdnur_json(AccountMoveLine.search(self._get_section_domain('cdnur'))),
-            'exp': _get_exp_json(AccountMoveLine.search(self._get_section_domain('exp'))),
-            'doc_issue': self._get_l10n_in_doc_issue_json(),
-        })
-        if nil_json:
-            return_json.update({'nil': nil_json})
-        if hsn_json:
-            return_json['hsn'] = {
-                hsn_section: _process_hsn_data(hsn_json[hsn_section])
-                for hsn_section in hsn_json
-            }
-        return return_json
-
     def action_l10n_in_send_gstr1(self):
         """ checks the validations and trigger the cron to send the GSTR-1 data
         """
@@ -1124,7 +1099,7 @@ class AccountReturn(models.Model):
                 raise ValidationError(_("Can not send GSTR-1 data because the required scheduled action '%s' is not active.\nPlease contact your system administrator.", cron_sudo.cron_name))
 
         self._l10n_in_check_config()
-        if not self.env['account.move.line'].sudo().search_count(self._get_section_domain('hsn'), limit=1):
+        if not self.env['account.move.line'].sudo().search_count(self._get_tax_detail_domain(), limit=1):
             raise ValidationError(_("There are no transactions available for the current period to send for GSTR-1 filing."))
         self.sudo().write({
             "l10n_in_gstr1_blocking_level": False,
@@ -1430,90 +1405,26 @@ class AccountReturn(models.Model):
     def _get_base_section_domain(self):
         return [
             ('company_id', 'in', (self.company_ids or self.company_id).ids),
-            ("date", ">=", self.date_from),
-            ("date", "<=", self.date_to),
-            ("move_id.state", "=", "posted"),
-            ("display_type", "not in", ('rounding', 'line_note', 'line_section', 'line_subsection'))
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+            ('parent_state', '=', 'posted'),
         ]
 
-    def _get_section_domain(self, section_code):
-        periodicity = self.type_id._get_periodicity(self.company_id)
-        eligible_domain = Domain.TRUE
-        if self.type_external_id == GSTR_IFF_RETURN_TYPE:
-            eligible_domain = Domain('move_id.l10n_in_gstr_iff_exclude', '=', False)
-        elif (
-            periodicity == 'trimester'
-            and self.type_external_id == GSTR1_RETURN_TYPE
-            and section_code in ('b2b', 'cdnr')
-        ):
-            eligible_domain = Domain('move_id.l10n_in_iff_reported', '=', False)
-
-        domain = list(Domain.AND([
-            self._get_base_section_domain(),
-            eligible_domain,
-        ]))
-
-        match section_code:
-            case "b2b":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', 'in', ['sale_b2b_rcm', 'sale_b2b_regular', 'sale_deemed_export', 'sale_sez_wp', 'sale_sez_wop'])
-                    ]
-                )
-            case "b2cl":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', '=', 'sale_b2cl')
-                    ]
-                )
-            case "b2cs":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', '=', 'sale_b2cs')
-                    ]
-                )
-            case "cdnr":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', 'in', ['sale_cdnr_rcm', 'sale_cdnr_regular', 'sale_cdnr_deemed_export', 'sale_cdnr_sez_wp', 'sale_cdnr_sez_wop'])
-                    ]
-                )
-            case "cdnur":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', 'in', ['sale_cdnur_b2cl', 'sale_cdnur_exp_wp', 'sale_cdnur_exp_wop'])
-                    ]
-                )
-            case "exp":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', 'in', ['sale_exp_wp', 'sale_exp_wop'])
-                    ]
-                )
-            case "nil":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', 'in', ['sale_nil_rated', 'sale_exempt', 'sale_non_gst_supplies']),
-                    ]
-                )
-            case "hsn":
-                return (
-                    domain
-                    + [
-                        ('l10n_in_gstr_section', 'in', ['sale_b2b_rcm', 'sale_b2b_regular', 'sale_b2cl', 'sale_b2cs', 'sale_exp_wp', 'sale_exp_wop', 'sale_sez_wp', 'sale_sez_wop', 'sale_deemed_export', 'sale_cdnr_rcm',
-                                                        'sale_cdnr_regular', 'sale_cdnr_deemed_export', 'sale_cdnr_sez_wp', 'sale_cdnr_sez_wop', 'sale_cdnur_b2cl', 'sale_cdnur_exp_wp', 'sale_cdnur_exp_wop', 'sale_nil_rated',
-                                                        'sale_exempt', 'sale_non_gst_supplies']),
-                    ]
-                )
-
-        raise UserError(self.env._("Section %(section)s is unknown", section=section_code))
+    def _get_tax_detail_domain(self, is_iff_return=False):
+        domain = self._get_base_section_domain()
+        if is_iff_return:
+            return list(Domain.AND([
+                self._get_base_section_domain(),
+                Domain('move_id.l10n_in_gstr_iff_exclude', '=', False),
+            ])) + [('l10n_in_gstr_section', 'in', self._get_iff_section())]
+        return (
+            domain
+            + [
+                ('l10n_in_gstr_section', 'in', ['sale_b2b_rcm', 'sale_b2b_regular', 'sale_b2cl', 'sale_b2cs', 'sale_exp_wp', 'sale_exp_wop', 'sale_sez_wp', 'sale_sez_wop', 'sale_deemed_export', 'sale_cdnr_rcm',
+                                                'sale_cdnr_regular', 'sale_cdnr_deemed_export', 'sale_cdnr_sez_wp', 'sale_cdnr_sez_wop', 'sale_cdnur_b2cl', 'sale_cdnur_exp_wp', 'sale_cdnur_exp_wop', 'sale_nil_rated',
+                                                'sale_exempt', 'sale_non_gst_supplies']),
+            ]
+        )
 
     def action_generate_document_summary(self):
         if self.type_external_id != GSTR1_RETURN_TYPE:

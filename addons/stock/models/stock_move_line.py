@@ -713,21 +713,24 @@ class StockMoveLine(models.Model):
             affected_pickings._check_entire_pack()
 
     def action_send_recall_email(self):
-        partners = self.picking_partner_id
-        if partners:
-            return {
-                'name': _('Send Email'),
-                'type': 'ir.actions.act_window',
-                'res_model': 'mail.compose.message',
-                'view_mode': 'form',
-                'target': 'new',
-                'context': {
-                    'default_composition_mode': 'mass_mail' if len(partners) > 1 else 'comment',
-                    'default_partner_ids': partners.ids,
-                    'default_model': 'stock.picking',
-                    'default_res_ids': self.picking_id.ids,
-                }
-            }
+        move_lines = self.filtered('picking_partner_id')
+        if not move_lines:
+            return {}
+        template = self.env.ref('stock.mail_template_data_stock_move_line_recall', raise_if_not_found=False)
+        return {
+            'name': _('Send Email'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'mail.compose.message',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_composition_mode': 'mass_mail',
+                'default_model': 'stock.move.line',
+                'default_res_ids': move_lines.ids,
+                'default_template_id': template.id if template else False,
+                'default_use_template': bool(template),
+            },
+        }
 
     def _synchronize_quant(self, quantity, location, action="available", in_date=False, **quants_value):
         """ quantity should be express in product's UoM"""
@@ -949,7 +952,7 @@ class StockMoveLine(models.Model):
                     previous_move_lines = move_line.move_id.move_line_ids.filtered(
                         lambda ml: line_key.startswith(self._get_aggregated_properties(move=ml.move_id)['line_key']) and ml.id != move_line.id
                     )
-                    qty_ordered -= sum(m.uom_id._compute_quantity(m.quantity, uom) for m in previous_move_lines)
+                    qty_ordered = uom.round(qty_ordered - sum(m.uom_id._compute_quantity(m.quantity, uom) for m in previous_move_lines))
                     packaging_qty_ordered = uom._compute_quantity(qty_ordered, move_line.move_id.packaging_uom_id)
                 aggregated_move_lines[line_key] = {
                     **aggregated_properties,
@@ -960,10 +963,10 @@ class StockMoveLine(models.Model):
                     'product': move_line.product_id,
                 }
             else:
-                aggregated_move_lines[line_key]['qty_ordered'] += quantity
-                aggregated_move_lines[line_key]['packaging_qty_ordered'] += packaging_quantity
-                aggregated_move_lines[line_key]['quantity'] += quantity
-                aggregated_move_lines[line_key]['packaging_quantity'] += packaging_quantity
+                aggregated_move_lines[line_key]['qty_ordered'] = uom.round(aggregated_move_lines[line_key]['qty_ordered'] + quantity)
+                aggregated_move_lines[line_key]['packaging_qty_ordered'] = move_line.move_id.packaging_uom_id.round(aggregated_move_lines[line_key]['packaging_qty_ordered'] + packaging_quantity)
+                aggregated_move_lines[line_key]['quantity'] = uom.round(aggregated_move_lines[line_key]['quantity'] + quantity)
+                aggregated_move_lines[line_key]['packaging_quantity'] = move_line.move_id.packaging_uom_id.round(aggregated_move_lines[line_key]['packaging_quantity'] + packaging_quantity)
 
         # Does the same for empty move line to retrieve the ordered qty. for partially done moves
         # (as they are splitted when the transfer is done and empty moves don't have move lines).
@@ -980,7 +983,7 @@ class StockMoveLine(models.Model):
                 else:
                     to_bypass = True
             aggregated_properties = self._get_aggregated_properties(move=empty_move)
-            line_key = aggregated_properties['line_key']
+            line_key, uom = aggregated_properties['line_key'], aggregated_properties['uom_id']
 
             if not any(aggregated_key.startswith(line_key) for aggregated_key in aggregated_move_lines) and not to_bypass:
                 qty_ordered = empty_move.product_uom_qty
@@ -993,11 +996,11 @@ class StockMoveLine(models.Model):
                     'product': empty_move.product_id,
                 }
             elif line_key in aggregated_move_lines:
-                aggregated_move_lines[line_key]['qty_ordered'] += empty_move.product_uom_qty
+                aggregated_move_lines[line_key]['qty_ordered'] = uom.round(aggregated_move_lines[line_key]['qty_ordered'] + empty_move.product_uom_qty)
             else:
                 keys = list(filter(lambda key: key.startswith(line_key), aggregated_move_lines))
                 if keys:
-                    aggregated_move_lines[keys[0]]['qty_ordered'] += empty_move.product_uom_qty
+                    aggregated_move_lines[keys[0]]['qty_ordered'] = uom.round(aggregated_move_lines[keys[0]]['qty_ordered'] + empty_move.product_uom_qty)
 
         return aggregated_move_lines
 

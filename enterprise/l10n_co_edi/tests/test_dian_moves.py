@@ -740,16 +740,18 @@ class TestDianMoves(TestCoEdiCommon):
         xml = self._generate_xml(contingency_invoice)
         self._assert_document_dian(xml, "l10n_co_edi/tests/attachments/contingency_invoice.xml")
 
-    def test_invoice_narration_in_note(self):
-        """ Test that invoice narration (Terms and Conditions) appears in first cbc:Note tag """
+    def test_only_terms_and_conditions_are_exported_in_note_tag(self):
         invoice = self._create_move()
-        invoice.narration = '<p>Payment due in 30 days. Bank account: 123456789.</p>'
+        invoice.narration = ("<p>Payment due in 15 days</p>")
         xml = self._generate_xml(invoice)
         root = etree.fromstring(xml)
         notes = root.findall('.//{*}Note')
-        self.assertEqual(len(notes), 2, "Should have 2 Note tags")
-        self.assertEqual(notes[0].text, 'Payment due in 30 days. Bank account: 123456789.', "First Note should contain Terms and Conditions")
-        self.assertTrue(notes[1].text.startswith('SETP'), "Second Note should contain CUFE calculation data")
+        self.assertEqual(len(notes), 1, "The XML should contain only one Note tag.")
+        self.assertEqual(
+            notes[0].text,
+            "Payment due in 15 days",
+            "The Note tag should contain only the Terms and Conditions.",
+        )
 
     def test_validate_duplicate_cufe(self):
         common_cufe = "d44ffc607057e6156d054591be6f74cc77738e5bfc7c003a991927b2ce4262194e8ea1204086b9d0d10e23eb6eed2228"

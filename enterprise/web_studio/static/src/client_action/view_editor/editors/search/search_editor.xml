@@ -130,6 +130,9 @@
         <Property t-if="this.type === 'filter'" name="'domain'" type="'domain'" value="this.domain" onChange.bind="this.onChangeDomain" childProps="{relation: this.viewEditorModel.resModel}">
             Domain
         </Property>
+        <Property t-if="this.isDateFilter" name="'end_date'" type="'selection'" value="this.endDate" onChange.bind="this.onChangeEndDate" childProps="{choices: this.endDateFields, required: false}">
+            End date
+        </Property>
         <SidebarPropertiesToolbox />
     </t>
 </templates>

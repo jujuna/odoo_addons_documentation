@@ -1,6 +1,6 @@
 import { WebClient } from "@web/webclient/webclient";
 import { test, beforeEach, expect } from "@odoo/hoot";
-import { contains, mountWithCleanup } from "@web/../tests/web_test_helpers";
+import { contains, getService, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { defineTimesheetModels } from "./sale_timesheet_models";
 import { setupTimesheetEnvironment } from "@timesheet_grid/../tests/timesheet_timer_helpers";
 
@@ -85,4 +85,39 @@ test("Existing timesheets retain their database is_billable value", async () => 
         message:
             "The is_billable checkbox must remain true when loading an existing timesheet from the database.",
     });
+});
+
+test.tags("desktop");
+test("A non-billable task is stored as the last visited one", async () => {
+    const [projectId] = pyEnv["project.project"].create([
+        {
+            allow_billable: false,
+            allow_timesheets: true,
+            name: "project_test",
+        },
+    ]);
+    const [taskId] = pyEnv["project.task"].create([
+        {
+            name: "Task 1",
+            project_id: projectId,
+            allow_billable: false,
+            allow_timesheets: true,
+        },
+    ]);
+
+    await mountWithCleanup(WebClient);
+    await getService("action").doAction({
+        res_model: "project.task",
+        res_id: taskId,
+        type: "ir.actions.act_window",
+        views: [[false, "form"]],
+    });
+    await contains("div[name='name'] input").edit("Task 1 renamed");
+
+    expect(JSON.parse(localStorage.getItem("timesheet.preFilledForm") || "{}")).toEqual(
+        { task_id: taskId },
+        {
+            message: "Billability should not decide whether the timer systray offers the task",
+        }
+    );
 });

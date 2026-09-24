@@ -138,7 +138,13 @@ export class TimesheetTimerInlineForm extends TimesheetInlineForm {
     }
 
     saveManualValuesOnUnmount() {
-        if (!this.currentRecord || this.staticTimerService.timerState.startTime === null) {
+        // Only what the user actually typed is worth keeping: an untouched form
+        // saved as a draft would shadow the prefill of the next task they visit.
+        if (
+            !this.currentRecord ||
+            !this.isFormEdited(this.currentRecord) ||
+            this.staticTimerService.timerState.startTime === null
+        ) {
             return;
         }
         const values = this.getManualValues(this.currentRecord);

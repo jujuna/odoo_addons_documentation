@@ -93,7 +93,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_sa'))]"/>
         <field name="company_id" ref="base.demo_company_sa"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.webp"/>
     </record>
 
     <record id="res_partner_bank_account_nura" model="res.partner.bank">
@@ -130,7 +130,7 @@
 
     <record id="hr_employee_nura" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_sa_hr_payroll.res_partner_nura')).name"/>
-        <field name="image_1920" type="bytes" file="hr/static/img/employee_mit-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_mit-image.webp"/>
         <field name="job_title">Manager</field>
         <field name="job_id" ref="hr.job_developer"/>
         <field name="department_id" ref="l10n_sa_hr_payroll.sa_hr_department_human_resources"/>
@@ -175,7 +175,7 @@
 
     <record id="hr_employee_salem" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_sa_hr_payroll.res_partner_salem')).name"/>
-        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.webp"/>
         <field name="job_title">Accounting Manager</field>
         <field name="job_id" ref="hr.job_consultant"/>
         <field name="department_id" ref="l10n_sa_hr_payroll.sa_hr_department_administration"/>

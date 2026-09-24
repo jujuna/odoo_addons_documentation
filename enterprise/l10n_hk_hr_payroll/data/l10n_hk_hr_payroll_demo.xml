@@ -180,7 +180,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_hk'))]"/>
         <field name="company_id" ref="base.demo_company_hk"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user'), ref('hr_holidays.group_hr_holidays_employee')])]"/>
-        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_natalie.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_natalie.webp"/>
     </record>
 
     <record id="res_partner_bank_account_anthony" model="res.partner.bank">
@@ -245,7 +245,7 @@
 
     <record id="hr_employee_anthony" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_anthony')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.webp"/>
         <field name="work_phone">9964 6983</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_anthony')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_hk_hr_payroll.res_partner_anthony"/>
@@ -299,7 +299,7 @@
 
     <record id="hr_employee_natalie" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_natalie')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_natalie.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_natalie.webp"/>
         <field name="work_phone">9932 4387</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_natalie')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_hk_hr_payroll.hr_employee_anthony"/>
@@ -348,7 +348,7 @@
 
     <record id="hr_employee_david_lee" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_david_lee')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_david.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_david.webp"/>
         <field name="work_phone">9123 4567</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_david_lee')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_hk_hr_payroll.hr_employee_anthony"/>
@@ -397,7 +397,7 @@
 
     <record id="hr_employee_rebecca_wong" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_rebecca_wong')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_rebecca.jpg"/>
+        <field name="image_1920" type="bytes" file="base/static/img/res_partner_address_32.webp"/>
         <field name="work_phone">98762345</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_rebecca_wong')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_hk_hr_payroll.hr_employee_anthony"/>
@@ -455,8 +455,8 @@
         <!-- So that it appears in demo payslips -->
         <field name="valid_up_to_date" eval="(DateTime.now() + relativedelta(day=31)).strftime('%Y-%m-%d')"/>
         <!-- These fields are required in draft, so we fill them with random data to avoid it affecting user testing. -->
-        <field name="lease_agreement_file" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.jpg"/>
-        <field name="stamped_duty_file" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.jpg"/>
+        <field name="lease_agreement_file" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.webp"/>
+        <field name="stamped_duty_file" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.webp"/>
     </record>
 
     <!-- PUBLIC HOLIDAYS -->

@@ -65,7 +65,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_nl'))]"/>
         <field name="company_id" ref="base.demo_company_nl"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="bytes" file="l10n_nl_hr_payroll/static/img/hr_employe_lotte.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-1.webp"/>
     </record>
 
     <record id="res_partner_bank_account_wouter" model="res.partner.bank">
@@ -98,7 +98,7 @@
 
     <record id="hr_employee_wouter" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_wouter')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_nl_hr_payroll/static/img/hr_employee_wouter.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-2.webp"/>
         <field name="work_phone">09 99437379</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_wouter')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_nl_hr_payroll.res_partner_wouter"/>
@@ -140,7 +140,7 @@
     <record id="hr_employee_lotte" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_lotte')).name"/>
         <field name="job_title">Software Developer</field>
-        <field name="image_1920" type="bytes" file="l10n_nl_hr_payroll/static/img/hr_employe_lotte.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-1.webp"/>
         <field name="work_phone">09 99896249</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_lotte')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_nl_hr_payroll.hr_employee_wouter"/>

@@ -23,8 +23,6 @@ export class EmbeddedArticleIndexComponent extends Component {
 
     props = useProps({
         host: t.object(),
-        articles: t.object().optional(),
-        showAllChildren: t.boolean().optional(),
     });
 
     setup() {

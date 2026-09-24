@@ -905,7 +905,7 @@ class ResCompany(models.Model):
         available_currency_names = available_currencies.mapped('name')
         if 'PEN' not in available_currency_names or "USD" not in available_currency_names:
             return result
-        result['PEN'] = (1.0, fields.Date.context_today(self.with_context(tz='America/Lima')))
+        result['PEN'] = (1.0, fields.Date.context_today(self.with_context(tz='America/Lima')) - datetime.timedelta(days=1))
         url_format = "https://www.sunat.gob.pe/a/txt/tipoCambio.txt"
         try:
             res = requests.get(url_format, timeout=10)
@@ -922,8 +922,10 @@ class ResCompany(models.Model):
             return result
         rate = 1.0 / rate if rate else 0
         date_rate_str = sunat_value[0]
-        date_rate = datetime.datetime.strptime(date_rate_str, '%d/%m/%Y').strftime(DEFAULT_SERVER_DATE_FORMAT)
-        result["USD"] = (rate, date_rate)
+        foreign_rate_date = datetime.datetime.strptime(date_rate_str, '%d/%m/%Y').date()
+        effective_rate_date = foreign_rate_date - datetime.timedelta(days=1)  # rates are shifted by one day
+        result["USD"] = (rate, effective_rate_date)
+        result["PEN"] = (1.0, effective_rate_date)
         return result
 
     def _parse_mindicador_data(self, available_currencies):

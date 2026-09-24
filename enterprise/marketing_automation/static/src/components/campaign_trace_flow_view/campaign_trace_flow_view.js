@@ -84,6 +84,7 @@ export class CampaignTraceFlowView extends FlowViewMixin(Component) {
                     },
                 },
             },
+            create_date: {},
             trace_ids: {
                 // marketing.trace
                 fields: {

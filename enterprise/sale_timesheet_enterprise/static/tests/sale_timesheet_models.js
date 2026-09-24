@@ -11,6 +11,26 @@ export class ProjectProject extends projectModels.ProjectProject {
     allow_billable = fields.Boolean();
 }
 
+export class ProjectTask extends projectModels.ProjectTask {
+    active = fields.Boolean({ default: true });
+    allow_billable = fields.Boolean();
+    rotting_days = fields.Integer();
+    duration_tracking = fields.Json();
+
+    _views = {
+        list: '<list><field name="name"/></list>',
+        form: `
+            <form>
+                <field name="stage_id" widget="task_rotting_statusbar_duration"/>
+                <field name="name"/>
+                <field name="active" invisible="1"/>
+                <field name="allow_timesheets" invisible="1"/>
+                <field name="allow_billable" invisible="1"/>
+                <field name="is_template" invisible="1"/>
+            </form>`,
+    };
+}
+
 export class HRTimesheet extends hrTimesheetModels.HRTimesheet {
     billable_type = fields.Selection({
         selection: [
@@ -321,6 +341,7 @@ const rankingData = {
     },
 };
 projectModels.ProjectProject = ProjectProject;
+projectModels.ProjectTask = ProjectTask;
 
 export function defineTimesheetModels() {
     onRpc(({ method, model, args }) => {

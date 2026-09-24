@@ -77,14 +77,12 @@ class HrPayslipWorkedDays(models.Model):
         # we compute the amount from the paid hours using the hourly formula
         self.ensure_one()
         excluded_work_entry_codes = ['000.00', '147.00', '147.05', '147.07', '147.04', '147.08', '147.13']
-        paid_hours = sum(self.payslip_id.worked_days_line_ids.filtered(
-            lambda wd: wd.is_paid and wd.code not in excluded_work_entry_codes and wd.version_id == self.version_id
-        ).mapped('number_of_hours'))
-        hours_per_week = self.version_id.resource_calendar_id.hours_per_week
-        # Calculate the 50% threshold based on theoretical hours
-        # Theoretical monthly hours = (hours_per_week * 13) / 3
-        theoretical_monthly_hours = (hours_per_week * 13) / 3 if hours_per_week else 0.0
-        return paid_hours >= theoretical_monthly_hours * 0.5 or self.work_entry_type_id.code in excluded_work_entry_codes
+
+        worked_days_line_ids = self.payslip_id.worked_days_line_ids
+        paid_hours = sum(wd.number_of_hours for wd in worked_days_line_ids if wd.is_paid and wd.code not in excluded_work_entry_codes)
+        unpaid_hours = sum(wd.number_of_hours for wd in worked_days_line_ids if not wd.is_paid or wd.code in excluded_work_entry_codes)
+
+        return paid_hours >= unpaid_hours
 
     def _l10n_be_get_paid_work_days(self):
         self.ensure_one()

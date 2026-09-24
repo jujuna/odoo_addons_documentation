@@ -10,6 +10,7 @@ import { useBus, useService } from "@web/core/utils/hooks";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { getDefaultConfig } from "@web/views/view";
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 
 import { Component, onWillStart, useProps, proxy, signal, t } from "@odoo/owl";
 
@@ -53,6 +54,9 @@ export class TemplateDialog extends Component {
         this.model = new SearchModel(this.env, {
             orm: this.orm,
             view: useService("view"),
+            field: useService("field"),
+            name: useService("name"),
+            dialog: useService("dialog"),
         });
         useSubEnv({
             searchModel: this.model,
@@ -72,21 +76,27 @@ export class TemplateDialog extends Component {
         ];
         onWillStart(async () => {
             this.folderId.set(this.folderOptions[0].id);
-            const views = await this.viewService.loadViews({
-                resModel: "spreadsheet.template",
-                context: this.props.context,
-                views: [[false, "search"]],
-            });
-            await this.model.load({
-                resModel: "spreadsheet.template",
-                context: this.props.context,
-                orderBy: "id",
-                searchMenuTypes: [],
-                searchViewArch: views.views.search.arch,
-                searchViewId: views.views.search.id,
-                searchViewFields: views.fields,
-            });
-            await this._fetchTemplates();
+            this.hasTemplatesAccess = await user.checkAccessRight("spreadsheet.template", "read");
+            if (this.hasTemplatesAccess) {
+                const views = await this.viewService.loadViews({
+                    resModel: "spreadsheet.template",
+                    context: this.props.context,
+                    views: [[false, "search"]],
+                });
+                await this.model.load({
+                    resModel: "spreadsheet.template",
+                    context: this.props.context,
+                    orderBy: "id",
+                    searchMenuTypes: [],
+                    searchViewArch: views.views.search.arch,
+                    searchViewId: views.views.search.id,
+                    searchViewFields: views.fields,
+                });
+                await this._fetchTemplates();
+            } else {
+                this.state.templates = [];
+                this.state.templatesCount = 0;
+            }
         });
     }
 

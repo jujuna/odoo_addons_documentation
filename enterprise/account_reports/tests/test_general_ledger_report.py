@@ -480,13 +480,13 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
             #   Name                                              Amount_currency   Debit           Credit   Balance
             [   0,                                                3,                4,              5,       6],
             [
-                ('121000 Accounts Receivable',                         '',             2100.0,         0.0,     2100.0),
-                ('211000 Accounts Payable',                            '',              100.0,         0.0,      100.0),
-                ('211010 Accounts Payable',                            '',               50.0,         0.0,       50.0),
-                ('400000 Product Sales',                               '',            20000.0,         0.0,    20000.0),
-                ('400010 Product Sales',                               '',                0.0,       200.0,     -200.0),
-                ('600000 Expenses',                                    '',                0.0,     21000.0,   -21000.0),
-                ('600010 Expenses',                                    '',              200.0,         0.0,      200.0),
+                ('121000 Accounts Receivable',                         '',            2100.0,         0.0,     2100.0),
+                ('211000 Accounts Payable',                            '',             100.0,         0.0,      100.0),
+                ('211010 Accounts Payable',                            '',              50.0,         0.0,       50.0),
+                ('400000 Product Sales',                               '',           20000.0,         0.0,    20000.0),
+                ('400010 Product Sales',                               '',               0.0,       200.0,     -200.0),
+                ('600000 Expenses',                                    '',               0.0,     21000.0,   -21000.0),
+                ('600010 Expenses',                                    '',             200.0,         0.0,      200.0),
                 ('test foreign_curr_account',                     -2300.0,               0.0,      1100.0,    -1100.0),
                 ('Initial Balance',                                -300.0,               0.0,       100.0,     -100.0),
                 ('INV/2017/00002 curr_2',                         -2000.0,               0.0,      1000.0,    -1100.0),
@@ -494,6 +494,72 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
                 ('Result Brought Forward - company_1_data',            '',             200.0,       300.0,     -100.0),
                 ('Result Brought Forward - company_2',                 '',               0.0,        50.0,      -50.0),
                 ('Total General Ledger',                               '',           22650.0,     22650.0,        0.0),
+            ],
+            options,
+            currency_map={3: {'currency': self.other_currency}},
+        )
+
+    def test_general_ledger_foreign_currency_account_initial_balance(self):
+        ''' Ensure the total in foreign currency of an account is displayed only if all journal items are sharing the
+        same currency.
+        '''
+        self.env.user.group_ids |= self.env.ref('base.group_multi_currency')
+
+        foreign_curr_account = self.env['account.account'].create({
+            'name': 'foreign_curr_account',
+            'code': 'test',
+            'account_type': 'liability_current',
+            'currency_id': self.other_currency.id,
+        })
+
+        move_2016 = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2016-01-01',
+            'journal_id': self.company_data['default_journal_sale'].id,
+            'line_ids': [
+                (0, 0, {
+                    'name': 'curr_1',
+                    'debit': 100.0,
+                    'credit': 0.0,
+                    'amount_currency': 100.0,
+                    'currency_id': self.company_data['currency'].id,
+                    'account_id': self.company_data['default_account_receivable'].id,
+                }),
+                (0, 0, {
+                    'name': 'curr_2',
+                    'debit': 0.0,
+                    'credit': 100.0,
+                    'amount_currency': -300.0,
+                    'currency_id': self.other_currency.id,
+                    'account_id': foreign_curr_account.id,
+                }),
+            ],
+        })
+        move_2016.action_post()
+
+        # Init options.
+        options = self._generate_options(self.report, '2017-01-01', '2017-12-31')
+        parent_line_id = self.report._get_generic_line_id(model_name='account.report.line', value=self.env.ref("account_reports.general_ledger_custom_engine_line").id)
+        account_revenue_line_id = self.report._get_generic_line_id(model_name='account.account', value=foreign_curr_account.id, markup={'groupby': 'account_id'}, parent_line_id=parent_line_id)
+        options['unfolded_lines'] = [account_revenue_line_id]
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                              Amount_currency   Debit           Credit   Balance
+            [   0,                                                3,                4,              5,       6],
+            [
+                ('121000 Accounts Receivable',                         '',            1100.0,         0.0,     1100.0),
+                ('211000 Accounts Payable',                            '',             100.0,         0.0,      100.0),
+                ('211010 Accounts Payable',                            '',              50.0,         0.0,       50.0),
+                ('400000 Product Sales',                               '',           20000.0,         0.0,    20000.0),
+                ('400010 Product Sales',                               '',               0.0,       200.0,     -200.0),
+                ('600000 Expenses',                                    '',               0.0,     21000.0,   -21000.0),
+                ('600010 Expenses',                                    '',             200.0,         0.0,      200.0),
+                ('test foreign_curr_account',                      -300.0,               0.0,       100.0,     -100.0),
+                ('Initial Balance',                                -300.0,               0.0,       100.0,     -100.0),
+                ('Total test foreign_curr_account',                -300.0,               0.0,       100.0,     -100.0),
+                ('Result Brought Forward - company_1_data',            '',             200.0,       300.0,     -100.0),
+                ('Result Brought Forward - company_2',                 '',               0.0,        50.0,      -50.0),
+                ('Total General Ledger',                               '',           21650.0,     21650.0,        0.0),
             ],
             options,
             currency_map={3: {'currency': self.other_currency}},
@@ -1210,5 +1276,65 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
             receivable_lines,
             [0, 1, 6],
             [(bill.name, '04/17/2026', '04/01/2026')],
+            options,
+        )
+
+    def test_general_ledger_pl_initial_balance_unfolded(self):
+        """ Test that operations made on P&L accounts between fiscal year start and period start are grouped into the initial balance when unfolded. """
+        self.env.company.totals_below_sections = False
+
+        receivable_acc = self.env['account.account'].create({
+            'code': 'TEST-REC',
+            'name': 'Test Receivable',
+            'account_type': 'asset_receivable',
+        })
+        revenue_acc = self.env['account.account'].create({
+            'code': 'TEST-REV',
+            'name': 'Test Revenue',
+            'account_type': 'income',
+        })
+
+        # Entry in between fiscal year start and period start
+        move_jan = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2017-01-15',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'line_ids': [
+                Command.create({'debit': 0.0, 'credit': 500.0, 'name': 'Jan Revenue', 'account_id': revenue_acc.id}),
+                Command.create({'debit': 500.0, 'credit': 0.0, 'name': 'Jan Receivable', 'account_id': receivable_acc.id}),
+            ],
+        })
+        move_jan.action_post()
+
+        # Entry in inside the report period
+        move_feb = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2017-02-15',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'line_ids': [
+                Command.create({'debit': 0.0, 'credit': 300.0, 'name': 'Feb Revenue', 'account_id': revenue_acc.id}),
+                Command.create({'debit': 300.0, 'credit': 0.0, 'name': 'Feb Receivable', 'account_id': receivable_acc.id}),
+            ],
+        })
+        move_feb.action_post()
+
+        # Report generated strictly for Feb
+        options = self._generate_options(self.report, '2017-02-01', '2017-02-28', default_options={'unfold_all': True})
+
+        # Apply a forced_domain to completely block historical accounts
+        options['forced_domain'] = [('account_id', 'in', (receivable_acc.id, revenue_acc.id))]
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            [   0,                                        3,        4,        5],
+            [
+                ('TEST-REC Test Receivable',              800.0,    0.0,      800.0),
+                ('Initial Balance',                       500.0,    0.0,      500.0),
+                (f'{move_feb.name} Feb Receivable',       300.0,    0.0,      800.0),
+                ('TEST-REV Test Revenue',                 0.0,      800.0,    -800.0),
+                ('Initial Balance',                       0.0,      500.0,    -500.0),
+                (f'{move_feb.name} Feb Revenue',          0.0,      300.0,    -800.0),
+                ('Total General Ledger',                  800.0,    800.0,    0.0),
+            ],
             options,
         )

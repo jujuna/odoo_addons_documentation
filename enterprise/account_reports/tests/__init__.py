@@ -12,6 +12,7 @@ from . import test_account_returns_tours
 from . import test_account_sales_report
 from . import test_cumulative_translation_adjustments
 from . import test_general_ledger_report
+from . import test_general_ledger_snapshots
 from . import test_trial_balance_report
 from . import test_partner_ledger_report
 from . import test_partner_ledger_snapshots

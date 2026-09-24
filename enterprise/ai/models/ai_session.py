@@ -788,9 +788,9 @@ class AiSession(models.Model):
 
         if self.loop_state in ('waiting_confirmation', 'waiting_answer'):
             user_input_request = pending_tool_call['user_input_request']
-            prompt_body = user_input_request['body']
-            if self.loop_state == 'waiting_confirmation':
-                prompt_body = html_sanitize(prompt_body, sanitize_attributes=True, sanitize_style=True)
+            prompt_body = html_sanitize(
+                user_input_request['body'], sanitize_attributes=True, sanitize_style=True,
+            )
             self._post_ai_response(prompt_body, is_user_input_request=True)
 
         ai_session_config = ai_session_config or {}

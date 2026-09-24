@@ -9,6 +9,7 @@
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'data': [
+        'security/ir.access.csv',
         'data/data.xml',
         'views/mrp_production.xml',
         'views/stock_move_line.xml',

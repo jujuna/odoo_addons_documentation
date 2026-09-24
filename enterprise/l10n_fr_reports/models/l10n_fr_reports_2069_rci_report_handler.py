@@ -1,3 +1,4 @@
+import json
 from odoo import api, models
 from odoo.tools import LazyTranslate
 from odoo.addons.l10n_fr_reports.utils.fiscal_reports_utils import _add_section, _display_add_section_line, _remove_section, _set_custom_options
@@ -387,24 +388,32 @@ class L10nFrReports2069RciReportHandler(models.AbstractModel):
         _set_custom_options(options=options, name='l10n_fr_reports.L10nFr2069RciReportLineName')
 
     def _custom_line_postprocessor(self, report, options, lines):
+        selection_options = {
+            "APR": self.env._("APR - Apprenticeship Tax Credit"),
+            "PTZ": self.env._("PTZ - Tax Credit for First-Time Home Ownership (Standard Zero-Interest Loan)"),
+            "BIO": self.env._("BIO - Organic Farming Tax Credit"),
+            "ART": self.env._("ART - Artistic Crafts Tax Credit (Métiers d'Art)"),
+            "MAI": self.env._("MAI - Master Restaurateur Tax Credit"),
+            "PTR": self.env._("PTR - Enhanced Zero-Interest Loan Tax Credit (PTZ+)"),
+            "CIR": self.env._("CIR - Research Tax Credit"),
+            "CIC": self.env._("CIC - Competitiveness and Employment Tax Credit (CICE)"),
+            "CPE": self.env._("CPE - Tax Credit on Repayable Advances for Energy Performance Improvement Works"),
+            "HVE": self.env._("HVE - Tax Credit for Agricultural Businesses with High Environmental Value (HVE) Certification"),
+            "COM": self.env._("COM - Tax Reduction for Productive Investments in Overseas Collectivities (and New Caledonia)"),
+            "CRC": self.env._("CRC - Collaborative Research Tax Credit"),
+            "EOM": self.env._("EOM - Tax Credit for Music Publishers"),
+            "TZM": self.env._("TZM - Tax Reduction for the Zero-Interest Mobility Loan"),
+            "2LI": self.env._("2LI - Tax Claim for Institutional Investors in Intermediate Rental Housing"),
+        }
+
         for line in lines:
             if line.code and any(label in line.code for label in ('first_case_label', 'second_case_label')):
-                line.get_custom()['tooltip'] = self.env._("""- APR: Apprenticeship Tax Credit
-                    - PTZ: Tax Credit for First-Time Home Ownership (Standard Zero-Interest Loan)
-                    - BIO: Organic Farming Tax Credit
-                    - ART: Artistic Crafts Tax Credit (Métiers d'Art)
-                    - MAI: \"Master Restaurateur\" Tax Credit
-                    - PTR: Enhanced Zero-Interest Loan Tax Credit (PTZ+)
-                    - CIR: Research Tax Credit
-                    - CIC: Competitiveness and Employment Tax Credit (CICE)
-                    - CPE: Tax Credit on Repayable Advances for Energy Performance Improvement Works
-                    - HVE: Tax Credit for Agricultural Businesses with High Environmental Value (HVE) Certification
-                    - COM: Tax Reduction for Productive Investments in Overseas Collectivities (and New Caledonia)
-                    - CRC: Collaborative Research Tax Credit
-                    - EOM: Tax Credit for Music Publishers
-                    - TZM: Tax Reduction for the Zero-Interest Mobility Loan
-                    - 2LI: Tax Claim for Institutional Investors in Intermediate Rental Housing
-                """)
+                balance_col_data = next(col_data for col_data in line.columns if col_data.expression_label == 'balance')
+
+                balance_col_data.edit_popup_data = json.dumps({
+                    **json.loads(balance_col_data.edit_popup_data or '{}'),
+                    'selection_options': selection_options,
+                })
 
         codes = {'l10n_fr_2069_special_cases_first_case', 'l10n_fr_2069_special_cases_second_case', 'l10n_fr_2069_sponsorship'}
         return _display_add_section_line(report=report, lines=lines, codes=codes, name=self.env._('Add new section'))

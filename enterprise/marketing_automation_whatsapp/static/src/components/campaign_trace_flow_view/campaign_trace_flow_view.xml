@@ -8,33 +8,23 @@
                 <div t-on-pointerdown="(e) => this.addPointerListenerOnMarketingActivity(activity, e)"
                     t-att-style="this.getCSSTransform(position.x, position.y)"
                     t-att-class="{
-                        'o-editor-node d-flex flex-column align-self-center flex-shrink-0 bg-light rounded border p-3': true,
+                        'o-editor-node d-flex flex-column align-self-center flex-shrink-0 bg-view rounded border overflow-hidden': true,
                         'border-warning': ['scheduled', 'waiting'].includes(trace?.state),
                         'border-success': trace?.state === 'processed',
                         'border-danger': ['canceled', 'error'].includes(trace?.state),
                     }">
-                    <div class="d-flex flex-row align-items-center">
-                        <i class="oi oi-2x mb-auto p-2 bg-300 rounded pt-1" data-icon="oi_whatsapp" alt="Whatsapp icon"/>
-                        <div class="d-flex flex-column ps-1 lh-sm pb-1">
-                            <span class="fs-2 fw-bold text-truncate" t-out="activity.name"/>
-                            <span class="small">
-                                <t t-if="trace?.state === 'processed'">
-                                    Triggered on <t t-out="this.formatDate(trace?.schedule_date)"/>
-                                </t>
-                                <t t-elif="trace?.state === 'scheduled'">
-                                    Scheduled on <t t-out="this.formatDate(trace?.schedule_date)"/>
-                                </t>
-                                <t t-elif="['canceled', 'error'].includes(trace?.state)">
-                                    Failed on <t t-out="this.formatDate(trace?.schedule_date)"/>
-                                </t>
-                                <t t-else="">
-                                    <t t-out="activity.whatsapp_template_id.display_name"/>
-                                </t>
-                            </span>
-                            <div t-if="trace?.state === 'scheduled'" class="d-flex">
-                                <button class="btn btn-primary me-1" t-on-pointerdown="(e) => this.addPointerListenerOnExecuteStepBtn(trace, e)">Run</button>
-                                <button class="btn btn-secondary" t-on-pointerdown="(e) => this.addPointerListenerOnCancelStepBtn(trace, e)">Cancel</button>
-                            </div>
+                    <div class="d-flex flex-row align-items-center p-2">
+                        <i class="o_ma_step_icon o_ma_step_communicate oi p-2 rounded" data-icon="oi_whatsapp" aria-hidden="true"/>
+                        <div class="d-flex flex-column min-w-0 ps-2">
+                            <span class="fw-bold text-truncate" t-out="activity.name" t-att-title="activity.name"/>
+                            <t t-if="trace">
+                                <t t-call="marketing_automation.CampaignTraceStatus"/>
+                                <div t-if="trace?.state === 'scheduled'" class="d-flex mt-2">
+                                    <button class="btn btn-primary me-1" t-on-pointerdown="(e) => this.addPointerListenerOnExecuteStepBtn(trace, e)">Run</button>
+                                    <button class="btn btn-secondary" t-on-pointerdown="(e) => this.addPointerListenerOnCancelStepBtn(trace, e)">Cancel</button>
+                                </div>
+                            </t>
+                            <span t-else="" t-out="activity.whatsapp_template_id.display_name" class="small text-break"/>
                         </div>
                     </div>
                 </div>

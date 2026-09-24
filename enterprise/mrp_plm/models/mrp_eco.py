@@ -866,12 +866,11 @@ class MrpEco(models.Model):
                         if attach.origin_attachment_id.company_id != attach.company_id:
                             attach.origin_attachment_id.company_id = attach.company_id
                         continue
-                    new_doc = attach.copy({
+                    attach.copy({
                         'res_model': 'product.template',
                         'res_id': eco.product_tmpl_id.id,
                         'origin_attachment_id': attach.ir_attachment_id.id,
                     })
-                    attach.origin_attachment_id = new_doc.ir_attachment_id.id
 
                 eco._set_cost()
                 vals = {'state': 'done'}

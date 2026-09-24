@@ -266,13 +266,22 @@ class AITool(models.AbstractModel):
 
         if response.get('error') in ('no_access', 'key_not_found'):
             return (
-                f'No stock photo library is configured, so images for "{query}" are generated instead. '
-                'Do NOT call this tool again: write the image straight into the HTML as '
-                '<img data-ai-image-prompt="<detailed description>"> and it is generated automatically '
-                'when the HTML is applied or finalized.'
+                'No stock photo library is configured, so no image can be searched. '
+                'Do NOT call this tool again this turn. Keep the default placeholder images that '
+                'come with the snippets exactly as they are: leave their `src` (or `background-image` '
+                'style) untouched and do NOT remove them. Do NOT generate images instead: only write '
+                '<img data-ai-image-prompt="..."> if the user explicitly asked for AI generated images.'
             )
         if 'error' in response:
             return f"An unknown error occurred while searching Unsplash: {response['error']}"
+
+        if not response.get('results'):
+            return (
+                f'No stock photo matches "{query}". Try another query, and if nothing usable comes '
+                'back, keep the default placeholder images that come with the snippets exactly as '
+                'they are. Do NOT generate images instead: only write '
+                '<img data-ai-image-prompt="..."> if the user explicitly asked for AI generated images.'
+            )
 
         result = (
             "Here are some images from Unsplash that match your search query.\n"
@@ -383,38 +392,29 @@ class AITool(models.AbstractModel):
         return self._call_ai_reviewer(prompt)
 
     @api.model
-    def _ai_tool_request_ai_scripts(self, tool_context):
-        """Turn AI JavaScript on for this website, once the user has confirmed."""
-        service = self.env['ai.website.service']
-        if service._ai_scripts_allowed():
-            return "JavaScript is already enabled for this website. You can write script actions."
+    def _ai_tool_request_ai_scripts(self, tool_context, scope):
+        """Turn AI JavaScript on, in the scope the user asked for in the chat."""
+        session_state = tool_context['state']
+        ai_website_service = self.env['ai.website.service']
+        if ai_website_service._ai_scripts_allowed(session_state):
+            return "JavaScript is already enabled. You can write script actions."
 
-        if not tool_context['tool_request_confirmed']:
-            tool_context['user_input_request'] = {
-                'type': 'confirmation',
-                'body': Markup("<p><b>%s</b></p><p>%s</p>") % (
-                    self.env._("Allow the AI to add JavaScript to this website?"),
-                    self.env._(
-                        "Generated scripts run in the browser of everyone who visits your site, "
-                        "and can read and change data through its public routes. You can turn it "
-                        "back off in the website settings."
-                    ),
-                ),
-                'choices': [
-                    {'label': self.env._("Yes, enable JavaScript"), 'value': UserInputResponse.CONFIRM_ONCE},
-                    {'label': self.env._("No, keep it off"), 'value': UserInputResponse.DECLINE},
-                ],
-                'allow_free_text': False,
-            }
-            return
+        if scope not in ('chat', 'website'):
+            raise ValueError("scope must be 'chat' or 'website', whichever the user asked for.")
 
-        website = self.env.website or self.env.ref('base.default_website')
-        website.check_access('write')
-        website.sudo().ai_allow_scripts = True
+        if scope == 'website':
+            website = ai_website_service._current_website()
+            website.check_access('write')
+            website.sudo().ai_allow_scripts = True
+            reach = "for the whole website, until they switch the setting back off"
+        else:
+            session_state['website_ai_allow_scripts'] = True
+            reach = "for this conversation only"
+
         return {
             'response': (
-                "The user allowed it: JavaScript is now enabled for this website and you can write script"
-                "actions from here on. Load the Website JavaScript skill for the rules they must follow."
+                f"Enabled {reach}: you can write script actions from here on. "
+                "Load the Website JavaScript skill for the rules they must follow."
             ),
             'summary': {'icon': 'settings', 'text': self.env._("Enabled JavaScript")}
         }
@@ -732,7 +732,7 @@ class AITool(models.AbstractModel):
         if not is_safe:
             raise ValueError(f"HTML content blocked by safety review: {reason}")
         service = self.env['ai.website.service']
-        service._validate_html_actions(actions)
+        service._validate_html_actions(actions, tool_context['state'])
         service._sanitize_html_actions(actions)
         service._validate_image_placeholders(actions)
         tool_context['state'].pop('page_url_pending_html', None)

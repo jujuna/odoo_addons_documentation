@@ -81,29 +81,33 @@
                     class="o_line_button o_delete_line btn btn-danger">
                 <span class="oi oi-lg oi-filled" data-icon="delete"/>
             </button>
+            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
             <button t-if="this.isSelected &amp;&amp; this.env.model.toggleAsCounted &amp;&amp; (!this.quantityIsSet || !this.qtyDone)"
                     t-on-click="this.toggleAsCounted"
                     t-attf-class="o_line_button btn btn-{{this.quantityIsSet ? 'warning o_unset' : 'light o_count_zero'}}">
                 <span t-if="this.quantityIsSet" class="oi oi-lg" data-icon="question_mark"/>
                 <span t-else="">0</span>
             </button>
+            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
             <button t-if="this.isSelected &amp;&amp; this.qtyDone &amp;&amp; !this.isPackage" name="decrementButton"
                     class="o_line_button o_remove_unit btn btn-light"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"
                     t-on-click="() => this.addQuantity(-1)">
                 -1
             </button>
+            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
             <button t-if="this.displayIncrementButton" name="incrementButton"
                     class="o_line_button o_add_quantity btn btn-light"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"
                     t-on-click="() => this.addQuantity(1)">+1</button>
+            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
             <button t-if="this.displayFulfillbutton &amp;&amp; this.showRemainingQty" name="fulfillButton"
                     t-on-click="() => this.addQuantity(this.incrementQty)"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"
                     t-attf-class="o_line_button o_add_remaining_quantity btn btn-{{this.isSelected ? 'light' : 'secondary'}}">
                 <t t-if="this.incrementQty > 0">+</t><t t-out="this.incrementQty"/>
             </button>
-            <span t-if="this.displayIncrementSpacer" class="o_line_button btn" style="visibility: hidden;"></span>
+            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
             <button t-if="this.displayCompletePackageButton" name="completePackageButton"
                     t-on-click="() => this.completePackage()"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"

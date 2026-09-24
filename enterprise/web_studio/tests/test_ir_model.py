@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import odoo
 
+from odoo.fields import Domain
 from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 from odoo.addons.web_studio.wizard.studio_export_wizard import DEFAULT_MODELS_TO_EXPORT, FIELDS_TO_EXPORT, MODELS_WITH_NOUPDATE, RELATIONS_NOT_TO_EXPORT
@@ -527,6 +528,13 @@ class TestStudioIrModel(TransactionCase):
         defaults = self.env["ir.default"].search([("field_id", "in", model.field_id.ids)])
         self.assertEqual(len(defaults), 2)
         self.assertEqual(defaults.mapped("field_id"), model.field_id.filtered(lambda f: f.relation == "res.company"))
+
+    def test_ir_access_custom(self):
+        model_id = self.env['ir.model']._get('res.partner')
+        ir_access = self.env['ir.access'].with_context(studio=1).create({'name': "test access", 'model_id': model_id.id, 'operation': 'r'})
+        self.assertFalse(ir_access.is_standard)
+        searched = self.env["ir.access"].search(Domain('id', '=', ir_access.id) & Domain('is_standard', '=', False))
+        self.assertEqual(searched, ir_access)
 
 
 @tagged("-at_install", "post_install")

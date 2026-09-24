@@ -219,7 +219,7 @@ class TestAppointmentNotificationsMicrosoftCalendar(MsftTestCommon, TestAppointm
         lambda user: user.login not in ['user_public', 'john@attendee.com'] and 'some-token'
     )
     def test_sync_or_email_resource_appointment(self):
-        """Check that resource appointments are only synced if there is no organizer. If the event isn't synced, a notification should be sent"""
+        """Check that resource appointments are only synced if the calendar is set. If the event isn't synced, a notification should be sent"""
         for with_organizer in [True, False]:
             with self.subTest(with_organizer=with_organizer):
                 is_public = self.env.user == self.user_public
@@ -235,7 +235,8 @@ class TestAppointmentNotificationsMicrosoftCalendar(MsftTestCommon, TestAppointm
                         'partner_ids': booking_partner.ids,
                         'start': datetime.now() + timedelta(days=1),
                         'stop': datetime.now() + timedelta(days=1, hours=1),
-                        'user_id': with_organizer and self.organizer_user.id,
+                        'user_id': self.organizer_user.id if with_organizer else False,
+                        'calendar_id': self.organizer_user._find_or_create_primary_calendar().id if with_organizer else False,
                     })
                     self.env.flush_all()
                     self.cr.precommit.run()

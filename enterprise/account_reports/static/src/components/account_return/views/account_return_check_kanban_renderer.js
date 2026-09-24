@@ -1,5 +1,5 @@
 import { KanbanRenderer } from "@web/views/kanban/kanban_renderer";
-import { onWillStart, signal, useScope, usePlugin, EventBus, status } from "@odoo/owl";
+import { onWillStart, signal, useScope, usePlugin, status } from "@odoo/owl";
 import { useService, useBus } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { parseXML } from "@web/core/utils/xml";
@@ -9,6 +9,7 @@ import { isNull } from "@web/views/utils";
 import { AccountReturnKanbanRecord } from "./account_return_kanban_record";
 import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { focusNextFlatCard } from "./account_return_kanban_renderer";
+import { GlobalBusPlugin } from "@web/core/global_bus_plugin";
 import { ORM } from "@web/core/orm_plugin";
 import { useEnv } from "@web/owl2/utils";
 import { ActionPlugin } from "@web/webclient/actions/action_plugin";
@@ -34,7 +35,7 @@ export class AccountReturnCheckKanbanRenderer extends KanbanRenderer {
 
     record = signal(undefined);
 
-    bus = new EventBus();
+    bus = usePlugin(GlobalBusPlugin).bus;
     scope = useScope();
 
     setup() {

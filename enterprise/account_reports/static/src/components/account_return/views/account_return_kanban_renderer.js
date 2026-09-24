@@ -4,9 +4,10 @@ import { KanbanRenderer } from "@web/views/kanban/kanban_renderer";
 import {AccountReturnKanbanRecord} from "./account_return_kanban_record";
 import { AccountReturnBaseKanbanRenderer } from "./account_return_base_kanban_renderer";
 import { useDeleteRecords } from "@web/views/view_hook";
-import { EventBus, usePlugin } from "@odoo/owl";
+import { usePlugin } from "@odoo/owl";
 import { ORM } from "@web/core/orm_plugin";
 import { ActionPlugin } from "@web/webclient/actions/action_plugin";
+import { GlobalBusPlugin } from "@web/core/global_bus_plugin";
 
 
 /**
@@ -58,7 +59,7 @@ export class AccountReturnKanbanRenderer extends AccountReturnBaseKanbanRenderer
         super.setup();
         this.deleteRecordsWithConfirmation = useDeleteRecords(this.props.list.model);
 
-        useBus(new EventBus(), "return_reload_model", (ev) => {
+        useBus(usePlugin(GlobalBusPlugin).bus, "return_reload_model", (ev) => {
             const recordIds = ev.detail.resIds;
             let recordToReload = this.records.filter((record) => recordIds.includes(record.resId));
             for (let record of recordToReload) {

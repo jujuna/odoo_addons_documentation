@@ -1,4 +1,4 @@
-import { useProps, proxy } from "@odoo/owl";
+import { proxy } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import {
     NewViewDialog,
@@ -12,7 +12,7 @@ delete mapNewViewDialogProps.viewType;
 
 export class MapNewViewDialog extends NewViewDialog {
     static template = "web_studio.MapNewViewDialog";
-    props = useProps(mapNewViewDialogProps);
+    static propsSchema = mapNewViewDialogProps;
 
     setup() {
         super.setup();

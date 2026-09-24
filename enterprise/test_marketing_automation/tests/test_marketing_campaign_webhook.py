@@ -1,5 +1,3 @@
-import json
-
 from odoo import Command
 from odoo.exceptions import AccessError
 from odoo.tests import common, tagged, users
@@ -135,9 +133,9 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
         # test that participants can be added through requests
         target_records = self._create_marketauto_records(model='marketing.test.sms')
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url, json={
                 'search_domain': [('id', 'in', target_records.ids)],
-            }))
+            })
         self.assertEqual(response.status_code, 200)
         self.assertFalse(target_records - self._get_campaign_participant_records(self.test_campaign),
             'All target records must have been added as participants')
@@ -204,9 +202,9 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
                 else:
                     expected_record_names = [val['name'] for val in create_values]
                 with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-                    response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({
+                    response = self.url_open(self.test_campaign.webhook_url, json={
                         'create_values': create_values,
-                    }))
+                    })
                 self.assertEqual(response.status_code, expected_response)
                 # check logs
                 ir_logs = self.env['ir.logging'].sudo().search([('name', '=', 'Webhook Log')])
@@ -225,7 +223,7 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
         target_records = self._create_marketauto_records(model='marketing.test.sms')
         new_record_name = 'recordToCreate2'
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url, json={
                 'search_domain': [('id', 'in', target_records.ids)],
                 'create_values': {
                     'customer_id': self.user_marketing_automation.partner_id.id,
@@ -233,7 +231,7 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
                     'email_from': f'{new_record_name}@example.com',
                     'name': new_record_name,
                 },
-            }))
+            })
         self.assertEqual(response.status_code, 200)
         self.assertFalse(target_records - self._get_campaign_participant_records(self.test_campaign),
             'All target records must have been added as participants')
@@ -242,23 +240,23 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
 
         # test if domain doesn't resolve to anything and there is no create_values
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url, json={
                 'search_domain': [('id', '=', 0)],
-            }))
+            })
         self.assertEqual(response.status_code, 200, 'If the domain doesn\'t resolve to existing records and no create_values are provided, the webhook still succeeds')
 
         # test if there is a create_values but creation is off
         new_record_name = 'recordToCreate3'
         self.test_campaign.webhook_allow_create = False
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url, json={
                 'create_values': {
                     'customer_id': self.user_marketing_automation.partner_id.id,
                     'description': f'Linked to partner {self.user_marketing_automation.name}',
                     'email_from': f'{new_record_name}@example.com',
                     'name': new_record_name,
                 },
-            }))
+            })
         self.assertEqual(response.status_code, 200, 'If webhooks may not create records and no domain is provided, the webhook should still appear to succeed')
         new_record = self.env['marketing.test.sms'].search([('name', '=', new_record_name)])
         self.assertFalse(new_record, 'The webhook should not create records')
@@ -311,9 +309,9 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
                 with self.subTest(case=case, login=login):
                     self.authenticate(login, pwd)
                     with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-                        response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({
+                        response = self.url_open(self.test_campaign.webhook_url, json={
                             'create_values': create_values,
-                        }))
+                        })
                     self.assertEqual(response.status_code, expected_response)
                     # check logs
                     ir_logs = self.env['ir.logging'].search([('name', '=', 'Webhook Log')])
@@ -341,7 +339,7 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
                             ('res_id', '=', new_records.id),
                         ])
                         self.assertEqual(len(new_participant), 1)
-                        self.assertIn(f'Webhook #{self.test_campaign.id} triggered with search_domain None and create_values', ir_logs.message)
+                        self.assertIn(f'Webhook #{self.test_campaign.id} triggered with search_domain {{}} and create_values', ir_logs.message)
                         new_participant.unlink()
                         new_records.unlink()
                     ir_logs.unlink()
@@ -352,12 +350,12 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
         self.authenticate(None, None)
         target_records = self._create_marketauto_records(model='marketing.test.sms')
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url, json={
                 'search_domain': [
                     ('id', 'in', target_records.ids),
                     ('nonexistant_field', '!=', False),
                 ],
-            }))
+            })
         self.assertEqual(response.status_code, 500)
         self.assertEqual(
             len(target_records - self._get_campaign_participant_records(self.test_campaign)),
@@ -366,7 +364,7 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
 
         # test that there needs to be a search_domain or a create_values argument
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url, data=json.dumps({}))
+            response = self.url_open(self.test_campaign.webhook_url, json={})
         self.assertEqual(response.status_code, 500, 'The webhook should fail if nothing is provided')
 
     @users('admin')
@@ -374,11 +372,11 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
     def test_webhook_test_endpoint(self):
         target_records = self._create_marketauto_records(model='marketing.test.sms')
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url + '/test', data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url + '/test', json={
                 'search_domain': [
                     ('id', 'in', target_records.ids),
                 ],
-            }))
+            })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['msg'], 'Webhook test successful. ')
         self.assertEqual(
@@ -387,9 +385,9 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
             'In test mode, no record should be added')
 
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url + '/test', data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url + '/test', json={
                 'create_values': '{"name": "NameName", "description": self.env.user}',
-            }))
+            })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('msg'),
             'Create argument is malformed: it should either be a dictionary of values, or a list of dictionaries',
@@ -397,14 +395,14 @@ class TestMarketingCampaignWebhook(TestMACommon, common.HttpCase):
 
         new_record_name = 'newRecord1'
         with mute_logger('odoo.addons.marketing_automation.models.marketing_campaign'):
-            response = self.url_open(self.test_campaign.webhook_url + '/test', data=json.dumps({
+            response = self.url_open(self.test_campaign.webhook_url + '/test', json={
                 'create_values': {
                     'customer_id': self.user_marketing_automation.partner_id.id,
                     'description': f'Linked to partner {self.user_marketing_automation.name}',
                     'email_from': f'{new_record_name}@example.com',
                     'name': new_record_name,
                 },
-            }))
+            })
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json().get('msg').startswith('Webhook test successful.'))
         self.assertEqual(

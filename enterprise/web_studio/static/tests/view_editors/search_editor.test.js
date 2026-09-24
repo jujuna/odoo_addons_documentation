@@ -1,5 +1,6 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
+import { queryAllTexts } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import {
     contains,
@@ -308,6 +309,57 @@ test("move a date/datetime field in search filter dropdown", async () => {
     expect(
         ".o_web_studio_search_sub_item.o-web-studio-search--filters [data-studio-xpath]"
     ).toHaveCount(1);
+});
+
+test("set an end date on a date filter", async () => {
+    Partner._fields.start = fields.Datetime({ string: "Start" });
+    Partner._fields.stop = fields.Datetime({ string: "Stop" });
+    Partner._fields.deadline = fields.Date({ string: "Deadline" });
+    Partner._fields.duration = fields.Date({ string: "Duration", searchable: false });
+
+    await mountViewEditor({
+        type: "search",
+        resModel: "partner",
+        arch: `
+            <search>
+                <filter string='Period' name='period' date='start'/>
+            </search>`,
+    });
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        expect.step("edit_view");
+        const { params } = await request.json();
+        expect(params.operations[0].new_attrs).toEqual({ end_date: "stop" });
+    });
+
+    await contains(".o-web-studio-search--filters .o-web-studio-editor--element-clickable").click();
+    await contains(".o_web_studio_property_end_date .o_select_menu_toggler").click();
+
+    // the date fields the records can be searched on, but the one the filter starts from
+    expect(queryAllTexts(".o_select_menu_item").sort()).toEqual([
+        "Created on",
+        "Deadline",
+        "Last Modified on",
+        "Stop",
+    ]);
+
+    await contains(".o_select_menu_item:contains(Stop)").click();
+    expect.verifySteps(["edit_view"]);
+});
+
+test("filters that are not date filters have no end date", async () => {
+    await mountViewEditor({
+        type: "search",
+        resModel: "partner",
+        arch: `
+            <search>
+                <filter string='My Filter' name='my_name' domain='[("display_name","=",Woof)]'/>
+            </search>`,
+    });
+
+    await contains(".o-web-studio-search--filters .o-web-studio-editor--element-clickable").click();
+    expect(".o_web_studio_property_domain").toHaveCount(1);
+    expect(".o_web_studio_property_end_date").toHaveCount(0);
 });
 
 test("empty search editor: drag a groupby", async () => {

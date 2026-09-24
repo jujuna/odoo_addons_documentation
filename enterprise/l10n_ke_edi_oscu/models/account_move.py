@@ -541,23 +541,28 @@ class AccountMove(models.Model):
 
         content = self._l10n_ke_oscu_json_from_move()
 
+        sequence = self._l10n_ke_get_invoice_sequence()
         try:
-            self.l10n_ke_oscu_invoice_number = content['invcNo'] = self.l10n_ke_oscu_invoice_number or self._l10n_ke_get_invoice_sequence().next_by_id()
+            content['invcNo'] = self.l10n_ke_oscu_invoice_number or sequence.next_by_id()
         except LockNotAvailable:
             raise UserError(_("Another user is already sending this invoice.")) from None
 
         error, data, _date = company._l10n_ke_call_etims('saveTrnsSalesOsdc', content)
         if not error:
             self.write({
+                'l10n_ke_oscu_invoice_number': content['invcNo'],
                 'l10n_ke_oscu_receipt_number': data['curRcptNo'],
                 'l10n_ke_oscu_signature': data['rcptSign'],
                 'l10n_ke_oscu_datetime': parse_etims_datetime(data['sdcDateTime']),
                 'l10n_ke_oscu_internal_data': data['intrlData'],
                 'l10n_ke_control_unit': company.l10n_ke_control_unit,
             })
-        elif error['code'] not in ('TIM', 'CON'):
+        elif error['code'] in ('TIM', 'CON'):
+            self.l10n_ke_oscu_invoice_number = content['invcNo']
+        else:
             # In order not to rollback, but just to avoid consuming the invoice number
-            self._l10n_ke_get_invoice_sequence().number_next -= 1
+            if not self.l10n_ke_oscu_invoice_number:
+                sequence.number_next -= 1
             self.l10n_ke_oscu_invoice_number = False
         return content, error
 

@@ -1,3 +1,4 @@
+from odoo import fields
 from odoo.tests.common import TransactionCase, tagged
 
 
@@ -104,14 +105,27 @@ class CurrencyTestCase(TransactionCase):
             'currency_provider': 'bcrp',
             'currency_id': pen.id
         })
-        pen_rates_count = len(pen.rate_ids)
-        usd_rates_count = len(usd.rate_ids)
-        res = self.test_company.update_currency_rates()
-        self.assertTrue(res)
-        self.assertEqual(len(pen.rate_ids), pen_rates_count + 1)
-        self.assertEqual(pen.rate_ids[-1].rate, 1.0)
-        self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)
-        self.assertLess(usd.rate_ids[-1].rate, 1)
+        Rate = self.env['res.currency.rate']
+        pen_domain = [('currency_id', '=', pen.id), ('company_id', '=', self.test_company.id)]
+        usd_domain = [('currency_id', '=', usd.id), ('company_id', '=', self.test_company.id)]
+        pen_rates_count = Rate.search_count(pen_domain)
+        usd_rates_count = Rate.search_count(usd_domain)
+
+        self.assertTrue(self.test_company.update_currency_rates())
+
+        self.assertEqual(Rate.search_count(pen_domain), pen_rates_count + 1)
+        self.assertEqual(Rate.search_count(usd_domain), usd_rates_count + 1)
+
+        lima_today = fields.Date.context_today(self.test_company.with_context(tz='America/Lima'))
+        pen_rate = Rate.search(pen_domain, order='name desc', limit=1)
+        usd_rate = Rate.search(usd_domain, order='name desc', limit=1)
+
+        self.assertEqual(pen_rate.rate, 1.0)
+        self.assertLess(usd_rate.rate, 1)
+
+        self.assertLess(pen_rate.name, lima_today)
+        # The publication of day D is stored on D - 1 so that it is the rate effective on D; it can be older when SUNAT has not published today.
+        self.assertEqual(pen_rate.name, usd_rate.name)
 
     def test_live_currency_update_banguat(self):
         gtq = self.env.ref('base.GTQ')

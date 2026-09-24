@@ -389,9 +389,13 @@ export class Rtc extends Record {
             return this.iceServers ? this.iceServers : GET_DEFAULT_ICE_SERVERS();
         },
     });
+    /** @type {Promise<void[]>|undefined} */
+    mediaPermissionsPromise;
     /** @type {"granted" | "denied" | "prompt" | undefined} */
     microphonePermission;
     isMicrophonePermissionWarningDismissed = false;
+    /** Whether a media permission dialog is currently shown, it already conveys the permission warning. */
+    isCallPermissionDialogOpen = false;
     /** @type {"granted" | "denied" | "prompt" | undefined} */
     cameraPermission;
     /**
@@ -505,7 +509,9 @@ export class Rtc extends Record {
 
     get showMicrophonePermissionWarning() {
         return (
-            !this.isMicrophonePermissionWarningDismissed && this.microphonePermission !== "granted"
+            !this.isCallPermissionDialogOpen &&
+            !this.isMicrophonePermissionWarningDismissed &&
+            this.microphonePermission !== "granted"
         );
     }
 
@@ -1113,7 +1119,7 @@ export class Rtc extends Record {
             }
             await this.joinCall(channel, joinCallOpts);
             if (fullscreen && this.selfSession) {
-                this.enterFullscreen();
+                await this.enterFullscreen();
             }
         }
     }
@@ -1236,6 +1242,8 @@ export class Rtc extends Record {
             this.showMediaUnavailableWarning({ [media]: true }, options);
             return;
         }
+        const onClose = options.onClose;
+        this.isCallPermissionDialogOpen = true;
         this.closeCallPermissionDialog = this.dialog.add(
             CallPermissionDialog,
             {
@@ -1253,8 +1261,43 @@ export class Rtc extends Record {
             {
                 rootRef: options.rootRef || (() => this.rootEl),
                 ...options,
+                onClose: () => {
+                    this.isCallPermissionDialogOpen = false;
+                    onClose?.();
+                },
             }
         );
+    }
+
+    /**
+     * Starts a meeting call and requests any required media permissions.
+     *
+     * @param {import("models").DiscussChannel} channel
+     * @param {Object} [initialState={}]
+     * @param {boolean} [initialState.fullscreen=false] open the fullscreen meeting view once joined
+     */
+    async startMeetingCall(channel, { fullscreen = false } = {}) {
+        await this.mediaPermissionsPromise;
+        const isMicrophonePermissionPending = this.microphonePermission === "prompt";
+        await this.toggleCall(channel, {
+            camera: this.cameraPermission === "granted" || !isMicrophonePermissionPending,
+            fullscreen,
+        });
+        if (isMicrophonePermissionPending && channel.isSelfInCall) {
+            this.showMediaPermissionDialog("microphone");
+        }
+    }
+
+    /**
+     * Prompts the user for the media permissions required by a meeting
+     */
+    async showMeetingMediaPermissionDialog() {
+        await this.mediaPermissionsPromise;
+        if (this.microphonePermission === "prompt") {
+            this.showMediaPermissionDialog("microphone");
+        } else if (this.cameraPermission === "prompt") {
+            this.showMediaPermissionDialog("camera");
+        }
     }
 
     /**
@@ -2230,6 +2273,7 @@ export class Rtc extends Record {
             isSendingCamera: false,
             isSendingScreen: false,
             isMicAudioTrackMuted: false,
+            isCallPermissionDialogOpen: false,
             isMicrophonePermissionWarningDismissed: false,
             localChannel: undefined,
             localSession: undefined,
@@ -2976,14 +3020,22 @@ export const rtcService = {
             },
             { immediate: true, initialRun: false }
         );
-        browser.navigator.permissions?.query({ name: "microphone" }).then((status) => {
-            rtc.microphonePermission = status.state;
-            status.onchange = () => (rtc.microphonePermission = status.state);
-        });
-        browser.navigator.permissions?.query({ name: "camera" }).then((status) => {
-            rtc.cameraPermission = status.state;
-            status.onchange = () => (rtc.cameraPermission = status.state);
-        });
+        rtc.mediaPermissionsPromise = Promise.all([
+            window.navigator.permissions
+                ?.query({ name: "microphone" })
+                .then((status) => {
+                    rtc.microphonePermission = status.state;
+                    status.onchange = () => (rtc.microphonePermission = status.state);
+                })
+                .catch(() => {}),
+            window.navigator.permissions
+                ?.query({ name: "camera" })
+                .then((status) => {
+                    rtc.cameraPermission = status.state;
+                    status.onchange = () => (rtc.cameraPermission = status.state);
+                })
+                .catch(() => {}),
+        ]);
         rtc.p2pService = services["discuss.p2p"];
         rtc.p2pService.acceptOffer = async (id, sequence) => {
             const session = await store["discuss.channel.rtc.session"].getWhenReady(Number(id));

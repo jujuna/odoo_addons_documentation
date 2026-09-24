@@ -155,7 +155,7 @@ describe("list side panel", () => {
         });
         // `ListDetailsSidePanel` only fetches the records count in `onWillUpdateProps`,
         // which Owl doesn't call on the initial mount. Force one re-render, as a real
-        await parent.render(true);
+        render(parent, true);
         await animationFrame();
         expect(".o-section:has(.o_model_name) span").toHaveText("10000+ records");
         await contains(".o-section:has(.o_model_name) span").click();

@@ -19,7 +19,11 @@ registry.category("web_tour.tours").add('appointment_crm_meeting_tour', {
         trigger: 'button[name="action_schedule_meeting"]',
         run: 'click',
     }, {
-        trigger: 'button:contains("Share my calendar")',
+        trigger: 'button:contains("Share")',
+        run: 'click',
+    },
+    {
+        trigger: 'span:contains("One-time link")',
         async run(helpers) {
             // Patch and ignore write on clipboard in tour as we don't have permissions
             browser.navigator.clipboard.writeText = () => { console.info('Copy in clipboard ignored!') };

@@ -1975,8 +1975,8 @@ registry.category("web_tour.tours").add("test_delivery_using_buttons", {
             trigger: ".o_barcode_lines",
             run: function () {
                 helper.assertButtonIsVisible(0, "remove_unit");
-                helper.assertButtonIsVisible(0, "add_quantity", false);
-                helper.assertButtonIsVisible(0, "add_remaining_quantity");
+                helper.assertButtonIsVisible(0, "add_quantity");
+                helper.assertButtonIsVisible(0, "add_remaining_quantity", false);
                 helper.assertLineQty(0, "1/2");
                 helper.assertLineIsHighlighted(0, true);
                 helper.assertLineIsHighlighted(1, false);
@@ -1985,7 +1985,7 @@ registry.category("web_tour.tours").add("test_delivery_using_buttons", {
         },
         // Press +1 button again, now its buttons must be hidden.
         {
-            trigger: ".o_barcode_line:first-child .o_add_remaining_quantity",
+            trigger: ".o_barcode_line:first-child .o_add_quantity",
             run: "click",
         },
         {
@@ -2663,7 +2663,7 @@ registry.category("web_tour.tours").add("test_delivery_reserved_lots_1", {
                 );
                 helper.assertLineQty(sublines[2], "1");
                 helper.assert(
-                    sublines[2].querySelector("button.o_add_remaining_quantity").innerText,
+                    sublines[2].querySelector("button.o_add_quantity").innerText,
                     "+1"
                 );
             },
@@ -2677,7 +2677,7 @@ registry.category("web_tour.tours").add("test_delivery_reserved_lots_1", {
                 const sublines = helper.getSublines();
                 helper.assertLineQty(sublines[0], "2/2");
                 helper.assert(
-                    sublines[0].querySelector("button.o_add_remaining_quantity").innerText,
+                    sublines[0].querySelector("button.o_add_quantity").innerText,
                     "+1"
                 );
                 helper.assertLineQty(sublines[1], "1/3");
@@ -3976,7 +3976,7 @@ registry.category("web_tour.tours").add("test_picking_type_mandatory_scan_comple
                     "lot-001 was scanned, its line's buttons should be enable"
                 );
                 helper.assert(
-                    lot001Line.querySelector(".btn.o_add_remaining_quantity").disabled,
+                    lot001Line.querySelector(".btn.o_add_quantity").disabled,
                     false,
                     "lot-001 was scanned, its line's buttons should be enable"
                 );
@@ -3997,8 +3997,8 @@ registry.category("web_tour.tours").add("test_picking_type_mandatory_scan_comple
                 const lot001Line = helper.getSubline({ completed: true });
                 const lot002Line = helper.getSubline({ completed: false });
                 helper.assertButtonIsVisible(lot001Line, "remove_unit");
-                helper.assertButtonIsVisible(lot001Line, "add_quantity", false);
-                helper.assertButtonIsVisible(lot001Line, "add_remaining_quantity");
+                helper.assertButtonIsVisible(lot001Line, "add_quantity", true);
+                helper.assertButtonIsVisible(lot001Line, "add_remaining_quantity", false);
                 helper.assert(
                     lot002Line.querySelector(".btn.o_add_remaining_quantity").disabled,
                     true
@@ -4019,7 +4019,7 @@ registry.category("web_tour.tours").add("test_picking_type_mandatory_scan_comple
                     "lot-002 was scanned, the button to remove quantity should be enabled."
                 );
                 helper.assert(
-                    lot002Line.querySelector(".btn.o_add_remaining_quantity").disabled,
+                    lot002Line.querySelector(".btn.o_add_quantity").disabled,
                     false,
                     "lot-002 was scanned, the button to add quantity should be enabled."
                 );

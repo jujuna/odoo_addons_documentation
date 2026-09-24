@@ -72,7 +72,7 @@ export class SignTemplateSidebarRoleItems extends Component {
         Dropdown,
         DropdownItem,
     };
-    static props = {
+    static propsSchema = {
         signItemTypes: t.array(),
         fetchSignItemTypes: t.function(),
         iframe: t.object().optional(),
@@ -101,7 +101,7 @@ export class SignTemplateSidebarRoleItems extends Component {
         updateAuthMethod: t.function().optional(),
     };
 
-    props = useProps(this.constructor.props);
+    props = useProps(this.constructor.propsSchema);
 
     roleInputRef = signal.ref();
 

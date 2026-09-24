@@ -221,8 +221,8 @@ class TestWebsiteSaleRentingPlanning(PaymentHttpCommon):
         self.assertEqual(len(planning_slot), 1, "There should be exactly 1 slot allocated to the rental Period.")
         website_tz = ZoneInfo(self.company.website_id.tz)
         timezone_diff = timedelta(seconds=website_tz.utcoffset(self.start_date).total_seconds())
-        picking_time = datetime.combine(self.start_date, float_to_time(pickup_time)) - timezone_diff
-        return_time = datetime.combine(self.end_date, float_to_time(return_time)) - timezone_diff
+        picking_time = datetime.combine(self.start_date.astimezone(website_tz), float_to_time(pickup_time)) - timezone_diff
+        return_time = datetime.combine(self.end_date.astimezone(website_tz), float_to_time(return_time)) - timezone_diff
         self.assertEqual(planning_slot.start_datetime, picking_time, "The planning slot should begin at the same time as the picking time.")
         self.assertEqual(planning_slot.end_datetime, return_time, "The planning slot should end at the same time as the return time.")
 

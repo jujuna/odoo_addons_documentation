@@ -12,6 +12,9 @@
                 <t t-elif="this.figureType() === 'many2one'" data-id="many2one">
                     <AccountReportLineCellEditableMany2One t-props="this.editableCellProps"/>
                 </t>
+                <t t-elif="this.isSelection()" data-id="selection">
+                    <AccountReportLineCellEditableSelection t-props="this.editableCellProps"/>
+                </t>
                 <t t-else="" data-id="literal">
                     <AccountReportLineCellEditableLiteral t-props="this.editableCellProps"/>
                 </t>

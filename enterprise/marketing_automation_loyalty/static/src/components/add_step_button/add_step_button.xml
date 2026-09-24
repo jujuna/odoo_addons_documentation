@@ -1,8 +1,8 @@
 <templates>
     <t t-name="marketing_automation_loyalty.AddStepButton" t-inherit="marketing_automation.AddStepButton" t-inherit-mode="extension">
         <xpath expr="//div[hasclass('o_actions_category')]/DropdownItem[last()]" position="before">
-            <DropdownItem class="'ps-1'" onSelected="() => this.props.onSelectedStep('coupon')">
-                <i class="oi pe-1" data-icon="card_giftcard"/>Coupon
+            <DropdownItem onSelected="() => this.props.onSelectedStep('coupon')">
+                <i class="oi pe-1" data-icon="card_giftcard" aria-hidden="true"/>Coupon
             </DropdownItem>
         </xpath>
     </t>

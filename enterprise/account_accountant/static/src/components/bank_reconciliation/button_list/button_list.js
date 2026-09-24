@@ -12,7 +12,6 @@ import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
 import { useBankReconciliation } from "../bank_reconciliation_service";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { floatIsZero } from "@web/core/utils/numbers";
-import { BankRecAccountSelectCreateDialog } from "../search_dialog/account_search_dialog";
 
 const mediaBreakpointLarge = MEDIAS_BREAKPOINTS[SIZES.LG];
 
@@ -90,7 +89,9 @@ export class BankRecButtonList extends Component {
                 resModel: "res.partner",
                 context: { default_name: this.statementLineData.partner_name },
                 domain: [
+                    "|",
                     ["company_id", "in", [false, this.statementLineData.company_id.id]],
+                    ["company_id", "parent_of", this.statementLineData.company_id.id],
                     "|",
                     ["parent_id", "=", false],
                     ["is_company", "=", true],
@@ -108,39 +109,48 @@ export class BankRecButtonList extends Component {
     /**
      * Opens a dialog to select an account and assigns it to the current reconcile line.
      */
-    async setAccountOnReconcileLine() {
+    setAccountOnReconcileLine() {
         const context = {
+            list_view_ref: "account_accountant.view_account_list_bank_rec_widget",
+            search_view_ref: "account_accountant.view_account_search_bank_rec_widget",
             ...(this.statementLineData.amount > 0
                 ? { preferred_account_type: "income" }
                 : { preferred_account_type: "expense" }),
         };
 
-        const wizardLines = await this.orm.call(
-            "account.bank.statement.line",
-            "create_selectable_accounts",
-            [this.statementLineData.id],
-            { context }
-        );
-
         this.addDialog(
-            BankRecAccountSelectCreateDialog,
+            SelectCreateDialog,
             {
                 title: _t("Search: Account"),
                 noCreate: true,
-                multiSelect: true,
-                resModel: "account.select.account.line",
-                domain: [["id", "in", wizardLines]],
-                suspenseAccountLine: this.props.suspenseAccountLine,
-                journalCurrencyId:
-                    this.statementLineData.journal_id.currency_id?.id ||
-                    this.props.suspenseAccountLine.currency_id.id,
-                reference: this.statementLineData.payment_ref,
-                date: this.statementLineData.date,
+                multiSelect: false,
+                domain: [
+                    [
+                        "id",
+                        "not in",
+                        [
+                            this.statementLineData.journal_id.suspense_account_id.id,
+                            this.statementLineData.journal_id.default_account_id.id,
+                        ],
+                    ],
+                ],
                 context: context,
-                onSelected: async (wizardIds) => {
-                    const context = { account_default_taxes: true };
-                    await this._setMultipleAccountOnReconcileLine(wizardIds, { context: context });
-                    await this.bankReconciliation.reloadRecords([this.props.statementLine]);
+                resModel: "account.account",
+                onSelected: async (account) => {
+                    // After setting an account on a line, a new reconciliation model may be automatically created. If so,
+                    // we need to reload the records that will use this model to make sure the new model is displayed.
+                    const linesToLoad = await this._setAccountOnReconcileLine(
+                        this.lastAccountMoveLine.data.id,
+                        account[0],
+                        { context: { account_default_taxes: true } }
+                    );
+                    const recordsToLoad = [
+                        ...this.env.model.root.records.filter((record) =>
+                            linesToLoad.includes(record.data.id)
+                        ),
+                        this.props.statementLine,
+                    ];
+                    await this.bankReconciliation.reloadRecords(recordsToLoad);
                     this.bankReconciliation.reloadChatter();
                     this.restoreFocus();
                 },
@@ -167,15 +177,6 @@ export class BankRecButtonList extends Component {
             "account.bank.statement.line",
             "set_account_bank_statement_line",
             [this.statementLineData.id, amlId, accountId],
-            context
-        );
-    }
-
-    async _setMultipleAccountOnReconcileLine(wizardIds, context = {}) {
-        return await this.orm.call(
-            "account.bank.statement.line",
-            "set_multiple_account_bank_statement_line",
-            [this.statementLineData.id, wizardIds],
             context
         );
     }
@@ -249,7 +250,9 @@ export class BankRecButtonList extends Component {
             {
                 title: _t("Search: Journal Items to Match"),
                 noCreate: true,
-                domain: this.getReconcileButtonDomain(),
+                domain: this.bankReconciliation.getAvailableReconciledLinesDomain(
+                    Array(this.props.statementLine)
+                ),
                 resModel: "account.move.line",
                 size: "xl",
                 context: this.bankRecSelectCreateDialogContext,
@@ -293,20 +296,6 @@ export class BankRecButtonList extends Component {
         return this.bankReconciliation.availableReconcileLines.filter((line) =>
             floatIsZero(line.amount_currency - statementLineAmount, decimalPlaces)
         );
-    }
-
-    getReconcileButtonDomain() {
-        return [
-            ["parent_state", "in", ["draft", "posted"]],
-            ["company_id", "child_of", this.statementLineData.company_id.id],
-            ["search_account_id.reconcile", "=", true],
-            ["display_type", "not in", ["line_section", "line_note"]],
-            ["reconciled", "=", false],
-            "|",
-            ["search_account_id.account_type", "not in", ["asset_receivable", "liability_payable"]],
-            ["payment_id", "=", false],
-            ["statement_line_id", "!=", this.statementLineData.id],
-        ];
     }
 
     /**

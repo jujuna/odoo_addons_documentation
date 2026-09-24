@@ -387,9 +387,3 @@ class L10nBeOnssRatesImportWizard(models.TransientModel):
     @api.model
     def _cron_fetch_onss_rates(self):
         self.env['l10n.be.onss.rates.import.wizard']._fetch_onss_rates_since(datetime.today().year - 1, 1)
-        payroll_manager_group = self.env.ref('hr_payroll.group_hr_payroll_manager')
-        for user in payroll_manager_group.all_user_ids:
-            user._bus_send('simple_notification', {
-                'type': 'success',
-                'message': self.env._('The ONSS rates have been successfully imported. You can now recompute your payslips.'),
-            })

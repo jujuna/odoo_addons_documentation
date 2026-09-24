@@ -5,6 +5,7 @@ import { AccountReportLineCellEditableBoolean } from "./line_cell_editable_boole
 import { AccountReportLineCellEditableDateTime } from "./line_cell_editable_datetime";
 import { AccountReportLineCellEditableLiteral } from "./line_cell_editable_literal";
 import { AccountReportLineCellEditableMany2One } from "./line_cell_editable_many2one";
+import { AccountReportLineCellEditableSelection } from "./line_cell_editable_selection";
 
 
 export class AccountReportLineCellEditable extends AccountReportLineCell {
@@ -14,10 +15,12 @@ export class AccountReportLineCellEditable extends AccountReportLineCell {
         AccountReportLineCellEditableDateTime,
         AccountReportLineCellEditableLiteral,
         AccountReportLineCellEditableMany2One,
+        AccountReportLineCellEditableSelection,
     };
 
     figureType = computed(() => this.props.cell.figure_type());
     hasEditPopupData = computed(() => Boolean(this.props.cell.edit_popup_data?.()));
+    isSelection = computed(() => Boolean(this.hasEditPopupData() && this.props.cell.edit_popup_data().includes("selection_options")));
 
     async onChange(editValue) {
         const cellEditData = this.hasEditPopupData()

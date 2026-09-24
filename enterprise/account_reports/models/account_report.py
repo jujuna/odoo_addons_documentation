@@ -76,6 +76,7 @@ class AccountReport(models.Model):
 
     horizontal_group_ids = fields.Many2many(string="Horizontal Groups", comodel_name='account.report.horizontal.group')
     return_type_ids = fields.One2many(string="Return Types", comodel_name='account.return.type', inverse_name='report_id')
+    snapshot_ids = fields.One2many(string="Snapshots", comodel_name='account.report.snapshot', inverse_name='report_id')
 
     # Those fields allow case-by-case fine-tuning of the engine, for custom reports.
     custom_handler_model_id = fields.Many2one(string='Custom Handler Model', comodel_name='ir.model')
@@ -239,6 +240,10 @@ class AccountReport(models.Model):
     def action_reset_custom_groupby(self):
         self.ensure_one()
         self.user_groupby = self.groupby
+
+    def action_open_snapshots(self):
+        self.ensure_one()
+        return self.snapshot_ids._get_records_action(views=[(False, 'list')], name=_("Snapshots"))
 
     def _asr_sections_domain(self, root_annual_statements):
         """
@@ -1841,14 +1846,18 @@ class AccountReport(models.Model):
                 header_level = []
                 # If horizontal group based on ledgers, adding the columns for the local journals each company
                 if field_name == 'journal_group_id':
-                    for company in self.env.companies:
-                        header_level.append({
-                            'name': company.display_name,
-                            'horizontal_groupby_element': {
-                                'company_id': company.id,
-                                'journal_id': self._get_selected_journals_without_group(options, company).ids,
-                            }
-                        })
+                    journal_groups_ids = {group['id'] for group in options.get('journal_groups', []) if group.get('selected')}
+                    if not journal_groups_ids or 'local_gaap' in journal_groups_ids:
+                        for company in self.env.companies:
+                            header_level.append({
+                                'name': company.display_name,
+                                'horizontal_groupby_element': {
+                                    'company_id': company.id,
+                                    'journal_id': self._get_selected_journals_without_group(options, company).ids,
+                                }
+                            })
+                    if journal_groups_ids:
+                        records = records.filtered(lambda r: r.id in journal_groups_ids)
                 header_level += [
                     {
                         'name': record.display_name,
@@ -4878,7 +4887,7 @@ class AccountReport(models.Model):
                            of account.report.expression's date_scope field's technical labels.
         :return: A dict containing the CTA debit, CTA credit and CTA balance.
         """
-        if self.currency_translation != 'cta':
+        if self.currency_translation != 'cta' or len({company_data['currency_id'] for company_data in options['companies']}) == 1:
             return {
                 'balance': 0.0,
                 'debit': 0.0,
@@ -6070,7 +6079,7 @@ class AccountReport(models.Model):
     def _is_available_for(self, companies):
         """ Called on report variants to know whether they are available in any of the provided companies or not.
         """
-        main_company = self.env.company
+        main_company = companies[0]
         reports = self.filtered(lambda r: r.availability_condition == 'always')
 
         reports_by_country = self.filtered(lambda r: r.availability_condition == 'country')

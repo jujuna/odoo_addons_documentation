@@ -1,6 +1,6 @@
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
-import { OboxActionButton } from "./obox_action_button";
+import { oboxActionButton, OboxActionButton } from "./obox_action_button";
 import { useProps, t, Component, proxy, onWillUnmount } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useService } from "@web/core/utils/hooks";
@@ -66,10 +66,8 @@ export class TokenDialog extends Component {
 }
 
 export const oboxRemoteDebug = {
+    ...oboxActionButton,
     component: OboxRemoteDebug,
-    extractProps: ({ attrs }) => ({
-        class: attrs.class,
-    }),
 };
 
 registry.category("view_widgets").add("obox_remote_debug", oboxRemoteDebug);

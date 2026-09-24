@@ -2,10 +2,14 @@ import { proxy, signal } from "@odoo/owl";
 
 import { AttendeeCalendarModel } from "@calendar/views/attendee_calendar/attendee_calendar_model";
 import { deserializeDateTime, serializeDateTime } from "@web/core/l10n/dates";
+import { unique } from "@web/core/utils/arrays";
 import { Cache } from "@web/core/utils/cache";
 import { patch } from "@web/core/utils/patch";
 import { user } from "@web/core/user";
 import { rpc } from "@web/core/network/rpc";
+
+
+export const APT_SIDEPANEL_LIST_PAST_FLEXIBLE_DISPLAY_LIMIT = { weeks: 2 };
 
 export class AppointmentAttendeeCalendarModel extends AttendeeCalendarModel {
     setup() {
@@ -55,11 +59,14 @@ export class AppointmentAttendeeCalendarModel extends AttendeeCalendarModel {
  * `env.calendarState.mode`:
  *  - "default": regular calendar
  *  - "slots-creation": drag to create slots
- *  - "slots-deletion": click to delete slots
  *
  * `model.data` are things that are fetched for every full data reload
  * `model.data.slots`: values of slots of the appointment type being edited.
  * `model.data.userAppointmentsData`: list of appointment types available in the "Booking Pages" list.
+ *
+ * `model.selectedAppointmentTypeId`: id of the appointment selected in the sidebar which should be synced
+ * with the default appointment in context. Setting this highlights events of this appointment type and
+ * sets it as the appointment type for events created while it is selected.
  *
  * `model.slotsAppointmentData`: values of the appointment type being edited, `undefined` when not editing.
  * This if fetched when switching which appointment is being edited, mostly to determine how slots should be generated and their values.
@@ -72,10 +79,17 @@ patch(AttendeeCalendarModel.prototype, {
     /**
      * @override
      */
-    setup() {
+    setup(params) {
+        // always fetch those fields as they'll be used by this model
+        const extraFields = ["appointment_type_id"];
+        params.fieldNames = unique(params.fieldNames.concat(extraFields));
         super.setup(...arguments);
         this.data.userAppointmentsData = proxy(new Map());
         this.data.slots = {};
+        const context = params.context || this.meta.context || {};
+        // reactive attribute to represent which appointment type is highlighted.
+        // if any, should be kept in sync with the context default for consistency.
+        this.selectedAppointmentTypeId = signal(context.default_appointment_type_id);
         // Relevant data of the appointment being edited in view, such as: id, duration and invite url
         // See `_updateSlotsAppointment` for the exact structure
         this.slotsAppointmentData = signal(undefined);
@@ -83,34 +97,20 @@ patch(AttendeeCalendarModel.prototype, {
         // if that context key is set, that appointment should be set as the appointment being edited at load time.
         // This is used to immediately enable edit mode when clicking the "slots" smart button in the appointment form.
         this.wasSlotsAppointmentLoaded = false;
-
-        // Data relevant to sidebar features
-        let sidebarAppointmentData;
-        try {
-            sidebarAppointmentData = JSON.parse(
-                localStorage.getItem("appointment.sidebar_appointment_data")
-            );
-        } catch {
-            sidebarAppointmentData = null;
-        }
-        this.sidebarAppointmentData = proxy({
-            // appointment types added to the sidebar "Booking Pages" list
-            listedAppointmentTypeIds: [],
-            ...sidebarAppointmentData,
-        });
+        // keep the original default so we know to keep it in the sidebar list data
+        // this implies that only the "edit appointment" button should be shown instead of the list
+        this.originalDefaultAppointmentTypeId = context.default_appointment_type_id;
     },
 
     /**
      * @override
-     * Hide events not related to the appointment type being edited
      */
-    computeDomain(data) {
-        const domain = super.computeDomain(data);
-        const appointmentData = this.slotsAppointmentData();
-        if (appointmentData) {
-            domain.push(["appointment_type_id", "=", appointmentData.id]);
+    makecontextdefaults() {
+        const context = super.makeContextDefaults(...arguments) || {};
+        if (this.selectedAppointmentTypeId()) {
+            context.default_appointment_type_id = this.selectedAppointmentTypeId()
         }
-        return domain;
+        return context;
     },
 
     async _updateSlotsAppointment(appointmentTypeId) {
@@ -142,7 +142,7 @@ patch(AttendeeCalendarModel.prototype, {
 
     /**
      * Editor-only slot duration (in hours) for non-recurring slots.
-     * Defaults to 30 minutes, matching the edition form.
+     * Defaults to 0 minutes, aka no splitting.
      */
     getLocalStorageDuration(appointmentId) {
         let localData;
@@ -153,7 +153,7 @@ patch(AttendeeCalendarModel.prototype, {
         } catch {
             localData = null;
         }
-        return localData?.appointmentDuration ?? 0.5;
+        return localData?.appointmentDuration ?? 0;
     },
 
     /**
@@ -169,6 +169,12 @@ patch(AttendeeCalendarModel.prototype, {
             scale !== "week"
         ) {
             params.scale = "week";
+        }
+        const context = params.context || this.meta.context || {};
+        // initialize selection based on original context
+        if (this.originalDefaultAppointmentTypeId === undefined) {
+            this.originalDefaultAppointmentTypeId = context.default_appointment_type_id || false;
+            this.selectedAppointmentTypeId.set(context.default_appointment_type_id);
         }
         return super.load(params);
     },
@@ -245,20 +251,48 @@ patch(AttendeeCalendarModel.prototype, {
             this.slotsAppointmentData()?.id, // we always want details for currently edited for the sidebar options
             this.meta.context.calendar_editing_custom_appointment_id, // in case it's not loaded yet
             this.meta.context.default_appointment_type_id, // we always want to be able to enter edition mode for the default type
+            this.originalDefaultAppointmentTypeId, // always show the original default so it can be reselected
         ].filter(Boolean);
 
         const appointmentValues = await this.orm.webSearchRead(
             "appointment.type",
             [
                 "|",
+                "&",
                 ["id", "in", forcedIds],
+                ["active", "in", [true, false]],
                 "&",
                 "&",
                 "&",
-                ["id", "in", this.listedAppointmentTypeIds],
+                "&",
+                // must be specified since active is in domain
+                ["active", "=", true],
                 ["schedule_based_on", "=", "users"],
                 ["staff_user_ids", "in", [user.userId]],
                 ["category", "!=", "anytime"],
+                // for custom slots, only pick those ending within the last X weeks/days to avoid clutter
+                // from "one-time" appointments, also avoiding those with no slots at all
+                "|",
+                "&",
+                "&",
+                ["category", "=", "custom"],
+                ["slot_ids", "!=", false],
+                [
+                    "slot_ids",
+                    "any",
+                    [
+                        [
+                            "end_datetime",
+                            ">",
+                            serializeDateTime(
+                                luxon.DateTime.now().minus(
+                                    APT_SIDEPANEL_LIST_PAST_FLEXIBLE_DISPLAY_LIMIT
+                                )
+                            ),
+                        ],
+                    ],
+                ],
+                ["category", "!=", "custom"],
             ],
             {
                 specification: {
@@ -276,6 +310,14 @@ patch(AttendeeCalendarModel.prototype, {
         }
     },
 
+    async setSelectedAppointmentTypeId(appointmentTypeId) {
+        if (appointmentTypeId) {
+            this.selectedAppointmentTypeId.set(appointmentTypeId);
+        } else {
+            this.selectedAppointmentTypeId.set(undefined);
+        }
+    },
+
     /**
      * Set the current appointment type being edited and refresh the view.
      */
@@ -283,6 +325,10 @@ patch(AttendeeCalendarModel.prototype, {
         const params = appointmentTypeId && (!this.meta || this.meta.scale !== "week")
             ? { scale: "week" }
             : {};
+        // editing slots = selecting it as default
+        if (appointmentTypeId && appointmentTypeId !== this.selectedAppointmentTypeId()) {
+            this.setSelectedAppointmentTypeId(appointmentTypeId);
+        }
         // reload even if unchanged, as it might have changed since; a full load
         // is required as entering/leaving edition changes the events domain
         await this._updateSlotsAppointment(appointmentTypeId);
@@ -295,8 +341,10 @@ patch(AttendeeCalendarModel.prototype, {
      */
     makeContextDefaults(rawRecord) {
         const context = super.makeContextDefaults(rawRecord);
-        if (this.slotsAppointmentData()) {
-            context.default_appointment_type_id = this.slotsAppointmentData().id;
+        if (this.selectedAppointmentTypeId()) {
+            context.default_appointment_type_id = this.selectedAppointmentTypeId();
+        } else if ("default_appointment_type_id" in context) {
+            delete context.default_appointment_type_id;
         }
         return context;
     },
@@ -428,32 +476,6 @@ patch(AttendeeCalendarModel.prototype, {
             await this.updateAllAppointmentData();
             this.notify();
         }
-    },
-
-
-    // SIDEBAR DATA HELPERS
-
-    /**
-     * Appointment types listed in the sidebar "Booking Pages" list.
-     */
-    get listedAppointmentTypeIds() {
-        return this.sidebarAppointmentData.listedAppointmentTypeIds;
-    },
-
-    /**
-     * Add/remove an appointment type line in the sidebar "Booking Pages" list.
-     */
-    async toggleAppointmentInList(appointmentTypeId) {
-        const listedIds = this.sidebarAppointmentData.listedAppointmentTypeIds;
-        this.sidebarAppointmentData.listedAppointmentTypeIds = listedIds.includes(appointmentTypeId)
-            ? listedIds.filter((listedId) => listedId !== appointmentTypeId)
-            : [...listedIds, appointmentTypeId];
-        localStorage.setItem(
-            "appointment.sidebar_appointment_data",
-            JSON.stringify(this.sidebarAppointmentData)
-        );
-        // refresh sidebar data to include the new one
-        await this.updateUserAppointmentsData();
     },
 
     // CONTEXT HELPERS

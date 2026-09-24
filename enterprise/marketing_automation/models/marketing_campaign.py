@@ -316,7 +316,11 @@ class MarketingCampaign(models.Model):
     def _compute_webhook_url(self):
         webhook_campaigns = self.filtered(lambda r: r.enroll_type == 'webhook')
         for campaign in webhook_campaigns:
-            campaign.webhook_url = '%s/mkauto/webhook/%s/%s' % (campaign.get_base_url(), campaign.id, campaign.webhook_uuid)
+            campaign.webhook_url = '%s/mkauto/webhook/%s/%s%s' % (
+                campaign.get_base_url(),
+                campaign.id, campaign.webhook_uuid,
+                '' if campaign.state == 'running' else '/test',
+            )
         (self - webhook_campaigns).webhook_url = ''
 
     @api.depends('model_name')
@@ -1481,7 +1485,7 @@ for record in records:
     def _process_webhook_payload(
             self, search_domain: DomainType,
             create_values: ValuesType | list[ValuesType],
-            webhook_test: bool = False
+            webhook_test: bool = False,
         ) -> MarketingParticipant:
         """ Execute the webhook for the given search_domain and create_values.
         search_domain is a domain (in string form) used to identify the record on which the automation should be run.
@@ -1491,7 +1495,7 @@ for record in records:
         if not self._is_webhook_enabled() and not (self.enroll_type == 'webhook' and webhook_test):
             raise ValidationError(_('Webhooks are not enabled for this campaign'))
         if not search_domain and not create_values:
-            raise ValidationError(_('Either a search or create argument should be provided'))
+            raise UserError(_('Either a search or create argument should be provided. Make sure you are sending properly formatted JSON.'))
         if create_values:
             sanitized_create_values = self._process_webhook_payload_check_create_values(create_values)
         else:
@@ -1524,8 +1528,8 @@ for record in records:
                 raise UserError(_('Campaign Webhook failed creating records')) from e
 
         # info logging is done by the ir.http logger
-        msg = '%sWebhook #%s triggered with search_domain %s and create_values %s'
-        msg_args = ('(TEST MODE) ' if webhook_test else '', self.id, search_domain, create_values)
+        msg = '%sWebhook #%s triggered with search_domain %s and create_values %s. Records found or created: %s'
+        msg_args = ('(TEST MODE) ' if webhook_test else '', self.id, search_domain, create_values, records.ids)
         _logger.debug(msg, *msg_args)
         if self.webhook_log_calls:
             ir_logging_sudo.create(self._prepare_logging_values(message=msg % msg_args))
@@ -1550,7 +1554,7 @@ for record in records:
         """ Sanitize / check given creation values before propagating to create.
         Do not modify, create new dictionaries in order to allow logging."""
         if not isinstance(create_values, (list, dict)) or (isinstance(create_values, list) and not all(isinstance(el, dict) for el in create_values)):
-            raise ValidationError(_('Create argument is malformed: it should either be a dictionary of values, or a list of dictionaries'))
+            raise UserError(_('Create argument is malformed: it should either be a dictionary of values, or a list of dictionaries'))
         sanitized = []
         for values in (create_values if isinstance(create_values, list) else [create_values]):
             propagated_fnames = []

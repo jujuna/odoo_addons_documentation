@@ -6,7 +6,12 @@ from odoo.exceptions import UserError
 from odoo.tools import float_round
 from odoo.tools.misc import default_parser, file_path
 
-from odoo.addons.l10n_vn_reports.models.appendix142 import VAT_8_PURCHASE_TAGS, VAT_8_SALE_TAGS
+from odoo.addons.l10n_vn_reports.models.appendix142 import (
+    VAT_8_PURCHASE_BASE_TAGS,
+    VAT_8_PURCHASE_TAX_TAGS,
+    VAT_8_SALE_BASE_TAGS,
+    VAT_8_SALE_TAX_TAGS,
+)
 
 
 class L10nVnReportsForm01GtgtHandler(models.AbstractModel):
@@ -236,13 +241,15 @@ class L10nVnReportsForm01GtgtHandler(models.AbstractModel):
         purchases, total_base_purchases, total_vat_purchases = appendix_handler._get_month_data(
             appendix_report,
             appendix_options,
-            VAT_8_PURCHASE_TAGS,
+            VAT_8_PURCHASE_BASE_TAGS,
+            VAT_8_PURCHASE_TAX_TAGS,
             False,
         )
         sales, total_base_sales, total_vat_sales = appendix_handler._get_month_data(
             appendix_report,
             appendix_options,
-            VAT_8_SALE_TAGS,
+            VAT_8_SALE_BASE_TAGS,
+            VAT_8_SALE_TAX_TAGS,
             True,
         )
 

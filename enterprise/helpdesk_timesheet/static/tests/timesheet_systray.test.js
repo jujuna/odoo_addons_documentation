@@ -75,7 +75,7 @@ test("Helpdesk project toggles Task field to Ticket field and state persists on 
 });
 
 test.tags("desktop");
-test("Timesheet is prefilled with the task/ticket last visited, unless a draft already exists", async () => {
+test("Timesheet is prefilled with the task/ticket last visited", async () => {
     onRpc("/timesheet_grid/timesheet_systray_user_data", async (request) => ({
         timesheets: {
             records: [],
@@ -124,7 +124,6 @@ test("Timesheet is prefilled with the task/ticket last visited, unless a draft a
         message: "The ticket should not be filled",
     });
 
-    // Closing the systray while checked in turns the current state into a draft.
     await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
     await tick();
 
@@ -139,10 +138,79 @@ test("Timesheet is prefilled with the task/ticket last visited, unless a draft a
     await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
     await tick();
     expect("div[name='project_id'] input").toHaveValue("Helpdesk Support Project", {
-        message: "The draft's project should be preserved",
+        message: "The project should follow the newly visited ticket",
+    });
+    expect("div[name='helpdesk_ticket_id'] input").toHaveValue("Very persuasive ticket", {
+        message: "The last visited ticket should replace the task the form was prefilled with",
+    });
+});
+
+test.tags("desktop");
+test("Timesheet keeps an edited draft over the ticket last visited", async () => {
+    onRpc("/timesheet_grid/timesheet_systray_user_data", async (request) => ({
+        timesheets: {
+            records: [],
+        },
+    }));
+
+    const [helpdeskProject] = pyEnv["project.project"].create([
+        {
+            name: "Helpdesk Support Project",
+            allow_timesheets: true,
+            has_helpdesk_team: true,
+        },
+    ]);
+    const [firstTicket] = pyEnv["helpdesk.ticket"].create([
+        {
+            name: "Very persuasive ticket",
+            project_id: helpdeskProject,
+        },
+    ]);
+    const [helpdeskTask] = pyEnv["project.task"].create([
+        {
+            name: "Some task in an helpdesk project",
+            project_id: helpdeskProject,
+        },
+    ]);
+
+    setPreFilledFormTimesheet({ task_id: helpdeskTask });
+
+    await mountWithCleanup(WebClient);
+    await getService("action").doAction({
+        res_model: "project.task",
+        res_id: helpdeskTask,
+        type: "ir.actions.act_window",
+        views: [[false, "form"]],
+        context: {
+            active_id: helpdeskProject,
+        },
+    });
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await contains(".o_timesheet_grid_popover div[name='ts_checkin_btn'] > button").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    await contains(".field-description textarea").edit("Half written", {
+        instantly: true,
+        confirm: "Tab",
+    });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await tick();
+
+    await getService("action").doAction({
+        res_model: "helpdesk.ticket",
+        res_id: firstTicket,
+        type: "ir.actions.act_window",
+        views: [[false, "form"]],
+    });
+    setPreFilledFormTimesheet({ helpdesk_ticket_id: firstTicket });
+
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await tick();
+    expect(".field-description textarea").toHaveValue("Half written", {
+        message: "Closing the timer systray should keep the typed description as a draft",
     });
     expect("div[name='helpdesk_ticket_id'] input").toHaveValue("", {
-        message: "The draft's (empty) ticket should be preserved",
+        message: "Visiting a ticket should not discard the draft left in the timer systray",
     });
 });
 

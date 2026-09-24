@@ -48,7 +48,6 @@ import {
     test,
 } from "@odoo/hoot";
 import { press, waitUntil } from "@odoo/hoot-dom";
-import { markup } from "@odoo/owl";
 import {
     Command,
     getService,
@@ -85,6 +84,16 @@ test("basic rendering", async () => {
     await contains(".o-discuss-CallActionList button", { count: 8 });
     await contains("button[aria-label='Unmute'], button[aria-label='Mute']"); // FIXME depends on current browser permission
     await contains("button[aria-label='Voice Settings']");
+    // Self's talking bars stand in for the chevrons of the voice settings and the call menu.
+    await contains(
+        "button[aria-label='Voice Settings'] .o-discuss-TalkingAudioBars:not(.o-isTalking)"
+    );
+    await contains(
+        ".o-discuss-CallMenu-actionsAudioBars .o-discuss-TalkingAudioBars:not(.o-isTalking)"
+    );
+    Object.assign(getService("discuss.rtc").selfSession, { is_muted: false, isTalking: true });
+    await contains("button[aria-label='Voice Settings'] .o-discuss-TalkingAudioBars.o-isTalking");
+    await contains(".o-discuss-CallMenu-actionsAudioBars .o-discuss-TalkingAudioBars.o-isTalking");
     await contains(".o-discuss-CallActionList button[aria-label='Turn camera on']");
     await contains("button[aria-label='Video Settings']");
     await contains(".o-discuss-CallActionList button[aria-label='Share Screen']");
@@ -1569,7 +1578,7 @@ test("should also invite to the call when inviting to the channel", async () => 
         ".o-discuss-ChannelInvitation:has(:text('Invite people to the channel \"TestChanel\"'))"
     );
     await click(".o-discuss-ChannelInvitation-selectable:has(:text('TestPartner'))");
-    await click("button[title='Invite']:enabled");
+    await click("button:text('Invite'):enabled");
     await contains(".o-discuss-CallParticipantCard.o-isInvitation");
 });
 
@@ -2083,7 +2092,18 @@ test("active call with a recording shows a processing link", async () => {
         channel_type: "channel",
         name: "General",
     });
-    const callHistoryId = 42;
+    const messageId = pyEnv["mail.message"].create({
+        body: '<div data-oe-type="call" class="o_mail_notification"></div>',
+        message_type: "notification",
+        model: "discuss.channel",
+        res_id: channelId,
+    });
+    const callHistoryId = pyEnv["discuss.call.history"].create({
+        channel_id: channelId,
+        has_recording: true,
+        start_call_message_id: messageId,
+        start_dt: "2026-01-01 10:00:00",
+    });
     mockService("action", {
         doAction(action) {
             if (action.res_model !== "discuss.call.history") {
@@ -2100,21 +2120,6 @@ test("active call with a recording shows a processing link", async () => {
     });
     await start();
     await openDiscuss(channelId);
-    const store = getService("mail.store");
-    const channel = await store["discuss.channel"].getOrFetch(channelId);
-    const thread = channel.thread;
-    thread.setAsDiscussThread(false);
-    const activeCallMessage = store["mail.message"].insert({
-        body: markup`<div data-oe-type="call" class="o_mail_notification"></div>`,
-        call_history_ids: [{ id: callHistoryId, has_recording: true }],
-        date: deserializeDateTime("2026-01-01 10:00:00"),
-        id: 42,
-        message_type: "notification",
-        model: "discuss.channel",
-        res_id: channelId,
-        thread,
-    });
-    thread.addOrReplaceMessage(activeCallMessage);
     await contains(
         ".o-mail-NotificationMessage div:text('A recording is being processed and will be available here.')",
         { count: 1 }
@@ -2330,6 +2335,33 @@ test("Adjust view: sidebar layout always shows the sidebar, even alone", async (
     await contains(".o-mail-Meeting");
     // Sidebar mode always shows the sidebar column, even with a single participant.
     await contains(".o-discuss-Call-sidebar");
+});
+
+test("Auto layout spotlights whoever joins a call, when self was alone in the call", async () => {
+    const pyEnv = await startServer();
+    const channelId = pyEnv["discuss.channel"].create({ name: "General" });
+    await start();
+    const store = getService("mail.store");
+    store.settings.callLayout = "auto";
+    await openDiscuss(channelId);
+    await click("[title='Start Call']");
+    await click(".o-discuss-CallActionList button[title='More']");
+    await click("[name='fullscreen']");
+    await contains(".o-mail-Meeting");
+    // Alone, self is the spotlight.
+    await contains(
+        ".o-discuss-Call-mainCards .o-discuss-CallParticipantCard[aria-label='Mitchell Admin']"
+    );
+    pyEnv["discuss.channel.rtc.session"].create({
+        channel_member_id: pyEnv["discuss.channel.member"].create({
+            channel_id: channelId,
+            partner_id: pyEnv["res.partner"].create({ name: "Bob" }),
+        }),
+        channel_id: channelId,
+    });
+    // Whoever joins takes the spotlight over. Without any video, self gets no inset.
+    await contains(".o-discuss-Call-mainCards .o-discuss-CallParticipantCard[aria-label='Bob']");
+    await contains(".o-discuss-CallParticipantCard[aria-label='Mitchell Admin']", { count: 0 });
 });
 
 test("confirm before switching calls", async () => {

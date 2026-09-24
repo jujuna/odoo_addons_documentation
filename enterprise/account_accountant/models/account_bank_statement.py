@@ -1,5 +1,4 @@
 import logging
-import math
 import re
 
 from collections import defaultdict
@@ -698,7 +697,7 @@ class AccountBankStatementLine(models.Model):
                 continue
             to_process[st_line_id, matching_word] = [(aml_id, aml_amount_residual)]
             for word in st_lines_refs.get(st_line_id, []):
-                if word in matching_word or matching_word in word:
+                if word.lower() in matching_word.lower() or matching_word.lower() in word.lower():
                     del to_process[st_line_id, matching_word]
                     del to_process[st_line_id, word]
             if st_line_id not in st_lines_refs:
@@ -967,7 +966,7 @@ class AccountBankStatementLine(models.Model):
         sub_escaped = re.escape(substring)
         # Allowed delimiters: start (^), end ($), whitespace (\s), or [. ; , ? !]
         pattern = rf"(^|[\s\.;,?!]){sub_escaped}($|[\s\.;,?!])"
-        return re.search(pattern, text) is not None
+        return re.search(pattern, text, re.IGNORECASE) is not None
 
     def _retrieve_partner(self):
         if not (lines_without_partner := self.filtered(lambda stl: not stl.partner_id)):
@@ -2338,72 +2337,14 @@ class AccountBankStatementLine(models.Model):
         self.unlink()
 
     def create_selectable_accounts(self):
-        self.ensure_one()
-        accounts = self.env['account.account'].search([
-            *self.env['account.account']._check_company_domain(self.env.company),
-            ('id', 'not in', [
-                self.journal_id.default_account_id.id,
-                self.journal_id.suspense_account_id.id,
-            ]),
-        ])
-        return self.env['account.select.account.line'].create([
-            {
-                'account_id': account.id,
-                'name': account.name,
-                'code': account.code,
-                'description': account.description,
-                'account_type': account.account_type,
-                'currency_id': self.currency_id.id,
-            }
-            for account in accounts
-        ])
+        # Not used but cannot remove a function in stable
+        return None
 
     def set_multiple_account_bank_statement_line(self, wizard_ids):
-        self.ensure_one()
-
-        wizards = self.env['account.select.account.line'].browse(wizard_ids).exists()
-        if not wizards:
-            return
-
-        if len(wizards) == 1 and not wizards.amount:
-            self.set_account_bank_statement_line(self.line_ids[-1].id, wizards.account_id.id)
-            return
-
-        lines_with_amount = wizards.filtered('amount')
-        lines_without_amount = wizards - lines_with_amount
-
-        # No matter the statement line, the UI will show the remaining amount positive, so that the user don't have to
-        # add a minus on every value when they use the set account feature on a negative statement line.
-        # By doing that we need to invert the sign when adding the line to the widget
-        sign = math.copysign(1, self.amount)
-        new_lines = [
-            self._prepare_new_line(sign * line.amount, line)
-            for line in lines_with_amount
-        ]
-        open_balance = -self.amount_residual - sum(line.amount for line in lines_with_amount)
-        if open_balance and lines_without_amount:
-            amount_per_line = self.currency_id.round(open_balance / len(lines_without_amount))
-            allocated_amount = 0
-            # We stop before the last line because you could have rounding issue to deal with
-            for line in lines_without_amount[:-1]:
-                allocated_amount += amount_per_line
-                new_lines.append(self._prepare_new_line(amount_per_line, line))
-
-            # Give the remaining amount to the last line
-            last_amount = open_balance - allocated_amount
-            last_line = lines_without_amount[-1]
-            new_lines.append(self._prepare_new_line(last_amount, last_line))
-
-        self.with_context(
-            no_exchange_difference_no_recursive=False,
-            recompute_partner=False,
-        )._add_move_line_to_statement_line_move(new_lines)
+        # Not used but cannot remove a function in stable
+        return None
 
     @api.model
     def _prepare_new_line(self, amount_per_line, line):
-        return {
-            'account_id': line.account_id.id,
-            'balance': -amount_per_line,
-            'amount_currency': -amount_per_line,
-            'currency_id': line.currency_id.id,
-        }
+        # Not used but cannot remove a function in stable
+        return None

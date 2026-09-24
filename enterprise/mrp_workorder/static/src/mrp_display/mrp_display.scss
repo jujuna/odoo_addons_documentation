@@ -53,21 +53,32 @@ body.o_mrp_workorder_o_mrp_display {
 
 .o_mrp_display {
     .o_mrp_display_records {
-        grid-template-columns: repeat(1, 1fr);
-
         @include media-breakpoint-up(md) {
             overflow-y: auto;
         }
-        @include media-breakpoint-up(lg) {
-            grid-template-columns: repeat(2, 1fr);
+
+        .o_mrp_display_records_grid {
+            grid-template-columns: repeat(1, 1fr);
+
+            @include media-breakpoint-up(lg) {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            @include media-breakpoint-up(xxl) {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
-        @include media-breakpoint-up(xxl) {
-            grid-template-columns: repeat(3, 1fr);
+
+        .o_mrp_display_demo_message_inner {
+            @include media-breakpoint-up(lg) {
+                max-width: calc((100% - #{map-get($spacers, 3)}) / 2);
+            }
+            @include media-breakpoint-up(xxl) {
+                max-width: calc((100% - #{map-get($spacers, 3)} * 2) / 3);
+            }
         }
     }
 
     .o_mrp_timer {
-        background-color: $list-group-active-bg;
         color: $list-group-active-border-color;
     }
 

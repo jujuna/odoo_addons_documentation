@@ -88,6 +88,16 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
     def setUpClass(cls):
         super().setUpClass()
         cls.website_builder_agent = cls.env.ref('ai_website.ai_agent_website_builder')
+        cls.website = cls.env['ai.website.service']._current_website()
+        cls._VIEW_INFO = {
+            "website_page": {
+                "is_page_ai_editable": True,
+                "main_object": {"model": "website.page", "id": 1},
+                "website_id": cls.website.id,
+                "location": "/test",
+                "editable_zones": {"main": "<section>Hello</section>", "footer": ""},
+            },
+        }
 
     def setUp(self):
         super().setUp()
@@ -162,16 +172,6 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
                     expected_message,
                 )
 
-    _VIEW_INFO = {
-        "website_page": {
-            "is_page_ai_editable": True,
-            "main_object": {"model": "website.page", "id": 1},
-            "website_id": 1,
-            "location": "/test",
-            "editable_zones": {"main": "<section>Hello</section>", "footer": ""},
-        },
-    }
-
     @users('admin')
     def test_scraper_resume_ignores_obsolete_or_unready_notifications(self):
         session = self._create_ai_website_builder_session().with_context(
@@ -197,7 +197,7 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
                 **self._VIEW_INFO['website_page'], 'main_object': {'model': 'website.page', 'id': 2},
             }}, 'scrape-1'),
             ('other website', pending, ready_state, {'website_page': {
-                **self._VIEW_INFO['website_page'], 'website_id': 2,
+                **self._VIEW_INFO['website_page'], 'website_id': self.website.id + 1,
             }}, 'scrape-1'),
         ]
         for name, pending_call, state, view_info, call_id in cases:
@@ -304,7 +304,7 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
             'tool_call_id': call_id,
             'target_page': {
                 'main_object': self._VIEW_INFO['website_page']['main_object'],
-                'location': '/test', 'website_id': 1,
+                'location': '/test', 'website_id': self.website.id,
             },
         })
         self.assertTrue(session.pending_tool_call['await_external_result'])
@@ -381,7 +381,7 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
         other_session._set_pending_tool_call(dict(session.pending_tool_call))
 
         self.authenticate(self.user_internal.login, self.user_internal.login)
-        params = {'website_id': 1, 'main_object': self._VIEW_INFO['website_page']['main_object']}
+        params = {'website_id': self.website.id, 'main_object': self._VIEW_INFO['website_page']['main_object']}
         self.assertEqual(self.make_jsonrpc_request('/ai_website/ready_scraper_results', params), [{
             'channel_id': session.channel_id.id,
             'session_id': session.id,
@@ -389,10 +389,10 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
             'tool_call_id': 'scrape-1',
             'target_page': {
                 'main_object': self._VIEW_INFO['website_page']['main_object'],
-                'location': '/test', 'website_id': 1,
+                'location': '/test', 'website_id': self.website.id,
             },
         }])
-        for changed in ({'website_id': 2}, {'main_object': {'model': 'website.page', 'id': 2}}):
+        for changed in ({'website_id': self.website.id + 1}, {'main_object': {'model': 'website.page', 'id': 2}}):
             self.assertEqual(self.make_jsonrpc_request('/ai_website/ready_scraper_results', params | changed), [])
         session._finish_exchange()
         self.assertEqual(self.make_jsonrpc_request('/ai_website/ready_scraper_results', params), [])
@@ -1058,16 +1058,26 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
                 "body { background: url(\"javascript:alert(1)\"); }"
             )
 
-        with self.assertRaisesRegex(ValueError, "Invalid CSS"):
-            # Compiling invalid css logs a warning
-            with self.assertLogs('odoo.addons.base.models.assetsbundle', level="WARNING"):
-                self.env['ai.tool']._ai_tool_write_custom_css("#test { : 15px; }")
+        with (
+            self.assertRaisesRegex(ValueError, "Invalid CSS"),
+            self.assertLogs('odoo.addons.base.models.assetsbundle', level="WARNING")
+        ):
+            self.env['ai.tool']._ai_tool_write_custom_css("#test { : 15px; }")
 
-        with self.assertRaisesRegex(ValueError, "Undefined variable"):
-            # We are preprocessing css in an external bundle, and we don't have
-            # access to scss variables there
-            with self.assertLogs('odoo.addons.base.models.assetsbundle', level="WARNING"):
-                self.env['ai.tool']._ai_tool_write_custom_css("#test { background-color: $o-view-background-color; }")
+        # We are preprocessing css in an external bundle, and we don't have
+        # access to scss variables there
+        with (
+            self.assertRaisesRegex(ValueError, "Undefined variable"),
+            self.assertLogs('odoo.addons.base.models.assetsbundle', level="WARNING")
+        ):
+            self.env['ai.tool']._ai_tool_write_custom_css("#test { background-color: $o-view-background-color; }")
+
+        # This breaks when bundle rewrites relative url()s
+        with (
+            self.assertRaisesRegex(ValueError, "Invalid CSS"),
+            self.assertLogs('odoo.addons.base.models.assetsbundle', level="WARNING")
+        ):
+            self.env['ai.tool']._ai_tool_write_custom_css('$img: "a.png"; #test { background: url($img); }')
 
     def test_ai_tool_apply_html_scripts_disabled(self):
         """With AI JavaScript off, any action carrying a <script> is refused."""
@@ -1421,6 +1431,41 @@ class TestAIWebsiteBuilder(TestAICallbackCommon):
         self.assertIn("'0' = Low, '1' = Medium", result)
         self.assertIn('chosen by the user', result,
                       "The send-mail action must flag the recipient as the user's choice.")
+
+    def test_ai_tool_request_ai_scripts_scopes(self):
+        """The scripts can be inserted only in the allowed scope."""
+        ai_tool = self.env['ai.tool']
+        website = self.env['ai.website.service']._current_website()
+        script_action = [{
+            'zone': 'footer',
+            'mode': 'replace',
+            'content': '<section><script data-ai-script-id="a">(() => {})();</script></section>',
+        }]
+
+        tool_context = self._create_page_tool_context()
+        with self.assertRaisesRegex(ValueError, "scope must be"):
+            ai_tool._ai_tool_request_ai_scripts(tool_context, 'everywhere')
+        self.assertFalse(website.ai_allow_scripts)
+
+        ai_tool._ai_tool_request_ai_scripts(tool_context, 'chat')
+        self.assertEqual(tool_context['state'], {'website_ai_allow_scripts': True})
+        self.assertFalse(website.ai_allow_scripts)
+
+        # The chat that was granted the permission can write scripts; another one cannot.
+        self.assertEqual(
+            ai_tool._ai_tool_apply_html_to_page(tool_context, script_action)['client_tool']['name'],
+            'website_apply_html',
+        )
+        with self.assertRaisesRegex(ValueError, "adding JavaScript is turned off"):
+            ai_tool._ai_tool_apply_html_to_page({'state': {}}, script_action)
+
+        website_context = self._create_page_tool_context()
+        ai_tool._ai_tool_request_ai_scripts(website_context, 'website')
+        self.assertTrue(website.ai_allow_scripts)
+        self.assertEqual(
+            ai_tool._ai_tool_apply_html_to_page({'state': {}}, script_action)['client_tool']['name'],
+            'website_apply_html',
+        )
 
     def test_ai_tool_get_website_menus(self):
         website = self.env['ai.website.service']._current_website()

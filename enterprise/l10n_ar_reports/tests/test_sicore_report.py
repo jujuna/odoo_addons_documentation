@@ -1,13 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import fields
+from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.addons.l10n_ar_withholding.tests.test_withholding_ar_ri import TestArWithholdingArRi
-from odoo.addons.l10n_ar_reports.tests.test_reports import TestArReports
 from odoo.tests import tagged
 from odoo.tools import file_open
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
-class TestSicoreReport(TestArReports, TestArWithholdingArRi):
+class TestSicoreReport(TestArWithholdingArRi, TestAccountReportsCommon):
 
     _test_user_groups = None  # FIXME list needed groups
 

@@ -1,6 +1,7 @@
 import { OverlayPlugin } from "@web/core/overlay/overlay_plugin";
 import { useSubEnv } from "@web/owl2/utils";
 import { user } from "@web/core/user";
+import { rpc } from "@web/core/network/rpc";
 import { session } from "@web/session";
 import { Pager } from "@web/core/pager/pager";
 import { useService, useBus } from "@web/core/utils/hooks";
@@ -15,9 +16,11 @@ import { MrpDisplayEmployeesPanel } from "@mrp_workorder/mrp_display/employees_p
 import { PinPopup } from "@mrp_workorder/components/pin_popup";
 import { useConnectedEmployee } from "@mrp_workorder/mrp_display/hooks/employee_hooks";
 import { MrpDisplaySearchBar } from "@mrp_workorder/mrp_display/search_bar";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { CheckboxItem } from "@web/core/dropdown/checkbox_item";
 import {
     Component,
+    markup,
     onMounted,
     onWillStart,
     onWillUnmount,
@@ -73,6 +76,7 @@ export class MrpDisplay extends Component {
         const firstLoad = !localStoredWC;
         const workcenters = [...defaultWorkcenterButtons, ...(firstLoad ? [] : localStoredWC)];
         const activeWorkcenter = this._loadActiveWorkcenter(this.localStorageName, workcenters);
+        const displayDemoMessage = this.props.action.params?.message_demo_barcodes || false;
 
         this.state = proxy({
             activeResModel: activeWorkcenter ? "mrp.workorder" : this.props.resModel,
@@ -83,6 +87,7 @@ export class MrpDisplay extends Component {
             limit: this.props.action?.context?.limit,
             firstLoad: firstLoad,
             actionPending: false,
+            displayDemoMessage,
         });
         this.recordCacheIds = [];
         this.showCaseId = undefined;
@@ -431,7 +436,7 @@ export class MrpDisplay extends Component {
 
     toggleWorkcenterDialog(showWarning = true) {
         const params = {
-            title: _t("Activate your Work Centers"),
+            title: _t("Select Work Centers"),
             confirm: this.toggleWorkcenter.bind(this),
             disabled: [],
             active: this.state.workcenters.map((wc) => wc.id),
@@ -602,6 +607,40 @@ export class MrpDisplay extends Component {
             return workcenters[0].id; // Defaults to the first WC (often All MO).
         }
         return false;
+    }
+
+    get demoMessage() {
+        const demo_link = _t("Download demo data sheet");
+        const barcode_link = _t("Download operation barcodes");
+
+        const sheet_s = markup`<a href="/mrp_workorder/static/src/pdf/barcodes_demo_shopfloor.pdf" target="_blank" aria-label="${demo_link}" title="${demo_link}">`;
+        const ops_s = markup`<a href="/mrp_workorder/static/src/pdf/barcodes_actions_Manufacturing.pdf" target="_blank" aria-label="${barcode_link}" title="${barcode_link}">`;
+        const sheet_e = markup`</a>`;
+        const ops_e = markup`</a>`;
+
+        return _t(
+            "Print the %(sheet_s)sdemo data sheet%(sheet_e)s to test, or %(ops_s)sbarcodes%(ops_e)s for operations.",
+            { sheet_s, sheet_e, ops_s, ops_e }
+        );
+    }
+
+    removeDemoMessage() {
+        const params = {
+            title: _t("Don't show this message again"),
+            body: _t(
+                "Do you want to permanently remove this message ? " +
+                    "It won't appear anymore, so make sure you don't need the barcodes sheet or you have a copy."
+            ),
+            confirm: () => {
+                rpc("/mrp_workorder/rid_of_message_demo_barcodes"); // Sets action message param false on server
+                this.state.displayDemoMessage = false; // Remove message from current view
+                this.props.action.params.message_demo_barcodes = false; // Remove message if using breadcrumbs
+            },
+            cancel: () => {},
+            confirmLabel: _t("Remove it"),
+            cancelLabel: _t("Leave it"),
+        };
+        this.dialogService.add(ConfirmationDialog, params);
     }
 
     demoMORecords = [

@@ -14,7 +14,7 @@ export class SignTemplateMobileSignersPanel extends SignTemplateSidebar {
         SignTemplateMobileSignerRow,
     };
 
-    static props = {
+    static propsSchema = {
         signers: t.array(),
         activeSignerId: t.number(),
         updateActiveSigner: t.function(),

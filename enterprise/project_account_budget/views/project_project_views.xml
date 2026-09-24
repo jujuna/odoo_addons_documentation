@@ -5,7 +5,7 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.view_project_card"/>
         <field name="arch" type="xml">
-            <field name="activity_ids" position="before">
+            <a class="o_project_milestone_btn" position="after">
                 <field name="account_id" invisible="1"/>
                 <field name="total_budget_amount" invisible="1"/>
                 <field name="total_budget_progress" invisible="1"/>
@@ -15,14 +15,14 @@
                     <t t-elif="budget_progress &gt;= 0.25" t-set="budget_title">Budget on track</t>
                     <t t-elif="budget_progress &gt;= 0" t-set="budget_title">Budget soon overspent</t>
                     <t t-else="" t-set="budget_title">Budget overspent</t>
-                    <a name="action_budget_spent" type="object">
+                    <button name="action_budget_spent" class="btn btn-light d-flex p-1">
                         <i role="img" aria-label="Budget"
-                            t-attf-class="oi ms-1 text-{{ budget_progress == -1.0 ? 'muted' : budget_progress &gt;= 0.25 ? 'success' : budget_progress &gt;= 0 ? 'warning' : 'danger' }}"
-                            t-att-title="budget_title"
-                         data-icon="attach_money"/>
-                    </a>
+                            t-attf-class="oi text-{{ budget_progress == -1.0 ? 'muted' : budget_progress &gt;= 0.25 ? 'success' : budget_progress &gt;= 0 ? 'warning' : 'danger' }}"
+                            t-att-data-tooltip="budget_title"
+                         data-icon="money_bag"/>
+                    </button>
                 </t>
-            </field>
+            </a>
         </field>
     </record>
 
@@ -33,7 +33,7 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_view_all_rating']" position="after">
                 <t groups="account.group_account_readonly">
-                    <button class="oe_stat_button" name="action_budget_spent" type="object" icon="attach_money"
+                    <button class="oe_stat_button" name="action_budget_spent" type="object" icon="money_bag"
                         groups="project.group_project_manager" context="{'active_id': id}" invisible="is_template or not budget_count">
                         <div class="o_stat_info">
                             <span class="o_stat_value">

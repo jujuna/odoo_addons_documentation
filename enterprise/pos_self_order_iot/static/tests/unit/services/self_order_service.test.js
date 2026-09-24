@@ -10,7 +10,6 @@ definePosSelfModels();
 beforeEach(async () => {
     onRpc("/iot_drivers/action", () => true);
     onRpc("/iot_drivers/event", () => true);
-    onRpc("/pos-self-order/update-last-changes", () => ({ last_order_preparation_change: {} }));
     patchWithCleanup(console, { log: () => {} });
 
     // Fonts

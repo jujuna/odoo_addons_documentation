@@ -23,7 +23,7 @@ export class AccountReportHeader extends Component {
 
         this.controller.options().column_headers.forEach((columnHeader, columnHeaderIndex) => {
             let columnHeadersRow = [];
-            if (columnHeader.length !== 1) {
+            if (columnHeaderIndex !== 0 || columnHeader.length !== 1) {
                 for (let i = 0; i < this.controller.columnHeadersRenderData.level_repetitions[columnHeaderIndex]; i++) {
                     columnHeadersRow = [ ...columnHeadersRow, ...columnHeader];
                 }

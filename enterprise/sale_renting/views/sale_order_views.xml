@@ -66,8 +66,9 @@
             <xpath expr="//field[@name='order_line']//list//field[@name='qty_delivered']" position="after">
                 <field
                     name="qty_returned"
+                    widget="labeled_float_field"
                     column_invisible="not parent.is_rental_order or parent.state != 'sale' or not parent.has_rentable_lines"
-                    invisible="not is_rental"
+                    invisible="not is_rental or qty_returned == 0"
                 />
             </xpath>
             <xpath expr="//field[@name='order_line']//list" position="inside">

@@ -19,8 +19,9 @@ export class NewViewDialog extends ConfirmationDialog {
     static template = "web_studio.NewViewDialog";
     static GROUPABLE_TYPES = ["many2one", "char", "boolean", "selection", "date", "datetime"];
     static MEASURABLE_TYPES = ["integer", "float"];
-    props = useProps(newViewDialogProps);
+    static propsSchema = newViewDialogProps;
 
+    props = useProps(this.constructor.propsSchema);
     debugMode = usePlugin(DebugModePlugin);
 
     setup() {

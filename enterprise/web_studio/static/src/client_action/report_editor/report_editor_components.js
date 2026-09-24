@@ -79,6 +79,10 @@ export class SaveDiscard extends Component {
 export class ReportPrintButton extends Component {
     static template = "web_studio.ReportEditor.PrintButton";
 
+    props = useProps({
+        onWillPrint: t.function().optional(),
+    });
+
     setup() {
         this.action = useService("action");
         this.notification = useService("notification");

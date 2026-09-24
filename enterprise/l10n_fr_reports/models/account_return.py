@@ -1,5 +1,3 @@
-from markupsafe import Markup
-
 from odoo import _, api, fields, models
 from odoo.tools.translate import LazyTranslate
 
@@ -324,46 +322,6 @@ class AccountReturn(models.Model):
                 message=_lt("Review partners having missing information. For addresses, simply enter ' / ' for non-address required fields."),
                 anomaly=error_data['partners']['errors'],
             )
-
-        if 'wrong_tax_credit_selection_value' not in check_codes_to_ignore and error_data['tax_credit_selection']['line_exists']:
-            checks.append({
-                'name': _lt("In 2069 RCI Section III: make sure to select a valid label for Tax Credit"),
-                'message': Markup(
-                    "%(apr)s<br/>"
-                    "%(ptz)s<br/>"
-                    "%(bio)s<br/>"
-                    "%(art)s<br/>"
-                    "%(mai)s<br/>"
-                    "%(ptr)s<br/>"
-                    "%(cir)s<br/>"
-                    "%(cic)s<br/>"
-                    "%(cpe)s<br/>"
-                    "%(hve)s<br/>"
-                    "%(com)s<br/>"
-                    "%(crc)s<br/>"
-                    "%(eom)s<br/>"
-                    "%(tzm)s<br/>"
-                    "%(li2)s<br/>"
-                ) % {
-                    'apr': _lt("- APR: Apprenticeship Tax Credit"),
-                    'ptz': _lt("- PTZ: Tax Credit for First-Time Home Ownership (Standard Zero-Interest Loan)"),
-                    'bio': _lt("- BIO: Organic Farming Tax Credit"),
-                    'art': _lt("- ART: Artistic Crafts Tax Credit (Métiers d'Art)"),
-                    'mai': _lt("- MAI: \"Master Restaurateur\" Tax Credit"),
-                    'ptr': _lt("- PTR: Enhanced Zero-Interest Loan Tax Credit (PTZ+)"),
-                    'cir': _lt("- CIR: Research Tax Credit"),
-                    'cic': _lt("- CIC: Competitiveness and Employment Tax Credit (CICE)"),
-                    'cpe': _lt("- CPE: Tax Credit on Repayable Advances for Energy Performance Improvement Works"),
-                    'hve': _lt("- HVE: Tax Credit for Agricultural Businesses with High Environmental Value (HVE) Certification"),
-                    'com': _lt("- COM: Tax Reduction for Productive Investments in Overseas Collectivities (and New Caledonia)"),
-                    'crc': _lt("- CRC: Collaborative Research Tax Credit"),
-                    'eom': _lt("- EOM: Tax Credit for Music Publishers"),
-                    'tzm': _lt("- TZM: Tax Reduction for the Zero-Interest Mobility Loan"),
-                    'li2': _lt("- 2LI: Tax Claim for Institutional Investors in Intermediate Rental Housing"),
-                },
-                'code': 'wrong_tax_credit_selection_value',
-                'result': 'anomaly' if error_data['tax_credit_selection']['error'] else 'reviewed',
-            })
 
         return checks
 

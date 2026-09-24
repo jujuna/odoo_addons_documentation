@@ -30,7 +30,7 @@ test("mobile status menu only offers audio activation when the microphone has an
 
     await contains(".o-voip-StatusMenu-enableAudio > .oi.text-danger", { text: "error" });
     await click(".o-voip-StatusMenu-enableAudio");
-    await contains(".modal-footer .btn-secondary", { text: "Use Microphone" });
+    await contains(".modal-footer .btn-secondary", { text: "Use microphone" });
 });
 
 test("mobile audio activation explains how to unblock the microphone", async () => {

@@ -1051,6 +1051,10 @@ class TestAISession(TestAICallbackCommon, BusCase):
             self._resume_pending_tool_on_session(session, {'kind': 'question', 'value': ['Draft']})
 
         self.assertFalse(session.pending_tool_call)
+        prompt = session.channel_id.message_ids.filtered(
+            lambda message: 'ai_user_input_request' in (message.body or '')
+        )
+        self.assertIn("<p>Which one?</p>", prompt.body)
 
         # the synthesized answer should be in the session history as the tool call result
         self._assert_tool_result_texts(

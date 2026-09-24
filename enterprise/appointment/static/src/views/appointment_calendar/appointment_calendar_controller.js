@@ -29,12 +29,12 @@ patch(AttendeeCalendarController.prototype, {
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.uiService = useService("ui");
+        this.userCanCreateAppointmentTypes = false;
 
         useSubEnv({
             calendarState: proxy({
                 // default: regular calendar event edition, should behave mostly as if no patching had been done
                 // slots-creation: enables editing slots of the "editing appointment" selected by a user
-                // slots-deletion: enables deleting slots when they are clicked for the "editing appointment"
                 mode: "default",
             }),
         });
@@ -47,8 +47,12 @@ patch(AttendeeCalendarController.prototype, {
             ) {
                 this.env.calendarState.mode = "slots-creation";
             }
-            [this.isAppointmentManager, this.isAppointmentUser] =
-await Promise.all([
+            [
+                this.userCanCreateAppointmentTypes,
+                this.isAppointmentManager,
+                this.isAppointmentUser,
+            ] = await Promise.all([
+                user.checkAccessRight("appointment.type", "create"),
                 user.hasGroup("appointment.group_appointment_manager"),
                 user.hasGroup("appointment.group_appointment_user"),
             ]);
@@ -116,14 +120,48 @@ await Promise.all([
         }
     },
 
+    async setSelectedAppointmentTypeId(appointmentTypeId) {
+        await this.model.setSelectedAppointmentTypeId(appointmentTypeId);
+        if (!appointmentTypeId) {
+            return;
+        }
+        const aptName = this.model.data.userAppointmentsData?.get(appointmentTypeId)?.name;
+        const message = aptName
+            ? _t("Managing bookings for %s", aptName)
+            : _t("Managing bookings for the selected appointment type");
+        this.notification.add(message, { type: "success" });
+    },
+
     get sidePanelProps() {
         return {
             ...super.sidePanelProps,
             copyAppointmentURL: this.onClickGetAppointmentUrl.bind(this),
             openAppointmentForm: this.onClickOpenForm.bind(this),
-            openAppointmentEditWizard: this.openAppointmentEditSlotsForm.bind(this),
             setEditingAppointmentId: this.setEditingAppointmentId.bind(this),
+            setSelectedAppointmentTypeId: this.setSelectedAppointmentTypeId.bind(this),
         };
+    },
+
+    async createAppointmentFlexible() {
+        const newAppointmentTypeIds = await this.orm.create("appointment.type", [
+            {
+                name: _t("My Availabilities"),
+                category: "custom",
+                staff_user_ids: [user.userId],
+            },
+        ]);
+        if (!newAppointmentTypeIds?.length) {
+            return;
+        }
+        return newAppointmentTypeIds[0];
+    },
+
+    async onClickCreateFlexibleAppointment() {
+        const newAppointmentTypeId = await this.createAppointmentFlexible();
+        if (newAppointmentTypeId) {
+            await this.setEditingAppointmentId(newAppointmentTypeId);
+            this._writeUrlToClipboard();
+        }
     },
 
     async onClickOpenForm(appointmentId) {
@@ -152,40 +190,56 @@ await Promise.all([
         this._writeUrlToClipboard(appointmentInfo.invite_url);
     },
 
-    async openAppointmentEditSlotsForm(appointmentTypeId, defaultName) {
+    async openAppointmentEditSlotsForm(appointmentTypeId) {
         const action = await this.actionService.loadAction(
             "appointment.appointment_edit_slots_action"
         );
         const context = action.context;
-        context.default_name =
-            defaultName || _t("%(user_name)s - Free Time Slots", { user_name: user.name });
         context.default_slot_duration = this.model.getLocalStorageDuration(appointmentTypeId);
-        this.displayDialog(FormViewDialog, {
-            canExpand: false,
-            context: context,
-            size: "sm",
-            title: action.name,
-            viewId: action.view_id?.[0],
-            resId: appointmentTypeId || false,
-            resModel: action.res_model,
-            onRecordSaved: async (record) => {
-                const appointmentSlotDurationVals = {
-                    appointmentDuration: record.data.slot_duration,
-                };
-                const savedAppointmentTypeId = record.resId;
-                localStorage.setItem(
-                    `appointment.slot.editor.data.${savedAppointmentTypeId}`,
-                    JSON.stringify(appointmentSlotDurationVals)
-                );
-                const promises = [];
-                // include new appointments in the sidebar
-                if (!appointmentTypeId) {
-                    promises.push(this.model.toggleAppointmentInList(savedAppointmentTypeId));
-                }
-                promises.push(this.setEditingAppointmentId(savedAppointmentTypeId));
-                await Promise.all(promises);
-                this._writeUrlToClipboard();
+        const editingActiveAppointmentType = this.model.slotsAppointmentData()?.active;
+        this.displayDialog(
+            FormViewDialog,
+            {
+                canExpand: false,
+                context: context,
+                size: "sm",
+                title: action.name,
+                viewId: action.view_id?.[0],
+                resId: appointmentTypeId || false,
+                resModel: action.res_model,
+                onRecordSaved: async (record) => {
+                    const appointmentSlotDurationVals = {
+                        appointmentDuration: record.data.slot_duration,
+                    };
+                    const savedAppointmentTypeId = record.resId;
+                    localStorage.setItem(
+                        `appointment.slot.editor.data.${savedAppointmentTypeId}`,
+                        JSON.stringify(appointmentSlotDurationVals)
+                    );
+                    await this.setEditingAppointmentId(savedAppointmentTypeId);
+                    this._writeUrlToClipboard();
+                },
             },
-        });
+            {
+                onClose: async () => {
+                    // if editing
+                    if (editingActiveAppointmentType) {
+                        await this.model._updateSlotsAppointment(
+                            this.model.slotsAppointmentData().id
+                        );
+                    }
+                    if (
+                        editingActiveAppointmentType &&
+                        !this.model.slotsAppointmentData()?.active
+                    ) {
+                        await this.setEditingAppointmentId(false);
+                    }
+                    // if we're not editing, update sidebar list in case we just archived one from it
+                    if (!this.model.slotsAppointmentData()) {
+                        return this.model.updateUserAppointmentsData();
+                    }
+                },
+            }
+        );
     },
 });

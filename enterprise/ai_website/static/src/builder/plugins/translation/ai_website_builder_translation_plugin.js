@@ -9,7 +9,7 @@ export class AiWebsiteBuilderTranslationPlugin extends Plugin {
 
     stopAiScripts(rootEl = this.editable) {
         rootEl.querySelectorAll("script[data-ai-script-id]").forEach((scriptEl) => {
-            this.window.__aiScriptsManager__.runtime.disposeScript(scriptEl);
+            this.window.__aiScriptsManager__.manager.disposeScript(scriptEl);
         });
     }
 }

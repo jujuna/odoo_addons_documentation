@@ -23,12 +23,12 @@ INTERFACE_KEYS = [
 
 class AIComposer(models.Model):
     _name = "ai.composer"
-    _description = "AI model configurations (system prompts) for text drafting."
+    _description = "AI model configurations (Default Prompt) for text drafting."
     _explanation = "Configures AI-assisted drafting components (e.g., email rewriting, HTML field assistance) by linking them with specific AI agents and base prompts."
 
     _unique_agent_interface_model = models.UniqueIndex(
-        "(ai_agent_id, interface_key, focused_model_id) NULLS NOT DISTINCT",
-        "A rule with this Agent, Action and Model combination already exists.",
+        "(interface_key, focused_model_id) NULLS NOT DISTINCT",
+        "A rule with this Action and Model combination already exists.",
     )
 
     def _get_default_agent(self):

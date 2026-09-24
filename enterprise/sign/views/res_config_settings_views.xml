@@ -34,19 +34,15 @@
                                 </div>
                             </div>
                         </setting>
-                        <setting help="Allow signatories to provide their identity using itsme®" id="module_sign_itsme">
+                        <setting id="module_sign_itsme" string="Digital Identity &amp; Qualified Signatures with itsme®"
+                                 help="Verify signatories identities with itsme® and enable eIDAS Qualified Electronic Signatures (QES)">
                             <field name="module_sign_itsme"/>
                             <widget name="documentation_link" path="https://www.itsme-id.com/en-BE/business/coverage" label="Available in supported countries" icon="east" icon_class="oi-fw o_button_icon"/>
-                            <widget name="iap_buy_more_credits" service_name="itsme_proxy" hide_service="1"/>
+                            <widget name="iap_buy_more_credits" service_name="itsme_proxy" hide_service="1" label="Manage &amp; Buy Identification Credits"/>
+                            <widget name="iap_buy_more_credits" service_name="sign_qes" hide_service="1" label="Manage &amp; Buy QES Credits"/>
                         </setting>
                         <setting help="Allow users to define the users or groups which have access to the template" id="manage_template_access">
                             <field name="group_manage_template_access"/>
-                        </setting>
-                        <setting id="sign_qes" string="Qualified Electronic Signatures"
-                                 help="Let signatories sign with a qualified electronic signature of their own"
-                                 invisible="not has_external_signature_service">
-                            <field name="has_external_signature_service" invisible="1"/>
-                            <widget name="iap_buy_more_credits" service_name="sign_qes" hide_service="1"/>
                         </setting>
                         <setting id="sms" string="Authenticate by SMS" documentation="/applications/marketing/sms_marketing/pricing/pricing_and_faq.html" help="Deliver one-time codes by SMS to identify signatories when signing a document">
                             <widget name="iap_buy_more_credits" service_name="sms" hide_service="1"/>

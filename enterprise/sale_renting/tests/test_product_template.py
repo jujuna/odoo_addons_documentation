@@ -4,11 +4,12 @@ from datetime import datetime
 
 from odoo.tests import tagged, users
 
+from odoo.addons.product.tests.common import ProductVariantsCommon
 from odoo.addons.sale_renting.tests.common import SaleRentingCommon
 
 
 @tagged("post_install", "-at_install")
-class TestSaleRentingProductTemplate(SaleRentingCommon):
+class TestSaleRentingProductTemplate(ProductVariantsCommon, SaleRentingCommon):
     _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
@@ -43,3 +44,11 @@ class TestSaleRentingProductTemplate(SaleRentingCommon):
         )
 
         self.assertEqual(configurator_data["price_info"], "/ 2 Days")
+
+    def test_action_view_rentals_without_default_product(self):
+        """Ensure action_view_rentals does not set default_product_id when no variants exist."""
+        self.product_template_sofa.rent_periodicity = "days"
+        self.product_template_sofa.product_variant_ids.unlink()
+
+        action = self.product_template_sofa.action_view_rentals()
+        self.assertNotIn("default_product_id", action["context"])

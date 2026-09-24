@@ -105,6 +105,14 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         encountered_product_ids = set()
         encountered_product_uom_ids = set()
 
+        def add_invoice_line_total(move_vals, line_vals):
+            if line_vals['balance'] > 0.0:
+                total_key = 'total_invoices_debit' if move_vals['type'] in ('out_invoice', 'out_refund') else 'total_bills_debit'
+                res[total_key] += line_vals['balance']
+            else:
+                total_key = 'total_invoices_credit' if move_vals['type'] in ('out_invoice', 'out_refund') else 'total_bills_credit'
+                res[total_key] -= line_vals['balance']
+
         # TODO: to remove in master, do not include the in_invoice if the template was not updated
         template_tree = self.env['ir.qweb']._get_template('l10n_lu_reports.saft_template_inherit_l10n_lu_saft')[0]
         missing_tree_node = template_tree.findall('.//PurchaseInvoices')
@@ -128,33 +136,42 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
             for line_vals in move_vals['line_vals_list']:
                 if (tax_id := line_vals['tax_line_id']):
-                    # Each tax should appear only once in the tax table
-                    if tax_id not in tax_factors:
-                        tax_factors[tax_id] = {
-                            'currency_id': line_vals['currency_id'],
-                            'currency_code': line_vals['currency_code'],
-                            'tax_id': line_vals['tax_line_id'],
-                            'tax_name': line_vals['tax_name'],
-                            'tax_amount': line_vals['tax_amount'],
-                            'tax_base_amount': line_vals['tax_base_amount'],
-                            'tax_amount_type': line_vals['tax_amount_type'],
-                            'amount': line_vals['balance'],
-                            'amount_currency': line_vals['amount_currency'],
-                            'rate': line_vals['rate'],
-                        }
-                    # only sum amounts if same sign as first repartition line
-                    elif line_vals['balance'] * tax_factors[tax_id]['amount'] > 0:
-                        tax_factors[tax_id]['amount'] += line_vals['balance']
-                        tax_factors[tax_id]['amount_currency'] += line_vals['amount_currency']
-                    move_vals['total_invoice_tax_balance'] -= line_vals['balance']
-                elif not line_vals['account_type'] in ('asset_receivable', 'liability_payable') and line_vals['display_type'] == 'product':
-                    move_vals['total_invoice_untaxed_balance'] -= line_vals['balance']
-                    if line_vals['balance'] > 0.0:
-                        total_debit_key = 'total_invoices_debit' if move_vals['type'] in ('out_invoice', 'out_refund') else 'total_bills_debit'
-                        res[total_debit_key] += line_vals['balance']
+                    if line_vals['tax_detail_vals_list']:
+                        move_vals['total_invoice_untaxed_balance'] -= line_vals['balance']
+                        add_invoice_line_total(move_vals, line_vals)
+                        move_vals['invoice_line_vals_list'].append({
+                            **line_vals,
+                            'quantity': 1.0,
+                            'price_unit': abs(line_vals['balance']) * line_vals['rate'],
+                        })
                     else:
-                        total_credit_key = 'total_invoices_credit' if move_vals['type'] in ('out_invoice', 'out_refund') else 'total_bills_credit'
-                        res[total_credit_key] -= line_vals['balance']
+                        # Each tax should appear only once in the document totals.
+                        if tax_id not in tax_factors:
+                            tax_factors[tax_id] = {
+                                'currency_id': line_vals['currency_id'],
+                                'currency_code': line_vals['currency_code'],
+                                'tax_id': line_vals['tax_line_id'],
+                                'tax_name': line_vals['tax_name'],
+                                'tax_amount': line_vals['tax_amount'],
+                                'tax_base_amount': line_vals['tax_base_amount'],
+                                'tax_amount_type': line_vals['tax_amount_type'],
+                                'amount': line_vals['balance'],
+                                'amount_currency': line_vals['amount_currency'],
+                                'rate': line_vals['rate'],
+                            }
+                        # Only sum amounts if same sign as first repartition line.
+                        elif line_vals['balance'] * tax_factors[tax_id]['amount'] > 0:
+                            tax_factors[tax_id]['amount'] += line_vals['balance']
+                            tax_factors[tax_id]['amount_currency'] += line_vals['amount_currency']
+                        move_vals['total_invoice_tax_balance'] -= line_vals['balance']
+                elif not line_vals['account_type'] in ('asset_receivable', 'liability_payable') and line_vals['display_type'] == 'product':
+                    line_vals['tax_detail_vals_list'] = [
+                        tax_vals
+                        for tax_vals in line_vals['tax_detail_vals_list']
+                        if not tax_vals['tax_include_base_amount']
+                    ]
+                    move_vals['total_invoice_untaxed_balance'] -= line_vals['balance']
+                    add_invoice_line_total(move_vals, line_vals)
                     if line_vals['product_id']:
                         encountered_product_ids.add(line_vals['product_id'])
                     if line_vals['product_uom_id']:

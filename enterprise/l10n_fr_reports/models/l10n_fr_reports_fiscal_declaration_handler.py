@@ -12,7 +12,6 @@ DECLARATION_MILLESIME = '26'
 FUNCTIONAL_GROUP_TYPE = 'INFENT'
 DECLARATION_TYPE = 'IDF'
 DECLARATION_REFERENCE = 'INFENT000000007'  # internal reference to the emitor
-TAX_CREDIT_SELECTION = {'APR', 'PTZ', 'BIO', 'ART', 'MAI', 'PTR', 'CIR', 'CIC', 'CPE', 'HVE', 'COM', 'CRC', 'EOM', 'TZM', '2LI'}
 
 REPORTS_TO_EXPORT = {
     '2031': {
@@ -268,10 +267,6 @@ class FiscalDeclarationHandler(models.AbstractModel):
 
         collected_data = {
             'partners_mandatory_fields': {},
-            'tax_credit_selection': {
-                'line_exists': False,
-                'error': False,
-            },
         }
         for report_name, config in REPORTS_TO_EXPORT.items():
             if fiscal_declaration_options and not fiscal_declaration_options.get(report_name):
@@ -300,13 +295,6 @@ class FiscalDeclarationHandler(models.AbstractModel):
                             mandatory = zone_details.get('structure', {}).get('mandatory', set())
                             if mandatory:
                                 collected_data['partners_mandatory_fields'].setdefault(res_id, set()).update(mandatory)
-                    elif not collected_data['tax_credit_selection']['error']\
-                        and line_code in {'l10n_fr_2069_special_cases_first_case_label', 'l10n_fr_2069_special_cases_second_case_label'}\
-                        and column.expression_label == 'balance':
-
-                        collected_data['tax_credit_selection']['line_exists'] = True
-                        if column.no_format and column.no_format not in TAX_CREDIT_SELECTION:
-                            collected_data['tax_credit_selection']['error'] = True
         return collected_data
 
     def _raise_many2one_errors(self, errors_by_report):
@@ -414,7 +402,6 @@ class FiscalDeclarationHandler(models.AbstractModel):
                 'errors': debtor_errors,
                 'record': debtor,
             },
-            'tax_credit_selection': collected_data['tax_credit_selection'],
         }
 
     @api.model

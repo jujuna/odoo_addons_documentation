@@ -9,11 +9,9 @@ class Website(models.CachedModel):
 
     ai_allow_scripts = fields.Boolean(
         string="AI JavaScript",
-        help="Let the AI website builder add JavaScript to the pages of this website.\n"
-             "Scripts already present on existing pages keep running when this is off; "
-             "only new ones are refused.",
-        default=False,
-    )
+        help="Always let the AI website builder add JavaScript to the pages of this website.\n"
+             "When off, it asks before adding any scripts.",
+        default=False)
 
     @api.model
     def get_site_profile(self):

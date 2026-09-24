@@ -208,32 +208,25 @@ class L10n_InReportHandler(models.AbstractModel):
 
     @api.model
     def _get_invalid_tds_tcs_moves(self, options, report):
+        domain = [
+            ('date', '>=', options['date']['date_from']),
+            ('date', '<=', options['date']['date_to']),
+            ('state', '=', 'posted'),
+            ('move_type', '!=', 'entry'),
+            ('commercial_partner_id.l10n_in_pan_entity_id', '=', False),
+        ]
 
-        def get_invalid_moves(tax_type, group_ref):
-            domain = [
-                ('date', '>=', options['date']['date_from']),
-                ('date', '<=', options['date']['date_to']),
-                ('state', '=', 'posted'),
-                ('move_type', '!=', 'entry'),
-                ('commercial_partner_id.l10n_in_pan_entity_id', '=', False),
-                ('invoice_line_ids.tax_ids.l10n_in_tax_type', '=', tax_type),
-                ('invoice_line_ids.tax_ids.tax_group_id', '=', self.env['account.chart.template'].with_company(self.env.company).ref(group_ref, raise_if_not_found=False)),
+        if report.id == self.env.ref("l10n_in.tds_report_it_act_25").id:
+            domain += [
+                ('invoice_line_ids.tax_ids.l10n_in_tax_type', '=', 'tds'),
+                ('invoice_line_ids.tax_ids.type_tax_use', '=', 'purchase'),
             ]
-            if tax_type == 'tds':
-                domain += [('invoice_line_ids.tax_ids.type_tax_use', '=', 'purchase')]
-            elif tax_type == 'tcs':
-                domain += [('invoice_line_ids.tax_ids.type_tax_use', '=', 'sale')]
-            return self.env['account.move'].search(domain)
-
-        invalid_move_ids = []
-        if report.id == self.env.ref("l10n_in.tds_report").id:
-            invalid_move_ids = get_invalid_moves('tds', 'tds_group').ids
-        elif report.id == self.env.ref("l10n_in.tcs_report").id:
-            invalid_move_ids = get_invalid_moves('tcs', 'tcs_group').ids
-        elif report.id == self.env.ref("l10n_in.tds_report_it_act_25").id:
-            invalid_move_ids = get_invalid_moves('tds', 'tds_it_act_25_group').ids
         elif report.id == self.env.ref("l10n_in.tcs_report_it_act_25").id:
-            invalid_move_ids = get_invalid_moves('tcs', 'tcs_it_act_25_group').ids
+            domain += [
+                ('invoice_line_ids.tax_ids.l10n_in_tax_type', '=', 'tcs'),
+                ('invoice_line_ids.tax_ids.type_tax_use', '=', 'sale'),
+            ]
+        invalid_move_ids = self.env['account.move'].search(domain).ids
 
         return 'l10n_in_reports.missing_pan_tds_tcs_warning', invalid_move_ids
 
@@ -263,7 +256,7 @@ class L10n_InReportHandler(models.AbstractModel):
                     (xml_id, obj.ids)
                     for xml_id, obj in all_checks
                 ]
-            elif report.id in (self.env.ref("l10n_in.tds_report").id, self.env.ref("l10n_in.tcs_report").id, self.env.ref("l10n_in.tds_report_it_act_25").id, self.env.ref("l10n_in.tcs_report_it_act_25").id):
+            elif report.id in (self.env.ref("l10n_in.tds_report_it_act_25").id, self.env.ref("l10n_in.tcs_report_it_act_25").id):
                 all_checks = [
                     self._get_invalid_tds_tcs_moves(options, report),
                 ]

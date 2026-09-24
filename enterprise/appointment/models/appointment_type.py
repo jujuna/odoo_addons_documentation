@@ -35,7 +35,7 @@ class AppointmentType(models.Model):
                 result['name'] = _("%s - Let's meet", self.env.user.name)
             if 'staff_user_ids' in fields and not result.get('staff_user_ids'):
                 result['staff_user_ids'] = [Command.set(self.env.user.ids)]
-        if 'event_videocall_source' in fields and not result.get('event_videocall_source'):
+        if 'event_videocall_source' in fields and result.get('event_videocall_source') is None:
             if not result.get('location_id'):
                 result['event_videocall_source'] = self._get_default_event_videocall_source()
         return result
@@ -1923,7 +1923,7 @@ class AppointmentType(models.Model):
 
         resources_booking_lines = booking_lines.grouped('appointment_resource_id')
         resources_remaining_capacity = {
-            resource: (resource.capacity if self.manage_capacity else self.max_bookings) - sum(booking_line.capacity_used for booking_line in resources_booking_lines.get(resource, []))
+            resource: max(0, (resource.capacity if self.manage_capacity else self.max_bookings) - sum(booking_line.capacity_used for booking_line in resources_booking_lines.get(resource, [])))
             for resource in all_resources
         }
         resources_remaining_capacity.update(total_remaining_capacity=sum(resources_remaining_capacity.values()))

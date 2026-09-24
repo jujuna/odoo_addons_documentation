@@ -8,8 +8,16 @@
             <field name="group_ids" eval="[(4, ref('planning.group_planning_user'))]"/>
         </record>
 
+        <record id="base.user_light" model="res.users">
+            <field name="group_ids" eval="[(4, ref('planning.group_planning_user'))]"/>
+        </record>
+
         <record id="base.default_user_group" model="res.groups">
             <field name="implied_ids" eval="[(4, ref('planning.group_planning_manager'))]"/>
+        </record>
+
+        <record id="base.user_light" model="res.users">
+            <field name="group_ids" eval="[(4, ref('planning.group_planning_user'))]"/>
         </record>
 
         <!-- Roles -->
@@ -271,7 +279,7 @@
         <record id="res_partner_aka" model="res.partner">
             <field name="name">Aka Foster</field>
             <field name="email">aka@test.com</field>
-            <field name="image_1920" type="bytes" file="planning/static/img/akaforest.jpg"/>
+            <field name="image_1920" type="bytes" file="planning/static/img/akafoster.webp"/>
         </record>
 
         <record id="employee_aka" model="hr.employee">
@@ -285,7 +293,7 @@
             <field name="work_location_id" ref="hr.work_location_1"/>
             <field name="work_phone">+3281813700</field>
             <field name="work_contact_id" ref="planning.res_partner_aka"/>
-            <field name="image_1920" type="bytes" file="planning/static/img/akaforest.jpg"/>
+            <field name="image_1920" type="bytes" file="planning/static/img/akafoster.webp"/>
             <field name="create_date">2023-01-01 00:00:00</field>
             <field name="hr_responsible_id" ref="base.user_admin"/>
             <field name="default_planning_role_id" ref="planning.planning_quality_control"/>
@@ -296,7 +304,7 @@
         <record id="res_partner_cry" model="res.partner">
             <field name="name">Cherry Nelson</field>
             <field name="email">cry@test.com</field>
-            <field name="image_1920" type="bytes" file="planning/static/img/cherrynilson.jpg"/>
+            <field name="image_1920" type="bytes" file="planning/static/img/cherrynelson.webp"/>
         </record>
 
         <record id="employee_cry" model="hr.employee">
@@ -310,7 +318,7 @@
             <field name="work_location_id" ref="hr.work_location_1"/>
             <field name="work_phone">+3281813700</field>
             <field name="work_contact_id" ref="planning.res_partner_cry"/>
-            <field name="image_1920" type="bytes" file="planning/static/img/cherrynilson.jpg"/>
+            <field name="image_1920" type="bytes" file="planning/static/img/cherrynelson.webp"/>
             <field name="create_date">2023-01-01 00:00:00</field>
             <field name="hr_responsible_id" ref="base.user_admin"/>
             <field name="default_planning_role_id" ref="planning.planning_maintenance_technician"></field>
@@ -334,7 +342,7 @@
             <field name="work_location_id" ref="hr.work_location_1"/>
             <field name="work_phone">+3281813700</field>
             <field name="work_contact_id" ref="planning.res_partner_oza"/>
-            <field name="image_1920" type="bytes" file="planning/static/img/sumanoza.jpg"/>
+            <field name="image_1920" type="bytes" file="planning/static/img/sumanoza.webp"/>
             <field name="create_date">2023-01-01 00:00:00</field>
             <field name="employee_type_id" ref="hr.contract_type_employee"/>
             <field name="default_planning_role_id" ref="planning.planning_maintenance_technician"></field>

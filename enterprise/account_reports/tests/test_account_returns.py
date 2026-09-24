@@ -2,6 +2,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 from itertools import product
+from markupsafe import Markup
 from unittest.mock import patch
 
 from odoo import fields, Command
@@ -1636,6 +1637,28 @@ class TestAccountReturn(TestAccountReportsCommon, MailCase):
         })
         # check_draft_entries
         draft_invoice = self.init_invoice('out_invoice', amounts=[10], invoice_date='2024-01-01')
+        draft_entry_with_tax = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2024-01-01',
+            'line_ids': [
+                Command.create({
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'credit': 10.0,
+                    'tax_ids': [Command.set([self.tax_sale_a.id])],
+                }),
+                Command.create({
+                    'account_id': self.company_data['default_account_receivable'].id,
+                    'debit': 11.5,
+                }),
+            ],
+        })
+        draft_entry_without_tax = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2024-01-01',
+        })
+        anomaly_invoice = self.init_invoice('out_invoice', amounts=[10], invoice_date='2024-01-01', post=True)
+        anomaly_invoice.review_state = 'anomaly'
+
         # check_bills_attachment
         bill = self.init_invoice('in_invoice', amounts=[10], invoice_date='2024-01-01', post=True)
 
@@ -1663,8 +1686,19 @@ class TestAccountReturn(TestAccountReportsCommon, MailCase):
         self.assertEqual(draft_entries_check.result, 'anomaly', "The draft entries check should fail as the invoice is not posted")
         self.assertEqual(bills_attachment_check.result, 'anomaly', "The bills attachment check should fail as the bill has no attachment")
 
+        self.assertEqual(draft_entries_check.records_count, 3, "The draft entries check should consider draft invoice, anomaly invoice and draft entry with tax.")
+        self.assertEqual(
+            company_data_check.message,
+            Markup(
+                '<p>Missing company details (like %(vat_label)s or country) can cause errors in your report, '
+                'such as using the wrong tax rate, wrongly exempting transactions.</p>'
+            ) % {'vat_label': january_return.company_id.partner_id.vat_label},
+        )
+
         self.env.company.vat = 'BE123456789'
-        draft_invoice.action_post()
+        (draft_invoice + draft_entry_with_tax).action_post()
+        anomaly_invoice.button_draft()
+        (draft_entry_without_tax + anomaly_invoice).unlink()
         bill.attachment_ids = self.env['ir.attachment'].create({
             'name': 'bill_attachment.pdf',
             'res_model': 'account.move',
@@ -1690,6 +1724,18 @@ class TestAccountReturn(TestAccountReportsCommon, MailCase):
         self.assertEqual(match_all_bank_entries_check.result, 'reviewed', "The match all bank entries check should succeed as the bank statement line is reconciled")
         self.assertEqual(draft_entries_check.result, 'reviewed', "The draft entries check should succeed as the invoice is posted")
         self.assertEqual(bills_attachment_check.result, 'reviewed', "The bills attachment check should succeed as the bill has an attachment")
+
+        february_return = self.env['account.return'].search([
+            ('type_id', '=', self.basic_return_type.id),
+            ('company_id', '=', self.env.company.id),
+            ('date_from', '=', '2024-02-01'),
+            ('date_to', '=', '2024-02-29'),
+        ])
+        february_return.refresh_checks()
+        self.assertFalse(
+            february_return.check_ids.filtered(lambda c: c.code == 'check_company_data'),
+            "The company data check should not be created if it is succeeding."
+        )
 
     def test_ec_sales_list_return_checks(self):
         """ Checks that the checks for the EC Sales List return are correctly generated.
@@ -2072,7 +2118,7 @@ class TestAccountReturn(TestAccountReportsCommon, MailCase):
         def patched_get_python_translations(self, module_name, lang):
             return frozendict({
                 "Drafts & Reviews": "Brouillons & Vérifications",
-                "Review Abnormal/To Review invoices and bills, and post drafts.":
+                "Review invoices, bills and entries which are either in draft or marked as Anomaly/To Review.":
                 "Vérifiez les factures et factures fournisseurs anormales ou à vérifier, et validez les brouillons.",
             })
 
@@ -2097,7 +2143,7 @@ class TestAccountReturn(TestAccountReportsCommon, MailCase):
             self.assertEqual(draft_entries_check.name, "Drafts & Reviews")
             self.assertEqual(
                 html2plaintext(draft_entries_check.message),
-                "Review Abnormal/To Review invoices and bills, and post drafts."
+                "Review invoices, bills and entries which are either in draft or marked as Anomaly/To Review."
             )
 
             self.assertEqual(draft_entries_check.with_context({"lang": "fr_FR"}).name, "Brouillons & Vérifications")

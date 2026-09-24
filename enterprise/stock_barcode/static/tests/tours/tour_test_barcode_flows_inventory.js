@@ -1569,8 +1569,8 @@ registry.category("web_tour.tours").add("test_inventory_setting_show_quantity_to
                 helper.assertLinesTrackingNumbers(sublines, ["sn1", "sn2", "sn3"]);
                 helper.assertButtonIsVisible(sublines[0], "count_zero");
                 helper.assertButtonIsVisible(sublines[0], "remove_unit", false);
-                helper.assertButtonIsVisible(sublines[0], "add_quantity", false);
-                helper.assertButtonIsVisible(sublines[0], "add_remaining_quantity");
+                helper.assertButtonIsVisible(sublines[0], "add_quantity", true);
+                helper.assertButtonIsVisible(sublines[0], "add_remaining_quantity", false);
                 helper.assertButtonIsVisible(sublines[1], "count_zero", false);
                 helper.assertButtonIsVisible(sublines[1], "remove_unit", false);
                 helper.assertButtonIsVisible(sublines[1], "add_quantity", false);

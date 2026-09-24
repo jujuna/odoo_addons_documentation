@@ -41,7 +41,7 @@
 
                 <button type="button" class="oi btn btn-secondary o-web-studio-interactive-list-edit-item" data-icon="edit_square" aria-label="Edit selection" data-tooltip="Edit selection" t-on-click="() => this.editItem(item)" />
 
-                <button type="button" t-att-class="{ disabled: !item.isRemovable }"  class="btn btn-secondary o-web-studio-interactive-list-remove-item" data-icon="delete" aria-label="Remove selection" data-tooltip="Remove selection" t-on-click="() => this.removeItem(item)" />
+                <button type="button" t-att-class="{ disabled: !item.isRemovable }"  class="btn btn-secondary oi o-web-studio-interactive-list-remove-item" data-icon="delete" aria-label="Remove selection" data-tooltip="Remove selection" t-on-click="() => this.removeItem(item)" />
             </div>
             <ul class="p-0 ms-5" t-if="item.children">
                 <t t-foreach="item.children" t-as="item" t-key="item.id">

@@ -77,7 +77,7 @@ test("Invite users into whatsapp channel", async () => {
     await contains(".o-discuss-ChannelMemberList"); // wait for auto-open of this panel
     await click("button[title='Add People']");
     await click(".o-discuss-ChannelInvitation-selectable");
-    await click(".o-discuss-ChannelInvitation [title='Invite']:enabled");
+    await click(".o-discuss-ChannelInvitation button:text('Invite'):enabled");
     await contains(".o_mail_notification", { text: "invited WhatsApp User to the channel" });
 });
 

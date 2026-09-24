@@ -5,6 +5,7 @@ import logging
 from odoo import _, api, fields, models
 from odoo.tools.float_utils import json_float_round
 from odoo.exceptions import UserError
+from odoo.fields import Domain
 from odoo.addons.l10n_ke_edi_oscu.models.account_move import format_etims_datetime
 from odoo.tools import SQL
 
@@ -105,6 +106,8 @@ class ProductTemplate(models.Model):
 
     @api.model
     def _search_l10n_ke_item_code(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
         return [('product_variant_ids.l10n_ke_item_code', operator, value)]
 
     # === Actions === #

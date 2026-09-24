@@ -160,6 +160,8 @@ class PlanningSlot(models.Model):
             slot.allow_billable = slot._get_timesheetable_project().allow_billable
 
     def _search_allow_billable(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
         return Domain('company_id', 'in', self.env.companies.sudo().filtered_domain([('planning_project_id.allow_billable', operator, value)]).ids)
 
     @api.depends('company_id.planning_project_id')
@@ -184,6 +186,8 @@ class PlanningSlot(models.Model):
             slot.sale_warning_text = "\n".join(warnings)
 
     def _search_allow_timesheets(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
         return Domain('company_id', 'in', self.env.companies.sudo().filtered_domain([('planning_project_id.allow_timesheets', operator, value)]).ids)
 
     def copy_data(self, default=None):

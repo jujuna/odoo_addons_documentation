@@ -265,7 +265,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
     @api.model
     def _get_tax_details_query(self, report, options):
         query = report._get_report_query(options, 'strict_range')
-        tax_details_query = self.env['account.move.line']._get_query_tax_details(query.from_clause, query.where_clause)
+        tax_details_query = self.env['account.move.line']._get_query_tax_details(query)
         tax_name = self.env['account.tax']._field_to_sql('tax', 'name')
 
         return SQL("""

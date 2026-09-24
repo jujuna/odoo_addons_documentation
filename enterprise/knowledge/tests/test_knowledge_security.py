@@ -121,6 +121,12 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
                                msg="ACLs: No cover access to portal"):
             self.env['knowledge.cover'].search([])
 
+        # HOME PAGE ACTION: entry point of the portal webclient, its groups have
+        # to list the portal one (see ``ir_actions_data.xml``)
+        action = self.env.ref('knowledge.ir_actions_server_knowledge_home_page').run()
+        self.assertEqual(action['res_model'], 'knowledge.article',
+                         "ACLs: portal can run the Knowledge home page action")
+
     @mute_logger('odoo.models.unlink')
     @users('user_erp_manager')
     def test_models_as_erp_manager(self):

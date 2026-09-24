@@ -13,7 +13,7 @@ from odoo import api, models
 from odoo.exceptions import ConcurrencyError
 from odoo.tools.image import image_process
 
-from odoo.addons.base.models.assetsbundle import AssetsBundle
+from odoo.addons.base.models.assetsbundle import AssetsBundle, StylesheetAsset
 from odoo.addons.html_editor.controllers.main import attachment_create
 from odoo.addons.web.icons import search_icons
 
@@ -130,10 +130,12 @@ class AIWebsiteService(models.AbstractModel):
         return new_attachment.image_src
 
     @api.model
-    def _ai_scripts_allowed(self):
-        """Whether the AI may add JavaScript to the website being edited."""
-        website = self.env.website or self.env.ref('base.default_website')
-        return website.ai_allow_scripts
+    def _ai_scripts_allowed(self, session_state):
+        """Whether the AI may add JavaScript, website-wide or just in this chat."""
+        return bool(
+            self._current_website().ai_allow_scripts
+            or session_state.get('website_ai_allow_scripts')
+        )
 
     @api.model
     def _strip_animation_runtime_state(self, content):
@@ -240,7 +242,7 @@ class AIWebsiteService(models.AbstractModel):
         return self._serialize_html_fragment(fragment) if changed else content
 
     @api.model
-    def _validate_html_actions(self, actions):
+    def _validate_html_actions(self, actions, session_state):
         """Sanity-check the HTML actions produced by the AI, raising on anything
         unsafe or out of bounds. The markup is sanitized in the builder, which
         knows to set the AI scripts aside first."""
@@ -254,11 +256,11 @@ class AIWebsiteService(models.AbstractModel):
                 raise ValueError(f"Action #{i}: content is too long ({content_length} characters). Maximum allowed is {_MAX_ACTION_CONTENT_LENGTH} characters.")
 
             # The JavaScript gates run on the raw content, before any rewriting.
-            if _SCRIPT_TAG_RE.search(content) and not self._ai_scripts_allowed():
+            if _SCRIPT_TAG_RE.search(content) and not self._ai_scripts_allowed(session_state):
                 raise ValueError(
-                    f"Action #{i}: adding JavaScript is turned off for this website. "
-                    "Tell the user it can be enabled in the website settings, and do "
-                    "not try to deliver this behaviour some other way."
+                    f"Action #{i}: adding JavaScript is turned off. Ask the user whether "
+                    "to allow it this time, always, or not at all, and do not "
+                    "try to deliver this behaviour some other way."
                 )
 
             if _DANGEROUS_JS_RE.search(content):
@@ -325,10 +327,13 @@ class AIWebsiteService(models.AbstractModel):
             action['content'] = self._generate_placeholder_icons(content)
 
     @api.model
+    def _get_website_assets(self):
+        return self.env['website.assets'].with_context(website_id=self._current_website().id)
+
+    @api.model
     def _read_custom_css(self):
         """Read the current content of user_custom_rules.scss."""
-        # `env.website` comes from the request host, not the site being edited.
-        assets = self.env['website.assets'].with_context(website_id=self._current_website().id)
+        assets = self._get_website_assets()
         content = assets._get_content_from_url(
             assets._make_custom_asset_url(
                 _USER_CUSTOM_RULES_URL, _USER_CUSTOM_RULES_BUNDLE), {'customized': True}
@@ -355,6 +360,12 @@ class AIWebsiteService(models.AbstractModel):
         if not css_content or not css_content.strip():
             return
         fake_bundle = 'ai_website.custom_css_validation'
+        # Inline content skips StylesheetAsset._fetch_content, which rewrites
+        # relative url()s with the asset's /_custom/... path. That can break
+        # valid SCSS (e.g. `url($var)`), so we test it here.
+        custom_url = self._get_website_assets()._make_custom_asset_url(_USER_CUSTOM_RULES_URL, _USER_CUSTOM_RULES_BUNDLE)
+        web_dir = custom_url.rsplit('/', 1)[0]
+        css_content = StylesheetAsset.rx_url.sub(fr"url(\1{web_dir}/", css_content)
 
         bundle = AssetsBundle(
             fake_bundle,

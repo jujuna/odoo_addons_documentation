@@ -82,7 +82,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_lu'))]"/>
         <field name="company_id" ref="base.demo_company_lu"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employe_frida_poirish.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-1.webp"/>
     </record>
 
     <record id="res_partner_frida_work_address" model="res.partner">
@@ -135,7 +135,7 @@
 
     <record id="hr_employee_tom" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_tom')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employee_tom_schmit.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-2.webp"/>
         <field name="work_phone">999 197 093</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_tom')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_lu_hr_payroll.res_partner_tom"/>
@@ -185,7 +185,7 @@
         <field name="address_id" ref="l10n_lu_hr_payroll.res_partner_frida_work_address"/>
         <field name="name" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_frida')).name"/>
         <field name="job_title">Software Developer</field>
-        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employe_frida_poirish.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-1.webp"/>
         <field name="work_phone">999 197 094</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_frida')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_lu_hr_payroll.hr_employee_tom"/>
@@ -245,7 +245,7 @@
 
     <record id="hr_employee_simone" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_simone')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employee_simon_jambon.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_employee_payroll-image.webp"/>
         <field name="work_phone">999 197 095</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_simone')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_lu_hr_payroll.res_partner_simone"/>

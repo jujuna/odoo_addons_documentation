@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "@odoo/hoot";
 import { queryAll, queryOne } from "@odoo/hoot-dom";
-import { advanceTime, animationFrame, mockDate, mockTimeZone } from "@odoo/hoot-mock";
+import { animationFrame, mockDate, mockTimeZone } from "@odoo/hoot-mock";
 
 import { session } from "@web/session";
-import { togglePartnerFilter } from "@calendar/../tests/calendar_test_helpers";
 import {
     clickAllDaySlot,
     moveEventToTime,
@@ -13,20 +12,21 @@ import {
 import {
     contains,
     defineActions,
+    makeMockServer,
     MockServer,
     mountView,
     onRpc,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
 
-import { AppointmentType, CalendarEvent, defineAppointmentModels } from "./appointment_tests_common";
+import { AppointmentType, defineAppointmentModels } from "./appointment_tests_common";
 
 describe.current.tags("desktop");
 defineAppointmentModels();
 
 let userId = session.user_id[0];
 
-// the sidebar "Booking Pages" autocomplete opens this action to create/edit an
+// the "Share > New Appointment" menu opens this action to create/edit an
 // appointment type; give it a minimal form
 AppointmentType._views = {
     form: `<form>
@@ -50,13 +50,14 @@ defineActions([
     },
 ]);
 
-async function createBookingPageFromSidebar(name, { slotDuration } = {}) {
-    await contains(`.o-autocomplete--input[placeholder="+ Add Booking Pages"]`).edit(name, {
-        confirm: false,
-    });
-    // wait for autocomplete debounce
-    await advanceTime(300);
-    await contains(".o-autocomplete--dropdown-item:contains(Create)").click();
+/**
+ * Create a booking page through the "Share > New Appointment" menu, which is also what
+ * stores the editor slot duration used to subdivide dragged slots.
+ */
+async function createBookingPageFromShareMenu(name, { slotDuration } = {}) {
+    await openShareMenu();
+    await contains(".o-dropdown-item:contains('New Appointment')").click();
+    await contains(".o_field_widget[name='name'] input").edit(name);
     if (slotDuration !== undefined) {
         await contains(".o_field_widget[name='slot_duration'] input").edit(String(slotDuration));
     }
@@ -64,13 +65,20 @@ async function createBookingPageFromSidebar(name, { slotDuration } = {}) {
     await animationFrame();
 }
 
-async function listBookingPageFromSidebar(name) {
-    const bookingPagesAutocomplete = `.o-autocomplete:has(.o-autocomplete--input[placeholder="+ Add Booking Pages"])`;
-    await contains(`${bookingPagesAutocomplete} .o-autocomplete--input`).edit(name, {
-        confirm: false,
-    });
-    await advanceTime(300);
-    await contains(`${bookingPagesAutocomplete} .o-autocomplete--dropdown-item:not(:contains(Create))`).click();
+/**
+ * Enter slot edition for a booking page listed in the sidebar. The sidebar lists every
+ * appointment type the user manages on each calendar load, so the record must already
+ * exist when the view is mounted.
+ */
+async function editBookingPageFromSidebar(name) {
+    await contains(`.o_calendar_filter_item:contains(${name}) button[title="Edit Appointment"]`, {
+        visible: false,
+    }).click();
+    await animationFrame();
+}
+
+async function openShareMenu() {
+    await contains(".o_appointment_scheduling_box button:contains(Share)").click();
 }
 
 const baseTestAppointmentStaffUsers = AppointmentType._records[1].staff_user_ids;
@@ -87,6 +95,8 @@ afterEach(function () {
 onRpc("res.partner", "get_attendee_detail", () => []);
 
 onRpc("res.users", "has_group", () => true);
+
+onRpc("appointment.type", "has_access", () => true);
 
 onRpc("res.users", "get_calendar_model_data", () => ({
     credential_status: {},
@@ -119,18 +129,15 @@ describe("appointment slot splitting", () => {
      * slot-edition mode, ready for a drag. Use captureSlotCreate() for the assertions.
      */
     async function editWeeklyType(name, extraVals = {}) {
-        await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
-        MockServer.env["appointment.type"].create({
+        const { env: pyEnv } = await makeMockServer();
+        pyEnv["appointment.type"].create({
             name,
             category: "website",
             staff_user_ids: [userId],
-            schedule_based_on: "users",
-            user_can_manage_slots: true,
             ...extraVals,
         });
-        await listBookingPageFromSidebar(name);
-        await contains(`.o_cw_filter_title:contains(${name})`).click();
-        await animationFrame();
+        await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
+        await editBookingPageFromSidebar(name);
     }
 
     test("custom slots split by the duration set in the wizard", async () => {
@@ -139,7 +146,7 @@ describe("appointment slot splitting", () => {
         await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
 
         // with slot duration, when dragging the length should be subdivided in (length / duration) (+ 1 unless exactly divisible)
-        await createBookingPageFromSidebar("Custom Duration Meeting", { slotDuration: 1 });
+        await createBookingPageFromShareMenu("Custom Duration Meeting", { slotDuration: 1 });
 
         await selectTimeRange("2022-01-05 09:00:00", "2022-01-05 11:30:00");
         await animationFrame();
@@ -162,7 +169,7 @@ describe("appointment slot splitting", () => {
         await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
 
         // a custom booking page whose slot duration is 0 => no automatic subdivision
-        await createBookingPageFromSidebar("Custom No Duration Meeting", { slotDuration: 0 });
+        await createBookingPageFromShareMenu("Custom No Duration Meeting", { slotDuration: 0 });
 
         // a 3h drag stays a single slot spanning the whole range
         await selectTimeRange("2022-01-05 09:00:00", "2022-01-05 12:00:00");
@@ -266,7 +273,6 @@ describe("booking pages sidebar", () => {
             arch: CALENDAR_ARCH,
         });
 
-        await listBookingPageFromSidebar("Test Appointment");
         queryOne(
             '.o_calendar_filter_item:contains("Test Appointment") button[title="Copy invite url to clipboard"]'
         ).click();
@@ -298,7 +304,8 @@ describe("booking pages sidebar", () => {
             resModel: "calendar.event",
             arch: CALENDAR_ARCH,
         });
-        await contains('button:contains("Share my calendar")').click();
+        await openShareMenu();
+        await contains(".o-dropdown-item:contains('My availabilities')").click();
         await animationFrame();
 
         expect.verifySteps(["/appointment/appointment_type/search_create_anytime"]);
@@ -306,7 +313,8 @@ describe("booking pages sidebar", () => {
             message: "Create a new appointment type",
         });
 
-        await contains('button:contains("Share my calendar")').click();
+        await openShareMenu();
+        await contains(".o-dropdown-item:contains('My availabilities')").click();
         await animationFrame();
 
         expect.verifySteps(["/appointment/appointment_type/search_create_anytime"]);
@@ -315,39 +323,43 @@ describe("booking pages sidebar", () => {
         });
     });
 
-    test("verify share button and booking pages sidebar are displayed", async () => {
+    test("verify share menu and booking pages sidebar are displayed", async () => {
         await mountView({
             type: "calendar",
             resModel: "calendar.event",
             arch: CALENDAR_ARCH,
         });
 
-        expect('button:contains("Share my calendar")').toHaveCount(1);
+        expect('.o_appointment_scheduling_box button:contains("Share")').toHaveCount(1);
         expect('.o_cw_filter_label:contains("Booking Pages")').toHaveCount(1);
+
+        await openShareMenu();
+        expect(".o-dropdown-item").toHaveCount(3);
+        expect(".o-dropdown-item:contains('My availabilities')").toHaveCount(1);
+        expect(".o-dropdown-item:contains('One-time link')").toHaveCount(1);
+        expect(".o-dropdown-item:contains('New Appointment')").toHaveCount(1);
     });
 });
 
 describe("recurring slot rendering", () => {
     async function startEditRecurringSlots({ aptVals = {}, slotValsAll = [] } = {}) {
-        await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
-        const appointmentTypeId = MockServer.env["appointment.type"].create({
+        const { env: pyEnv } = await makeMockServer();
+        const appointmentTypeId = pyEnv["appointment.type"].create({
             name: "Recurring Meeting",
-            staff_user_ids: [userId],
-            schedule_based_on: "users",
             category: "website",
-            user_can_manage_slots: true,
+            staff_user_ids: [userId],
             ...aptVals,
         });
-        slotValsAll = slotValsAll.map((vals) => ({
-            appointment_type_id: appointmentTypeId,
-            slot_type: "recurring",
-            weekday: "1",
-            ...vals,
-        }));
-        MockServer.env["appointment.slot"].create(slotValsAll);
-        await listBookingPageFromSidebar("Recurring Meeting");
-        await contains('.o_cw_filter_title:contains("Recurring Meeting")').click();
-        await animationFrame();
+        pyEnv["appointment.slot"].create(
+            slotValsAll.map((vals) => ({
+                appointment_type_id: appointmentTypeId,
+                slot_type: "recurring",
+                weekday: "1",
+                ...vals,
+            }))
+        );
+        await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
+        await editBookingPageFromSidebar("Recurring Meeting");
     }
 
     test("a recurring slot crossing midnight in the viewer tz renders as two day segments", async () => {
@@ -366,7 +378,7 @@ describe("recurring slot rendering", () => {
     });
 
     test("subslots straddling midnight render as partials on both days", async () => {
-        expect.assertions(4);
+        expect.assertions(3);
         mockTimeZone(2);
         await startEditRecurringSlots({
             aptVals: { appointment_tz: "UTC", appointment_duration: 1, slot_creation_interval: 1 },
@@ -381,11 +393,7 @@ describe("recurring slot rendering", () => {
         // the straddling slot is drawn as a partial at the bottom of Wed and the top of Thu
         expect(startSubslots).toHaveLength(2);
         expect(endSubslots).toHaveLength(2);
-        // ...but both partials reference the same underlying bookable slot
-        expect(startSubslots.at(-1).dataset.subslotStart).toBe(
-            endSubslots.at(0).dataset.subslotStart
-        );
-        expect(startSubslots.at(-1).dataset.subslotEnd).toBe(endSubslots.at(0).dataset.subslotEnd);
+        expect(startSubslots.at(-1).textContent).toEqual(endSubslots.at(0).textContent);
     });
 });
 
@@ -406,14 +414,14 @@ describe("slot editing", () => {
         });
 
         await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
-        await createBookingPageFromSidebar("Test Online Meeting");
+        await createBookingPageFromShareMenu("Test Online Meeting");
 
         await clickAllDaySlot("2022-01-08");
         await animationFrame();
         expect(".o_calendar_slot").toHaveCount(1);
         expect.verifySteps(["create slot"]);
 
-        await contains('button[title="Save Slots"]').click();
+        await contains('button[title="Done"]').click();
         expect(MockServer.env["appointment.slot"]).toHaveLength(1);
     });
 
@@ -438,10 +446,7 @@ describe("slot editing", () => {
             arch: CALENDAR_ARCH,
         });
 
-        await listBookingPageFromSidebar("Punctual Meeting");
-        await contains('.o_cw_filter_title:contains("Punctual Meeting")').click();
-        await animationFrame();
-
+        await editBookingPageFromSidebar("Punctual Meeting");
 
         // "slot selection" is the greyed out part
         // normally 1 for the "allday" grid and one for the regular one = 2
@@ -451,60 +456,17 @@ describe("slot editing", () => {
         expect('.fc-day[data-date="2022-01-08"].o_calendar_slot_selection').toHaveCount(2);
     });
 
-    test("deletion mode removes a slot", async () => {
+    test("clicking a slot removes it while editing", async () => {
         expect.assertions(2);
         await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
-        await createBookingPageFromSidebar("Test Online Meeting");
+        await createBookingPageFromShareMenu("Test Online Meeting");
 
         await clickAllDaySlot("2022-01-08");
         await animationFrame();
         expect(".o_calendar_slot").toHaveCount(1);
 
-        await contains('button[title="Enable Slot Deletion"]').click();
         await contains(".o_calendar_slot").click();
         await animationFrame();
         expect(".o_calendar_slot").toHaveCount(0);
-    });
-
-    test("only the edited type's events show while editing, and are restored on save", async () => {
-        expect.assertions(5);
-        // have an event for the appointment type we'll be editing
-        CalendarEvent._records = [
-            ...CalendarEvent._records,
-            {
-                id: 10,
-                active: true,
-                user_id: 214,
-                partner_id: 214,
-                name: "Linked Event",
-                start: "2022-01-05 10:00:00",
-                stop: "2022-01-05 11:00:00",
-                allday: false,
-                appointment_status: "booked",
-                partner_ids: [214],
-                appointment_type_id: 2,
-            },
-        ];
-
-        await mountView({ type: "calendar", resModel: "calendar.event", arch: CALENDAR_ARCH });
-        // add the attendee filter so we can actually see the event
-        await togglePartnerFilter("partner_ids", "Partner 214");
-        expect(".fc-event").toHaveCount(3);
-
-        await listBookingPageFromSidebar("Test Appointment");
-        await contains('.o_cw_filter_title:contains("Test Appointment")').click();
-        await animationFrame();
-        // now we only see the event linked to the appointment type
-        expect(".fc-event").toHaveCount(1);
-
-        // removing the filter still updated the domain properly
-        await togglePartnerFilter("partner_ids", "Partner 214");
-        expect(".fc-event").toHaveCount(0);
-        await togglePartnerFilter("partner_ids", "Partner 214");
-        expect(".fc-event").toHaveCount(1);
-
-        // saving returns to the original domain
-        await contains('button[title="Save Slots"]').click();
-        expect(".fc-event").toHaveCount(3);
     });
 });

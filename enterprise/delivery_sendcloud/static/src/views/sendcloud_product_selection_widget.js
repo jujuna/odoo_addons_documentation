@@ -3,7 +3,7 @@ import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { registry } from "@web/core/registry";
 import { formatFloat } from "@web/views/fields/formatters";
-import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
+import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class SendcloudProductSelectionWidget extends Component {
     static template = "delivery_sendcloud.SendcloudProductWidget";
@@ -12,7 +12,7 @@ export class SendcloudProductSelectionWidget extends Component {
         DropdownItem,
     };
 
-    props = useProps(standardWidgetProps);
+    props = useProps(standardFieldProps);
 
     setup() {
         const { data } = this.props.record;

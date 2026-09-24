@@ -18,13 +18,6 @@ class AccountReturn(models.Model):
         for record in self:
             record.l10n_in_hide_include_einvoice = record.type_id._get_periodicity(record.company_id) == 'trimester'
 
-    def _is_l10n_in_einvoice_skippable(self, move_id):
-        # Check if the skip e-invoice condition is met for a given move_id.
-        return (
-            not self.l10n_in_gstr1_include_einvoice
-            and move_id.l10n_in_edi_status in ['sent', 'cancelled']
-        )
-
     def _check_suite_in_gstr1_report(self, check_codes_to_ignore):
         _ = self.env._
         checks = super()._check_suite_in_gstr1_report(check_codes_to_ignore)
@@ -72,3 +65,11 @@ class AccountReturn(models.Model):
                 ) if moves else None,
             })
         return checks
+
+    def _get_tax_detail_domain(self, iff=False):
+        domain = super()._get_tax_detail_domain(iff)
+        if not self.l10n_in_gstr1_include_einvoice:
+            domain = domain + [
+                ('move_id.l10n_in_edi_status', 'not in', ['sent', 'cancelled'])
+            ]
+        return domain

@@ -11,12 +11,16 @@
                         <PriorityField t-if="this.props.production.data.priority === '1'" name="'priority'" record="this.props.production" readonly="true"/>
                     </div>
                     <div class="ms-auto o_mrp_display_record_assigned_users d-flex flex-wrap position-relative z-1">
+                        <div t-if="this.props.record.resModel === 'mrp.workorder' and this.props.groups.timer and this.props.record.data.duration" class="o_mrp_timer o_tabular_nums align-content-center rounded px-2 fw-bolder">
+                            <MrpTimerField name="'duration'" record="this.props.record" readonly="true"/>
+                        </div>
+
                         <div t-if="this.showAssignedEmployees">
                             <t t-foreach="this.record.employee_assigned_ids.resIds" t-as="employee_id" t-key="employee_id">
                                 <img t-attf-src="/web/image/hr.employee.public/{{employee_id}}/avatar_128"
                                      class="o_avatar border border-2 rounded-circle"
-                                     t-att-class="{'ms-n2': !this.employee_first}"
-                                     t-attf-style="position: relative; z-index: -{{this.employee_index}}"/>
+                                     t-att-class="{'ms-n2': !employee_id_first}"
+                                     t-attf-style="position: relative; z-index: -{{employee_id_index}}"/>
                             </t>
                         </div>
                         <t t-if="!this.props.record.data.employee_ids.records.length">
@@ -39,9 +43,9 @@
                                 <img t-attf-src="/web/image/hr.employee.public/{{employee}}/avatar_128" class="o_avatar border border-2 rounded-circle" t-att-class="{'ms-n2': !employee_first}" t-attf-style="position: relative; z-index: -{{employee_index}}"/>
                             </t>
                         </div>
-                        <div t-if="this.props.record.resModel === 'mrp.workorder' and this.record.state === 'progress' and this.props.groups.timer" class="o_mrp_timer o_tabular_nums align-content-center rounded px-2 fw-bolder">
-                            <MrpTimerField name="'duration'" record="this.props.record" readonly="true"/>
-                        </div>
+                        <span t-if="this.props.record.resModel === 'mrp.workorder'"
+                              class="o_mrp_display_record_start_btn btn btn-secondary text-uppercase fw-bold lh-1 ms-auto"
+                              t-on-click="this.stopWorking">pause</span>
                     </div>
                 </div>
                 <div class="o_mrp_display_record_title o_record_name card-title d-flex justify-content-between align-items-start mb-0 h-auto">

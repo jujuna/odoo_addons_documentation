@@ -154,6 +154,36 @@ test("Can search template in modal with searchbar", async function () {
     expect(`${dialogSelector} .o-spreadsheet-grid:first`).toHaveText("Blank spreadsheet");
 });
 
+test("Searchbar remains even without search matches", async function () {
+    await initTestEnvWithKanban();
+    await openTemplateDialog();
+
+    expect(`${dialogSelector} .o-spreadsheet-grid:not(.o-spreadsheet-grid-ghost-item)`).toHaveCount(
+        3
+    );
+    expect(`${dialogSelector} .o-spreadsheet-grid:first`).toHaveText("Blank spreadsheet");
+
+    await contains(`${dialogSelector} .o_searchview_input`).edit("No Match");
+    await press("Enter");
+    await animationFrame();
+    expect(`${dialogSelector} .o-spreadsheet-grid:not(.o-spreadsheet-grid-ghost-item)`).toHaveCount(
+        1
+    );
+    expect(`${dialogSelector} .o-spreadsheet-grid:first`).toHaveText("Blank spreadsheet");
+    expect(`${dialogSelector} .o_searchview_input`).toHaveCount(1);
+});
+
+test("Can make a custom filter in the searchbar", async function () {
+    await initTestEnvWithKanban();
+    await openTemplateDialog();
+
+    await contains(`${dialogSelector} .o_searchview_input`).edit("t", { confirm: false });
+    expect(`.o_domain_selector`).toHaveCount(0);
+    await animationFrame();
+    await contains(".o_searchview_autocomplete a[title='Add a custom filter']").click();
+    expect(`.o_domain_selector`).toHaveCount(1);
+});
+
 test("Can fetch next templates", async function () {
     let fetch = 0;
     const mockRPC = async function (route, args) {

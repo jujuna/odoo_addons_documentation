@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo import Command
 from odoo.exceptions import ValidationError
 from odoo.tests import tagged, Form, new_test_user
 from odoo.addons.sale_timesheet.tests.common import TestCommonSaleTimesheet
@@ -357,3 +358,96 @@ class TestSaleTimesheetInTicket(TestCommonSaleTimesheet):
         # the destination should have properties linking to sale order B
         self.assertEqual(timesheet_src.so_line.id, sol_b.id)
         self.assertEqual(timesheet_src.order_id.id, so_b.id)
+
+    def test_create_invoice_action(self):
+        """Test invoice creation from helpdesk tickets.
+
+        Test cases:
+            Case 1:
+                - Create a ticket without a sale order line.
+                - Try to create an invoice.
+                - Verify the error message.
+
+            Case 2:
+                - Create a ticket linked to a sale order line.
+                - Create an invoice from the sale order.
+                - Try to create another invoice from the helpdesk ticket.
+                - Verify the error message.
+
+            Case 3:
+                - Create two tickets, one linked to an already invoiced sale order
+                line and the other without a sale order line.
+                - Try to create an invoice for both tickets.
+                - Verify the error message.
+
+            Case 4:
+                - Create a helpdesk ticket.
+                - Create a sale order and link its sale order line to the ticket.
+                - Create and post the invoice.
+                - Verify the helpdesk ticket's invoice count.
+        """
+        # Test case 1:
+        ticket_a, ticket_b = self.env["helpdesk.ticket"].create([
+            {
+                "name": "Test Ticket A",
+                "team_id": self.helpdesk_team.id,
+                "partner_id": self.partner_b.id,
+                "sale_line_id": False,
+            }, {
+                "name": "Test Ticket B",
+                "team_id": self.helpdesk_team.id,
+                "partner_id": self.partner_b.id,
+                "sale_line_id": False,
+            },
+        ])
+
+        action = ticket_a.action_create_invoice()
+        self.assertEqual(
+            action["params"]["message"],
+            "No invoice was created because none of the selected tickets are billable.",
+        )
+
+        # Test case 2
+        sale_order = self.env["sale.order"].create({
+            "partner_id": self.partner_a.id,
+            "order_line": [
+                Command.create({
+                    "product_id": self.product_order_timesheet1.id,
+                }),
+            ],
+        })
+        sale_order.action_confirm()
+        sale_order._create_invoices()
+
+        ticket_a.sale_line_id = sale_order.order_line.id
+
+        action = ticket_a.action_create_invoice()
+        self.assertEqual(
+            action["params"]["message"],
+            "No invoice was created because none of the selected tickets "
+            "have sale orders ready to be invoiced.",
+        )
+
+        # Test case 3
+        sale_order.invoice_ids.unlink()
+
+        action = (ticket_a + ticket_b).action_create_invoice()
+        self.assertEqual(
+            action["params"]["message"],
+            "No invoice was created because some of the selected tickets "
+            "are not billable.",
+        )
+
+        # Test case 4
+        action = ticket_a.action_create_invoice()
+        self.assertEqual(
+            action["xml_id"],
+            "sale.action_view_sale_advance_payment_inv",
+        )
+        self.assertEqual(ticket_a.invoice_count, 0)
+
+        payment_wizard = self.env["sale.advance.payment.inv"].with_context(action["context"]).create({})
+        action = payment_wizard.create_invoices()
+        invoice = self.env["account.move"].browse(action["res_id"])
+        invoice.action_post()
+        self.assertEqual(ticket_a.invoice_count, 1)

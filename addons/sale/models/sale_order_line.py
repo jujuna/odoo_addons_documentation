@@ -478,7 +478,12 @@ class SaleOrderLine(models.Model):
             line.product_template_id = line.product_id.product_tmpl_id
 
     def _search_product_template_id(self, operator, value):
-        return [("product_id.product_tmpl_id", operator, value)]
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
+        domain = Domain("product_id.product_tmpl_id", operator, value)
+        if operator == 'in' and False in value:  # relation may be falsy
+            domain |= Domain('product_id', '=', False)
+        return domain
 
     @api.depends("product_id")
     def _compute_is_product_archived(self):
@@ -768,14 +773,22 @@ class SaleOrderLine(models.Model):
             if not line.order_id or line.is_downpayment or line._is_global_discount():
                 continue
 
-            # check if the price has been manually set or there is already invoiced amount.
-            # if so, the price shouldn't change as it might have been manually edited.
-            if (
-                (not force_recompute and has_manual_price(line))
-                or line.qty_invoiced > 0
-                or (line.product_id.reinvoice_policy == "cost" and line.is_expense)
+            if line.qty_invoiced > 0 or (
+                line.product_id.reinvoice_policy == "cost" and line.is_expense
             ):
                 continue
+
+            manual_price = has_manual_price(line)
+
+            # If the price was manually set (!= technical_price_unit), price shouldn't be reset
+            # unless it was requested (pricelist change).
+            if not force_recompute and manual_price:
+                continue
+
+            # The price of productless lines shouldn't be reset when the pricelist changes
+            if force_recompute and not line.product_id and manual_price:
+                continue
+
             line = line.with_context(sale_write_from_compute=True)
             if not line.product_uom_id or not line.product_id:
                 line.price_unit = 0.0
@@ -1550,17 +1563,13 @@ class SaleOrderLine(models.Model):
             line.untaxed_amount_to_invoice = amount_to_invoice
 
     @api.depends(
-        "discount", "price_total", "product_uom_qty", "qty_delivered", "qty_invoiced_posted"
+        "discount", "price_total", "product_uom_qty", "qty_invoiced_posted"
     )
     def _compute_amount_to_invoice(self):
         for line in self:
             if line.product_uom_qty:
-                uom_qty_to_consider = (
-                    line.qty_delivered
-                    if line.product_id.invoice_policy == "delivery"
-                    else line.product_uom_qty
-                )
-                qty_to_invoice = uom_qty_to_consider - line.qty_invoiced_posted
+                # The ordered quantity is what the customer committed to, delivered or not.
+                qty_to_invoice = line.product_uom_qty - line.qty_invoiced_posted
                 unit_price_total = line.price_total / line.product_uom_qty
                 line.amount_to_invoice = unit_price_total * qty_to_invoice
             else:
@@ -1762,6 +1771,13 @@ class SaleOrderLine(models.Model):
             if not self.product_template_id:
                 self.product_id = False
                 self.name = ""
+
+    @api.onchange("label")
+    def _onchange_label(self):
+        """Immediately apply the label inverse to set the line name and prevent subsequent onchanges
+        from resetting it.
+        """
+        self._inverse_label()
 
     # === CRUD METHODS ===#
 
@@ -2305,6 +2321,7 @@ class SaleOrderLine(models.Model):
             self.order_id._can_be_edited_on_portal()
             and not self.combo_item_id
             and not self._is_discount_line()
+            and not self._is_analytic_reinvoice_line()
         )
 
     def _get_rounding(self):

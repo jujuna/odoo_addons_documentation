@@ -35,6 +35,11 @@ class MarketingActivity(models.Model):
     trigger_category = fields.Selection(selection_add=[('sms', 'SMS')], compute='_compute_trigger_category')
     trigger_category_ui = fields.Selection(selection_add=[('sms', 'SMS')], compute='_compute_trigger_category_ui')
 
+    def _get_allowed_triggering_activity_types(self):
+        allowed_triggering_activity_types = super()._get_allowed_triggering_activity_types()
+        allowed_triggering_activity_types.append('sms')
+        return allowed_triggering_activity_types
+
     def _search_can_be_triggering_activity(self, operator, value):
         domain = Domain('activity_type', '=', 'sms')
         if (operator == '=' and False in value) or (operator == '!=' and True in value):

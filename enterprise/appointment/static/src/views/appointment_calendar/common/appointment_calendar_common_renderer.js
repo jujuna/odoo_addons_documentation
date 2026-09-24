@@ -186,30 +186,11 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
         const { event, jsEvent } = info;
         if (event.extendedProps.slotId) {
             // startEditable <=> editable in this app
-            if (this.isSlotDeletionMode() && event.startEditable) {
+            if (event.startEditable) {
                 jsEvent.preventDefault();
                 jsEvent.stopPropagation();
                 event.remove();
                 this.props.model.removeSlot(event.extendedProps.slotId);
-            }
-            if (this.isSlotCreationMode()) {
-                const subslotEl = jsEvent.target.closest("[data-subslot-start]");
-                if (this.props.model.slotsAppointmentData().category_slot_scheduling === "weekly") {
-                    if (!subslotEl) {
-                        return;
-                    }
-                    this.props.createRecord({
-                        start: luxon.DateTime.fromISO(subslotEl.dataset.subslotStart),
-                        end: luxon.DateTime.fromISO(subslotEl.dataset.subslotEnd),
-                        isAllDay: false,
-                    });
-                } else {
-                    this.props.createRecord({
-                        start: luxon.DateTime.fromJSDate(event.start),
-                        end: luxon.DateTime.fromJSDate(event.end),
-                        isAllDay: event.allDay,
-                    });
-                }
             }
             return;
         }
@@ -223,6 +204,16 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
         const classesToAdd = super.eventClassNames(...arguments);
         if (event.extendedProps.slotId) {
             classesToAdd.push("o_calendar_slot");
+        } else if (this.props.model.selectedAppointmentTypeId()) {
+            const calendarEvent = this.props.model.records[event.id];
+            if (
+                calendarEvent &&
+                (!calendarEvent.rawRecord.appointment_type_id ||
+                    calendarEvent.rawRecord.appointment_type_id[0] !==
+                        this.props.model.selectedAppointmentTypeId())
+            ) {
+                classesToAdd.push("opacity-50");
+            }
         }
         return classesToAdd;
     },
@@ -306,8 +297,6 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
                                 flexWeight: shownEnd.diff(shownStart, "minutes").minutes,
                                 startFormatted: subslotStart.toFormat(this.timeFormat),
                                 endFormatted: subslotEnd.toFormat(this.timeFormat),
-                                startISO: subslotStart.toISO(),
-                                endISO: subslotEnd.toISO(),
                             });
                         }
                         subslotStart = subslotStart.plus({ minutes: createIntervalMinutes });
@@ -328,7 +317,6 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
             const fragment = renderToFragment("appointment.AttendeeCalendarCommonRenderer.slot", {
                 event,
                 eventDurationMinutes: slotEnd.diff(slotStart, "minutes").minutes,
-                isSlotDeletionMode: this.isSlotDeletionMode(),
                 slotStartFormatted: slotStart.toFormat(this.timeFormat),
                 slotEndFormatted: slotEnd.toFormat(this.timeFormat),
                 subslots,
@@ -343,10 +331,7 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
      * @override
      */
     isSelectionAllowed(event) {
-        let result = super.isSelectionAllowed(...arguments);
-        if (this.isSlotDeletionMode()) {
-            return false;
-        }
+        const result = super.isSelectionAllowed(...arguments);
         if (this.isSlotCreationMode()) {
             return this.isSlotSelectionAllowedFromValues(event);
         }
@@ -399,12 +384,8 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
      */
     async onSelect(info) {
         info.jsEvent.preventDefault();
-        if (!this.isSlotCreationMode() && !this.isSlotDeletionMode()) {
+        if (!this.isSlotCreationMode()) {
             return super.onSelect(...arguments);
-        }
-        if (this.isSlotDeletionMode()) {
-            this.fc().unselect();
-            return false;
         }
         const slotRecords = this._getSplitSlotRecords(
             this.fcEventToRecord(info),
@@ -482,7 +463,7 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
      * @override
      */
     async onDateClick(info) {
-        if (info.jsEvent.defaultPrevented || this.isSlotDeletionMode()) {
+        if (info.jsEvent.defaultPrevented) {
             return;
         }
         if (!this.isSlotCreationMode()) {
@@ -507,9 +488,6 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
      * @override
      */
     async onEventDrop(info) {
-        if (this.isSlotDeletionMode()) {
-            return;
-        }
         if (!this.isSlotCreationMode()) {
             return super.onEventDrop(...arguments);
         }
@@ -530,9 +508,6 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
      * @override
      */
     async onEventResize(info) {
-        if (this.isSlotDeletionMode()) {
-            return;
-        }
         if (!this.isSlotCreationMode()) {
             return super.onEventResize(...arguments);
         }
@@ -551,9 +526,6 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
      * @override
      */
     onEventResizeStart(info) {
-        if (this.isSlotDeletionMode()) {
-            return;
-        }
         if (!this.isSlotCreationMode()) {
             return super.onEventResizeStart(...arguments);
         }
@@ -582,9 +554,6 @@ patch(AttendeeCalendarCommonRenderer.prototype, {
      * Prevent drag & drop events in the past in slot creationmode
      */
     onEventAllow(dropInfo, draggedEvent) {
-        if (this.isSlotDeletionMode()) {
-            return false;
-        }
         if (!this.isSlotCreationMode()) {
             return super.onEventAllow?.(...arguments) || true;
         }

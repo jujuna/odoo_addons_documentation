@@ -21,27 +21,13 @@ class AITool(models.AbstractModel):
 
     @api.model
     def _delete_campaign_step(self, activity_id, step_type, cascade_delete=False):
-        """Remove a step from a campaign, repairing the workflow around it.
-
-        cascade_delete is only for the root activity, whose removal takes the
-        whole workflow with it.
-        """
+        """Remove a step from a campaign, repairing the workflow around it."""
         activity = self.env['marketing.activity'].browse(activity_id).exists()
         if not activity:
             return {'success': False, 'error': f'No marketing activity with id {activity_id}.'}
 
         campaign = activity.campaign_id
-        is_root = activity.trigger_type == 'begin'
-        if cascade_delete != is_root:
-            return {
-                'success': False,
-                'error': (
-                    'cascade_delete must be true for the root activity and false for '
-                    f'any other step. "{activity.name}" is {"" if is_root else "not "}the root.'
-                ),
-            }
-
-        activity.action_delete_step(step_type, cascade_delete)
+        activity.action_delete_step(step_type)
         campaign.action_sort_steps()
         return {
             'success': True,

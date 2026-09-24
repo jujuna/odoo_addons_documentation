@@ -37,6 +37,12 @@ class L10n_VnAccountGeneralLedgerReportHandler(models.AbstractModel):
     def _report_engine_s03b_dn(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         return self._report_engine_counterpart_lines(options, date_scope, formulas_dict, current_groupby, warnings=warnings)
 
+    def _get_query(self, options, current_groupby):
+        # The counterpart mixin builds the initial balance rows (the ones with a NULL id) and the period
+        # rows from a single query, so it always needs the whole history, the way the general ledger
+        # queried it before its initial balance was split into an engine of its own.
+        return super()._get_query(options, 'from_beginning', current_groupby)
+
     def _custom_line_postprocessor(self, report, options, lines):
         lines = super()._custom_line_postprocessor(report, options, lines)
         if not lines:

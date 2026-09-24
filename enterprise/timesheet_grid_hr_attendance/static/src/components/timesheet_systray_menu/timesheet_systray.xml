@@ -16,8 +16,8 @@
                         class="o_wrap_btn_sign_out position-md-sticky bottom-0 z-2
                             align-self-center d-flex flex-grow-1">
                         <button t-if="this.hrAttendanceProps.signInOut" t-on-click="this.hrAttendanceProps.signInOut"
-                            class="btn btn-warning flex-grow-1">
-                            Check out <i class="oi ms-1" data-icon="logout"/>
+                            class="btn btn-secondary">
+                            Check out
                         </button>
                     </div>
                     <div t-if="this.employee and this.employee.working_hours !== false" name="total_hours"
@@ -44,11 +44,10 @@
                     class="o_wrap_btn_sign_out position-md-sticky bottom-0 z-2
                         align-self-center d-flex flex-grow-1">
                     <button t-on-click="() => this.hrAttendanceProps.signInOut()"
-                            t-attf-class="btn btn-{{ this.props.checkInData.checkedIn ? 'warning' : 'primary w-100' }}">
+                            t-attf-class="btn btn-{{ this.props.checkInData.checkedIn ? 'secondary' : 'primary w-100' }}">
                         <span t-if="!this.props.checkInData.checkedIn">Start Session</span>
                         <span t-else="">End Session</span>
-                        <i class="oi ms-1"
-                           t-attf-data-icon="{{ this.props.checkInData.checkedIn ? 'logout' : 'login' }}"/>
+                        <i t-if="!this.props.checkInData.checkedIn" class="oi ms-1" data-icon="login"/>
                     </button>
                 </div>
                 <div t-if="this.employee and this.employee.working_hours !== false

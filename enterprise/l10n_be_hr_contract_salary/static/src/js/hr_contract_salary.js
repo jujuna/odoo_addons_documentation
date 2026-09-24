@@ -343,7 +343,6 @@ patch(SalaryPackage.prototype, {
             "fold_company_car_total_depreciated_cost",
             "fold_l10n_be_bicyle_cost",
             "fold_temporary_car_total_depreciated_cost",
-            "fold_company_bike_depreciated_cost",
         ];
         const transportRelatedFields = [
             "bus_transport_reimbursed_amount",
@@ -391,7 +390,6 @@ patch(SalaryPackage.prototype, {
             this.el.querySelector("label[for='train_transport_reimbursed_amount']")?.parentElement.classList.add("o_disabled");
             this.el.querySelector("label[for='train_transport_periodicity']")?.parentElement.classList.add("o_disabled");
             this.el.querySelector("label[for='private_car_reimbursed_amount']")?.parentElement.classList.add("o_disabled");
-            this.el.querySelector("label[for='company_bike_depreciated_cost']")?.parentElement.classList.add("o_disabled");
             this.el.querySelector("label[for='bike_reimbursed_amount']")?.parentElement.classList.add("o_disabled");
             this.el.querySelector("label[for='fuel_card']")?.parentElement.classList.add("o_disabled");
         } else {
@@ -406,7 +404,6 @@ patch(SalaryPackage.prototype, {
             this.el.querySelector("label[for='train_transport_reimbursed_amount']")?.parentElement.classList.remove("o_disabled");
             this.el.querySelector("label[for='train_transport_periodicity']")?.parentElement.classList.remove("o_disabled");
             this.el.querySelector("label[for='private_car_reimbursed_amount']")?.parentElement.classList.remove("o_disabled");
-            this.el.querySelector("label[for='company_bike_depreciated_cost']")?.parentElement.classList.remove("o_disabled");
             this.el.querySelector("label[for='bike_reimbursed_amount']")?.parentElement.classList.remove("o_disabled");
             this.el.querySelector("label[for='fuel_card']")?.parentElement.classList.remove("o_disabled");
         }

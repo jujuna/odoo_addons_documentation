@@ -123,7 +123,7 @@ class IoTController(http.Controller):
                 device_identifier, iot_box_identifier
             )
             return
-        request.env['iot.channel'].send_message({
+        request.env['iot.channel'].sudo().send_message({
             'session_id': session_id or kwargs.get("owner"),  # TODO: remove "owner" when v19.0 is deprecated
             'iot_box_identifier': iot_box_identifier,
             'device_identifier': device_identifier,

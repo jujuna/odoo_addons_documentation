@@ -1,12 +1,13 @@
 import { DiscussClientAction } from "@mail/core/public_web/discuss_app/client_action";
 
-import { useOnChange } from "@odoo/owl";
+import { t, useOnChange, useProps } from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
 import { router } from "@web/core/browser/router";
 
 patch(DiscussClientAction.prototype, {
     setup() {
         super.setup(...arguments);
+        this.updateActionState = useProps.static("updateActionState", t.function());
         useOnChange(
             () => [this.action(), router.current.scoped_ai_agent_id],
             (action) => this.syncScopedAiAgent(action)
@@ -17,7 +18,7 @@ patch(DiscussClientAction.prototype, {
         useOnChange(
             () => [this.store.discuss.scopedAiAgentId],
             (scopedAiAgentId) => {
-                this.props.updateActionState?.({ scoped_ai_agent_id: scopedAiAgentId });
+                this.updateActionState({ scoped_ai_agent_id: scopedAiAgentId });
                 if (this.action()) {
                     this.action().context.scoped_ai_agent_id = scopedAiAgentId;
                 }

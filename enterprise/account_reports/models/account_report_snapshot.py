@@ -85,7 +85,7 @@ class AccountReportSnapshot(models.Model):
     _name = 'account.report.snapshot'
     _description = "Accounting Report Snapshot"
 
-    report_id = fields.Many2one(comodel_name='account.report', required=True)
+    report_id = fields.Many2one(comodel_name='account.report', required=True, index='btree')
     engine_func = fields.Char(required=True)
     engine_version = fields.Integer(required=True)
     serialized_options = fields.Json(required=True)
@@ -170,21 +170,24 @@ class AccountReportSnapshot(models.Model):
                 company_id,
                 lock_date_field,
                 lock_date,
-                create_date
+                end_datetime
             FROM account_lock_exception
             WHERE
                 lock_date_field IN ('fiscalyear_lock_date', 'tax_lock_date')
             ORDER BY company_id, lock_date_field, create_date
         """))
 
-        for (company_id, lock_date_field, lock_date, create_date) in self.env.cr.fetchall():
+        for (company_id, lock_date_field, lock_date, end_datetime) in self.env.cr.fetchall():
             # For simplicity, we consider all branches are impacted, and need garbage collection of their snapshots, even if they have a more
             # restrictive lock date themselves.
-            impacted_branches = self.env['res.company'].browse(company_id)._accessible_branches()
+            impacted_branches = self.env['res.company'].search([('id', 'child_of', company_id)])
 
-            exception_violation_domain = [('create_date', '>=', create_date), ('company_id', 'in', impacted_branches.ids)]
+            exception_violation_domain = [('company_id', 'in', impacted_branches.ids)]
             if lock_date:
                 exception_violation_domain.append(('date', '>', lock_date))
+
+            if end_datetime:
+                exception_violation_domain.append(('create_date', '<', end_datetime))
 
             if lock_date_field == 'tax_lock_date':
                 exception_violation_domain.append(('report_id.root_report_id', '=', generic_tax_report.id))
@@ -192,7 +195,6 @@ class AccountReportSnapshot(models.Model):
             snapshot_deletion_domains.append(exception_violation_domain)
 
         snapshots_to_unlink = self.env['account.report.snapshot'].search(Domain.OR(snapshot_deletion_domains))
-
         snapshots_to_unlink.unlink()
 
         refresh_cron = self.env.ref('account_reports.ir_cron_create_snapshots')
@@ -269,7 +271,8 @@ class AccountReportSnapshot(models.Model):
         when regenerating snapshots after garbage-collection, for example because of a change in an engine version (probably coming from a bugfix).
         """
         company_ids = report.get_report_company_ids(col_group_options)
-        if len(company_ids) > 1:
+        company = self.env['res.company'].browse(company_ids)
+        if len(company) > 1:
             raise UserError(self.env._("Snapshots of accounting reports should be made one company at a time."))
 
         engine_main_func_name = report._get_engine_function_name(engine)
@@ -285,18 +288,20 @@ class AccountReportSnapshot(models.Model):
             return None
 
         if years_spread:
-            last_snapshot_date = latest_snapshot.date
-            if not last_snapshot_date:
-                aml_data = self.env['account.move.line'].search_read([], fields=['date'], order='date ASC', limit=1)
+            next_snapshot_fy_end = None
+            if latest_snapshot:
+                next_snapshot_fy_end = fields.Date.add(company.compute_fiscalyear_dates(latest_snapshot.date)['date_to'], years=1)
+            else:
+                aml_data = self.env['account.move.line'].search_read([('company_id', '=', company_ids[0])], fields=['date'], order='date ASC', limit=1)
                 if aml_data:
-                    last_snapshot_date = aml_data[0]['date']
+                    next_snapshot_fy_end = company.compute_fiscalyear_dates(aml_data[0]['date'])['date_to']
 
-            if last_snapshot_date and fields.Date.add(last_snapshot_date, years=1) < snapshot_date:
-                # Instead of creating the snapshot at the date to, we create after the last snapshot, or years_spread years ago, if
-                # it's closer. Doing it that way ensures we keep comparisons working when regenerating snapshots. A more naive approach where we only
-                # regenerate a snapshot at the current lock date would have made all comparisons super slow.
-                years_before = fields.Date.subtract(snapshot_date, years=years_spread)
-                scoped_date_to = fields.Date.add(max(years_before, last_snapshot_date), years=1)
+            if next_snapshot_fy_end and next_snapshot_fy_end < snapshot_date:
+                # Instead of creating the snapshot at the date to, we create after the last snapshot, or years_spread years ago, at the end of a fiscal
+                # year, if it's closer. Doing it that way ensures we keep comparisons working when regenerating snapshots. A more naive approach where
+                # we only regenerate a snapshot at the current lock date would have made all comparisons super slow.
+                years_before_fy_end = company.compute_fiscalyear_dates(fields.Date.subtract(snapshot_date, years=years_spread))['date_to']
+                scoped_date_to = max(years_before_fy_end, next_snapshot_fy_end)
                 col_group_options = self._align_options_with_snapshot_date(report, col_group_options, date_scope, scoped_date_to)
                 snapshot_date = fields.Date.to_date(report._get_date_bounds_info(col_group_options, date_scope)[1])
 

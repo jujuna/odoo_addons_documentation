@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, api
+from odoo.fields import Domain
 
 
 class PlanningAnalysisReport(models.Model):
@@ -17,4 +17,9 @@ class PlanningAnalysisReport(models.Model):
 
     @api.model
     def _search_employee_skill_ids(self, operator, value):
-        return [('employee_ids.employee_skill_ids', operator, value)]
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
+        domain = Domain('employee_ids.employee_skill_ids', operator, value)
+        if operator == 'in' and False in value:  # relation may be falsy
+            domain |= Domain('employee_ids', '=', False)
+        return domain

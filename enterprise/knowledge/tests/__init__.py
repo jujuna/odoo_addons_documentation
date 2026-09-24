@@ -17,4 +17,5 @@ from . import test_knowledge_editor_commands
 from . import test_knowledge_form_ui
 from . import test_knowledge_performance
 from . import test_knowledge_security
+from . import test_light_user
 from . import test_res_users

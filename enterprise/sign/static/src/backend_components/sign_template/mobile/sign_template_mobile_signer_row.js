@@ -9,7 +9,7 @@ import { SignTemplateSidebarRoleItems } from "@sign/backend_components/sign_temp
 export class SignTemplateMobileSignerRow extends SignTemplateSidebarRoleItems {
     static template = "sign.SignTemplateMobileSignerRow";
 
-    static props = {
+    static propsSchema = {
         id: t.number(),
         name: t.string(),
         signTemplateId: t.number(),

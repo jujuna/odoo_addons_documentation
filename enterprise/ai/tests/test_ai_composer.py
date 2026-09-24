@@ -10,16 +10,34 @@ class TestAIComposer(TestAICommon):
 
     @mute_logger('odoo.sql_db')
     def test_unique_composer_constraint(self):
-        """Creating two composers with same agent, interface_key and NULL focused_model_id should raise."""
-        agent = self.env['ai.agent'].create({'name': 'Test Agent'})
+        """Creating two composers with the same interface_key and focused_model_id should raise,
+        even for two different agents: the rule is unique system-wide, not per agent."""
+        agent_a = self.env['ai.agent'].create({'name': 'Agent A'})
+        agent_b = self.env['ai.agent'].create({'name': 'Agent B'})
+        partner_model = self.env['ir.model']._get('res.partner')
+
         self.env['ai.composer'].create({
             'name': 'First',
             'interface_key': 'systray_ai_button',
-            'ai_agent_id': agent.id,
+            'ai_agent_id': agent_a.id,
+            'focused_model_id': partner_model.id,
         })
         with self.assertRaises(IntegrityError):
             self.env['ai.composer'].create({
                 'name': 'Second',
+                'interface_key': 'systray_ai_button',
+                'ai_agent_id': agent_b.id,
+                'focused_model_id': partner_model.id,
+            })
+
+    @mute_logger('odoo.sql_db')
+    def test_unique_composer_constraint_conflicts_with_system_default(self):
+        """A new composer with no focused_model_id collides with the seeded system-default
+        rule for that interface_key, since NULL models are not distinct from one another."""
+        agent = self.env['ai.agent'].create({'name': 'Test Agent'})
+        with self.assertRaises(IntegrityError):
+            self.env['ai.composer'].create({
+                'name': 'Custom Systray Default',
                 'interface_key': 'systray_ai_button',
                 'ai_agent_id': agent.id,
             })

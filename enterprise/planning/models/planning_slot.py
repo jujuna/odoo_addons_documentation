@@ -173,6 +173,8 @@ class PlanningSlot(models.Model):
             slot.user_ids = slot.resource_ids.user_id
 
     def _search_user_ids(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
         return [('resource_ids.user_id', operator, value)]
 
     @api.depends('resource_ids')

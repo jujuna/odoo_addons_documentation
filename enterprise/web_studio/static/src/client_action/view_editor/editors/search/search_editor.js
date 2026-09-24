@@ -18,7 +18,7 @@ import {
     FieldConfigurationDialog,
     FilterConfiguration,
 } from "@web_studio/client_action/view_editor/interactive_editor/field_configuration/field_configuration";
-import { randomName } from "@web_studio/client_action/view_editor/editors/utils";
+import { fieldsToChoices, randomName } from "@web_studio/client_action/view_editor/editors/utils";
 import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 function getGroupByFieldNameFromString(str) {
@@ -301,24 +301,41 @@ class SimpleElementEditor extends Component {
         return null;
     }
 
-    onChangeDomain(value) {
-        const operation = {
-            new_attrs: { domain: value },
+    get isDateFilter() {
+        return this.type === "filter" && !!this.node.attrs.date;
+    }
+
+    get endDate() {
+        return this.node.attrs.end_date;
+    }
+
+    get endDateFields() {
+        return fieldsToChoices(
+            this.viewEditorModel.fields,
+            ["date", "datetime"],
+            (field) => field.searchable && field.name !== this.node.attrs.date
+        );
+    }
+
+    editAttributes(newAttrs) {
+        this.viewEditorModel.doOperation({
+            new_attrs: newAttrs,
             type: "attributes",
             position: "attributes",
             target: this.viewEditorModel.getFullTarget(this.viewEditorModel.activeNodeXpath),
-        };
-        this.viewEditorModel.doOperation(operation);
+        });
+    }
+
+    onChangeDomain(value) {
+        this.editAttributes({ domain: value });
+    }
+
+    onChangeEndDate(value) {
+        this.editAttributes({ end_date: value || "" });
     }
 
     onChangeLabel(value) {
-        const operation = {
-            new_attrs: { string: value },
-            type: "attributes",
-            position: "attributes",
-            target: this.viewEditorModel.getFullTarget(this.viewEditorModel.activeNodeXpath),
-        };
-        this.viewEditorModel.doOperation(operation);
+        this.editAttributes({ string: value });
     }
 
     onPropertyRemoved() {

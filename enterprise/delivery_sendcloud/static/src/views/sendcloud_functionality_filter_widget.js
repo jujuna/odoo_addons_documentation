@@ -1,12 +1,12 @@
 import { Component, onWillStart, onWillUpdateProps, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
+import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class SendcloudFunctionalitiesField extends Component {
     static template = "delivery_sendcloud.functionalities";
 
-    props = useProps(standardWidgetProps);
+    props = useProps(standardFieldProps);
 
     setup() {
         const { data } = this.props.record;

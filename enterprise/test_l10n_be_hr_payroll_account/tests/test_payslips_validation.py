@@ -2637,7 +2637,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(len(october_payslip.input_line_ids), 0)
 
         self._validate_worked_days(october_payslip, {
-            '002.00': (9.0, 68.4, 1019.23),
+            '002.00': (9.0, 68.4, 1100.77),
             '122.00': (9.0, 68.4, 0.0),
             '147.00': (4.0, 30.4, 0.0),
         })
@@ -6135,7 +6135,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip = self._generate_payslip(datetime.date(2023, 8, 1), datetime.date(2023, 8, 31), version_id=version_2.id)
 
         self._validate_worked_days(payslip, {
-            '002.00': (9.0, 68.4, 1202.54),
+            '002.00': (9.0, 68.4, 1330.68),
             '000.00': (9.0, 68.4, 0.0),
             '016.00': (1.0, 7.6, 147.85),
             '147.00': (3.0, 22.8, 0.0),
@@ -6430,7 +6430,6 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         #  ∴ final_car_atn = 159.29 * (14/30)
         #                  = 74.33
         payslip = self._generate_payslip(datetime.date(2026, 4, 1), datetime.date(2026, 4, 30))
-
         self._validate_payslip(payslip)
 
     def test_employment_bonuses(self):
@@ -8036,7 +8035,7 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
             'work_entry_type_id': self.unpaid_time_off_type.id,
             'date_from': datetime.datetime(2026, 7, 16, 0, 0, 0),
             'date_to': datetime.datetime(2026, 7, 31, 23, 59, 59),
-            'request_date_from': datetime.datetime(2026, 7, 16, 0, 0, 0),
+            'request_date_from': datetime.datetime(2026, 7, 18, 0, 0, 0),
             'request_date_to': datetime.datetime(2026, 7, 31, 23, 59, 59),
             'number_of_days': 13,
             'employee_id': self.employee.id,
@@ -8047,8 +8046,8 @@ class TestPayslipValidation(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(len(payslip.worked_days_line_ids), 2)
 
         self._validate_worked_days(payslip, {
-            '002.00': (11.0, 83.6, 1338.46),
-            '158.00': (12.0, 91.2, 0.0),
+            '002.00': (13.0, 98.8, 1615.38),
+            '158.00': (10.0, 76.0, 0),
         })
 
         self._validate_payslip(payslip)

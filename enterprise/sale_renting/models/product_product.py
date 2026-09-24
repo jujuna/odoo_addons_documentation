@@ -48,7 +48,8 @@ class ProductProduct(models.Model):
         context: dict = ast.literal_eval(action.get("context", "{}"))
 
         domain &= Domain("product_id", "in", self.ids)
-        context["default_product_id"] = self.ids[0]
+        if first_product := self[:1]:
+            context["default_product_id"] = first_product.id
 
         action.update(domain=domain, context=context)
         return action

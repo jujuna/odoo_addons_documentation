@@ -796,7 +796,7 @@
                                 <field name="engine">aggregation</field>
                                 <field name="formula">l10n_ie_18.balance</field>
                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
-                                <field name="subformula">cross_report(l10n_ie_reports.l10n_ie_pl_tags)</field>
+                                <field name="subformula">cross_report(l10n_ie_reports.l10n_ie_pl_tags, force_date_scope)</field>
                             </record>
                             <record id="l10n_ie_bs_tags_H_V_accounts" model="account.report.expression">
                                 <field name="label">accounts</field>
@@ -820,7 +820,7 @@
                                 <field name="engine">aggregation</field>
                                 <field name="formula">l10n_ie_18.balance</field>
                                 <field name="date_scope">from_fiscalyear</field>
-                                <field name="subformula">cross_report(l10n_ie_reports.l10n_ie_pl_tags)</field>
+                                <field name="subformula">cross_report(l10n_ie_reports.l10n_ie_pl_tags, force_date_scope)</field>
                             </record>
                         </field>
                     </record>

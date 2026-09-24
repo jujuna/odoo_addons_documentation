@@ -388,7 +388,7 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
         res = {}
         for column_group_index, options in options_by_column_group.items():
             query = report._get_report_query(options, 'strict_range')
-            tax_details_query = self.env['account.move.line']._get_query_tax_details(query.from_clause, query.where_clause)
+            tax_details_query = self.env['account.move.line']._get_query_tax_details(query)
 
             # Avoid adding multiple times the same base amount sharing the same grouping_key.
             # It could happen when dealing with group of taxes for example.

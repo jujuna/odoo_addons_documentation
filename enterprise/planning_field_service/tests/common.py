@@ -22,18 +22,22 @@ class TestPlanningFieldServiceCommon(TestCommonPlanning):
             {
                 'name': 'Current User',
                 'user_id': cls.env.user.id,
+                'tz': 'UTC',
             },
             {
                 'name': 'Marcel',
                 'user_id': cls.marcel_user.id,
+                'tz': 'UTC',
             },
             {
                 'name': 'Henri',
                 'user_id': cls.henri_user.id,
+                'tz': 'UTC',
             },
             {
                 'name': 'George',
                 'user_id': cls.george_user.id,
+                'tz': 'UTC',
             }
         ])
         cls.intervention, cls.second_intervention = cls.env['planning.slot'].create([

@@ -14,7 +14,7 @@
 
         <xpath expr="//div[hasclass('o_att_today_wrap')]" position="before">
             <div t-if="this.state.checkedIn and this.state.showTimesheetsSystray"
-                class="nav nav-underline nav-justified border-bottom px-3"
+                class="nav nav-underline nav-justified bg-100 border-bottom px-3"
                 role="tablist">
                 <button type="button"
                     id="timesheet_recording_tab_button"
@@ -26,11 +26,6 @@
                     t-att-aria-selected="this.state.activeTab === 'timesheets' ? 'true' : 'false'">
                     Timesheets
                 </button>
-                <a t-if="this.state.showAssistant" name="assistant-link" href="#"
-                    t-on-click.prevent="this.openAssistantAction"
-                    class="btn btn-link btn-sm fw-bolder align-self-center">
-                    Assistant
-                </a>
                 <button type="button"
                     id="attendance_review_tab_button"
                     class="nav-link text-primary"
@@ -41,6 +36,14 @@
                     t-att-aria-selected="this.state.activeTab === 'attendance' ? 'true' : 'false'">
                     Attendance
                 </button>
+                <t t-if="this.state.showAssistant">
+                    <span class="vr text-300 opacity-100"/>
+                    <a name="assistant-link" href="#"
+                        t-on-click.prevent="this.openAssistantAction"
+                        class="btn btn-secondary btn-sm align-self-center my-2">
+                        Assistant <i class="oi" data-icon="open_in_new"/>
+                    </a>
+                </t>
             </div>
         </xpath>
 
@@ -83,6 +86,20 @@
 
         <xpath expr="//div[hasclass('o_wrap_btn_sign_out')]" position="attributes">
             <attribute name="class" remove="p-2" add="py-2" separator=" "/>
+        </xpath>
+
+        <!-- Check out matches the timesheet tab footer once both tabs are displayed. -->
+        <xpath expr="//div[hasclass('o_wrap_btn_sign_out')]/button" position="attributes">
+            <attribute name="t-attf-class"/>
+            <attribute name="class">btn</attribute>
+            <attribute name="t-att-class">{
+                'btn-secondary': this.state.checkedIn and this.state.showTimesheetsSystray,
+                'btn-warning flex-grow-1': this.state.checkedIn and !this.state.showTimesheetsSystray,
+                'btn-primary flex-grow-1': !this.state.checkedIn,
+            }</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_wrap_btn_sign_out')]/button/i" position="attributes">
+            <attribute name="t-if">!(this.state.checkedIn and this.state.showTimesheetsSystray)</attribute>
         </xpath>
 
         <xpath expr="//Dropdown/button/i" position="attributes">

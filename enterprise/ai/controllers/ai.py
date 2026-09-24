@@ -79,7 +79,7 @@ class AIController(http.Controller):
         call_odoo_ai(self.env, '1/report_realtime_session_usage', params, add_iap_token=False, timeout=5)
 
     @http.route("/ai/transcription", type="jsonrpc", auth="user")
-    def transcribe(self, audio_base64):
+    def transcribe(self, audio_base64, language=None):
         if not audio_base64:
             raise BadRequest("No audio data provided")
 
@@ -87,6 +87,8 @@ class AIController(http.Controller):
             'audio': audio_base64,
             'mimetype': 'audio/mp3',
         }
+        if language:
+            params['language'] = language
         try:
             response = call_odoo_ai(self.env, '1/get_transcription', params)
             return {

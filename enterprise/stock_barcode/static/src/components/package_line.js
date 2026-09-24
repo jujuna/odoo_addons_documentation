@@ -3,7 +3,7 @@ import LineComponent from "./line";
 
 export default class PackageLineComponent extends LineComponent {
     static template = "stock_barcode.PackageLineComponent";
-    static props = {
+    static propsSchema = {
         displayUOM: t.any(),
         line: t.any(),
         openPackage: t.any(),

@@ -146,26 +146,31 @@ class AccountMove(models.Model):
                 ], limit=1)
             )
 
-    def _compute_sql_l10n_in_iff_reported(self, table):
+    def _get_l10n_in_iff_reported_query(self, table_alias):
         iff_return_type = self.env.ref(GSTR_IFF_RETURN_TYPE, raise_if_not_found=False)
-        if not iff_return_type:
-            return SQL("FALSE")
-        return SQL("""
-            EXISTS (
-                SELECT 1
-                FROM account_return ar
-                WHERE ar.company_id = %(table)s.company_id
-                AND ar.type_id = %(iff_return_type)s
-                AND ar.date_from <= %(table)s.date
-                AND ar.date_to >= %(table)s.date
-                AND ar.state IS NOT NULL
-                AND ar.state != 'reviewed'
-                AND %(table)s.l10n_in_gstr_iff_exclude IS NOT TRUE
+        return SQL(
+            """
+            COALESCE(
+                EXISTS (
+                    SELECT 1
+                    FROM account_return ar
+                    WHERE ar.company_id = %(table)s.company_id
+                    AND ar.type_id = %(iff_return_type)s
+                    AND ar.date_from <= %(table)s.date
+                    AND ar.date_to >= %(table)s.date
+                    AND ar.state IS NOT NULL
+                    AND ar.state != 'reviewed'
+                    AND %(table)s.l10n_in_gstr_iff_exclude IS NOT TRUE
+                ),
+                FALSE
             )
-        """,
-            table=SQL.identifier(table._alias),
-            iff_return_type=(iff_return_type.id),
+            """,
+            table=SQL.identifier(table_alias),
+            iff_return_type=iff_return_type.id if iff_return_type else None,
         )
+
+    def _compute_sql_l10n_in_iff_reported(self, table):
+        return self._get_l10n_in_iff_reported_query(table._alias)
 
     def _l10n_in_get_fiscal_year_start_date(self, company, reversal_move_date):
         fiscal_year_start_month = (int(company.fiscalyear_last_month) % 12) + 1

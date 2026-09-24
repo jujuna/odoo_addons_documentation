@@ -66,7 +66,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_ro'))]"/>
         <field name="company_id" ref="base.demo_company_ro"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="bytes" file="l10n_ro_hr_payroll/static/img/hr_employe_demetra_voinea.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-1.webp"/>
     </record>
 
     <record id="res_partner_bank_account_ionel" model="res.partner.bank">
@@ -99,7 +99,7 @@
 
     <record id="hr_employee_ionel" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_ionel')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_ro_hr_payroll/static/img/hr_employee_ionel_oprea.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-2.webp"/>
         <field name="work_phone">0999 381 213</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_ionel')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_ro_hr_payroll.res_partner_ionel"/>
@@ -139,7 +139,7 @@
 
     <record id="hr_employee_demetra" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_demetra')).name"/>
-        <field name="image_1920" type="bytes" file="l10n_ro_hr_payroll/static/img/hr_employe_demetra_voinea.jpg"/>
+        <field name="image_1920" type="bytes" file="hr_payroll/static/img/hr_payroll-employee-1.webp"/>
         <field name="work_phone">0999 318 214</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_demetra')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_ro_hr_payroll.hr_employee_ionel"/>

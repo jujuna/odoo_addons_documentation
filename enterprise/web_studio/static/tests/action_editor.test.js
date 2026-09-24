@@ -1,7 +1,16 @@
-import { describe, expect, test } from "@odoo/hoot";
+import { describe, expect, test, waitFor } from "@odoo/hoot";
 import { edit, press } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
-import { contains, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
+import {
+    contains,
+    mountWithCleanup,
+    onRpc,
+    getService,
+    models,
+    fields,
+    defineModels,
+    defineActions,
+} from "@web/../tests/web_test_helpers";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 import { defineStudioEnvironment } from "./studio_tests_context";
 
@@ -195,4 +204,67 @@ test("active_id and active_ids present in context at reload", async () => {
         "edit_action",
         `load_action: {"action_id":1,"context":{"lang":"en","tz":"taht","uid":7,"allowed_company_ids":[1]}}`,
     ]);
+});
+
+test("add map view", async () => {
+    onRpc("/web_studio/add_view_type", async (request) => {
+        const { params } = await request.json();
+        expect.step("/web_studio/add_view_type");
+        expect(params.view_type).toBe("map");
+    });
+    onRpc("/web_studio/create_default_view", async (request) => {
+        const { params } = await request.json();
+        expect.step("/web_studio/create_default_view");
+        expect(params.view_type).toBe("map");
+        Dummy._views = {
+            map: `<map><field name="display_name" /></map>`,
+        };
+    });
+    onRpc("/web_studio/edit_action", async function (request) {
+        const { params } = await request.json();
+        expect.step("/web_studio/edit_action");
+        expect(params).toEqual({
+            action_id: 555,
+            action_type: "ir.actions.act_window",
+            args: {
+                view_mode: "form,map",
+            },
+        });
+
+        const action = this.actions.find((a) => a.id === params.action_id);
+        action.view_mode = params.args.view_mode;
+        action.views.push([false, "map"]);
+    });
+
+    class Dummy extends models.Model {
+        _name = "dummy";
+        partner_id = fields.Many2one({ relation: "res.partner" });
+    }
+    defineModels([Dummy]);
+    defineActions([
+        {
+            id: 555,
+            type: "ir.actions.act_window",
+            views: [[false, "form"]],
+            view_mode: "form",
+            res_model: "dummy",
+            group_ids: [],
+        },
+    ]);
+
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+    await getService("action").doAction(555);
+    await waitFor(".o_form_view");
+    await animationFrame();
+
+    await getService("studio").open();
+    await contains(".o_studio .o_web_studio_menu .o_menu_sections button:contains(Views)").click();
+    await contains(".o_web_studio_views .o_web_studio_thumbnail_map").click();
+    expect.verifySteps(["/web_studio/add_view_type"]);
+    await waitFor(".modal .modal-title:contains(Generate map View)");
+    await contains(".modal-footer button:contains(Activate View)").click();
+    expect.verifySteps(["/web_studio/create_default_view", "/web_studio/edit_action"]);
+
+    await waitFor(".o_web_studio_editor_manager .o_map_view");
 });

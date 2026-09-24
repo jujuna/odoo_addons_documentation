@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.fields import Domain
 
 
 class RatingRating(models.Model):
@@ -20,5 +21,10 @@ class RatingRating(models.Model):
             self.ticket_id = False
 
     def _search_ticket_id(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
         ticket_ids = self.env['helpdesk.ticket']._search([('id', operator, value)])
-        return [('res_model', '=', 'helpdesk.ticket'), ('res_id', 'in', ticket_ids)]
+        domain = Domain([('res_model', '=', 'helpdesk.ticket'), ('res_id', 'in', ticket_ids)])
+        if operator == 'in' and False in value:  # relation may be falsy
+            domain |= Domain('author', '=', False)
+        return domain

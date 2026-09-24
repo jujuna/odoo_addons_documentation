@@ -108,7 +108,10 @@ class AccountAnalyticLine(models.Model):
             return list(set(unavailable_days))
 
         def get_company_unavailable_dates():
-            return get_unavailable_dates(self.env.company.resource_calendar_id._work_intervals_batch(from_datetime, to_datetime)[False])
+            return get_unavailable_dates(self.env.company.resource_calendar_id._work_intervals_batch(
+                from_datetime, to_datetime,
+                domain=[('count_as', '=', 'absence'), ('company_id', '=', self.env.company.id)],
+            )[False])
 
         def get_current_user_unavailable_dates():
             resource = self.env.user.employee_id.resource_id
@@ -127,10 +130,7 @@ class AccountAnalyticLine(models.Model):
             if not calendar_work_intervals:
                 unavailability_intervals_per_employee_id[False] = get_company_unavailable_dates()
                 return unavailability_intervals_per_employee_id
-            if self.env.company.resource_calendar_id.id in calendar_work_intervals:
-                company_unavailable_days = get_unavailable_dates(calendar_work_intervals[self.env.company.resource_calendar_id.id])
-            else:
-                company_unavailable_days = get_company_unavailable_dates()
+            company_unavailable_days = get_company_unavailable_dates()
             unavailability_intervals_per_employee_id = {
                 employee_id:
                     []

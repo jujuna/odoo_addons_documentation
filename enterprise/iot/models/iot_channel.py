@@ -18,6 +18,8 @@ class IotChannel(models.AbstractModel):
 
         :return: The IoT websocket channel used to send the message
         """
+        if not self.env.is_system() and not self.env.user._is_internal():
+            return
         ir_config_parameter = self.env['ir.config_parameter'].sudo()
         ws_channel = ir_config_parameter.get_str('iot.ws_channel')
         if not ws_channel:
@@ -33,6 +35,8 @@ class IotChannel(models.AbstractModel):
         :param message: The message to send to the IoT Box
         :param message_type: The type of the message (Default: call an action on a device)
         """
+        if not self.env.is_system() and not self.env.user._is_internal():
+            return
         loggable_message = {k: v for k, v in message.items() if k != "document"}
         _logger.info("Sending message to IoT channel: %s", loggable_message)
         self.env['bus.bus']._sendone(self.get_iot_channel(), message_type, message)

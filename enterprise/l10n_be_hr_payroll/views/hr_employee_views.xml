@@ -206,7 +206,7 @@
                 <field name="l10n_be_worker_code_id" string="Sub-type"
                        invisible="country_code != 'BE' or l10n_be_egov3_code == '999'"
                        readonly="l10n_be_worker_code_is_single"
-                       placeholder="Dmfa code, e.g. 015"
+                       placeholder="e.g. Ordinary Employee"
                        domain="[('id', 'in', l10n_be_allowed_worker_code_ids), '|', ('employee_type_ids', '=', False), ('employee_type_ids', 'in', employee_type_id)]"/>
                 <field name="l10n_be_apprenticeship_contract_type" invisible="country_code != 'BE' or l10n_be_egov3_code == '999' or l10n_be_employee_type_code != 'Apprenticeship'"/>
                 <field name="l10n_be_apprenticeship_contract_subtype" invisible="country_code != 'BE' or l10n_be_egov3_code == '999' or not l10n_be_apprenticeship_contract_type"/>
@@ -262,8 +262,6 @@
                     <field name="l10n_be_work_exemption_training_date"
                            invisible="l10n_be_work_exemption not in ['2', '7'] or l10n_be_work_exemption_training_situation == '0'"
                            required="l10n_be_work_exemption in ['2', '7']"/>
-                    <field name="available_l10n_be_worker_status" invisible="1"/> <!-- Needed for the filterable_selection-->
-                    <field name="l10n_be_worker_status" widget="filterable_selection" options="{'whitelist_fname': 'available_l10n_be_worker_status'}"/>
                 </group>
                 <group name="insurances" string="Insurances" invisible="1">
                 </group>

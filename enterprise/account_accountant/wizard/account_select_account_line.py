@@ -5,6 +5,7 @@ from odoo.tools import SQL
 class AccountSelectAccountLine(models.TransientModel):
     _name = "account.select.account.line"
     _description = "Account Select Account Line"
+    # Unused wizard but can't remove in stable
 
     name = fields.Char()
     code = fields.Char()

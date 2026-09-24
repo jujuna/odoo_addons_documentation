@@ -9,37 +9,54 @@
 $o-white: #000 !default;
 $o-black: #FFF !default;
 
-$o-gray-100: #1C1C20 !default;
-$o-gray-200: #25262b !default;
-$o-gray-300: #3A3B41 !default;
+$o-gray-100: #1F1F23 !default;
+$o-gray-200: #2C2E35 !default;
+$o-gray-300: #3E3F47 !default;
 $o-gray-400: #56575E !default;
 $o-gray-500: #6E6F77 !default;
 $o-gray-600: #88898F !default;
 $o-gray-700: #B3B4B8 !default;
 $o-gray-800: #D1D1D3 !default;
-$o-gray-900: #E4E4E5 !default;
+$o-gray-900: #EBEBEB !default;
 
 $o-enterprise-color: #92427d !default;
 $o-brand-primary: $o-enterprise-color !default;
 $o-enterprise-action-color: #1CBCB1 !default;
 
 $o-success: #22b053 !default;
-$o-info: #6AB5FB !default;
+$o-info: #71ADEA !default;
 $o-warning: #e39c50 !default;
 $o-danger: #cb2f2f !default;
 $o-action: $o-enterprise-action-color !default;
 $light: $o-gray-300 !default;
 $dark: $o-gray-700 !default;
 
-$o-colors-original: lighten(#000, 46.7%), #e74e4e, #f4b660, #F7CD1F, #6cedeb, #8d5482,
-              #f07b50, #2C8397, #475577, #dc0457, #30C381, #9365B8 !default;
+$o-colors-original: #a2a2a2, #ee2d2d, #dc8534, #8c700e, #5794dd, #986497, #db8865,
+#008278, #304be0, #ee2f8a, #009345, #9872e6 !default;
 
 $o-colors: ()!default;
 
 @each $-color in $o-colors-original {
-    $-adjusted: saturate(mix($-color, $o-black, 50%), 60%);
+    $-adjusted: saturate(mix($-color, $o-black, 80%), 65%);
     $o-colors: append($o-colors, $-adjusted);
 }
+
+// Tag and badge palette
+$o-colors-border:
+    #b1b1b1, #f8907e, #ee9b56, #d1ad41,
+    #37c2ef, #d396e6, #d1a888, #1ccbc2,
+    #86b1fd, #f28db4, #75c77f, #b0a2fd
+    !default;
+$o-colors-bg-subtle:
+    #2e2e2e, #58271f, #542d06, #392c02,
+    #043e50, #3d2046, #463324, #04413e,
+    #172d53, #4a1b2f, #0d3715, #38305c
+    !default;
+$o-colors-text-emphasis:
+    #d7d7d7, #fec9bf, #fecca6, #eed592,
+    #a0e3fe, #f1c5fe, #ebd2bf, #8eebe3,
+    #c3d9fe, #fec5d9, #b0e8b5, #d6d1fe
+    !default;
 
 
 // = Text
@@ -56,7 +73,7 @@ $o-theme-text-colors: (
     "success": #30C06E,
     "info": #71ADEA,
     "warning": #D89D54,
-    "danger": #F08D86,
+    "danger": #ff5757,
 ) !default;
 
 
@@ -85,7 +102,7 @@ $o-list-group-active-bg: rgba(saturate(adjust-hue($o-info, 15), 1.8), .5) !defau
 $modal-backdrop-bg: $o-white !default;
 
 // = Buttons
-$o-gradient-btn:  none !default;
+$o-gradient-btn: linear-gradient(145deg, rgba($o-white, .08), rgba($o-white, 0)) !default;
 $o-btns-bs-override: () !default;
 $o-btns-bs-override: map-merge((
     "primary": (
@@ -125,8 +142,8 @@ $o-btns-bs-override: map-merge((
     ),
 
     "light": (
-        background: $o-gray-200,
-        border: $o-gray-200,
+        background: transparent,
+        border: transparent,
         color: $o-gray-900,
 
         hover-background: $o-gray-300,
@@ -137,8 +154,8 @@ $o-btns-bs-override: map-merge((
         active-border: lighten($o-action, 10%),
         active-color: $o-black,
 
-        disabled-background: $o-gray-200,
-        disabled-border: $o-gray-200,
+        disabled-background: transparent,
+        disabled-border: transparent,
         disabled-color: $o-gray-900,
     ),
 
@@ -220,8 +237,8 @@ $o-btns-bs-outline-override: map-merge((
 
     "danger": (
         background: transparent,
-        border: $o-danger,
-        color: $o-danger,
+        border: map-get($o-theme-text-colors, 'danger'),
+        color: map-get($o-theme-text-colors, 'danger'),
 
         hover-background: lighten($o-danger, 3%),
         hover-border: lighten($o-danger, 3%),

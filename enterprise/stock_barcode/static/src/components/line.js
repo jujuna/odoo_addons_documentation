@@ -5,7 +5,7 @@ import { useService } from "@web/core/utils/hooks";
 
 export default class LineComponent extends Component {
     static template = "stock_barcode.LineComponent";
-    static props = {
+    static propsSchema = {
         displayUOM: t.any(),
         line: t.any(),
         subline: t.any().optional(),
@@ -13,7 +13,7 @@ export default class LineComponent extends Component {
         hidePickingName: t.any().optional(),
     };
 
-    props = useProps(this.constructor.props);
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         this.orm = useService("orm");
@@ -38,18 +38,10 @@ export default class LineComponent extends Component {
     }
 
     get displayFulfillbutton() {
-        return (
-            this.incrementQty && this.env.model.getDisplayIncrementBtn(this.line) && !this.isPackage
-        );
-    }
-
-    get displayIncrementSpacer() {
-        return (
-            this.isSelected &&
-            this.qtyDemand &&
-            this.qtyDemand !== 1 &&
-            (!this.displayIncrementButton || !this.displayFulfillbutton)
-        );
+        if (this.isPackage || this.incrementQty <= 0) {
+            return false;
+        }
+        return (this.incrementQty !== 1 || !this.isSelected) && this.env.model.getDisplayIncrementBtn(this.line);
     }
 
     get displayCompletePackageButton() {
@@ -57,12 +49,12 @@ export default class LineComponent extends Component {
     }
 
     get displayIncrementButton() {
-        if (this.isSelected && !this.isPackage && this.incrementQty !== 1) {
-            return this.isTracked && this.line.product_id.tracking === "serial"
-                ? this.env.model.getDisplayIncrementBtnForSerial(this.line)
-                : this.env.model.getDisplayIncrementBtn(this.line);
+        if (this.isPackage || !this.isSelected) {
+            return false;
         }
-        return false;
+        return this.isTracked && this.line.product_id.tracking === "serial"
+            ? this.env.model.getDisplayIncrementBtnForSerial(this.line)
+            : this.env.model.getDisplayIncrementBtn(this.line);
     }
 
     get incrementQty() {
@@ -179,9 +171,13 @@ export default class LineComponent extends Component {
 
     get showCreateSNLN() {
         const picking_type = this.env.model.pickingTypeId;
-        if (picking_type){
-            return this.line.product_id.tracking && this.incrementQty > 0
-                && picking_type.use_create_lots && picking_type.restrict_scan_tracking_number === 'optional';
+        if (picking_type) {
+            return (
+                this.line.product_id.tracking &&
+                this.incrementQty > 0 &&
+                picking_type.use_create_lots &&
+                picking_type.restrict_scan_tracking_number === "optional"
+            );
         }
         return false;
     }
@@ -245,18 +241,11 @@ export default class LineComponent extends Component {
     }
 
     async openDialog() {
-        const sequence = (
-            await this.orm.searchRead(
-                "ir.sequence",
-                [["id", "=", this.line.product_id.lot_sequence_id]],
-                ["number_next", "number_next_actual"]
-            )
-        )[0];
-        const nextCustomSerialNumber = await this.orm.call("ir.sequence", "get_next_char", [
-            sequence.id,
-            sequence.number_next,
-        ]);
-
+        const nextSerial = (await this.orm.read(
+            "product.product",
+            [this.line.product_id.id],
+            ["next_serial"]
+        ))[0].next_serial;
         const move =
             typeof this.line.move_id === "number"
                 ? this.env.model.cache.getRecord("stock.move", this.line.move_id)
@@ -264,8 +253,8 @@ export default class LineComponent extends Component {
         this.env.dialog.add(BarcodeGenerateDialog, {
             model: this.env.model,
             move: move,
-            line: this.props.line,
-            nextCustomSerialNumber: nextCustomSerialNumber,
+            line: this.line,
+            nextCustomSerialNumber: nextSerial,
         });
     }
 }

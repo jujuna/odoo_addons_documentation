@@ -56,7 +56,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MailCase):
         )
 
         # make sure the admin user has an avatar
-        cls.user_admin.image_1920 = cls.file_read('base/static/img/partner_root-image.png')
+        cls.user_admin.image_1920 = cls.file_read('base/static/img/partner_admin-image.webp')
 
         # use the Document app icon as test file
         cls.doc_icon = cls.file_read('documents/static/description/icon.png').content
@@ -223,11 +223,11 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MailCase):
 
         for document, user, status, content, filename in [
             (        self.missing_file,   None, 200, placeholder, 'avatar_grey.png'),
-            (         self.public_file,   None, 200,  avatar_128, '"Mitchell Admin.png"'),
+            (         self.public_file,   None, 200,  avatar_128, '"Mitchell Admin.webp"'),
             (       self.internal_file,   None, 200, placeholder, 'avatar_grey.png'),
             (   self.internal_shortcut,   None, 200, placeholder, 'avatar_grey.png'),
-            (   self.internal_shortcut, 'demo', 200,  avatar_128, '"Mitchell Admin.png"'),
-            (       self.internal_file, 'demo', 200,  avatar_128, '"Mitchell Admin.png"'),
+            (   self.internal_shortcut, 'demo', 200,  avatar_128, '"Mitchell Admin.webp"'),
+            (       self.internal_file, 'demo', 200,  avatar_128, '"Mitchell Admin.webp"'),
             # keep it last the response is reused outside the loop
         ]:
             url = f'/documents/avatar/{document.access_token}'

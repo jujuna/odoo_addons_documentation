@@ -143,3 +143,50 @@ class TestSubcontractingBarcodeClientAction(TestBarcodeClientAction):
 
         self.assertEqual(receipt.state, 'done')
         self.assertTrue(receipt.backorder_ids)
+
+    def test_partial_subcontract_receipt_exit_without_validating(self):
+        """
+        Scan a part of a subcontracted receipt in Barcode and leave it without validating:
+        the remaining quantity must still be shown as to be scanned and the receipt must
+        still be linked to a single subcontracting MO, as nothing was received yet.
+        """
+        receipt = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_in.id,
+            'partner_id': self.subcontractor_partner.id,
+            'location_id': self.supplier_location.id,
+            'location_dest_id': self.stock_location.id,
+            'move_ids': [Command.create({
+                'product_id': self.subcontracted_product.id,
+                'product_uom_qty': 5,
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+            })],
+        })
+        receipt.action_confirm()
+        move = receipt.move_ids
+        self.assertRecordValues(move._get_subcontract_production(), [{'product_qty': 5, 'state': 'confirmed'}])
+
+        # Scan 2 out of 5, then leave Barcode without validating.
+        move.move_line_ids.quantity = 2
+        move.move_line_ids.picked = True
+        move.post_barcode_process({})
+
+        # The scanned quantity and the remaining one to scan are kept apart, and the
+        # subcontracting MO is left untouched.
+        self.assertRecordValues(move.move_line_ids, [
+            {'quantity': 2, 'picked': True},
+            {'quantity': 3, 'picked': False},
+        ])
+        self.assertRecordValues(move._get_subcontract_production(), [{'product_qty': 5, 'state': 'confirmed'}])
+
+        # Validating afterwards (Barcode and the form view both call button_validate)
+        # receives the scanned quantity and backorders the rest, each with its own MO.
+        action = receipt.button_validate()
+        Form.from_action(self.env, action).save().process()
+        self.assertEqual(receipt.state, 'done')
+        self.assertRecordValues(receipt.move_ids._get_subcontract_production(), [{'product_qty': 2, 'state': 'done'}])
+        self.assertEqual(receipt.backorder_ids.move_ids.quantity, 3)
+        self.assertRecordValues(
+            receipt.backorder_ids.move_ids._get_subcontract_production(),
+            [{'product_qty': 3, 'state': 'confirmed'}],
+        )

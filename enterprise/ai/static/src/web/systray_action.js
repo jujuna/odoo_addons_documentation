@@ -1,5 +1,6 @@
 import { Component } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
 export default class SystrayAction extends Component {
@@ -23,6 +24,12 @@ export default class SystrayAction extends Component {
     }
 }
 
-registry
-    .category("systray")
-    .add("ai.systray_action", { Component: SystrayAction }, { sequence: 30 });
+registry.category("systray").add(
+    "ai.systray_action",
+    {
+        Component: SystrayAction,
+        // A light user has no AI chat: it is not meant to drive the database.
+        isDisplayed: () => user.isRegularUser,
+    },
+    { sequence: 30 }
+);

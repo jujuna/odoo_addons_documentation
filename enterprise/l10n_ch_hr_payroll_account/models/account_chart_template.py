@@ -157,7 +157,8 @@ class AccountChartTemplate(models.AbstractModel):
 
         for xml_id in [
             'l10n_ch_elm_2000', 'l10n_ch_elm_2005', 'l10n_ch_elm_2010',
-            'l10n_ch_elm_2015', 'l10n_ch_elm_2020', 'l10n_ch_elm_2021', 'l10n_ch_elm_2022'
+            'l10n_ch_elm_2015', 'l10n_ch_elm_2020', 'l10n_ch_elm_2021', 'l10n_ch_elm_2022',
+            'l10n_ch_elm_2000_net', 'l10n_ch_elm_2005_net', 'l10n_ch_elm_2010_net', 'l10n_ch_elm_2020_net',
         ]:
             rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
             rules_mapping[rule]['debit'] = social_insurance_payments

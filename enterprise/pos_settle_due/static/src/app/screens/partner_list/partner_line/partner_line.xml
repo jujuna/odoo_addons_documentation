@@ -6,11 +6,9 @@
                 Settle invoices
             </DropdownItem>
         </t>
-        <t t-else="">
-            <DropdownItem t-if="this.payLaterPaymentExists()" onSelected="() => this.onClickDepositMoney()">
-                Deposit money
-            </DropdownItem>
-        </t>
+        <DropdownItem t-if="this.payLaterPaymentExists()" onSelected="() => this.onClickDepositMoney()">
+            Deposit money
+        </DropdownItem>
     </t>
 
     <t t-name="pos_settle_due.PartnerLine" t-inherit="point_of_sale.PartnerLine" t-inherit-mode="extension">

@@ -1,9 +1,9 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 import json
 
 from datetime import date
 
 from odoo.addons.account.tests.common import TestTaxCommon
+from odoo.addons.l10n_in_reports.tests.common import L10nInTestAccountReportsCommon
 from odoo.addons.l10n_in_pos.tests.common import TestInPosBase
 from odoo.tools import file_open
 
@@ -11,7 +11,7 @@ TEST_DATE = date(2023, 5, 20)
 HSN_SCHEMA_TEST_DATE = date(2025, 5, 20)
 
 
-class TestInGstrPosBase(TestInPosBase):
+class TestInGstrPosBase(TestInPosBase, L10nInTestAccountReportsCommon):
     """
     Base class for Indian GSTR and POS-related test cases.
     This class sets up the company, products, and configuration required

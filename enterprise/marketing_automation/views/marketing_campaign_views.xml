@@ -54,8 +54,8 @@
                     </button>
                 </div>
                 <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
-                <div class="d-flex align-items-center gap-1 px-3 py-1 bg-100">
-                    <div class="me-auto bg-white p-1 rounded border">
+                <div class="d-flex align-items-center gap-1 px-3 pt-1 pb-3 border-bottom bg-100">
+                    <div class="me-auto bg-view p-1 rounded border">
                         <field name="title" class="text-break" widget="autosize_char" required="1" placeholder="e.g. eCommerce Offers Plan" />
                         <field name="state" widget="badge" class="ps-1" invisible="not id"/>
                     </div>
@@ -166,7 +166,7 @@
                                             help="If renewed, update the secret URL in the third-party app that calls this webhook."
                                         />
                                     </div>
-                                    <div class="oe_inline mb-0 text-muted" invisible="id">Save your campaign to get your URL.</div>
+                                    <div class="oe_inline mb-0 text-muted" invisible="id">Save this Trigger to get your URL.</div>
                                 </div>
                                 <label for="webhook_allow_create" string="Allow Create" invisible="enroll_type != 'webhook'"/>
                                 <div invisible="enroll_type != 'webhook'">
@@ -179,15 +179,15 @@
                                     </div>
                                     <ul class="text-muted">
                                         <li>
-                                            <code>search_domain</code>: an Odoo domain
+                                            <code>search_domain</code>: an Odoo domain matching the records that should be added
                                             <ul>
-                                                <li><code>[('email_normalized', 'ilike', '%@odoo.com'), ('company_id', '=', 1)]</code></li>
+                                                <li><code>[["email_normalized", "ilike", "%@odoo.com"], ["company_id", "=", 1]]</code></li>
                                             </ul>
                                         </li>
                                         <li invisible="not webhook_allow_create">
                                             <code>create_values</code>: the base values of the record that will be created should the search_domain fails to retrieve any
                                             <ul>
-                                                <li><code>[{'name': 'Camille Daffoldi', 'email': 'camilledaffoldi@gmail.com'}]</code></li>
+                                                <li><code>[{"name": "Camille Daffoldi", "email": "camilledaffoldi@gmail.com"}]</code></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -195,6 +195,9 @@
                                         You can test your webhook by sending a request to the webhook URL appended with <code>/test</code>.
                                         In draft mode, the fetched resource IDs will be included in the response.
                                         You may also enable logging to always get full logs for every call.
+                                    </div>
+                                    <div invisible="state == 'running'" class="text-warning"><i class="oi" data-icon="warning"/>
+                                        You will not be able to add participants unless the campaign is running.
                                     </div>
                                 </div>
                                 <label for="webhook_log_calls" string="Log Calls" invisible="enroll_type != 'webhook' or not is_admin_and_debug" groups="base.group_system"/>
@@ -235,6 +238,20 @@
                             </group>
                         </page>
                     </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="marketing_campaign_view_form_reply_trigger" model="ir.ui.view">
+        <field name="name">marketing.campaign.view.form.reply.trigger</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <p>Trigger specific follow-up actions whenever a participant replies to an email.</p>
+                    <label for="collect_reply_early_end" class="me-2" string="Cancel main workflow when triggered?"/>
+                    <field name="collect_reply_early_end" widget="boolean_toggle" nolabel="1"/>
                 </sheet>
             </form>
         </field>
@@ -301,5 +318,13 @@
         <field name="view_mode">form</field>
         <field name="view_id" ref="marketing_automation.marketing_campaign_view_form_trigger"/>
         <field name="target">new</field>
+    </record>
+
+    <record id="marketing_campaign_create_reply_trigger" model="ir.actions.act_window">
+        <field name="target">new</field>
+        <field name="name">Configure Reply Path</field>
+        <field name="res_model">marketing.campaign</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="marketing_automation.marketing_campaign_view_form_reply_trigger"/>
     </record>
 </odoo>

@@ -600,8 +600,11 @@ class KnowledgeArticle(models.Model):
         if self.env.is_system():
             self.user_can_write = True
         else:
-            for article in self:
-                article.user_can_write = article.user_has_write_access
+            # The ACLs, not only the article permission: a light user reads the
+            # articles it is member of, but never writes any of them.
+            writable = self._filtered_access('write')
+            writable.user_can_write = True
+            (self - writable).user_can_write = False
 
     @api.depends('root_article_id.internal_permission', 'root_article_id.article_member_ids.permission')
     def _compute_category(self):

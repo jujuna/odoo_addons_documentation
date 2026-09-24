@@ -9,7 +9,7 @@ import { SignTemplateSidebar } from "@sign/backend_components/sign_template/sign
 export class SignTemplateMobileDocumentsPanel extends SignTemplateSidebar {
     static template = "sign.SignTemplateMobileDocumentsPanel";
 
-    static props = {
+    static propsSchema = {
         canAddDocument: t.boolean().optional(),
         deleteDocument: t.function(),
         documents: t.array(),

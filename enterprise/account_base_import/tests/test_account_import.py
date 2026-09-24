@@ -178,7 +178,7 @@ class TestBaseImport(AccountTestInvoicingCommon):
 
         account_move_lines = self.env["account.move.line"].browse(result["ids"])
         self.assertEqual(len(account_move_lines.mapped("move_id").ids), 3, "3 moves should have been created")
-        self.assertEqual(sorted(account_move_lines.mapped("journal_id.code")), ["MISC1", "OD26_19", "OD_BLAB"], "The journals should be set correctly")
+        self.assertEqual(sorted(account_move_lines.mapped("journal_id.code")), ["OD26_19", "OD_BLABLA", "OD_BLABLU"], "The journals should be set correctly")
 
     def test_import_summary_fields(self):
         import_summary = self.env['account.import.summary'].create({

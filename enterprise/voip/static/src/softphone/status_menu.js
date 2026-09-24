@@ -16,7 +16,7 @@ class DeviceSelect extends MailDeviceSelect {
     CLICK_TO_ACTIVATE = _t("Click to Enable");
 
     setup() {
-        this.settingName = this.props.settingName;
+        this.settingName = useProps.static("settingName", t.string().optional());
         super.setup();
     }
 

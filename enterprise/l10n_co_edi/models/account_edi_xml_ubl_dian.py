@@ -693,10 +693,6 @@ class AccountEdiXmlUbl_Dian(models.AbstractModel):
     def _add_document_uuid_node(self, document_node, vals):
         # Add CUFE/CUDE/CUDS
         document_node['cbc:UUID']['_text'] = vals['uuid']  # as stated in the "Anexo Tecnico" file, SHA384 must be used
-        document_node['cbc:Note'] = [
-            document_node['cbc:Note'],
-            {'_text': vals['cufe_cude_cuds']}
-        ]
 
         if 'invoice' in vals and vals['invoice'].l10n_co_edi_is_unsent_contingency_invoice:
             document_node['cac:AdditionalDocumentReference']['cbc:UUID']['_text'] = document_node['cbc:UUID']['_text']

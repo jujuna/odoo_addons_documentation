@@ -1,3 +1,4 @@
+from collections.abc import Mapping, Sequence
 import json
 
 from odoo.addons.l10n_in.tests.common import L10nInTestInvoicingCommon
@@ -33,3 +34,33 @@ class L10nInTestAccountReportsCommon(TestAccountReportsCommon, L10nInTestInvoici
             data = json.load(file)
 
         return data
+
+    def comparable_dict(cls, d: Mapping) -> Mapping:
+        """
+        Recursively sorts lists in a dictionary to make it comparable regardless of order.
+        :param d: The dictionary to normalize.
+        :return: A new dictionary with sorted lists.
+        """
+        def normalize(value):
+            if isinstance(value, Mapping):
+                return {
+                    key: normalize(val)
+                    for key, val in value.items()
+                }
+            if isinstance(value, Sequence) and not isinstance(
+                value, (str, bytes, bytearray)
+            ):
+                values = [normalize(item) for item in value]
+                return sorted(values, key=lambda item: json.dumps(
+                    item, sort_keys=True, separators=(",", ":")
+                ))
+            return value
+        return normalize(d)
+
+    def compare_dict_ignoring_list_order(self, dict1, dict2):
+        """
+        Compare two dictionaries while ignoring the order of lists within them.
+        """
+        normalized_dict1 = self.comparable_dict(dict1)
+        normalized_dict2 = self.comparable_dict(dict2)
+        return self.assertDictEqual(normalized_dict1, normalized_dict2)

@@ -121,14 +121,16 @@ re-schedules the UNWRAPPED function (`requestAnimationFrame(tick)` inside `tick`
 only on the first call): every frame after the first then mutates the page unprotected. In
 particular reject scripts that hide with `d-none` any element they read text from as a source
 without tracking or manually un-hiding it (translated text must never end up permanently hidden).
-- Any use of the script API beyond its three members. A script takes its API with
-`const ai = window.__aiScriptsManager__.getApi(scriptEl)` and may then use ONLY `ai.protectMutations`,
-`ai.trackElement` and `ai.registerCleanup`.
+- Any use of the scripts manager beyond its API. A script takes its API with
+`const ai = window.__aiScriptsManager__.getApi(scriptEl)`.
 - If the content doesn't follow the instructions at all, when returning the "reason" say that perhaps
 AI website builder agent hasn't loaded the "Website JavaScript" skill.
-- MARK code as NOT VALID if it contains hardcoded UI text or text sourced from attributes:
-e.g. `el.textContent = 'Active'` or `el.textContent = el.dataset.text`). ALL UI text MUST
-be extracted dynamically from the HTML DOM text content to support Odoo translations.
+MARK code as NOT VALID if:
+- Things that require dom content to be loaded (lookups/listeners/dom mutations) are not wrapped in
+`ai.whenReady`.
+- It contains hardcoded UI text or text sourced from attributes: e.g. `el.textContent = 'Active'`
+or `el.textContent = el.dataset.text`). ALL UI text MUST be extracted dynamically from the HTML DOM
+text content to support Odoo translations.
 Typical SAFE content includes normal page structure, styling, animations, and DOM-only UI behavior
 within the current page.</field>
         <field name="is_system_agent">True</field>

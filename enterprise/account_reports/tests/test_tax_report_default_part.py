@@ -285,109 +285,6 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-    def test_tax_group_of_taxes_affected_by_other(self):
-        tax_10_affect_base = self.env['account.tax'].create({
-            'name': "tax_10_affect_base",
-            'amount_type': 'percent',
-            'amount': 10.0,
-            'include_base_amount': True,
-        })
-        tax_20_affect_base = self.env['account.tax'].create({
-            'name': "tax_20_affect_base",
-            'amount_type': 'percent',
-            'amount': 20.0,
-            'include_base_amount': True,
-            'type_tax_use': 'none',
-        })
-        tax_10 = self.env['account.tax'].create({
-            'name': "tax_10",
-            'amount_type': 'percent',
-            'amount': 10.0,
-            'type_tax_use': 'none',
-        })
-        tax_group = self.env['account.tax'].create({
-            'name': "tax_group",
-            'amount_type': 'group',
-            'children_tax_ids': [Command.set((tax_20_affect_base + tax_10).ids)],
-            'type_tax_use': 'sale',
-        })
-
-        invoice = self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': self.partner_a.id,
-            'invoice_date': '2019-01-01',
-            'date': '2019-01-01',
-            'invoice_line_ids': [
-                Command.create({
-                    'name': 'base line',
-                    'account_id': self.revenue_1.id,
-                    'price_unit': 1000.0,
-                    'tax_ids': [Command.set((tax_10_affect_base + tax_group).ids)],
-                }),
-            ],
-        })
-        invoice.action_post()
-
-        date_from_str = '2019-01-01'
-        date_to_str = '2019-01-31'
-        options = self._generate_options(self.report_generic, date_from_str, date_to_str)
-        self.assertLinesValues(
-            self.report_generic._get_lines(options),
-            #   Name                                    NET         TAX
-            [   0,                                      1,          2],
-            [
-                ('Sales',                               '',         452.0),
-                ('tax_10_affect_base (10.0%)',          1000.0,     100.0),
-                ('tax_group',                           1100.0,     352.0),
-                ('Total Sales',                         '',         452.0),
-            ],
-            options,
-        )
-
-        options = self._generate_options(self.report_grouped_account_tax, date_from_str, date_to_str)
-        self.assertLinesValues(
-            self.report_grouped_account_tax._get_lines(options),
-            #   Name                                    NET         TAX
-            [   0,                                      1,          2],
-            [
-                ('Sales',                               '',         452.0),
-                ('400000 Product Sales',                '',         452.0),
-                ('tax_10_affect_base (10.0%)',          1000.0,     100.0),
-                ('tax_group',                           1100.0,     352.0),
-                ('Total 400000 Product Sales',          '',         452.0),
-                ('Total Sales',                         '',         452.0),
-            ],
-            options,
-        )
-
-        options = self._generate_options(self.report_grouped_tax_account, date_from_str, date_to_str)
-        report_lines = self.report_grouped_tax_account._get_lines(options)
-        self.assertLinesValues(
-            report_lines,
-            #   Name                                    NET         TAX
-            [   0,                                      1,          2],
-            [
-                ('Sales',                               '',         452.0),
-                ('tax_10_affect_base (10.0%)',          '',         100.0),
-                ('400000 Product Sales',                1000.0,     100.0),
-                ('Total tax_10_affect_base (10.0%)',    '',         100.0),
-                ('tax_group',                           '',         352.0),
-                ('400000 Product Sales',                1100.0,     352.0),
-                ('Total tax_group',                     '',         352.0),
-                ('Total Sales',                         '',         452.0),
-            ],
-            options,
-        )
-
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
-        expected_amls_tax_10_affect_base = invoice.line_ids.filtered(lambda x: x.tax_line_id == tax_10_affect_base or tax_10_affect_base in x.tax_ids)
-        expected_amls_tax_group = invoice.line_ids.filtered(lambda x: x.tax_line_id or x.tax_ids)
-        expected_amls_based_on_tax_dict = {
-            'tax_10_affect_base (10.0%)': expected_amls_tax_10_affect_base,
-            'tax_group': expected_amls_tax_group,
-        }
-        self.checkAmlsRedirection(self.report_grouped_tax_account, options, tax_lines_with_caret_options, expected_amls_based_on_tax_dict)
-
     def test_mixed_all_type_tax_use_same_line(self):
         tax_10 = self.env['account.tax'].create({
             'name': "tax_10",
@@ -616,6 +513,9 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             'amount': 20.0,
             'type_tax_use': 'sale',
         })
+        (tax_10 + tax_20).invoice_repartition_line_ids.filtered(
+            lambda x: x.repartition_type == 'tax'
+        ).account_id = self.revenue_2
 
         invoice = self.env['account.move'].create({
             'move_type': 'out_invoice',

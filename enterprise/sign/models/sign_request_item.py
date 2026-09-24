@@ -28,6 +28,7 @@ QES_IAP_SERVICE_NAME = 'sign_qes'
 # up. The service cannot tell that what it produced does not arrive whole, so nothing but
 # this stops the same one being asked for on every page the signer opens
 MAX_EXTERNAL_SIGNATURE_FAILURES = 5
+QES_DEFAULT_HOST = 'https://sign.api.odoo.com'
 QES_HOST_TIMEOUT = 15
 QES_HOST_UPLOAD_TIMEOUT = 120
 
@@ -916,9 +917,7 @@ class SignRequestItem(models.Model):
         :raise requests.RequestException: when the host could not be reached
         """
         self.ensure_one()
-        endpoint = self.env['ir.config_parameter'].sudo().get_str('sign.qes_endpoint') or ''
-        if not endpoint:
-            raise ValidationError(self.env._("No configured endpoint for the QES signing host."))
+        endpoint = self.env['ir.config_parameter'].sudo().get_str('sign.qes_endpoint') or QES_DEFAULT_HOST
         provider = self.role_id._get_external_signature_provider()
         return iap_tools.iap_jsonrpc(
             url_join(endpoint, '/qes/v1/%s/session/%s' % (provider, route)),
@@ -963,7 +962,7 @@ class SignRequestItem(models.Model):
                 lang=self.partner_id.lang or self.env.lang or self.env.company.partner_id.lang or 'en_US',
                 documents=documents,
             )
-        except (ValidationError, requests.RequestException):
+        except requests.RequestException:
             return {'message': self.env._("The signature service could not be reached. Please try again later.")}
         if opened.get('session_token') and opened.get('signing_url'):
             self.external_signature_session_token = opened['session_token']
@@ -985,7 +984,7 @@ class SignRequestItem(models.Model):
             return
         try:
             response = self._qes_host_call('status', session_token=self.external_signature_session_token)
-        except (ValidationError, requests.RequestException):
+        except requests.RequestException:
             # nothing here can act on it, and the signer must not be held up by it
             _logger.warning("Could not reach the signature service about sign request item %s", self.id)
             return
@@ -1012,7 +1011,7 @@ class SignRequestItem(models.Model):
         if self.external_signature_session_token:
             try:
                 rejected = self._qes_host_call('reject', session_token=self.external_signature_session_token)
-            except (ValidationError, requests.RequestException):
+            except requests.RequestException:
                 # the service ends the session on its own, and this signer is not made to wait
                 # for it to answer before they can sign or refuse again
                 _logger.warning("Could not give up the signature session of sign request item %s", self.id)

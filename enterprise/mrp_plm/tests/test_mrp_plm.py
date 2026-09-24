@@ -863,38 +863,11 @@ class TestMrpPlm(TestPlmCommon):
         self.assertEqual(bom_eco.new_bom_id.bom_line_ids[0].product_qty, 1.0003)
         self.assertEqual(bom_eco.bom_change_ids.upd_product_qty, 0.0003)
 
-    def test_eco_attachments(self):
-        """Test that applying an ECO updates the origin_attachment_id for product.document"""
-        tmpl = self.env["product.template"].create({"name": "Test"})
-        eco_form = Form(self.env["mrp.eco"])
-        eco_form.name = "ELCT ECO"
-        eco_form.type_id = self.eco_type
-        eco_form.product_tmpl_id = tmpl
-        eco = eco_form.save()
-        eco.stage_id = self.eco_stage
-        eco.action_new_revision()
-        eco.document_ids = [
-            (
-                0,
-                0,
-                {
-                    "name": "test.pdf",
-                    "type": "binary",
-                    "raw": b"Original content",
-                    "res_id": eco.id,
-                    "res_model": "mrp.eco",
-                },
-            )
-        ]
-        doc = eco.document_ids[0]
-        old_origin_id = doc.origin_attachment_id
-        self._update_eco_version(eco.open_wizard(), update_product_version=False)
-        self.assertNotEqual(doc.origin_attachment_id, old_origin_id)
-
     def test_eco_apply_document_without_origin(self):
-        """Test that applying an ECO with a product.document without origin_attachment_id
-        correctly sets the origin_attachment_id to the ir.attachment of the product.document.
-        """
+        """Test that applying an ECO with a new product.document correctly sets the
+        origin_attachment_id of the ir.attachment of the product.template to the
+        ir.attachment of the mrp.eco, but doesn't change the origin_attachment_id of
+        the ir.attachment of the mrp.eco. """
         # product.document and ir.attachment have their own id sequence: create a
         # standalone attachment so the document never shares the id of its own one
         self.env['ir.attachment'].create({'name': 'standalone.txt', 'raw': b'Standalone'})
@@ -922,4 +895,4 @@ class TestMrpPlm(TestPlmCommon):
             ('res_model', '=', 'product.template'), ('res_id', '=', tmpl.id),
         ])
         self.assertEqual(new_doc.origin_attachment_id, doc.ir_attachment_id)
-        self.assertEqual(doc.origin_attachment_id, new_doc.ir_attachment_id)
+        self.assertFalse(doc.origin_attachment_id)

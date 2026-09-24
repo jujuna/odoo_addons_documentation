@@ -130,8 +130,7 @@ class PlatformOrderProvider(models.Model):
     @api.model
     def _setup_journal(self, company, code):
         providers_description = dict(self._fields['code']._description_selection(self.env) or [])
-        journal_code_size = self.env['account.journal']._fields['code'].size
-        journal_code = code[:journal_code_size].upper()
+        journal_code = code.upper()
         if not (journal := self._get_provider_journal(journal_code, company.id)):
             journal = self.env['account.journal'].sudo().create({
                 'name': providers_description[code],

@@ -68,7 +68,7 @@
         </t>
         <div class="o_gantt_header_groups o_gantt_grid_columns bg-view position-sticky sticky-top bg-view bg-opacity-75 backdrop-blur">
             <t t-foreach="this.columnsGroups" t-as="columnGroup" t-key="columnGroup_index">
-                <div class="o_gantt_header_title position-sticky d-flex align-items-center ps-2 overflow-hidden"
+                <div class="o_gantt_header_title position-sticky d-flex align-items-center ps-2 overflow-hidden bg-view bg-opacity-100"
                     t-att-style="this.getGroupHeaderStyle({column: columnGroup.grid.column})"
                     t-att-title="!columnGroup.isFolded and this.model.metaData.scale.groupHeaderTitle(columnGroup.start, this.env)"
                 >

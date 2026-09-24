@@ -74,7 +74,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_ke'))]"/>
         <field name="company_id" ref="base.demo_company_ke"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="bytes" file="l10n_ke_hr_payroll/static/img/hr_employee_barack.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_ke_hr_payroll/static/img/hr_employee_barack.webp"/>
     </record>
 
     <record id="res_partner_bank_account_ahmed" model="res.partner.bank">
@@ -108,7 +108,7 @@
     <record id="hr_employee_ahmed" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ke_hr_payroll.res_partner_ahmed')).name"/>
         <field name="address_id" ref="l10n_ke_hr_payroll.res_partner_ke_work_address"/>
-        <field name="image_1920" type="bytes" file="l10n_ke_hr_payroll/static/img/hr_employee_ahmed.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_ke_hr_payroll/static/img/hr_employee_ahmed.webp"/>
         <field name="work_phone">0999 432209</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ke_hr_payroll.res_partner_ahmed')).name.replace(' ', '.').lower() + '@example.com'"/> <field name="company_id" model="res.partner" eval="obj(ref('l10n_ke_hr_payroll.res_partner_ahmed')).company_id"/>
         <field name="work_contact_id" ref="l10n_ke_hr_payroll.res_partner_ahmed"/>
@@ -161,7 +161,7 @@
     <record id="hr_employee_barack" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ke_hr_payroll.res_partner_barack')).name"/>
         <field name="address_id" ref="l10n_ke_hr_payroll.res_partner_ke_work_address"/>
-        <field name="image_1920" type="bytes" file="l10n_ke_hr_payroll/static/img/hr_employee_barack.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_ke_hr_payroll/static/img/hr_employee_barack.webp"/>
         <field name="work_phone">0999 724290</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ke_hr_payroll.res_partner_barack')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_ke_hr_payroll.hr_employee_ahmed"/>

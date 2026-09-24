@@ -100,7 +100,7 @@ class L10n_NoTaxReportHandler(models.AbstractModel):
         """
 
         query = report._get_report_query(options, 'strict_range')
-        tax_details_query = self.env['account.move.line']._get_query_tax_details(query.from_clause, query.where_clause)
+        tax_details_query = self.env['account.move.line']._get_query_tax_details(query)
 
         # The following tax details query will group taxes with their tax repartition lines in order to have one result
         # per standard tax and two results per deductible taxes.
