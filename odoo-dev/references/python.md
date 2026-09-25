@@ -252,6 +252,9 @@ msg = self.env._("Order {} cannot be deleted.".format(self.name))
 `self.env._()` is the preferred form in v19+ and is what new core code uses. The imported
 `from odoo import _` reads the language from the caller's `context` / `kwargs` / `self.env`
 locals (`odoo/tools/translate.py` `_get_lang`); do not mix the two styles inside one file.
+Never name a placeholder `source` or `self` with `self.env._()`: they collide with its own parameters
+(`environments.py:344`) and raise `TypeError`. The imported `_` allowed `source=`, so conversions hit this
+(see refactor.md section 5).
 
 | Where the text is | Use | Why |
 |---|---|---|

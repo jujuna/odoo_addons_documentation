@@ -61,6 +61,14 @@ export class AccountReportLineCellEditableLiteral extends Component {
         });
     }
 
+    get editableValue() {
+        const value = this.isLocaleFormatType
+            ? this.editableNumericValue
+            : this.props.cell.no_format();
+
+        return value == null ? "" : String(value);
+    }
+
     onClickEdit() {
         this.inputRef().focus();
     }
@@ -93,16 +101,12 @@ export class AccountReportLineCellEditableLiteral extends Component {
 
     onFocus() {
         this.isFocused.set(true);
-        this.inputRef().value = this.isLocaleFormatType
-            ? this.editableNumericValue
-            : this.props.cell.no_format;
+        this.inputRef().value = this.editableValue;
         this.inputRef().select();
     }
 
     onBlur() {
-        const no_format = this.props.cell.no_format();
-        const cellNoFormatValue = typeof no_format === "string" ? no_format : JSON.stringify(no_format);
-        if (cellNoFormatValue === this.inputRef().value) {
+        if (this.editableValue === this.inputRef().value) {
             this.isFocused.set(false);
         }
     }
@@ -121,12 +125,6 @@ export class AccountReportLineCellEditableLiteral extends Component {
     }
 
     get inputValue() {
-        if (!this.isFocused()) {
-            return this.props.cell.name();
-        } else if (this.isLocaleFormatType) {
-            return this.editableNumericValue;
-        } else {
-            return this.props.cell.no_format();
-        }
+        return this.isFocused() ? this.editableValue : this.props.cell.name();
     }
 }

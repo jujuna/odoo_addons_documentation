@@ -245,6 +245,8 @@ logo = fields.Image('Logo', max_width=1920, max_height=1920)
 ```
 
 **Binary:**
+- v20 values are `BinaryValue` objects: write `BinaryBytes(raw_bytes)` (`from odoo.tools import BinaryBytes`), read
+  `record.file.content` (bytes) or `.to_base64()`. Writing `bytes`, base64 or not, raises `TypeError` (`v20-changes.md` §10).
 - `attachment=True` (default) stores the value as an `ir.attachment`, not a table column. `attachment=False` stores it in a `bytea` column. A non-stored binary forces `attachment=False`.
 - `prefetch=False` by default — blobs are never batch-loaded.
 - With `bin_size=True` in context (or `bin_size_<field>`), reads return the human-readable size instead of the content — use it in list views to avoid loading blobs.

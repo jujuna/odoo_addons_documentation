@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="sign.SignItemCustomPopover">
-        <div class="popover" style="max-width: 25rem;">
-            <div class="popover-header d-flex align-items-center justify-content-between">
+        <div style="max-width: 25rem;">
+            <div class="popover-header d-flex align-items-center justify-content-between gap-2">
                 <span class="fw-bold text-capitalize" t-out="this.props.header_title"/>
                 <button type="button" title="Close" class="btn btn-secondary oi p-0" data-icon="close_small" t-on-click="this.props.onClose"/>
             </div>
@@ -60,7 +60,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center justify-content-between gap-2">
                     <button class="btn o_sign_validate_field_button btn-primary" t-on-click="this.onValidate">Save</button>
                     <div class="btn-group" role="group">
                         <button class="btn btn-secondary" t-on-click="this.props.onDuplicate">

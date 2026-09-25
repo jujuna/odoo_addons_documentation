@@ -486,9 +486,8 @@ class HrVersion(models.Model):
         self.ensure_one()
         match self.l10n_au_tax_treatment_category:
             case "R":
-                if self.l10n_au_employment_basis_code == "C":
-                    code = "D"
-                elif self.l10n_au_tax_free_threshold:
+                # TODO: Add additional logic for daily casual employees
+                if self.l10n_au_tax_free_threshold:
                     code = "T"
                 else:
                     code = "N"

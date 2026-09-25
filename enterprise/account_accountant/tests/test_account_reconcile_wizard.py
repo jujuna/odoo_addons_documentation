@@ -21,7 +21,7 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         cls.revenue_account = cls.company_data['default_account_revenue']
         cls.payable_account_2 = cls.env['account.account'].create({
             'name': 'Payable Account 2',
-            'account_type': 'liability_current',
+            'account_type': 'liability_payable',
             'code': 'PAY2.TEST',
         })
         cls.write_off_account = cls.env['account.account'].create({
@@ -198,16 +198,17 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
 
     def test_write_off_one_foreign_currency_rounding(self):
         """ Reconciliation of two lines with one of the two using foreign currency should reconcile in foreign currency."""
+        self.write_off_account.reconcile = True
         foreign_currency = self.setup_other_currency('CAD', rounding=0.01, rates=[('2015-12-31', 0.052972554919), ('2016-12-31', 4.0)])
 
         # Check that the reconciliation works independently of
         # - whether the foreign amount is debit or credit
         # - the account type (payable / receivable)
-        self.assertFalse(self.payable_account_2.account_type in ('asset_receivable', 'liability_payable'))
+        self.assertFalse(self.write_off_account.account_type in ('asset_receivable', 'liability_payable'))
         self.assertTrue(self.receivable_account.account_type in ('asset_receivable', 'liability_payable'))
         for foreign_amount_sign, account in [
-            (-1, self.payable_account_2),
-            (1, self.payable_account_2),
+            (-1, self.write_off_account),
+            (1, self.write_off_account),
             (-1, self.receivable_account),
             (1, self.receivable_account),
         ]:
@@ -871,3 +872,73 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
             {'balance': 600.0, 'account_id': self.payable_account.id, 'partner_id': partner_b.id},
             {'balance': 400.0, 'account_id': self.payable_account.id, 'partner_id': partner_c.id},
         ])
+
+    def test_reconciliation_currency_depending_on_account(self):
+        company_currency, foreign_currency = self.company_currency, self.foreign_currency
+        for (
+            index, account_reconcile, use_foreign_currency, amounts_currency_match, balances_match, opens_wizard, reco_currency) in (
+            (1,    True,              False,                None,                   True,           False,        company_currency),
+            (2,    True,              False,                None,                   False,          True,         company_currency),
+            (3,    True,              True,                 True,                   True,           False,        foreign_currency),
+            (4,    True,              True,                 True,                   False,          False,        foreign_currency),
+            (5,    True,              True,                 False,                  True,           True,         foreign_currency),
+            (6,    True,              True,                 False,                  False,          True,         foreign_currency),
+            (7,    False,             False,                None,                   True,           False,        company_currency),
+            (8,    False,             False,                None,                   False,          True,         company_currency),
+            (9,    False,             True,                 True,                   True,           False,        company_currency),
+            (10,   False,             True,                 True,                   False,          True,         company_currency),
+            (11,   False,             True,                 False,                  True,           False,        company_currency),
+            (12,   False,             True,                 False,                  False,          True,         company_currency),
+        ):
+            with self.subTest(index=index):
+                account = self.env['account.account'].create({
+                    'name': 'Reconciliation Currency Account',
+                    'account_type': 'liability_current',
+                    'code': f'RECOCUR{index}.TEST',
+                    'reconcile': account_reconcile,
+                })
+                currency = foreign_currency if use_foreign_currency else company_currency
+                balance_1 = 1000
+                balance_2 = -1000.0 if balances_match else -900.0
+                if use_foreign_currency:  # the rate of the foreign currency is 3.0 at that date
+                    amount_currency_1 = 3000.0
+                    amount_currency_2 = -3000.0 if amounts_currency_match else -2700.0
+                else:
+                    amount_currency_1, amount_currency_2 = balance_1, balance_2
+                line_1 = self.create_line_for_reconciliation(balance_1, amount_currency_1, currency, self.test_date, account_1=account)
+                line_2 = self.create_line_for_reconciliation(balance_2, amount_currency_2, currency, self.test_date, account_1=account)
+                lines = line_1 + line_2
+
+                result = lines.action_reconcile()
+
+                if opens_wizard:  # a write-off is needed, fill the wizard with arbitrary values and reconcile from it
+                    self.assertEqual(result.get('res_model'), 'account.reconcile.wizard')
+                    wizard = self.env['account.reconcile.wizard'].with_context(
+                        active_model='account.move.line',
+                        active_ids=lines.ids,
+                    ).new({
+                        'journal_id': self.misc_journal.id,
+                        'account_id': self.write_off_account.id,
+                        'label': 'Write-Off Test Label',
+                        'date': self.test_date,
+                    })
+                    write_off_line = wizard.reconcile() - lines
+                    # the write-off is expressed in the currency used for the reconciliation
+                    self.assertRecordValues(write_off_line, [{
+                        'account_id': account.id,
+                        'currency_id': reco_currency.id,
+                    }])
+                else:  # the items have been reconciled silently, without any write-off
+                    self.assertFalse(isinstance(result, dict))
+                    partials = lines.matched_debit_ids | lines.matched_credit_ids
+                    if reco_currency == company_currency:
+                        self.assertFalse(partials.exchange_move_id)
+                        self.assertRecordValues(partials, [{
+                            'amount': 1000.0,
+                            'debit_amount_currency': amount_currency_1,
+                            'credit_amount_currency': -amount_currency_2,
+                        }])
+                    else:
+                        self.assertEqual(sum(partials.mapped('debit_amount_currency')), amount_currency_1)
+                        self.assertEqual(sum(partials.mapped('credit_amount_currency')), -amount_currency_2)
+                        self.assertEqual(bool(partials.exchange_move_id), not balances_match)

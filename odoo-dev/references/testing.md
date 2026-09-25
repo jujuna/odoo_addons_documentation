@@ -36,12 +36,12 @@ This file is what to do once the user says yes.
 ```python
 from odoo.tests import tagged, TransactionCase
 
-# Default: runs at install time
+# Default in v20 (no @tagged): standard + post_install
 @tagged('post_install', '-at_install')  # run only after all modules installed
 class TestMyModel(TransactionCase):
     ...
 
-@tagged('at_install')  # default — runs during module install
+@tagged('at_install', '-post_install')  # opt in: runs during module install
 class TestMyModelInstall(TransactionCase):
     ...
 
@@ -51,8 +51,9 @@ class TestSpecific(TransactionCase):
 ```
 
 **Tag rules:**
-- `at_install` — runs during module installation (default)
-- `post_install` — runs after all modules are installed
+- `post_install` — runs after all modules are installed (v20 default for untagged classes,
+  [odoo/tests/common.py:605](../../../../odoo/tests/common.py#L605); v19 defaulted to `at_install`)
+- `at_install` — runs during module installation (opt in)
 - `-at_install` — exclude from install-time tests
 - Custom tags can be used for filtering: `--test-tags my_custom_tag`
 - Use `post_install` for tests that depend on other modules being fully loaded

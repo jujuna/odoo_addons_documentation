@@ -50,6 +50,10 @@ Full 19 → 20 delta with source links: `v20-changes.md`.
 | `res.bank`, `bank_id.bic`, `journal.bank_id` | `res.partner.bank.bank_bic` / `bank_name`, `journal.bank_bic` |
 | `acc_number`, `sanitized_acc_number`, `journal.bank_acc_number` | `account_number`, `sanitized_account_number`, `journal.bank_account_number` |
 | `def __get_bank_statements_available_sources` | `def _get_bank_statements_available_sources` |
+| `rec.file = base64.b64encode(raw)` / `base64.b64decode(rec.file)` | `rec.file = BinaryBytes(raw)` (`from odoo.tools import BinaryBytes`) / `rec.file.content` |
+| `ir.attachment.create({'datas': base64.b64encode(raw)})` | `{'raw': raw}` — `datas` is silently dropped, the attachment is empty |
+| `partner._display_address(without_company=True)` | `partner._display_address(without_name=True, separator=' ')` |
+| `company_type`, writing `is_company` | removed / computed: own commercial entity + Tax ID; refine per country in `_compute_is_company` |
 
 **`read_group()` is NOT deprecated in v20.** It is the public, `@api.model`, RPC-safe
 wrapper with the modern signature. Backend code still calls `_read_group()`; the web layer

@@ -145,7 +145,7 @@ class ImportWizard(models.TransientModel):
     def action_parse(self):
         """Parse uploaded file and show preview."""
         self.ensure_one()
-        data = base64.b64decode(self.file)
+        data = self.file.content
         lines = self._parse_file(data)
         self.line_ids = [(5, 0, 0)]  # clear existing
         self.line_ids = [(0, 0, vals) for vals in lines]

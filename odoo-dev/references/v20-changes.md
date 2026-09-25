@@ -306,9 +306,23 @@ New core primitives: `computed`, `signal`, `t`, `useProps`, `useOnChange`, plugi
   labelled "Scope" in the UI; disjoint-group validation is stricter.
 - **UoM has no `rounding` field** — round quantities with
   `precision_digits=env['decimal.precision'].precision_get('Product Unit')`.
-- **`odoo.tools.binary`**: new `BinaryBytes` / `BinaryValue` wrappers.
+- **Binary fields hold `BinaryValue` objects, not base64** (`odoo.tools.binary`). Writing `bytes` raises
+  `TypeError: <field>: use BinaryValue instead of bytes` ([fields_binary.py:112](../../../../odoo/orm/fields_binary.py#L112));
+  a `str` is still accepted and decoded as base64 (RPC input). Write `BinaryBytes(raw)` (`from odoo.tools import BinaryBytes`):
+  core turned v19 `base64.b64encode(buf.getvalue())` into `BinaryBytes(buf.getvalue())`
+  ([l10n_hu_edi_tax_audit_export.py:110](../../../../addons/l10n_hu_edi/wizard/l10n_hu_edi_tax_audit_export.py#L110)). Reads
+  return a `BinaryValue`: `.content` for bytes, `.to_base64()` for base64
+  ([l10n_se_sie4_import import_wizard.py:289](../../../../enterprise/l10n_se_sie4_import/wizard/import_wizard.py#L289)). A leftover
+  `base64.b64decode(record.file)` decodes the raw bytes as base64 and raises `binascii.Error` or returns garbage. Found in
+  `gec_income_tax_report` (2026-09-24): Export and the Explanation Workbook crashed on the first click.
+  **`ir.attachment.datas` is removed:** `create({'datas': ...})` only warns "Use raw, datas has beeen removed" and drops the
+  key, so the attachment is created **empty**, no error ([ir_attachment.py:535](../../../../odoo/addons/base/models/ir_attachment.py#L535)).
+  Pass `'raw': pdf_bytes`; plain `bytes` are accepted for `raw` only ([fields_binary.py:109](../../../../odoo/orm/fields_binary.py#L109)).
 - **Tests**: new `MockHTTPClient` context manager in
   [odoo/tests/common.py](../../../../odoo/tests/common.py) for asserting outbound HTTP.
+  **Untagged test classes now default to `standard` + `post_install`** ([common.py:605](../../../../odoo/tests/common.py#L605));
+  v19 gave them `at_install`. A v19 file without `@tagged` silently moves from install time to after all modules load;
+  opt back in with `@tagged('at_install', '-post_install')`.
 - **`odoo.tools.safe_eval` is a package** (`evaluation`, `expression`, `runtime`).
 - **Font Awesome is removed — icons are Material Symbols** (commit `3e15a7be694`). Icons are
   font ligatures: `<i class="oi" data-icon="check"/>`, not `class="fa fa-check"`. Button
@@ -649,3 +663,131 @@ Still correct in v20, despite churn elsewhere:
 - `odoo.Command`, `odoo.fields.Domain`, `bypass_search_access` (the v19 replacement for `auto_join`)
 - `check_company=True`, `_check_company_auto`, `company_dependent=True`
 - `self.env._("...")` as the preferred translation call
+
+---
+
+## 14. Found in the documentation review (2026-09-24)
+
+Each item was verified in the 20.0 source while `documentations/` was reviewed. Paths are relative to this file.
+
+### Stock and manufacturing
+
+| v19 | v20 | Bites |
+|---|---|---|
+| `stock.scrap` model | removed (commit `1c7d80a10b5d`): a scrap is a `stock.move` with `is_scrap` ([stock_move.py:139](../../../../addons/stock/models/stock_move.py#L139)), posted by `_action_scrap()` ([:2961](../../../../addons/stock/models/stock_move.py#L2961)); new fields `scrap_reason_tag_ids`, `should_replenish_scrapped` | `_inherit = 'stock.scrap'` stops the registry. Kits cannot be scrapped: the scrap form's product domain has `is_kits = False` ([mrp stock_move_views.xml:81](../../../../addons/mrp/views/stock_move_views.xml#L81)) |
+| `stock.move.location_final_id` | `forecasted_location_id` ([stock_move.py:86](../../../../addons/stock/models/stock_move.py#L86)) | reads and domains on the old name fail |
+| module `stock_picking_batch`, setting `module_stock_picking_batch` | merged into `stock`; setting `group_stock_picking_batch` ([res_config_settings.py:19](../../../../addons/stock/models/res_config_settings.py#L19)) | `depends` on the module fails |
+| `stock.rule._run_push()` | removed; push rules are applied per move by `stock.move._push_apply()` ([stock_move.py:1270](../../../../addons/stock/models/stock_move.py#L1270)) | overrides are never called |
+| `stock.move.line.action_revert_inventory()` | `action_revert()`, which also reverts scraps ([stock_move_line.py:1223](../../../../addons/stock/models/stock_move_line.py#L1223)) | |
+| reception report, `group_stock_reception_report`, mrp `group_mrp_reception_report` | `stock.allocation.report` + operation-type field `auto_show_allocation_report` ([stock_picking_type.py:104](../../../../addons/stock/models/stock_picking_type.py#L104)) | |
+| setting `default_picking_policy` | `res.company.picking_policy`; saving settings rewrites `move_type` on every operation type of the company ([res_config_settings.py:103](../../../../addons/stock/models/res_config_settings.py#L103)) | a per-type shipping policy is overwritten on the next settings save |
+| `stock.quantity.history` wizard | removed | |
+| `product.template.tracking = 'none'` | no such value; `False` means untracked ([product.py:835](../../../../addons/stock/models/product.py#L835)) | data files writing `'none'` fail |
+| `security_lead`, `horizon_days` Float | Integer; the `module_delivery_*` settings are gone | |
+| `stock.lot.partner_ids` computed | stored, and written at delivery ([stock_move_line.py:704](../../../../addons/stock/models/stock_move_line.py#L704)) | |
+| BoM/MO `consumption` (flexible / warning / strict) | removed: a quantity mismatch always opens the warning; skip it with context `skip_consumption` ([mrp_production.py:1893](../../../../addons/mrp/models/mrp_production.py#L1893)) | code reading `bom.consumption` fails |
+| `stock.move.manual_consumption` | removed: a picked move is simply not recomputed ([mrp stock_move.py:213](../../../../addons/mrp/models/stock_move.py#L213)) | |
+| mrp setting `group_mrp_workorder_dependencies` | removed | |
+| maintenance stage `done`, request `user_id`, `kanban_state`, `request_date`, instruction PDF / Google Slide fields | `state` ([maintenance.py:294](../../../../addons/maintenance/models/maintenance.py#L294)) and technicians `user_ids` ([:287](../../../../addons/maintenance/models/maintenance.py#L287)); internal users see only requests they created, follow or are assigned to ([ir.access.csv:5](../../../../addons/maintenance/security/ir.access.csv#L5)) | |
+
+### Accounting and the Georgian localization
+
+- **Currency rates apply from the next day.** `_get_rates()` takes the latest rate dated strictly before the document
+  date ([res_currency.py:185](../../../../odoo/addons/base/models/res_currency.py#L185), commit `cba671dfb30d`). The
+  National Bank of Georgia provider stores each rate under the day it becomes valid (`validFromDate`, [res_config_settings.py:501](../../../../enterprise/currency_rate_live/models/res_config_settings.py#L501)),
+  so with automatic NBG rates every document is valued at the previous day's official rate. Checked against the live
+  NBG feed on 2026-09-24.
+- **A Bank and Cash or Credit Card account creates its journal** ([account_account.py:1129](../../../../addons/account/models/account_account.py#L1129)),
+  also when a module installs such accounts into an existing company ([ir_module.py:80](../../../../addons/account/models/ir_module.py#L80)).
+- Journal Items and invoice lines no longer offer Bank and Cash accounts ([account_move_views.xml:1536](../../../../addons/account/views/account_move_views.xml#L1536)).
+- A move that was never posted can be deleted regardless of lock dates (`_can_be_unlinked`, [account_move.py:5919](../../../../addons/account/models/account_move.py#L5919)).
+- `account.journal.code` lost its `size=7` limit.
+- `account_online_synchronization` replaces `setting_init_bank_account_action` ([company.py:10](../../../../enterprise/account_online_synchronization/models/company.py#L10)):
+  the dashboard's Bank card opens the online bank search, not the manual form.
+- `res.partner._display_address(without_company=True)` raises `TypeError`: the signature is
+  `_display_address(without_name=False, separator='\n')` ([res_partner.py:1307](../../../../odoo/addons/base/models/res_partner.py#L1307)).
+  `without_name` is the renamed flag (drops the parent company line). v19 `' '.join(p._display_address(without_company=True).split())`
+  is `p._display_address(without_name=True, separator=' ')` in 20, the core one-line form
+  ([project_project.py:248](../../../../addons/project/models/project_project.py#L248)); the computed `address_inline` uses `', '`.
+- **`res.partner.is_company` is computed from the Tax ID** (commit `f2965048f60f` "[REM] base: company_type is dead for good"):
+  a contact is a company when it is its own commercial entity and has a VAT ([res_partner.py:946](../../../../odoo/addons/base/models/res_partner.py#L946)).
+  `company_type` and the Person/Company switch are gone, and `is_company=False` written with or before a VAT is recomputed to
+  True. 15 localizations override `_compute_is_company` (e.g. `l10n_uz`: only a 9-digit TIN is a company,
+  [res_partner.py:8](../../../../addons/l10n_uz/models/res_partner.py#L8)); `l10n_ge` does not, so a Georgian individual whose
+  11-digit personal number is in Tax ID is a company. Code that branches on `is_company` (name splitting, person-only fields)
+  misreads such contacts. Proven on a scratch DB, 2026-09-24 (`gec_income_tax_report` split "ნუცა თორაძე" as a company).
+- `l10n_account_withholding_tax`: when the register-payment wizard will create one payment per bill (no Group Payments),
+  the withholding lines are not offered ([account_payment_register.py:151](../../../../addons/l10n_account_withholding_tax/wizards/account_payment_register.py#L151)).
+- `l10n_ge` as shipped: "Georgia (VAT Registered)" means "the contact has a Tax ID" (`has_vat`, [partner.py:924](../../../../addons/account/models/partner.py#L924)),
+  and under "Non-Georgia" one purchase `18%` is replaced by three reverse-charge taxes ([account.tax-ge.csv:134](../../../../addons/l10n_ge/data/template/account.tax-ge.csv#L134)).
+  The sales mappings are in §11; all three defects and their fix options are in `documentations/l10n_ge.md`.
+
+### HR, time off, payroll
+
+- **One country-bound work entry type hides all generic ones.** Since core commit `f144f933c7ba` nine
+  `_compute_allowed_work_entry_type_ids` (time off, allocations, accrual plans, both multi wizards, schedule lines,
+  public holidays, company, payroll structure types, plus the holiday loader) offer only the country's types as soon
+  as one active type with that country exists ([hr_leave.py:322](../../../../addons/hr_holidays/models/hr_leave.py#L322)).
+  v19 had no such rule. Core gives a localized country a complete set in
+  [hr_work_entry_type_data.xml](../../../../addons/hr_work_entry/data/hr_work_entry_type_data.xml) (32 countries, not
+  Georgia) and remaps existing records with `res.country._adapt_work_entry_types_to_country`
+  ([res_country.py:15](../../../../enterprise/hr_payroll/models/res_country.py#L15)) from the l10n payroll modules. Never
+  ship a single `country_id`-bound time type; leave `country_id` empty. `geo_payroll`'s `GE_PUBLIC_HOLIDAY` did that
+  and left Georgian companies with "Public Holiday" as the only choice; removed 2026-09-24.
+- **hr_payroll's weekly cron "Payroll: Update data" sets `noupdate=False` on the xmlid of every time type not
+  edited by a user**, ours included ([hr_work_entry_type.py:88](../../../../enterprise/hr_payroll/models/hr_work_entry_type.py#L88),
+  cron `ir_cron_update_payroll_data`). `noupdate="1"` in our XML therefore stops protecting time types: once the
+  cron has run, removing a type from module data makes the next `-u` delete it (`_process_end`), and before the
+  first run the row stays. Proven on `gec20_geo_payroll_test` 2026-09-24 (both cases).
+- `resource.calendar.calendar_type` values are `fixed` / `variable` / `undefined` ([resource_calendar.py:78](../../../../addons/resource/models/resource_calendar.py#L78)).
+- Worked-day pricing tests `worked_days.code in '000.00'`, a substring test ([hr_payslip_worked_days.py:114](../../../../enterprise/hr_payroll/models/hr_payslip_worked_days.py#L114)):
+  custom codes such as `0`, `00` or `.` are priced at 0.
+- The weekly time-rule cron handles only rules whose week start is the day it runs ([hr_time_rule_source_mixin.py:195](../../../../addons/hr_work_entry/models/hr_time_rule_source_mixin.py#L195)),
+  and `hr.time.rule` requires start < stop ([hr_time_rule.py:226](../../../../addons/hr_work_entry/models/hr_time_rule.py#L226)), so a window across midnight cannot be defined.
+- `hr.payslip.state` is `draft` / `validated` / `paid` / `cancel`. The payment report wizard's IBAN check filters
+  `state == "done"` and therefore never runs ([hr_payroll_payment_report_wizard.py:11](../../../../enterprise/hr_payroll_account/wizard/hr_payroll_payment_report_wizard.py#L11)).
+- `action_payslip_paid()` keeps a `paid_date` that is already set ([hr_payslip.py:1070](../../../../enterprise/hr_payroll/models/hr_payslip.py#L1070)).
+- `hr_payroll_attendance`'s pay-run warning filters on `overtime_status`, a field that no longer exists ([hr_payslip_run.py:19](../../../../enterprise/hr_payroll_attendance/models/hr_payslip_run.py#L19));
+  not run, but a crash is likely when that warning is evaluated.
+- `hr_contract_salary`: refusing or deleting an offer removes only the versions it created, keyed on `originated_offer_id`
+  ([hr_contract_salary_offer.py:645](../../../../enterprise/hr_contract_salary/models/hr_contract_salary_offer.py#L645)).
+
+### Platform
+
+- `ir.mail_server.max_email_size` and `action_retrieve_max_email_size` are gone; the limit is the system parameter
+  `base.default_max_email_size`, 20 MB by default ([ir_mail_server.py:258](../../../../odoo/addons/base/models/ir_mail_server.py#L258)).
+- Enterprise `ai` has no provider keys or `LLMApiService`: every call goes through Odoo AI over IAP
+  (`call_odoo_ai`, [ai_utils.py:109](../../../../enterprise/ai/utils/ai_utils.py#L109)); install aborts without pgvector
+  (`_pre_init_ai`, [ai/__init__.py:20](../../../../enterprise/ai/__init__.py#L20)). `ai_app` and `esg_csrd_ai` are deleted.
+- The light-user group `base.group_user_regular` gates menus such as Dashboards ([menu_views.xml:13](../../../../addons/spreadsheet_dashboard/views/menu_views.xml#L13)).
+- `auth_ldap`: `change_password(old, new)` is `_change_password(new_passwd)` ([res_users.py:52](../../../../addons/auth_ldap/models/res_users.py#L52));
+  `auth_signup`: `res.users.state` can be `inactive` ([res_users.py:24](../../../../addons/auth_signup/models/res_users.py#L24)).
+- **Sign:** `sign.completed.document` is replaced by `sign.request.document` ([sign_request_document.py:19](../../../../enterprise/sign/models/sign_request_document.py#L19),
+  enterprise commit `d542cb352d8`); `render_document_with_items()` returns `(overlay, regions)` ([sign_document.py:594](../../../../enterprise/sign/models/sign_document.py#L594));
+  completion runs `_finalize_documents()` ([sign_request_document.py:151](../../../../enterprise/sign/models/sign_request_document.py#L151));
+  roles can require an external signature (`requires_external_signature`, [sign_item_role.py:44](../../../../enterprise/sign/models/sign_item_role.py#L44)).
+  A module inheriting `sign.completed.document` (our `id_ge_sign`) does not load.
+
+## 15. Found in end-to-end payroll scenarios (2026-09-24, fresh DB, dropped after)
+
+- **No `hr.work.entry` model any more** (`'hr.work.entry' not in env`; v19 had `hr_work_entry/models/hr_work_entry.py`).
+  Worked days come from the calendar at compute time; `generate_work_entries()` only builds values.
+- **A payment through a method line without an Outstanding account has no journal entry**: it is `paid` but reconciles
+  nothing ([account_payment.py:529](../../../../addons/account/models/account_payment.py#L529)). New bank journals'
+  "Manual Payment" line has none, so a payroll Register Payment there leaves the payslip `validated` and its payables open
+  (a later Pay Salaries pays them again). l10n_au refuses this case in its payroll wizard (`_create_payments`).
+- **`hr.payslip.run.action_draft` keeps each slip's journal entry** ([hr_payslip_run.py:303](../../../../enterprise/hr_payroll/models/hr_payslip_run.py#L303));
+  re-validation skips slips that have one ([hr_payroll_account hr_payslip.py:55](../../../../enterprise/hr_payroll_account/models/hr_payslip.py#L55)),
+  so recomputed amounts never reach the books and Pay Salaries pays the old net. Only the payslip Cancel path unlinks or
+  reverses the entry ([hr_payroll_account hr_payslip.py:29](../../../../enterprise/hr_payroll_account/models/hr_payslip.py#L29)).
+- **The payslip list actions "Cancel" and "Set to Draft" run on any state** ([hr_payslip_views.xml:385](../../../../enterprise/hr_payroll/views/hr_payslip_views.xml#L385),
+  [:346](../../../../enterprise/hr_payroll/views/hr_payslip_views.xml#L346)); `action_payslip_cancel` only stops non-managers
+  on validated slips ([hr_payslip.py:1055](../../../../enterprise/hr_payroll/models/hr_payslip.py#L1055)). A manager can cancel
+  or reopen a paid slip; the form buttons hide both.
+- **`_action_correct_payslips()` creates no refund**; the UI wizard does refund + correction
+  ([hr_payslip_correction_wizard.py:80](../../../../enterprise/hr_payroll/wizard/hr_payslip_correction_wizard.py#L80)). Call the
+  wizard (or both methods) in scripts and tests.
+- **A one-cent rounding gap needs the salary journal's default account**: `_prepare_adjust_line` raises "The Expense Journal
+  ... has not properly configured the default Account!" without it ([hr_payroll_account hr_payslip.py:260](../../../../enterprise/hr_payroll_account/models/hr_payslip.py#L260)).
+  Rules computed on unrounded categories hit it on prorated wages (952.38 base: 19.05 + 186.67 + 746.67 = 952.39).
+  Localizations pass `default_account=` to `_configure_payroll_account` (AU, AE, BE, HK).

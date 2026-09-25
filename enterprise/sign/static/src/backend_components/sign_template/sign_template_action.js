@@ -600,8 +600,8 @@ export class SignTemplate extends Component {
                     this.updateSigners(updatedInfo);
                     this.state.nextId = this.state.signers.length;
 
-                    /* We must have at least one signer after load. */
-                    if (updatedInfo.length == 0) {
+                    /* We must have at least one signer after load, unless the template has sign requests. */
+                    if (updatedInfo.length == 0 && !this.hasSignRequests) {
                         this.pushNewSigner();
                     }
 

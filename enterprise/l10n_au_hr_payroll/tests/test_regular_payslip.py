@@ -355,7 +355,7 @@ class TestRegularPayslip(TestPayrollCommon):
             'l10n_au_training_loan': False,
             'l10n_au_tax_free_threshold': True})
 
-        self.assertEqual(employee.l10n_au_tax_treatment_code, 'RDXXXX')
+        self.assertEqual(employee.l10n_au_tax_treatment_code, 'RTXXXX')
 
         self._test_payslip(
             employee,

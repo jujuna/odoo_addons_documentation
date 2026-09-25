@@ -146,6 +146,16 @@ eval="[(5, 0, 0)]"
 | Default data records | Yes | Users may modify them |
 | Demo data | Yes | Never overwrite |
 
+### Removing a record from a data file
+
+`-u` deletes a record that disappeared from the module's data only when its `ir.model.data` row has
+`noupdate = False` ([ir_model.py:2718](../../../../odoo/addons/base/models/ir_model.py#L2718) `_process_end`).
+A `noupdate` row stays in the database for good: editing or deleting a `noupdate="1"` record in XML
+never reaches an installed database, so the fix needs a manual step there (archive, or delete on
+the user's go). Check the real flag with `SELECT noupdate FROM ir_model_data WHERE module=... AND name=...`
+before predicting what an upgrade does: core code can flip it (hr_payroll's weekly cron sets every
+unedited time type to `noupdate = False`, see `v20-changes.md` section 14).
+
 ---
 
 ## 4. CSV Data Files

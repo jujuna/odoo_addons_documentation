@@ -260,7 +260,7 @@ class AccountReconcileWizard(models.TransientModel):
         def get_reco_currency(amls, aml_values_map):
             company_currency = amls.company_currency_id
             foreign_currencies = amls.currency_id - company_currency
-            if len(foreign_currencies) == 0:
+            if len(foreign_currencies) == 0 or not all(amls.account_id.mapped('reconcile')):
                 return company_currency
             elif len(foreign_currencies) == 1:
                 return foreign_currencies
@@ -316,7 +316,10 @@ class AccountReconcileWizard(models.TransientModel):
 
             plan = plan_list[0]
             # residuals are subtracted from aml_values_map
-            amls._prepare_reconciliation_plan(plan, aml_values_map, shadowed_aml_values=shadowed_aml_values)
+            # Same context as in reconcile()
+            amls.with_context(
+                no_exchange_difference=not all(accounts.mapped('reconcile')),
+            )._prepare_reconciliation_plan(plan, aml_values_map, shadowed_aml_values=shadowed_aml_values)
 
             reco_currency = get_reco_currency(amls, aml_values_map)
             if not reco_currency:
@@ -759,7 +762,7 @@ class AccountReconcileWizard(models.TransientModel):
     def reconcile(self):
         """ Reconcile selected moves, with a transfer and/or write-off move if necessary."""
         self.ensure_one()
-        self = self.with_context(no_exchange_difference=not self.reco_account_id.reconcile)  # ruff: ignore[self-or-cls-assignment]
+        self = self.with_context(no_exchange_difference=not all(self.move_line_ids.account_id.mapped('reconcile')))  # ruff: ignore[self-or-cls-assignment]
         move_lines_to_reconcile = self.move_line_ids._origin
         do_transfer = self.is_transfer_required
         do_write_off = self.edit_mode or (self.is_write_off_required and not self.allow_partials)
