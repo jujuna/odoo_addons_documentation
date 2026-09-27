@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"POT-Creation-Date: 2026-09-25 17:45+0000\n"
 "PO-Revision-Date: 2026-09-17 22:43+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
@@ -123,12 +123,6 @@ msgstr ""
 "(event_name)s%(event_id)s"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
-msgid "%(user_name)s - Free Time Slots"
-msgstr "%(user_name)s - Espacios disponibles"
-
-#. module: appointment
 #. odoo-python
 #: code:addons/appointment/models/appointment_type.py:0
 msgid "%s - Let's meet"
@@ -156,12 +150,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
 msgstr "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
-msgid "+ Add Booking Pages"
-msgstr "+ Agregar páginas de reservación"
 
 #. module: appointment
 #. odoo-javascript
@@ -1273,11 +1261,9 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid ""
-"<i class=\"oi oi-filled text-muted\" data-icon=\"calendar_today\" aria-"
-"label=\"Date range\"/>"
+"<i class=\"oi oi-filled text-muted\" data-icon=\"event_upcoming\" aria-"
+"label=\"Slot Creation Mode\"/>"
 msgstr ""
-"<i class=\"oi oi-filled text-muted\" data-icon=\"calendar_today\" aria-"
-"label=\"Rango de fechas\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1383,6 +1369,11 @@ msgstr ""
 "<i class=\"oi text-muted\" data-icon=\"schedule\" aria-label=\"Duración\"/>"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "<i class=\"oi\" data-icon=\"archive\"/> Archive"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
 msgid "<i class=\"oi\" data-icon=\"info\" title=\"Info\"/>"
 msgstr "<i class=\"oi\" data-icon=\"info\" title=\"Información\"/>"
@@ -1395,6 +1386,11 @@ msgstr " <i class=\"oi\" data-icon=\"inventory_2\" title=\"Recursos\"/>"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Staff Member\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "<i class=\"oi\" data-icon=\"unarchive\"/> Unarchive"
 msgstr ""
 
 #. module: appointment
@@ -1572,6 +1568,7 @@ msgstr "Agregar espacio"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Add Video"
 msgstr "Agregar video"
 
@@ -2597,12 +2594,6 @@ msgstr ""
 "de citas, ...)"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Configure this appointment"
-msgstr "Configura esta cita"
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 msgid "Confirm"
 msgstr "Confirmar"
@@ -2697,24 +2688,6 @@ msgstr "Copiar URL de invitación al portapapeles"
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Copy the link to your clipboard."
 msgstr "Copia el enlace en tu portapapeles."
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Create"
-msgstr "Crear"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
-msgid "Create \"%s\""
-msgstr "Crear \"%s\""
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
-msgid "Create New"
-msgstr "Crear nuevo"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3018,6 +2991,12 @@ msgid "Does not repeat"
 msgstr "No se repite"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Done"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Drag blocks here to add them on all appointments"
 msgstr "Arrastra los bloques aquí para agregarlos a todas las citas"
@@ -3074,12 +3053,6 @@ msgid "Edit Appointment"
 msgstr "Editar cita"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Edit Slots"
-msgstr "Editar horarios"
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
 msgid "Email*"
 msgstr "Correo electrónico*"
@@ -3088,18 +3061,6 @@ msgstr "Correo electrónico*"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Emails & SMS"
 msgstr "Correos y SMS"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Enable Slot Creation"
-msgstr "Habilitar la creación de horarios"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Enable Slot Deletion"
-msgstr "Habilitar la eliminación de horarios"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -3143,6 +3104,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Every"
 msgstr "Cada"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Existing invitations will cease working. Archive anyways?"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__extra_comment
@@ -3724,6 +3690,18 @@ msgstr ""
 "cuando haya nuevas reservaciones."
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "Managing bookings for %s"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "Managing bookings for the selected appointment type"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Mandatory"
 msgstr "Obligatorio"
@@ -3804,6 +3782,11 @@ msgid "Multi-line text"
 msgstr "Texto multilínea"
 
 #. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__slot_creation_mode__split
+msgid "Multiple"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr "Fecha límite de mi actividad"
@@ -3814,6 +3797,12 @@ msgid "My Appointments"
 msgstr "Mis citas"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "My Availabilities"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
 msgid "My Calendar Link"
 msgstr "Mi enlace de calendario"
@@ -3822,6 +3811,12 @@ msgstr "Mi enlace de calendario"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_search
 msgid "My Links"
 msgstr "Mis enlaces"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "My availabilities"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -3839,6 +3834,12 @@ msgstr "¿Necesita cambiar la cita?"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Neutral"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "New Appointment"
 msgstr ""
 
 #. module: appointment
@@ -3987,6 +3988,17 @@ msgid "One Shot"
 msgstr "Solo una vez"
 
 #. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__slot_creation_mode__single
+msgid "One by one"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "One-time link"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "Online"
 msgstr "En línea"
@@ -4061,6 +4073,8 @@ msgid "Opening Hours"
 msgstr "Horario de apertura"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Options"
 msgstr "Opciones"
@@ -4118,11 +4132,6 @@ msgstr "Teléfono"
 #: model:appointment.question,name:appointment.appointment_question_phone
 msgid "Phone number"
 msgstr "Teléfono"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
-msgid "Pick Slots"
-msgstr "Seleccionar horarios"
 
 #. module: appointment
 #. odoo-javascript
@@ -4238,18 +4247,6 @@ msgstr "Regular"
 #: model:ir.ui.menu,name:appointment.menu_appointment_reminders
 msgid "Reminders"
 msgstr "Recordatorios"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Remove"
-msgstr "Eliminar"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Remove from list"
-msgstr "Eliminar de la lista"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -4414,10 +4411,9 @@ msgid "Saturday"
 msgstr "Sábado"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Save Slots"
-msgstr "Guardar horarios"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Save &amp; Pick Slots"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__category_slot_scheduling
@@ -4510,6 +4506,12 @@ msgstr "Seleccionar la fecha y la hora primero"
 
 #. module: appointment
 #. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Select this appointment type"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Select this attendee."
 msgstr "Selecciona a este asistente."
@@ -4554,6 +4556,7 @@ msgstr "Secuencia"
 
 #. module: appointment
 #. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
 #: code:addons/appointment/static/src/views/kanban/kanban_controller.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_tree
@@ -4576,12 +4579,6 @@ msgstr "Compartir enlace"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Share Time Slots"
 msgstr "Compartir horarios"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-msgid "Share my calendar"
-msgstr "Compartir mi calendario"
 
 #. module: appointment
 #. odoo-javascript
@@ -4629,6 +4626,11 @@ msgstr "Iniciar sesión"
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__char
 msgid "Single line text"
 msgstr "Una sola línea de texto"
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_creation_mode
+msgid "Slot Creation Mode"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_duration
@@ -5543,11 +5545,6 @@ msgid "bookings"
 msgstr "reservaciones"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
-msgid "days"
-msgstr "días"
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "days,"
 msgstr "días,"
@@ -5746,6 +5743,58 @@ msgstr "próximas<br/>"
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 msgid "with"
 msgstr "con"
+
+#~ msgid "%(user_name)s - Free Time Slots"
+#~ msgstr "%(user_name)s - Espacios disponibles"
+
+#~ msgid "+ Add Booking Pages"
+#~ msgstr "+ Agregar páginas de reservación"
+
+#~ msgid ""
+#~ "<i class=\"oi oi-filled text-muted\" data-icon=\"calendar_today\" aria-"
+#~ "label=\"Date range\"/>"
+#~ msgstr ""
+#~ "<i class=\"oi oi-filled text-muted\" data-icon=\"calendar_today\" aria-"
+#~ "label=\"Rango de fechas\"/>"
+
+#~ msgid "Configure this appointment"
+#~ msgstr "Configura esta cita"
+
+#~ msgid "Create"
+#~ msgstr "Crear"
+
+#~ msgid "Create \"%s\""
+#~ msgstr "Crear \"%s\""
+
+#~ msgid "Create New"
+#~ msgstr "Crear nuevo"
+
+#~ msgid "Edit Slots"
+#~ msgstr "Editar horarios"
+
+#~ msgid "Enable Slot Creation"
+#~ msgstr "Habilitar la creación de horarios"
+
+#~ msgid "Enable Slot Deletion"
+#~ msgstr "Habilitar la eliminación de horarios"
+
+#~ msgid "Pick Slots"
+#~ msgstr "Seleccionar horarios"
+
+#~ msgid "Remove"
+#~ msgstr "Eliminar"
+
+#~ msgid "Remove from list"
+#~ msgstr "Eliminar de la lista"
+
+#~ msgid "Save Slots"
+#~ msgstr "Guardar horarios"
+
+#~ msgid "Share my calendar"
+#~ msgstr "Compartir mi calendario"
+
+#~ msgid "days"
+#~ msgstr "días"
 
 #~ msgid "'e.g. \"John Doe - Tennis Court Booking\""
 #~ msgstr "Por ejemplo, \"Juan Pérez - Reservación de la cancha de tenis\""

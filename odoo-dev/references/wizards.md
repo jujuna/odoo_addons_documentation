@@ -147,8 +147,7 @@ class ImportWizard(models.TransientModel):
         self.ensure_one()
         data = self.file.content
         lines = self._parse_file(data)
-        self.line_ids = [(5, 0, 0)]  # clear existing
-        self.line_ids = [(0, 0, vals) for vals in lines]
+        self.line_ids = [Command.clear()] + [Command.create(vals) for vals in lines]
         # Return the same wizard to show parsed lines
         return {
             'type': 'ir.actions.act_window',

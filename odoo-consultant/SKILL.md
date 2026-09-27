@@ -6,6 +6,7 @@ description: >
   and functional specifications. Use for learning Odoo, finding features, comparing
   options, and planning implementations. Verify behavior against the available Odoo
   version and source; this is functional consulting, not custom-code development.
+  Code-level explanations and writing documentations/ files are odoo-dev's.
 ---
 
 # Odoo consultant and learning partner

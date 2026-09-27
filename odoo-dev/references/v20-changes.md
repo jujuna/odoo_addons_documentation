@@ -456,7 +456,7 @@ Found while planning the `l10n_ge` merge of `gec_localization` + `gec_l10n_ge_ta
   [hr_work_entry_type.py:36](../../../../addons/hr_work_entry/models/hr_work_entry_type.py#L36)). Data files
   setting `is_leave` stop the module install.
 - **Chart reload never changes `reconcile` on an existing account**
-  ([chart_template.py:452](../../../../addons/account/models/chart_template.py#L452), "Prevents overriding user
+  ([chart_template.py:457](../../../../addons/account/models/chart_template.py#L457), "Prevents overriding user
   setting"). An extension module's `reconcile` override reaches only companies that load the chart after it is
   installed; a type change to Payable still forces `reconcile=True` through the compute.
 - **`l10n_ge` sales taxes as shipped (checked on a clean DB, 2026-09-23)**: under "Georgia (VAT Registered)"
@@ -503,7 +503,12 @@ core maps `generic_work_entry_type_attendance` to BASIC (`data/hr_work_entry_typ
 now `category_ids=[(5, 0, 0)]` with `result = payslip._get_basic_salary()` and
 `if not categories['BASIC']: categories['BASIC'] = result`. A v19 BASIC rule that keeps category BASIC
 counts attendance twice in GROSS; a paid work entry type without a category is shown on the BASIC
-line but missing from GROSS.
+line but missing from GROSS. A rule that sets `categories['BASIC']` in its code loses that on a **line edit**:
+core forces the edited line and every line before it (`_recompute_with_forced_lines`, context
+`force_payslip_line_overrides`, [hr_payslip.py:787-806](../../../../enterprise/hr_payroll/models/hr_payslip.py#L787)) and skips a
+forced line's code, so GROSS and NET keep the attendance pre-fill: an edited BASIC changes nothing below it. Set the
+category from the forced total in a `_get_localdict` override (geo_payroll `hr_payslip.py`), as core's own test
+`test_payslip_manual_line_edit_and_compute` expects NET to move.
 
 **One payslip spans several versions.** `_compute_worked_days_line_ids` adds every version with the same
 `(employee, contract_date_start, contract_date_end)` ([hr_version.py:653](../../../../enterprise/hr_payroll/models/hr_version.py#L653))
@@ -666,7 +671,7 @@ Still correct in v20, despite churn elsewhere:
 
 ---
 
-## 14. Found in the documentation review (2026-09-24)
+## 14. Stock, accounting, HR and platform changes (verified 2026-09-24)
 
 Each item was verified in the 20.0 source while `documentations/` was reviewed. Paths are relative to this file.
 
@@ -675,6 +680,9 @@ Each item was verified in the 20.0 source while `documentations/` was reviewed. 
 | v19 | v20 | Bites |
 |---|---|---|
 | `stock.scrap` model | removed (commit `1c7d80a10b5d`): a scrap is a `stock.move` with `is_scrap` ([stock_move.py:139](../../../../addons/stock/models/stock_move.py#L139)), posted by `_action_scrap()` ([:2961](../../../../addons/stock/models/stock_move.py#L2961)); new fields `scrap_reason_tag_ids`, `should_replenish_scrapped` | `_inherit = 'stock.scrap'` stops the registry. Kits cannot be scrapped: the scrap form's product domain has `is_kits = False` ([mrp stock_move_views.xml:81](../../../../addons/mrp/views/stock_move_views.xml#L81)) |
+| `stock.return.picking` wizard (`stock/wizard/stock_picking_return.py`) | removed (commit `36b4a0f5fb2b`): **Return** calls `stock.picking._create_return()`, which builds a draft return transfer with every line at 0 ([stock_picking.py:976](../../../../addons/stock/models/stock_picking.py#L976)); Return All / Clear / Exchange are picking buttons ([:823](../../../../addons/stock/models/stock_picking.py#L823), [:843](../../../../addons/stock/models/stock_picking.py#L843)). Override `_prepare_return_move_default_values()` / `_prepare_return_picking_default_values()` | code creating `stock.return.picking` or inheriting its view fails |
+| `to_refund` on the return wizard line (debug column) | only `stock.move.to_refund` (default True, copied, [stock_account stock_move.py:27](../../../../addons/stock_account/models/stock_move.py#L27)); no view shows it | every return lowers Delivered / Received; "return without updating the SO/PO" needs code |
+| `stock.picking._create_backorder(self, backorder_moves=None)` | `_create_backorder(self, backorder_moves=None, from_manual_backorder=False)` ([stock_picking.py:1397](../../../../addons/stock/models/stock_picking.py#L1397)); **Split** passes the flag by keyword ([:1260](../../../../addons/stock/models/stock_picking.py#L1260)), enterprise `quality_control` passes it positionally ([stock_picking.py:98](../../../../enterprise/quality_control/models/stock_picking.py#L98)) | an override with the v19 signature makes Split raise `TypeError` (verified with `rs_waybill`, 2026-09-25); with `quality_control` above it in the MRO every backorder would raise too (read from the signatures, not run). Override with the full v20 signature and forward both arguments |
 | `stock.move.location_final_id` | `forecasted_location_id` ([stock_move.py:86](../../../../addons/stock/models/stock_move.py#L86)) | reads and domains on the old name fail |
 | module `stock_picking_batch`, setting `module_stock_picking_batch` | merged into `stock`; setting `group_stock_picking_batch` ([res_config_settings.py:19](../../../../addons/stock/models/res_config_settings.py#L19)) | `depends` on the module fails |
 | `stock.rule._run_push()` | removed; push rules are applied per move by `stock.move._push_apply()` ([stock_move.py:1270](../../../../addons/stock/models/stock_move.py#L1270)) | overrides are never called |
@@ -721,6 +729,13 @@ Each item was verified in the 20.0 source while `documentations/` was reviewed. 
 - `l10n_ge` as shipped: "Georgia (VAT Registered)" means "the contact has a Tax ID" (`has_vat`, [partner.py:924](../../../../addons/account/models/partner.py#L924)),
   and under "Non-Georgia" one purchase `18%` is replaced by three reverse-charge taxes ([account.tax-ge.csv:134](../../../../addons/l10n_ge/data/template/account.tax-ge.csv#L134)).
   The sales mappings are in §11; all three defects and their fix options are in `documentations/l10n_ge.md`.
+- **Default taxes on invoice lines** (`_get_computed_taxes`, commit `d069ce59e28f`): a product-less sales line typed in the
+  invoice tab now gets `company.account_sale_tax_id`, and a company flagged `vat_disabled` gets it on every sales line
+  ([account_move_line.py:1305](../../../../addons/account/models/account_move_line.py#L1305), :1316). Vendor-bill lines
+  still never get `account_purchase_tax_id`; core says so at :1324 and leaves bill taxes to the product's
+  `supplier_taxes_id`, the account's taxes and the fiscal position. Code that "applies the company default purchase tax
+  like core" does not copy core. `l10n_ge` ships nine purchase taxes at exactly 18%, each on its own VAT-return box
+  (24, 29-33, reverse charge 21-23/27), so a search on `amount = 18` picks one by `sequence, id`.
 
 ### HR, time off, payroll
 
@@ -768,7 +783,7 @@ Each item was verified in the 20.0 source while `documentations/` was reviewed. 
   roles can require an external signature (`requires_external_signature`, [sign_item_role.py:44](../../../../enterprise/sign/models/sign_item_role.py#L44)).
   A module inheriting `sign.completed.document` (our `id_ge_sign`) does not load.
 
-## 15. Found in end-to-end payroll scenarios (2026-09-24, fresh DB, dropped after)
+## 15. Payroll: work entries, payslip entries and payments (verified 2026-09-24)
 
 - **No `hr.work.entry` model any more** (`'hr.work.entry' not in env`; v19 had `hr_work_entry/models/hr_work_entry.py`).
   Worked days come from the calendar at compute time; `generate_work_entries()` only builds values.
@@ -791,3 +806,35 @@ Each item was verified in the 20.0 source while `documentations/` was reviewed. 
   ... has not properly configured the default Account!" without it ([hr_payroll_account hr_payslip.py:260](../../../../enterprise/hr_payroll_account/models/hr_payslip.py#L260)).
   Rules computed on unrounded categories hit it on prorated wages (952.38 base: 19.05 + 186.67 + 746.67 = 952.39).
   Localizations pass `default_account=` to `_configure_payroll_account` (AU, AE, BE, HK).
+
+## 16. Payroll: reset, cancel, inputs and pay-run validation (verified 2026-09-25)
+
+- **A reset recomputes the lines, not the inputs.** Core `write` refreshes a slip whose state goes back to draft
+  ([hr_payslip.py:696](../../../../enterprise/hr_payroll/models/hr_payslip.py#L696), :781, `action_refresh_from_work_entries` :1326-1335), but
+  `_compute_input_line_ids` depends only on employee, version, structure and dates (:337-338). Inputs injected from other records
+  (benefits, attachments you manage yourself) stay as they were while the slip sat validated or cancelled, and Validate does not
+  recompute. Mark them in an `action_refresh_from_work_entries` override *before* `super()`; marking after the refresh leaves lines
+  built from the old inputs (a changed deduction paid at the old amount, a once-bonus another slip took paid twice).
+- **Core Cancel keeps a reversed entry linked.** hr_payroll_account's `action_payslip_cancel` calls `_unlink_or_reverse()`
+  ([hr_payslip.py:29-32](../../../../enterprise/hr_payroll_account/models/hr_payslip.py#L29)); only a deleted move clears `move_id`. Under a
+  lock date or hash it is reversed, under a restrictive audit trail cancelled, and the slip still points at it; after Set to Draft,
+  validation skips any slip with `move_id` (:55), so no new entry is booked. Release before `super()` and clear `move_id`; unlink
+  (never reverse again) an entry whose `reversal_move_ids` is set or whose state is `cancel`.
+- **`inputs['CODE']` holding several inputs is core's aggregator proxy** ([hr_payslip.py:1671-1675](../../../../enterprise/hr_payroll/models/hr_payslip.py#L1671),
+  :2457-2511): `.amount` sums, `.name` joins, every other field behaves as on a multi-record recordset (a Many2one returns the union,
+  a scalar raises "Expected singleton", wrapped as "Wrong python code"). A helper that follows one input's link must loop over the records.
+- **Pay-run Validate re-sends validated slips.** `hr.payslip.run.action_validate` filters only cancelled and line-less slips
+  ([hr_payslip_run.py:384-386](../../../../enterprise/hr_payroll/models/hr_payslip_run.py#L384)), so `action_payslip_done` also gets the run's
+  already validated ones; a guard written for drafts must filter drafts.
+- **Edited lines are marked.** `hr.payslip.line.manually_modified` ([hr_payslip_line.py:58](../../../../enterprise/hr_payroll/models/hr_payslip_line.py#L58))
+  is set on lines the user edited. A check that re-runs `_get_payslip_lines()` to compare with stored lines must replay them through
+  `force_payslip_line_overrides`, or every edit reads as drift.
+
+## 17. Fleet: license plates are unique (verified 2026-09-26)
+
+- **Fleet license plates are unique.** `fleet.vehicle` has `models.Constraint('UNIQUE(license_plate)')`
+  ([fleet_vehicle.py:158](../../../../addons/fleet/models/fleet_vehicle.py#L158), commit `1c8fb57eb5cb`); 19.0 had none. It spans all
+  companies and archived vehicles. Code that found or created a vehicle per driver + plate now raises `UniqueViolation` for a truck
+  shared by two drivers: find by plate alone with `active_test=False` and keep the driver on your own record. Do not do that lookup in
+  an onchange that sets a vehicle when another onchange copies the vehicle's driver: onchanges cascade
+  ([web models.py:2369](../../../../addons/web/models/models.py#L2369)) and overwrite the driver the user picked.

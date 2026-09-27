@@ -244,6 +244,45 @@ class TestRequest(common.TransactionCase):
         self.assertFalse(product_line.exists())
         self.assertFalse(approvals.exists())
 
+    def test_prevent_detaching_attachment_from_approved_request(self):
+        category_test = self.env.ref('approvals.approval_category_data_business_trip')
+        category_test.write({'manager_approval': False, 'approval_minimum': 1})
+
+        approval = self.env['approval.request'].create({
+            'name': 'test approved attachment',
+            'category_id': category_test.id,
+            'date_start': fields.Datetime.now(),
+            'date_end': fields.Datetime.now(),
+            'location': 'testland'
+        })
+
+        attachment = self.env['ir.attachment'].create({
+            'name': 'test.file',
+            'res_id': approval.id,
+            'res_model': 'approval.request',
+        })
+
+        self.env['approval.approver'].create({
+            'user_id': self.env.ref('base.user_root').id,
+            'request_id': approval.id,
+            'status': 'new'
+        })
+
+        approval.action_confirm()
+
+        approval.with_user(self.env.ref('base.user_root')).action_approve()
+
+        self.assertEqual(approval.request_status, 'approved')
+
+        with self.assertRaises(UserError):
+            attachment.write({
+                'res_model': 'mail.message',
+                'res_id': 1
+            })
+
+        with self.assertRaises(UserError):
+            attachment.unlink()
+
     def test_request_with_automated_sequence(self):
         approval_category = self.env['approval.category'].create({
             'name': 'Test Category',

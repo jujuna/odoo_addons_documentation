@@ -157,7 +157,7 @@ record.message_post_with_source(
 self.ensure_one()
 attachment = self.env['ir.attachment'].create({
     'name': 'report.pdf',
-    'datas': base64_content,
+    'raw': pdf_bytes,
     'res_model': self._name,
     'res_id': self.id,
 })

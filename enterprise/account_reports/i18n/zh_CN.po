@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
 "PO-Revision-Date: 2026-09-18 01:43+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
@@ -1364,7 +1364,7 @@ msgstr "审计周期代码必须唯一。"
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
-"tax grids."
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -1533,7 +1533,8 @@ msgstr "银行和现金科目"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
-"Bank transactions are reconciled to avoid any missing VAT invoices or bills."
+"Bank reconciliation helps identify missing invoices or bills that may affect "
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -3143,8 +3144,10 @@ msgstr "确保记录不可抵扣的增值税费用（含增值税，总额）。
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
-msgid "Ensure the taxes on invoices and bills match the customer’s country."
-msgstr "确保发票和账单上的税款与客户所在国家/地区匹配。"
+msgid ""
+"Ensures that applied taxes and fiscal positions match the customer or vendor "
+"country location."
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -4641,12 +4644,10 @@ msgstr "缺失"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
-"Missing company details (like VAT number or country) can cause errors in "
-"your report, such as using the wrong VAT rate, wrongly exempting "
+"Missing company details (like %(vat_label)s or country) can cause errors in "
+"your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
-"公司信息缺失（例如税号、所属国家）会导致报表出错，比如适用错误税率、交易免税"
-"判定异常。"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -6087,12 +6088,6 @@ msgid "Review"
 msgstr "审查"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "Review Abnormal/To Review invoices and bills, and post drafts."
-msgstr "审核异常/待审核的发票和账单，并发布草稿。"
-
-#. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_foreign_exchange_differences
 msgid ""
 "Review FX rates used at year-end, compare with prior year, and verify "
@@ -6125,6 +6120,14 @@ msgstr "核对未关联任何发票的银行交易。确保在 Odoo 中已创建
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_for_capitalizable_expenses
 msgid "Review for capitalizable expenses"
 msgstr "审查可资本化费用"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid ""
+"Review invoices, bills and entries which are either in draft or marked as "
+"Anomaly/To Review."
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6273,6 +6276,12 @@ msgstr "搜索......"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
 msgid "Sections"
 msgstr "分节"
+
+#. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
+msgid "Select or type a value"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -6467,6 +6476,14 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account_reports.selection__account_report_send__mode__single
 msgid "Single Recipient"
 msgstr "唯一收件人"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_report.py:0
+#: model:ir.model.fields,field_description:account_reports.field_account_report__snapshot_ids
+#: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
+msgid "Snapshots"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -6721,8 +6738,20 @@ msgstr "纳税周期"
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Rate & Country Consistency"
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Received Adjustment"
 msgstr "已收税款调整"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Reconciliation"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -6834,12 +6863,6 @@ msgstr "税项"
 #: code:addons/account_reports/static/src/components/journal_report/line/line.xml:0
 msgid "Taxes Applied"
 msgstr "应用的税项"
-
-#. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "Taxes and countries matching"
-msgstr "税款与国家匹配"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_tax_unit__fpos_synced
@@ -7466,12 +7489,6 @@ msgid "VAT Numbers"
 msgstr "增值税号"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "VAT Reconciliation"
-msgstr ""
-
-#. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_vat_rate_compliance
 msgid "VAT rate compliance"
 msgstr "增值税税率合规"
@@ -8075,6 +8092,23 @@ msgstr "⇒重置为Odoo汇率"
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#~ msgid "Ensure the taxes on invoices and bills match the customer’s country."
+#~ msgstr "确保发票和账单上的税款与客户所在国家/地区匹配。"
+
+#~ msgid ""
+#~ "Missing company details (like VAT number or country) can cause errors in "
+#~ "your report, such as using the wrong VAT rate, wrongly exempting "
+#~ "transactions."
+#~ msgstr ""
+#~ "公司信息缺失（例如税号、所属国家）会导致报表出错，比如适用错误税率、交易免"
+#~ "税判定异常。"
+
+#~ msgid "Review Abnormal/To Review invoices and bills, and post drafts."
+#~ msgstr "审核异常/待审核的发票和账单，并发布草稿。"
+
+#~ msgid "Taxes and countries matching"
+#~ msgstr "税款与国家匹配"
 
 #~ msgid "Configure your tax accounts"
 #~ msgstr "配置税项科目"

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"POT-Creation-Date: 2026-09-25 17:45+0000\n"
 "PO-Revision-Date: 2026-09-17 22:44+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
@@ -121,12 +121,6 @@ msgstr ""
 "(event_id)s)"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
-msgid "%(user_name)s - Free Time Slots"
-msgstr ""
-
-#. module: appointment
 #. odoo-python
 #: code:addons/appointment/models/appointment_type.py:0
 msgid "%s - Let's meet"
@@ -154,12 +148,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
 msgstr "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
-msgid "+ Add Booking Pages"
-msgstr ""
 
 #. module: appointment
 #. odoo-javascript
@@ -982,8 +970,8 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid ""
-"<i class=\"oi oi-filled text-muted\" data-icon=\"calendar_today\" aria-"
-"label=\"Date range\"/>"
+"<i class=\"oi oi-filled text-muted\" data-icon=\"event_upcoming\" aria-"
+"label=\"Slot Creation Mode\"/>"
 msgstr ""
 
 #. module: appointment
@@ -1070,6 +1058,11 @@ msgid ""
 msgstr ""
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "<i class=\"oi\" data-icon=\"archive\"/> Archive"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
 msgid "<i class=\"oi\" data-icon=\"info\" title=\"Info\"/>"
 msgstr "<i class=\"oi\" data-icon=\"info\" title=\"Info\"/>"
@@ -1082,6 +1075,11 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Staff Member\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "<i class=\"oi\" data-icon=\"unarchive\"/> Unarchive"
 msgstr ""
 
 #. module: appointment
@@ -1257,6 +1255,7 @@ msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Add Video"
 msgstr ""
 
@@ -2265,12 +2264,6 @@ msgstr ""
 "                (例: 特定のユーザのみ、アポイントメントタイプのリスト...)"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Configure this appointment"
-msgstr ""
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 msgid "Confirm"
 msgstr "確定"
@@ -2363,24 +2356,6 @@ msgstr ""
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Copy the link to your clipboard."
 msgstr "リンクをクリップボードにコピーしてください。"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Create"
-msgstr ""
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
-msgid "Create \"%s\""
-msgstr ""
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
-msgid "Create New"
-msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2676,6 +2651,12 @@ msgid "Does not repeat"
 msgstr ""
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Done"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Drag blocks here to add them on all appointments"
 msgstr "ここにブロックをドラッグしてすべての予定に追加"
@@ -2730,12 +2711,6 @@ msgid "Edit Appointment"
 msgstr ""
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Edit Slots"
-msgstr ""
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
 msgid "Email*"
 msgstr "メール*"
@@ -2744,18 +2719,6 @@ msgstr "メール*"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Emails & SMS"
 msgstr "EメールとSMS"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Enable Slot Creation"
-msgstr ""
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Enable Slot Deletion"
-msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -2798,6 +2761,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Every"
 msgstr "すべての"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Existing invitations will cease working. Archive anyways?"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__extra_comment
@@ -3361,6 +3329,18 @@ msgid ""
 msgstr ""
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "Managing bookings for %s"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "Managing bookings for the selected appointment type"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Mandatory"
 msgstr "必須"
@@ -3441,6 +3421,11 @@ msgid "Multi-line text"
 msgstr "複数行のテキスト"
 
 #. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__slot_creation_mode__split
+msgid "Multiple"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr "活動期限"
@@ -3451,6 +3436,12 @@ msgid "My Appointments"
 msgstr "自分の予約"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "My Availabilities"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
 msgid "My Calendar Link"
 msgstr "自分のカレンダーリンク"
@@ -3459,6 +3450,12 @@ msgstr "自分のカレンダーリンク"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_search
 msgid "My Links"
 msgstr "自分のリンク"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "My availabilities"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -3476,6 +3473,12 @@ msgstr "リスケジュールが必要ですか？"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Neutral"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "New Appointment"
 msgstr ""
 
 #. module: appointment
@@ -3624,6 +3627,17 @@ msgid "One Shot"
 msgstr "ワンショット"
 
 #. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__slot_creation_mode__single
+msgid "One by one"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "One-time link"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "Online"
 msgstr "オンライン"
@@ -3697,6 +3711,8 @@ msgid "Opening Hours"
 msgstr "営業時間"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Options"
 msgstr "オプション"
@@ -3754,11 +3770,6 @@ msgstr "電話番号"
 #: model:appointment.question,name:appointment.appointment_question_phone
 msgid "Phone number"
 msgstr "電話番号"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
-msgid "Pick Slots"
-msgstr ""
 
 #. module: appointment
 #. odoo-javascript
@@ -3874,18 +3885,6 @@ msgstr "標準"
 #: model:ir.ui.menu,name:appointment.menu_appointment_reminders
 msgid "Reminders"
 msgstr "リマインダ"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Remove"
-msgstr "削除"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Remove from list"
-msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -4048,9 +4047,8 @@ msgid "Saturday"
 msgstr "土曜"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Save Slots"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Save &amp; Pick Slots"
 msgstr ""
 
 #. module: appointment
@@ -4143,6 +4141,12 @@ msgstr "まず日付と時間を選択してください"
 
 #. module: appointment
 #. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Select this appointment type"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Select this attendee."
 msgstr ""
@@ -4187,6 +4191,7 @@ msgstr "シーケンス"
 
 #. module: appointment
 #. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
 #: code:addons/appointment/static/src/views/kanban/kanban_controller.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_tree
@@ -4208,12 +4213,6 @@ msgstr "リンクをシェア"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Share Time Slots"
-msgstr ""
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-msgid "Share my calendar"
 msgstr ""
 
 #. module: appointment
@@ -4261,6 +4260,11 @@ msgstr "サインイン"
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__char
 msgid "Single line text"
 msgstr "1行のテキスト"
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_creation_mode
+msgid "Slot Creation Mode"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_duration
@@ -5161,11 +5165,6 @@ msgid "bookings"
 msgstr "予約"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
-msgid "days"
-msgstr ""
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "days,"
 msgstr "日間、"
@@ -5364,6 +5363,9 @@ msgstr "今後の予定<br/>"
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 msgid "with"
 msgstr "と:"
+
+#~ msgid "Remove"
+#~ msgstr "削除"
 
 #~ msgid "'e.g. \"John Doe - Tennis Court Booking\""
 #~ msgstr "'例: \"John Doe - テニスコート予約\""

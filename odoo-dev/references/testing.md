@@ -662,13 +662,18 @@ def test_confirm_already_confirmed_raises(self):
         self.record.action_confirm()
 ```
 
-### DO NOT modify setUpClass data in tests:
+### DO NOT write to shared data in a `SingleTransactionCase`:
+`TransactionCase` (the default) rolls every test back to its savepoint
+([odoo/tests/common.py:1464](../../../../odoo/tests/common.py#L1464)), so writing to a
+`setUpClass` record there is fine and is what core tests do
+([test_sale_prices.py:642](../../../../addons/sale/tests/test_sale_prices.py#L642)).
+`SingleTransactionCase` keeps the write for every later test:
 ```python
-# BAD — modifies shared data, breaks other tests
+# BAD in SingleTransactionCase — the next test sees 'Changed'
 def test_something(self):
-    self.partner.write({'name': 'Changed'})  # affects all subsequent tests!
+    self.partner.write({'name': 'Changed'})
 
-# GOOD — create a copy or use fresh data
+# GOOD — change a copy
 def test_something(self):
     partner = self.partner.copy({'name': 'Changed'})
     ...

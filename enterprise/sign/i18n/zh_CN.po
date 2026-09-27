@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"POT-Creation-Date: 2026-09-25 17:45+0000\n"
 "PO-Revision-Date: 2026-09-18 02:50+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
@@ -789,11 +789,6 @@ msgstr "所有应用程序"
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
 msgid "All set! We'll let you know when everyone has signed."
 msgstr ""
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
-msgid "Allow signatories to provide their identity using itsme®"
-msgstr "允许签署人使用 itsme® 提供身份信息"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
@@ -1688,6 +1683,11 @@ msgid "Details"
 msgstr "详情"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+msgid "Digital Identity & Qualified Signatures with itsme®"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_users__sign_initials_data
 msgid "Digital Initials"
 msgstr "数字简签"
@@ -2255,11 +2255,6 @@ msgid "Has Default Template"
 msgstr "拥有默认模板"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_res_config_settings__has_external_signature_service
-msgid "Has External Signature Service"
-msgstr ""
-
-#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__has_message
 msgid "Has Message"
 msgstr "有消息"
@@ -2379,11 +2374,6 @@ msgstr "图标"
 #: model:ir.model.fields,help:sign.field_sign_request__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr "指示异常活动的图标。"
-
-#. module: sign
-#: model:ir.model.fields,field_description:sign.field_res_config_settings__module_sign_itsme
-msgid "Identify with itsme®"
-msgstr "用 itsme® 身份识别"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__message_needaction
@@ -2632,11 +2622,6 @@ msgid "Left"
 msgstr "左"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
-msgid "Let signatories sign with a qualified electronic signature of their own"
-msgstr ""
-
-#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/js/tours/sign.js:0
 msgid "Let's <b>prepare & sign</b> our first document."
@@ -2760,6 +2745,16 @@ msgstr "将此字段对所有人开放。"
 #: code:addons/sign/models/sign_item_type.py:0
 msgid "Malformed expression: %(exp)s"
 msgstr "表达式格式不正确：%(exp)s"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+msgid "Manage & Buy Identification Credits"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+msgid "Manage & Buy QES Credits"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
@@ -3017,12 +3012,6 @@ msgstr "下一个签字人（"
 #. module: sign
 #: model:res.groups.privilege,placeholder:sign.res_groups_privilege_sign
 msgid "No"
-msgstr ""
-
-#. module: sign
-#. odoo-python
-#: code:addons/sign/models/sign_request_item.py:0
-msgid "No configured endpoint for the QES signing host."
 msgstr ""
 
 #. module: sign
@@ -3392,7 +3381,6 @@ msgstr ""
 
 #. module: sign
 #: model:iap.service,name:sign.iap_service_sign_qes
-#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid "Qualified Electronic Signatures"
 msgstr ""
 
@@ -5552,6 +5540,13 @@ msgid "Verify"
 msgstr "验证"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+msgid ""
+"Verify signatories identities with itsme® and enable eIDAS Qualified "
+"Electronic Signatures (QES)"
+msgstr ""
+
+#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/core/web/activity_patch.xml:0
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
@@ -6016,6 +6011,11 @@ msgid "is next. They can sign now on this device, or later by email."
 msgstr ""
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_res_config_settings__module_sign_itsme
+msgid "itsme®"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "john@example.com"
 msgstr "john@example.com"
@@ -6173,6 +6173,12 @@ msgstr "你"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{0}} Summary"
 msgstr "{{0}} 总结"
+
+#~ msgid "Allow signatories to provide their identity using itsme®"
+#~ msgstr "允许签署人使用 itsme® 提供身份信息"
+
+#~ msgid "Identify with itsme®"
+#~ msgstr "用 itsme® 身份识别"
 
 #~ msgid ""
 #~ "<strong>Warning</strong> do not forward this email to other people!<br/>\n"

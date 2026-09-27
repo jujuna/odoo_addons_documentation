@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"POT-Creation-Date: 2026-09-25 17:45+0000\n"
 "PO-Revision-Date: 2026-09-17 23:51+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Estonian <https://translate.odoo.com/projects/odoo-master/"
@@ -98,15 +98,15 @@ msgstr ""
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form_trigger
 msgid ""
-"<code>[('email_normalized', 'ilike', '%@odoo.com'), ('company_id', '=', 1)]</"
-"code>"
+"<code>[[\"email_normalized\", \"ilike\", \"%@odoo.com\"], [\"company_id\", "
+"\"=\", 1]]</code>"
 msgstr ""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form_trigger
 msgid ""
-"<code>[{'name': 'Camille Daffoldi', 'email': 'camilledaffoldi@gmail.com'}]</"
-"code>"
+"<code>[{\"name\": \"Camille Daffoldi\", \"email\": "
+"\"camilledaffoldi@gmail.com\"}]</code>"
 msgstr ""
 
 #. module: marketing_automation
@@ -118,7 +118,23 @@ msgstr ""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form_trigger
-msgid "<code>search_domain</code>: an Odoo domain"
+msgid ""
+"<code>search_domain</code>: an Odoo domain matching the records that should "
+"be added"
+msgstr ""
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_subscribe_to_list
+msgid ""
+"<i class=\"oi oi-2x mb-auto p-2 bg-300 rounded\" data-icon=\"contact_mail\" "
+"title=\"Update icon\"/>"
+msgstr ""
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.ir_actions_server_view_form_simple_marketing_automation
+msgid ""
+"<i class=\"oi oi-2x mb-auto p-2 bg-300 rounded\" data-icon=\"edit\" "
+"title=\"Update icon\"/>"
 msgstr ""
 
 #. module: marketing_automation
@@ -150,10 +166,10 @@ msgid ""
 msgstr ""
 
 #. module: marketing_automation
-#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_subscribe_to_list
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_mailing
 msgid ""
-"<i class=\"oi oi-2x mb-auto p-2 bg-300 rounded\" data-icon=\"person\" "
-"title=\"Update icon\"/>"
+"<i class=\"oi oi-2x mb-auto p-2 bg-300 rounded\" data-icon=\"settings\" "
+"title=\"Action icon\"/>"
 msgstr ""
 
 #. module: marketing_automation
@@ -164,10 +180,10 @@ msgid ""
 msgstr ""
 
 #. module: marketing_automation
-#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_mailing
+#: model_terms:ir.ui.view,arch_db:marketing_automation.ir_actions_server_view_form_simple_marketing_automation
 msgid ""
-"<i class=\"oi oi-2x mb-auto p-2 bg-300\" data-icon=\"settings\" "
-"title=\"Action icon\"/>"
+"<i class=\"oi oi-2x mb-auto p-2 bg-300 rounded\" data-icon=\"verified\" "
+"title=\"Activity icon\"/>"
 msgstr ""
 
 #. module: marketing_automation
@@ -181,6 +197,14 @@ msgid ""
 "participants.<br/>\n"
 "                                        Payload must be sent as a JSON "
 "object. Its contents may be:"
+msgstr ""
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form_trigger
+msgid ""
+"<i class=\"oi\" data-icon=\"warning\"/>\n"
+"                                        You will not be able to add "
+"participants unless the campaign is running."
 msgstr ""
 
 #. module: marketing_automation
@@ -330,12 +354,6 @@ msgid "Add Hot Category"
 msgstr ""
 
 #. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/add_record_to_campaign/add_record_to_campaign.xml:0
-msgid "Add Record To Campaign"
-msgstr ""
-
-#. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Add Tag"
@@ -343,8 +361,8 @@ msgstr "Lisa silt"
 
 #. module: marketing_automation
 #. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-msgid "Add collect_reply activity"
+#: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
+msgid "Add a step"
 msgstr ""
 
 #. module: marketing_automation
@@ -354,16 +372,16 @@ msgid "Add participant to %s"
 msgstr ""
 
 #. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/add_record_to_campaign/add_record_to_campaign.xml:0
+msgid "Add to Campaign"
+msgstr ""
+
+#. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Add to list"
 msgstr "Lisa nimekirja"
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
-msgid "Add/Remove from List"
-msgstr ""
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_campaign__enroll_date_delay_order__after
@@ -528,13 +546,6 @@ msgid "Based on Webhook"
 msgstr ""
 
 #. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Basic example"
-msgstr ""
-
-#. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_campaign__enroll_date_delay_order__before
 msgid "Before"
 msgstr ""
@@ -671,6 +682,13 @@ msgid "Cancel flows with global reply catcher"
 msgstr ""
 
 #. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form_reply_trigger
+msgid "Cancel main workflow when triggered?"
+msgstr ""
+
+#. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_participant__state__canceled
 msgid "Canceled"
 msgstr ""
@@ -704,13 +722,6 @@ msgid ""
 "Check this to make sure your actions are not executed after a specific "
 "amount of time after the scheduled date. (e.g. Time-limited offer, Upcoming "
 "event, …)"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Checkpoint"
 msgstr ""
 
 #. module: marketing_automation
@@ -784,21 +795,21 @@ msgstr "Valmis"
 #. module: marketing_automation
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
-#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_trigger
-msgid "Condition Delay"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Conditional Split"
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_trigger
+msgid "Condition Delay"
 msgstr ""
 
 #. module: marketing_automation
 #: model:ir.ui.menu,name:marketing_automation.marketing_automation_menu_configuration
 msgid "Configuration"
 msgstr "Seadistus"
+
+#. module: marketing_automation
+#: model:ir.actions.act_window,name:marketing_automation.marketing_campaign_create_reply_trigger
+msgid "Configure Reply Path"
+msgstr ""
 
 #. module: marketing_automation
 #. odoo-python
@@ -857,14 +868,8 @@ msgstr ""
 #: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model_terms:ir.actions.act_window,help:marketing_automation.marketing_activity_action
+#: model_terms:ir.ui.view,arch_db:marketing_automation.ir_actions_server_view_form_simple_marketing_automation
 msgid "Create an Activity"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Create an Activity icon"
 msgstr ""
 
 #. module: marketing_automation
@@ -963,6 +968,7 @@ msgstr ""
 
 #. module: marketing_automation
 #. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_delay
@@ -1072,7 +1078,9 @@ msgstr ""
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
-msgid "Either a search or create argument should be provided"
+msgid ""
+"Either a search or create argument should be provided. Make sure you are "
+"sending properly formatted JSON."
 msgstr ""
 
 #. module: marketing_automation
@@ -1099,13 +1107,6 @@ msgstr "E-maili koostamise juhend"
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid "Email failed"
 msgstr "E-maili saatmine ebaõnnestus"
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Email icon"
-msgstr ""
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__enroll_action_type
@@ -1205,12 +1206,6 @@ msgstr ""
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_search
 msgid "Failed Cron"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Failed on"
 msgstr ""
 
 #. module: marketing_automation
@@ -1356,6 +1351,8 @@ msgstr ""
 #. module: marketing_automation
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
+#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_mailing
 msgid "If/Else Split"
 msgstr ""
@@ -1480,29 +1477,17 @@ msgstr ""
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 #: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
+#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__activity_type__log_note
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_log_note
 msgid "Log Note"
 msgstr ""
 
 #. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Log Note icon"
-msgstr ""
-
-#. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid "Log Note: %(log_note_body)s"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Log a Note"
 msgstr ""
 
 #. module: marketing_automation
@@ -1963,6 +1948,12 @@ msgid "On Demand"
 msgstr ""
 
 #. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+msgid "On Replies, trigger:"
+msgstr ""
+
+#. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Oops! Only Administrators can change a trigger to or from Webhook!"
@@ -2136,6 +2127,8 @@ msgid "Pick or create a/an"
 msgstr "Vali või loo a/an"
 
 #. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__processed
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_trace__state__processed
 msgid "Processed"
@@ -2248,8 +2241,8 @@ msgstr "Eemaldatud tähendab, et kirjet enam ei eksisteeri."
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.js:0
 msgid ""
-"Removing this activity will remove a full marketing flow. \n"
-"Are you sure?"
+"Removing this node will remove all checkpoint nodes that come after it. Are "
+"you sure?"
 msgstr ""
 
 #. module: marketing_automation
@@ -2358,7 +2351,7 @@ msgstr ""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form_trigger
-msgid "Save your campaign to get your URL."
+msgid "Save this Trigger to get your URL."
 msgstr ""
 
 #. module: marketing_automation
@@ -2367,15 +2360,11 @@ msgid "Schedule Date"
 msgstr "Planeeritud kuupäev"
 
 #. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_trace__state__scheduled
 msgid "Scheduled"
 msgstr "Planeeritud"
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Scheduled on"
-msgstr ""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_search
@@ -2435,8 +2424,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 #: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 msgid "Send Email"
 msgstr ""
 
@@ -2507,8 +2494,6 @@ msgstr "Saadetud"
 #. module: marketing_automation
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model,name:marketing_automation.model_ir_actions_server
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__server_action_id
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__activity_type__action
@@ -2523,22 +2508,9 @@ msgid "Server action"
 msgstr ""
 
 #. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Server action icon"
-msgstr ""
-
-#. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid "Server action: %(server_action_name)s"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-msgid "Sort Steps"
 msgstr ""
 
 #. module: marketing_automation
@@ -2549,13 +2521,6 @@ msgstr "Specific mailing used in marketing campaign"
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__activity_type__split
 msgid "Split"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Split icon"
 msgstr ""
 
 #. module: marketing_automation
@@ -2748,8 +2713,8 @@ msgstr ""
 
 #. module: marketing_automation
 #. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
-msgid "Time Delay"
+#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+msgid "Tidy Up"
 msgstr ""
 
 #. module: marketing_automation
@@ -2841,7 +2806,20 @@ msgstr ""
 #. module: marketing_automation
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+msgid "Trigger another path on replies"
+msgstr ""
+
+#. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 msgid "Trigger icon"
+msgstr ""
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form_reply_trigger
+msgid ""
+"Trigger specific follow-up actions whenever a participant replies to an "
+"email."
 msgstr ""
 
 #. module: marketing_automation
@@ -2853,12 +2831,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__triggered_activity_ids
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_trace__triggered_activity_ids
 msgid "Triggered Activity"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Triggered on"
 msgstr ""
 
 #. module: marketing_automation
@@ -2921,29 +2893,17 @@ msgstr ""
 #: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+#: model_terms:ir.ui.view,arch_db:marketing_automation.ir_actions_server_view_form_simple_marketing_automation
 msgid "Update Record"
 msgstr ""
 
 #. module: marketing_automation
 #. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Update Record icon"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/add_step_button/add_step_button.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 #: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_view_form_subscribe_to_list
 msgid "Update Subscription"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "Update Subscription icon"
 msgstr ""
 
 #. module: marketing_automation
@@ -3050,8 +3010,16 @@ msgid "Wait until"
 msgstr ""
 
 #. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_trace__state__waiting
 msgid "Waiting"
+msgstr ""
+
+#. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Waiting interaction"
 msgstr ""
 
 #. module: marketing_automation
@@ -3166,6 +3134,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid ""
+"You are trying to set an incorrect activity as the triggering of another "
+"one. Please change the triggering activity."
+msgstr ""
+
+#. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/marketing_activity.py:0
+msgid ""
 "You are trying to set the activity \"%(parent_activity)s\" as \"%"
 "(parent_type)s\" while its child \"%(activity)s\" has the trigger type \"%"
 "(trigger_type)s\"\n"
@@ -3211,6 +3187,21 @@ msgstr ""
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "You must set up at least one activity to start this campaign."
 msgstr "You must set up at least one activity to start this campaign."
+
+#. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/marketing_campaign.py:0
+msgid ""
+"Your campaign isn't valid as you have some root activities that have a "
+"checkpoint: %(activity_names)s"
+msgstr ""
+
+#. module: marketing_automation
+#. odoo-javascript
+#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Zoom"
+msgstr ""
 
 #. module: marketing_automation
 #. odoo-javascript
@@ -3302,13 +3293,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid "mail_reply"
-msgstr ""
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
-#: code:addons/marketing_automation/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
-msgid "on"
 msgstr ""
 
 #. module: marketing_automation

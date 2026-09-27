@@ -17,10 +17,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:41+0000\n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
+"PO-Revision-Date: 2026-09-21 10:23+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "account_reports/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -1405,7 +1405,7 @@ msgstr "Auditcycluscodes moeten uniek zijn."
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
-"tax grids."
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -1574,7 +1574,8 @@ msgstr "Bank en Kas"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
-"Bank transactions are reconciled to avoid any missing VAT invoices or bills."
+"Bank reconciliation helps identify missing invoices or bills that may affect "
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -3243,10 +3244,10 @@ msgstr ""
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
-msgid "Ensure the taxes on invoices and bills match the customer’s country."
+msgid ""
+"Ensures that applied taxes and fiscal positions match the customer or vendor "
+"country location."
 msgstr ""
-"Zorg dat de belastingen op verkoopfacturen en aankoopfacturen overeenkomen "
-"met het land van de klant."
 
 #. module: account_reports
 #. odoo-python
@@ -4774,13 +4775,10 @@ msgstr "Ontbrekend"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
-"Missing company details (like VAT number or country) can cause errors in "
-"your report, such as using the wrong VAT rate, wrongly exempting "
+"Missing company details (like %(vat_label)s or country) can cause errors in "
+"your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
-"Ontbrekende bedrijfsgegevens (zoals btw-nummer of land) kunnen fouten in je "
-"rapport veroorzaken, zoals het gebruik van het verkeerde btw-tarief of het "
-"ten onrechte vrijstellen van transacties."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -5747,6 +5745,8 @@ msgid ""
 "Please set a deferred account on the related account or in the accounting "
 "settings."
 msgstr ""
+"Stel een overlopende rekening in op de betreffende rekening of in de "
+"instellingen voor de boekhouding."
 
 #. module: account_reports
 #. odoo-python
@@ -6246,14 +6246,6 @@ msgid "Review"
 msgstr "Controle"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "Review Abnormal/To Review invoices and bills, and post drafts."
-msgstr ""
-"Controleer ''Abnormaal/Te controleren' verkoopfacturen en "
-"leveranciersfacturen, en publiceer concepten."
-
-#. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_foreign_exchange_differences
 msgid ""
 "Review FX rates used at year-end, compare with prior year, and verify "
@@ -6295,6 +6287,14 @@ msgstr ""
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_for_capitalizable_expenses
 msgid "Review for capitalizable expenses"
 msgstr "Controle op activeerbare uitgaven"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid ""
+"Review invoices, bills and entries which are either in draft or marked as "
+"Anomaly/To Review."
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6452,6 +6452,12 @@ msgstr "Zoeken..."
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
 msgid "Sections"
 msgstr "Secties"
+
+#. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
+msgid "Select or type a value"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -6646,6 +6652,14 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account_reports.selection__account_report_send__mode__single
 msgid "Single Recipient"
 msgstr "Eén ontvanger"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_report.py:0
+#: model:ir.model.fields,field_description:account_reports.field_account_report__snapshot_ids
+#: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
+msgid "Snapshots"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -6908,8 +6922,20 @@ msgstr "Belastingperiodiciteit"
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Rate & Country Consistency"
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Received Adjustment"
 msgstr "Aanpassing ontvangen btw"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Reconciliation"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -7021,12 +7047,6 @@ msgstr "Btw"
 #: code:addons/account_reports/static/src/components/journal_report/line/line.xml:0
 msgid "Taxes Applied"
 msgstr "Btw toegepast"
-
-#. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "Taxes and countries matching"
-msgstr "Matching van belastingen en landen"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_tax_unit__fpos_synced
@@ -7700,12 +7720,6 @@ msgid "VAT Numbers"
 msgstr "Btw-nummers"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "VAT Reconciliation"
-msgstr ""
-
-#. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_vat_rate_compliance
 msgid "VAT rate compliance"
 msgstr "Naleving van btw-tarieven"
@@ -8340,6 +8354,28 @@ msgstr "⇒ Reset naar Odoo’s koers"
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#~ msgid "Ensure the taxes on invoices and bills match the customer’s country."
+#~ msgstr ""
+#~ "Zorg dat de belastingen op verkoopfacturen en aankoopfacturen "
+#~ "overeenkomen met het land van de klant."
+
+#~ msgid ""
+#~ "Missing company details (like VAT number or country) can cause errors in "
+#~ "your report, such as using the wrong VAT rate, wrongly exempting "
+#~ "transactions."
+#~ msgstr ""
+#~ "Ontbrekende bedrijfsgegevens (zoals btw-nummer of land) kunnen fouten in "
+#~ "je rapport veroorzaken, zoals het gebruik van het verkeerde btw-tarief of "
+#~ "het ten onrechte vrijstellen van transacties."
+
+#~ msgid "Review Abnormal/To Review invoices and bills, and post drafts."
+#~ msgstr ""
+#~ "Controleer ''Abnormaal/Te controleren' verkoopfacturen en "
+#~ "leveranciersfacturen, en publiceer concepten."
+
+#~ msgid "Taxes and countries matching"
+#~ msgstr "Matching van belastingen en landen"
 
 #~ msgid "Configure your tax accounts"
 #~ msgstr "Configureer je btw rekeningen"

@@ -82,7 +82,7 @@ class L10n_DeTaxReportHandler(models.AbstractModel):
         periodicity = options['return_periodicity']['periodicity']
         if periodicity == 'monthly':
             template_context['period'] = date_to.strftime("%m")
-        elif periodicity == 'quarterly':
+        elif periodicity == 'trimester':
             month_end = date_to.month
             if month_end % 3 != 0:
                 raise UserError(self.env._("Quarter not supported."))

@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-17 22:35+0000\n"
+"POT-Creation-Date: 2026-09-25 17:46+0000\n"
+"PO-Revision-Date: 2026-09-23 02:33+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "account_accountant/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +37,12 @@ msgid ""
 "as bank recon and payment follow-up.\n"
 "\n"
 msgstr ""
+"\n"
+"請求アクセス権\n"
+"========================\n"
+"管理者ユーザは、銀行消込や支払フォローアップなどの重要な顧客請求書機能にアク"
+"セスできます。\n"
+"\n"
 
 #. module: account_accountant
 #. odoo-python
@@ -305,7 +311,7 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "アクセスグループ"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -328,7 +334,7 @@ msgstr "勘定科目表テンプレート"
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_select_account_line
 msgid "Account Select Account Line"
-msgstr ""
+msgstr "勘定科目選択行"
 
 #. module: account_accountant
 #: model:ir.actions.act_window,name:account_accountant.account_tag_action
@@ -344,7 +350,7 @@ msgstr "以下から口座振替する："
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_select_account_line__account_type
 msgid "Account Type"
-msgstr ""
+msgstr "勘定科目タイプ"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_auto_reconcile_wizard
@@ -354,7 +360,7 @@ msgstr "勘定自動消込ウィザード"
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_account__deferred_account_id
 msgid "Account automatically used for deferred entries on this account."
-msgstr ""
+msgstr "この勘定で発生する繰延仕訳に自動的に使用される勘定科目です。"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_reconcile_wizard
@@ -393,7 +399,7 @@ msgstr "活動"
 #. module: account_accountant
 #: model:ir.actions.server,name:account_accountant.action_schedule_activity_bank_statement_line
 msgid "Activity"
-msgstr ""
+msgstr "活動"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__activity_exception_decoration
@@ -475,7 +481,7 @@ msgstr "1年より長い/短い会計年度の定義を許可"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__allowed_reconcile_model_ids
 msgid "Allowed Reconcile Model"
-msgstr ""
+msgstr "使用可能な消込モデル"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__amount_currency
@@ -625,7 +631,7 @@ msgstr "自動調整が完了しました。"
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_sequence_mixin
 msgid "Automatic sequence"
-msgstr ""
+msgstr "自動付番"
 
 #. module: account_accountant
 #. odoo-python
@@ -635,7 +641,6 @@ msgstr "自動消込済仕訳"
 
 #. module: account_accountant
 #. odoo-javascript
-#: code:addons/account_accountant/static/src/components/bank_reconciliation/search_dialog/account_search_dialog_list.xml:0
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/search_dialog/search_dialog_kanban.xml:0
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/search_dialog/search_dialog_list.xml:0
 msgid "Balance:"
@@ -698,12 +703,12 @@ msgstr "銀行明細.pdf"
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "銀行取引"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__asset_cash
 msgid "Bank and Cash"
-msgstr ""
+msgstr "銀行・現金"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_amount_computation_method__day
@@ -749,12 +754,12 @@ msgstr "現金"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
 msgid "Cash In"
-msgstr ""
+msgstr "入金"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
 msgid "Cash Out"
-msgstr ""
+msgstr "出金"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_change_lock_date
@@ -779,6 +784,8 @@ msgid ""
 "Check to enable deferred accounting, deferred dates will be required on "
 "invoice / bill"
 msgstr ""
+"繰延会計を有効にするにはチェックしてください。有効にすると、顧客請求書/仕入先"
+"請求書に繰延日付の入力が必須になります"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.bank_rec_auto_reconcile_wizard_view_form
@@ -825,7 +832,7 @@ msgstr "明細をクリックして展開してください。"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_select_account_line__code
 msgid "Code"
-msgstr ""
+msgstr "コード"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_res_company
@@ -882,7 +889,7 @@ msgstr "クレジットカードアカウントと連携して、支払いを管
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__expense_direct_cost
 msgid "Cost of Revenue"
-msgstr ""
+msgstr "売上原価"
 
 #. module: account_accountant
 #: model:ir.actions.act_window,name:account_accountant.action_bank_statement_form_bank_rec_widget
@@ -953,7 +960,7 @@ msgstr "作成日"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__liability_credit_card
 msgid "Credit Card"
-msgstr ""
+msgstr "クレジットカード"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__cron_last_check
@@ -991,12 +998,12 @@ msgstr "現在の確定ロック日"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__liability_current
 msgid "Current Liabilities"
-msgstr ""
+msgstr "流動負債"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__equity_unaffected
 msgid "Current Year Earnings"
-msgstr ""
+msgstr "当期利益"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__date
@@ -1019,7 +1026,7 @@ msgstr "前払費用/前受収益の開始日"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_form
 msgid "Default"
-msgstr ""
+msgstr "デフォルト"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_form_inherit
@@ -1041,7 +1048,7 @@ msgstr "繰延"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_account__deferred_account_id
 msgid "Deferred Account"
-msgstr ""
+msgstr "繰延勘定"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -1162,12 +1169,12 @@ msgstr "取引を削除"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__expense_depreciation
 msgid "Depreciation"
-msgstr ""
+msgstr "減価償却"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_select_account_line__description
 msgid "Description"
-msgstr ""
+msgstr "説明"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_digest_digest
@@ -1302,7 +1309,7 @@ msgstr "会計年度に含まれる終了日。"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__equity
 msgid "Equity"
-msgstr ""
+msgstr "純資産"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_res_company__invoicing_switch_threshold

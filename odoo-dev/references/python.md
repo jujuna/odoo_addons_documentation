@@ -29,36 +29,10 @@ load `references/orm.md` first.
 
 ## 1. Type Hints in Odoo
 
-Odoo core does NOT use type hints extensively, but for custom modules they
-improve readability and IDE support. Use them on private/utility methods —
-skip on ORM overrides (the framework types are complex).
-
-```python
-from collections.abc import Iterable
-
-def _prepare_invoice_values(self) -> dict:
-    """Prepare dictionary for account.move creation."""
-    self.ensure_one()
-    return {
-        'partner_id': self.partner_id.id,
-        'move_type': 'out_invoice',
-    }
-
-def _get_partner_ids_from_domain(self, domain: list) -> list[int]:
-    """Extract partner IDs matching the given domain."""
-    return self.env['res.partner'].search(domain).ids
-
-def _split_into_batches(self, records, size: int = 200) -> Iterable:
-    """Yield successive batches of the given size."""
-    for i in range(0, len(records), size):
-        yield records[i:i + size]
-```
-
-**Rules:**
-- Use on private helpers and utility methods
-- Skip on `create`, `write`, `unlink`, `search` overrides (signature is defined by ORM)
-- Use `dict` not `Dict`, `list` not `List`
-- Use `X | None` not `Optional[X]`; PEP 695 generics (`def f[T](...)`) are available
+Match the file you are in: add type hints only where the surrounding code already uses them
+(core model code rarely does, our modules do not). Where a file does, write `dict` / `list` /
+`X | None` (not `Dict` / `List` / `Optional[X]`) and leave ORM override signatures
+(`create`, `write`, `unlink`, `search`) unannotated.
 
 ---
 
@@ -191,7 +165,7 @@ value = my_dict.get(key, default_value)
 
 # Accumulating in a dict
 vals = {}
-vals.setdefault('invoice_line_ids', []).append((0, 0, line_vals))
+vals.setdefault('invoice_line_ids', []).append(Command.create(line_vals))
 ```
 
 ### Tuple unpacking in loops:

@@ -355,7 +355,7 @@ def upload_file(self, file, record_id, **kwargs):
 
     attachment = request.env['ir.attachment'].create({
         'name': file.filename,
-        'datas': base64.b64encode(file.read()),
+        'raw': file.read(),
         'res_model': 'my.model',
         'res_id': record.id,
     })

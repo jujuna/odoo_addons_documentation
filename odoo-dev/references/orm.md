@@ -505,3 +505,11 @@ Treat these as blockers unless there is a measured reason:
 - Direct float equality on quantities, currency, or UoM values.
 - `cr.commit()` outside cron/import/migration code.
 - Domains assembled with fragile nested `|`/`&` lists when `Domain` would be clearer.
+
+### Sibling-search constraints and x2many write commands
+
+- A constraint that searches siblings must exclude only the record itself (`('id', '!=', rec.id)`), not `self.ids`:
+  constraints run after the whole batch is written, so excluding the batch hides records saved in the same call from each other.
+- A helper that predicts an x2many write must normalize the value as `Field._parse_write_commands` does
+  ([fields_relational.py:810-822](../../../../odoo/orm/fields_relational.py#L810)): a tuple, a recordset or a plain id list means SET,
+  `False`/`None` means CLEAR; only a list of tuples is a command list.

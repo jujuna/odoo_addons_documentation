@@ -21,3 +21,21 @@ class IrAttachment(models.Model):
         for approval_request in approval_requests:
             if approval_request.request_status in ['approved', 'refused', 'cancel']:
                 raise UserError(_("You cannot unlink an attachment which is linked to a validated, refused or cancelled approval request."))
+
+    def write(self, vals):
+        """
+            Prevent detaching attachments from an approval
+            request that is in the approved, refused, or cancel state.
+        """
+        if 'res_model' in vals or 'res_id' in vals:
+            approval_attachments = self.filtered(
+                lambda a: a.res_model == 'approval.request' and not a.res_field
+            )
+
+            if approval_attachments:
+                requests = self.env['approval.request'].browse(approval_attachments.mapped('res_id'))
+                for request in requests:
+                    if request.request_status in ['approved', 'refused', 'cancel']:
+                        raise UserError(_("You cannot unlink an attachment which is linked to a validated, refused or cancelled approval request."))
+
+        return super().write(vals)

@@ -5,14 +5,15 @@
 # "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-17 22:53+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-09-24 12:17+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "hr_expense_stripe/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -89,6 +90,8 @@ msgid ""
 "<span>unmapped MCC code<span invisible=\"unmapped_mcc_count == 1\">s</span>."
 "</span>"
 msgstr ""
+"<span>code MCC non mappé<span invisible=\"unmapped_mcc_count == 1\">s</span>"
+".</span>"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_topup_wizard_form
@@ -1122,7 +1125,7 @@ msgstr "Action requise"
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_restriction
 msgid "Action Required: Stripe Issuing Verification"
-msgstr ""
+msgstr "Action requise : vérification Stripe Issuing"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_card_receive_wizard_form
@@ -2553,7 +2556,7 @@ msgstr "Catégorie de frais à utiliser"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_card.py:0
 msgid "Expense Settings"
-msgstr ""
+msgstr "Paramètres des notes de frais"
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_hr_expense_split
@@ -2873,7 +2876,7 @@ msgstr "Épiceries et supermarchés"
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_restriction
 msgid "HR Expense Stripe Account Restriction"
-msgstr ""
+msgstr "Restriction du compte Stripe pour les notes de frais RH"
 
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_card_assigned
@@ -3182,7 +3185,7 @@ msgstr "Est un abonné"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_res_company__is_stripe_issuing_supported
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_res_config_settings__is_stripe_issuing_supported
 msgid "Is Stripe Issuing Supported"
-msgstr ""
+msgstr "Stripe Issuing est-il pris en charge"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.jewelry_stores_watches_clocks_and_silverware_stores
@@ -3331,12 +3334,14 @@ msgid ""
 "MCC %(mcc_code)s %(mcc_name)s not allowed, because it is not mapped to any "
 "expense product."
 msgstr ""
+"Le MCC %(mcc_code)s %(mcc_name)s n'est pas autorisé, car il n'est associé à "
+"aucun produit de notes de frais."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/product_mcc_stripe_tag.py:0
 msgid "MCC code %(mcc_code)s is not allowed or was not found."
-msgstr ""
+msgstr "Le code MCC %(mcc_code)s n'est pas autorisé ou n'a pas été trouvé."
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.view_product_mcc_stripe_tag_search
@@ -3615,7 +3620,7 @@ msgstr "Dépositaires et kiosques à journaux"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/product_mcc_stripe_tag.py:0
 msgid "No MCC code provided."
-msgstr ""
+msgstr "Aucun code MCC fourni."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3829,7 +3834,7 @@ msgstr ""
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.res_config_settings_view_form
 msgid "Open MCC"
-msgstr ""
+msgstr "Ouvrir le MCC"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4315,7 +4320,7 @@ msgstr "Courtiers et négociants en valeurs mobilières"
 #. module: hr_expense_stripe
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_restriction
 msgid "Sent to the administrator when Stripe restricts the account"
-msgstr ""
+msgstr "Envoyé à l'administrateur lorsque Stripe restreint le compte"
 
 #. module: hr_expense_stripe
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_dispute_lost
@@ -4721,6 +4726,8 @@ msgid ""
 "Stripe has restricted your account. Please update your information soon to "
 "avoid disruption."
 msgstr ""
+"Stripe a restreint votre compte. Veuillez mettre à jour vos informations "
+"rapidement pour éviter toute interruption."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5735,7 +5742,7 @@ msgstr "Illimité"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_res_company__unmapped_mcc_count
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_res_config_settings__unmapped_mcc_count
 msgid "Unmapped Mcc Count"
-msgstr ""
+msgstr "Nombre de MCC non associés"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.view_hr_expense_stripe_card_form

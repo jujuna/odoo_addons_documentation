@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 18:11+0000\n"
+"POT-Creation-Date: 2026-09-25 18:26+0000\n"
 "PO-Revision-Date: 2026-09-18 05:02+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
@@ -241,6 +241,32 @@ msgstr "%(company)s-ch-global-account-%(year)s"
 #: code:addons/l10n_ch_hr_payroll/models/l10n_ch_individual_account.py:0
 msgid "%(employee)s-ch-individual-account-%(year)s"
 msgstr "%(employee)s-ch-individual-account-%(year)s"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_payslip.py:0
+msgid ""
+"%(payslip)s: A manual Third Party Correction (2050) input disables the "
+"automatic third party offsetting: the net compensation (4900) cannot be "
+"solved. Remove either the manual 2050 input or the net compensation wage "
+"types."
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_payslip.py:0
+msgid ""
+"%(payslip)s: The net compensation (4900) could not be bracketed within ±%"
+"(bound).2f."
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_payslip.py:0
+msgid ""
+"%(payslip)s: The net compensation (4900) did not converge within %(count)s "
+"payslip evaluations."
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.actions.report,print_report_name:l10n_ch_hr_payroll.action_report_payslip_ch_elm
@@ -691,8 +717,8 @@ msgid ""
 "import might take a few minutes if you chose to import all Cantons at once.</"
 "span>"
 msgstr ""
-"<span invisible=\"import_mode == 'manual'\" class=\"text-muted\">"
-"L'importazione automatica può richiedere alcuni minuti se scegli di "
+"<span invisible=\"import_mode == 'manual'\" class=\"text-"
+"muted\">L'importazione automatica può richiedere alcuni minuti se scegli di "
 "importare tutti i Cantoni in una sola volta.</span>"
 
 #. module: l10n_ch_hr_payroll
@@ -1306,6 +1332,11 @@ msgstr "Infortunio - Pensione"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2030
 msgid "Accident - daily allowance"
 msgstr "Infortunio - Indennità giornaliera"
+
+#. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2030_net
+msgid "Accident - daily allowance (Net compensation)"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_contract_template_form_view
@@ -2432,8 +2463,8 @@ msgstr ""
 "          pagati regolarmente.\n"
 "    - J: importo lordo delle indennità per lavoro a turni, lavoro domenicale "
 "o notturno e altre indennità per lavori gravosi\n"
-"         (indennità per servizio di reperibilità, lavori insudicianti, ecc.)"
-".\n"
+"         (indennità per servizio di reperibilità, lavori insudicianti, "
+"ecc.).\n"
 "- K: importo totale degli assegni familiari versati dal datore di lavoro "
 "sotto forma di assegni per figli,\n"
 "         assegni per la formazione professionale, assegni per la famiglia o "
@@ -2525,8 +2556,8 @@ msgstr ""
 "di salario);\n"
 "          - altri benefici salariali accessori (sezione 2.3 del certificato "
 "di salario);\n"
-"          - diritti di partecipazione (sezione 5 del certificato di salario)"
-".\n"
+"          - diritti di partecipazione (sezione 5 del certificato di "
+"salario).\n"
 "    - S: Pagamento in capitale: benefici in capitale di natura pensionistica "
 "versati dal datore di lavoro direttamente al\n"
 "         dipendente e soggetti a un'aliquota fiscale ridotta.\n"
@@ -3232,6 +3263,11 @@ msgid "DI allowance"
 msgstr "Indennità AI"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2025_net
+msgid "DI allowance (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2026
 msgid "DI pension"
 msgstr "Pensione AI"
@@ -3279,6 +3315,11 @@ msgstr "Assicurazione malattia giornaliera 2 datore di lavoro"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2035
 msgid "Daily sickness allowance"
 msgstr "Indennità giornaliera di malattia"
+
+#. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2035_net
+msgid "Daily sickness allowance (Net compensation)"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_1250
@@ -6833,6 +6874,11 @@ msgid "Loss-of-earnings indemnity (APG)"
 msgstr "Indennità di perdità di guadagno (APG)"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2000_net
+msgid "Loss-of-earnings indemnity (APG) (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_job_type__lowercadre
 msgid "Lower Management"
 msgstr "Settore inferiore"
@@ -7040,6 +7086,11 @@ msgid "Maternity/Paternity allowance"
 msgstr "Indennità di maternità/paternità"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2040_net
+msgid "Maternity/Paternity allowance (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__ch_yearly_report__month__5
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_ema_declaration__month__5
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_is_report__month__5
@@ -7133,9 +7184,19 @@ msgid "Military compensation benefit (CCM)"
 msgstr "Prestazioni compensazione militare (CCM)"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2005_net
+msgid "Military compensation benefit (CCM) (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2020
 msgid "Military insurance compensation"
 msgstr "Indennità assicurazione militare"
+
+#. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2020_net
+msgid "Military insurance compensation (Net compensation)"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2021
@@ -7821,7 +7882,8 @@ msgstr "Numero di errori"
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
 msgid "Number of holidays per year at 100% Occupation Rate"
-msgstr "Numero di giorni di ferie per anno con un tasso di occupazione del 100%"
+msgstr ""
+"Numero di giorni di ferie per anno con un tasso di occupazione del 100%"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,help:l10n_ch_hr_payroll.field_ch_yearly_report__message_needaction_counter
@@ -9991,6 +10053,11 @@ msgstr "Soggetto all'imposta alla fonte"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2010
 msgid "Subsidiary military fund"
 msgstr "Cassa militare sussidiaria"
+
+#. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2010_net
+msgid "Subsidiary military fund (Net compensation)"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript

@@ -8,14 +8,15 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:51+0000\n"
-"PO-Revision-Date: 2026-09-18 01:05+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-09-23 16:35+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "account_3way_match/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -51,6 +52,32 @@ msgid ""
 "    - No (The bill cannot be paid, nothing has been delivered yet)\n"
 "    - Exception (Received and invoiced quantities differ)\n"
 msgstr ""
+"\n"
+"Gérer le rapprochement à trois niveaux sur les factures fournisseurs\n"
+"=====================================\n"
+"\n"
+"Dans l’industrie manufacturière, les entreprises reçoivent souvent les "
+"factures fournisseurs avant\n"
+"de recevoir leur achat, mais elles ne souhaitent pas payer la facture tant "
+"que les marchandises\n"
+"n’ont pas été livrées.\n"
+"\n"
+"La solution à cette situation consiste à créer la facture fournisseur "
+"lorsque vous la recevez\n"
+"(sur la base des quantités commandées), mais à ne payer la facture que "
+"lorsque les quantités\n"
+"reçues (sur les lignes de commande fournisseur) correspondent à la facture "
+"fournisseur enregistrée.\n"
+"\n"
+"Ce module introduit un mécanisme de \"libération pour paiement\" qui "
+"indique, pour chaque facture fournisseur,\n"
+"si elle peut être payée ou non.\n"
+"\n"
+"Chaque facture fournisseur reçoit l’un des trois statuts suivants :\n"
+"\n"
+"    - Oui (La facture peut être payée)\n"
+"    - Non (La facture ne peut pas être payée, rien n’a encore été livré)\n"
+"    - Exception (Les quantités reçues et facturées diffèrent)\n"
 
 #. module: account_3way_match
 #: model:ir.model.fields,help:account_3way_match.field_account_bank_statement_line__release_to_pay_manual
@@ -184,7 +211,7 @@ msgstr ""
 #. module: account_3way_match
 #: model:ir.module.module,shortdesc:base.module_account_3way_match
 msgid "Vendor Bill: Release to Pay"
-msgstr ""
+msgstr "Facture fournisseur : libération pour paiement"
 
 #. module: account_3way_match
 #: model:ir.model.fields.selection,name:account_3way_match.selection__account_move__release_to_pay__yes

@@ -230,6 +230,18 @@ class GermanTaxReportTest(AccountSalesReportCommon):
             self.get_xml_tree_from_string(expected_xml),
         )
 
+    @freeze_time('2026-10-01')
+    def test_zeitraum_is_set_for_quarterly_tax_report(self):
+        self.env.ref('l10n_de_reports.de_tax_return_type').deadline_periodicity = 'trimester'
+
+        report = self.env.ref('l10n_de.tax_report')
+        options = report.get_options({})
+
+        xml_export = self.env[report.custom_handler_model_name].export_tax_report_to_xml(options)
+        tree = self.get_xml_tree_from_string(xml_export['file_content'])
+        zeitraum = tree.xpath('//*[local-name()="Zeitraum"]')[0].text
+        self.assertEqual(zeitraum, '43')
+
     @freeze_time('2019-12-15')
     def test_successful_submission(self):
         with self.allow_pdf_render(), patch(REQUESTS_POST, side_effect=_mock_post_success):

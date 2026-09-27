@@ -23,7 +23,7 @@ Ranked options — always take the highest one that solves the task:
 Never invent a model, wizard, menu, or setting the task did not require. A new model is
 a permanent cost for the user (new menu, new access rules, new records to maintain).
 
-## 2. No overthinking
+## 2. No over-engineering
 
 - Solve the case in front of you, not the imagined future one
 - No abstraction layer, hook, or generic engine for a single caller

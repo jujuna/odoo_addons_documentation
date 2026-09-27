@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 18:11+0000\n"
+"POT-Creation-Date: 2026-09-25 18:26+0000\n"
 "PO-Revision-Date: 2026-09-18 05:02+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
@@ -242,6 +242,32 @@ msgstr "%(company)s-ch-global-account-%(year)s"
 #: code:addons/l10n_ch_hr_payroll/models/l10n_ch_individual_account.py:0
 msgid "%(employee)s-ch-individual-account-%(year)s"
 msgstr "%(employee)s-ch-individual-account-%(year)s"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_payslip.py:0
+msgid ""
+"%(payslip)s: A manual Third Party Correction (2050) input disables the "
+"automatic third party offsetting: the net compensation (4900) cannot be "
+"solved. Remove either the manual 2050 input or the net compensation wage "
+"types."
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_payslip.py:0
+msgid ""
+"%(payslip)s: The net compensation (4900) could not be bracketed within ±%"
+"(bound).2f."
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_payslip.py:0
+msgid ""
+"%(payslip)s: The net compensation (4900) did not converge within %(count)s "
+"payslip evaluations."
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.actions.report,print_report_name:l10n_ch_hr_payroll.action_report_payslip_ch_elm
@@ -675,9 +701,10 @@ msgid ""
 "files (.txt format) can be found at https://www.estv.admin.ch/de/"
 "quellensteuertarife-import-in-lohnbuchhaltungssysteme</span>"
 msgstr ""
-"<span invisible=\"import_mode == 'automatic'\" class=\"text-muted\">"
-"Steuerdateien (.txt-Format) finden Sie unter https://www.estv.admin.ch/de/"
-"quellensteuertarife-import-in-lohnbuchhaltungssysteme</span>"
+"<span invisible=\"import_mode == 'automatic'\" class=\"text-"
+"muted\">Steuerdateien (.txt-Format) finden Sie unter https://"
+"www.estv.admin.ch/de/quellensteuertarife-import-in-lohnbuchhaltungssysteme</"
+"span>"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_tax_rate_import_wizard_view_form
@@ -1297,6 +1324,11 @@ msgstr "Unfall – Rente"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2030
 msgid "Accident - daily allowance"
 msgstr "Unfall – Taggeld"
+
+#. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2030_net
+msgid "Accident - daily allowance (Net compensation)"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_contract_template_form_view
@@ -3211,6 +3243,11 @@ msgid "DI allowance"
 msgstr "IV-Taggeld"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2025_net
+msgid "DI allowance (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2026
 msgid "DI pension"
 msgstr "IV-Rente"
@@ -3258,6 +3295,11 @@ msgstr "Taggeldversicherung 2 Arbeitgeber"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2035
 msgid "Daily sickness allowance"
 msgstr "Krankentagegeld"
+
+#. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2035_net
+msgid "Daily sickness allowance (Net compensation)"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_1250
@@ -3959,7 +4001,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_ch_hr_payroll/models/hr_employee.py:0
 msgid "Employee's Birthday cannot be greater than today."
-msgstr "Der Geburtstag des Mitarbeiters darf nicht vor dem heutigen Tag liegen."
+msgstr ""
+"Der Geburtstag des Mitarbeiters darf nicht vor dem heutigen Tag liegen."
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,help:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_lesson_wage
@@ -4115,7 +4158,8 @@ msgstr "Endperiode"
 #. odoo-python
 #: code:addons/l10n_ch_hr_payroll/models/l10n_ch_hr_employee_children.py:0
 msgid "End of deduction period cannot be before the starting period"
-msgstr "Das Ende des Abzugszeitraums darf nicht vor dem Anfangszeitraum liegen."
+msgstr ""
+"Das Ende des Abzugszeitraums darf nicht vor dem Anfangszeitraum liegen."
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model,name:l10n_ch_hr_payroll.model_l10n_ch_ema_declaration
@@ -6756,6 +6800,11 @@ msgid "Loss-of-earnings indemnity (APG)"
 msgstr "Erwerbsausfallsentschädigung (APG)"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2000_net
+msgid "Loss-of-earnings indemnity (APG) (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_job_type__lowercadre
 msgid "Lower Management"
 msgstr "Untere Führungsebene"
@@ -6957,6 +7006,11 @@ msgid "Maternity/Paternity allowance"
 msgstr "Mutter-/Vaterschaftsentschädigung"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2040_net
+msgid "Maternity/Paternity allowance (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__ch_yearly_report__month__5
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_ema_declaration__month__5
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_is_report__month__5
@@ -7050,9 +7104,19 @@ msgid "Military compensation benefit (CCM)"
 msgstr "Militärdienstkasse (MDK)"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2005_net
+msgid "Military compensation benefit (CCM) (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2020
 msgid "Military insurance compensation"
 msgstr "MV-Taggeld"
+
+#. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2020_net
+msgid "Military insurance compensation (Net compensation)"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2021
@@ -7733,7 +7797,8 @@ msgstr "Anzahl Fehler"
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
 msgid "Number of holidays per year at 100% Occupation Rate"
-msgstr "Anzahl der Urlaubstage pro Jahr bei einer Beschäftigungsquote von 100 %"
+msgstr ""
+"Anzahl der Urlaubstage pro Jahr bei einer Beschäftigungsquote von 100 %"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,help:l10n_ch_hr_payroll.field_ch_yearly_report__message_needaction_counter
@@ -8281,8 +8346,8 @@ msgid ""
 "\"packages\" that are transmitted independently of one another using the ELM "
 "standard."
 msgstr ""
-"Buchungskreise ermöglichen es Unternehmen und Rentenversicherungsträgern, «"
-"Pakete» zu erstellen, die unabhängig voneinander unter Verwendung des ELM-"
+"Buchungskreise ermöglichen es Unternehmen und Rentenversicherungsträgern, "
+"«Pakete» zu erstellen, die unabhängig voneinander unter Verwendung des ELM-"
 "Standards übermittelt werden."
 
 #. module: l10n_ch_hr_payroll
@@ -9888,6 +9953,11 @@ msgid "Subsidiary military fund"
 msgstr "Militärergänzungskasse (MEK)"
 
 #. module: l10n_ch_hr_payroll
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2010_net
+msgid "Subsidiary military fund (Net compensation)"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/client_action/interoperability_client.xml:0
 msgid "Subtraction Result"
@@ -9978,7 +10048,8 @@ msgstr "Schweizerische Personalabrechnung: monatliche Zusammenfassung"
 #. module: l10n_ch_hr_payroll
 #: model:ir.model,name:l10n_ch_hr_payroll.model_l10n_ch_tax_rate_import_wizard
 msgid "Swiss Payroll: Tax rate import wizard"
-msgstr "Schweizer Personalabrechnung: Assistent zum Importierend er Steuersätze"
+msgstr ""
+"Schweizer Personalabrechnung: Assistent zum Importierend er Steuersätze"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_social_insurance_view_form

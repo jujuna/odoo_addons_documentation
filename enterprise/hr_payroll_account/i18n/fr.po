@@ -8,14 +8,15 @@
 # Martin Trigaux, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-11 17:53+0000\n"
-"PO-Revision-Date: 2026-09-18 03:36+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-09-24 12:17+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "hr_payroll_account/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -82,6 +83,9 @@ msgid ""
 "                            Journal Entry <br/> (Preview)\n"
 "                        </span>"
 msgstr ""
+"<span class=\"o_stat_text\">\n"
+"                            Écriture comptable <br/> (Aperçu)\n"
+"                        </span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -92,11 +96,13 @@ msgstr "<span class=\"o_stat_text\">Fiche de paie</span>"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "<span invisible=\"reference\">No payrun id passed in context.</span>"
 msgstr ""
+"<span invisible=\"reference\">Aucun ID de cycle de paie transmis dans le "
+"contexte.</span>"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__account
 msgid "Account"
-msgstr ""
+msgstr "Compte"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_chart_template
@@ -170,7 +176,7 @@ msgstr "Entreprise"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__company_currency_id
 msgid "Company Currency"
-msgstr ""
+msgstr "Devise de l'entreprise"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_config_settings
@@ -181,18 +187,18 @@ msgstr "Paramètres de configuration"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_uid
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Créé par"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Créé le"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__credit
 msgid "Credit"
-msgstr ""
+msgstr "Crédit"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_credit
@@ -209,7 +215,7 @@ msgstr "Grilles de taxes sur le crédit"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__debit
 msgid "Debit"
-msgstr ""
+msgstr "Débit"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
@@ -319,7 +325,7 @@ msgstr "Exclu du net"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "Generate Draft Journal Entries"
-msgstr ""
+msgstr "Générer des écritures comptables brouillon"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
@@ -373,6 +379,8 @@ msgid ""
 "Invalid IBAN for the following Beneficiaries:\n"
 "%s"
 msgstr ""
+"IBAN invalide pour les bénéficiaires suivants :\n"
+"%s"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -411,7 +419,7 @@ msgstr "Écriture comptable"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Journal Items"
-msgstr ""
+msgstr "Écritures comptables"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip__date
@@ -423,29 +431,31 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__label
 msgid "Label"
-msgstr ""
+msgstr "Libellé"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_uid
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Dernière mise à jour par"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Dernière mise à jour le"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__line_ids
 msgid "Line"
-msgstr ""
+msgstr "Ligne"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_line
 msgid "Mock version of an account move line used for simulations"
 msgstr ""
+"Version fictive d'une ligne d'écriture comptable utilisée pour les "
+"simulations"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_id
@@ -460,7 +470,7 @@ msgstr "Statut du mouvement"
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "No Journal"
-msgstr ""
+msgstr "Aucun journal"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -476,7 +486,7 @@ msgstr "Aucun(e)"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__partner
 msgid "Partner"
-msgstr ""
+msgstr "Partenaire"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -512,7 +522,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payroll_warning
 msgid "Payroll Warning"
-msgstr ""
+msgstr "Avertissement de paie"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip_line
@@ -522,7 +532,7 @@ msgstr "Ligne de la fiche de paie"
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,description:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "Payslip has no journal defined"
-msgstr ""
+msgstr "Aucun journal n'est défini pour la fiche de paie"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_ids
@@ -533,17 +543,17 @@ msgstr "Fiches de paie"
 #. module: hr_payroll_account
 #: model:ir.actions.act_window,name:hr_payroll_account.action_open_payrun_move_preview
 msgid "Preview of Journal Entry"
-msgstr ""
+msgstr "Aperçu de l'écriture comptable"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__reference
 msgid "Reference"
-msgstr ""
+msgstr "Référence"
 
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,button_name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "Review Records"
-msgstr ""
+msgstr "Vérifier les enregistrements"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -616,7 +626,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__tax_tag_ids
 msgid "Tax Grids"
-msgstr ""
+msgstr "Grilles de TVA"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -630,12 +640,12 @@ msgstr ""
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Credit"
-msgstr ""
+msgstr "Total crédit"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Debit"
-msgstr ""
+msgstr "Total débit"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
@@ -646,6 +656,8 @@ msgstr "Valider"
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_wizard
 msgid "Wizard to show previews of account moves related to pay runs."
 msgstr ""
+"Assistant pour afficher des aperçus des écritures comptables liées aux "
+"cycles de paie."
 
 #. module: hr_payroll_account
 #. odoo-python

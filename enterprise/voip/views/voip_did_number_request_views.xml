@@ -131,5 +131,19 @@
         <field name="res_model">voip.did.number.request</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="voip_did_number_request_search_view"/>
+        <field name="help" type="html">
+            <div>
+                <div class="position-relative mb-3">
+                    <span class="o_view_nocontent_voip_bg_shape o_view_nocontent_voip_number_bg position-absolute bg-primary"/>
+                    <img class="position-relative mw-100" src="/voip/static/src/img/voip_phone_number.svg" alt="Phone numbers"/>
+                </div>
+                <h2>No number requests found</h2>
+                <p>
+                    Search for a number to buy. If none are available,<br/>
+                    click Request Numbers to submit a request and track it here.
+                </p>
+                <a href="#" type="action" name="%(action_voip_did_number_search_wizard)d" class="btn btn-primary">Buy a Number</a>
+            </div>
+        </field>
     </record>
 </odoo>

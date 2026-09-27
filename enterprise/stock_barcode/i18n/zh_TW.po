@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"POT-Creation-Date: 2026-09-25 17:45+0000\n"
 "PO-Revision-Date: 2026-09-17 23:13+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
@@ -171,6 +171,11 @@ msgid ""
 "A product tracked by serial numbers can't have multiple quantities for the "
 "same serial number."
 msgstr "以序號追蹤的產品，同一個序號中不可有多個數量。"
+
+#. module: stock_barcode
+#: model:ir.model,name:stock_barcode.model_res_groups
+msgid "Access Groups"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -331,6 +336,7 @@ msgstr "缺貨訂單確認"
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__product_barcode
 #: model:ir.module.module,shortdesc:base.module_stock_barcode
 #: model:ir.ui.menu,name:stock_barcode.stock_barcode_menu
+#: model:res.groups.privilege,name:stock_barcode.res_groups_privilege_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:stock_barcode.view_picking_form
 msgid "Barcode"
@@ -646,6 +652,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_barcode.field_product_product__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_product_uom__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:stock_barcode.field_res_groups__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_res_partner__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_backorder_confirmation__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__display_name
@@ -911,6 +918,7 @@ msgstr "隱藏批次名稱"
 #: model:ir.model.fields,field_description:stock_barcode.field_product_product__id
 #: model:ir.model.fields,field_description:stock_barcode.field_product_uom__id
 #: model:ir.model.fields,field_description:stock_barcode.field_res_config_settings__id
+#: model:ir.model.fields,field_description:stock_barcode.field_res_groups__id
 #: model:ir.model.fields,field_description:stock_barcode.field_res_partner__id
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_backorder_confirmation__id
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__id
@@ -1142,6 +1150,7 @@ msgstr "靜音條碼應用程式聲效"
 #. module: stock_barcode
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__restrict_put_in_pack__no
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__restrict_scan_dest_location__no
+#: model:res.groups.privilege,placeholder:stock_barcode.res_groups_privilege_barcode
 msgid "No"
 msgstr "否"
 
@@ -2416,6 +2425,11 @@ msgid "Use barcode scanners to process logistics operations"
 msgstr ""
 
 #. module: stock_barcode
+#: model:res.groups,name:stock_barcode.group_barcode_user
+msgid "User"
+msgstr ""
+
+#. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
 #: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
@@ -2547,6 +2561,12 @@ msgstr "你必須掃瞄包裹或放入包裹"
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "You must scan a product"
 msgstr "必須掃瞄產品"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "e.g. LOT-PR-00012"
+msgstr ""
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.view_backorder_confirmation

@@ -30,6 +30,14 @@ class TestFsSaleWithTravelInoice(TestPlanningFieldServiceSaleTimesheetCommon):
         self.intervention.action_complete()
         self.assertNotIn(self.travel_product, self.intervention.sale_order_id.order_line.product_id)
 
+    def test_planning_user_without_sale_access_can_complete_with_travel_fee(self):
+        """ A planning user with no access to the Sales app (i.e. not a salesman/accountant)
+        must still be able to complete their own intervention when travel fees are enabled,
+        as the resulting sale.order.line creation should not depend on their Sales rights. """
+        self.assertFalse(self.george_user.has_group('sales_team.group_sale_salesman'))
+        self.intervention.with_user(self.george_user).action_complete()
+        self.assertIn(self.travel_product, self.intervention.sale_order_id.order_line.product_id)
+
     def test_delete_or_archive_travel_fee(self):
         with self.assertRaises(UserError):
             self.env.company.travel_time_invoicing_product_id.action_archive()

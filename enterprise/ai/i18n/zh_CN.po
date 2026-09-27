@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
 "PO-Revision-Date: 2026-09-17 23:39+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
@@ -409,13 +409,11 @@ msgid ""
 "            Search for records and their values in the database.\n"
 "            Ideal for \"Do I have...\", \"Is there any\", \"What is the name "
 "of\", searching for relations, ...\n"
+"            Returns {records, total_count} and a pagination hint when more "
+"rows remain; by default only display_name is fetched (pass `fields` for "
+"more) and at most 50 rows (max 200) are returned.\n"
 "        "
 msgstr ""
-"\n"
-"            在数据库中搜索记录及其值。\n"
-"            适用于“我是否有……”、“是否有任何……”、“名称是什么……”、查找关联关系"
-"等场景。\n"
-"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_group
@@ -618,7 +616,7 @@ msgstr ""
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_composer_unique_agent_interface_model
-msgid "A rule with this Agent, Action and Model combination already exists."
+msgid "A rule with this Action and Model combination already exists."
 msgstr ""
 
 #. module: ai
@@ -910,8 +908,8 @@ msgstr "AI 正在听..."
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_composer
-msgid "AI model configurations (system prompts) for text drafting."
-msgstr "用作编写文本草稿的 AI 模型配置（系统提示）。"
+msgid "AI model configurations (Default Prompt) for text drafting."
+msgstr ""
 
 #. module: ai
 #. odoo-python
@@ -1436,6 +1434,13 @@ msgstr "自定义设定，以控制相关程度及格式。"
 msgid ""
 "Declined by the user. Do not attempt to run this sub-agent again unless "
 "explicitly instructed."
+msgstr ""
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_prompt_button
+msgid ""
+"Default action prompt that can be attached to AI UI rules for quick access "
+"by the user."
 msgstr ""
 
 #. module: ai
@@ -2404,12 +2409,6 @@ msgid "Prompt"
 msgstr "提示"
 
 #. module: ai
-#: model:ir.model,name:ai.model_ai_prompt_button
-msgid ""
-"Prompt that can be attached to AI UI rules for quick access by the user."
-msgstr "可附加到人工智能用户界面规则的提示，以便用户快速访问。"
-
-#. module: ai
 #: model:ir.model.fields,help:ai.field_ir_actions_server__ai_action_prompt
 #: model:ir.model.fields,help:ai.field_ir_cron__ai_action_prompt
 msgid "Prompt used by \"AI\" action"
@@ -3027,6 +3026,12 @@ msgstr "参数“%(name)s ”的值与任何预期模式均不匹配。"
 
 #. module: ai
 #. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "The value of the parameter '%(name)s' must be at least %(minimum)s."
+msgstr ""
+
+#. module: ai
+#. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid ""
 "The web grounding option is not supported with tools. Use the web search "
@@ -3546,6 +3551,26 @@ msgstr ""
 #: code:addons/ai/models/ai_session.py:0
 msgid "✅ Auto-approval enabled for this chat."
 msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "            Search for records and their values in the database.\n"
+#~ "            Ideal for \"Do I have...\", \"Is there any\", \"What is the "
+#~ "name of\", searching for relations, ...\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "            在数据库中搜索记录及其值。\n"
+#~ "            适用于“我是否有……”、“是否有任何……”、“名称是什么……”、查找关联关"
+#~ "系等场景。\n"
+#~ "        "
+
+#~ msgid "AI model configurations (system prompts) for text drafting."
+#~ msgstr "用作编写文本草稿的 AI 模型配置（系统提示）。"
+
+#~ msgid ""
+#~ "Prompt that can be attached to AI UI rules for quick access by the user."
+#~ msgstr "可附加到人工智能用户界面规则的提示，以便用户快速访问。"
 
 #~ msgid "Channel Image"
 #~ msgstr "频道图片"

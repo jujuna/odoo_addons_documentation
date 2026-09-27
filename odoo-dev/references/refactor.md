@@ -12,7 +12,7 @@ commits `6e777ba` `89ca0cb` `358c5ec` in `custom_addons/gec_odoo_modules`).
 "Much shorter" is rarely true for a working integration module. Measure before promising:
 
 ```bash
-python .claude/skills/odoo-dev/scripts/code_inventory.py snapshot <module_dir> -o /tmp/before.json
+python .claude/skills/odoo-dev/scripts/code_inventory.py snapshot <module_dir> -o <scratchpad>/before.json
 ```
 
 | rs_einvoice / rs_base_methods | Before | After 4 phases |

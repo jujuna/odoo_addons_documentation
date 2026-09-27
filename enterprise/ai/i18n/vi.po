@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
 "PO-Revision-Date: 2026-09-17 23:39+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
@@ -373,6 +373,9 @@ msgid ""
 "            Search for records and their values in the database.\n"
 "            Ideal for \"Do I have...\", \"Is there any\", \"What is the name "
 "of\", searching for relations, ...\n"
+"            Returns {records, total_count} and a pagination hint when more "
+"rows remain; by default only display_name is fetched (pass `fields` for "
+"more) and at most 50 rows (max 200) are returned.\n"
 "        "
 msgstr ""
 
@@ -550,7 +553,7 @@ msgstr ""
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_composer_unique_agent_interface_model
-msgid "A rule with this Agent, Action and Model combination already exists."
+msgid "A rule with this Action and Model combination already exists."
 msgstr ""
 
 #. module: ai
@@ -842,8 +845,8 @@ msgstr ""
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_composer
-msgid "AI model configurations (system prompts) for text drafting."
-msgstr "Cấu hình mô hình AI (yêu cầu hệ thống) cho việc soạn thảo văn bản."
+msgid "AI model configurations (Default Prompt) for text drafting."
+msgstr ""
 
 #. module: ai
 #. odoo-python
@@ -1357,6 +1360,13 @@ msgstr "Tùy chỉnh để kiểm soát mức độ liên quan và định dạn
 msgid ""
 "Declined by the user. Do not attempt to run this sub-agent again unless "
 "explicitly instructed."
+msgstr ""
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_prompt_button
+msgid ""
+"Default action prompt that can be attached to AI UI rules for quick access "
+"by the user."
 msgstr ""
 
 #. module: ai
@@ -2320,12 +2330,6 @@ msgid "Prompt"
 msgstr "Yêu cầu"
 
 #. module: ai
-#: model:ir.model,name:ai.model_ai_prompt_button
-msgid ""
-"Prompt that can be attached to AI UI rules for quick access by the user."
-msgstr ""
-
-#. module: ai
 #: model:ir.model.fields,help:ai.field_ir_actions_server__ai_action_prompt
 #: model:ir.model.fields,help:ai.field_ir_cron__ai_action_prompt
 msgid "Prompt used by \"AI\" action"
@@ -2925,6 +2929,12 @@ msgstr ""
 
 #. module: ai
 #. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "The value of the parameter '%(name)s' must be at least %(minimum)s."
+msgstr ""
+
+#. module: ai
+#. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid ""
 "The web grounding option is not supported with tools. Use the web search "
@@ -3448,6 +3458,9 @@ msgstr ""
 #: code:addons/ai/models/ai_session.py:0
 msgid "✅ Auto-approval enabled for this chat."
 msgstr ""
+
+#~ msgid "AI model configurations (system prompts) for text drafting."
+#~ msgstr "Cấu hình mô hình AI (yêu cầu hệ thống) cho việc soạn thảo văn bản."
 
 #~ msgid "Checksum/SHA1"
 #~ msgstr "Checksum/SHA1"

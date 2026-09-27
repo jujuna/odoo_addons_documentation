@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
 "PO-Revision-Date: 2026-09-18 01:42+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
@@ -1464,7 +1464,7 @@ msgstr ""
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
-"tax grids."
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -1658,7 +1658,8 @@ msgstr "Bank va naqd pul hisobvaraqlari"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
-"Bank transactions are reconciled to avoid any missing VAT invoices or bills."
+"Bank reconciliation helps identify missing invoices or bills that may affect "
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -3474,7 +3475,9 @@ msgstr ""
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
-msgid "Ensure the taxes on invoices and bills match the customer’s country."
+msgid ""
+"Ensures that applied taxes and fiscal positions match the customer or vendor "
+"country location."
 msgstr ""
 
 #. module: account_reports
@@ -5178,15 +5181,11 @@ msgstr "Mavjud emas"
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
-#, fuzzy
 msgid ""
-"Missing company details (like VAT number or country) can cause errors in "
-"your report, such as using the wrong VAT rate, wrongly exempting "
+"Missing company details (like %(vat_label)s or country) can cause errors in "
+"your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
-"Kompaniya tafsilotlarining yetishmasligi (masalan, QQS raqami yoki mamlakat) "
-"hisobotingizda xatolarga olib kelishi mumkin, jumladan noto‘g‘ri QQS "
-"stavkasidan foydalanish yoki tranzaksiyalarni noto‘g‘ri ozod qilish."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -6823,12 +6822,6 @@ msgid "Review"
 msgstr "Ko‘rib chiqish"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "Review Abnormal/To Review invoices and bills, and post drafts."
-msgstr ""
-
-#. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_foreign_exchange_differences
 #, fuzzy
 msgid ""
@@ -6869,6 +6862,14 @@ msgstr ""
 #, fuzzy
 msgid "Review for capitalizable expenses"
 msgstr "Kapitallashtiriladigan xarajatlarni ko‘rib chiqish"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid ""
+"Review invoices, bills and entries which are either in draft or marked as "
+"Anomaly/To Review."
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -7045,6 +7046,12 @@ msgstr "Qidirish..."
 #, fuzzy
 msgid "Sections"
 msgstr "Bo‘limlar"
+
+#. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
+msgid "Select or type a value"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -7261,6 +7268,14 @@ msgstr ""
 #, fuzzy
 msgid "Single Recipient"
 msgstr "Yagona qabul qiluvchi"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_report.py:0
+#: model:ir.model.fields,field_description:account_reports.field_account_report__snapshot_ids
+#: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
+msgid "Snapshots"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -7543,9 +7558,21 @@ msgstr "Soliq davriyligi"
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Rate & Country Consistency"
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
 #, fuzzy
 msgid "Tax Received Adjustment"
 msgstr "Olingan soliq tuzatishi"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Reconciliation"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -7667,13 +7694,6 @@ msgstr "Soliqlar"
 #, fuzzy
 msgid "Taxes Applied"
 msgstr "Qo‘llanilgan soliqlar"
-
-#. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-#, fuzzy
-msgid "Taxes and countries matching"
-msgstr "Soliqlar va mamlakatlar mosligi"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_tax_unit__fpos_synced
@@ -8406,12 +8426,6 @@ msgid "VAT Numbers"
 msgstr "QQS raqamlari"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "VAT Reconciliation"
-msgstr ""
-
-#. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_vat_rate_compliance
 msgid "VAT rate compliance"
 msgstr ""
@@ -9082,6 +9096,21 @@ msgstr ""
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#, fuzzy
+#~ msgid ""
+#~ "Missing company details (like VAT number or country) can cause errors in "
+#~ "your report, such as using the wrong VAT rate, wrongly exempting "
+#~ "transactions."
+#~ msgstr ""
+#~ "Kompaniya tafsilotlarining yetishmasligi (masalan, QQS raqami yoki "
+#~ "mamlakat) hisobotingizda xatolarga olib kelishi mumkin, jumladan "
+#~ "noto‘g‘ri QQS stavkasidan foydalanish yoki tranzaksiyalarni noto‘g‘ri "
+#~ "ozod qilish."
+
+#, fuzzy
+#~ msgid "Taxes and countries matching"
+#~ msgstr "Soliqlar va mamlakatlar mosligi"
 
 #, fuzzy
 #~ msgid "Configure your tax accounts"

@@ -589,7 +589,7 @@ class PlanningSlot(models.Model):
         if self.company_id.field_service_travel_fees and (quantity := self._get_travel_fee_quantity()):
             self._ensure_sale_order_set()
             product = self.company_id.travel_time_invoicing_product_id.product_variant_id
-            self.env["sale.order.line"].create({
+            self.env["sale.order.line"].sudo().create({
                 **self._get_sale_order_line_vals(),
                 'product_id': product.id,
                 'product_uom_qty': quantity,

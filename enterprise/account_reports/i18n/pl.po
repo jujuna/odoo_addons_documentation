@@ -34,7 +34,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
 "PO-Revision-Date: 2026-09-18 01:41+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
@@ -1368,7 +1368,7 @@ msgstr ""
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
-"tax grids."
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -1537,7 +1537,8 @@ msgstr "Konta bankowe i gotówkowe"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
-"Bank transactions are reconciled to avoid any missing VAT invoices or bills."
+"Bank reconciliation helps identify missing invoices or bills that may affect "
+"taxes."
 msgstr ""
 
 #. module: account_reports
@@ -3198,9 +3199,10 @@ msgstr ""
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
-msgid "Ensure the taxes on invoices and bills match the customer’s country."
+msgid ""
+"Ensures that applied taxes and fiscal positions match the customer or vendor "
+"country location."
 msgstr ""
-"Upewnij się, że podatki na fakturach i rachunkach pasują do kraju klienta."
 
 #. module: account_reports
 #. odoo-python
@@ -4722,13 +4724,10 @@ msgstr "Brakujące"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid ""
-"Missing company details (like VAT number or country) can cause errors in "
-"your report, such as using the wrong VAT rate, wrongly exempting "
+"Missing company details (like %(vat_label)s or country) can cause errors in "
+"your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
-"Brak danych firmy (takich jak numer VAT lub kraj) może powodować błędy w "
-"raporcie, np. stosowanie niewłaściwej stawki VAT lub błędne zwolnienie "
-"transakcji z podatku."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -6185,12 +6184,6 @@ msgid "Review"
 msgstr "Recenzja"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "Review Abnormal/To Review invoices and bills, and post drafts."
-msgstr ""
-
-#. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_foreign_exchange_differences
 msgid ""
 "Review FX rates used at year-end, compare with prior year, and verify "
@@ -6230,6 +6223,14 @@ msgstr ""
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_for_capitalizable_expenses
 msgid "Review for capitalizable expenses"
 msgstr "Przegląd wydatków podlegających kapitalizacji"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid ""
+"Review invoices, bills and entries which are either in draft or marked as "
+"Anomaly/To Review."
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6387,6 +6388,12 @@ msgstr "Szukaj..."
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
 msgid "Sections"
 msgstr "Sekcje"
+
+#. module: account_reports
+#. odoo-javascript
+#: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
+msgid "Select or type a value"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -6581,6 +6588,14 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account_reports.selection__account_report_send__mode__single
 msgid "Single Recipient"
 msgstr "Pojedynczy odbiorca"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_report.py:0
+#: model:ir.model.fields,field_description:account_reports.field_account_report__snapshot_ids
+#: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
+msgid "Snapshots"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -6840,8 +6855,20 @@ msgstr "Okresowość podatkowa"
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Rate & Country Consistency"
+msgstr ""
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Received Adjustment"
 msgstr "Korekta otrzymanego podatku"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "Tax Reconciliation"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -6953,12 +6980,6 @@ msgstr "Podatki"
 #: code:addons/account_reports/static/src/components/journal_report/line/line.xml:0
 msgid "Taxes Applied"
 msgstr "Zastosowane podatki"
-
-#. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "Taxes and countries matching"
-msgstr "Podatki i pasujące kraje"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_tax_unit__fpos_synced
@@ -7612,12 +7633,6 @@ msgid "VAT Numbers"
 msgstr "Nip-y"
 
 #. module: account_reports
-#. odoo-python
-#: code:addons/account_reports/models/account_return.py:0
-msgid "VAT Reconciliation"
-msgstr ""
-
-#. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_vat_rate_compliance
 msgid "VAT rate compliance"
 msgstr "Zgodność ze stawką VAT"
@@ -8247,6 +8262,22 @@ msgstr ""
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#~ msgid "Ensure the taxes on invoices and bills match the customer’s country."
+#~ msgstr ""
+#~ "Upewnij się, że podatki na fakturach i rachunkach pasują do kraju klienta."
+
+#~ msgid ""
+#~ "Missing company details (like VAT number or country) can cause errors in "
+#~ "your report, such as using the wrong VAT rate, wrongly exempting "
+#~ "transactions."
+#~ msgstr ""
+#~ "Brak danych firmy (takich jak numer VAT lub kraj) może powodować błędy w "
+#~ "raporcie, np. stosowanie niewłaściwej stawki VAT lub błędne zwolnienie "
+#~ "transakcji z podatku."
+
+#~ msgid "Taxes and countries matching"
+#~ msgstr "Podatki i pasujące kraje"
 
 #~ msgid "Configure your tax accounts"
 #~ msgstr "Konfiguracja kont podatkowych"

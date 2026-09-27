@@ -72,7 +72,7 @@ if self._has_cycle():
 
 ---
 
-## 2. Security — non-negotiable
+## 2. Security
 
 - Groups in `security/<module>_security.xml`, **first** in manifest `data`
 - Access in `security/ir.access.csv`, **last** in manifest `data`
@@ -89,7 +89,7 @@ if self._has_cycle():
 - No secrets in XML/data files, never log passwords/tokens/keys
 - Portal and public routes: verify ownership, return 404 (not 403) on mismatch
 
-## 3. Multi-company — non-negotiable
+## 3. Multi-company
 
 Every model that stores business data is multi-company until proven otherwise.
 
@@ -102,7 +102,7 @@ Every model that stores business data is multi-company until proven otherwise.
 
 Details, domains and the branch-company (`parent_of`) rules: `multicompany.md`.
 
-## 4. Dependency safety — non-negotiable
+## 4. Dependency safety
 
 Before changing anything that already exists (a core method, a core field, a core view, a
 public method of ours), run the sweep in `dependencies.md` and state the result in the

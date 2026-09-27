@@ -8,7 +8,9 @@ description: >
   inheritance, jsonrpc/JSON-2 API, compute_sql, performance, security, multi-company, and
   customization requests. Also triggers for code quality reviews and "make my code better /
   shorter / cleaner without changing logic", Odoo business module learning, documentation
-  requests, and "how does X work in Odoo".
+  requests (module READMEs: odoo-readme), and "how does X work in Odoo" when the answer lives
+  in the code. Client discovery, configuration choices and teaching consultants belong to
+  odoo-consultant.
 ---
 
 # Odoo 20 Development Skill
@@ -26,7 +28,7 @@ changed from 19. If you are about to write something you remember from v19, chec
 1. **Smallest change wins.** Take the highest option that solves the task: config → extend
    an existing method → add a field/method → new model → new module. A new model, wizard,
    menu or setting needs a stated reason.
-2. **No overthinking.** Solve the case in front of you. No abstraction for one caller, no
+2. **No over-engineering.** Solve the case in front of you. No abstraction for one caller, no
    setting with one realistic value, no future-proofing.
 3. **Proof, not guessing.** Every claim needs a source file+line, a `psql SELECT`, or a test
    run. Otherwise say "not verified — assumption". Never invent a field, method or option.
@@ -73,7 +75,7 @@ Load **only** the file(s) the current task needs.
 |---|---|
 | `references/simplicity.md` | the law — outranks every other file |
 | `references/dependencies.md` | impact sweep + precedent search before touching anything |
-| `references/guardrails.md` | v20 API forms, banned patterns (internalize; load when unsure) |
+| `references/guardrails.md` | v20 API forms and banned patterns |
 
 ### v20 specifics
 | Task | File |
@@ -108,7 +110,7 @@ Proof scripts for refactors (inventory, dead code, split check, old-vs-new harne
 check) live in `scripts/`; `references/refactor.md` section 9 says which proves what.
 
 **Auto-load rules**
-- Any code change → `simplicity.md` + `dependencies.md`
+- Any code change → `simplicity.md` + `dependencies.md` + `guardrails.md`
 - New model or field storing business data → `multicompany.md`
 - Any security file → `security.md`
 - Full module request → `scaffold.md`
@@ -127,7 +129,8 @@ check) live in `scripts/`; `references/refactor.md` section 9 says which proves 
 2. **`learn/document`** → Documentation Workflow below
    **`review` / `refactor`** → `refactor.md`: measure first, plan per phase, the user approves
    each phase and commits it; bugs found are listed, never fixed inside the refactor
-3. **Code tasks** → load `simplicity.md` + `dependencies.md` + the matching area file(s)
+3. **Code tasks** → load `simplicity.md` + `dependencies.md` + `guardrails.md` + the
+   matching area file(s)
 4. **Sweep** — find callers, overrides, inheriting views, and the core precedent. State the
    result in the answer.
 5. **Write** the minimal correct code for the request scope, multi-company aware, with its
@@ -143,8 +146,8 @@ check) live in `scripts/`; `references/refactor.md` section 9 says which proves 
 - Lead with the one-sentence answer, then the proof: a source line, a real example, numbers.
 - Concrete beats abstract ("invoice 123 posts 100 GEL to 3120" beats "the payment logic
   reconciles the counterpart").
-- A few lines plus one snippet or one small table. No walls of text, no restating the
-  question, no listing what you did not check.
+- As short as the answer allows, with a snippet or a small table where it carries the proof.
+  No walls of text, no restating the question, no listing what you did not check.
 - If the honest answer is "not verified", say it in the first line.
 
 ---
