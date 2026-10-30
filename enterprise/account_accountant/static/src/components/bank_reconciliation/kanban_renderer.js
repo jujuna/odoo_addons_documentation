@@ -143,7 +143,7 @@ export class BankRecKanbanRenderer extends KanbanRenderer {
     async actionReviewStatement(statementId) {
         const action = await this.orm.call(
             "account.bank.statement",
-            "action_open_statements_to_review",
+            "action_open_review_statements",
             [statementId],
             { context: this.globalState.context }
         );

@@ -126,7 +126,9 @@ class HelpdeskTicket(models.Model):
         :rtype: set[int]
         """
         self.ensure_one()
-        if not self.embedding_ids or not all(emb.embedding_vector for emb in self.embedding_ids):
+        # sudo: ai.embedding - only used to check that the ticket embeddings are computed
+        embeddings_sudo = self.sudo().embedding_ids
+        if not embeddings_sudo or not all(emb.embedding_vector for emb in embeddings_sudo):
             return self.env["helpdesk.ticket"]
 
         if not self.team_id.ai_agent_id:

@@ -13,15 +13,16 @@
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:07+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
+"POT-Creation-Date: 2026-10-02 17:46+0000\n"
+"PO-Revision-Date: 2026-10-11 06:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/sale_subscription/zh_Hans/>\n"
+"projects/odoo-20/sale_subscription/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -53,6 +54,13 @@ msgid ""
 "    - Modify subscriptions with sales orders\n"
 "    - Generate invoice automatically at fixed intervals\n"
 msgstr ""
+"\n"
+"本模块可让您管理订阅。\n"
+"\n"
+"功能：\n"
+"    - 创建并编辑订阅\n"
+"    - 通过销售订单修改订阅\n"
+"    - 按固定间隔自动生成发票\n"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__nbr
@@ -135,7 +143,7 @@ msgstr "* 这些经常性产品的附加费，基于以下时段按比例计算�
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "- Until"
-msgstr ""
+msgstr "- 至"
 
 #. module: sale_subscription
 #. odoo-python
@@ -150,6 +158,8 @@ msgid ""
 "             Any new delivered quantity during this period for the following "
 "product(s) may never be invoiced:"
 msgstr ""
+".\n"
+"             此期间内以下产品的新增已交付数量可能永远不会被开具发票："
 
 #. module: sale_subscription
 #. odoo-python
@@ -177,7 +187,7 @@ msgstr "6个月"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_advance_payment_inv_sale_subscription
 msgid "<b>Subscriptions</b><br/>"
-msgstr ""
+msgstr "<b>订阅</b><br/>"
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.mail_template_subscription_rating
@@ -395,7 +405,7 @@ msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>返回您的订阅"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> To Renew"
-msgstr ""
+msgstr "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> 待续订"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -438,7 +448,7 @@ msgstr "<small class=\"text-600\">自动支付已关联订阅计划的费用</sm
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<small class=\"text-muted\">Plan</small>"
-msgstr ""
+msgstr "<small class=\"text-muted\">计划</small>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -489,6 +499,8 @@ msgid ""
 "<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
 "data-icon=\"check\"/> In Progress</span>"
 msgstr ""
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> 进行中</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -566,17 +578,17 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Invoices</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">发票</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Period</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">期间</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Plan</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">计划</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
@@ -980,7 +992,7 @@ msgstr "附件数量"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
 msgid "Attributes"
-msgstr ""
+msgstr "属性"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__authorized
@@ -1211,7 +1223,7 @@ msgstr "选择一个产品的名字<br/><i>（例如网络访问）。</i>"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Choose a reason..."
-msgstr ""
+msgstr "选择原因…"
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -1260,7 +1272,7 @@ msgstr "关闭"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_date
 msgid "Close Date"
-msgstr ""
+msgstr "关闭日期"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__close_reason_id
@@ -1288,7 +1300,7 @@ msgstr "关闭订阅"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Close the recurring plan dropdown."
-msgstr ""
+msgstr "关闭循环计划下拉菜单。"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__user_closable_options
@@ -1324,6 +1336,8 @@ msgid ""
 "0,1,2,7,14,-2,-7,-14) on which a payment reminder is sent for subscriptions "
 "with no saved payment token."
 msgstr ""
+"以逗号分隔的日期偏移列表，相对于下一发票日期（例如 0,1,2,7,14,-2,-7,-14），在"
+"这些日期为未保存支付令牌的订阅发送付款提醒。"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
@@ -1332,6 +1346,8 @@ msgid ""
 "0,1,2,7,14,-2,-7,-14) on which a reminder is sent for subscriptions with no "
 "saved payment token."
 msgstr ""
+"以逗号分隔的日期偏移列表，相对于下一发票日期（例如 0,1,2,7,14,-2,-7,-14），在"
+"这些日期为未保存支付令牌的订阅发送提醒。"
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_res_config_settings__payment_failed_reminder_days
@@ -1339,6 +1355,8 @@ msgid ""
 "Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
 "reminder email is sent when an automatic payment with a saved token fails."
 msgstr ""
+"以逗号分隔的发票日期后天数列表（例如 2,7,14），当使用已保存令牌的自动付款失败"
+"时，在这些日期发送提醒邮件。"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
@@ -1346,6 +1364,8 @@ msgid ""
 "Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
 "reminder is sent when an automatic payment fails."
 msgstr ""
+"以逗号分隔的发票日期后天数列表（例如 2,7,14），当自动付款失败时，在这些日期发"
+"送提醒。"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__commercial_partner_id
@@ -1610,37 +1630,37 @@ msgstr "定义该订阅产品是否也可作为一次性购买。"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s months"
-msgstr ""
+msgstr "每 %s 个月交付一次"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s weeks"
-msgstr ""
+msgstr "每 %s 周交付一次"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s years"
-msgstr ""
+msgstr "每 %s 年交付一次"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every month"
-msgstr ""
+msgstr "每月交付一次"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every week"
-msgstr ""
+msgstr "每周交付一次"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every year"
-msgstr ""
+msgstr "每年交付一次"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
@@ -1650,7 +1670,7 @@ msgstr "送货地址"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__delivery_period_display
 msgid "Delivery Period Display"
-msgstr ""
+msgstr "交付周期显示"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
@@ -1660,7 +1680,7 @@ msgstr "详情"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Discard"
-msgstr ""
+msgstr "丢弃"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -1746,7 +1766,7 @@ msgstr "草稿"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Due"
-msgstr ""
+msgstr "截止"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template__duration_unit
@@ -1808,7 +1828,7 @@ msgstr "服务期完结时"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid "Error during renewal of contract %(order_ids)s %(order_refs)s"
-msgstr ""
+msgstr "续订合同 %(order_ids)s %(order_refs)s 时出错"
 
 #. module: sale_subscription
 #. odoo-python
@@ -1838,12 +1858,12 @@ msgstr "加大"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__purchase_price
 msgid "Expected Cost"
-msgstr ""
+msgstr "预期成本"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Extend Until"
-msgstr ""
+msgstr "延长至"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
@@ -1887,7 +1907,7 @@ msgstr "关注者（合作伙伴）"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "For"
-msgstr ""
+msgstr "对于"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
@@ -1913,7 +1933,7 @@ msgstr "生成销售付款链接"
 #. module: sale_subscription
 #: model:ir.module.module,summary:base.module_sale_subscription
 msgid "Generate recurring invoices and manage renewals"
-msgstr ""
+msgstr "生成经常性发票并管理续订"
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2053,14 +2073,14 @@ msgstr "如果设置了，在确认带有这个产品的订单的时候会创建
 msgid ""
 "If you change the pricelist, the prices of all order lines will be updated "
 "accordingly."
-msgstr ""
+msgstr "如果您更改价格表，所有订单行的价格将随之更新。"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid ""
 "If you wish to reopen it, you can pay your invoice for the current invoicing "
 "period"
-msgstr ""
+msgstr "如果您希望重新开放，可以支付当前计费周期的发票"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -2386,7 +2406,7 @@ msgstr "毛利"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin_percent
 msgid "Margin (%)"
-msgstr ""
+msgstr "毛利率（%）"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__medium_id
@@ -2430,7 +2450,7 @@ msgstr "每月"
 #. module: sale_subscription
 #: model:sale.order.template,name:sale_subscription.monthly_template
 msgid "Monthly Cleaning"
-msgstr ""
+msgstr "每月清洁"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_monthly
@@ -2447,7 +2467,7 @@ msgstr "每月经常性收入"
 #. module: sale_subscription
 #: model:product.template,description_sale:sale_subscription.product_car_leasing_product_template
 msgid "Monthly lease for city or business driving"
-msgstr ""
+msgstr "适合城市或商务出行的按月租赁"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_template__duration_unit__month
@@ -2578,7 +2598,7 @@ msgstr "无有效付款方式"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__no_token_reminder_days
 msgid "No-token payment reminder days"
-msgstr ""
+msgstr "无令牌付款提醒天数"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2655,7 +2675,7 @@ msgstr "办公室清洁服务"
 msgid ""
 "Onboarding example showing how the app tracks customer subscriptions and "
 "visualizes MRR growth."
-msgstr ""
+msgstr "入门示例，展示该应用如何跟踪客户订阅并可视化月度经常性收入（MRR）增长。"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2690,7 +2710,7 @@ msgstr "订单发票状态"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_name
 msgid "Order Line Name"
-msgstr ""
+msgstr "订单行名称"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__name
@@ -2705,7 +2725,7 @@ msgstr "订单状态"
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_order_template
 msgid "Order Templates"
-msgstr ""
+msgstr "订单模板"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__origin_order_id
@@ -2829,7 +2849,7 @@ msgstr "付款交易"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__payment_failed_reminder_days
 msgid "Payment failure reminder days"
-msgstr ""
+msgstr "付款失败提醒天数"
 
 #. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.email_payment_reminder
@@ -2868,7 +2888,7 @@ msgstr "安排"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/product/product.xml:0
 msgid "Plan not available"
-msgstr ""
+msgstr "计划不可用"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2987,7 +3007,7 @@ msgstr "产品"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Prorated"
-msgstr ""
+msgstr "按比例"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_prorated_price
@@ -3130,12 +3150,12 @@ msgstr "定期"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_total
 msgid "Recurring Amount"
-msgstr ""
+msgstr "经常性金额"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
 msgid "Recurring Invoice"
-msgstr ""
+msgstr "经常性发票"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__plan_id
@@ -3172,14 +3192,14 @@ msgstr "周期收益"
 msgid ""
 "Recurring order with this product will be invoiced at the beginning of the "
 "period."
-msgstr ""
+msgstr "包含此产品的经常性订单将在计费周期开始时开具发票。"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/product_template.py:0
 msgid ""
 "Recurring order with this product will be invoiced at the end of the period."
-msgstr ""
+msgstr "包含此产品的经常性订单将在计费周期结束时开具发票。"
 
 #. module: sale_subscription
 #. odoo-python
@@ -3412,7 +3432,7 @@ msgstr "保存"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Save your subscription."
-msgstr ""
+msgstr "保存您的订阅。"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
@@ -3434,13 +3454,13 @@ msgstr "选择经常性产品"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select this product."
-msgstr ""
+msgstr "选择此产品。"
 
 #. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select this recurring plan."
-msgstr ""
+msgstr "选择此循环计划。"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -3500,7 +3520,7 @@ msgstr "设置"
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_account_move_send
 msgid "Shared Send Invoice Wizard Functions"
-msgstr ""
+msgstr "共用开票向导功能"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__starred
@@ -3532,7 +3552,7 @@ msgstr "开始日期："
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Started"
-msgstr ""
+msgstr "开始于"
 
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_state_change
@@ -3542,7 +3562,7 @@ msgstr "状态变更"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
 msgid "State before"
-msgstr ""
+msgstr "变更前状态"
 
 #. module: sale_subscription
 #. odoo-python
@@ -3679,7 +3699,7 @@ msgstr "订阅价目表规则"
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__subscription_rule_ids
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__subscription_rule_ids
 msgid "Subscription Pricings"
-msgstr ""
+msgstr "订阅定价"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__recurring_invoice
@@ -3803,7 +3823,7 @@ msgid ""
 "Subscriptions late in renewing (e.g., automatic payment is failing "
 "continuously,customer didn't pay, etc.) will be automatically closed after "
 "this period."
-msgstr ""
+msgstr "续订滞后的订阅（例如自动付款持续失败、客户未付款等）将在此期限后自动关闭。"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -3948,7 +3968,7 @@ msgstr "将在此日期上创建下一张结算单，那么期间将会延长。
 msgid ""
 "The payment method you selected can only pay amounts starting from %s. "
 "Please create or select another one."
-msgstr ""
+msgstr "您选择的支付方式只能支付从 %s 起的金额。请创建或选择其他支付方式。"
 
 #. module: sale_subscription
 #. odoo-python
@@ -3997,6 +4017,8 @@ msgid ""
 "You should first invoice the original subscription, use an earlier start "
 "date for the upsell or create a renewal quotation."
 msgstr ""
+"追加销售的开始日期不能大于或等于订阅 %s 的下一发票日期。\n"
+"您应先为原始订阅开具发票、为追加销售使用更早的开始日期，或创建续订报价。"
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_renew
@@ -4056,7 +4078,7 @@ msgid ""
 "This payment method cannot be deleted, because it is currently linked to "
 "the\n"
 "                following active subscriptions:"
-msgstr ""
+msgstr "无法删除此支付方式，因为它当前关联到以下有效订阅："
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -4068,7 +4090,7 @@ msgstr "该订阅已被客户暂停至"
 msgid ""
 "This subscription is overdue and exceeds the auto-close limit of the "
 "recurring plan. It will be closed soon by the system."
-msgstr ""
+msgstr "此订阅已逾期并超出循环计划的自动关闭期限。系统将很快关闭它。"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4153,7 +4175,7 @@ msgstr "活动类型"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__utm_reference
 msgid "UTM Reference"
-msgstr ""
+msgstr "UTM 参考"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -4189,7 +4211,7 @@ msgstr "未付款订阅"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_delivered_amount
 msgid "Untaxed Amount Delivered"
-msgstr ""
+msgstr "已交付未税金额"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_amount_invoiced
@@ -4278,7 +4300,7 @@ msgstr "用户暂停开始时间"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Valid until"
-msgstr ""
+msgstr "有效期至"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__visible_in_portal
@@ -4316,7 +4338,7 @@ msgstr "仓库"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__warn_system_closing
 msgid "Warn System Closing"
-msgstr ""
+msgstr "系统关闭警告"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4358,7 +4380,7 @@ msgstr "周"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
 msgid "When"
-msgstr ""
+msgstr "时间"
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order__starred
@@ -4373,7 +4395,7 @@ msgstr "每年"
 #. module: sale_subscription
 #: model:sale.order.template,name:sale_subscription.yearly_template
 msgid "Yearly Cleaning"
-msgstr ""
+msgstr "每年清洁"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_yearly
@@ -4394,11 +4416,13 @@ msgid ""
 "                Any new delivered quantity during that period may never be "
 "invoiced."
 msgstr ""
+"您即将为按已交付数量开票的产品开具未来订阅期间的发票。\n"
+"                该期间内任何新增的已交付数量可能永远不会被开具发票。"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.invoice_warning_message
 msgid "You are about to invoice the subscription until the"
-msgstr ""
+msgstr "您即将为该订阅开具发票，直至"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_portal_templates_warnings
@@ -4415,7 +4439,7 @@ msgstr ""
 msgid ""
 "You can not change the recurring property of this product because it has "
 "been sold already (%s)"
-msgstr ""
+msgstr "您无法更改此产品的经常性属性，因为它已被售出（%s）"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4480,7 +4504,7 @@ msgstr ""
 msgid ""
 "You cannot generate a payment link for a recurring plan without a recurring "
 "product."
-msgstr ""
+msgstr "没有经常性产品，无法为循环计划生成付款链接。"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4488,7 +4512,7 @@ msgstr ""
 msgid ""
 "You cannot generate a payment link for a recurring product without a "
 "recurring plan."
-msgstr ""
+msgstr "没有循环计划，无法为经常性产品生成付款链接。"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4651,8 +4675,8 @@ msgstr "已存在于此订阅内，请确认或拒绝。"
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/res_partner.py:0
-msgid "is_subscription"
-msgstr "is_subscription"
+msgid "id"
+msgstr ""
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,retention_button_link:sale_subscription.close_reason_1
@@ -4766,6 +4790,9 @@ msgstr "{{ object.company_id.name }}:请检查订阅 {{ object.name }}."
 #: model:mail.template,subject:sale_subscription.mail_template_subscription_rating
 msgid "{{ object.company_id.name }}: Service Rating Request"
 msgstr "{{ object.company_id.name}}:服务要求评价"
+
+#~ msgid "is_subscription"
+#~ msgstr "is_subscription"
 
 #~ msgid "<i class=\"oi oi-fw\" data-icon=\"redo\"/> To Renew"
 #~ msgstr "<i class=\"oi oi-fw\" data-icon=\"redo\"/> 需续订"

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
 "PO-Revision-Date: 2026-09-18 02:49+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/sign/"
@@ -359,13 +359,6 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
-msgstr ""
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<small>SMS Verification: The signatory has confirmed their control of the "
-"phone number using a unique code sent by SMS</small>"
 msgstr ""
 
 #. module: sign
@@ -1996,18 +1989,6 @@ msgstr "Email"
 #: model:ir.model.fields,field_description:sign.field_sign_request__subject
 msgid "Email Subject"
 msgstr "Тема письма"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Email Verification"
-msgstr "Подтверждение электронной почты"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"Email Verification: The signatory has confirmed control of their email inbox "
-"by clicking on a unique link"
-msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -3706,11 +3687,6 @@ msgid "SMS Token"
 msgstr "SMS-токен"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "SMS Verification"
-msgstr ""
-
-#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "Продажи"
@@ -3794,6 +3770,11 @@ msgstr ""
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Поиск ( <span class=\"nolabel\"> в документе)</span>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Secure Link"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4779,6 +4760,11 @@ msgid "Subject"
 msgstr "Тема"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "System Account"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
 msgid "Tag Name"
 msgstr "Название тега"
@@ -5430,8 +5416,14 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Уникальный код через SMS"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Unique Link via Email"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5589,6 +5581,11 @@ msgstr "Значение"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "Ценность уже существует!"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Verification method"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6238,6 +6235,9 @@ msgstr "вы"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{0}} Summary"
 msgstr "{{0}} Сводка"
+
+#~ msgid "Email Verification"
+#~ msgstr "Подтверждение электронной почты"
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr "Разрешить подтверждение личности через itsme®"

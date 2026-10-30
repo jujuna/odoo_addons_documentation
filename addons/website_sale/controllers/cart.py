@@ -133,9 +133,32 @@ class Cart(PaymentPortal):
                 )
             )
         if not product or not product._is_add_to_cart_allowed():
-            raise UserError(
-                self.env._("The given product does not exist therefore it cannot be added to cart.")
-            )
+            raise UserError(self._get_product_user_error(product))
+
+        def check_selected_combo_items(combo_product, linked_products):
+            combo_item_products = [
+                linked_product for linked_product in linked_products or []
+                if (
+                    linked_product.get("combo_item_id")
+                    and linked_product.get("parent_product_template_id")
+                    == combo_product.sudo().product_tmpl_id.id
+                )
+            ]
+            combos_sudo = combo_product.sudo().product_tmpl_id.combo_ids
+            selected_combos_sudo = request.env['product.combo.item'].sudo().browse([
+                combo_item['combo_item_id'] for combo_item in combo_item_products
+            ]).combo_id
+            if (
+                len(combo_item_products) != len(combos_sudo)
+                or set(selected_combos_sudo.ids) != set(combos_sudo.ids)
+            ):
+                raise UserError(self.env._(
+                    "The number of selected combo items must match the number of available"
+                    " combo choices."
+                ))
+
+        if product.sudo().type == "combo":
+            check_selected_combo_items(product, linked_products)
 
         added_qty_per_line = {}
         values = order_sudo.with_context(skip_cart_verification=True)._cart_add(
@@ -160,6 +183,8 @@ class Cart(PaymentPortal):
                 product_sudo = (
                     self.env["product.product"].sudo().browse(product_data["product_id"]).exists()
                 )
+                if product_sudo.type == "combo":
+                    check_selected_combo_items(product_sudo, linked_products)
                 if product_data["quantity"] and (
                     not product_sudo
                     or (
@@ -169,11 +194,7 @@ class Cart(PaymentPortal):
                         and not product_data.get("combo_item_id")
                     )
                 ):
-                    raise UserError(
-                        self.env._(
-                            "The given product does not exist therefore it cannot be added to cart."
-                        )
-                    )
+                    raise UserError(self._get_product_user_error(product_sudo))
 
                 product_values = order_sudo.with_context(skip_cart_verification=True)._cart_add(
                     product_id=product_data["product_id"],
@@ -221,14 +242,31 @@ class Cart(PaymentPortal):
             warning = changed_reason
             values["quantity"] = updated_line.product_uom_qty
 
+        optional_combo_lines = order_sudo.env["sale.order.line"]
+        for linked_product_data in linked_products or []:
+            if not linked_product_data.get("combo_item_id"):
+                optional_line = order_sudo.env["sale.order.line"].browse(
+                    line_ids.get(linked_product_data["product_template_id"])
+                )
+                if optional_line.product_type == "combo":
+                    optional_combo_lines |= optional_line
+                    if order_sudo._check_combo_quantities(optional_line):
+                        added_qty_per_line.update({
+                            line.id: optional_line.product_uom_qty
+                            for line in (optional_line + optional_line.linked_line_ids)
+                        })
+                        warning = optional_line.shop_warning
+
         # Recompute delivery prices & other cart stuff (loyalty rewards)
         order_sudo._verify_cart_after_update()
 
         # The validity of a combo product line can only be checked after creating all of its combo
         # item lines.
-        main_product_line = self.env["sale.order.line"].browse(values["line_id"])
+        main_product_line = self.env["sale.order.line"].sudo().browse(values["line_id"])
         if main_product_line.product_type == "combo":
             main_product_line._check_validity()
+        for optional_combo_line in optional_combo_lines:
+            optional_combo_line._check_validity()
 
         positive_added_qty_per_line = {
             line_id: qty for line_id, qty in added_qty_per_line.items() if qty > 0
@@ -252,6 +290,9 @@ class Cart(PaymentPortal):
             "tracking_info": tracking_info,
             "currency": order_sudo.currency_id.name,
         }
+
+    def _get_product_user_error(self, product):
+        return self.env._("The given product does not exist therefore it cannot be added to cart.")
 
     @route(
         route="/shop/cart/quick_add", type="jsonrpc", auth="user", methods=["POST"], website=True
@@ -326,8 +367,8 @@ class Cart(PaymentPortal):
             is falsy
         :params dict kwargs: additional parameters given to _cart_update_line_quantity calls.
         """
-        order_sudo = request.cart
-        order_sudo._check_not_partially_paid()  # Prevent modifying the cart if it's partially paid
+        if order_sudo := request.cart:
+            order_sudo._check_not_partially_paid()  # Prevent modifying the cart if it's partially paid
         quantity = int(quantity)  # Do not allow float values in ecommerce by default
 
         # This method must be only called from the cart page BUT in some advanced logic
@@ -337,6 +378,16 @@ class Cart(PaymentPortal):
             line_id = order_sudo.order_line.filtered(lambda sol: sol.product_id.id == product_id)[
                 :1
             ].id
+
+        # Combo item lines are updated together with their combo
+        if line_id:
+            target_line = order_sudo.order_line.filtered(lambda sol: sol.id == line_id)
+            if target_line.combo_item_id:
+                return {
+                    "warning": self.env._(
+                        "This product is part of a combo and can't be updated individually."
+                    )
+                }
 
         values = order_sudo._cart_update_line_quantity(line_id, quantity, **kwargs)
         values.update(self._get_updated_cart_page_values(order_sudo))
@@ -361,8 +412,11 @@ class Cart(PaymentPortal):
             "cart_quantity": order_sudo.cart_quantity,
             "currency": order_sudo.currency_id.name,
             "amount": order_sudo.amount_total,
-            "minor_amount": payment_utils.to_minor_currency_units(
-                order_sudo.amount_total, order_sudo.currency_id
+            "minor_amount": (
+                order_sudo.amount_total
+                and payment_utils.to_minor_currency_units(
+                    order_sudo.amount_total, order_sudo.currency_id
+                )
             ),
             "website_sale.cart_lines": IrUiView._render_template(
                 "website_sale.cart_lines",

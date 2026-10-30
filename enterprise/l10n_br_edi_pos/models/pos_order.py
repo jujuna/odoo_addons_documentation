@@ -496,7 +496,7 @@ class PosOrder(models.Model):
         access_key = "".join(
             [
                 f"{self._l10n_br_get_cuf(self.company_id.state_id):2.2}",
-                f"{self.date_order.strftime('%y%m'):4.4}",  # dhEmi
+                f"{fields.Datetime.context_timestamp(self, fields.Datetime.now()).strftime('%y%m'):4.4}",  # dhEmi
                 f"{compacted_vat:14.14}",  # Emitter CNPJ
                 f"{self.env.ref('l10n_br.dt_65').code:>02.2}",  # mod (NFC-e)
                 f"{self.config_id.l10n_br_invoice_serial:>03.3}",  # serie

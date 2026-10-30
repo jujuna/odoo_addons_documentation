@@ -17,7 +17,7 @@ class TestPayrollPayslipWithDmfaLanguages(TestPayrollCommon):
         cls.env['res.lang']._activate_lang('nl_BE')
 
         cls.env['hr.work.location'].create({
-            'bce_code': '8888887654',
+            'bce_code': '8888888770',
             'location_type': 'dmfa_unit',
             'company_id': cls.belgian_company.id,
             'address_id': working_address.id,

@@ -220,11 +220,11 @@ const clickHierarchyArticle = async (articleId) => {
  * open the dropdown in the hierarchy
  */
 const openHierarchyDropdown = async () => {
-    if (queryFirst(".o_hierarchy_item a:contains('...').show")) {
+    if (queryFirst(".o_hierarchy_item .dropdown-toggle.show")) {
         // dropdown already opened
         return;
     }
-    await click(".o_hierarchy_item a:contains('...')");
+    await click(".o_hierarchy_item .dropdown-toggle");
     return animationFrame();
 };
 

@@ -28,8 +28,8 @@ class SodaAccountMapping(models.Model):
     @api.depends('code', 'company_id')
     def _compute_account_id(self):
         for mapping in self:
-            mapping.account_id = self.env['account.account'].with_company(self.company_id).search([
-                *self.env['account.account']._check_company_domain(self.company_id),
+            mapping.account_id = self.env['account.account'].with_company(mapping.company_id).search([
+                *self.env['account.account']._check_company_domain(mapping.company_id),
                 ('code', '=like', f'{mapping.code}%'),
             ], limit=1)
 

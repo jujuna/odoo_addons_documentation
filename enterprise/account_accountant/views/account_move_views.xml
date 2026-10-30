@@ -143,7 +143,9 @@
                                 </div>
                             </div>
                             <field name="full_amount_switch_html" string="" widget="apply_amount_html" invisible="not reconciled_lines_excluding_exchange_diff_ids"/>
-                            <field name="account_id" readonly="reconciled_lines_excluding_exchange_diff_ids or tax_line_id"/>
+                            <field name="account_id"
+                                   context="{'list_view_ref': 'account.view_account_list_from_entry'}"
+                                   readonly="reconciled_lines_excluding_exchange_diff_ids or tax_line_id"/>
                             <field name="partner_id" readonly="reconciled_lines_excluding_exchange_diff_ids or tax_line_id"/>
                             <field name="name" readonly="reconciled_lines_excluding_exchange_diff_ids"/>
                         </group>

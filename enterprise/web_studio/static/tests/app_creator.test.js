@@ -36,7 +36,9 @@ test("app creator: standard flow with model creation", async () => {
         return true;
     });
 
-    onRpc("ir.attachment", "read", () => [{ raw: sampleIconUrl }]);
+    onRpc("ir.attachment", "read", () => [
+        { id: 666, raw: { filename: "default_icon_app.png", content: sampleIconUrl, size: 70 } },
+    ]);
 
     onRpc("/web/binary/upload_attachment", () => {
         expect.step("upload_attachment");

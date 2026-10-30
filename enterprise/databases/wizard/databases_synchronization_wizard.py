@@ -1,19 +1,26 @@
 import logging
 import re
+import requests
 from collections import defaultdict
 from concurrent.futures import as_completed, ThreadPoolExecutor
+from http import HTTPStatus
+from json.decoder import JSONDecodeError
 from markupsafe import Markup
 from socket import IPPROTO_TCP, gaierror, getaddrinfo
-from urllib.parse import urlparse
+from urllib3.exceptions import LocationParseError
+from urllib3.util import parse_url
 
 from odoo import api, Command, fields, models
 from odoo.fields import Domain
+from odoo.tools import split_every
+from odoo.tools.urls import urljoin
 from odoo.addons.databases.models.project_project import get_database_api_keys
 
-from ..api import ApiError, OdooComApi, OdooDatabaseApi, _humanize_version
+from ..api import ApiError, OdooComApi, OdooDatabaseApi, TIMEOUT, _humanize_version
 
 
 _logger = logging.getLogger(__name__)
+DEFAULT_TRUSTED_SAAS_SUFFIXES = '.odoo.com'
 
 
 class DatabasesSynchronizationWizard(models.TransientModel):
@@ -196,7 +203,9 @@ class DatabasesSynchronizationWizard(models.TransientModel):
         if not self.database_ids:
             return self._open()
 
-        immediate_sync_limit = self.env['ir.config_parameter'].sudo().get_int('databases.immediate_sync_limit', 300)
+        ICP = self.env['ir.config_parameter'].sudo()
+
+        immediate_sync_limit = ICP.get_int('databases.immediate_sync_limit', 300)
 
         dbs_to_process = self.database_ids[:immediate_sync_limit]
         dbs_to_postpone = self.database_ids[immediate_sync_limit:]
@@ -235,8 +244,17 @@ class DatabasesSynchronizationWizard(models.TransientModel):
         for db_url, errors in errors_by_url.items():
             _mark_db_unreachable(db_by_url[db_url], errors)
 
+        # /kpi/summary fast-fetching route will receive API keys of sibling databases.
+        # A malicious server could intercept them by overriding the route on their instance.
+        # A possible vector of attack could be instances hidden behind the same reverse proxy (e.g. Cloudflare).
+        # This setting limits which SaaS suffixes are trusted to receive calls to /kpi/summary from this instance.
+        trusted_saas_suffixes_icp = ICP.get_str('databases.trusted_saas_suffixes', DEFAULT_TRUSTED_SAAS_SUFFIXES)
+        trusted_saas_suffixes = tuple('.' + normalized
+                                      for suffix in trusted_saas_suffixes_icp.split(',')
+                                      if (normalized := suffix.strip().strip('.').lower()))
+
         with ThreadPoolExecutor(max_workers=8) as executor:
-            db_apis_by_future = {executor.submit(_fetch_database_info, db_apis, self.env._): (db_apis, ip)
+            db_apis_by_future = {executor.submit(_fetch_database_info, db_apis, trusted_saas_suffixes, self.env._): (db_apis, ip)
                                  for ip, db_apis in db_apis_per_ip.items()}
             for future in as_completed(db_apis_by_future):
                 try:
@@ -423,7 +441,14 @@ def _group_by_ips(db_apis, translate):
     groups = defaultdict(list)
     errors_by_url = defaultdict(list)
     for db_api in db_apis:
-        hostname = urlparse(db_api.host).hostname
+        try:
+            hostname = parse_url(db_api.host).host
+        except LocationParseError as e:
+            errors_by_url[db_api.host].append(translate("Unable to parse URL %(url)s: %(exception)s\n", url=db_api.host, exception=str(e)))
+            continue
+        if not hostname:
+            errors_by_url[db_api.host].append(translate("Unable to parse URL %(url)s: no hostname\n", url=db_api.host))
+            continue
         try:
             addrinfo = getaddrinfo(hostname, None, proto=IPPROTO_TCP)
         except gaierror as e:
@@ -438,10 +463,107 @@ def _group_by_ips(db_apis, translate):
     return groups, errors_by_url
 
 
-def _fetch_database_info(db_apis, translate):
+def _fetch_database_info(db_apis, trusted_saas_suffixes, translate):
+    """
+    Fetch KPI information from a set of databases.
+
+    ``db_apis`` is expected to contain ``OdooDatabaseApi`` instances for databases
+    whose hostnames resolve to the same IP address.
+
+    The function first performs batched queries to ``/kpi/summary``, a fast endpoint
+    that retrieves KPI information without loading an ORM registry. Databases that
+    are not included in the results (for example because the database has expired or
+    the API key is not recognized as valid) are then retried individually using
+    ``OdooDatabaseApi``, with JSON-2 falling back to XML-RPC.
+
+    If at least one database has a hostname matching a trusted SaaS suffix, the
+    resolved IP is considered trusted and the batch endpoint is used for all
+    databases sharing that IP. This intentionally includes databases whose
+    individual hostname does not match the trusted suffix.
+    """
     results = {}
     errors_by_url = defaultdict(list)
-    for db_api in db_apis:
+    host_by_database = {db_api.database: db_api.host for db_api in db_apis}
+
+    def is_trusted(host):
+        try:
+            url = parse_url(host)
+        except LocationParseError:
+            return False
+
+        if url.auth or (url.path or '').strip('/') or url.query or url.fragment or not url.host:
+            return False
+
+        return url.host.rstrip('.').lower().endswith(trusted_saas_suffixes)
+
+    trusted_hosts = [db_api.host for db_api in db_apis if is_trusted(db_api.host)]
+    if trusted_hosts:
+        for db_apis_batch in split_every(500, db_apis):
+            kpi_summary_url = urljoin(f'{trusted_hosts[0]}/', 'kpi/summary')
+            try:
+                response = requests.post(
+                    kpi_summary_url,
+                    allow_redirects=False,
+                    json={'params': {
+                        'credentials': [[db_api.database, db_api.apikey] for db_api in db_apis_batch if db_api.database],
+                    }},
+                    timeout=TIMEOUT,
+                )
+            except requests.exceptions.RequestException as e:
+                _logger.info('Batch route %r could not be requested: %s', kpi_summary_url, e)
+                continue
+            if response.status_code != HTTPStatus.OK:
+                # consider that /kpi/summary is not available on this server
+                _logger.info('Batch route %r returned code %r', kpi_summary_url, response.status_code)
+                continue
+            try:
+                result = response.json()
+            except JSONDecodeError:
+                _logger.warning('Batch route %r returned invalid JSON', kpi_summary_url)
+                continue
+            if not isinstance(result, dict):
+                _logger.warning('Batch route %r returned JSON which is not a dict', kpi_summary_url)
+                continue
+            if 'error' in result:
+                if not isinstance(result['error'], dict):
+                    _logger.warning('Batch route %r returned JSON error which is not a dict', kpi_summary_url)
+                    continue
+                error_data = result['error'].get('data', {})
+                _logger.warning('Batch route %r resulted in an error: %s: %s\n%s',
+                                kpi_summary_url, error_data.get('name'), error_data.get('message'),
+                                error_data.get('debug'))
+                continue
+
+            if not isinstance(result.get('result'), dict):
+                _logger.warning('Batch route %r returned JSON result which is not a dict', kpi_summary_url)
+                continue
+            for dbname, dbresult in result['result'].items():
+                dbhost = host_by_database.get(dbname)
+                if not dbhost:
+                    _logger.warning('Ignoring dbname=%r which was returned by %r but not asked for.', dbname, kpi_summary_url)
+                    continue
+
+                if not isinstance(dbresult, dict):
+                    errors_by_url[dbhost].append('Returned JSON is not a dict')
+                elif 'error' in dbresult:
+                    errors_by_url[dbhost].append(dbresult['error'])
+                elif missing_keys := {'database_version', 'kpi_summary', 'users'} - dbresult.keys():
+                    errors_by_url[dbhost].append(f'Returned JSON misses keys {missing_keys}')
+                else:
+                    results[dbhost] = {
+                        'database_last_synchro': fields.Datetime.now(),
+                        'database_nb_synchro_errors': 0,
+                        'database_version': _humanize_version(dbresult['database_version']),
+                        'kpi_summary': dbresult['kpi_summary'],
+                        'users': dbresult['users'],
+                    }
+
+    done_hosts = {*results, *errors_by_url}
+    remaining_db_apis = [db_api
+                         for db_api in db_apis
+                         if db_api.host not in done_hosts]
+
+    for db_api in remaining_db_apis:
         results[db_api.host] = {
             'database_last_synchro': fields.Datetime.now(),
             'database_nb_synchro_errors': 0,

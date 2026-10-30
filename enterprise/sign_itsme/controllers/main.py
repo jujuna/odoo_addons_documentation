@@ -88,8 +88,8 @@ class SignItsme(SignController):
         if sign_user:
             # sign as a known user
             context = {}
-            if request.env.user != sign_user and not request.env.user._is_public():
-                context.update(logged_user_id=request.env.user.id)
+            if request.env.user != sign_user:
+                context.update(logged_user_id=None if request.env.user._is_public() else request.env.user.id)
             request_item = request_item.with_context(context).with_user(sign_user).sudo()
 
         request_item.write_itsme_data(itsme_hash, name, birthdate)

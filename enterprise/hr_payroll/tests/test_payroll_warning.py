@@ -11,6 +11,7 @@ class TestPayrollWarning(TransactionCase):
 
     def setUp(self):
         super().setUp()
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         self.test_company = self.env['res.company'].create({
             'name': 'Test Company',
             'first_payrun_date': date(2025, 1, 1),
@@ -107,6 +108,40 @@ class TestPayrollWarning(TransactionCase):
         monthly_closing_date = self.test_company._get_monthly_payroll_next_closing_date()
         warning_date = warning._get_warning_date(self.will_byers, monthly_closing_date)
         self.assertEqual(warning_date, date(2025, 12, 26), "Warning date should be 5 days before the contract end date")
+
+    def test_filter_warning_records_by_contract_period(self):
+        ended_employee, rehired_employee = self.env['hr.employee'].create([{
+            'name': 'Jim Hopper',
+            'company_id': self.test_company.id,
+            'date_version': date(2024, 1, 1),
+            'contract_date_start': date(2024, 1, 1),
+            'contract_date_end': date(2025, 6, 30),
+            'structure_type_id': self.monthly_structure_type.id,
+        }, {
+            'name': 'Joyce Byers',
+            'company_id': self.test_company.id,
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'contract_date_end': date(2025, 12, 31),
+            'structure_type_id': self.monthly_structure_type.id,
+        }])
+        running_version = rehired_employee.version_id
+        rehired_employee.create_version({
+            'date_version': date(2026, 3, 1),
+            'contract_date_start': date(2026, 3, 1),
+            'contract_date_end': False,
+        })
+        employees = self.will_byers | ended_employee
+        self.assertEqual(
+            self.Warning._filter_warning_records_by_contract_period(employees, date(2025, 10, 26), date(2025, 11, 25)),
+            self.will_byers,
+            "Only the employees with a running contract during the period should be kept",
+        )
+        self.assertEqual(
+            self.Warning._filter_warning_records_by_contract_period(rehired_employee.version_ids, date(2025, 10, 26), date(2025, 11, 25)),
+            running_version,
+            "Only the versions with a running contract during the period should be kept",
+        )
 
     def test_warning_domain_records_active_ids_restriction(self):
         eleven = self.env['hr.employee'].create({
@@ -275,3 +310,58 @@ class TestPayrollWarning(TransactionCase):
         version = self.will_byers.version_id
         version._compute_issues()
         self.assertFalse(warning.id in (version.issues or {}))
+
+    def test_employee_python_warning_custom_warning_details(self):
+        """Test that Python warnings targeting hr.employee with custom warning_details are properly extracted into version.issues"""
+        self.Warning.create({
+            'name': 'Employee Details Warning',
+            'model_id': self.env.ref('hr.model_hr_employee').id,
+            'warning_type': 'python',
+            'display_on_model': True,
+            'active': True,
+            'evaluation_code': """
+warning_records = self.env['hr.employee']
+warning_details = defaultdict(list)
+
+for emp in self.env['hr.employee'].browse(active_ids):
+    warning_records |= emp
+    warning_details[emp].append({
+        'message': 'Custom employee alert',
+        'level': 'warning',
+    })
+""",
+        })
+        version = self.will_byers.version_id
+        version._compute_issues()
+
+        self.assertTrue(version.issues, "Version issues should not be empty")
+
+        first_issue = version.issues.get('0')
+        self.assertIsNotNone(first_issue, "Issue index 0 should exist in version.issues")
+        self.assertEqual(first_issue.get('message'), 'Custom employee alert')
+        self.assertEqual(first_issue.get('level'), 'warning')
+
+    def test_payroll_dashboard_button_action_context_merged(self):
+        action = self.env['ir.actions.act_window'].create({
+            'name': 'Employees',
+            'res_model': 'hr.employee',
+            'context': "{'search_default_my_filter': 1, 'shared_key': 'action'}",
+        })
+        warning = self.Warning.with_company(self.test_company).create({
+            'name': 'Context Warning',
+            'warning_type': 'python',
+            'model_id': self.env.ref('hr.model_hr_employee').id,
+            'evaluation_code': (
+                f"warning_records = model.browse({self.will_byers.id})\n"
+                "additional_context = {'from_warning': True, 'shared_key': 'warning'}"
+            ),
+            'closing_on': 'next_payslip',
+            'button_action': action.id,
+        })
+
+        warning_entry = self.Warning.with_company(self.test_company).get_payroll_dashboard_warning_cards([warning.id])[0]
+        self.assertEqual(
+            warning_entry['button_action']['context'],
+            {'search_default_my_filter': 1, 'from_warning': True, 'shared_key': 'warning'},
+            "The warning additional context should be merged into the button action context, taking precedence on conflicts",
+        )

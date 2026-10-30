@@ -51,8 +51,8 @@ patch(QualityCheck.prototype, {
             case "passfail":
                 if (this.isComplete) {
                     this.state.reOpened = true;
-                    this.props.record.data.quality_state = "none";
-                    return;
+                    await this.props.record.update({ quality_state: "none" });
+                    return this.props.record.save({ reload: false });
                 } else {
                     this.state.reOpened = false;
                     return this.doActionAndNext("action_pass_and_next");

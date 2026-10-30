@@ -350,6 +350,16 @@
                                 </group>
                             </group>
                         </page>
+                        <page name="google_reserve_onboarding" string="Google Bookings" groups="base.group_system"
+                            invisible="category in ['custom', 'punctual'] or not manage_capacity or schedule_based_on != 'resources' or not is_auto_assign">
+                            <div name="google_reserve_banner" class="alert alert-info d-flex flex-wrap align-items-center" role="alert">
+                                <i class="oi oi-fw" data-icon="map" title="Google Reserve"/>
+                                <button name="action_install_google_reserve" type="object" class="btn btn-link fw-semibold py-0 px-1">
+                                    Enable Google Reserve
+                                </button>
+                                <span>to get restaurant bookings through Google Maps and Search.</span>
+                            </div>
+                        </page>
                         <page string="Options" name="options">
                             <group>
                                 <group name="options_left_details">

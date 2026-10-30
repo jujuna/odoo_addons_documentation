@@ -169,15 +169,14 @@ class TestPayslipValidation(TestPayslipValidationCommon):
     def test_other_inputs_payslip_1(self):
         self.version.wage = 40000.0
         payslip = self._generate_payslip(date(2024, 1, 1), date(2024, 1, 31))
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_other_allowances_rule').code: 2000,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_salary_arrears_rule').code: 3000,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_over_time_rule').code: 500,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_prov_fund_rule').code: 400,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_grat_fund_rule').code: 300,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_tax_exemption_rule').code: 100,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'BASIC': 40000.0, 'EXTRA_HOURS': 500.0, 'GRAT_FUND': 300.0, 'OTHER_ALLOW': 2000.0, 'PROV_FUND': 400.0, 'SALARY_ARREARS': 3000.0, 'GROSS': 46200.0, 'TAX_CREDITS': 100.0, 'TAXABLE_AMOUNT': 30700.0, 'TAXES': -416.67, 'NET': 45783.33}
         self._validate_payslip(payslip, payslip_results)
@@ -185,15 +184,14 @@ class TestPayslipValidation(TestPayslipValidationCommon):
     def test_other_inputs_payslip_2(self):
         self.version.wage = 60000.0
         payslip = self._generate_payslip(date(2024, 1, 1), date(2024, 1, 31))
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_other_allowances_rule').code: 2000,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_salary_arrears_rule').code: 3000,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_over_time_rule').code: 500,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_prov_fund_rule').code: 400,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_grat_fund_rule').code: 300,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_tax_exemption_rule').code: 100,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'BASIC': 60000.0, 'EXTRA_HOURS': 500.0, 'GRAT_FUND': 300.0, 'OTHER_ALLOW': 2000.0, 'PROV_FUND': 400.0, 'SALARY_ARREARS': 3000.0, 'GROSS': 66200.0, 'TAX_CREDITS': 100.0, 'TAXABLE_AMOUNT': 44033.33, 'TAXES': -1070.0, 'NET': 65130.0}
@@ -202,15 +200,14 @@ class TestPayslipValidation(TestPayslipValidationCommon):
     def test_other_inputs_payslip_3(self):
         self.version.wage = 80000.0
         payslip = self._generate_payslip(date(2024, 1, 1), date(2024, 1, 31))
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_other_allowances_rule').code: 2000,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_salary_arrears_rule').code: 3000,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_over_time_rule').code: 500,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_prov_fund_rule').code: 400,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_grat_fund_rule').code: 300,
             self.env.ref('l10n_bd_hr_payroll.l10n_bd_tax_exemption_rule').code: 100,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'BASIC': 80000.0, 'EXTRA_HOURS': 500.0, 'GRAT_FUND': 300.0, 'OTHER_ALLOW': 2000.0, 'PROV_FUND': 400.0, 'SALARY_ARREARS': 3000.0, 'GROSS': 86200.0, 'TAX_CREDITS': 100.0, 'TAXABLE_AMOUNT': 57366.67, 'TAXES': -2403.33, 'NET': 83796.67}

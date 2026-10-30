@@ -972,6 +972,18 @@ class TestSnapshots(TestAccountReportsCommon):
             ]
         )
 
+        # Removing the lock date for everyone should delete the snapshots
+        lock_date_wizard = self.env['account.change.lock.date'].create({
+            'fiscalyear_lock_date': False,
+            'exception_applies_to': 'everyone',
+            'exception_duration': 'forever',
+            'exception_reason': "Nnnnnnni !",
+        })
+
+        lock_date_wizard.change_lock_date()
+        self._simulate_crons_after_lock_date_change(0)
+        self.assertFalse(self.env['account.report.snapshot'].search([('report_id', '=', report.id)]))
+
     def test_merge_result_partitions_groupby_lists(self):
         """ Groupby result partitions must merge by grouping key, keeping the list sorted and supporting None keys
         (e.g. the 'Unknown Partner' group).

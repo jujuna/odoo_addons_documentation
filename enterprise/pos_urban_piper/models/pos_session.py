@@ -22,10 +22,11 @@ class PosSession(models.Model):
         return models + ['pos.urbanpiper.store', 'urbanpiper.store.aggregator', 'pos.delivery.provider']
 
     def set_opening_control(self, cashbox_value, notes):
-        super().set_opening_control(cashbox_value, notes)
+        result = super().set_opening_control(cashbox_value, notes)
         if self.state == 'opened' and (urbanpiper_store := self.config_id.urbanpiper_store_id):
             # Enable all delivery providers
             urbanpiper_store._change_aggregator_availability(active=True)
+        return result
 
     def close_session_from_ui(self, payment_method_closing={}):
         result = super().close_session_from_ui(payment_method_closing)

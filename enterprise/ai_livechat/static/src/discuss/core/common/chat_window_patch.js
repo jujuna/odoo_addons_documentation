@@ -5,7 +5,11 @@ import { patch } from "@web/core/utils/patch";
 patch(ChatWindow.prototype, {
     get showForwardOperatorButton() {
         const channel = this.props.chatWindow.channel;
-        return channel.channel_type === "livechat" && channel.ai_agent_id;
+        return (
+            channel.channel_type === "livechat" &&
+            channel.ai_agent_id &&
+            channel.livechat_channel_has_agents
+        );
     },
 
     async forwardOperator(ev) {
@@ -32,8 +36,6 @@ patch(ChatWindow.prototype, {
                 type: result["notification_type"],
             });
         }
-        if (result["success"] === true) {
-            thread.resolveReadyToSwap();
-        }
+        thread.resolveReadyToSwap();
     },
 });

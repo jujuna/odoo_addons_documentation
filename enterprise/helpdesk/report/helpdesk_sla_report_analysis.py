@@ -103,7 +103,7 @@ class HelpdeskSlaReportAnalysis(models.Model):
                                 WHEN SLA_S.reached_datetime IS NULL AND (SLA_S.deadline IS NULL OR SLA_S.deadline > NOW() AT TIME ZONE 'UTC') THEN 'ongoing'
                             END AS sla_status,
                             CASE
-                                WHEN (SLA_S.deadline IS NOT NULL AND SLA_S.deadline > NOW() AT TIME ZONE 'UTC') THEN TRUE ELSE FALSE
+                                WHEN SLA_S.reached_datetime IS NOT NULL AND (SLA_S.deadline IS NULL OR SLA_S.reached_datetime < SLA_S.deadline) THEN TRUE ELSE FALSE
                             END AS sla_success
         """)
 

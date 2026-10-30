@@ -678,27 +678,6 @@
                     </record>
                 </field>
             </record>
-            <record id="l10n_fr_2065_sd_e" model="account.report.line">
-                <field name="name">E – Annual contributions on rental income</field>
-                <field name="name@fr">E – Contributions annuelles sur les revenus locatifs</field>
-                <field name="code">FR_2065_SD_E</field>
-                <field name="children_ids">
-                    <record id="l10n_fr_2065_sd_e_f1" model="account.report.line">
-                        <field name="name">Net income subject to 2.5% contribution</field>
-                        <field name="name@fr">Recettes nettes soumises à la contribution de 2,5%</field>
-                        <field name="code">FR_2065_SD_E_F1</field>
-                        <field name="expression_ids">
-                            <record id="l10n_fr_2065_sd_e_f1_expression" model="account.report.expression">
-                                <field name="label">balance</field>
-                                <field name="engine">external</field>
-                                <field name="formula">most_recent</field>
-                                <field name="date_scope">from_beginning</field>
-                                <field name="subformula">editable;rounding=0</field>
-                            </record>
-                        </field>
-                    </record>
-                </field>
-            </record>
             <record id="l10n_fr_2065_sd_" model="account.report.line">
                 <field name="name">F – Computerised Accounting</field>
                 <field name="name@fr">F – Comptabilité Informatisée</field>

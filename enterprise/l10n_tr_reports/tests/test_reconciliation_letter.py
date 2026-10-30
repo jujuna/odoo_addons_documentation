@@ -25,10 +25,13 @@ class TestTRCustomerStatement(TestAccountReportsCommon):
         options = report.get_options({
             'partner_ids': partner.ids,
             'report_id': report.id,
+            'unfold_all': True,
+            'date': {'date_from': '2026-06-01', 'date_to': '2026-06-30'},
         })
         handler = self.env[report.custom_handler_model_name]
         html = handler._get_pdf_export_html(options, report._get_lines(options), additional_context={})
         self.assertIn("Cari Hesap Mutabakat Formu", html)
+        self.assertIn(invoice.name, html)
         self.assertIn("Fatura Sayısı", html)
         self.assertIn("Mutabakat Sonucu:", html)
         self.assertIn("300.00", html)

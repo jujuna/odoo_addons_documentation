@@ -3,7 +3,19 @@ import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
 import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_screen_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
 import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
+import { patch } from "@web/core/utils/patch";
 import { registry } from "@web/core/registry";
+
+const epsonModulePath = "@l10n_it_pos/app/fiscal_printer/epson_fiscal_printer";
+if (odoo.loader.modules.has(epsonModulePath)) {
+    const { EpsonFiscalPrinter } = odoo.loader.modules.get(epsonModulePath);
+
+    patch(EpsonFiscalPrinter.prototype, {
+        async getPrinterSerialNumber() {
+            return "TEST-SERIAL";
+        },
+    });
+}
 
 function addDocument(documentParams) {
     const steps = [];
@@ -46,7 +58,6 @@ registry.category("web_tour.tours").add("test_taxes_l10n_it_epson_printer_pos", 
     steps: () =>
         [
             Chrome.startPoS(),
-            Dialog.confirm("Ok"),
             Dialog.confirm("Open Register"),
 
             ...addDocument([{ product: "product_1_1", quantity: "3" }]),

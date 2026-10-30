@@ -3,6 +3,7 @@ import { Plugin, usePlugin } from "@odoo/owl";
 import { services } from "@web/core/services";
 import { registry } from "@web/core/registry";
 import { session } from "@web/session";
+import { useEnv } from "@web/owl2/utils";
 
 import mobile from "@web_mobile/js/services/core";
 import { shortcutItem, switchAccountItem } from "./user_menu_items";
@@ -14,6 +15,8 @@ export class MobilePlugin extends Plugin {
     timeBetweenReadsInMs = session.time_between_reads_in_ms || 100;
     /** @private */
     idInterval = null;
+    /** @private */
+    env = useEnv();
 
     setup() {
         let listenerCount = 0;
@@ -42,6 +45,27 @@ export class MobilePlugin extends Plugin {
             userMenuRegistry.remove("odoo_account");
 
             userMenuRegistry.add("web_mobile.switch", switchAccountItem);
+        }
+
+        if (mobile.methods.updateAvailableApps) {
+            let lastApps = null;
+            this.env.bus.addEventListener("HOME-MENU:APPS-UPDATED", ({ detail }) => {
+                const apps = detail.apps.map((app) => {
+                    const match = (app.webIconData || "").match(/^data:image\/png;base64,(.*)$/);
+                    return {
+                        xmlid: app.xmlid,
+                        link: app.href,
+                        name: app.label,
+                        pngIcon: match ? match[1] : null,
+                    };
+                });
+                const serializedApps = JSON.stringify(apps);
+                if (serializedApps === lastApps) {
+                    return;
+                }
+                lastApps = serializedApps;
+                mobile.methods.updateAvailableApps(apps);
+            });
         }
     }
 

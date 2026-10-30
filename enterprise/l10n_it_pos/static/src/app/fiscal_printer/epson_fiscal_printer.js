@@ -18,6 +18,7 @@ import {
     OpenDrawer,
     RTStatus,
     DirectIO,
+    GetSerialNumber,
 } from "@l10n_it_pos/app/fiscal_printer/commands";
 
 const DEFAULT_TIMEOUT = 10000;
@@ -53,6 +54,7 @@ const tags = [
     "printNormal",
     "beginNonFiscal",
     "endNonFiscal",
+    "getSerialNumber",
 ];
 
 const attributes = [
@@ -193,18 +195,19 @@ export class EpsonFiscalPrinter extends Reactive {
         return this.sendCommand(command, { timeout, devid });
     }
 
+    async getPrinterSerialNumber({ timeout, devid } = {}) {
+        const command = await this.command(GetSerialNumber);
+        const result = await this.sendCommand(command, { timeout, devid });
+        return result.addInfo.serialNumber;
+    }
+
+    /*
+     * DirectIO is used to send a wide range of commands to the printer using native PDU communication protocol strings.
+     * Refer to the printer "Communication Protocol" documentation for the command reference.
+     */
     async directIO(cmd, data, { timeout, devid } = {}) {
         const command = await this.command(DirectIO, { command: cmd, data });
         return this.sendCommand(command, { timeout, devid });
-    }
-
-    async getPrinterSerialNumber() {
-        const result = await this.directIO("3217", "01");
-        if (!result.success) {
-            return null;
-        }
-
-        return result.addInfo.responseData;
     }
 
     /*

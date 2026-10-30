@@ -29,10 +29,10 @@
                     <tr id="pay_period">
                         <td>Pay Period:</td>
                         <td class="text-end fw-bold">
-                            <span t-if="o.version_id.date_start and o.date_from &lt; o.version_id.date_start" t-field="o.version_id.date_start"/>
+                            <span t-if="o.version_id.contract_date_start and o.date_from &lt; o.version_id.contract_date_start" t-field="o.version_id.contract_date_start"/>
                             <span t-else="" t-field="o.date_from"/>
                             -
-                            <span t-if="o.version_id.date_end and o.date_to &gt; o.version_id.date_end" t-field="o.version_id.date_end"/>
+                            <span t-if="o.version_id.contract_date_end and o.date_to &gt; o.version_id.contract_date_end" t-field="o.version_id.contract_date_end"/>
                             <span t-else="" t-field="o.date_to"/>
                         </td>
                     </tr>

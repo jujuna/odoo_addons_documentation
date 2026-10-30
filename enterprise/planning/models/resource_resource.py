@@ -74,7 +74,7 @@ class ResourceResource(models.Model):
         res = super().action_archive()
         departure_date = datetime.combine(fields.Date.context_today(self) + timedelta(days=1), time.min)
         planning_slots = self.env['planning.slot'].sudo().search([
-            ('resource_ids', 'in', self.filtered(lambda r: r.resource_type == 'material').ids),
+            ('resource_ids', 'in', self.ids),
             ('end_datetime', '>=', departure_date),
         ])
         planning_slots._manage_archived_resources(self, departure_date)

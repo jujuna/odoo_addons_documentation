@@ -8,10 +8,10 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:55+0000\n"
-"PO-Revision-Date: 2026-09-18 05:10+0000\n"
+"PO-Revision-Date: 2026-10-21 06:33+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
-"ai_social/de/>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/ai_social/"
+"de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,6 +31,18 @@ msgid ""
 "conversation.\n"
 "        "
 msgstr ""
+"\n"
+"            Fügt der aktuellen Unterhaltung einen verfügbaren menschlichen "
+"Mitarbeiter hinzu\n"
+"            und verhindert, dass der KI-Agent neue Nachrichten des Benutzers "
+"bearbeitet.\n"
+"            Verwenden Sie dieses Tool, wenn der Benutzer nach einem realen "
+"Menschen fragt\n"
+"            oder wenn das Gespräch an eine Person weitergeleitet werden "
+"muss.\n"
+"            Ist kein Mitarbeiter verfügbar, bleibt der KI-Agent in der "
+"Unterhaltung.\n"
+"        "
 
 #. module: ai_social
 #. odoo-python
@@ -39,22 +51,25 @@ msgid ""
 "A human operator has been added to the conversation. Let the user know that "
 "a human will take over."
 msgstr ""
+"Ein Mitarbeiter wurde zur Unterhaltung hinzugefügt. Informieren Sie den "
+"Benutzer darüber, dass ein Mitarbeiter die Unterhaltung übernehmen wird."
 
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_ai_agent
 #: model:ir.model.fields,field_description:ai_social.field_im_livechat_channel__ai_social_livechat_agent_id
 msgid "AI Agent"
-msgstr ""
+msgstr "KI-Agent"
 
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
 msgstr ""
+"Konfigurationen des KI-Modells (Standard-Prompt) für den Entwurf von Texten."
 
 #. module: ai_social
 #: model:ir.actions.server,name:ai_social.ir_actions_server_add_human
 msgid "AI: Social Live Chat Add Human Operator"
-msgstr ""
+msgstr "KI: Social-Media-Livechat mit menschlichem Bediener"
 
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_ai_composer__interface_key
@@ -64,27 +79,27 @@ msgstr "Aktion"
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_ai_agent__ai_social_livechat_channel_ids
 msgid "Ai Social Livechat Channel"
-msgstr ""
+msgstr "KI-Social-Media-Livechat-Kanal"
 
 #. module: ai_social
 #: model:ir.model.fields.selection,name:ai_social.selection__im_livechat_channel__ai_social_livechat_enabled_condition__always
 msgid "Always"
-msgstr ""
+msgstr "Immer"
 
 #. module: ai_social
 #: model_terms:ir.ui.view,arch_db:ai_social.im_livechat_channel_view_form
 msgid "Connect an AI Agent..."
-msgstr ""
+msgstr "KI-Agenten verbinden …"
 
 #. module: ai_social
 #: model:ir.actions.server,ai_tool_thinking_text:ai_social.ir_actions_server_add_human
 msgid "Contacting an operator"
-msgstr ""
+msgstr "Mitarbeiter wird kontaktiert"
 
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "Diskussionskanal"
 
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_ai_agent__display_name
@@ -97,19 +112,21 @@ msgstr "Anzeigename"
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_im_livechat_channel__ai_social_livechat_enabled_condition
 msgid "Enable ChatBot"
-msgstr ""
+msgstr "ChatBot aktivieren"
 
 #. module: ai_social
 #. odoo-python
 #: code:addons/ai_social/models/ai_agent.py:0
 msgid "Error: Cannot use this tool in this conversation"
-msgstr ""
+msgstr "Fehler: Dieses Tool kann in dieser Unterhaltung nicht verwendet werden"
 
 #. module: ai_social
 #. odoo-python
 #: code:addons/ai_social/models/ai_agent.py:0
 msgid "Error: Failed to add a human, no human operator online."
 msgstr ""
+"Fehler: Das Hinzufügen eines Mitarbeiters ist fehlgeschlagen, es ist kein "
+"Mitarbeiter online."
 
 #. module: ai_social
 #: model_terms:ai.prompt.button,prompt:ai_social.ai_prompt_button_social_post_idea
@@ -152,22 +169,22 @@ msgstr ""
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_im_livechat_channel
 msgid "Livechat Channel"
-msgstr ""
+msgstr "Livechat-Kanal"
 
 #. module: ai_social
 #: model:ir.model.fields.selection,name:ai_social.selection__im_livechat_channel__ai_social_livechat_enabled_condition__only_if_operator
 msgid "Only when an operator is available"
-msgstr ""
+msgstr "Nur wenn ein Bediener verfügbar ist"
 
 #. module: ai_social
 #: model:ir.model.fields.selection,name:ai_social.selection__im_livechat_channel__ai_social_livechat_enabled_condition__only_if_no_operator
 msgid "Only when no operator is available"
-msgstr ""
+msgstr "Nur wenn kein Bediener verfügbar ist"
 
 #. module: ai_social
 #: model:ir.module.module,shortdesc:base.module_ai_social
 msgid "Social AI"
-msgstr ""
+msgstr "Social & KI"
 
 #. module: ai_social
 #. odoo-javascript
@@ -184,7 +201,7 @@ msgstr "Social-Media-Beitrag verfassen"
 #: model:ir.module.module,description:base.module_ai_social
 #: model:ir.module.module,summary:base.module_ai_social
 msgid "Write social post using AI."
-msgstr ""
+msgstr "Verfassen Sie einen Social-Media-Beitrag mithilfe von KI."
 
 #~ msgid "AI model configurations (system prompts) for text drafting."
 #~ msgstr ""

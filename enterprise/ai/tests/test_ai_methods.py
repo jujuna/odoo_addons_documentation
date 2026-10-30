@@ -36,6 +36,7 @@ class TestAIMethods(HttpCase, TestAICommon):
             messages,
             agent._get_instructions(),
             self._prepare_default_tools(agent),
+            timeout=60,
             schema=None,
             usage='agent:custom',
         )

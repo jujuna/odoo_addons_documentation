@@ -3,15 +3,16 @@
 # * planning_field_service
 #
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 00:01+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-11 06:34+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/planning_field_service/zh_Hans/>\n"
+"projects/odoo-20/planning_field_service/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/components/planned_date_range_with_allocated_hours/planning_date_range_with_allocated_hours.js:0
 msgid "%(allocatedHoursFormatted)s + %(breakTimeFormatted)s break"
-msgstr ""
+msgstr "%(allocatedHoursFormatted)s + %(breakTimeFormatted)s 休息"
 
 #. module: planning_field_service
 #. odoo-python
@@ -35,15 +36,7 @@ msgstr "%(display_name)s%(partner_city)s"
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "%(employee)s requested a replacement for this shift."
-msgstr ""
-
-#. module: planning_field_service
-#. odoo-javascript
-#: code:addons/planning_field_service/static/src/js/tours/planning_field_service_tour.js:0
-msgid ""
-"<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "
-"equipment if needed.</i>"
-msgstr "<b>分配资源</b><br/><i> 如有需要，可添加多名技术人员或预留设备。</i>"
+msgstr "%(employee)s 申请为本次班次安排替补。"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -105,7 +98,7 @@ msgstr "<b>开始管理您的现场班次</b><br/><i> 一切从这里开始。</
 msgid ""
 "<b>Start onsite</b><br/><i>Start the shift when you arrive at the customer "
 "location.</i>"
-msgstr ""
+msgstr "<b>开始现场工作</b><br/><i>到达客户地点后开始班次。</i>"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_details
@@ -198,6 +191,8 @@ msgid ""
 "<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
 "                                Back to Shift"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
+"                                返回班次"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
@@ -212,6 +207,14 @@ msgid ""
 "icon=\"sentiment_sad\" invisible=\"rating_avg &gt;= 2.33\" title=\"Unhappy\"/"
 ">"
 msgstr ""
+"<i class=\"oi oi-fw o_button_icon text-success\" data-"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" title=\"满"
+"意\"/>\n"
+"                    <i class=\"oi oi-fw o_button_icon text-warning\" data-"
+"icon=\"sentiment_neutral\" invisible=\"rating_avg &lt; 2.33 or rating_avg "
+"&gt;= 3.66\" title=\"一般\"/>\n"
+"                    <i class=\"oi oi-fw o_button_icon text-danger\" data-"
+"icon=\"sentiment_sad\" invisible=\"rating_avg &gt;= 2.33\" title=\"不满意\"/>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -219,6 +222,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"check\"/>\n"
 "                                Sign Report"
 msgstr ""
+"<i class=\"oi\" data-icon=\"check\"/>\n"
+"                                签署报告"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -226,6 +231,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"print\"/>\n"
 "                                Print"
 msgstr ""
+"<i class=\"oi\" data-icon=\"print\"/>\n"
+"                                打印"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_report
@@ -253,22 +260,22 @@ msgstr ""
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "<small class=\"text-muted\">Customer</small>"
-msgstr ""
+msgstr "<small class=\"text-muted\">客户</small>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "<small class=\"text-muted\">Technicians</small>"
-msgstr ""
+msgstr "<small class=\"text-muted\">技术人员</small>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "<span class=\"o_stat_text text-wrap\">Customer Preview</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text text-wrap\">客户预览</span>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "<span class=\"o_stat_text\">Rating</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">评分</span>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
@@ -305,6 +312,8 @@ msgid ""
 "<span><b>You're all set!</b><br>You're ready to manage your shifts.\n"
 "        </span>"
 msgstr ""
+"<span><b>一切就绪！</b><br>您可以开始管理您的班次了。\n"
+"        </span>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
@@ -314,7 +323,7 @@ msgstr "<strong>客户：</strong>"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "<strong>Technician: </strong>"
-msgstr ""
+msgstr "<strong>技术人员：</strong>"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.rating_shift_request_email_template
@@ -471,7 +480,7 @@ msgstr "访问警告"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_needaction
 msgid "Action Needed"
-msgstr ""
+msgstr "待处理"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_ids
@@ -481,30 +490,30 @@ msgstr "活动"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr ""
+msgstr "活动异常标示"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.mail_activity_plan_action_config_field_service_plan
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_plans_ids
 #: model:ir.ui.menu,name:planning_field_service.project_field_service_menu_mail_activity_plan
 msgid "Activity Plans"
-msgstr ""
+msgstr "活动计划"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_state
 msgid "Activity State"
-msgstr ""
+msgstr "活动状态"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_type_icon
 msgid "Activity Type Icon"
-msgstr ""
+msgstr "活动类型图标"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.mail_activity_type_action_config_field_service_types
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_activity_type
 msgid "Activity Types"
-msgstr ""
+msgstr "活动类型"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_plan_action_config_field_service_plan
@@ -512,87 +521,89 @@ msgid ""
 "Activity plans are used to assign a list of activities in just a few clicks\n"
 "                    (e.g. \"Progress Report\", \"Stand-up Meeting\", ...)"
 msgstr ""
+"只需点击几下，活动计划就可用于分配活动列表\n"
+"                    （例如：“进度报告”、“常设会议”等）"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.mail_followers_edit_action_from_planning_slot
 msgid "Add/Remove Followers"
-msgstr ""
+msgstr "添加/删除关注者"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_address
 msgid "Address (without name)"
-msgstr ""
+msgstr "地址（不带姓名）"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_all
 msgid "All"
-msgstr ""
+msgstr "全部"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__allocated_hours
 msgid "Allocated Time"
-msgstr ""
+msgstr "已分配时间"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_appliance_tech
 msgid "Appliance Technician"
-msgstr ""
+msgstr "家电技术员"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/fields/field_service_slot_status_bar.js:0
 msgid "Are you sure you want to mark this shift as complete?"
-msgstr ""
+msgstr "您确定要将此班次标记为已完成吗？"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_attachment_count
 msgid "Attachment Count"
-msgstr ""
+msgstr "附件数量"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_avg
 msgid "Average Rating"
-msgstr ""
+msgstr "平均评价"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__break_time
 msgid "Break Time"
-msgstr ""
+msgstr "休息时间"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_maps_by_resource
 msgid "By Resource"
-msgstr ""
+msgstr "按资源分类"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_carpenter
 msgid "Carpenter"
-msgstr ""
+msgstr "木工"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_city
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_city
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "City"
-msgstr ""
+msgstr "城市"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_company
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__company_id
 msgid "Company"
-msgstr ""
+msgstr "公司"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_base_document_layout
 msgid "Company Document Layout"
-msgstr ""
+msgstr "公司单据布局"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -603,7 +614,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form_in_gantt
 msgid "Complete"
-msgstr ""
+msgstr "完成"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -614,43 +625,43 @@ msgstr ""
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_slot__state__4_completed
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Completed"
-msgstr ""
+msgstr "已完成"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "配置设置"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_email
 msgid "Confirmation Email"
-msgstr ""
+msgstr "确认邮件"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "联系人"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_country_id
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_country_id
 msgid "Country"
-msgstr ""
+msgstr "国家/地区"
 
 #. module: planning_field_service
 #: model:ir.model,website_form_label:planning_field_service.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "创建客户"
 
 #. module: planning_field_service
 #: model:ir.model,website_form_label:planning_field_service.model_planning_slot
 msgid "Create a Shift"
-msgstr ""
+msgstr "创建班次"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_plan_action_config_field_service_plan
 msgid "Create a Shift Activity Plan"
-msgstr ""
+msgstr "创建班次活动计划"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_id
@@ -664,13 +675,13 @@ msgstr "客户"
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__access_url
 msgid "Customer Portal URL"
-msgstr ""
+msgstr "客户门户网站网址"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.rating_rating_action_planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_customer_ratings
 msgid "Customer Ratings"
-msgstr ""
+msgstr "客户点评"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_state_id
@@ -681,24 +692,24 @@ msgstr "客户状态"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_shift_ics_description_inherit
 msgid "Customer:"
-msgstr ""
+msgstr "客户："
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Debug"
-msgstr ""
+msgstr "调试"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_decorator
 msgid "Decorator"
-msgstr ""
+msgstr "装修工"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__role_id
@@ -714,7 +725,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Depart at"
-msgstr ""
+msgstr "出发时间"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_base_document_layout__display_name
@@ -731,29 +742,29 @@ msgstr ""
 #: model:ir.model.fields,field_description:planning_field_service.field_res_users__display_name
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "显示名称"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Distance"
-msgstr ""
+msgstr "距离"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_in
 msgid "Distance from previous shift (or work location) to this shift."
-msgstr ""
+msgstr "上一个班次（或工作地点）到本班次的距离。"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_out
 msgid "Distance from this shift to the next (or work location)."
-msgstr ""
+msgstr "本班次到下一个班次（或工作地点）的距离。"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Duration"
-msgstr ""
+msgstr "时长"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_electrician
@@ -764,7 +775,7 @@ msgstr "电工"
 #: model:ir.model,name:planning_field_service.model_mail_template
 #: model_terms:ir.ui.view,arch_db:planning_field_service.res_config_settings_view_form
 msgid "Email Template"
-msgstr ""
+msgstr "电子邮件模板"
 
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.mail_template_data_intervention_report
@@ -782,7 +793,7 @@ msgstr "员工"
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__end_datetime
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_live_map
 msgid "End Date"
-msgstr ""
+msgstr "结束日期"
 
 #. module: planning_field_service
 #: model:ir.module.module,shortdesc:base.module_planning_field_service
@@ -790,27 +801,27 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_home_menu_planning_field_service
 msgid "Field Service"
-msgstr ""
+msgstr "现场服务"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_email
 msgid "Field Service Confirmation Email"
-msgstr ""
+msgstr "现场服务确认邮件"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Email Template"
-msgstr ""
+msgstr "现场服务确认邮件模板"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Mail Template"
-msgstr ""
+msgstr "现场服务确认邮件模板"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__rating_shift_request_mail_template_id
 msgid "Field Service Intervention Customer Rating Mail Template"
-msgstr ""
+msgstr "现场服务工单客户评分邮件模板"
 
 #. module: planning_field_service
 #. odoo-python
@@ -819,25 +830,25 @@ msgstr ""
 #: model:ir.model,name:planning_field_service.model_report_planning_field_service_worksheet_custom
 #: model:mail.template,subject:planning_field_service.mail_template_data_intervention_report
 msgid "Field Service Report"
-msgstr ""
+msgstr "现场服务报表"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "Field Service Report -"
-msgstr ""
+msgstr "现场服务报表 -"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Field Service Report - %(date)s"
-msgstr ""
+msgstr "现场服务报表 - %(date)s"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Field Service Report - %s"
-msgstr ""
+msgstr "现场服务报表 - %s"
 
 #. module: planning_field_service
 #: model:mail.template,name:planning_field_service.mail_template_data_intervention_report
@@ -847,12 +858,12 @@ msgstr "现场服务报告"
 #. module: planning_field_service
 #: model:mail.template,name:planning_field_service.rating_shift_request_email_template
 msgid "Field Service: Shift Rating Request"
-msgstr ""
+msgstr "现场服务：班次评分请求"
 
 #. module: planning_field_service
 #: model:mail.template,name:planning_field_service.mail_template_data_intervention_details
 msgid "Field Service: Shift Scheduled"
-msgstr ""
+msgstr "现场服务：班次已排期"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_my_map
@@ -860,38 +871,45 @@ msgid ""
 "Find here your planning. Assign yourself open shifts that match your roles, "
 "or indicate your unavailability."
 msgstr ""
+"在这里找到你的计划。为自己分配与你的角色相匹配的空闲班次，或表明你的不可用性"
+"。"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "关注者"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_partner_ids
 msgid "Followers (Partners)"
-msgstr ""
+msgstr "关注者（合作伙伴）"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Future Activities"
+msgstr "未来活动"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "GPS Coordinates: %(localisation_start)s (%(latitude)s, %(longitude)s)"
-msgstr ""
+msgstr "GPS 坐标：%(localisation_start)s (%(latitude)s, %(longitude)s)"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Generate Sample Data"
-msgstr ""
+msgstr "生成示例数据"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__has_message
 msgid "Has Message"
-msgstr ""
+msgstr "有消息"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_heating_engineer
 msgid "Heating Engineer"
-msgstr ""
+msgstr "暖通工程师"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__2
@@ -899,12 +917,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "High"
-msgstr ""
+msgstr "高"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "History"
-msgstr ""
+msgstr "历史"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_base_document_layout__id
@@ -926,12 +944,12 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "图标"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr ""
+msgstr "指示异常活动的图标。"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_needaction
@@ -942,13 +960,13 @@ msgstr "如果勾选此项，则需要查看新消息。"
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_has_error
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "如果勾选此项， 某些消息将出现发送错误。"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_slot__state__3_in_progress
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "In Progress"
-msgstr ""
+msgstr "进行中"
 
 #. module: planning_field_service
 #: model:mail.template,subject:planning_field_service.mail_template_data_intervention_details
@@ -959,17 +977,22 @@ msgid ""
 "format_time(object.start_datetime, time_format='short', "
 "tz=object.partner_id.tz, lang_code=object.partner_id.lang) or '' }}"
 msgstr ""
+"服务工单已排期 {{ object.start_datetime and 'for ' + format_datetime"
+"(object.start_datetime, dt_format='MMM d', tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang) + ' at ' + format_time"
+"(object.start_datetime, time_format='short', tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang) or '' }}"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_activity
 msgid "Interventions"
-msgstr ""
+msgstr "服务工单"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 msgid "Invalid Intervention."
-msgstr ""
+msgstr "无效的服务工单。"
 
 #. module: planning_field_service
 #. odoo-python
@@ -980,7 +1003,7 @@ msgstr "签名数据无效。"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_is_follower
 msgid "Is Follower"
-msgstr ""
+msgstr "是关注者"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
@@ -991,12 +1014,17 @@ msgstr "Jane smith"
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.js:0
 msgid "Just now"
-msgstr ""
+msgstr "刚刚"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_landscaper
 msgid "Landscaper"
-msgstr ""
+msgstr "园林绿化师"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Late Activities"
+msgstr "最近活动"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_latitude
@@ -1006,12 +1034,12 @@ msgstr "Live Latitude"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_location_last_update
 msgid "Live Location Last Update"
-msgstr ""
+msgstr "实时位置最后更新"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_longitude
 msgid "Live Longitude"
-msgstr ""
+msgstr "实时经度"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_live_map
@@ -1029,12 +1057,12 @@ msgstr "位置错误"
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/services/field_service_geolocation_service.js:0
 msgid "Location error: %s"
-msgstr ""
+msgstr "位置错误：%s"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_locksmith
 msgid "Locksmith"
-msgstr ""
+msgstr "锁匠"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__0
@@ -1042,53 +1070,53 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Low"
-msgstr ""
+msgstr "低"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_my_map
 msgid "Map"
-msgstr ""
+msgstr "地图"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "MapBox servers unreachable"
-msgstr ""
+msgstr "地图盒子服务器无法访问"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Mapbox could not be reached."
-msgstr ""
+msgstr "无法连接地图盒子。"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Mapbox could not compute the route."
-msgstr ""
+msgstr "地图盒子无法计算路线。"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_by_resource
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_maps
 msgid "Maps"
-msgstr ""
+msgstr "地图"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "Marc Demo"
-msgstr ""
+msgstr "马克-迪莫"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols 图标，例如 checklist"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
 msgid ""
 "Measure your customer satisfaction by sending rating requests when "
 "interventions are done."
-msgstr ""
+msgstr "在服务工单完成后发送评分请求，衡量客户满意度。"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__1
@@ -1096,48 +1124,53 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Medium"
-msgstr ""
+msgstr "中等"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "菜单"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "消息发送错误"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "消息"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_my
 msgid "My"
-msgstr ""
+msgstr "我的"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "My Activities"
+msgstr "我的活动"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr ""
+msgstr "我的活动截止时间"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_my_map
 msgid "My Map"
-msgstr ""
+msgstr "我的地图"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/__init__.py:0
 msgid "My Planning"
-msgstr ""
+msgstr "我的计划"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_name
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1145,37 +1178,37 @@ msgstr ""
 #: code:addons/planning_field_service/static/src/views/planning_calendar/common/planning_calendar_common_popover.xml:0
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "Navigate"
-msgstr ""
+msgstr "导航"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr ""
+msgstr "下一活动日历事件"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr ""
+msgstr "下一活动截止日期"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_summary
 msgid "Next Activity Summary"
-msgstr ""
+msgstr "下一活动摘要"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_type_id
 msgid "Next Activity Type"
-msgstr ""
+msgstr "下一活动类型"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_type_action_config_field_service_types
 msgid "No activity types found. Let's create one!"
-msgstr ""
+msgstr "未找到活动类型。让我们创建一个！"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
 msgid "No customer ratings yet"
-msgstr ""
+msgstr "还没有客户评级"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_by_resource
@@ -1188,78 +1221,78 @@ msgstr "未找到班次。让我们创建一个！"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_needaction_counter
 msgid "Number of Actions"
-msgstr ""
+msgstr "操作数量"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_error_counter
 msgid "Number of errors"
-msgstr ""
+msgstr "错误数量"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr ""
+msgstr "需要采取行动的消息数量"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr ""
+msgstr "发送错误的消息的数量"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "Open Map"
-msgstr ""
+msgstr "打开地图"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_phone
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_card
 msgid "Phone"
-msgstr ""
+msgstr "电话"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_shift_ics_description_inherit
 msgid "Phone:"
-msgstr ""
+msgstr "电话号码："
 
 #. module: planning_field_service
 #: model:ir.module.module,summary:base.module_planning_field_service
 msgid "Plan intervention in planning"
-msgstr ""
+msgstr "在计划中安排服务工单"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_my_planning_internal_user
 msgid "Planning"
-msgstr ""
+msgstr "计划"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_analysis_report
 msgid "Planning Analysis Report"
-msgstr ""
+msgstr "计划分析报表"
 
 #. module: planning_field_service
 #: model:ir.actions.server,name:planning_field_service.ir_cron_remove_outdated_technician_live_location_ir_actions_server
 msgid "Planning Field Service: remove technicians' location older than one day"
-msgstr ""
+msgstr "计划现场服务：移除超过一天的技术人员位置"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_slot
 msgid "Planning Shift"
-msgstr ""
+msgstr "计划班次"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_plumber
 msgid "Plumber"
-msgstr ""
+msgstr "水管工"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__access_url
 msgid "Portal Access URL"
-msgstr ""
+msgstr "门户网站访问网址"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Print"
-msgstr ""
+msgstr "打印"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__priority
@@ -1267,7 +1300,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Priority"
-msgstr ""
+msgstr "优先级"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1275,7 +1308,7 @@ msgstr ""
 msgid ""
 "Privacy first: Location is recorded only after sign-in and with your "
 "permission."
-msgstr ""
+msgstr "隐私优先：仅在登录后并在您允许的情况下才会记录位置。"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_action_schedule_by_resource_view_graph_inherit_planning
@@ -1283,95 +1316,95 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_graph_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_pivot_planning_field_service
 msgid "Rating (1-5)"
-msgstr ""
+msgstr "评分（1-5）"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_avg_text
 msgid "Rating Avg Text"
-msgstr ""
+msgstr "评价平均文本"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_feedback
 msgid "Rating Last Feedback"
-msgstr ""
+msgstr "最新反馈评级"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_image
 msgid "Rating Last Image"
-msgstr ""
+msgstr "最新图像评级"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_value
 msgid "Rating Last Value"
-msgstr ""
+msgstr "最新值评级"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_percentage_satisfaction
 msgid "Rating Satisfaction"
-msgstr ""
+msgstr "评级满意度"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_last_text
 msgid "Rating Text"
-msgstr ""
+msgstr "评分文本"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_count
 msgid "Rating count"
-msgstr ""
+msgstr "点评数"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_ids
 msgid "Ratings"
-msgstr ""
+msgstr "点评"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_replacement_requested
 #: model:mail.message.subtype,name:planning_field_service.mt_replacement_requested
 msgid "Replacement Requested"
-msgstr ""
+msgstr "已请求替换"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_actions_report
 msgid "Report Action"
-msgstr ""
+msgstr "报表操作"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_resource_resource
 msgid "Resource"
-msgstr ""
+msgstr "资源"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__resource_ids
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 msgid "Resources"
-msgstr ""
+msgstr "资源"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_user_id
 msgid "Responsible User"
-msgstr ""
+msgstr "责任用户"
 
 #. module: planning_field_service
 #: model:portal.entry,description:planning_field_service.portal_field_service
 msgid "Review and sign your intervention reports"
-msgstr ""
+msgstr "查看并签署您的服务工单报告"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__role_id
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 msgid "Role"
-msgstr ""
+msgstr "角色"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr ""
+msgstr "短信发送错误"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_safety
 msgid "Safety Technician"
-msgstr ""
+msgstr "安全技术员"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_by_resource
@@ -1379,7 +1412,7 @@ msgstr ""
 msgid ""
 "Schedule your human and material resources across roles, projects and sales "
 "orders."
-msgstr ""
+msgstr "在角色、项目和销售订单之间安排你的人力和物力资源。"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
@@ -1400,7 +1433,7 @@ msgstr "发送现场服务报表"
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_send
 msgid "Send Planning"
-msgstr ""
+msgstr "发送计划"
 
 #. module: planning_field_service
 #: model:ir.actions.server,name:planning_field_service.action_intervention_send_report
@@ -1410,7 +1443,7 @@ msgstr "发送报告"
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.res_config_settings_view_form
 msgid "Send a confirmation email to the customer when a shift is published"
-msgstr ""
+msgstr "班次发布时向客户发送确认邮件"
 
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.rating_shift_request_email_template
@@ -1433,25 +1466,25 @@ msgstr "时段"
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_assigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_assigned
 msgid "Shift Assigned"
-msgstr ""
+msgstr "班次已分配"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_reassigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_reassigned
 msgid "Shift Re-assigned"
-msgstr ""
+msgstr "班次已重新分配"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_rescheduled
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_rescheduled
 msgid "Shift Rescheduled"
-msgstr ""
+msgstr "班次已重新排期"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_unassigned
 #: model:mail.message.subtype,name:planning_field_service.mt_shift_unassigned
 msgid "Shift Unassigned"
-msgstr ""
+msgstr "班次已取消分配"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1460,24 +1493,29 @@ msgstr ""
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 #: code:addons/planning_field_service/static/src/views/planning_kanban/planning_slot_kanban_button.js:0
 msgid "Shift started"
-msgstr ""
+msgstr "班次已开始"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_map_timeline/planning_field_service_map_timeline_model.js:0
 msgid "Shifts to Schedule"
-msgstr ""
+msgstr "待安排班次"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Show all records whose next activity date is past"
+msgstr "显示所有逾期未完成活动的记录"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Sign Field Service Report"
-msgstr ""
+msgstr "签署现场服务报表"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Sign Report"
-msgstr ""
+msgstr "签署报告"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__worksheet_signature
@@ -1490,7 +1528,7 @@ msgstr "签名"
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 msgid "Signature is missing."
-msgstr ""
+msgstr "缺少签名。"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1502,13 +1540,13 @@ msgstr "已签署"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__worksheet_signed_by
 msgid "Signed By"
-msgstr ""
+msgstr "签名人"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Some routing points are too far apart"
-msgstr ""
+msgstr "一些路由点相距太远"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1518,25 +1556,25 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form_in_gantt
 msgid "Start"
-msgstr ""
+msgstr "开始"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__start_datetime
 msgid "Start Date"
-msgstr ""
+msgstr "开始日期"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__state
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Status"
-msgstr ""
+msgstr "状态"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_intervention_status_changed
 #: model:mail.message.subtype,name:planning_field_service.mt_intervention_status_changed
 msgid "Status Changed"
-msgstr ""
+msgstr "状态已经更改"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_state
@@ -1546,33 +1584,37 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
+"基于活动的状态\n"
+"逾期：超出到期日期\n"
+"今天：活动日期是今天\n"
+"计划：未来活动。"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_street
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_street
 msgid "Street"
-msgstr ""
+msgstr "街道"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_street2
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_street2
 msgid "Street2"
-msgstr ""
+msgstr "街道2"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Technician"
-msgstr ""
+msgstr "技术人员"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Technicians"
-msgstr ""
+msgstr "技术人员"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_telecom
 msgid "Telecom Installer"
-msgstr ""
+msgstr "电信安装员"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1588,7 +1630,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 msgid "The intervention report is not in a state requiring customer signature."
-msgstr ""
+msgstr "该服务工单报表的状态无需客户签名。"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
@@ -1599,7 +1641,7 @@ msgstr "暂无外勤工单报告待审核及签署。"
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "There are no reports to send."
-msgstr ""
+msgstr "没有可发送的报告。"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1609,62 +1651,69 @@ msgid ""
 "customer ratings for shifts. Choose another template or disable the feature "
 "in Planning settings."
 msgstr ""
+"无法删除此电子邮件模板，因为收集班次客户评分需要使用它。请选择其他模板，或在"
+"计划设置中禁用此功能。"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This method must take two slots in argument."
-msgstr ""
+msgstr "此方法必须在参数中占用两个槽。"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This shift is already completed."
-msgstr ""
+msgstr "此班次已完成。"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This shift is already in progress."
-msgstr ""
+msgstr "此班次正在进行中。"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_type_action_config_field_service_types
 msgid ""
 "Those represent the different categories of things you have to do (e.g. "
 "\"Call\" or \"Send email\")."
-msgstr ""
+msgstr "这些代表了你必须做的不同类别的事情（例如：\"打电话 \"或 \"发送电子邮件\"）"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_map_timeline
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_map_timeline
 msgid "Timeline"
-msgstr ""
+msgstr "时间线"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "To Review"
-msgstr ""
+msgstr "待审查"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Today Activities"
+msgstr "今日活动"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Token invalid"
-msgstr ""
+msgstr "令牌无效"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Too many requests, try again in a few minutes"
-msgstr ""
+msgstr "请求太多，几分钟后再试。"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Track technicians’ locations and shifts in progress."
-msgstr ""
+msgstr "跟踪技术人员的位置和进行中的班次。"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_live_map
@@ -1672,82 +1721,84 @@ msgid ""
 "Track technicians’ locations and shifts in progress. Privacy first: Location "
 "is recorded only after sign-in and with your permission."
 msgstr ""
+"跟踪技术人员的位置和进行中的班次。隐私优先：仅在登录后并在您允许的情况下才会"
+"记录位置。"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_distance_in
 msgid "Travel Distance In"
-msgstr ""
+msgstr "到达行程距离"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_distance_out
 msgid "Travel Distance Out"
-msgstr ""
+msgstr "出发行程距离"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_time_in
 msgid "Travel Time In"
-msgstr ""
+msgstr "到达行程时间"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_time_out
 msgid "Travel Time Out"
-msgstr ""
+msgstr "出发行程时间"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer_controls.xml:0
 msgid "Travel Times"
-msgstr ""
+msgstr "行程时间"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_times_up_to_date
 msgid "Travel Times Up To Date"
-msgstr ""
+msgstr "行程时间已是最新"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Travel time"
-msgstr ""
+msgstr "行程时间"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_in
 msgid "Travel time from previous shift (or work location) to this shift."
-msgstr ""
+msgstr "上一个班次（或工作地点）到本班次的行程时间。"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_out
 msgid "Travel time from this shift to the next (or work location)."
-msgstr ""
+msgstr "本班次到下一个班次（或工作地点）的行程时间。"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_model.js:0
 msgid "Travel times updated"
-msgstr ""
+msgstr "行程时间已更新"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
+msgstr "记录中异常活动的类型。"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Unauthorized connection"
-msgstr ""
+msgstr "未经授权的连接"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_map_timeline/planning_field_service_map_timeline_controller.js:0
 msgid "Untitled"
-msgstr ""
+msgstr "未命名的"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer_controls.js:0
 msgid "Update travel times as they are out-of-date"
-msgstr ""
+msgstr "行程时间已过期，请更新"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__3
@@ -1755,36 +1806,36 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Urgent"
-msgstr ""
+msgstr "紧急"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_users
 msgid "User"
-msgstr ""
+msgstr "用户"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "View Intervention"
-msgstr ""
+msgstr "查看服务工单"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "View Report"
-msgstr ""
+msgstr "查看报告"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.js:0
 msgid "View location"
-msgstr ""
+msgstr "查看位置"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "View on Map"
-msgstr ""
+msgstr "在地图上查看"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1792,7 +1843,7 @@ msgstr ""
 msgid ""
 "You can't move this shift to draft because it is already in progress or "
 "completed."
-msgstr ""
+msgstr "无法将此班次移回草稿，因为它已在进行中或已完成。"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1800,13 +1851,13 @@ msgstr ""
 msgid ""
 "You can't unschedule this shift because it's already in progress or "
 "completed."
-msgstr ""
+msgstr "无法取消安排此班次，因为它已在进行中或已完成。"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "You cannot set a slot to draft."
-msgstr ""
+msgstr "无法将班次设为草稿。"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_zip
@@ -1818,7 +1869,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_card
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "break"
-msgstr ""
+msgstr "休息"
 
 #. module: planning_field_service
 #: model:ir.actions.report,print_report_name:planning_field_service.intervention_report
@@ -1830,4 +1881,10 @@ msgstr ""
 msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name }}: Service "
 "Rating Request"
-msgstr ""
+msgstr "{{ object.company_id.name or object.user_id.company_id.name }}：服务评分请求"
+
+#~ msgid ""
+#~ "<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "
+#~ "equipment if needed.</i>"
+#~ msgstr ""
+#~ "<b>分配资源</b><br/><i> 如有需要，可添加多名技术人员或预留设备。</i>"

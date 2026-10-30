@@ -1,8 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from collections import defaultdict
 from datetime import date
 import logging
-import re
 
 from lxml import etree
 from markupsafe import Markup
@@ -11,9 +11,8 @@ from stdnum.be.vat import compact as vat_be_compact
 from odoo import api, fields, models
 from odoo.fields import Domain
 from odoo.addons.l10n_be_hr_payroll.models.l10n_be_281_XX import COUNTRY_CODES
+from odoo.addons.l10n_be_hr_payroll.models.utils import sum_values_by_group
 from odoo.exceptions import UserError
-from odoo.tools import float_round
-from odoo.tools.safe_eval import safe_eval
 
 _logger = logging.getLogger(__name__)
 
@@ -113,12 +112,52 @@ class L10n_Be281_Mixin(models.AbstractModel):
 
     def _get_eligible_employees(self, payslips):
         # Return employees that should be included in the declaration.
-        return payslips.employee_id
+        income_lines = self._get_income_lines()
+        if not income_lines:
+            return payslips.employee_id
+        line_codes = self._get_line_codes()
+        all_line_values = payslips._get_line_values(line_codes, extra_domain=self._get_fiscal_line_domain())
+        employee_payslips = payslips.grouped('employee_id')
+        mapped_totals_by_employee = sum_values_by_group(employee_payslips, all_line_values, line_codes)
+        evaluation_plan = income_lines._get_evaluation_plan()
+        eligible_employees = self.env['hr.employee']
+        for employee, slips in employee_payslips.items():
+            line_values = mapped_totals_by_employee[employee]
+            localdict = self._get_localdict(line_values, employee, slips, all_line_values)
+            if any(round(amount, 2) for amount in income_lines._evaluate_batch(localdict, evaluation_plan).values()):
+                eligible_employees |= employee
+        return eligible_employees
+
+    def _get_income_lines(self):
+        return self.env['l10n.be.281.mapping']
+
+    def _get_withholding_amount(self):
+        # Total withholding taxes declared by this form, in euros.
+        self.ensure_one()
+        rendering_data = self.with_context(round_281=False)._get_rendering_data(self.line_ids.employee_id)
+        return rendering_data['sum_withholding']
+
+    def _get_withholding_tag(self):
+        raise NotImplementedError("Child models must define the tag of their withholding taxes.")
+
+    def _get_control_total_tag(self):
+        # Zone 2059: the control total of the form, the total of its amounts
+        return f"f{self._get_declaration_code().split('.')[1]}_2059_totaalcontrole"
+
+    def _get_withholding_amounts(self):
+        """Withholding taxes declared by this form for each employee, in euros.
+
+        :return: tuple ({employee: amount}, {employee left out of the form: error message})
+        """
+        self.ensure_one()
+        rendering_data = self.with_context(round_281=False)._get_rendering_data(self.line_ids.employee_id)
+        tag = self._get_withholding_tag()
+        amounts = {sheet_values['employee']: sheet_values[tag] for sheet_values in rendering_data['employees_data']}
+        return amounts, rendering_data['employees_with_error']
 
     def _to_eurocent(self, amount):
-        # Convert amount to eurocents if context requires it.
-        round_281 = self.env.context.get('round_281')
-        return int(amount * 100) if round_281 else amount
+        # Moved to l10n.be.281.mapping, but some other reports still expect this method to exist here.
+        return self.env['l10n.be.281.mapping']._to_eurocent(amount)
 
     def _get_line_codes(self):
         return list(set(self.env['hr.salary.rule'].with_context(active_test=False).search([]).mapped('code')))
@@ -134,6 +173,12 @@ class L10n_Be281_Mixin(models.AbstractModel):
             '|', ('date_to', '=', False), ('date_to', '>=', date(int(year), 12, 31)),
         ])
 
+    def _get_precomputed_employee_data(self, employee_payslips, all_line_values, mapped_totals_by_employee):
+        return mapped_totals_by_employee
+
+    def _get_atn_code_mapping(self):
+        return {}
+
     def _generate_employees_data(self, employee_payslips, all_line_values):
         self.ensure_one()
         base_employees_data = {}
@@ -148,23 +193,26 @@ class L10n_Be281_Mixin(models.AbstractModel):
                 employees_with_error[employee] = self.env._("The belgian postcode length shouldn't exceed 4 characters and should contain only numbers for employee %s", employee.name)
                 continue
 
-            names = re.sub(r"\([^()]*\)", "", employee.name).strip().split()
-            first_name = names[-1]
-            last_name = ' '.join(names[:-1])
+            # Box 4: the legal names of the employee, the display name may hold anything else (nickname, login...)
+            first_name, last_name = (name.strip() for name in employee._get_split_name())
             if len(first_name) > 30:
                 employees_with_error[employee] = self.env._("The employee first name shouldn't exceed 30 characters for employee %s", employee.name)
                 continue
 
-            first_contract_date = employee._get_first_contract_date(date_limit=date(int(self.declaration_id.year), 12, 31))
+            year_end = date(int(self.declaration_id.year), 12, 31)
+            first_contract_date = employee._get_first_contract_date(date_limit=year_end)
             if not first_contract_date:
                 employees_with_error[employee] = self.env._("No first contract date found for employee %s", employee.name)
                 continue
+            # Box 2: the entry date if the employee started during the year, the departure date if the employee
+            # wasn't employed anymore on December 31
+            departure_date = employee.departure_date
 
             sheet_values = {
                 'employee': employee,
                 'employee_id': employee.id,
-                'entry_date': first_contract_date.strftime('%d-%m-%Y'),
-                'departure_date': employee.departure_date.strftime('%d-%m-%Y') if employee.departure_date and employee.departure_date > first_contract_date else '',
+                'entry_date': first_contract_date.strftime('%d-%m-%Y') if first_contract_date.year == year_end.year else '',
+                'departure_date': departure_date.strftime('%d-%m-%Y') if departure_date and first_contract_date < departure_date < year_end else '',
                 'f2002_inkomstenjaar': self.declaration_id.year,
                 'f2005_registratienummer': vat_be_compact(self.declaration_id.company_id.vat),
                 'f2008_typefiche': self._get_declaration_code().replace('.', ''),
@@ -196,31 +244,51 @@ class L10n_Be281_Mixin(models.AbstractModel):
         year = self.declaration_id.year
         mapping_lines = self._get_mapping_lines(year)
         line_codes = self._get_line_codes()
+        all_worked_days = {}
+        if mapping_lines:
+            work_entry_type_codes = self.env['hr.work.entry.type'].with_context(active_test=False).search([]).mapped('code')
+            all_worked_days = self.env['hr.payslip'].union(employee_payslips.values())._get_worked_days_line_values(
+                work_entry_type_codes, ['number_of_days'])
         employees_data = []
+        valid_employee_payslips = {
+            employee: payslips for employee, payslips in employee_payslips.items() if employee not in employees_with_error
+        }
+        mapped_totals_by_employee = sum_values_by_group(valid_employee_payslips, all_line_values, line_codes)
+        worked_days_by_employee = sum_values_by_group(
+            valid_employee_payslips, all_worked_days, list(all_worked_days), 'number_of_days')
+        mapped_totals_by_employee = self._get_precomputed_employee_data(employee_payslips, all_line_values, mapped_totals_by_employee)
+        evaluation_plan = mapping_lines._get_evaluation_plan()
         for employee, payslips in employee_payslips.items():
             if employee not in base_employees_data:
                 continue
-            line_values = {
-                code: sum(all_line_values[code][p.id]['total'] for p in payslips)
-                for code in line_codes
-            }
-            sheet_values = self._get_declaration_data(mapping_lines, line_values)
+            line_values = mapped_totals_by_employee.get(employee, {})
+            line_values['entry_date'] = base_employees_data[employee]['entry_date']
+            line_values['departure_date'] = base_employees_data[employee]['departure_date']
+            localdict = self._get_localdict(
+                line_values, employee, payslips, all_line_values, worked_days=worked_days_by_employee[employee])
+            sheet_values = mapping_lines._evaluate_batch(localdict, evaluation_plan)
             employees_data.append({**base_employees_data[employee], **sheet_values})
 
-        control_tags = mapping_lines.filtered(lambda mapping_line: mapping_line.evaluation_type == 'control').mapped('tag')
-        sum_control_total = sum(
-            sheet_values[tag] for sheet_values in employees_data for tag in control_tags
-        )
-
+        control_tag = self._get_control_total_tag()
+        withholding_tag = self._get_withholding_tag()
         return {
             'base_employees_data': base_employees_data,
             'employees_data': employees_data,
             'employees_with_error': employees_with_error,
             'sum_volgnummer': sum_2009,
-            'sum_control_total': sum_control_total,
-            'sum_withholding': 0,
+            'sum_control_total': sum(sheet_values.get(control_tag, 0) for sheet_values in employees_data),
+            'sum_withholding': sum(sheet_values.get(withholding_tag, 0) for sheet_values in employees_data),
             'mapping_lines': mapping_lines,
         }
+
+    def _get_pdf_report(self):
+        return self.env.ref(f"l10n_be_hr_payroll.action_report_employee_{self._get_declaration_code().replace('.', '_')}")
+
+    def _get_pdf_filename(self, employee):
+        self.ensure_one()
+        return self.env._(
+            '%(year)s-%(employee)s-%(form)s',
+            year=self.declaration_id.year, employee=employee.name, form=self._get_declaration_code().replace('.', '_'))
 
     def _post_process_rendering_data_pdf(self, rendering_data):
         result = {}
@@ -236,65 +304,16 @@ class L10n_Be281_Mixin(models.AbstractModel):
             result[sheet_values['employee']] = {**sheet_values, **data}
         return result
 
-    def _get_localdict(self):
-        return {"float_round": float_round, "_to_eurocent": self._to_eurocent}
-
-    def _get_declaration_data(self, mapping_lines, line_values):
-        self.ensure_one()
-        mapping_lines = mapping_lines.sorted(key=lambda mapping_line: mapping_line.evaluation_type == 'control')
-
-        computed = {}
-        for mapping_line in mapping_lines:
-            computed[mapping_line.tag] = self._evaluate(mapping_line, line_values, computed)
-        return computed
-
-    def _evaluate(self, mapping_line, line_values, computed):
-        if mapping_line.evaluation_type == 'salary_rule':
-            return self._evaluate_salary_rule(mapping_line, line_values)
-        if mapping_line.evaluation_type == 'python':
-            return self._evaluate_python(mapping_line, line_values)
-        if mapping_line.evaluation_type == 'control':
-            return self._evaluate_control(mapping_line, computed)
-        raise UserError(self.env._(
-            "l10n.be.281.mapping row %(tag)s has unsupported evaluation type %(type)s.",
-            tag=mapping_line.tag, type=mapping_line.evaluation_type,
-        ))
-
-    def _evaluate_salary_rule(self, mapping_line, line_values):
-        total = sum(line_values[code] for code in mapping_line._get_codes())
-        return self._to_eurocent(round(total, 2))
-
-    def _evaluate_python(self, mapping_line, line_values):
-        localdict = self._get_localdict()
-        localdict['mapped_total'] = dict(line_values)
-        try:
-            # PY001: evaluation_value is writable only by group_hr_payroll_manager.
-            # That's the same trust level as hr.salary.rule's condition_python/amount_python_compute.
-            safe_eval(mapping_line.evaluation_value, localdict, mode='exec')
-        except Exception as e:
-            raise UserError(self.env._(
-                "l10n.be.281.mapping row %(tag)s failed to evaluate %(expr)s: %(error)s",
-                tag=mapping_line.tag, expr=mapping_line.evaluation_value, error=e,
-            )) from e
-        if 'result' not in localdict:
-            raise UserError(self.env._(
-                "l10n.be.281.mapping row %(tag)s: python evaluation_value must assign a 'result' variable.",
-                tag=mapping_line.tag,
-            ))
-        result = localdict['result']
-        return self._to_eurocent(round(result, 2)) if mapping_line.is_monetary else result
-
-    def _evaluate_control(self, mapping_line, computed):
-        total = 0
-        for target in mapping_line.control_mapping_ids:
-            try:
-                total += computed[target.tag]
-            except KeyError as e:
-                raise UserError(self.env._(
-                    "l10n.be.281.mapping control row %(tag)s references unknown or not-yet-computed tag %(missing)s.",
-                    tag=mapping_line.tag, missing=e.args[0],
-                )) from e
-        return total
+    def _get_localdict(self, line_values, employee=None, payslips=None, all_line_values=None, worked_days=None):
+        return self.env['l10n.be.281.mapping']._get_localdict(
+            line_values=line_values,
+            employee=employee or self.env['hr.employee'],
+            payslips=payslips or self.env['hr.payslip'],
+            all_line_values=all_line_values or {},
+            worked_days=defaultdict(float, worked_days or {}),
+            atn_mapping=self._get_atn_code_mapping(),
+            _to_eurocent=self._to_eurocent,
+        )
 
     def _get_xml_declaration_fields_markup(self, employee_data, lines):
         # Built with lxml, not a QWeb t-foreach: QWeb can't set an element's tag name dynamically.

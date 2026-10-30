@@ -500,8 +500,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     bus_transport_employee_kilometer = fields.Integer(
         'Bus Ride', groups="hr_payroll.group_hr_payroll_user", tracking=1)
     bus_transport_periodicity = fields.Selection([
-        ('yearly', 'Yearly'),
-        ('monthly', 'Monthly'),
+        ('yearly', 'per year'),
+        ('monthly', 'per month'),
         ('fixed', 'Fixed Price'),
     ], default='monthly')
     tram_transport_employee_amount = fields.Monetary(
@@ -509,8 +509,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     tram_transport_employee_kilometer = fields.Integer(
         'Tram Ride', groups="hr_payroll.group_hr_payroll_user", tracking=1)
     tram_transport_periodicity = fields.Selection([
-        ('yearly', 'Yearly'),
-        ('monthly', 'Monthly'),
+        ('yearly', 'per year'),
+        ('monthly', 'per month'),
         ('fixed', 'Fixed Price'),
     ], default='monthly')
     metro_transport_employee_amount = fields.Monetary(
@@ -518,8 +518,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     metro_transport_employee_kilometer = fields.Integer(
         'Metro Ride', groups="hr_payroll.group_hr_payroll_user", tracking=1)
     metro_transport_periodicity = fields.Selection([
-        ('yearly', 'Yearly'),
-        ('monthly', 'Monthly'),
+        ('yearly', 'per year'),
+        ('monthly', 'per month'),
         ('fixed', 'Fixed Price'),
     ], default='monthly')
     bike_transport_employee_kilometer = fields.Float(
@@ -734,7 +734,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             ],
             groups="hr_payroll.group_hr_payroll_user",
     )
-    l10n_be_is_retired = fields.Boolean(string="Retired", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_be_is_retired = fields.Boolean(
+        string="Retired",
+        groups="hr_payroll.group_hr_payroll_user",
+        tracking=1,
+        help="Select this when the employee works while receiving a legal retirement pension or a legal survivor's pension.",
+    )
     l10n_be_retirement_date = fields.Date(compute='_compute_retirement_date', groups="hr_payroll.group_hr_payroll_user")
     l10n_be_contribute_to_fse = fields.Boolean(string="Allowed to Contribute (FSE)", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_be_early_retirement_status = fields.Boolean(
@@ -1521,9 +1526,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     def _get_below_scale_warning_applicable_versions(self):
         today = fields.Date.context_today(self)
         valid_contract_templates = self.filtered(lambda v: not v.employee_id)
+        # Past amendments are not checked against today's minimum wage
         valid_employee_versions = self.filtered(
             lambda v: v.employee_id and v.contract_date_start and v.contract_date_start <= today
-                      and (not v.contract_date_end or v.contract_date_end >= today)
+                      and (not v.date_end or v.date_end >= today)
         )
         return (valid_contract_templates | valid_employee_versions).filtered(
             lambda v: v.company_id.country_id.code == 'BE'
@@ -1562,6 +1568,16 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
     @api.depends('l10n_be_dimona_declaration_id.state', 'contract_date_start')
     def _compute_l10n_be_needs_dimona_in(self):
+        # Contracts (employee, contract start) already declared by another version, fetched at once
+        to_check = self.filtered(lambda v: not v.l10n_be_dimona_declaration_id and v.contract_date_start)
+        declared_contracts = set()
+        if to_check:
+            declared_versions = self.env['hr.version'].search_fetch([
+                ('employee_id', 'in', to_check.employee_id._origin.ids),
+                ('contract_date_start', 'in', list(set(to_check.mapped('contract_date_start')))),
+                ('l10n_be_dimona_declaration_id', '!=', False),
+            ], ['employee_id', 'contract_date_start'])
+            declared_contracts = {(v.employee_id.id, v.contract_date_start) for v in declared_versions}
         for version in self:
             if version.l10n_be_dimona_declaration_id:
                 if version.l10n_be_dimona_declaration_id.state != 'B':
@@ -1570,14 +1586,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                     version.l10n_be_needs_dimona_in = True
                 continue
             if version.contract_date_start:
-                versions_by_employee = version.employee_id._get_contract_versions(
-                    date_start=version.contract_date_start,
-                    date_end=version.contract_date_start,
-                    domain=Domain('l10n_be_dimona_declaration_id', '!=', False))
-                if versions_by_employee[version.employee_id.id][version.contract_date_start]:
-                    version.l10n_be_needs_dimona_in = False
-                else:
-                    version.l10n_be_needs_dimona_in = True
+                version.l10n_be_needs_dimona_in = (version.employee_id._origin.id, version.contract_date_start) not in declared_contracts
             else:
                 version.l10n_be_needs_dimona_in = False
 
@@ -1590,7 +1599,107 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                     start_q_year = (start_date.year, (start_date.month - 1) // 3)
                     q_month = start_q_year[1] * 3 + 3
                     vals['contract_date_end'] = (date(start_q_year[0], q_month, 1) + relativedelta(months=1, days=-1)).strftime('%Y-%m-%d')
-        return super().create(vals_list)
+        versions = super().create(vals_list)
+        versions._activate_joint_committees()
+        versions.filtered(lambda version: version.country_code == 'BE')._check_seniority_gaps_and_schedule_activity()
+        return versions
+
+    def _activate_joint_committees(self):
+        # sudo: activating a joint committee also activates its payroll structures, rules and warnings
+        joint_committees = self.sudo().l10n_be_joint_committee_id.filtered(lambda joint_committee: not joint_committee.active)
+        if joint_committees:
+            joint_committees.active = True
+
+    def _has_work_hours_between_versions(self, version_to):
+        self.ensure_one()
+        if self.country_code != 'BE':
+            return super()._has_work_hours_between_versions(version_to)
+        seniority_lost_period = self.employee_id.version_id._l10n_be_get_seniority_lost_period()
+        seniority_lost_period_months, seniority_lost_period_days = (
+            seniority_lost_period.get("seniority_lost_period_months"),
+            seniority_lost_period.get("seniority_lost_period_days"),
+        )
+        if seniority_lost_period_months is not None or seniority_lost_period_days is not None:
+            return not self._is_continuous_with(version_to)
+        return super()._has_work_hours_between_versions(version_to)
+
+    def _check_seniority_gaps_and_schedule_activity(self):
+        if self.env.context.get('salary_simulation'):
+            return
+        seniority_lost_period = self.env['hr.rule.parameter']._get_parameter_from_code(
+            'l10n_be_seniority_lost_period', raise_if_not_found=False) or {}
+        versions = self.sudo().filtered(lambda version: version.l10n_be_joint_committee_id.egov3_code in ('200', '302'))
+        for employee, employee_versions in versions.grouped('employee_id').items():
+            if not employee.l10n_be_fictive_hire_date:
+                continue
+            if "l10n_be_hr_payroll_fictive_hiring_date_verification" in employee.activity_ids.mapped("technical_usage"):
+                continue
+            all_employee_versions_sorted = employee.version_ids.sorted('date_version')
+            if len(all_employee_versions_sorted) < 2:
+                continue
+
+            # Pairs (earlier, later) versions for each concerned version from employee_versions
+            positions = {version.id: index for index, version in enumerate(all_employee_versions_sorted)}
+            pair_indexes = set()
+            for version in employee_versions:
+                index = positions[version.id]
+                if not index:
+                    continue
+                if index > 0:
+                    pair_indexes.add((index - 1, index))
+                if index < len(all_employee_versions_sorted) - 1:
+                    pair_indexes.add((index, index + 1))
+
+            for earlier_index, later_index in sorted(pair_indexes, reverse=True):
+                earlier_version = all_employee_versions_sorted[earlier_index]
+                later_version = all_employee_versions_sorted[later_index]
+                if earlier_version._is_continuous_with(later_version):
+                    continue
+
+                # Currently only cp200, and cp302 are considered for seniority lost period
+                # cp200 1 month & cp302 0 days
+                # So we assume that for each JC, the seniority should be either in months or days
+                # If another JC in the future change this assumption, we should update this logic accordingly
+                seniority_lost_period = later_version._l10n_be_get_seniority_lost_period()
+                seniority_lost_period_months = seniority_lost_period.get('seniority_lost_period_months')
+                seniority_lost_period_days = seniority_lost_period.get('seniority_lost_period_days')
+                employee.activity_schedule(
+                    'mail.mail_activity_data_todo',
+                    note=self.env._('You created a new contract after more than %(count)d %(period_name)s(s) of interruption, verify that the fictive hiring date is correct. The fictive hiring date will be used to compute seniority and the duration of the notice period.',
+                        count=seniority_lost_period_months or seniority_lost_period_days,
+                        period_name='month' if seniority_lost_period_months else 'day'),
+                    user_id=employee.current_version_id.hr_responsible_id.id or self.env.user.id,
+                    summary=self.env._('Fictive Hiring Date Verification'),
+                    technical_usage='l10n_be_hr_payroll_fictive_hiring_date_verification',
+                )
+
+    def _is_continuous_with(self, next_version):
+        self.ensure_one()
+        if self.country_code != 'BE':
+            return super()._is_continuous_with(next_version)
+        date_from, date_to = self.contract_date_end, next_version.contract_date_start
+        if not date_from or not date_to or date_to <= date_from + timedelta(days=1):
+            return True
+        seniority_lost_period = self._l10n_be_get_seniority_lost_period()
+        max_days, max_months = seniority_lost_period['seniority_lost_period_days'], seniority_lost_period['seniority_lost_period_months']
+        if max_days is not None:
+            return self.resource_calendar_id._get_working_days_gap(date_from, date_to) <= max_days
+        if max_months is not None:
+            return date_to <= date_from + relativedelta(months=max_months)
+        return False
+
+    def _l10n_be_get_seniority_lost_period(self):
+        """
+        Returns the interruption tolerated between two contracts before the seniority is lost
+        """
+        self.ensure_one()
+        seniority_lost_period = self.env['hr.rule.parameter']._get_parameter_from_code(
+            'l10n_be_seniority_lost_period', raise_if_not_found=False) or {}
+        lost_period = seniority_lost_period.get(self.l10n_be_joint_committee_id.egov3_code, {})
+        return {
+            'seniority_lost_period_months': lost_period.get('months'),
+            'seniority_lost_period_days': lost_period.get('days'),
+        }
 
     @api.depends('address_id', 'country_code')
     def _compute_l10n_be_location_unit(self):
@@ -1601,11 +1710,14 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             version.l10n_be_location_unit = self.env['hr.work.location'].search([
                     ('address_id', '=', version.address_id.id), ('location_type', '=', 'dmfa_unit')], limit=1) if version.address_id else False
 
-    @api.depends('employee_id.version_ids.date_version', 'employee_id.version_ids.l10n_be_is_retired')
+    @api.depends('employee_id.version_ids.date_version', 'employee_id.version_ids.contract_date_start', 'employee_id.version_ids.l10n_be_is_retired')
     def _compute_retirement_date(self):
+        retirement_date_by_employee = {}
+        for employee in self.employee_id:
+            retired_versions = employee.version_ids.filtered(lambda v: v.l10n_be_is_retired)
+            retirement_date_by_employee[employee] = retired_versions[0].date_start if retired_versions else False
         for version in self:
-            retired_versions = self.employee_id.version_ids.filtered(lambda v: v.l10n_be_is_retired)
-            version.l10n_be_retirement_date = retired_versions[0].date_version if retired_versions else False
+            version.l10n_be_retirement_date = retirement_date_by_employee.get(version.employee_id, False)
 
     def write(self, vals):
         trigger_fields = ['contract_date_start', 'contract_date_end', 'l10n_be_dimona_planned_hours', 'active', 'l10n_be_joint_committee_id', 'transport_mode_car', 'car_id', 'l10n_be_dimona_planned_start_time', 'l10n_be_dimona_planned_end_time']
@@ -1624,6 +1736,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                     version.l10n_be_needs_dimona_in = True
 
         res = super().write(vals)
+        if 'l10n_be_joint_committee_id' in vals or 'employee_type_id' in vals:
+            self._activate_joint_committees()
         if potential_update:
             trigger_activities_employees = self.env['hr.employee']
             for version_sudo in self.sudo():
@@ -1657,10 +1771,11 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                         and version_sudo.employee_id and version_sudo.employee_id.current_version_id._is_struct_from_country('BE')\
                         and version_sudo.employee_id.current_version_id.contract_date_start:
                     trigger_activities_employees |= version_sudo.employee_id
+                    version_sudo._check_seniority_gaps_and_schedule_activity()
 
             trigger_activities_employees.sudo()._trigger_l10n_be_next_activities()
 
-        if ((cat_id := vals.get('l10n_be_salary_scale_id')) and self.l10n_be_joint_committee_id.egov3_code == '302'):
+        if ((cat_id := vals.get('l10n_be_salary_scale_id')) and self.l10n_be_joint_committee_id.egov3_code == '302' and self.employee_id):
             salary_scale = self.env['l10n_be.salary.scale'].browse(cat_id)
             if (cat_code := salary_scale.code) and cat_code.isnumeric() and int(cat_code) <= 9:
                 for version_sudo in self.sudo():
@@ -1964,16 +2079,15 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             return 0
         code = self.l10n_be_joint_committee_id.egov3_code
         rate = 1 / 12 if self.train_transport_periodicity == 'yearly' else 1
-        train_equivalent_amount = self._get_train_equivalent_amount(
-            self.train_transport_employee_kilometer, self.train_transport_periodicity)
-        amount = train_equivalent_amount * rate
         if code == '200':
             rule = 'train_cp200_reimbursement_ratio'
+            amount = self._get_train_equivalent_amount(self.train_transport_employee_kilometer, self.train_transport_periodicity)
         else:
             rule = 'train_cp302_reimbursement_ratio'
+            amount = self._get_train_71_8_amount(self.train_transport_employee_kilometer, self.train_transport_periodicity)
         reimbursement_rate = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
             rule, date=self.env.context.get('payslip_date'), raise_if_not_found=False) or 0
-        return amount * reimbursement_rate
+        return amount * rate * reimbursement_rate
 
     def _difference_years_months(self, start_date, end_date):
         if not start_date:
@@ -1986,10 +2100,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
     def _compute_l10n_be_in_position_seniority(self):
         today = fields.Datetime.today().date()
         for version in self:
-            dates = filter(None, [
-                version._get_field_block_start_date('l10n_be_salary_scale_id'),
-                version.contract_date_start])
-            last_occupation_change_date = min(dates, default=False)
+            last_occupation_change_date = version._get_field_block_start_date('l10n_be_salary_scale_id') \
+                or version.contract_date_start
             if version.date_start > today:
                 end_date = version.date_start
             else:
@@ -2015,7 +2127,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         *** 4th Case ***
         Employee type = CREW
         """
-        crew_employee_type_id = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_crew').id
+        # not created anymore, only exists on older databases
+        crew_employee_type = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_crew', raise_if_not_found=False)
         temporary_employee_type_id = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_temporary').id
         seasonal_employee_type_id = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_seasonal').id
         cp302_versions = self.filtered(lambda v: v.l10n_be_joint_committee_id.egov3_code == '302')
@@ -2034,10 +2147,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             version.l10n_be_computed_seniority_months = (company_seniority.months + version.l10n_be_scale_seniority_months) % 12
 
         for version in cp302_versions:
-            dates = list(filter(None, [
-                version._get_field_block_start_date('l10n_be_salary_scale_id'),
-                version.contract_date_start]))
-            last_occupation_change_date = min(dates) if dates else False
+            last_occupation_change_date = version._get_field_block_start_date('l10n_be_salary_scale_id') \
+                or version.contract_date_start
             if not last_occupation_change_date:
                 version.l10n_be_computed_seniority_years = 0
                 version.l10n_be_computed_seniority_months = 0
@@ -2048,7 +2159,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
                 version._calculate_seniority_work_entries(last_occupation_change_date)
 
             # 1st & 4th Cases
-            elif not version.fixed_term or version.employee_type_id.id == crew_employee_type_id:
+            elif not version.fixed_term or (crew_employee_type and version.employee_type_id == crew_employee_type):
                 version._calculate_seniority_cdi_crew()
             else:
                 version.l10n_be_computed_seniority_years = 0
@@ -2087,7 +2198,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         """
         self.ensure_one()
 
-        is_crew = self.employee_type_id.id == self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_crew').id
+        crew_employee_type = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_crew', raise_if_not_found=False)
+        is_crew = bool(crew_employee_type) and self.employee_type_id == crew_employee_type
         if not self.l10n_be_base_computed_seniority:
             if self.l10n_be_in_position_years == 0 and self.l10n_be_in_position_months < 6:
                 self.l10n_be_computed_seniority_years = 0
@@ -2202,13 +2314,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         """
         self.ensure_one()
 
-        dates = list(filter(None, [
-            self._get_field_block_start_date('l10n_be_salary_scale_id'),
-            self.contract_date_start,
-        ]))
-        if not dates:
+        last_occupation_change_date = self._get_field_block_start_date('l10n_be_salary_scale_id') \
+            or self.contract_date_start
+        if not last_occupation_change_date:
             return False
-        last_occupation_change_date = min(dates)
 
         adjusted_start = last_occupation_change_date
         if adjusted_start.day != 1:
@@ -2314,13 +2423,14 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             # Only the first 9 salary scales have seniority levels
             return
         current_occuation_start_date = self._get_field_block_start_date('l10n_be_salary_scale_id')
-        all_versions = self.employee_id.version_ids.filtered(lambda v: v.l10n_be_salary_scale_id).sorted(key=lambda v: v.contract_date_start or date.min, reverse=True)
+        if not current_occuation_start_date:
+            return
+        all_versions = self.employee_id.version_ids.filtered(
+            lambda v: v.l10n_be_salary_scale_id and v.contract_date_start).sorted('date_start', reverse=True)
         previous_version = self.env['hr.version']
-        previous_version_start_date = current_occuation_start_date
         for version in all_versions:
-            if version.contract_date_start < previous_version_start_date and version.l10n_be_salary_scale_id.code != new_salary_scale:
+            if version.date_start < current_occuation_start_date and version.l10n_be_salary_scale_id.code != new_salary_scale:
                 previous_version = version
-                previous_version_start_date = version.contract_date_start
                 break
         if not previous_version or previous_version.l10n_be_joint_committee_id.egov3_code != '302':
             return  # No previous occupation
@@ -2343,17 +2453,32 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         self.l10n_be_base_computed_seniority = seniority
 
     def _get_public_transport_amount_302(self, field):
+        """ CP 302 - Employer contribution to public transport costs (bus, tram, metro; train excluded).
+
+        80% of the amount actually paid by the employee, capped at the amount of the 71.8% train
+        reimbursement table for 16 km over the same period. The sector rule applies from 1 km of
+        distance; there is no minimum amount.
+        """
         self.ensure_one()
         if field not in ['bus', 'tram', 'metro']:
             raise NotImplementedError()
         amount = self[f'{field}_transport_employee_amount']
         periodicity = self[f'{field}_transport_periodicity']
-        train_equivalent_amount_1km = self._get_train_equivalent_amount(1, 'monthly')
-        train_equivalent_amount_16km = self._get_train_equivalent_amount(16, 'monthly')
         rate = 1 / 12 if periodicity == 'yearly' else 1
-        return 0.8 * min(train_equivalent_amount_16km, max(train_equivalent_amount_1km, amount * rate))
+        train_71_8_amount_16km = self._get_train_71_8_amount(16, 'yearly' if periodicity == 'yearly' else 'monthly')
+        return min(amount * 0.8, train_71_8_amount_16km) * rate
 
     def _get_public_transport_amount_200(self, field):
+        """ CP 200 - Employer contribution to public transport costs (bus, tram, metro; train excluded).
+
+        - Fixed price (independent of the distance): 71.8% of the amount actually
+          paid by the employee, capped at the 7 km amount of the 71.8% train
+          reimbursement table.
+        - Price proportional to the distance: the 71.8% train reimbursement table
+          amount for the travelled distance, capped at 75% of the amount actually
+          paid by the employee.
+
+        """
         self.ensure_one()
         if field not in ['bus', 'tram', 'metro']:
             raise NotImplementedError()
@@ -2362,10 +2487,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         kilometer = self[f'{field}_transport_employee_kilometer']
         rate = 1 / 12 if periodicity == 'yearly' else 1
         if periodicity == 'fixed':
-            train_equivalent_amount_7km = self._get_train_equivalent_amount(7, 'monthly')
-            return 0.718 * min(train_equivalent_amount_7km, amount)
-        train_equivalent_amount = self._get_train_equivalent_amount(kilometer, periodicity)
-        return min(train_equivalent_amount, 0.75 * amount) * rate
+            train_71_8_amount_7km = self._get_train_71_8_amount(7, 'monthly')
+            return min(amount * 0.718, train_71_8_amount_7km)
+        train_71_8_amount = self._get_train_71_8_amount(kilometer, periodicity)
+        return min(train_71_8_amount, 0.75 * amount) * rate
 
     def _get_l10n_be_min_wage(self):
         self.ensure_one()
@@ -2565,17 +2690,20 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
         amount = 0
         train_equivalent_amount = self._get_train_equivalent_amount(kilometer)
-        if (code == '200' or self.l10n_be_dimona_category == 'stu') and kilometer >= 3:
+        # CP 302 pays its students as its other workers
+        if (code == '200' or (self.l10n_be_dimona_category == 'stu' and code != '302')) and kilometer >= 3:
             amount = train_equivalent_amount * 0.5
-        elif kilometer >= 1:
+        elif code != '200' and kilometer >= 1:
             amount = train_equivalent_amount * 0.7
         return amount
 
-    def _get_bike_reimbursed_amount(self):
+    def _get_bike_reimbursed_amount(self, reference_date=None):
+        """Return the daily reimbursement at the given date, or today for salary package estimates."""
         self.ensure_one()
         if self.country_code != 'BE' or not self.bike_transport_employee_kilometer:
             return 0
 
+        reference_date = reference_date or fields.Date.today()
         code = self.l10n_be_joint_committee_id.egov3_code
         if code == "200":
             rule_param_per_km = "cp200_cycle_reimbursement_per_km"
@@ -2585,11 +2713,11 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             rule_param_per_km = "bike_reimbursement"
 
         cycle_reimbursement_per_km = self.env["hr.rule.parameter"].sudo()._get_parameter_from_code(
-            rule_param_per_km, date=self.env.context.get("payslip_date"), raise_if_not_found=False) or 0
+            rule_param_per_km, date=reference_date, raise_if_not_found=False) or 0
         amount = cycle_reimbursement_per_km * self.bike_transport_employee_kilometer * 2
         if code == '200':
             maximum_daily_amount = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
-            'bike_max_reimbursement_daily_cp200', date=self.env.context.get('payslip_date'), raise_if_not_found=False) or 0
+                'bike_max_reimbursement_daily_cp200', date=reference_date, raise_if_not_found=False) or 0
             amount = min(maximum_daily_amount, amount)
         return amount
 
@@ -2815,6 +2943,21 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         return train_table[kilometer_key][periodicity]
 
     @api.model
+    def _get_train_71_8_amount(self, kilometer, periodicity='monthly'):
+        train_table = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
+            'train_reimbursement_71_8', date=self.env.context.get('payslip_date'), raise_if_not_found=False)
+        if not train_table:
+            return 0.718 * self._get_train_equivalent_amount(kilometer, periodicity)
+        train_table_keys = sorted(train_table.keys())
+        kilometer_key = train_table_keys[0]
+        for train_km in train_table_keys:
+            if kilometer >= train_km:
+                kilometer_key = train_km
+            else:
+                break
+        return train_table[kilometer_key][periodicity]
+
+    @api.model
     def _generate_work_entries_postprocess_adapt_to_calendar(self, vals):
         res = super()._generate_work_entries_postprocess_adapt_to_calendar(vals)
         return res and not vals.get('l10n_be_is_time_credit')
@@ -2826,6 +2969,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
         For each date in the period, the work entries of that date are examined together to decide how the
         theoretical number of days (0, 0.5 or 1) of that date is distributed among them:
+        - extra hours come on top of the day: their duration counts, never a share of the day (a public holiday
+          with overtime keeps its full day);
         - a single work entry on a date gets 0.5 or 1 day, depending on its duration compared to the theoretical
           number of hours for that date;
         - two work entries whose durations are equal and add up to the theoretical number of hours each get 0.5 day;
@@ -2883,6 +3028,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             })
 
         for entry_date, work_entry_data in work_entries.items():
+            extra_hours = [we for we in work_entry_data if we['work_entry_type_id'].is_extra_hours]
+            for work_entry in extra_hours:
+                _add_work_data(work_data, work_entry, 0)
+            work_entry_data = [we for we in work_entry_data if we not in extra_hours]
+            if not work_entry_data:
+                continue
 
             if calendar.calendar_type == 'fixed':
                 number_of_hours_full_day = hours_per_dayofweek.get(str(entry_date.weekday()), default_hours_full_day)
@@ -2997,12 +3148,17 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             # Do not re-derive a local date from the UTC date_from/date_to datetime fields.
             leave_tz = ZoneInfo(leave.resource_id.tz or leave.company_id.tz or 'UTC')
             leave_date = leave.date_from.replace(tzinfo=UTC).astimezone(leave_tz).date()
+            # The validation splits a sickness and a work accident into paid and unpaid parts, of the
+            # worker and short-term employee scheme too: each part keeps the suspension going.
+            paid_sick_codes = ['013.00', '010.00', '082.00', '072.00', '072.01']
+            paid_work_accident_codes = ['009.00', '012.00', '070.00', '082.01']
             absent_less_than_X_days_before = self.env['hr.leave'].search([
                 ('employee_id', '=', self.employee_id.id),
                 ('request_date_to', '>=', leave_date + relativedelta(days=-30)),
                 ('request_date_from', '<=', leave_date),
                 ('work_entry_type_id.code', 'in', [
-                    '128.00', '007.05', '128.05', '009.00', '122.04', '123.00', '013.00', '122.00'
+                    '128.00', '007.05', '128.05', '122.04', '123.00', '122.00', '110.00',
+                    *paid_sick_codes, *paid_work_accident_codes,
                 ]),
                 ('state', '=', 'validate'),
             ], order="request_date_from asc")
@@ -3014,8 +3170,10 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             # Use the current absence to determine the public holiday's work entry type.
             if current_absence:
                 unpaid_work_entry_type = current_absence.work_entry_type_id
-                if unpaid_work_entry_type.code == '013.00':
+                if unpaid_work_entry_type.code in paid_sick_codes:
                     unpaid_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_common_law_illness_after_legal_period', False)
+                elif unpaid_work_entry_type.code in paid_work_accident_codes:
+                    unpaid_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid', False)
                 is_absent = True
                 paid_duration = 30
                 for offset in range(paid_duration):
@@ -3062,18 +3220,13 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             )
 
             prev_leaves_sum = current_leave_duration
-            prev_leave_start = leave.holiday_id.date_from
-            relapse_period = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code('sickness_relapse_period_days', date=prev_leave_start)
 
-            for leave in all_sick_leaves:
-                if (prev_leave_start - leave.date_to).days > relapse_period:
-                    return result
-                prev_leaves_sum += (leave.date_to - leave.date_from).days + 1
+            for sick_leave in all_sick_leaves:
+                prev_leaves_sum += (sick_leave.date_to - sick_leave.date_from).days + 1
                 if prev_leaves_sum > 30:
                     return partial_sick_work_entry_type
-                if leave.l10n_be_sickness_relapse is False:
+                if not sick_leave.l10n_be_sickness_can_relapse or not sick_leave.l10n_be_sickness_relapse:
                     return result
-                prev_leave_start = leave.date_from
 
         return result
 
@@ -3103,6 +3256,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         version_time_credit_type = version.resource_calendar_id.attendance_ids.work_entry_type_id.filtered('l10n_be_is_time_credit')
         is_starterjob = self.l10n_be_is_starterjob
         return res \
+            and not float_compare(self.resource_calendar_id.days_per_week, version.resource_calendar_id.days_per_week, precision_digits=2) \
             and self.l10n_be_time_credit == version.l10n_be_time_credit \
             and time_credit_type == version_time_credit_type \
             and self.l10n_be_joint_committee_id == version.l10n_be_joint_committee_id \
@@ -3113,16 +3267,18 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         workers_worker_codes = self.env["hr.rule.parameter"]._get_parameter_from_code('l10n_be_workers_worker_codes', raise_if_not_found=False)
         if not workers_worker_codes:
             return False
-        return self.l10n_be_worker_code_id and\
-            self.l10n_be_worker_code_id.dmfa_code in workers_worker_codes
+        # sudo: hr.version - the time off officers check the kind of worker when approving the time off
+        worker_code = self.sudo().l10n_be_worker_code_id
+        return worker_code and worker_code.dmfa_code in workers_worker_codes
 
     def is_employee(self):
         self.ensure_one()
         employees_worker_codes = self.env["hr.rule.parameter"]._get_parameter_from_code('l10n_be_employees_worker_codes', raise_if_not_found=False)
         if not employees_worker_codes:
             return False
-        return self.l10n_be_worker_code_id and\
-            self.l10n_be_worker_code_id.dmfa_code in employees_worker_codes
+        # sudo: hr.version - the time off officers check the kind of worker when approving the time off
+        worker_code = self.sudo().l10n_be_worker_code_id
+        return worker_code and worker_code.dmfa_code in employees_worker_codes
 
     def is_short_term_contract(self):
         self.ensure_one()
@@ -3139,6 +3295,12 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             self.l10n_be_worker_code_id.dmfa_code in ['024', '025', '029', '484', '485'] and
             self.l10n_be_working_region == 'br'
         )
+
+    def _l10n_be_has_no_minimum_occupation(self):
+        """ The reductions have no minimum occupation (27.5% of a full time) for the artists and the subsidised
+        contract employees (ACS) """
+        self.ensure_one()
+        return self.l10n_be_worker_code_id.dmfa_code in ['046', '047'] or self._l10n_be_is_eligible_for_acs_deduction()
 
     def is_student(self):
         self.ensure_one()
@@ -3398,7 +3560,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         }
         try:
             pem_key = certificate_sudo.private_key_id.pem_key.content
-            password = certificate_sudo.private_key_id.password.content
+            password = certificate_sudo.private_key_id.password
 
             private_key = serialization.load_pem_private_key(
                 pem_key,
@@ -3525,7 +3687,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
     @api.model
     def _issues_dependencies(self):
-        return super()._issues_dependencies() + ['l10n_be_onss_reduction_unexperienced_employees_flander'] + ['employee_id.birthday']
+        return super()._issues_dependencies() + ['l10n_be_onss_reduction_unexperienced_employees_flander'] + ['employee_id.birthday'] + ['l10n_be_dimona_next_action']
 
     def _l10n_be_dimona_issues(self, declaration_type, foreigner=False):
         """Everything that stops this version from filing this Dimona declaration."""
@@ -3559,12 +3721,14 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             if self.l10n_be_dimona_category == 'stu':
                 if not self.l10n_be_dimona_planned_hours:
                     issues.append(self.env._('- There is no defined planned hours on the student contract.'))
-                if not self.date_end:
+                if not self.contract_date_end:
                     issues.append(self.env._('- There is no defined end date on the student contract.'))
-                elif (self.date_end.month - 1) // 3 + 1 != (self.date_start.month - 1) // 3 + 1:
+                elif (self.contract_date_end.month - 1) // 3 + 1 != (self.contract_date_start.month - 1) // 3 + 1:
                     issues.append(self.env._('- Start date and end date should belong to the same quarter.'))
-                if self.date_start < fields.Date.context_today(self):
+                if self.contract_date_start and self.contract_date_start < fields.Date.context_today(self):
                     issues.append(self.env._('- The DIMONA should be introduced before start date for students.'))
+        if declaration_type in ('out', 'update', 'cancel') and not self.l10n_be_dimona_declaration_id:
+            issues.append(self.env._('- The DIMONA entrance of this contract was not declared from Odoo: declare it from the portal of the social security.'))
         elif declaration_type == 'out':
             if not self.contract_date_end:
                 issues.append(self.env._('- There is not end date defined on the employee contract.'))
@@ -4042,7 +4206,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         if self.company_id.country_id.code != 'BE' or not self.contract_date_start:
             return
         new_resource_calendar = self.env['resource.calendar'].browse(resource_calendar_id)
-        if new_resource_calendar.work_time_rate == self.resource_calendar_id.work_time_rate:
+        if new_resource_calendar == self.resource_calendar_id:
             return
         # Don't open the pop-up if employee does not have a payslip
         if not self.env['hr.payslip'].search_count([('employee_id', '=', self.employee_id.id)], limit=1):
@@ -4050,8 +4214,8 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         action = self.env['ir.actions.actions']._for_xml_id('l10n_be_hr_payroll.schedule_change_wizard_action')
         action['context'] = {
             'default_version_id': self.id,
-            'default_date_start': self.contract_date_start,
-            'default_date_end': self.contract_date_end or False,
+            'default_date_start': self.date_start,
+            'default_date_end': self.date_end or False,
             'default_resource_calendar_id': new_resource_calendar.id,
         }
         return action

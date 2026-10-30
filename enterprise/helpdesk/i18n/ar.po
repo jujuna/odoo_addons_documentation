@@ -17,11 +17,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 03:29+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-12 10:38+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
-"helpdesk/ar/>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/helpdesk/"
+"ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -122,8 +122,8 @@ msgstr "<b>قم بسحب وإفلات</b> البطاقة لتغيير مرحلة
 msgid ""
 "<b>Log internal notes</b> and use @<b>mentions</b> to notify your colleagues."
 msgstr ""
-"<b>قم بتدوين الملاحظات الداخلية</b> واستخدم @<b>الإشارات</b> لإخطار زملائك في "
-"العمل."
+"<b>قم بتدوين الملاحظات الداخلية</b> واستخدم @<b>الإشارات</b> لإخطار زملائك "
+"في العمل."
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
@@ -177,8 +177,8 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"                مرحباً <t t-out=\"object.sudo().partner_id.name\"/>،<br/><br/>"
-"\n"
+"                مرحباً <t t-out=\"object.sudo().partner_id.name\"/>،<br/><br/"
+">\n"
 "                لاحظنا عدم وجود أي نشاط على تذكرة الدعم الخاصة بك\n"
 "                <t t-if=\"object.team_id.privacy_visibility == 'portal'\">\n"
 "                    <a t-att-href=\"object.get_portal_url()\">#<t t-"
@@ -189,11 +189,11 @@ msgstr ""
 "out=\"object.name\"/>)</strong>\n"
 "                </t>\n"
 "                لفترة طويلة.<br/><br/>\n"
-"                إذا تم حل مشكلتك، فلا داعي لاتخاذ أي إجراء - سيتم إغلاق التذكرة "
-"تلقائيًا خلال <t t-out=\"object.team_id.auto_close_reminder_delay\"/> "
+"                إذا تم حل مشكلتك، فلا داعي لاتخاذ أي إجراء - سيتم إغلاق "
+"التذكرة تلقائيًا خلال <t t-out=\"object.team_id.auto_close_reminder_delay\"/> "
 "أيام.<br/><br/>\n"
-"                إذا كنت لا تزال بحاجة إلى المساعدة، فما عليك سوى الرد على هذا "
-"البريد الإلكتروني وسنبقي تذكرتك مفتوحة.<br/><br/>\n"
+"                إذا كنت لا تزال بحاجة إلى المساعدة، فما عليك سوى الرد على "
+"هذا البريد الإلكتروني وسنبقي تذكرتك مفتوحة.<br/><br/>\n"
 "                <t t-out=\"object.company_id.name\"/> فريق الدعم \n"
 "            </div>\n"
 "        "
@@ -319,16 +319,16 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>"
-"\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
 "    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
 "    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            <t t-if=\"partner.name\">\n"
-"                مرحباً <t t-out=\"partner.name or ''\">براندن فريمان</t>،<br/>"
-"<br/>\n"
+"                مرحباً <t t-out=\"partner.name or ''\">براندن فريمان</t>،<br/"
+"><br/>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
 "                مرحباً،<br/>\n"
@@ -385,8 +385,8 @@ msgstr ""
 "            نحن نقدّر ملاحظاتك، حيث أنها تعييننا على التحسن باستمرار.\n"
 "            <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
 "12px; opacity: 0.5; color: #454748;\">تم إرسال استبيان العميل هذا لأنه قد تم "
-"نقل تذكرتك إلى مرحلة <b t-out=\"object.stage_id.name or ''\">قيد التنفيذ</b>"
-".</span>\n"
+"نقل تذكرتك إلى مرحلة <b t-out=\"object.stage_id.name or ''\">قيد التنفيذ</b>."
+"</span>\n"
 "        </td></tr>\n"
 "    </tbody>\n"
 "    </table>\n"
@@ -478,13 +478,13 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    السيد/السيدة<t t-out=\"object.sudo().partner_id.name or object.sudo()"
-".partner_name or 'Madam/Sir'\">الموقرين</t>،<br/><br/>\n"
+"    السيد/السيدة<t t-out=\"object.sudo().partner_id.name or "
+"object.sudo().partner_name or 'Madam/Sir'\">الموقرين</t>،<br/><br/>\n"
 "    لقد تم تلقي طلبك\n"
-"    <t t-if=\"hasattr(object.team_id, 'website_id') and object.get_portal_url"
-"()\">\n"
-"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ "
-"object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">أرجل "
+"    <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.get_portal_url()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
+"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">أرجل "
 "الطاولة غير متوازنة</a>\n"
 "    </t>\n"
 "    وتتم مراجعته الآن من قِبَل <t t-out=\"object.team_id.name or ''\">فريق "
@@ -495,9 +495,9 @@ msgstr ""
 "    لإرسال أي معلومات إضافية، ما عليك سوى الرد على رسالة البريد الإلكتروني "
 "هذه.<br/><br/>\n"
 "    <t t-if=\"object.team_id.show_knowledge_base\">\n"
-"        لا تتردد في زيارة <a t-attf-href=\"{{ "
-"object.team_id.get_knowledge_base_url() }}\">مركز المساعدة لدينا</a>. قد تجد "
-"الإجابات التي تبحث عنها هناك.\n"
+"        لا تتردد في زيارة <a t-attf-"
+"href=\"{{ object.team_id.get_knowledge_base_url() }}\">مركز المساعدة لدينا</"
+"a>. قد تجد الإجابات التي تبحث عنها هناك.\n"
 "        <br/><br/>\n"
 "    </t>\n"
 "    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
@@ -510,25 +510,25 @@ msgstr ""
 "object.team_id.use_website_helpdesk_form\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain "
 "or '', object.get_portal_url())\" target=\"_blank\">عرض التذكرة</a>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
-"font-size: 14px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">"
-"عرض التذكرة</a>\n"
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"object.get_portal_url()\" "
+"target=\"_blank\">عرض التذكرة</a>\n"
 "        </t>\n"
 "        <t t-if=\"hasattr(object.team_id, 'website_id') and "
 "object.team_id.allow_portal_ticket_closing\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
 "(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
 "target=\"_blank\">إغلاق التذكرة</a>\n"
@@ -536,8 +536,8 @@ msgstr ""
 "        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, "
 "object.access_token)\" target=\"_blank\">إغلاق التذكرة</a>\n"
 "        </t>\n"
@@ -546,8 +546,8 @@ msgstr ""
 "object.team_id.use_website_helpdesk_slides\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"object.team_id.feature_form_url\" "
 "target=\"_blank\">الذهاب إلى مركز المساعدة</a>\n"
 "        </t><br/><br/>\n"
@@ -577,8 +577,8 @@ msgid ""
 "title=\"Unhappy\"/>"
 msgstr ""
 "<i class=\"oi oi-fw o_button_icon text-success\" data-"
-"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"سعيد "
-"\"/>\n"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"سعيد \"/"
+">\n"
 "                            <i class=\"oi oi-fw o_button_icon text-warning\" "
 "data-icon=\"sentiment_neutral\">= 3.66\" title=\"محايد \"/>\n"
 "                            <i class=\"oi oi-fw o_button_icon text-danger\" "
@@ -598,8 +598,8 @@ msgid ""
 "title=\"Unhappy\"/>"
 msgstr ""
 "<i class=\"oi oi-fw o_button_icon text-success\" data-"
-"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"سعيد "
-"\"/>\n"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"سعيد \"/"
+">\n"
 "                            <i class=\"oi oi-fw o_button_icon text-warning\" "
 "data-icon=\"sentiment_neutral\">= 3.66\" title=\"محايد \"/>\n"
 "                            <i class=\"oi oi-fw o_button_icon text-danger\" "
@@ -622,9 +622,10 @@ msgid ""
 "Alias Domain. You can achieve this by navigating to the General Settings and "
 "configuring the corresponding field.</span>"
 msgstr ""
-"<i class=\"oi\" data-icon=\"lightbulb\" role=\"img\"/><span class=\"ms-2\">"
-"لاستخدام لقب البريد الإلكتروني، الخطوة الأولى هي تهيئة نطاق اللقب. يمكنك القيام "
-"بذلك عن طريق التنقل إلى الإعدادات العامة وتهيئة الحقل المقابل.</span>"
+"<i class=\"oi\" data-icon=\"lightbulb\" role=\"img\"/><span "
+"class=\"ms-2\">لاستخدام لقب البريد الإلكتروني، الخطوة الأولى هي تهيئة نطاق "
+"اللقب. يمكنك القيام بذلك عن طريق التنقل إلى الإعدادات العامة وتهيئة الحقل "
+"المقابل.</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -930,8 +931,8 @@ msgid ""
 "Adapt your <b>pipeline</b> to your workflow by adding <b>stages</b> <i>(e.g. "
 "Awaiting Customer Feedback, etc.).</i>"
 msgstr ""
-"قم بملاءمة <b>مخطط سير العمل</b> الخاص بك ليناسب سير عملك عن طريق إضافة <b>"
-"مراحل</b> <i>(مثال: بانتظار ملاحظات العميل، وما إلى ذلك).</i>"
+"قم بملاءمة <b>مخطط سير العمل</b> الخاص بك ليناسب سير عملك عن طريق إضافة "
+"<b>مراحل</b> <i>(مثال: بانتظار ملاحظات العميل، وما إلى ذلك).</i>"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
@@ -1140,9 +1141,9 @@ msgid ""
 "cannot be accessed by the customer, as it belongs to a helpdesk team that is "
 "not publicly available, or there is no customer associated with the ticket."
 msgstr ""
-"في الوقت الحالي، لا توجد معاينة متاحة للعرض. لا يمكن للعميل الوصول إلى التذكرة "
-"الحالية، لأنها تخص فريق مكتب المساعدة غير المتاح للجمهور، أو لا يوجد عميل "
-"مرتبط بالتذكرة."
+"في الوقت الحالي، لا توجد معاينة متاحة للعرض. لا يمكن للعميل الوصول إلى "
+"التذكرة الحالية، لأنها تخص فريق مكتب المساعدة غير المتاح للجمهور، أو لا يوجد "
+"عميل مرتبط بالتذكرة."
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__message_attachment_count
@@ -1153,7 +1154,7 @@ msgstr "عدد المرفقات"
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_auto_assignment
 msgid "Auto Assignment"
-msgstr ""
+msgstr "التعيين التلقائي"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_ticket_reminder
@@ -1656,17 +1657,18 @@ msgid ""
 "Day to reach the stage of the SLA, without taking the working calendar into "
 "account"
 msgstr ""
-"اليوم للوصول إلى مرحلة اتفاقية مستوى الخدمة، دون أخذ تقويم العمل بعين الاعتبار"
+"اليوم للوصول إلى مرحلة اتفاقية مستوى الخدمة، دون أخذ تقويم العمل بعين "
+"الاعتبار"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__rotting_days
 msgid "Days Rotting"
-msgstr ""
+msgstr "أيام الانتظار دون إجراء تغيير"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rotting_threshold_days
 msgid "Days to rot"
-msgstr ""
+msgstr "عدد الأيام حتى تصل إلى مرحلة الركود "
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_status__deadline
@@ -1810,8 +1812,8 @@ msgid ""
 msgstr ""
 "بريد إلكتروني يتم إرساله تلقائياً إلى العميل عندما تصل التذكرة إلى هذه "
 "المرحلة. \n"
-"سيتم إرسال هذا البريد الإلكتروني افتراضياً من لقب البريد الإلكتروني لفريق مكتب "
-"المساعدة. \n"
+"سيتم إرسال هذا البريد الإلكتروني افتراضياً من لقب البريد الإلكتروني لفريق "
+"مكتب المساعدة. \n"
 "وإلا، فسيتم إرساله من عنوان البريد الإلكتروني الخاص بالشركة أو من جامع رسائل "
 "البريد الإلكتروني (كما هو محدد في معايير النظام)."
 
@@ -1990,9 +1992,9 @@ msgid ""
 "followers. Employees automatically get access to the tickets they are "
 "assigned to."
 msgstr ""
-"امنح الموظفين صلاحية الوصول إلى فريق مكتب المساعدة أو التذاكر عن طريق إضافتهم "
-"كمتابعين. يحصل الموظفون تلقائياً على صلاحيات الوصول إلى التذاكر التي تم "
-"إسنادها إليهم."
+"امنح الموظفين صلاحية الوصول إلى فريق مكتب المساعدة أو التذاكر عن طريق "
+"إضافتهم كمتابعين. يحصل الموظفون تلقائياً على صلاحيات الوصول إلى التذاكر التي "
+"تم إسنادها إليهم."
 
 #. module: helpdesk
 #. odoo-python
@@ -2182,7 +2184,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 msgid "High Priority"
-msgstr ""
+msgstr "أولوية عالية"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__2
@@ -2194,7 +2196,7 @@ msgstr "أولوية عالية"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__rotting_threshold_days
 msgid "Highlight tickets that haven't been updated for this many days."
-msgstr ""
+msgstr "قم بتمييز التذاكر التي لم يتم تحديثها منذ عدة أيام."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -2249,7 +2251,7 @@ msgstr ""
 #. module: helpdesk
 #: model:helpdesk.team,name:helpdesk.helpdesk_team2
 msgid "IT Support (Auto Assignment by Tags)"
-msgstr ""
+msgstr "الدعم التقني (إسناد التذاكر تلقائياً حسب علامات التصنيف)"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_exception_icon
@@ -2460,7 +2462,8 @@ msgstr "فلنقم بإنشاء <b>تذكرتك</b> الأولى."
 msgid ""
 "Let's go back to the <b>kanban view</b> to get an overview of your next "
 "tickets."
-msgstr "فلنعد إلى <b>طريقة عرض كانبان</b> للحصول على نظرة عامة لتذاكرك التالية."
+msgstr ""
+"فلنعد إلى <b>طريقة عرض كانبان</b> للحصول على نظرة عامة لتذاكرك التالية."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -2864,8 +2867,8 @@ msgid ""
 "attached, even if they did not reply to it. If set, this will disable the "
 "creation of new records completely."
 msgstr ""
-"معرف اختياري لمناقشة (سجل) سيتم إرفاق كافة رسائل البريد الإلكتروني الواردة فيه"
-"، حتى لو لم يتم الرد عليها. إذا تم تعيين قيمة له، سيعطل هذا إنشاء السجلات "
+"معرف اختياري لمناقشة (سجل) سيتم إرفاق كافة رسائل البريد الإلكتروني الواردة "
+"فيه، حتى لو لم يتم الرد عليها. إذا تم تعيين قيمة له، سيعطل هذا إنشاء السجلات "
 "الجديدة بالكامل."
 
 #. module: helpdesk
@@ -2931,8 +2934,8 @@ msgstr ""
 "- المستخدمون الداخليون المدعوون: بوسع المستخدمين الداخليين الوصول إلى الفِرَق "
 "والتذاكر التي يتابعونها. يمكن تعديل صلاحيات الوصول لكل تذكرة على حدة، عن "
 "طريقة إضافة أو إزالة المستخدمين كمتابعين.\n"
-"سيظل بوسع المستخدمين ذوي مستوى صلاحية وصول مكتب المساعدة > المدراء الوصول إلى "
-"هذا الفريق وتذاكره، حتى وإن لم يكونوا من المتابعين.\n"
+"سيظل بوسع المستخدمين ذوي مستوى صلاحية وصول مكتب المساعدة > المدراء الوصول "
+"إلى هذا الفريق وتذاكره، حتى وإن لم يكونوا من المتابعين.\n"
 "\n"
 "- كافة المستخدمين الداخليين: بوسع كافة المستخدمين الداخليين الوصول إلى "
 "الفريق وتذاكره دون تمييز.\n"
@@ -3210,7 +3213,7 @@ msgstr "الاستردادات"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Reimburse customers with a voucher code for future purchases"
-msgstr ""
+msgstr "تعويض العملاء بقسيمة لاستخدامها في المشتريات القادمة "
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.auto_close_reminder_email_template
@@ -3236,7 +3239,7 @@ msgstr "الإصلاحات"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_product_replacements
 msgid "Replacements"
-msgstr ""
+msgstr "البدائل"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
@@ -3277,7 +3280,7 @@ msgstr "البضاعة المرجعة"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__is_rotting
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Rotting"
-msgstr ""
+msgstr "راكدة "
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
@@ -3372,7 +3375,7 @@ msgstr "نجاح اتفاقية مستوى الخدمة"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 msgid "SLA Success Rate"
-msgstr ""
+msgstr "نسبة نجاح اتفاقية مستوى الخدمة"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__sla_status__ongoing
@@ -3453,12 +3456,6 @@ msgid "Security Token"
 msgstr "رمز الحماية"
 
 #. module: helpdesk
-#. odoo-javascript
-#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
-msgid "Select the <b>customer</b> of your ticket."
-msgstr "اختر <b>عميل</b> تذكرتك."
-
-#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Self-Service"
 msgstr "خدمة ذاتية"
@@ -3496,7 +3493,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Send customers a replacement for a lost, damaged, or returned item"
-msgstr ""
+msgstr "أرسل للعملاء بديلاً عن المنتج المفقود أو التالف أو المرتجع "
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_service
@@ -3738,7 +3735,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "The customer cannot belong to a different company than the ticket."
-msgstr ""
+msgstr "لا يمكن أن ينتمي العميل إلى شركة مختلفة عن الشركة المذكورة في التذكرة."
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_model_id
@@ -3747,8 +3744,8 @@ msgid ""
 "email that does not reply to an existing record will cause the creation of a "
 "new record of this model (e.g. a Project Task)"
 msgstr ""
-"النموذج (مستندات أودو) الذي يقترن به هذا اللقب. أي رسالة واردة لا ترد على سجل "
-"موجود ستقوم بإنشاء سجل جديد من نفس نوع هذا النموذج (مثلًا: مهمة مشروع)"
+"النموذج (مستندات أودو) الذي يقترن به هذا اللقب. أي رسالة واردة لا ترد على "
+"سجل موجود ستقوم بإنشاء سجل جديد من نفس نوع هذا النموذج (مثلًا: مهمة مشروع)"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_name
@@ -3789,14 +3786,15 @@ msgid ""
 "This is a name that helps you keep track of your different campaign efforts, "
 "e.g. Fall_Drive, Christmas_Special"
 msgstr ""
-"يساعدك هذا الاسم على تتبع جهود حملاتك المختلفة، مثال: fall_drive ،"
-"christmas_special"
+"يساعدك هذا الاسم على تتبع جهود حملاتك المختلفة، مثال: "
+"fall_drive ،christmas_special"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__medium_id
 msgid "This is the method of delivery, e.g. Postcard, Email, or Banner Ad"
 msgstr ""
-"هذه هي طريقة التوصيل، مثال: بطاقة بريدية، أو البريد الإلكتروني أو لافتة إعلانية"
+"هذه هي طريقة التوصيل، مثال: بطاقة بريدية، أو البريد الإلكتروني أو لافتة "
+"إعلانية"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__source_id
@@ -3812,8 +3810,8 @@ msgstr ""
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "This ticket was closed %s hours after its SLA deadline."
 msgstr ""
-"تم إغلاق هذه التذكرة بعد %s ساعات من الموعد النهائي لاتفاقية مستوى الخدمة (SLA)"
-"."
+"تم إغلاق هذه التذكرة بعد %s ساعات من الموعد النهائي لاتفاقية مستوى الخدمة "
+"(SLA)."
 
 #. module: helpdesk
 #. odoo-python
@@ -4105,8 +4103,8 @@ msgid ""
 "Track the performance of your teams, the success rate of your tickets, and "
 "how quickly you reach your service level agreements (SLAs)."
 msgstr ""
-"تتبع أداء فِرَقك ونسبة نجاح تذاكرك وسرعة وصولك إلى اتفاقيات مستوى الخدمة (SLAs)"
-"."
+"تتبع أداء فِرَقك ونسبة نجاح تذاكرك وسرعة وصولك إلى اتفاقيات مستوى الخدمة "
+"(SLAs)."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -4201,7 +4199,7 @@ msgstr "استخدام الكوبونات"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__use_giftcards
 msgid "Use Gift Cards"
-msgstr ""
+msgstr "استخدم بطاقات الهدايا"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -4211,8 +4209,9 @@ msgid ""
 "customers. Add new people to the followers' list to make them aware of the "
 "progress of this ticket."
 msgstr ""
-"استخدم الدردشة <b>لإرسال رسائل البريد الإلكتروني</b> والتواصل بكفاءة مع عملائك. "
-"أضف المزيد من الأشخاص إلى قائمة المتابعين لإبقائهم على علم بتقدم هذه التذكرة."
+"استخدم الدردشة <b>لإرسال رسائل البريد الإلكتروني</b> والتواصل بكفاءة مع "
+"عملائك. أضف المزيد من الأشخاص إلى قائمة المتابعين لإبقائهم على علم بتقدم هذه "
+"التذكرة."
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_res_users
@@ -4252,8 +4251,8 @@ msgid ""
 "Want to use the website form? Just adjust your team's visibility to "
 "\"Invited portal users and all internal users\" and watch the magic happen!"
 msgstr ""
-"هل ترغب في استخدام استمارة الموقع الإلكتروني؟ ما عليك سوى ضبط ظهور فريقك إلى ”"
-"مستخدمي البوابة المدعوين وكافة المستخدمين الداخليين“ وشاهد مفعول ذلك!"
+"هل ترغب في استخدام استمارة الموقع الإلكتروني؟ ما عليك سوى ضبط ظهور فريقك إلى "
+"”مستخدمي البوابة المدعوين وكافة المستخدمين الداخليين“ وشاهد مفعول ذلك!"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -4347,7 +4346,7 @@ msgstr "هل ترغب في إلغاء أرشفة كافة التذاكر الم�
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_twitter
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
@@ -4379,6 +4378,8 @@ msgid ""
 "You cannot update the company of this partner because it would lead to "
 "inconsistency with some of its tickets."
 msgstr ""
+"لا يمكنك تحديث الشركة الخاصة بهذا الشريك لأن ذلك سيؤدي إلى عدم اتساق بعض "
+"التذاكر الخاصة بها."
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_sla
@@ -4476,8 +4477,8 @@ msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name or "
 "'Helpdesk' }}: Service Rating Request"
 msgstr ""
-"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' }}"
-": طلب تقييم الخدمة"
+"{{ object.company_id.name or object.user_id.company_id.name or "
+"'Helpdesk' }}: طلب تقييم الخدمة"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.new_ticket_request_email_template
@@ -4489,6 +4490,9 @@ msgstr "{{ object.name }}"
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "👤 Unassigned"
 msgstr "👤 غير مسند"
+
+#~ msgid "Select the <b>customer</b> of your ticket."
+#~ msgstr "اختر <b>عميل</b> تذكرتك."
 
 #~ msgid "Auto Assigment"
 #~ msgstr "التعيين التلقائي"

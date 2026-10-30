@@ -59,7 +59,7 @@ class AccountReturn(models.Model):
             new_states = []
             for state_dict in record.visible_states:
                 mutated_state = state_dict.copy()
-                if mutated_state['name'] == 'submitted' and not record.is_quarter_month:
+                if mutated_state['name'] == 'submitted' and record.type_external_id == 'l10n_it_reports.it_tax_return_type' and not record.is_quarter_month:
                     mutated_state['label'] = self.env._('Close')
 
                 new_states.append(mutated_state)
@@ -80,13 +80,15 @@ class AccountReturn(models.Model):
             and self.closing_move_ids
             and "l10n_it_reports_monthly_tax_report_options" not in self.env.context
             and self.is_quarter_month
+            # Only the periodic VAT return produces the LIPE, other Italian returns (e.g. withholding) must not open the wizard.
+            and self.type_external_id == 'l10n_it_reports.it_tax_return_type'
         ):
             return res
 
         closing_max_date = max(self.closing_move_ids.mapped('date'))
         last_posted_tax_closing = self.env['account.move'].search(Domain([
             *self.env['account.move']._check_company_domain(self.company_id),
-            ('closing_return_id', '!=', False),
+            ('closing_return_id.type_id', '=', self.type_id.id),
             ('move_type', '=', 'entry'),
             ('state', '=', 'posted'),
             ('date', '<', closing_max_date),

@@ -1,11 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from unittest.mock import patch
 
-from odoo.tests import tagged, Form
-from odoo.addons.l10n_au_hr_payroll_api.models.account_edi_proxy_user import AccountEdiProxyClientUser
-from odoo.addons.l10n_au_hr_payroll_account.tests.test_superstream import TestPayrollSuperStream
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo import Command
+from odoo.exceptions import UserError
+from odoo.tests import Form, tagged
+
 from .common import TestL10nAUPayrollAPICommon
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.addons.l10n_au_hr_payroll_account.tests.test_superstream import TestPayrollSuperStream
+from odoo.addons.l10n_au_hr_payroll_api.models.account_edi_proxy_user import AccountEdiProxyClientUser
 
 
 @tagged("post_install_l10n", "post_install", "-at_install", "l10n_au_hr_payroll")
@@ -102,6 +105,19 @@ class TestPayrollSuperStreamApi(TestPayrollSuperStream, TestL10nAUPayrollAPIComm
         with self.mock_super_requests():
             superstream.action_register_super_payment()
             superstream.update_payment_status()
+
+    def test_02_invalid_apra_fund_blocks_validation(self):
+        self._create_fund()
+        fund = self.SuperFund.search([], limit=1)
+        fund.is_valid = False
+        self.employee.l10n_au_super_account_ids.unlink()
+        self.employee.l10n_au_super_account_ids = [Command.create({
+            "fund_id": fund.id,
+            "member_nbr": "123456",
+        })]
+        self.payslips.compute_sheet()
+        with self.assertRaisesRegex(UserError, "superannuation fund is not valid"):
+            self.payslips.action_payslip_done()
 
     def test_04_super_resubmit_failed(self):
         self._create_fund()

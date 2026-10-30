@@ -1,11 +1,17 @@
 /** @odoo-module **/
 
-import { describe, expect, test } from "@odoo/hoot";
+import { beforeEach, describe, expect, test } from "@odoo/hoot";
+import { patchWithCleanup } from "@web/../tests/web_test_helpers";
+import { localization } from "@web/core/l10n/localization";
 import { patch } from "@web/core/utils/patch";
 import { FlowEditor } from "@voip/core/flow_editor/flow_editor";
 import { FlowEditorStore } from "@voip/core/flow_editor/flow_editor_store";
 
 test.tags("headless");
+
+beforeEach(() => {
+    patchWithCleanup(localization, { direction: "ltr" });
+});
 
 const DEFAULT_NODE_SIZE = { width: 220, height: 120 };
 const MIN_NODE_SIZE = { width: 120, height: 80 };

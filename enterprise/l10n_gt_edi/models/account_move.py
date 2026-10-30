@@ -24,10 +24,13 @@ DOC_TYPE_NAME = {
     'FESP': "Factura Especial",
     'FPEQ': "Factura Electrónica para Pequeños Contribuyentes",
     'FCAP': "Factura Cambiaria de Pequeño Contribuyente",
-    'NABN': "Nota de Pago Electrónica",
+    'NABN': "Nota de Abono",
     'NCRE': "Nota de Crédito Electrónica",
     'NDEB': "Nota de Débito Electrónica",
 }
+
+# document types for which SAT accepts the export complement
+EXPORT_DOC_TYPES = {'FACT', 'FCAM', 'FPEQ', 'FCAP'}
 
 VALID_DOC_TYPES_BY_AFFILIATION = {
     'GEN': {'FACT', 'FCAM', 'FESP', 'NABN', 'NCRE', 'NDEB'},
@@ -38,6 +41,8 @@ VALID_DOC_TYPES_BY_AFFILIATION = {
     'ECA': {'NABN'},
     'EXI': {'NABN'},
     'EXE': {},
+    'PRIM': {},
+    'PECU': {},
 }
 
 
@@ -181,20 +186,21 @@ class AccountMove(models.Model):
             else:
                 move.l10n_gt_edi_doc_type = False
 
-    @api.depends('commercial_partner_id', 'l10n_gt_edi_doc_type')
+    @api.depends('commercial_partner_id', 'l10n_gt_edi_doc_type', 'state')
     def _compute_l10n_gt_edi_phrase_ids(self):
         for move in self:
-            if move.country_code == 'GT' and move.commercial_partner_id and move.l10n_gt_edi_doc_type not in ('FESP', 'NABN'):
-                if move.state == 'draft' or (move.state == 'posted' and not move.l10n_gt_edi_state):
-                    move.l10n_gt_edi_phrase_ids = (
-                        move.l10n_gt_edi_phrase_ids +
-                        move.company_id.l10n_gt_edi_phrase_ids +
-                        move.commercial_partner_id.l10n_gt_edi_phrase_ids
-                    )
-                else:
-                    move.l10n_gt_edi_phrase_ids = move.l10n_gt_edi_phrase_ids
-            else:
+            if move.country_code != 'GT' or not move.commercial_partner_id or move.l10n_gt_edi_doc_type == 'FESP':
                 move.l10n_gt_edi_phrase_ids = False
+            elif move.state == 'draft' or (move.state == 'posted' and not move.l10n_gt_edi_state):
+                move.l10n_gt_edi_phrase_ids = (
+                    move.l10n_gt_edi_phrase_ids +
+                    move.company_id.l10n_gt_edi_phrase_ids +
+                    move.commercial_partner_id.l10n_gt_edi_phrase_ids
+                )
+                if move.l10n_gt_edi_doc_type == 'NABN':
+                    move.l10n_gt_edi_phrase_ids -= move.company_id.l10n_gt_edi_phrase_ids
+            else:
+                move.l10n_gt_edi_phrase_ids = move.l10n_gt_edi_phrase_ids
 
     @api.depends('country_code', 'commercial_partner_id')
     def _compute_l10n_gt_edi_show_consignatory_partner(self):
@@ -726,6 +732,12 @@ class AccountMove(models.Model):
         partner_is_final_consumer = self.commercial_partner_id == self.env.ref('l10n_gt_edi.final_consumer', raise_if_not_found=False)
         partner_is_guatemalan = self.commercial_partner_id.country_code == 'GT'
 
+        dte_exp = self.l10n_gt_edi_doc_type in EXPORT_DOC_TYPES and not partner_is_guatemalan
+        if self.l10n_gt_edi_doc_type in ('NCRE', 'NDEB'):
+            # notes copy 'Exp' from the referenced document but never carry the export complement
+            reference_move = self.reversed_entry_id if self.l10n_gt_edi_doc_type == 'NCRE' else self.debit_origin_id
+            dte_exp = reference_move.l10n_gt_edi_doc_type in EXPORT_DOC_TYPES and reference_move.commercial_partner_id.country_code != 'GT'
+
         receptor_tipo_especial = None
         # the receptor is identified by its NIT (`vat`), or by its CUI when it has no NIT
         receptor_id = (partner_identifier.get('value') or '').replace('-', '')
@@ -739,7 +751,7 @@ class AccountMove(models.Model):
 
         gt_values.update({
             'dte_tipo': self.l10n_gt_edi_doc_type,
-            'dte_exp': 'SI' if self.commercial_partner_id.country_code != 'GT' else None,
+            'dte_exp': 'SI' if dte_exp else None,
             'dte_fecha': self.invoice_date.strftime(DTE_DATE_FORMAT),
             'dte_codigo_moneda': self.currency_id.name,
             'emisor_nit': (sudo_root_company.vat or '').replace('-', ''),
@@ -774,16 +786,13 @@ class AccountMove(models.Model):
             'items': items,
             'total_impuestos': total_impuestos,
             'gran_total': f"{grand_total:.10f}",
-            'have_exportacion': self.l10n_gt_edi_doc_type == 'FACT' and not partner_is_guatemalan,
+            'have_exportacion': self.l10n_gt_edi_doc_type in EXPORT_DOC_TYPES and dte_exp,
             'have_referencias': self.l10n_gt_edi_doc_type in ('NCRE', 'NDEB'),
             'have_cambiaria': self.l10n_gt_edi_doc_type in ('FCAM', 'FCAP'),
             'is_especial_fectura': self.l10n_gt_edi_doc_type == 'FESP',
             'skip_phrases': (
-                self.l10n_gt_edi_doc_type == 'NABN'
-                or (
-                    self.l10n_gt_edi_doc_type == 'FESP'
-                    and not self.l10n_gt_edi_phrase_ids
-                )
+                self.l10n_gt_edi_doc_type in ('FESP', 'NABN')
+                and not self.l10n_gt_edi_phrase_ids
             ),
             'narration': html2plaintext(self.narration),
         })
@@ -858,7 +867,7 @@ class AccountMove(models.Model):
         gt_values = {}
         self._l10n_gt_edi_add_base_values(gt_values)
         if gt_values['have_exportacion']:
-            self._l10n_gt_edi_add_export_values(gt_values)  # FACT export invoices (to foreigner)
+            self._l10n_gt_edi_add_export_values(gt_values)  # export documents (to foreigner)
         if gt_values['have_referencias']:
             self._l10n_gt_edi_add_reference_values(gt_values)  # credit/debit note (NCRE/NDEB)
         if gt_values['have_cambiaria']:
@@ -892,7 +901,7 @@ class AccountMove(models.Model):
                                          "It is considered as accepted and it won't be sent to the SAT."))
 
         if self._can_commit():
-            self._cr.commit()
+            self.env.cr.commit()
 
     def _l10n_gt_edi_try_cancel(self, cancel_reason):
         self.ensure_one()

@@ -104,6 +104,26 @@ registry.category("web_tour.tours").add("test_quality_fail_message", {
             run: "click",
         },
         {
+            content: "Pass the quality check.",
+            trigger: '.o_mrp_record_line:contains("Assembly Quality Check") [data-icon="check"]',
+            run: "click",
+        },
+        {
+            content: "Undo the passed quality check.",
+            trigger: '.o_mrp_record_line:contains("Assembly Quality Check") [data-icon="undo"]',
+            run: "click",
+        },
+        {
+            content: "Reload after unchecking the quality check.",
+            trigger: '.o_mrp_record_line:contains("Assembly Quality Check") [data-icon="check"]',
+            run: () => window.location.reload(),
+            expectUnloadPage: true,
+        },
+        {
+            content: "The quality check remains unchecked after reloading.",
+            trigger: '.o_mrp_record_line:contains("Assembly Quality Check") [data-icon="check"]',
+        },
+        {
             content: "Fail the quality check.",
             trigger: ".o_mrp_record_line i[data-icon='close']",
             run: "click",

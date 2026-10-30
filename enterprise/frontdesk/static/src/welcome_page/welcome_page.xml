@@ -16,14 +16,15 @@
                         Welcome to
                         <div class="display-5 fw-bold" t-out="this.props.stationInfo.name"/>
                     </h1>
-                    <div class="d-none d-lg-block flex-basis-50 text-end">
+                    <div t-if="this.props.stationInfo.self_check_in" class="d-none d-lg-block flex-basis-50 text-end">
                         <button command="show-modal" commandfor="frontdesk-qrcode-dialog" class="btn p-0">
                             <img class="rounded border bg-white o_qrcode" t-att-src="this.state.qrCode" alt="QR Code"/>
                         </button>
                     </div>
+                    <div t-else="" class="flex-basis-50"/>
                 </div>
 
-                <dialog id="frontdesk-qrcode-dialog" class="border-0 position-relative">
+                <dialog t-if="this.props.stationInfo.self_check_in" id="frontdesk-qrcode-dialog" class="border-0 position-relative">
                     <button class="position-absolute top-0 end-0 p-3 btn-close btn-sm pe-none" aria-label="Close"/>
                     <button commandfor="frontdesk-qrcode-dialog" command="close" class="btn p-0">
                         <img class="bg-white w-100" t-att-src="this.state.qrCode" alt="QR Code"/>

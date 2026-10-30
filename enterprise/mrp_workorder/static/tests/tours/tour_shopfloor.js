@@ -114,6 +114,21 @@ registry.category("web_tour.tours").add("test_shop_floor", {
             run: "click",
         },
         {
+            content: "Uncheck the instruction and reload the page",
+            trigger: ".o_mrp_record_line:nth-child(2) [data-icon='undo']",
+            run: "click",
+        },
+        {
+            trigger: ".o_mrp_record_line:nth-child(2) [data-icon='check']",
+            run: () => window.location.reload(),
+            expectUnloadPage: true,
+        },
+        {
+            content: "Mark the instruction as read again",
+            trigger: ".o_mrp_record_line:nth-child(2) [data-icon='check']",
+            run: "click",
+        },
+        {
             content: "Register legs consumption by scanning product's barcode",
             trigger: ".o_mrp_record_line:nth-child(2) [data-icon='undo']",
             run: "scan PRODUCT_LEG",

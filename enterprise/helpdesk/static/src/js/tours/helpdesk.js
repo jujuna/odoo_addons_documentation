@@ -1,6 +1,7 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { markup } from "@odoo/owl";
+import { searchOrCreateMany2X } from "@web_tour/tour_scenarios";
 
 registry.category("web_tour.tours").add("helpdesk_tour", {
     steps: () => [
@@ -48,29 +49,12 @@ registry.category("web_tour.tours").add("helpdesk_tour", {
         {
             trigger: ".o_form_editable",
         },
-        {
-            isActive: ["manual"],
-            trigger: ".o_field_widget[name='partner_id']",
-            content: markup(_t("Select the <b>customer</b> of your ticket.")),
-            tooltipPosition: "top",
-            run: "click",
-        },
-        {
-            isActive: ["auto"],
+        ...searchOrCreateMany2X({
             trigger: "div[name=partner_id] input",
-            content: markup(_t("Select the <b>customer</b> of your ticket.")),
-            tooltipPosition: "top",
-            run: "edit Admin",
-        },
-        {
-            trigger: ".o_form_editable",
-        },
-        {
-            isActive: ["auto"],
-            trigger: ".ui-autocomplete > li > a:not(:has(i.oi))",
-            run: "click",
-            tooltipPosition: "right",
-        },
+            label: "customer",
+            searchText: "Admin",
+            selectExisting: true,
+        }),
         {
             trigger: ".o_form_view",
         },

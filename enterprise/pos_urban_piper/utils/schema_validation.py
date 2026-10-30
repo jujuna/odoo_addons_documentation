@@ -57,11 +57,29 @@ store_action_schema = object_of({
     'location_ref_id': True,
 })
 
+inventory_update_schema = object_of({
+    'store': object_of({
+        'ref_id': True,
+    }),
+    'stats': object_of({
+        'items': True,
+    }),
+})
+
+store_creation_schema = object_of({
+    'stores': list_of(object_of({
+        'ref_id': True,
+        'upipr_status': True,
+    })),
+})
+
 EVENT_TYPE_SCHEMAS = {
     'order_placed': order_data_schema,
     'order_status_update': order_status_update_schema,
     'rider_status_update': rider_status_update_schema,
     'store_action': store_action_schema,
+    'inventory_update': inventory_update_schema,
+    'store_creation': store_creation_schema,
 }
 
 
@@ -74,6 +92,10 @@ def get_store_ref_id(data, event_type):
         return data['store']['ref_id']
     if event_type == 'store_action':
         return data['location_ref_id']
+    if event_type == 'inventory_update':
+        return data['store']['ref_id']
+    if event_type == 'store_creation':
+        return data['stores'][0]['ref_id'] if data['stores'] else False
     return False
 
 

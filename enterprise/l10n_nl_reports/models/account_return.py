@@ -86,6 +86,12 @@ class AccountReturn(models.Model):
         return super()._prepare_submission()
 
     def action_refresh_sbr_status(self):
+        self.ensure_one()
+        if self.l10n_nl_sbr_status == 'pending':
+            status_service = self.env['l10n_nl_reports.sbr.status.service'].search([
+                ('account_return_id', '=', self.id),
+            ], order='id desc', limit=1)
+            status_service.is_done = False
         self.env['l10n_nl_reports.sbr.status.service']._cron_process_submission_status()
         return {
             'type': 'ir.actions.client',

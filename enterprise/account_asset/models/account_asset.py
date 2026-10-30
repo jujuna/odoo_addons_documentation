@@ -7,6 +7,9 @@ from odoo.tools import float_is_zero, formatLang
 
 from odoo.addons.account.models.product import ACCOUNT_DOMAIN
 
+# Countries where assets created from bills are left in "draft" state
+MANUAL_VALIDATION_COUNTRY_CODES = ['DE']
+
 
 class AccountAsset(models.Model):
     _name = 'account.asset'
@@ -145,13 +148,17 @@ class AccountAsset(models.Model):
     gross_increase_count = fields.Integer(related='current_selected_variant_id.gross_increase_count')
     total_depreciation_entries_count = fields.Integer(related='current_selected_variant_id.total_depreciation_entries_count')
 
-    # Import fields
+    can_edit_asset_accounts = fields.Boolean(compute='_compute_can_edit_asset_accounts')
+
+    # Import fields, also used to edit the accounts of the selected variant from the asset form
     import_account_depreciation_id = fields.Many2one(
-        comodel_name='account.account', check_company=True, store=False,
+        comodel_name='account.account', check_company=True,
+        compute='_compute_depreciation_accounts', inverse='_inverse_depreciation_accounts', readonly=False,
         domain=ACCOUNT_DOMAIN,
     )
     import_account_depreciation_expense_id = fields.Many2one(
-        comodel_name='account.account', check_company=True, store=False,
+        comodel_name='account.account', check_company=True,
+        compute='_compute_depreciation_accounts', inverse='_inverse_depreciation_accounts', readonly=False,
         domain=ACCOUNT_DOMAIN,
     )
 
@@ -216,6 +223,33 @@ class AccountAsset(models.Model):
                 if len(asset.original_move_line_ids.account_id) > 1:
                     raise UserError(self.env._("All the lines should be from the same account"))
                 asset.account_asset_id = asset.original_move_line_ids.account_id
+
+    @api.depends('state', 'account_asset_id.asset_depreciation_account_id', 'account_asset_id.asset_expense_account_id')
+    def _compute_can_edit_asset_accounts(self):
+        for asset in self:
+            asset.can_edit_asset_accounts = (
+                asset.state == 'draft'
+                and asset.account_asset_id
+                and not (asset.account_asset_id.asset_depreciation_account_id and asset.account_asset_id.asset_expense_account_id)
+            )
+
+    @api.depends(
+        'account_asset_id',
+        'current_selected_variant_id.account_depreciation_id',
+        'current_selected_variant_id.account_depreciation_expense_id',
+    )
+    def _compute_depreciation_accounts(self):
+        for asset in self:
+            asset.import_account_depreciation_id = asset.current_selected_variant_id.account_depreciation_id or asset.account_asset_id.asset_depreciation_account_id
+            asset.import_account_depreciation_expense_id = asset.current_selected_variant_id.account_depreciation_expense_id or asset.account_asset_id.asset_expense_account_id
+
+    def _inverse_depreciation_accounts(self):
+        # Without variant, the accounts are given to the variant when it is created
+        for asset in self.filtered('current_selected_variant_id'):
+            asset.current_selected_variant_id.write({
+                'account_depreciation_id': asset.import_account_depreciation_id.id,
+                'account_depreciation_expense_id': asset.import_account_depreciation_expense_id.id,
+            })
 
     @api.depends('original_move_line_ids')
     def _compute_related_purchase_value(self):
@@ -296,11 +330,11 @@ class AccountAsset(models.Model):
     @api.onchange('account_asset_id')
     def _onchange_account_asset_id(self):
         self.model_id = self.account_asset_id.depreciation_model_id
-        self.prorata_computation_type = self.account_asset_id.depreciation_model_id.prorata_computation_type
+        self.prorata_computation_type = self.account_asset_id.depreciation_model_id.prorata_computation_type or 'constant_periods'
 
     @api.onchange('model_id')
     def _onchange_model_id(self):
-        self.prorata_computation_type = self.model_id.prorata_computation_type
+        self.prorata_computation_type = self.model_id.prorata_computation_type or 'constant_periods'
         self.method = self.model_id.method
         self.journal_id = self.model_id._get_journal(self.company_id)
 
@@ -406,6 +440,11 @@ class AccountAsset(models.Model):
             })
         return new_assets
 
+    def _set_no_depreciation_model_if_empty(self):
+        # Assets saved without a depreciation model are not depreciated.
+        if assets := self.filtered(lambda asset: asset.id and not asset.model_id):
+            assets.model_id = self.env['account.depreciation.model']._get_no_depreciation_model()
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -428,12 +467,26 @@ class AccountAsset(models.Model):
             if 'original_value' in asset_vals:
                 asset.original_value = asset_vals['original_value']
             if 'main_variant_id' not in asset_vals and not asset.main_variant_id:
-                asset.main_variant_id = self.env['account.asset.variant'].create({
-                        'asset_id': asset.id,
-                        'account_depreciation_id': asset.import_account_depreciation_id,
-                        'account_depreciation_expense_id': asset.import_account_depreciation_expense_id,
-                        **variant_vals
-                    }).id
+                # The form sends these fields empty as long as the variant doesn't exist: let the variant compute them
+                variant_vals = {
+                    field: value for field, value in variant_vals.items()
+                    if value or field not in ('prorata_date', 'prorata_computation_type')
+                }
+                accounts = {
+                    'account_depreciation_id': variant_vals.pop('account_depreciation_id', asset.import_account_depreciation_id.id),
+                    'account_depreciation_expense_id': variant_vals.pop('account_depreciation_expense_id', asset.import_account_depreciation_expense_id.id),
+                }
+                variant = self.env['account.asset.variant'].create({
+                    'asset_id': asset.id,
+                    **accounts,
+                    **variant_vals,
+                })
+                asset.main_variant_id = variant
+                # Becoming the main variant recomputes the variant's accounts from the fixed asset account
+                if changed_accounts := {field: account for field, account in accounts.items() if variant[field].id != account}:
+                    variant.write(changed_accounts)
+        # The model is held by the main variant, so it can only be set once the variant exists
+        new_recs._set_no_depreciation_model_if_empty()
         return new_recs
 
     def write(self, vals):
@@ -441,6 +494,8 @@ class AccountAsset(models.Model):
         result = super().write(asset_vals)
         if variant_vals:
             self.current_selected_variant_id.write(variant_vals)
+        # After the variant write, which would otherwise clear the model set here
+        self._set_no_depreciation_model_if_empty()
         return result
 
     def _split_assets_variants_vals(self, vals):
@@ -675,6 +730,15 @@ class AccountAsset(models.Model):
     # -------------------------------------------------------------------------
     # HELPER METHODS
     # -------------------------------------------------------------------------
+    def _can_be_auto_validated(self):
+        """ Whether an asset created or updated from a bill is confirmed when the bill is posted. """
+        self.ensure_one()
+        if self.country_code in MANUAL_VALIDATION_COUNTRY_CODES:
+            return False
+        return self.model_id.method == 'no_depreciation' or bool(
+            self.main_variant_id.account_depreciation_id and self.main_variant_id.account_depreciation_expense_id
+        )
+
     def _post_non_deductible_tax_value(self):
         # If the asset has a non-deductible tax, the value is posted in the chatter to explain why
         # the original value does not match the related purchase(s).

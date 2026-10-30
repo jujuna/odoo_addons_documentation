@@ -257,3 +257,51 @@ class BelgiumSalesReportTest(AccountSalesReportCommon):
         listing_node = xml_tree.find('.//ns2:IntraListing', namespaces)
         declarant_ref = listing_node.get('DeclarantReference')
         self.assertIn('0477472701', declarant_ref)
+
+    @freeze_time('2019-12-31')
+    def test_ec_sales_report_xml_period_shifted_fiscal_year(self):
+        """
+        Test that a shifted fiscal year (i.e., ending March 15) does not
+        affect the period tags of the EC Sales List XML: only perfect
+        calendar months and quarters generate a Month/Quarter tag.
+        """
+        self.company.write({
+            'fiscalyear_last_day': 15,
+            'fiscalyear_last_month': '3',
+        })
+        handler = self.env[self.report.custom_handler_model_name]
+        namespaces = {'ns2': 'http://www.minfin.fgov.be/IntraConsignment'}
+
+        # Case 1: March 16 - April 15 ('period_type' resolved as: custom)
+        # Expectation: No tags. It is a fiscal month, but an irregular calendar month.
+        options = self.report.get_options({'date': {'date_from': '2026-03-16', 'date_to': '2026-04-15'}})
+        xml_tree = self.get_xml_tree_from_string(handler.export_to_xml_sales_report(options)['file_content'])
+        month_node = xml_tree.find('.//ns2:Period/ns2:Month', namespaces)
+        quarter_node = xml_tree.find('.//ns2:Period/ns2:Quarter', namespaces)
+        self.assertIsNone(month_node, "Fiscal month should not generate a Month tag")
+        self.assertIsNone(quarter_node, "Fiscal month should not generate a Quarter tag")
+
+        # Case 2: March 16 - June 15 ('period_type' resolved as: custom)
+        # Expectation: No tags. It is a fiscal quarter, but an irregular calendar quarter.
+        options = self.report.get_options({'date': {'date_from': '2026-03-16', 'date_to': '2026-06-15'}})
+        xml_tree = self.get_xml_tree_from_string(handler.export_to_xml_sales_report(options)['file_content'])
+        month_node = xml_tree.find('.//ns2:Period/ns2:Month', namespaces)
+        quarter_node = xml_tree.find('.//ns2:Period/ns2:Quarter', namespaces)
+        self.assertIsNone(month_node, "Fiscal quarter should not generate a Month tag")
+        self.assertIsNone(quarter_node, "Fiscal quarter should not generate a Quarter tag")
+
+        # Case 3: April 1 - April 30 ('period_type' resolved as: month)
+        # Expectation: <ns2:Month>4</ns2:Month>. It's a perfect calendar month.
+        options = self.report.get_options({'date': {'date_from': '2026-04-01', 'date_to': '2026-04-30'}})
+        xml_tree = self.get_xml_tree_from_string(handler.export_to_xml_sales_report(options)['file_content'])
+        month_node = xml_tree.find('.//ns2:Period/ns2:Month', namespaces)
+        self.assertIsNotNone(month_node, "Perfect calendar month must generate a Month tag")
+        self.assertEqual(month_node.text, '4')
+
+        # Case 4: April 1 - June 30 ('period_type' resolved as: quarter)
+        # Expectation: <ns2:Quarter>2</ns2:Quarter>. It's a perfect calendar Q2.
+        options = self.report.get_options({'date': {'date_from': '2026-04-01', 'date_to': '2026-06-30'}})
+        xml_tree = self.get_xml_tree_from_string(handler.export_to_xml_sales_report(options)['file_content'])
+        quarter_node = xml_tree.find('.//ns2:Period/ns2:Quarter', namespaces)
+        self.assertIsNotNone(quarter_node, "Perfect calendar Q2 must generate a Quarter tag")
+        self.assertEqual(quarter_node.text, '2')

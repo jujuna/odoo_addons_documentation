@@ -207,10 +207,11 @@ class AccountEdiFormat(models.Model):
                         _("You cannot cancel a document that is still authorized (%(authorization_num)s, %(authorization_date)s), check the SRI portal",
                           authorization_num=auth_num, authorization_date=auth_date),
                     )
-            if not errors:
+            is_cancelled = not errors and not warnings
+            if is_cancelled:
                 move.l10n_ec_authorization_date = False  # unset upon cancelling
             res[move] = {
-                'success': not errors,
+                'success': is_cancelled,
                 'error': '<br/>'.join([html_escape(e) for e in (errors or warnings)]),
                 'blocking_level': 'error' if errors else 'warning',
             }
@@ -521,7 +522,7 @@ class AccountEdiFormat(models.Model):
             # No authorization number means the invoice was no authorized yet
             warnings.append(_("Document with access key %s received by government and pending authorization",
                               authorization_num))
-        else:
+        elif not auth_warnings:
             # SRI unexpected error
             errors.append(_("Document not authorized by SRI, please try again later"))
 
@@ -541,7 +542,7 @@ class AccountEdiFormat(models.Model):
             company_id, "authorization",
             claveAccesoComprobante=l10n_ec_authorization_number
         )
-        if zeep_errors:
+        if zeep_errors or response is None:
             return auth_state, auth_num, auth_date, zeep_errors, zeep_warnings
         try:
             response_auth_list = response['autorizaciones'] and response['autorizaciones']['autorizacion'] or []

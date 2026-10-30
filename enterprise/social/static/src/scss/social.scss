@@ -1,7 +1,5 @@
 // Variables
 // ===================================================
-$o-social-border-radius-base: 3px;
-$o-social-border-radius-bubble: 16px;
 $o-social-font-family-reset: $o-font-family-sans-serif;
 
 // Form Views
@@ -280,17 +278,12 @@ $o-social-font-family-reset: $o-font-family-sans-serif;
 
 // Record Design
 .o_social_stream_post_kanban_global {
-    border-radius: $o-social-border-radius-base;
+    --Card-border-radius-top: var(--border-radius-lg);
+    --Card-border-radius-bottom: var(--border-radius-lg);
+    cursor: pointer;
 
     &:hover {
-        border-color: var(--link-color);
-        cursor: pointer;
-    }
-}
-
-.o_kanban_ungrouped {
-    .o_social_stream_post_kanban_global {
-        border-radius: 0;
+        --Card-border-color: #{$gray-400};
     }
 }
 
@@ -317,7 +310,7 @@ $o-social-font-family-reset: $o-font-family-sans-serif;
 }
 
 .o_social_stream_post_link {
-    border-radius: $o-social-border-radius-base;
+    border-radius: $border-radius;
 
     img {
         width: 2.6em;
@@ -467,10 +460,6 @@ $o-social-font-family-reset: $o-font-family-sans-serif;
         .dropdown-toggle:after {
             content: none;
         }
-    }
-
-    .o_social_add_comment, .o_social_comment_image {
-        border-radius: $o-social-border-radius-base;
     }
 
     .o_social_comment_image {

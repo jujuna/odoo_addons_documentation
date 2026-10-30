@@ -2,9 +2,10 @@ import { _t } from "@web/core/l10n/translation";
 import { localization } from "@web/core/l10n/localization";
 import { registry } from "@web/core/registry";
 
-import { Component, onWillStart, onWillUpdateProps, proxy, t, useProps } from "@odoo/owl";
+import { Component, computed, onWillStart, onWillUpdateProps, proxy, t, useProps } from "@odoo/owl";
 import { useStudioServiceAsReactive } from "@web_studio/studio_service";
 import { useService } from "@web/core/utils/hooks";
+import { useEnv } from "@web/owl2/utils";
 const editorTabRegistry = registry.category("web_studio.editor_tabs");
 
 class Breadcrumbs extends Component {
@@ -13,28 +14,31 @@ class Breadcrumbs extends Component {
         currentTab: t.object(),
         switchTab: t.function(),
     });
-    setup() {
-        this.editionFlow = proxy(this.env.editionFlow);
-        this.nextCrumbId = 1;
-    }
-    get breadcrumbs() {
+    editionFlow = useEnv().editionFlow;
+    nextCrumbId = 0;
+
+    baseCrumb = computed(() => {
         const currentTab = this.props.currentTab;
-        const crumbs = [
-            {
-                data: {
-                    name: currentTab.name,
-                },
-                handler: () => this.props.switchTab({ tab: currentTab.id }),
+        return {
+            id: `__base__${currentTab.id}`,
+            data: {
+                name: currentTab.name,
             },
-        ];
-        const breadcrumbs = this.editionFlow.breadcrumbs;
-        breadcrumbs.forEach((crumb) => {
-            crumbs.push(crumb);
-        });
-        for (const crumb of crumbs) {
-            crumb.id = crumb.id || this.nextCrumbId++;
+            handler: () => this.props.switchTab({ tab: currentTab.id }),
+        };
+    });
+
+    crumbs = computed(() => {
+        const crumbs = [this.baseCrumb()];
+        for (const c of this.env.editionFlow.breadcrumbs) {
+            c.id ??= this.nextCrumbId++;
+            crumbs.push(c);
         }
         return crumbs;
+    });
+
+    get breadcrumbs() {
+        return this.crumbs();
     }
 }
 

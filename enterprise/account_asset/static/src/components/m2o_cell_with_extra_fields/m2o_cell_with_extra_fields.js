@@ -31,7 +31,7 @@ patch(M2OCellWithExtraFields.prototype, {
         const m2oProps = computeM2OProps({
             ...this.props,
             name: "depreciation_model_id",
-            placeholder: _t("Select a Depreciation Model"),
+            placeholder: _t("No depreciation"),
             string: _t("Depreciation Model"),
             canOpen: true,
             canQuickCreate: false,

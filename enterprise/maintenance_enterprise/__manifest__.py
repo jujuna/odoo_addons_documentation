@@ -8,6 +8,11 @@
     'data': [
         'views/maintenance_views.xml',
     ],
+    'assets': {
+        'web.assets_backend_lazy': [
+            'maintenance_enterprise/static/src/**/*',
+        ],
+    },
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'auto_install': True,

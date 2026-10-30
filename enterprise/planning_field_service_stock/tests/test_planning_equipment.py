@@ -1,6 +1,9 @@
 from datetime import datetime
 
+from odoo import Command
+from odoo.tools import html2plaintext
 from odoo.tests import tagged, new_test_user, freeze_time, Form
+from odoo.tests.common import users
 from odoo.addons.planning.tests.common import TestCommonPlanning
 from odoo.exceptions import AccessError
 
@@ -225,3 +228,53 @@ class TestPlanningEquipment(TestCommonPlanning):
 
         self.assertEqual(slot.lot_ids, self.lot_other,
                          "Changing the customer entirely should reset the equipment list.")
+
+    @users('eq_planning_user', 'eq_planning_admin')
+    def test_documents_from_equipment_variant_and_template(self):
+        """Test that the button counts and opens the documents of the equipment variant and of its
+        template, not the ones of the template's other variants."""
+        color = self.env['product.attribute'].sudo().create({
+            'name': 'Color',
+            'value_ids': [Command.create({'name': 'Red'}), Command.create({'name': 'Blue'})],
+        })
+
+        template = self.env['product.template'].sudo().create({
+            'name': 'Tracked Product With Variants',
+            'is_storable': True,
+            'tracking': 'lot',
+            'attribute_line_ids': [Command.create({
+                'attribute_id': color.id,
+                'value_ids': [Command.set(color.value_ids.ids)],
+            })],
+        })
+        equipment_variant, other_variant = template.product_variant_ids
+
+        partner = self.env['res.partner'].sudo().create({'name': 'Customer With Documents'})
+        self._deliver_lot_to_partner(equipment_variant, 'SN-DOCUMENTS', partner)
+
+        template_document, variant_document, _other_variant_document = self.env['product.document'].sudo().create([
+            {'name': 'Template Manual', 'res_model': 'product.template', 'res_id': template.id},
+            {'name': 'Variant Manual', 'res_model': 'product.product', 'res_id': equipment_variant.id},
+            {'name': 'Other Variant Manual', 'res_model': 'product.product', 'res_id': other_variant.id},
+        ])
+
+        with self.with_user('eq_planning_admin'):
+            slot = self._create_slot(partner)
+        slot = slot.with_user(self.env.user)
+
+        self.assertEqual(slot.product_document_count, 2,
+                         "Only the documents of the equipment variant and of its template should be counted.")
+
+        documents = slot.env['product.document'].search(slot.action_open_documents()['domain'])
+        self.assertEqual(documents, template_document + variant_document, "The button should open the documents it counts.")
+
+    def test_equipement_report(self):
+        slot = self._create_slot(self.partner_a)
+        html = self.env['ir.actions.report']._render_qweb_html('planning_field_service.intervention_report', slot.id)[0]
+        text = html2plaintext(html)
+        self.assertRegex(text, r'\*\*Equipment\*\*\n\n\nName\nLot/Serial Number', "Reports should have display Equipment table when the slot has equipment")
+
+        slot.partner_id = self.partner_no_lots
+        html = self.env['ir.actions.report']._render_qweb_html('planning_field_service.intervention_report', slot.id)[0]
+        text = html2plaintext(html)
+        self.assertNotRegex(text, r'\*\*Equipment\*\*\n\n\nName\nLot/Serial Number', "Reports should have not display Equipment table when the slot has no equipment")

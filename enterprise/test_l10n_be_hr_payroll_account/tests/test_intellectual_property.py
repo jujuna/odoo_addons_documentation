@@ -60,6 +60,7 @@ class TestIntellectualProperty(TestPayslipValidationCommon, TestBelgiumCommon):
         self._validate_rule_computed(payslip, 'IP.EXEMPT')
         self._validate_rule_computed(payslip, 'IP.ONSS', expected=False)
         self._validate_rule_computed(payslip, 'ONSS.NO.WT', expected=False)
+        payslip.with_context(hr_payroll_force_compute_issue=True)._compute_issues()
         self.assertFalse(payslip.error_count)
 
     def test_ip_onss_forced(self):
@@ -122,6 +123,7 @@ class TestIntellectualProperty(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip = self._generate_payslip(self.date_from, self.date_to)
         self._validate_payslip(payslip)
         self.assertAlmostEqual(payslip.line_ids.filtered(lambda l: l.code == 'IP').total, 500, 2)
+        payslip.with_context(hr_payroll_force_compute_issue=True)._compute_issues()
         self.assertFalse(payslip.error_count)
         messages = [issue['message'] for issue in payslip.issues.values()]
         self.assertTrue(any('intellectual property limit' in message for message in messages), messages)
@@ -133,6 +135,7 @@ class TestIntellectualProperty(TestPayslipValidationCommon, TestBelgiumCommon):
         self._validate_payslip(payslip)
         for code in ['IP.EXEMPT', 'IP.PART', 'IP.ONSS', 'ONSS.NO.WT', 'GROSSIP', 'IP', 'IP.DED']:
             self._validate_rule_computed(payslip, code, expected=False)
+        payslip.with_context(hr_payroll_force_compute_issue=True)._compute_issues()
         self.assertFalse(payslip.error_count)
         messages = [issue['message'] for issue in payslip.issues.values()]
         self.assertTrue(any('intellectual property limit' in message for message in messages), messages)

@@ -305,7 +305,19 @@
             <field name="structure_id" ref="hr_payroll.structure_002"/>
         </record>
 
-        <!-- Generate payslips -->
+        <!-- without these, no payslips will be in the payruns, so the payruns will appear empty -->
+        <function model="hr.payslip.run" name="_generate_payslips">
+            <value model="hr.payslip.run" eval="ref('hr_payslip_batch_year_1')"/>
+        </function>
+        <function model="hr.payslip.run" name="_generate_payslips">
+            <value model="hr.payslip.run" eval="ref('hr_payslip_batch_year_2')"/>
+        </function>
+        <function model="hr.payslip.run" name="_generate_payslips">
+            <value model="hr.payslip.run" eval="ref('hr_payslip_batch_latest')"/>
+        </function>
+        <function model="hr.payslip.run" name="_generate_payslips">
+            <value model="hr.payslip.run" eval="ref('hr_payslip_batch_new_batch')"/>
+        </function>
         <function model="hr.payslip.run" name="_generate_payslips">
             <value model="hr.payslip.run" eval="ref('hr_payslip_batch_month_1')"/>
         </function>
@@ -319,8 +331,8 @@
         </function>
 
         <!-- Set pay run to paid -->
-        <function model="hr.payslip.run" name="action_paid">
-            <value model="hr.payslip.run" eval="[ref('hr_payslip_batch_month_2')]"/>
+        <function model="hr.payslip" name="action_payslip_paid">
+            <value model="hr.payslip" search="[('payslip_run_id', '=', ref('hr_payslip_batch_month_2'))]"/>
         </function>
 
         <function model="hr.leave" name="action_approve">

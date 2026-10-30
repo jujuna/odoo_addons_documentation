@@ -7,6 +7,7 @@ import { getModelName } from "@website/builder/plugins/form/utils";
 import { aiChannelBus } from "@ai/utils/ai_channel_bus";
 import { getData, triggers } from "@ai/utils/bus_data_getter";
 import { getCSSVariableValue, getHtmlStyle } from "@html_editor/utils/formatting";
+import { setBuilderCSSVariables } from "@html_builder/utils/utils_css";
 import { EDITOR_COLOR_CSS_VARIABLES } from "@html_editor/utils/color";
 import {
     AI_EDITABLE_ZONE_SELECTORS,
@@ -180,9 +181,18 @@ export class AiWebsiteBuilderPlugin extends Plugin {
             }, CSS_RELOAD_MAX_WAIT);
         });
 
-        const reloadPromise = this.dependencies.customizeWebsite.reloadBundles().catch((error) => {
-            console.warn("ai_website: CSS reload failed", error);
-        });
+        const reloadPromise = this.dependencies.customizeWebsite
+            .reloadBundles()
+            .then(() => {
+                if (!this.isDestroyed) {
+                    // AI updates CSS outside the builder; refresh previews.
+                    setBuilderCSSVariables(getHtmlStyle(this.document));
+                    this.trigger("on_dom_updated_handlers");
+                }
+            })
+            .catch((error) => {
+                console.warn("ai_website: CSS reload failed", error);
+            });
 
         return Promise.race([reloadPromise, timeoutPromise]).finally(() => {
             clearTimeout(timeoutId);

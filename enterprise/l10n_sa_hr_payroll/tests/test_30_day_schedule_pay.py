@@ -71,7 +71,7 @@ class Test30DaySchedulePay(TestSACommon):
         payslip = self._generate_payslip(date(2026, 4, 1), date(2026, 4, 30), employee_id=self.saudi_employee.id,
             version_id=self.saudi_employee.version_id.id,
             struct_id=self.env.ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure').id)
-        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -2283.33, 'ALPPOUT': 1370.0, 'EOSP': 475.69, 'ANNUALP': 799.17, 'GROSS': 13700.0, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 10149.17, 'NETCOST': 14144.17}
+        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -2283.33, 'ALPPOUT': 1370.0, 'EOSP': 475.69, 'ANNUALP': 799.17, 'GROSS': 11416.67, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 10149.17, 'NETCOST': 14144.17}
         self._validate_payslip(payslip, payslip_results)
 
     def test_30_day_saudi_payslip_laid_off(self):
@@ -176,7 +176,7 @@ class Test30DaySchedulePay(TestSACommon):
             employee_id=self.saudi_employee.id,
             version_id=self.saudi_employee.version_id.id,
             struct_id=self.env.ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure').id)
-        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -685.0, 'EOSP': 542.29, 'ANNUALP': 799.17, 'GROSS': 13700.0, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 11747.5, 'NETCOST': 15742.5}
+        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -685.0, 'EOSP': 542.29, 'ANNUALP': 799.17, 'GROSS': 13015.0, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 11747.5, 'NETCOST': 15742.5}
         self._validate_payslip(payslip, payslip_results)
 
     def test_30_day_saudi_payslip_deferred_amount(self):

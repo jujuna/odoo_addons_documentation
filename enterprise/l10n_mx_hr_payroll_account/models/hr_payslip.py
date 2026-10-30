@@ -2,7 +2,6 @@
 
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
-from markupsafe import Markup
 from werkzeug.urls import url_quote_plus
 import logging
 
@@ -214,11 +213,13 @@ class HrPayslip(models.Model):
         is_clabe = bank_account and len(bank_account.sanitized_account_number) == 18
         base_contribution_salary_rule = self.env.ref('l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary', raise_if_not_found=False)
         base_contribution_salary = rules_amount[base_contribution_salary_rule] if base_contribution_salary_rule and base_contribution_salary_rule in rules_amount else 0
+        seniority_days = (self.date_to - self.version_id.contract_date_start).days
+        seniority = f'P{seniority_days + 1}D' if seniority_days < 7 else f'P{seniority_days // 7}W'
         cfdi_values['nomina_receptor'] = {
             'curp': self.employee_id.l10n_mx_curp,
             'num_seguridad_social': self.employee_id.l10n_mx_ssn,
             'fecha_inicio_rel_laboral': self.version_id.contract_date_start.isoformat(),
-            'antigüedad': f'P{(self.date_to - self.version_id.contract_date_start).days // 7}W',
+            'antigüedad': seniority,
             'tipo_contrato': self.version_id.employee_type_id.code,
             'tipo_regimen': self.version_id.l10n_mx_regime_type,
             'tipo_jornada': self.version_id.l10n_mx_shift_type,
@@ -456,13 +457,8 @@ class HrPayslip(models.Model):
             self._l10n_mx_edi_add_payslip_cfdi_values(cfdi_values)
 
         def on_failure(error, cfdi_filename=None, cfdi_str=None):
-            document = self._l10n_mx_edi_cfdi_sent_failed(error, cfdi_filename=cfdi_filename, cfdi_str=cfdi_str)
+            self._l10n_mx_edi_cfdi_sent_failed(error, cfdi_filename=cfdi_filename, cfdi_str=cfdi_str)
             _logger.error('An error occurred while signing the CFDI document with the government.\n%s\n', error)
-            self.message_post(
-                body=self.env._(
-                    "An error occurred while signing the CFDI document with the government:%(error)s",
-                    error=Markup("<br/><b>%s</b>") % error),
-                attachment_ids=document.attachment_id.ids)
 
         def on_success(_cfdi_values, cfdi_filename, cfdi_str, populate_return=None):
             document = self._l10n_mx_edi_cfdi_sent(cfdi_filename, cfdi_str)

@@ -49,6 +49,7 @@ export class MailComposerChatGPT extends Component {
                     this.props.record.update({ body: htmlJoin([getInnerHtml(root), body]) });
                 },
                 selectPreviousInsertion: (selectionId) => false,
+                setCursor: (selectionId, cursor) => cursor,
             },
             channelTitle: this.props.record.data.subject,
             aiChatSourceId: this.props.record.id,

@@ -58,6 +58,7 @@ class StockMove(models.Model):
                         'team_id': point.team_id.id,
                         'measure_on': 'operation',
                         'picking_id': picking.id,
+                        'company_id': picking.company_id.id,
                     })
         return check_vals_list
 

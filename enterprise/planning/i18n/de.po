@@ -15,10 +15,10 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-17 23:57+0000\n"
+"PO-Revision-Date: 2026-10-21 08:33+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
-"planning/de/>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/planning/"
+"de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,6 +32,8 @@ msgid ""
 "\n"
 "Schedule your teams and employees with shift.\n"
 msgstr ""
+"\n"
+"Planen Sie die Schichten für Ihre Teams und Mitarbeiter.\n"
 
 #. module: planning
 #. odoo-javascript
@@ -55,13 +57,13 @@ msgstr "%(resource_name)s (%(role)s)"
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "%s are looking for a replacement"
-msgstr ""
+msgstr "%s suchen einen Ersatz"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning_slot.py:0
 msgid "%s is looking for a replacement"
-msgstr ""
+msgstr "%s sucht einen Ersatz"
 
 #. module: planning
 #: model:ir.actions.report,print_report_name:planning.report_planning_slot
@@ -134,12 +136,12 @@ msgstr "<b>Rolle:</b>"
 #. module: planning
 #: model_terms:digest.tip,tip_description:planning.digest_tip_planning_0
 msgid "<b>Tip: Plan faster</b>"
-msgstr ""
+msgstr "<b>Tipp: Plane schneller</b>"
 
 #. module: planning
 #: model_terms:digest.tip,tip_description:planning.digest_tip_planning_1
 msgid "<b>Tip: Quickly schedule multiple shifts</b>"
-msgstr ""
+msgstr "<b>Tipp: Plane mehrere Schichten schnell ein</b>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
@@ -147,6 +149,9 @@ msgid ""
 "<br/>\n"
 "                                Employees can no longer remove themselves"
 msgstr ""
+"<br/>\n"
+"                                Mitarbeiter können sich nicht mehr selbst "
+"entfernen"
 
 #. module: planning
 #: model:mail.template,body_html:planning.email_template_planning_planning
@@ -209,6 +214,64 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p t-if=\"ctx.get('employee')\">Liebe <t t-"
+"out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
+"                    <p t-else=\"\">Guten Abend,</p>\n"
+"                    <br/>\n"
+"                   <p t-if=\"ctx.get('start_datetime') and ctx.get"
+"('end_datetime')\"> \n"
+"                        Ihre anstehenden Schichten vom <t t-out=\"format_date"
+"(ctx['start_datetime'])\">05.05.2021</t>\n"
+"                        bis zum <t t-out=\"format_date(ctx['end_datetime'])"
+"\">11.05.2021</t> wurden veröffentlicht.\n"
+"                   </p>\n"
+"                    <div style=\"display: flex; margin: 15px;\"> \n"
+"                       <div t-if=\"ctx.get('planning_url')\" style=\"margin-"
+"right: 15px;\">\n"
+"                            <a t-att-href=\"ctx['planning_url']\" "
+"target=\"_blank\" t-att-style=\"'font-size: 12px; color: ' + "
+"(company.email_primary_color or '#FFFFFF') + '; background-color: ' + "
+"(company.email_secondary_color or '#875A7B') + '; padding: 8px 12px 11px; "
+"text-decoration: none !important; font-weight: bold;'\"> \n"
+"                                Ihre Planung anzeigen\n"
+"                           </a>\n"
+"                        </div> \n"
+"                       <div t-if=\"ctx.get('planning_url_ics')\">\n"
+"                            <a target=\"_blank\" t-att-"
+"href=\"ctx['planning_url_ics']\" t-att-style=\"'font-size: 12px; color: ' + "
+"(company.email_secondary_color or '#875A7B') + '; padding: 8px 12px 11px; "
+"text-decoration: none !important; font-weight: bold;'\"> \n"
+"                                Zum Kalender hinzufügen\n"
+"                           </a>\n"
+"                        </div> \n"
+"                   </div>\n"
+"                    <br/> \n"
+"                   <p t-if=\"ctx.get('planning_url') and (ctx.get"
+"('slot_unassigned') or (object.allow_self_unassign and "
+"object.self_unassign_days_before))\">\n"
+"                        <t t-if=\"ctx.get('slot_unassigned')\"> \n"
+"                            Wir möchten Sie außerdem daran erinnern, dass "
+"noch einige freie Schichten verfügbar sind. Falls Sie Interesse und Zeit "
+"haben, tragen Sie sich bitte selbst für diese Schichten ein.\n"
+"                       </t>\n"
+"                        <t t-if=\"object.allow_self_unassign and "
+"object.self_unassign_days_before\"> \n"
+"                            Falls Sie eine Ihnen zugewiesene Schicht nicht "
+"übernehmen können, heben Sie bitte Ihre Zuweisung mindestens <t t-"
+"out=\"object.self_unassign_days_before or ''\">5</t> Tage vor Schichtbeginn "
+"auf.\n"
+"                       </t>\n"
+"                    </p> \n"
+"                   <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"/>"
+"\n"
+"                    <p t-if=\"ctx.get('is_internal_user') and not "
+"object.allow_self_unassign\"> Falls Ihnen Ihr aktueller Dienstplan nicht "
+"passt, empfehlen wir Ihnen, sich an Ihre Kollegen zu wenden und Schicht zu "
+"tauschen. Vielleicht sind sie daran interessiert, die Schichten mit Ihnen zu "
+"tauschen.</p>\n"
+"                </div>\n"
+"            "
 
 #. module: planning
 #: model:mail.template,body_html:planning.email_template_shift_switch_email
@@ -382,6 +445,8 @@ msgid ""
 "<i class=\"oi oi-filled ps-1 mt-1 d-touch-none\" data-"
 "icon=\"calendar_today\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
 msgstr ""
+"<i class=\"oi oi-filled ps-1 mt-1 d-touch-none\" data-"
+"icon=\"calendar_today\" role=\"img\" aria-label=\"Date\" title=\"Datum\"/>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.hr_employee_public_view_form
@@ -576,6 +641,142 @@ msgid ""
 "                </div>\n"
 "            </body>"
 msgstr ""
+"<style>\n"
+"                    .top_button {\n"
+"                        color: #FFFFFF;\n"
+"                        background-color: #714B67;\n"
+"                        border: solid #714B67;\n"
+"                        flex: 1 1 60%;\n"
+"                    }\n"
+"                    .button_box {\n"
+"                        display: flex;\n"
+"                        flex-wrap: wrap;\n"
+"                        gap: 10px;\n"
+"                        margin: 20px 15px 0px 15px;\n"
+"                    }\n"
+"                </style>\n"
+"                <body><div>\n"
+"                    <p t-if=\"ctx.get('employee_name')\">Guten Tag<t t-"
+"out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
+"                    <p t-else=\"\">Guten Tag,</p>\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('open_shift_available')\">Es gibt neue "
+"offene Schichten:</p>\n"
+"                    <p t-else=\"\">Ihnen wurde folgende Schicht zugewiesen:</"
+"p>\n"
+"                    <table style=\"margin-left: 30px;\">\n"
+"                        <tr t-if=\"(ctx.get('start_datetime') and ctx.get"
+"('end_datetime'))                                   or ctx.get"
+"('allocated_hours')                                   or ctx.get"
+"('allocated_percentage')\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Date</th>\n"
+"                            <td style=\"padding: 5px;\">\n"
+"                                <span t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+"(                                     "
+"ctx['start_datetime'],                                     "
+"ctx['end_datetime'],                                 )\">\n"
+"                                    31.05.2021, 8:00 Uhr ⟶ 31.05.2021, 4:00 "
+"Uhr\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_hours')\" "
+"style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_hours']\">"
+"4:00</t> St.)\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_percentage') "
+"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
+"                                    (<t t-"
+"out=\"ctx['allocated_percentage']\">50</t>%)\n"
+"                                </span>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"object.role_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Rolle</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.role_id.name or ''\">Theke</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'project_id') and "
+"object.project_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Projekt</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".project_id.name or ''\">Versammlung</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'task_id') and "
+"object.task_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Aufgabe</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".task_id.name or ''\">Koch</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+"object.sale_line_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Verkaufsauftragsposition</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.sudo()"
+".sale_line_id.name or ''\">Kaffee</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'name') and object.name\">"
+"\n"
+"                            <th style=\"padding: 5px; text-align: left;\">"
+"Notiz</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.name "
+"or ''\">/</td>\n"
+"                        </tr>\n"
+"                    </table>\n"
+"                    <div class=\"button_box\">\n"
+"                        <a t-if=\"ctx.get('available_link')\" t-att-"
+"href=\"ctx['available_link']\" target=\"_blank\" t-att-style=\"'font-size: "
+"12px; color: ' + (company.email_primary_color or '#FFFFFF') + '; background-"
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            Mir diese Schicht zuweisen\n"
+"                        </a>\n"
+"                        <a t-if=\"ctx.get('unavailable_link')\" t-att-"
+"href=\"ctx['unavailable_link']\" target=\"_blank\" t-att-style=\"'font-size: "
+"12px; color: ' + (company.email_primary_color or '#FFFFFF') + '; background-"
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            Ich bin nicht verfügbar\n"
+"                        </a>\n"
+"                        <a t-if=\"ctx.get('google_url')\" t-att-"
+"href=\"ctx['google_url']\" target=\"_blank\" t-att-style=\"'font-size: 12px; "
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            Zu Google Kalender hinzufügen\n"
+"                        </a>\n"
+"                        <a t-if=\"ctx.get('iCal_url')\" t-att-"
+"href=\"ctx['iCal_url']\" target=\"_blank\" t-att-style=\"'font-size: 12px; "
+"color: ' + (company.email_secondary_color or '#875A7B') + '; padding: 8px "
+"12px 11px; text-decoration: none !important; font-weight: bold;'\">\n"
+"                            Zu iCal/Outlook hinzufügen\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    <br/>\n"
+"                    <t t-if=\"ctx.get('open_shift_available')\">\n"
+"                        <p t-if=\"ctx.get('is_internal_user')\">\n"
+"                            Wenn Sie Interesse haben und verfügbar sind, "
+"weisen Sie bitte diese offene Schicht selbst zu.\n"
+"                        </p>\n"
+"                        <p t-else=\"\">\n"
+"                            Bitte wenden Sie sich an Ihren Manager, wenn Sie "
+"diese Schicht übernehmen möchten.\n"
+"                        </p>\n"
+"                    </t>\n"
+"                    <t t-else=\"\">\n"
+"                        <p t-if=\"ctx.get('is_internal_user') and not "
+"object.allow_self_unassign\">\n"
+"                            Falls Ihnen die aktuelle Schicht nicht zusagt, "
+"empfehlen wir Ihnen, sich mit Ihren Kollegen abzustimmen und sie um einen "
+"Schichttausch zu bitten. Vielleicht sind Ihre Kollegen daran interessiert, "
+"ihre Schichten mit Ihnen zu tauschen.\n"
+"                        </p>\n"
+"                    </t>\n"
+"                </div>\n"
+"            </body>"
 
 #. module: planning
 #: model:ir.model.constraint,message:planning.constraint_planning_recurrency_check_until_limit
@@ -601,7 +802,7 @@ msgstr "Eine Vorlage für diese Schicht existiert bereits"
 #. module: planning
 #: model:ir.model,name:planning.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Zugriffsgruppen"
 
 #. module: planning
 #. odoo-javascript
@@ -665,7 +866,7 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
 msgid "Allocated Hours"
-msgstr ""
+msgstr "Zugewiesene Stunden"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_analysis_report__allocated_hours
@@ -706,11 +907,13 @@ msgid ""
 "Allow employees to request a replacement or remove themselves from shifts "
 "when they are unavailable"
 msgstr ""
+"Ermöglichen Sie es Mitarbeitern, einen Ersatz anzufordern oder sich von "
+"Schichten abzumelden, wenn sie die Schicht nicht übernehmen können."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Analytics"
-msgstr ""
+msgstr "Analytics"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_report_action_analysis
@@ -804,25 +1007,29 @@ msgstr "Nach Rolle"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_hooks.js:0
 msgid "Bye-bye, record!"
-msgstr ""
+msgstr "Tschau, Datensatz!"
 
 #. module: planning
 #: model:res.groups,comment:planning.group_planning_manager
 msgid "Can manage all shifts, with access to reporting and configuration."
 msgstr ""
+"Kann alle Schichten verwalten und hat Zugriff auf Berichte und "
+"Konfigurationen."
 
 #. module: planning
 #: model:res.groups,comment:planning.group_planning_user
 msgid ""
 "Can view all published shifts, but can only edit shifts assigned to them."
 msgstr ""
+"Kann alle veröffentlichten Schichten einsehen, darf jedoch nur die ihm "
+"zugewiesenen Schichten bearbeiten."
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form_in_gantt
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree
 msgid "Cancel Request"
-msgstr ""
+msgstr "Anfrage stornieren"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.hr_employee_view_form_simplified
@@ -913,7 +1120,7 @@ msgstr "Eine Schicht erstellen"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Create new quotations directly from interventions"
-msgstr ""
+msgstr "Erstellen Sie neue Angebote direkt aus Einsätzen."
 
 #. module: planning
 #: model:ir.model.fields,help:planning.field_res_config_settings__group_field_service_allow_quotations
@@ -1119,6 +1326,10 @@ msgid ""
 "it. Hold <b>Ctrl</b> (or <b>Cmd</b> on Mac) while dragging a shift to "
 "duplicate it."
 msgstr ""
+"Ziehen Sie eine Schicht auf einen anderen Tag, um sie neu zu planen, oder in "
+"eine andere Zeile, um sie neu zuzuweisen. Halten Sie beim Verschieben einer "
+"Schicht die Taste <b>Strg</b> (bzw. auf dem Mac <b>Cmd</b> ) gedrückt, um "
+"sie zu duplizieren."
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__duration
@@ -1409,7 +1620,7 @@ msgstr "Interne Notiz …"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Invoice the travel time to the customer's location"
-msgstr ""
+msgstr "Rechnen Sie die Anfahrtszeit zum Standort des Kunden ab"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
@@ -1505,7 +1716,7 @@ msgstr "Erleichtern Sie die Erfassung von Schichten dank Vorlagen."
 #. module: planning
 #: model:ir.module.module,summary:base.module_planning
 msgid "Manage your employees' schedule"
-msgstr ""
+msgstr "Zeitplan der Mitarbeiter verwalten"
 
 #. module: planning
 #: model:planning.role,name:planning.planning_role_management
@@ -1593,11 +1804,13 @@ msgid ""
 "Need several people for the afternoon shift this week? Schedule them all at "
 "once ⚡"
 msgstr ""
+"Benötigen Sie diese Woche mehrere Mitarbeiter für die Nachmittagsschicht? "
+"Planen Sie sie alle auf einmal ein ⚡"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
 msgid "Needs Attention"
-msgstr ""
+msgstr "Erfordert Ihre Aufmerksamkeit"
 
 #. module: planning
 #. odoo-javascript
@@ -1616,7 +1829,7 @@ msgstr "New_Shift"
 #. module: planning
 #: model:res.groups.privilege,placeholder:planning.res_groups_privilege_planning
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #. module: planning
 #. odoo-python
@@ -2066,7 +2279,7 @@ msgstr ""
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__res_company__planning_employee_unavailabilities__unassign
 msgid "Remove themselves from shifts"
-msgstr ""
+msgstr "Sich eigenständig von Schichten abmelden"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__repeat
@@ -2131,7 +2344,7 @@ msgstr ""
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__res_company__planning_employee_unavailabilities__switch
 msgid "Request a replacement"
-msgstr ""
+msgstr "Ersatz anfordern"
 
 #. module: planning
 #: model:ir.actions.server,name:planning.model_planning_slot_action_reset_to_draft
@@ -2377,7 +2590,7 @@ msgstr "Schicht"
 #: model:ir.model.fields,field_description:planning.field_res_config_settings__planning_employee_unavailabilities
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
 msgid "Shift Changes"
-msgstr ""
+msgstr "Schichtänderungen"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_tree

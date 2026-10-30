@@ -137,6 +137,7 @@ patch(AttendeeCalendarController.prototype, {
             ...super.sidePanelProps,
             copyAppointmentURL: this.onClickGetAppointmentUrl.bind(this),
             openAppointmentForm: this.onClickOpenForm.bind(this),
+            saveAndCopyAppointmentUrl: this.onClickSaveAndCopyAppointmentUrl.bind(this),
             setEditingAppointmentId: this.setEditingAppointmentId.bind(this),
             setSelectedAppointmentTypeId: this.setSelectedAppointmentTypeId.bind(this),
         };
@@ -171,6 +172,11 @@ patch(AttendeeCalendarController.prototype, {
         this.openAppointmentEditSlotsForm(appointmentId);
     },
 
+    async onClickSaveAndCopyAppointmentUrl(appointmentTypeId) {
+        await this.setEditingAppointmentId(false);
+        await this.onClickGetAppointmentUrl(appointmentTypeId);
+    },
+
     async onClickSearchCreateAnytimeAppointment() {
         const anytimeAppointmentInfo = await rpc(
             "/appointment/appointment_type/search_create_anytime",
@@ -196,6 +202,10 @@ patch(AttendeeCalendarController.prototype, {
         );
         const context = action.context;
         context.default_slot_duration = this.model.getLocalStorageDuration(appointmentTypeId);
+        if (!appointmentTypeId) {
+            // Clicking "New Appointment" creates a custom appointment by default.
+            context.default_category = 'custom';
+        }
         const editingActiveAppointmentType = this.model.slotsAppointmentData()?.active;
         this.displayDialog(
             FormViewDialog,

@@ -229,7 +229,9 @@ class PlanningRecurrency(models.Model):
         res = datetime.max
         sorted_slots = self.slot_ids.sorted('end_datetime')
         initial_slot, last_slot = sorted_slots[0], sorted_slots[-1]
-        end_contract = last_slot.sudo().employee_ids[:1].version_id.contract_date_end
+        employee = last_slot.sudo().employee_ids[:1]
+        # Use the contract running at the date of the slot, not the current one
+        end_contract = employee._get_contract_dates(last_slot.start_datetime.date())[1] if employee else False
         end_contract = datetime.combine(end_contract, time.max) if end_contract else res
         # If the initial slot that we are repeating is planned after the end of the resource contract, we generate the slots
         # on out-of-contract dates normally.

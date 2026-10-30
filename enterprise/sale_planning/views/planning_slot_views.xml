@@ -166,15 +166,17 @@
         <field name="domain">[('start_datetime', '!=', False), ('end_datetime', '!=', False)]</field>
         <field name="context">{
             'search_default_my_shifts': 1, 'my_planning_action': 1, 'search_default_open_shifts': 1, 'search_default_unwanted_shifts': 1,
-            'planning_expand_employee': 1, 'planning_expand_role': 1, 'planning_expand_sale_line_id': 1, 'planning_expand_resource': 1,
+            'planning_expand_role': 1, 'planning_expand_sale_line_id': 1, 'planning_expand_resource': 1,
+            'planning_expand_project': 1, 'planning_expand_task': 1,
+            'search_default_start_datetime': 'today',
         }</field>
     </record>
 
     <record id="planning.planning_action_schedule_by_resource" model="ir.actions.act_window">
         <field name="domain">[('start_datetime', '!=', False), ('end_datetime', '!=', False)]</field>
         <field name="context">{
-            'search_default_group_by_employee': 1, 'planning_expand_employee': 1, 'planning_expand_role': 1,
-            'planning_expand_sale_line_id': 1, 'planning_expand_resource': 1, 'planning_expand_resource': 1
+            'search_default_group_by_employee': 1, 'planning_expand_role': 1,
+            'planning_expand_sale_line_id': 1, 'planning_expand_resource': 1,
         }</field>
     </record>
 
@@ -242,7 +244,7 @@
         <field name="domain">[('start_datetime', '!=', False), ('end_datetime', '!=', False)]</field>
         <field name="context">{
             'planning_groupby_sale_order': True, 'search_default_group_by_sale_order_line': 1, 'search_default_group_by_resource': 2, 'with_price_unit': True, 'planning_expand_resource': 1,
-            'planning_expand_employee': 1, 'planning_expand_role': 1, 'planning_expand_sale_line_id': 1,
+            'planning_expand_role': 1, 'planning_expand_sale_line_id': 1,
         }</field>
         <field name="group_ids" eval="[(4, ref('planning.group_planning_manager'))]"/>
         <field name="help" type="html">

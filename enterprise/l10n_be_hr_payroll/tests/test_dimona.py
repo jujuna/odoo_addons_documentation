@@ -95,7 +95,7 @@ class TestDimona(TransactionCase):
         self.version.write({
             'l10n_be_dimona_category': 'stu',
             'l10n_be_dimona_planned_hours': 130,
-            'date_end': date.today() + relativedelta(months=1, day=31),
+            'contract_date_end': date.today() + relativedelta(months=1, day=31),
         })
         wizard = self.env['l10n.be.dimona.wizard'].create({
             'employee_id': self.employee.id,
@@ -133,6 +133,17 @@ class TestDimona(TransactionCase):
         self.assertEqual(self.version.l10n_be_last_dimona_declaration_id.name, '309320239')
         self.assertFalse(self.version.l10n_be_dimona_declaration_id.state)
         self.assertFalse(self.version.l10n_be_last_dimona_declaration_id.state)
+
+    def test_dimona_close_without_entrance(self):
+        # The entrance of the contract was declared outside Odoo
+        self.version.contract_date_end = date.today() + relativedelta(months=1, day=31)
+        wizard = self.env['l10n.be.dimona.wizard'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'declaration_type': 'out',
+        })
+        with self.assertRaisesRegex(UserError, 'was not declared from Odoo'):
+            wizard.submit_declaration()
 
     def test_dimona_update(self):
         self.version.l10n_be_dimona_declaration_id = self.env['l10n.be.dimona.declaration'].create({
@@ -433,6 +444,8 @@ class TestDimona(TransactionCase):
         self.assertEqual(self.employee.l10n_be_dimona_next_action, 'done')
 
     def test_dimona_periods_alignment_mismatch_warning(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.version = self.version.with_env(self.env)
         certificate = self.env["certificate.certificate"].create({"name": "onss cert"})
         self.version.date_version = date(2025, 9, 26)
         self.version.contract_date_start = date(2025, 9, 26)
@@ -491,6 +504,8 @@ class TestDimona(TransactionCase):
         self.assertIn("Dimona periods and contract versions are not aligned", " ".join(issue["message"] for issue in issues.values()))
 
     def test_dimona_periods_category_mismatch_warning(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.version = self.version.with_env(self.env)
         certificate = self.env["certificate.certificate"].create({"name": "onss cert"})
         self.version.date_version = date(2025, 9, 26)
         self.version.contract_date_start = date(2025, 9, 26)
@@ -550,6 +565,135 @@ class TestDimona(TransactionCase):
         issues = self.version.issues or {}
         self.assertIn("The Dimona category does not match the contract version one", " ".join(issue["message"] for issue in issues.values()))
         self.assertIn("The Dimona joint committee does not match the contract version one", " ".join(issue["message"] for issue in issues.values()))
+
+    def test_dimona_periods_alignment_with_amendment(self):
+        """ The versions of a same contract are compared as a single contract to the Dimona periods. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.version = self.version.with_env(self.env)
+        certificate = self.env["certificate.certificate"].create({"name": "onss cert"})
+        self.version.date_version = date(2025, 9, 26)
+        self.version.contract_date_start = date(2025, 9, 26)
+        self.version.contract_date_end = date(2025, 10, 25)
+        self.version.l10n_be_dimona_category = "oth"
+        self.version.l10n_be_joint_committee_id = self.env.ref("l10n_be_hr_payroll.l10n_be_joint_committee_200").id
+        amendment = self.employee.create_version({
+            "date_version": date(2025, 10, 10),
+            "wage": 3000,
+        })
+        self.assertEqual(amendment.contract_date_end, date(2025, 10, 25))
+
+        self.version.company_id.write({"onss_certificate_id": certificate})
+
+        with MockHTTPClient(
+            return_json={
+                "items": [
+                    {
+                        "worker": {
+                            "ssin": self.employee.niss,
+                            "gender": "1",
+                            "birthDate": "1991-11-11",
+                            "givenName": "TEST",
+                            "familyName": "EMPLOYEE",
+                            "givenNames": "TEST EMPLOYEE",
+                            "nationality": 150,
+                        },
+                        "startDate": "2025-09-26",
+                        "endDate": "2025-10-25",
+                        "periodId": "2029409422",
+                        "dimonaIn": {
+                            "features": {
+                                "workerType": "OTH",
+                                "jointCommissionNumber": "200",
+                            },
+                            "startDate": "2025-09-26",
+                        },
+                        "employer": {
+                            "employerId": 12548245,
+                            "enterpriseNumber": "477472701",
+                        },
+                        "declarationStatus": {
+                            "period": {
+                                "id": 2029409422,
+                            },
+                            "result": "A",
+                            "declarationId": 2029409422,
+                        },
+                    }
+                ],
+                "next": False,
+            },
+            return_status=200,
+        ):
+            self.version.action_fetch_all_dimona()
+
+        self.assertFalse(self.employee._get_dimona_periods_version_mismatch_warning())
+
+    def test_missing_dimona_in_warning(self):
+        warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_missing_dimona_in')
+
+        def get_dashboard_employees():
+            return self.env['hr.employee'].union(*(
+                warning_data['records'] for warning_data in warning._get_applicable_payroll_warnings(self.env.company)
+            ))
+
+        self.assertEqual(self.employee.l10n_be_dimona_next_action, 'in')
+        self.assertIn(self.employee, get_dashboard_employees())
+
+        # Submit Dimona
+        action = self.version.action_send_dimona()
+        self.assertEqual(action['res_model'], 'l10n.be.dimona.manual.wizard')
+        wizard = self.env[action['res_model']].with_context(action['context']).create({})
+        wizard.submit_dimona()
+
+        self.assertEqual(self.employee.l10n_be_dimona_next_action, 'done')
+
+        # No warning in dashboard
+        self.assertNotIn(self.employee, get_dashboard_employees())
+
+    def test_dimona_period_not_covered_by_payslip_warning(self):
+        warning = self.env.ref('l10n_be_hr_payroll.hr_payroll_warning_dimona_period_not_covered_by_payslip')
+
+        def get_dashboard_employees():
+            return self.env['hr.employee'].union(*(
+                warning_data['records'] for warning_data in warning._get_applicable_payroll_warnings(self.env.company)
+            ))
+
+        date_start = self.version.contract_date_start
+        colleague = self.env['hr.employee'].create({
+            'name': 'Colleague',
+            'wage': 2000,
+            'date_version': date_start,
+            'contract_date_start': date_start,
+        })
+        payrun = self.env['hr.payslip.run'].create({
+            'name': 'Payrun',
+            'date_start': date_start,
+            'date_end': date_start + relativedelta(day=31),
+            'structure_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+        })
+        payrun.version_ids -= self.version
+        self.assertEqual(payrun.version_ids, colleague.version_id)
+
+        # A declaration waiting for the ONSS answer and a cancellation carry no date
+        self.env['l10n.be.dimona.declaration'].create([{
+            'company_id': self.env.company.id,
+            'employee_id': self.employee.id,
+            'request_content': {'dimonaIn': {'startDate': date_start.isoformat()}},
+        }, {
+            'name': '2029409423',
+            'company_id': self.env.company.id,
+            'employee_id': self.employee.id,
+            'content': {'dimonaCancel': {'periodId': 2029409422}, 'declarationStatus': {'result': 'A'}},
+        }])
+        self.assertNotIn(self.employee, get_dashboard_employees())
+
+        self.env['l10n.be.dimona.declaration'].create({
+            'name': '2029409422',
+            'company_id': self.env.company.id,
+            'employee_id': self.employee.id,
+            'content': {'dimonaIn': {'startDate': date_start.isoformat()}, 'declarationStatus': {'result': 'A'}},
+        })
+        self.assertIn(self.employee, get_dashboard_employees())
 
     def test_dimona_needs_in_survives_stale_explicit_create_vals(self):
         # l10n_be_needs_dimona_in must stay purely server-computed.

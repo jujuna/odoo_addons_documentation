@@ -5,6 +5,14 @@ export class ProductProduct extends models.Model {
 
     name = fields.Char({ string: "Product Name" });
     default_code = fields.Char({ string: "Default Code" });
+    type = fields.Selection({
+        string: "Product Type",
+        selection: [
+            ["consu", "Goods"],
+            ["service", "Service"],
+            ["combo", "Combo"],
+        ],
+    });
 
     _records = [
         { id: 1, name: "name1", default_code: "AAAA" },

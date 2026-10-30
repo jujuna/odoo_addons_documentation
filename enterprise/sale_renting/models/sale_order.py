@@ -136,6 +136,14 @@ class SaleOrder(models.Model):
 
     # === COMPUTE METHODS === #
 
+    @api.depends("rental_start_date")
+    def _compute_delivery_date(self):
+        """Override to use the rental start date as the delivery date for rental orders."""
+        super()._compute_delivery_date()
+        for order in self:
+            if order.is_rental_order:
+                order.delivery_date = order.rental_start_date
+
     @api.depends("rental_start_date", "rental_return_date")
     def _compute_is_rental_order(self):
         for order in self:

@@ -426,6 +426,27 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
         self.assertEqual(allocations.date_from, public_holiday.date_to.replace(day=1).date(), "The allocation's date_from should be the first day of the month of the public holiday.")
         self.assertEqual(allocations.date_to, public_holiday.date_to.replace(day=31, month=12).date(), "The allocation's date_to should be the last day of the year of the public holiday.")
 
+    def test_create_allocation_public_holiday_non_working_day_company_executive(self):
+        self.env['resource.calendar.leaves'].create({
+            'name': 'Public Holiday on Weekend',
+            'date_from': datetime(2023, 1, 1, 0, 0, 0),
+            'date_to': datetime(2023, 1, 1, 23, 59, 59),
+            'company_id': self.belgian_company.id,
+        })
+        executive_jc = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        company_executive = self.create_employee({
+            'name': 'New Employee',
+            'l10n_be_joint_committee_id': executive_jc.id,
+            'date_version': date(2023, 1, 1),
+            'resource_calendar_id': self.resource_calendar_40_hours.id,
+        })
+        company_executive.contract_date_start = date(2023, 1, 1)
+
+        allocations = self.env['hr.leave.allocation'].search([
+            ('employee_id', '=', company_executive.id),
+        ])
+        self.assertFalse(allocations, "No Public Holiday Compensation allocation should be created for company executive.")
+
     def test_linkable_allocation_ids_only_matches_correct(self):
         """
         Only an allocation matching the employee, the holiday year and the legal-leave
@@ -762,3 +783,111 @@ class TestPayrollAllocatingPaidTimeOff(TestPayrollCommon):
 
         self.assertEqual(alloc_employee.paid_time_off_to_allocate, 18)
         self.assertEqual(alloc_employee.hours_to_allocate, 140)
+
+    def test_allocating_paid_time_off_with_amendment(self):
+        """
+        A worker has a single contract since 2022, at mid-time (19h/week) until an amendment
+        on 01/07/2025 moving to full time (38h/week). Each version only accrues paid time
+        off over its own period of 2025:
+        - 01/01 -> 30/06: 155 / 313 days * 4 weeks * 19h = 37.64 hours
+        - 01/07 -> 31/12: 158 / 313 days * 4 weeks * 38h = 76.73 hours
+        Total: 114.36 hours, i.e. 15 days (114.36 / 7.6 hours/day = 15.05, rounded down).
+        """
+        employee = self.create_employee({
+            'name': 'Amended Schedule',
+            'date_version': date(2022, 1, 1),
+            'contract_date_start': date(2022, 1, 1),
+            'resource_calendar_id': self.resource_calendar_mid_time.id,
+            'l10n_be_worker_code_id': self.worker_code_id.id,
+            'l10n_be_dimona_category': 'oth',
+        })
+        employee.create_version({
+            'date_version': date(2025, 7, 1),
+            'resource_calendar_id': self.resource_calendar.id,
+        })
+
+        wizard = self.env['hr.payroll.alloc.paid.leave'].create({'year': '2025'})
+        alloc_employee = wizard.alloc_employee_ids.filtered(lambda a: a.employee_id == employee)
+
+        self.assertEqual(alloc_employee.paid_time_off_to_allocate, 15)
+        self.assertAlmostEqual(alloc_employee.hours_to_allocate, 114.36, places=2)
+
+    def test_create_allocation_public_holiday_non_working_day_with_amendments(self):
+        """ A public holiday on a non working day gives one day of compensation, whatever
+            the number of amendments of the contract.
+        """
+        public_holiday = self.env['resource.calendar.leaves'].create({
+            'name': 'Public Holiday on Weekend',
+            'date_from': datetime(2023, 1, 8, 0, 0, 0),
+            'date_to': datetime(2023, 1, 8, 23, 59, 59),
+            'company_id': self.belgian_company.id,
+        })
+        employee = self.create_employee({
+            'name': 'Amended Employee',
+            'date_version': date(2022, 1, 1),
+            'contract_date_start': date(2022, 1, 1),
+            'l10n_be_worker_code_id': self.worker_code_id.id,
+        })
+        employee.create_version({'date_version': date(2022, 6, 1), 'wage': 2600})
+        employee.create_version({'date_version': date(2023, 6, 1), 'wage': 2700})
+        allocation_domain = [
+            ('employee_id', '=', employee.id),
+            ('public_holiday_id', '=', public_holiday.id),
+        ]
+        self.env['hr.leave.allocation'].search(allocation_domain).with_context(active_test=False).action_refuse()
+        self.env['hr.leave.allocation'].search(allocation_domain).unlink()
+
+        employee._create_public_holiday_allocations()
+        allocation = self.env['hr.leave.allocation'].search(allocation_domain)
+        self.assertEqual(allocation.number_of_days, 1)
+        allocation.action_refuse()
+        allocation.unlink()
+
+        action = public_holiday.action_open_multi_allocations_wizard()
+        wizard = self.env['hr.leave.allocation.generate.multi.wizard'].with_context(**action['context']).create({})
+        wizard.employee_ids = employee
+        wizard.action_generate_allocations()
+        allocation = self.env['hr.leave.allocation'].search(allocation_domain)
+        self.assertEqual(allocation.number_of_days, 1)
+
+    def test_change_contract_start_keeps_other_contracts_public_holiday_allocations(self):
+        """ Changing the start date of a contract only removes the public holiday
+            compensations of that contract which are now outside of it.
+        """
+        public_holidays = self.env['resource.calendar.leaves'].create([{
+            'name': 'Public Holiday on Weekend 2022',
+            'date_from': datetime(2022, 1, 9, 0, 0, 0),
+            'date_to': datetime(2022, 1, 9, 23, 59, 59),
+            'company_id': self.belgian_company.id,
+        }, {
+            'name': 'Public Holiday on Weekend 2023',
+            'date_from': datetime(2023, 1, 8, 0, 0, 0),
+            'date_to': datetime(2023, 1, 8, 23, 59, 59),
+            'company_id': self.belgian_company.id,
+        }])
+        employee = self.create_employee({
+            'name': 'Rehired Employee',
+            'date_version': date(2022, 1, 1),
+            'contract_date_start': date(2022, 1, 1),
+            'contract_date_end': date(2022, 12, 31),
+            'l10n_be_worker_code_id': self.worker_code_id.id,
+        })
+        employee.create_version({
+            'date_version': date(2023, 1, 1),
+            'contract_date_start': date(2023, 1, 1),
+            'contract_date_end': False,
+        })
+        employee._create_public_holiday_allocations()
+        allocations = self.env['hr.leave.allocation'].search([
+            ('employee_id', '=', employee.id),
+            ('public_holiday_id', 'in', public_holidays.ids),
+        ])
+        self.assertEqual(allocations.public_holiday_id, public_holidays)
+        allocation_2022 = allocations.filtered(lambda a: a.public_holiday_id == public_holidays[0])
+
+        employee.with_context(version_id=employee.version_ids[-1].id).write({'contract_date_start': date(2023, 2, 1)})
+        allocations = self.env['hr.leave.allocation'].search([
+            ('employee_id', '=', employee.id),
+            ('public_holiday_id', 'in', public_holidays.ids),
+        ])
+        self.assertEqual(allocations, allocation_2022)

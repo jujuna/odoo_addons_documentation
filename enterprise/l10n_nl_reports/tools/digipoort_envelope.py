@@ -85,11 +85,46 @@ def _get_aanlever_operation_name(delivery_service):
 
 
 def prepare_signed_xbrl_envelope(report_type, report_file, vat, certificate, private_key, server_root_certificate, is_test):
+    def get_operation_data(delivery_client, delivery_service):
+        factory = delivery_client.type_factory('ns0')
+        return (
+            _get_aanlever_operation_name(delivery_service),
+            _get_aanlever_kwargs(report_type, report_file, vat, factory),
+        )
+
+    return _prepare_signed_envelope(
+        service_name='aanleverservice',
+        get_operation_data=get_operation_data,
+        certificate=certificate,
+        private_key=private_key,
+        server_root_certificate=server_root_certificate,
+        is_test=is_test,
+    )
+
+
+def prepare_signed_status_envelope(kenmerk, certificate, private_key, server_root_certificate, is_test):
+    return _prepare_signed_envelope(
+        service_name='statusinformatieservice',
+        get_operation_data=lambda _client, _service: (
+            'getStatussenProces',
+            {
+                'kenmerk': kenmerk,
+                'autorisatieAdres': 'http://geenausp.nl',
+            },
+        ),
+        certificate=certificate,
+        private_key=private_key,
+        server_root_certificate=server_root_certificate,
+        is_test=is_test,
+    )
+
+
+def _prepare_signed_envelope(service_name, get_operation_data, certificate, private_key, server_root_certificate, is_test):
     with temporary_certificate_files(server_root_certificate, certificate, private_key) as (
         server_root_file, client_cert_file, client_pkey_file,
     ):
-        wsdl = f'https://{get_digipoort_host(is_test)}/wus/2.0/aanleverservice/1.2?wsdl'
-        service_address = f'https://{get_digipoort_service_base(is_test)}/wus/2.0/aanleverservice/1.2'
+        wsdl = f'https://{get_digipoort_host(is_test)}/wus/2.0/{service_name}/1.2?wsdl'
+        service_address = f'https://{get_digipoort_service_base(is_test)}/wus/2.0/{service_name}/1.2'
         delivery_client, delivery_service, raw_delivery_service = create_soap_client_logius(
             wsdl_address=wsdl,
             root_cert_file=server_root_file,
@@ -101,12 +136,11 @@ def prepare_signed_xbrl_envelope(report_type, report_file, vat, certificate, pri
             binary_security_token_index=0,
             return_raw_service=True,
         )
-        factory = delivery_client.type_factory('ns0')
-        operation_name = _get_aanlever_operation_name(delivery_service)
+        operation_name, operation_kwargs = get_operation_data(delivery_client, delivery_service)
         envelope, http_headers = raw_delivery_service._binding._create(
             operation_name,
             (),
-            _get_aanlever_kwargs(report_type, report_file, vat, factory),
+            operation_kwargs,
             client=delivery_client._Client__obj,
             options=raw_delivery_service._binding_options,
         )

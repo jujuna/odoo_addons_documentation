@@ -15,7 +15,7 @@ class HelpdeskTicket(models.Model):
     sale_order_state = fields.Selection(related='sale_order_id.state', tracking=False)
     sale_warning_text = fields.Text('Helpdesk Warning', compute='_compute_sale_warning_text', help='Warning for the partner as set by the user.')
 
-    @api.depends('partner_id.name', 'partner_id.sale_warn_msg')
+    @api.depends('partner_id.name', 'partner_id.sale_warn_msg', 'team_id.use_helpdesk_sale_timesheet')
     def _compute_sale_warning_text(self):
         if not self.env.user.has_group("sale.group_warning_sale"):
             self.sale_warning_text = ""

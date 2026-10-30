@@ -10,12 +10,9 @@
                 <group>
                     <field name="employee_ids" widget="many2many_avatar_employee"/>
                     <field name="salary_rule_id" context="{'default_input_usage_payslip': True}"/>
-                    <label for="amount"/>
-                    <span class="d-flex">
-                        <span style="width: 150px">
-                            <field class="o_hr_narrow_field" name="amount"/>
-                        </span>
-                    </span>
+                    <!-- loads the unit (input suffix) of the rule for the amount -->
+                    <field name="salary_rule_id" widget="salary_rule_unit_tile" invisible="1" readonly="1"/>
+                    <field class="o_hr_narrow_field" name="amount" widget="amount_with_rule_unit"/>
                     <field name="date_start" style="width: 10ch;"/>
                     <label name="is_recurring" for="is_recurring" string="Repeat"/>
                     <div name="is_recurring" class="o_row">

@@ -24,7 +24,7 @@ export class ConflictingEmissionIdsField extends Component {
 
     async showConflictingEmissions() {
         if (this.props.record.isNew) {
-            await this.props.record.save({ noReload: true });
+            await this.props.record.save({ reload: false });
         }
         this.actionService.doActionButton({
             type: "object",

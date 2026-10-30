@@ -26,9 +26,9 @@ class L10nBE_AccountReturnCheckKanbanRenderer extends accountReturnCheckKanbanVi
 
         this.shouldShowIsocView = computed(
             () =>
-                this.state.record?.data.type_external_id === "l10n_be_reports.be_isoc_prepayment_return_type"
+                this.record()?.data.type_external_id === "l10n_be_reports.be_isoc_prepayment_return_type"
         );
-        this.isSubviewReadonly = computed(() => this.state.record?.data.is_completed);
+        this.isSubviewReadonly = computed(() => this.record()?.data.is_completed);
 
         effect(() => {
             if (this.shouldShowIsocView()) {
@@ -38,7 +38,7 @@ class L10nBE_AccountReturnCheckKanbanRenderer extends accountReturnCheckKanbanVi
     }
 
     async loadIsocCustomView() {
-        const resId = this.state.record.data.l10n_be_isoc_payment_form_id.id;
+        const resId = this.record().data.l10n_be_isoc_payment_form_id.id;
         const resModel = "l10n_be_reports.isoc.prepayment.pay.form";
 
         const { fields, relatedModels, views } = await this.viewService.loadViews({
@@ -86,7 +86,7 @@ class L10nBE_AccountReturnCheckKanbanRenderer extends accountReturnCheckKanbanVi
             // We need to save the changes in order to load the computed modification on the return card.
             await this.scope.run(() => this.isocPaymentFormState.record._save());
             if (status(this) === "destroyed") return;
-            await this.scope.run(() => this.state.record.load());
+            await this.scope.run(() => this.record().load());
         };
 
         this.isocPaymentFormState.record = model.root;

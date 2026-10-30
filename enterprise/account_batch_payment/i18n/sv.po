@@ -20,10 +20,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:30+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-23 14:33+0000\n"
+"Last-Translator: Hanna Kharraziha <hakha@odoo.com>\n"
+"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-20/"
 "account_batch_payment/sv/>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -47,6 +47,16 @@ msgid ""
 "When you reconcile, simply select the corresponding batch payment to "
 "reconcile all the payments in the batch.\n"
 msgstr ""
+"\n"
+"Batchbetalningar\n"
+"=======================================\n"
+"Batchbetalningar gör det möjligt att gruppera betalningar.\n"
+"\n"
+"De används till exempel, men inte enbart, för att gruppera flera checkar för "
+"att kunna sätta in dem på banken samtidigt i en enda gemensam batch.\n"
+"Totalbeloppet visas då som en enskild transaktion i dina kontoutdrag.\n"
+"Vid avstämningar, kan du helt enkelt välja motsvarande batchbetalning för "
+"att stämma av alla betalningar som ingår i batchen.\n"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -142,7 +152,7 @@ msgstr "Alla betalningar måste antingen ha en post eller ingen alls."
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "All payments must have the same payment method."
-msgstr ""
+msgstr "Alla betalningar måste ha samma betalningsmetod."
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount
@@ -183,7 +193,7 @@ msgstr "Bankjournal"
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Banktransaktion"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -433,7 +443,7 @@ msgstr "Exkludera betalningar"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_attachment_id
 msgid "Export File Attachment"
-msgstr "Exportera fil från bilaga"
+msgstr "Exportera bifogad fil"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__export_file
@@ -469,7 +479,7 @@ msgstr "Följare (Partners)"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
 msgid "Generate File"
-msgstr ""
+msgstr "Skapa fil"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_create_date
@@ -589,7 +599,7 @@ msgstr "Lämna fältet tomt för att skapa automatiskt..."
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols-ikon, t.ex. checklista"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -599,7 +609,7 @@ msgstr "Memo"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__message_has_error
 msgid "Message Delivery error"
-msgstr "Leveransfel för meddelanden"
+msgstr "Leveransfel för meddelande"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__message_ids
@@ -688,12 +698,6 @@ msgid "Only %s payments can be added to a batch. Invalid ones will be ignored."
 msgstr ""
 "Endast %s-betalningar kan läggas till i en batch. Ogiltiga betalningar "
 "ignoreras."
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_payment.py:0
-msgid "Only outbound payments can be exported."
-msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
@@ -814,7 +818,7 @@ msgstr "Ansvarig användare"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr "Leveransfel för SMS"
+msgstr "Leveransfel för sms"
 
 #. module: account_batch_payment
 #. odoo-javascript
@@ -826,7 +830,7 @@ msgstr "Sök: batchbetalning"
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "Selected payments include methods that cannot generate a file."
-msgstr ""
+msgstr "De valda betalningarna inkluderar metoder som inte kan skapa en fil."
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__sent
@@ -847,7 +851,7 @@ msgstr "Visa"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__show_download_xml_button
 msgid "Show Download Xml Button"
-msgstr ""
+msgstr "Visa knappen ”Ladda ner XML”"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__show_remove_button
@@ -1047,6 +1051,8 @@ msgstr ""
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You can't generate a file for payments from more than one journal."
 msgstr ""
+"Du kan inte skapa filer för betalningar som är kopplade till fler än en "
+"journal."
 
 #. module: account_batch_payment
 #. odoo-python
@@ -1081,7 +1087,7 @@ msgstr "Det är inte möjligt att skapa batcher med överlappande betalningar."
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You must select at least one payment to generate a file."
-msgstr ""
+msgstr "Du måste välja minst en betalning för att skapa en fil."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment

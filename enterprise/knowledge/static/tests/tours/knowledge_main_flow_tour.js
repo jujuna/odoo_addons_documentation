@@ -42,7 +42,10 @@ function waitUntilArticle(hierarchies) {
             await waitUntil(
                 () => {
                     const items = queryAll(`.o_hierarchy_item`);
-                    const items_text = items.map((item) => item.textContent);
+                    const items_text = items.map((item) => {
+                        const input = item.querySelector(".o_hierarchy_article_name > input");
+                        return input ? input.value || input.placeholder : item.textContent;
+                    });
                     return JSON.stringify(items_text) === JSON.stringify(hierarchies);
                 },
                 {
@@ -115,7 +118,7 @@ registry.category("web_tour.tours").add("knowledge_main_flow_tour", {
             run: "hover && click .o_article:contains(My Workspace Article) .o_article_create",
         },
         checkArticle("workspace", "1|Untitled"),
-        waitUntilArticle(["My Workspace Article/", "Untitled"]),
+        waitUntilArticle(["My Workspace Article", "Untitled"]),
         waitUntilAutofocusOnEditorEditable(),
         {
             content: "modify the article name with Child Article 1",
@@ -128,7 +131,7 @@ registry.category("web_tour.tours").add("knowledge_main_flow_tour", {
             run: "hover && click .o_article:contains(My Workspace Article) .o_article_create",
         },
         clickOnArticle("workspace", "1|My Workspace Article", "1|Untitled"),
-        waitUntilArticle(["My Workspace Article/", "Untitled"]),
+        waitUntilArticle(["My Workspace Article", "Untitled"]),
         waitUntilAutofocusOnEditorEditable(),
         {
             content: "modify the article name",

@@ -149,7 +149,7 @@ test("displays network error", async () => {
 
 test("sends test receipt print", async () => {
     const { notificationsReceived, component } = await setup("printer");
-    mockReceiptFetch("mock-epos-response");
+    mockReceiptFetch('<response success="true" code="" status="0"/>');
 
     await editSelectMenu(".o_select_menu input", { value: "Receipt" });
     await click(".btn");
@@ -157,6 +157,18 @@ test("sends test receipt print", async () => {
 
     expect(notificationsReceived).toHaveLength(1);
     expect(notificationsReceived[0]).toBe("Test print successful");
+});
+
+test("displays the error of a refused test receipt", async () => {
+    const { notificationsReceived, component } = await setup("printer");
+    mockReceiptFetch('<response success="false" code="EPTR_COVER_OPEN" status="0"/>');
+
+    await editSelectMenu(".o_select_menu input", { value: "Receipt" });
+    await click(".btn");
+    await waitForLoading(component);
+
+    expect(notificationsReceived).toHaveLength(1);
+    expect(notificationsReceived[0]).toBe("Test print failed: EPTR_COVER_OPEN");
 });
 
 test("sends test ZPL print", async () => {

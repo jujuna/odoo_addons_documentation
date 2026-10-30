@@ -440,7 +440,7 @@ export class MapRenderer extends Component {
             return;
         }
         for (const [groupId, route] of Object.entries(this.props.model.data.routes)) {
-            if (route === null) {
+            if (route === null || this.props.model.closedGroupIds().has(groupId)) {
                 continue;
             }
 

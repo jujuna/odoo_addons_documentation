@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:38+0000\n"
+"POT-Creation-Date: 2026-10-23 17:40+0000\n"
 "PO-Revision-Date: 2026-08-31 15:55+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Norwegian Bokmål <https://translate.odoo.com/projects/odoo-"
@@ -98,6 +98,11 @@ msgid " valid until %s"
 msgstr ""
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_payment__reconciled_statement_lines_count
+msgid "# Reconciled Bank Transactions"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment__reconciled_bills_count
 msgid "# Reconciled Bills"
 msgstr "# Avstemte Fakturaer"
@@ -106,11 +111,6 @@ msgstr "# Avstemte Fakturaer"
 #: model:ir.model.fields,field_description:account.field_account_payment__reconciled_invoices_count
 msgid "# Reconciled Invoices"
 msgstr "# Avstemte Fakturaer"
-
-#. module: account
-#: model:ir.model.fields,field_description:account.field_account_payment__reconciled_statement_lines_count
-msgid "# Reconciled Statement Lines"
-msgstr "# Avstemte erklæringslinjer"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_partner__supplier_invoice_count
@@ -205,13 +205,10 @@ msgstr ""
 #. odoo-python
 #: code:addons/account/models/account_bank_statement_line.py:0
 msgid ""
-"%(move)s reached an invalid state regarding its related statement line.\n"
+"%(move)s reached an invalid state regarding its related bank transaction.\n"
 "To be consistent, the journal entry must always have exactly one suspense "
 "line."
 msgstr ""
-"%(move)s nådde en ugyldig tilstand i forhold til tilknyttet bilagslinje. \n"
-"For å være konsistent, må regnskapsføringen alltid ha nøyaktig én "
-"avstemmingslinje."
 
 #. module: account
 #. odoo-python
@@ -473,11 +470,9 @@ msgstr "90 dager, den 10."
 #. odoo-python
 #: code:addons/account/models/account_payment_term.py:0
 msgid ""
-"<b>%(count)s#</b> Installment of <b>%(amount)s</b> due on <b style='color: "
+"<b>%(count)s</b> - Installment of <b>%(amount)s</b> due on <b style='color: "
 "#704A66;'>%(date)s</b>"
 msgstr ""
-"<b>%(count)s#</b>avdrag på <b>%(amount)s</b> forfaller den <b style='color: "
-"#704A66;'>%(date)s</b>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
@@ -2983,6 +2978,46 @@ msgstr ""
 "Justeringsoppføring {link} {percent}%% of {amount} bekreftet den {new_date}"
 
 #. module: account
+#: model:account.account.tag,name:account.account_tag_adj_depreciation_and_amortization
+msgid "Adjustment - Depreciation and amortization"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_adj_fin_instr_sale
+msgid "Adjustment - Financial Instruments"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_adj_intangible_asset
+msgid "Adjustment - Intangible Assets"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_adj_net_fin_result
+msgid "Adjustment - Net Financial Result"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_adj_PPE_sale
+msgid "Adjustment - PPE Sale"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_adj_provisions
+msgid "Adjustment - Provisions"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_adj_ROU_sale
+msgid "Adjustment - Right of Use Sale"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_adj_unrealized_forex
+msgid "Adjustment - Unrealized Forex"
+msgstr ""
+
+#. module: account
 #: model:account.account,name:account.22_account_account_us_administration_fees
 msgid "Administration Fees"
 msgstr ""
@@ -3141,7 +3176,7 @@ msgstr ""
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_secure_entries_wizard__unreconciled_bank_statement_line_ids
-msgid "All unreconciled bank statement lines before the selected date."
+msgid "All unreconciled bank transactions before the selected date."
 msgstr ""
 
 #. module: account
@@ -3709,8 +3744,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account/models/account_bank_statement.py:0
 msgid ""
-"At least one transaction in the statement is prior the last posted statement "
-"line (%s)"
+"At least one transaction in the statement is prior the last posted "
+"transaction (%s)"
 msgstr ""
 
 #. module: account
@@ -4014,7 +4049,19 @@ msgstr ""
 #. module: account
 #. odoo-javascript
 #: code:addons/account/static/src/components/product_catalog/kanban_controller.js:0
+msgid "Back to Credit Note"
+msgstr ""
+
+#. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/product_catalog/kanban_controller.js:0
 msgid "Back to Invoice"
+msgstr ""
+
+#. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/product_catalog/kanban_controller.js:0
+msgid "Back to Refund"
 msgstr ""
 
 #. module: account
@@ -4059,7 +4106,7 @@ msgstr "Saldo-prosent kan ikke være 0"
 #: code:addons/account/models/account_journal.py:0
 #: code:addons/account/models/chart_template.py:0
 #: model:account.account,name:account.21_bank_journal_default_account_163
-#: model:account.account,name:account.22_bank_journal_default_account_296
+#: model:account.account,name:account.22_bank_journal_default_account_297
 #: model:account.journal,name:account.21_bank
 #: model:account.journal,name:account.22_bank
 #: model:ir.model.fields,field_description:account.field_res_partner__bank_account_count
@@ -4219,11 +4266,6 @@ msgid "Bank Statement Digitization"
 msgstr ""
 
 #. module: account
-#: model:ir.model,name:account.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Kontoutskrift-linje"
-
-#. module: account
 #: model:ir.actions.act_window,name:account.action_bank_statement_tree
 msgid "Bank Statements"
 msgstr "Kontoutskrift"
@@ -4249,6 +4291,9 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_move.py:0
+#: model:ir.model,name:account.model_account_bank_statement_line
+#: model:ir.model.fields,field_description:account.field_account_bank_statement_line__statement_line_id
+#: model:ir.model.fields,field_description:account.field_account_move__statement_line_id
 msgid "Bank Transaction"
 msgstr "Bank transaksjon"
 
@@ -4317,6 +4362,11 @@ msgstr ""
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "Bank transactions and payments:"
+msgstr ""
+
+#. module: account
+#: model:ir.model.fields,help:account.field_account_payment__reconciled_statement_line_ids
+msgid "Bank transactions matched to this payment"
 msgstr ""
 
 #. module: account
@@ -4880,7 +4930,7 @@ msgstr "Overfør til"
 #. odoo-python
 #: code:addons/account/models/account_journal.py:0
 #: code:addons/account/models/account_journal_dashboard.py:0
-#: model:account.account,name:account.21_cash_journal_default_account_306
+#: model:account.account,name:account.21_cash_journal_default_account_307
 #: model:ir.model.fields.selection,name:account.selection__account_journal__type__cash
 #: model_terms:ir.ui.view,arch_db:account.account_bank_statement_line_view_search_cashflow
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_filter
@@ -4894,12 +4944,12 @@ msgid "Cash Account"
 msgstr "Kontant-konto"
 
 #. module: account
-#: model:account.account,name:account.21_cash_journal_default_account_303
+#: model:account.account,name:account.21_cash_journal_default_account_304
 msgid "Cash Bakery"
 msgstr ""
 
 #. module: account
-#: model:account.account,name:account.21_cash_journal_default_account_305
+#: model:account.account,name:account.21_cash_journal_default_account_306
 msgid "Cash Bar"
 msgstr ""
 
@@ -4941,7 +4991,7 @@ msgid "Cash Basis Transition Account"
 msgstr "Kontantbasis overgangskonto"
 
 #. module: account
-#: model:account.account,name:account.21_cash_journal_default_account_302
+#: model:account.account,name:account.21_cash_journal_default_account_303
 msgid "Cash Clothes Shop"
 msgstr ""
 
@@ -5003,7 +5053,7 @@ msgid "Cash Discount Write-Off Loss Account"
 msgstr "Tapkonto for avskrivning av kontantrabatt"
 
 #. module: account
-#: model:account.account,name:account.21_cash_journal_default_account_301
+#: model:account.account,name:account.21_cash_journal_default_account_302
 msgid "Cash Furn. Shop"
 msgstr ""
 
@@ -5018,7 +5068,7 @@ msgid "Cash Out"
 msgstr ""
 
 #. module: account
-#: model:account.account,name:account.21_cash_journal_default_account_304
+#: model:account.account,name:account.21_cash_journal_default_account_305
 msgid "Cash Restaurant"
 msgstr "Kontantrestaurant"
 
@@ -5310,12 +5360,12 @@ msgstr ""
 "Intrastat."
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_account_tag__color
 #: model:ir.model.fields,field_description:account.field_account_setup_bank_manual_config__color
 msgid "Color"
 msgstr "Farge"
 
 #. module: account
-#: model:ir.model.fields,field_description:account.field_account_account_tag__color
 #: model:ir.model.fields,field_description:account.field_account_journal__color
 msgid "Color Index"
 msgstr "Fargeindeks"
@@ -6208,7 +6258,9 @@ msgid "Created on"
 msgstr "Opprettet den"
 
 #. module: account
+#. odoo-javascript
 #. odoo-python
+#: code:addons/account/static/src/components/stock_valuation/stock_valuation_report.xml:0
 #: code:addons/account/wizard/account_automatic_entry_wizard.py:0
 #: code:addons/account/wizard/accrued_orders.py:0
 #: model:ir.model.fields,field_description:account.field_account_move_line__credit
@@ -6829,7 +6881,9 @@ msgid "Days on the next month"
 msgstr "Dager i neste måned"
 
 #. module: account
+#. odoo-javascript
 #. odoo-python
+#: code:addons/account/static/src/components/stock_valuation/stock_valuation_report.xml:0
 #: code:addons/account/wizard/account_automatic_entry_wizard.py:0
 #: code:addons/account/wizard/accrued_orders.py:0
 #: model:ir.model.fields,field_description:account.field_account_move_line__debit
@@ -7139,6 +7193,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account.selection__account_account__account_type__expense_depreciation
 msgid "Depreciation"
 msgstr "Avskrivning"
+
+#. module: account
+#: model:account.account,name:account.22_account_account_us_deprec_amort_expense
+msgid "Depreciation & Amortization Expense"
+msgstr ""
 
 #. module: account
 #: model:account.account,name:account.22_account_account_us_expense_buildings
@@ -8303,14 +8362,6 @@ msgstr ""
 
 #. module: account
 #. odoo-python
-#: code:addons/account/controllers/download_docs.py:0
-msgid ""
-"Error while creating XML:\n"
-"- %s"
-msgstr ""
-
-#. module: account
-#. odoo-python
 #: code:addons/account/models/chart_template.py:0
 msgid ""
 "Error while loading the localization: missing tax tag %(tag_name)s for "
@@ -8671,6 +8722,36 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_analytic_line__journal_id
 msgid "Financial Journal"
 msgstr "Finansjournal"
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_fin_borrowings_lt
+msgid "Financing - Borrowings Long Term"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_fin_borrowings_st
+msgid "Financing - Borrowings Short Term"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_fin_dividends
+msgid "Financing - Dividends"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_fin_lease
+msgid "Financing - Lease"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_fin_recov_adv
+msgid "Financing - Recoverable Advances"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_fin_share_issuance
+msgid "Financing - Share Issuance"
+msgstr ""
 
 #. module: account
 #: model:account.account.tag,name:account.account_tag_financing
@@ -10493,6 +10574,7 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/chart_template.py:0
+#: code:addons/account/report/account_stock_valuation_report.py:0
 #: model:account.account,name:account.21_stock_valuation
 #: model:account.account,name:account.22_account_account_us_inventory_valuation
 #: model:account.journal,name:account.21_inventory_valuation
@@ -10517,6 +10599,51 @@ msgstr ""
 #: model:account.account.tag,name:account.account_tag_investing
 msgid "Investing & Extraordinary Activities"
 msgstr "Investeringer og ekstraordinære aktiviteter"
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_cash_advances
+msgid "Investment - Cash Advances"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_fin_instr_purchase
+msgid "Investment - Financial Instruments Purchase"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_fin_instr_sale
+msgid "Investment - Financial Instruments Sale"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_int_ass_purchase
+msgid "Investment - Intangible Assets Purchase"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_int_ass_sale
+msgid "Investment - Intangible Assets Sale"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_interest_received
+msgid "Investment - Interest Received"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_ppe_purchase
+msgid "Investment - PPE Purchase"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_ppe_sale
+msgid "Investment - PPE Sale"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_inv_rou_sale
+msgid "Investment - Right of Use Sale"
+msgstr ""
 
 #. module: account
 #. odoo-javascript
@@ -11196,6 +11323,7 @@ msgstr "Journal valuta"
 #: model:ir.actions.act_window,name:account.action_move_journal_line
 #: model:ir.ui.menu,name:account.menu_action_move_journal_line_form
 #: model_terms:ir.ui.view,arch_db:account.account_journal_dashboard_kanban_view
+#: model_terms:ir.ui.view,arch_db:account.account_move_view_list_stock_closing
 #: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
 #: model_terms:ir.ui.view,arch_db:account.view_account_reconcile_model_form
 #: model_terms:ir.ui.view,arch_db:account.view_move_tree
@@ -13166,11 +13294,9 @@ msgstr "Odoo domene"
 #: model_terms:ir.actions.act_window,help:account.action_bank_statement_tree
 #: model_terms:ir.actions.act_window,help:account.action_credit_statement_tree
 msgid ""
-"Odoo allows you to reconcile a statement line directly with\n"
+"Odoo allows you to reconcile a transaction directly with\n"
 "                the related sale or purchase invoices."
 msgstr ""
-"Odoo lar deg avstemme en kontolinje direkte med de relaterte salgs- eller "
-"kjøpsfakturaene."
 
 #. module: account
 #: model_terms:ir.actions.act_window,help:account.res_partner_action_customer
@@ -13456,6 +13582,16 @@ msgid "Opening balance"
 msgstr "Inngående saldo"
 
 #. module: account
+#: model:account.account.tag,name:account.account_tag_op_income_tax_paid_received
+msgid "Operating - Income Tax Paid Received"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_op_interest_paid
+msgid "Operating - Interest Paid"
+msgstr ""
+
+#. module: account
 #: model:account.account.tag,name:account.account_tag_operating
 msgid "Operating Activities"
 msgstr "Opererende aktiviteter"
@@ -13517,6 +13653,12 @@ msgid "Original Lock Date"
 msgstr ""
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_move_line__statement_line_id
+#: model_terms:ir.ui.view,arch_db:account.view_move_line_form
+msgid "Originator Bank Transaction"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__group_tax_id
 msgid "Originator Group of Taxes"
 msgstr "Opprinnelsesgruppe av skatter"
@@ -13525,12 +13667,6 @@ msgstr "Opprinnelsesgruppe av skatter"
 #: model:ir.model.fields,field_description:account.field_account_move_line__payment_id
 msgid "Originator Payment"
 msgstr "Original betaling"
-
-#. module: account
-#: model:ir.model.fields,field_description:account.field_account_move_line__statement_line_id
-#: model_terms:ir.ui.view,arch_db:account.view_move_line_form
-msgid "Originator Statement Line"
-msgstr "Opprinnelseserklæringslinje"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__tax_line_id
@@ -13575,6 +13711,12 @@ msgstr "Annen inntekt"
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
 msgid "Other Info"
 msgstr "Annen informasjon"
+
+#. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/stock_valuation/stock_valuation_report.js:0
+msgid "Other Stock Variation"
+msgstr ""
 
 #. module: account
 #: model:account.account,name:account.22_account_account_us_other_property
@@ -14368,8 +14510,8 @@ msgstr "Prosentandel av hver linje for å utføre handlingen på."
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_reconcile_model_line__amount_type__percentage_st_line
-msgid "Percentage of statement line"
-msgstr "Prosentandel av kontoutdraglinjen."
+msgid "Percentage of transaction"
+msgstr ""
 
 #. module: account
 #. odoo-python
@@ -15253,6 +15395,11 @@ msgid "Reconciled"
 msgstr "Forsonet"
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_payment__reconciled_statement_line_ids
+msgid "Reconciled Bank Transactions"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment__reconciled_bill_ids
 msgid "Reconciled Bills"
 msgstr "Avstemte fakturaer"
@@ -15282,11 +15429,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:account.field_account_move__reconciled_payment_ids
 msgid "Reconciled Payments"
 msgstr ""
-
-#. module: account
-#: model:ir.model.fields,field_description:account.field_account_payment__reconciled_statement_line_ids
-msgid "Reconciled Statement Lines"
-msgstr "Reviderte kontoutdraglinjer"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__reconcile_model_id
@@ -16896,8 +17038,8 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/company.py:0
-msgid "Show Unreconciled Bank Statement Line"
-msgstr "Vis uavstemt kontoutskriftslinje"
+msgid "Show Unreconciled Bank Transactions"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_tax_search
@@ -17103,12 +17245,6 @@ msgid "Statement %(date)s"
 msgstr ""
 
 #. module: account
-#: model:ir.model.fields,field_description:account.field_account_bank_statement_line__statement_line_id
-#: model:ir.model.fields,field_description:account.field_account_move__statement_line_id
-msgid "Statement Line"
-msgstr "erklæring Linje"
-
-#. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__statement_name
 #: model_terms:ir.ui.view,arch_db:account.report_statement
 msgid "Statement Name"
@@ -17120,17 +17256,6 @@ msgid "Statement Reports"
 msgstr "Kontoutdragsrapporter"
 
 #. module: account
-#. odoo-python
-#: code:addons/account/models/account_reconcile_model.py:0
-msgid "Statement line percentage can't be 0"
-msgstr "Prosentandel for erklæringslinje kan ikke være 0"
-
-#. module: account
-#: model:ir.model.fields,field_description:account.field_account_bank_statement__line_ids
-msgid "Statement lines"
-msgstr "Uttalelse-linje"
-
-#. module: account
 #: model:ir.actions.act_window,name:account.action_view_bank_statement_tree
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__statement_line_ids
 #: model:ir.model.fields,field_description:account.field_account_move__statement_line_ids
@@ -17138,11 +17263,6 @@ msgstr "Uttalelse-linje"
 #: model_terms:ir.ui.view,arch_db:account.view_bank_statement_tree
 msgid "Statements"
 msgstr "Uttalelser"
-
-#. module: account
-#: model:ir.model.fields,help:account.field_account_payment__reconciled_statement_line_ids
-msgid "Statements lines matched to this payment"
-msgstr "Utskriftslinjer samsvarte med denne betalingen"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_fiscal_position__states_count
@@ -17213,7 +17333,7 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/company.py:0
-msgid "Stock Closing"
+msgid "Stock Closing as of %(date)s"
 msgstr ""
 
 #. module: account
@@ -17242,7 +17362,7 @@ msgstr ""
 #. odoo-javascript
 #. odoo-python
 #: code:addons/account/report/account_stock_valuation_report.py:0
-#: code:addons/account/static/src/components/stock_valuation/stock_valuation_report.xml:0
+#: code:addons/account/static/src/components/stock_valuation/stock_valuation_report.js:0
 #: model_terms:ir.ui.view,arch_db:account.view_category_property_form
 msgid "Stock Variation"
 msgstr ""
@@ -18367,6 +18487,11 @@ msgid "The bank statement used for bank reconciliation"
 msgstr "Bankkontoutskrift til bruk for avstemming"
 
 #. module: account
+#: model:ir.model.fields,help:account.field_account_move_line__statement_line_id
+msgid "The bank transaction that created this entry"
+msgstr ""
+
+#. module: account
 #. odoo-python
 #: code:addons/account/models/account_move.py:0
 msgid ""
@@ -18729,15 +18854,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/account/models/account_bank_statement_line.py:0
 msgid ""
-"The journal entry %s reached an invalid state regarding its related "
-"statement line.\n"
+"The journal entry %s reached an invalid state regarding its related bank "
+"transaction.\n"
 "To be consistent, the journal entry must always have exactly one journal "
 "item involving the bank/cash account."
 msgstr ""
-"Journaloppføringen %s nådde en ugyldig tilstand angående den relaterte "
-"oppgavelinjen.\n"
-"For å være konsistent må journalposten alltid ha nøyaktig én journalpost som "
-"involverer bank/kassekonto."
 
 #. module: account
 #: model:ir.model.fields,help:account.field_res_company__account_opening_move_id
@@ -18895,9 +19016,9 @@ msgstr ""
 #. module: account
 #: model:ir.model.fields,help:account.field_account_reconcile_model__match_label
 msgid ""
-"The reconciliation model will only be applied when either the statement line "
+"The reconciliation model will only be applied when either the transaction "
 "label, the transaction details or the note matches the following:\n"
-"        * Contains: The statement line must contains this string (case "
+"        * Contains: The transaction must contain this string (case "
 "insensitive).\n"
 "        * Not Contains: Negation of \"Contains\".\n"
 "        * Match Regex: Define your own regular expression."
@@ -19153,11 +19274,6 @@ msgid "The smallest value used to round the total amount (e.g., 0.05 or 100)."
 msgstr ""
 
 #. module: account
-#: model:ir.model.fields,help:account.field_account_move_line__statement_line_id
-msgid "The statement line that created this entry"
-msgstr "Utsagnslinjen som opprettet denne oppføringen"
-
-#. module: account
 #: model:ir.model.fields,help:account.field_account_fiscal_position__foreign_vat
 msgid ""
 "The tax ID of your company in the region mapped by this fiscal position."
@@ -19227,8 +19343,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account/wizard/account_secure_entries_wizard.py:0
 msgid ""
-"There are still unreconciled bank statement lines before the selected date. "
-"The entries from journal prefixes containing them will not be secured: %"
+"There are still unreconciled bank transactions before the selected date. The "
+"entries from journal prefixes containing them will not be secured: %"
 "(prefix_info)s"
 msgstr ""
 
@@ -19236,11 +19352,9 @@ msgstr ""
 #. odoo-python
 #: code:addons/account/models/company.py:0
 msgid ""
-"There are still unreconciled bank statement lines in the period you want to "
-"lock.You should either reconcile or delete them."
+"There are still unreconciled bank transactions in the period you want to "
+"lock. You should either reconcile or delete them."
 msgstr ""
-"Det er fortsatt uavstemte kontoutskriftslinjer i perioden du ønsker å låse. "
-"Du bør enten avstemme eller slette dem."
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_accrued_orders_wizard
@@ -19671,8 +19785,8 @@ msgstr ""
 #. module: account
 #: model_terms:ir.actions.act_window,help:account.action_account_matching_rules
 msgid ""
-"Those can be used to automatically match journal items with your statement "
-"lines."
+"Those can be used to automatically match journal items with your "
+"transactions."
 msgstr ""
 
 #. module: account
@@ -19808,6 +19922,7 @@ msgstr "Dagens aktiviteter"
 #: model:ir.model.fields,field_description:account.field_account_move__amount_total
 #: model:ir.model.fields,field_description:account.field_account_move_line__price_total
 #: model_terms:ir.ui.view,arch_db:account.account_invoice_report_view_tree
+#: model_terms:ir.ui.view,arch_db:account.account_move_view_list_stock_closing
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_tree
 #: model_terms:ir.ui.view,arch_db:account.view_invoice_tree
 #: model_terms:ir.ui.view,arch_db:account.view_move_tree
@@ -19847,12 +19962,6 @@ msgstr "Total kreditt"
 #: model_terms:ir.ui.view,arch_db:account.view_move_line_tree
 msgid "Total Debit"
 msgstr "Total debet"
-
-#. module: account
-#. odoo-python
-#: code:addons/account/report/account_stock_valuation_report.py:0
-msgid "Total Inventory Valuation"
-msgstr ""
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_partner__total_invoiced
@@ -20017,6 +20126,13 @@ msgid "Transaction Type"
 msgstr "Transaksjonstype"
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/account_reconcile_model.py:0
+msgid "Transaction percentage can't be 0"
+msgstr ""
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_bank_statement__line_ids
 #: model:ir.ui.menu,name:account.account_transactions_menu
 #: model_terms:ir.ui.view,arch_db:account.account_journal_dashboard_kanban_view
 msgid "Transactions"
@@ -20625,9 +20741,8 @@ msgstr "Valider bankkonto"
 #. module: account
 #: model:ir.model.fields,help:account.field_account_reconcile_model__trigger
 msgid ""
-"Validate the statement line automatically (reconciliation based on your "
-"rule)."
-msgstr "Valider utsagnslinjen automatisk (avstemming basert på regelen din)."
+"Validate the transaction automatically (reconciliation based on your rule)."
+msgstr ""
 
 #. module: account
 #. odoo-javascript
@@ -21020,6 +21135,36 @@ msgid "Workers Compensation Insurance"
 msgstr ""
 
 #. module: account
+#: model:account.account.tag,name:account.account_tag_wcap_deferred_revenue
+msgid "Working Capital - Deferred Revenue"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_wcap_inventory
+msgid "Working Capital - Inventory"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_wcap_other_payable
+msgid "Working Capital - Other Payable"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_wcap_other_receivable
+msgid "Working Capital - Other Receivable"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_wcap_trade_payable
+msgid "Working Capital - Trade Payable"
+msgstr ""
+
+#. module: account
+#: model:account.account.tag,name:account.account_tag_wcap_trade_receivable
+msgid "Working Capital - Trade Receivable"
+msgstr ""
+
+#. module: account
 #. odoo-javascript
 #: code:addons/account/static/src/js/tours/account.js:0
 msgid "Write a customer name to <b>create one</b> or <b>see suggestions</b>."
@@ -21206,6 +21351,14 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_bank_statement_line.py:0
+msgid ""
+"You can't create a new bank transaction without a suspense account set on "
+"the %s journal."
+msgstr ""
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/account_payment.py:0
 msgid ""
 "You can't create a new payment without an outstanding payments/receipts "
@@ -21215,16 +21368,6 @@ msgstr ""
 "Du kan ikke opprette en ny betaling uten en utestående betalings-/"
 "kvitteringskonto satt enten på firmaet eller %"
 "(payment_method)sbetalingsmåten i %(journal)s journalen."
-
-#. module: account
-#. odoo-python
-#: code:addons/account/models/account_bank_statement_line.py:0
-msgid ""
-"You can't create a new statement line without a suspense account set on the "
-"%s journal."
-msgstr ""
-"Du kan ikke opprette en ny kontoutskriftslinje uten en mellomkonto satt på "
-"%s journalen."
 
 #. module: account
 #. odoo-python
@@ -21314,6 +21457,14 @@ msgid ""
 msgstr ""
 "Du kan ikke registrere betalinger for både inngående og utgående flyttinger "
 "samtidig."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid ""
+"You can't reset to draft those journal entries. You need to request a "
+"cancellation instead."
+msgstr ""
 
 #. module: account
 #. odoo-python
@@ -22261,6 +22412,11 @@ msgstr ""
 "eller levering av tjenestene."
 
 #. module: account
+#: model:account.account.tag,name:account.account_tag_non_applicable
+msgid "not applicable"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_tax_repartition_line__repartition_type__tax
 msgid "of tax"
 msgstr "av mva"
@@ -22493,6 +22649,94 @@ msgid ""
 "{{ object.company_id.name }} {{ object.payment_receipt_title }} (Ref "
 "{{ object.name or 'n/a' }})"
 msgstr ""
+
+#~ msgid ""
+#~ "<b>%(count)s#</b> Installment of <b>%(amount)s</b> due on <b "
+#~ "style='color: #704A66;'>%(date)s</b>"
+#~ msgstr ""
+#~ "<b>%(count)s#</b>avdrag på <b>%(amount)s</b> forfaller den <b "
+#~ "style='color: #704A66;'>%(date)s</b>"
+
+#~ msgid "# Reconciled Statement Lines"
+#~ msgstr "# Avstemte erklæringslinjer"
+
+#~ msgid ""
+#~ "%(move)s reached an invalid state regarding its related statement line.\n"
+#~ "To be consistent, the journal entry must always have exactly one suspense "
+#~ "line."
+#~ msgstr ""
+#~ "%(move)s nådde en ugyldig tilstand i forhold til tilknyttet "
+#~ "bilagslinje. \n"
+#~ "For å være konsistent, må regnskapsføringen alltid ha nøyaktig én "
+#~ "avstemmingslinje."
+
+#~ msgid "Bank Statement Line"
+#~ msgstr "Kontoutskrift-linje"
+
+#~ msgid ""
+#~ "Odoo allows you to reconcile a statement line directly with\n"
+#~ "                the related sale or purchase invoices."
+#~ msgstr ""
+#~ "Odoo lar deg avstemme en kontolinje direkte med de relaterte salgs- eller "
+#~ "kjøpsfakturaene."
+
+#~ msgid "Originator Statement Line"
+#~ msgstr "Opprinnelseserklæringslinje"
+
+#~ msgid "Percentage of statement line"
+#~ msgstr "Prosentandel av kontoutdraglinjen."
+
+#~ msgid "Reconciled Statement Lines"
+#~ msgstr "Reviderte kontoutdraglinjer"
+
+#~ msgid "Show Unreconciled Bank Statement Line"
+#~ msgstr "Vis uavstemt kontoutskriftslinje"
+
+#~ msgid "Statement Line"
+#~ msgstr "erklæring Linje"
+
+#~ msgid "Statement line percentage can't be 0"
+#~ msgstr "Prosentandel for erklæringslinje kan ikke være 0"
+
+#~ msgid "Statement lines"
+#~ msgstr "Uttalelse-linje"
+
+#~ msgid "Statements lines matched to this payment"
+#~ msgstr "Utskriftslinjer samsvarte med denne betalingen"
+
+#~ msgid ""
+#~ "The journal entry %s reached an invalid state regarding its related "
+#~ "statement line.\n"
+#~ "To be consistent, the journal entry must always have exactly one journal "
+#~ "item involving the bank/cash account."
+#~ msgstr ""
+#~ "Journaloppføringen %s nådde en ugyldig tilstand angående den relaterte "
+#~ "oppgavelinjen.\n"
+#~ "For å være konsistent må journalposten alltid ha nøyaktig én journalpost "
+#~ "som involverer bank/kassekonto."
+
+#~ msgid "The statement line that created this entry"
+#~ msgstr "Utsagnslinjen som opprettet denne oppføringen"
+
+#~ msgid ""
+#~ "There are still unreconciled bank statement lines in the period you want "
+#~ "to lock.You should either reconcile or delete them."
+#~ msgstr ""
+#~ "Det er fortsatt uavstemte kontoutskriftslinjer i perioden du ønsker å "
+#~ "låse. Du bør enten avstemme eller slette dem."
+
+#~ msgid ""
+#~ "Validate the statement line automatically (reconciliation based on your "
+#~ "rule)."
+#~ msgstr ""
+#~ "Valider utsagnslinjen automatisk (avstemming basert på regelen din)."
+
+#~ msgid ""
+#~ "You can't create a new statement line without a suspense account set on "
+#~ "the %s journal."
+#~ msgstr ""
+#~ "Du kan ikke opprette en ny kontoutskriftslinje uten en mellomkonto satt "
+#~ "på %s journalen."
 
 #~ msgid ""
 #~ "Downpayments posted on this account will be considered by the Tax Closing "

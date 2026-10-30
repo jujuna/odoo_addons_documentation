@@ -14,6 +14,24 @@ from ast import literal_eval
 _logger = logging.getLogger(__name__)
 
 
+def _safe_eval_rule(expr, localdict, **kwargs):
+    """Evaluate salary rule code with an acyclic alias to the shared context."""
+    # Salary rule code expects a `localdict` variable referring to the shared
+    # computation context. Adding it directly as a key like
+    # `localdict['localdict'] = localdict` creates a cyclic reference, which
+    # prevents the safe_eval runtime from performing a fast JSON encoding check.
+    # To address this, we add it only to a temporary evaluation namespace so
+    # the shared context does not contain a self-reference,
+    eval_context = dict(localdict, localdict=localdict)
+    try:
+        return safe_eval(expr, eval_context, **kwargs)
+    finally:
+        # Propagate variables created by the rule, excluding the temporary
+        # `localdict` alias because copying it back would recreate the cycle.
+        eval_context.pop('localdict', None)
+        localdict.update(eval_context)
+
+
 class HrSalaryRule(models.Model):
     _name = 'hr.salary.rule'
     _order = 'sequence, id'
@@ -234,7 +252,6 @@ result_rate = 10''')
         :rtype: (float, float, float)
         """
         self.ensure_one()
-        localdict['localdict'] = localdict
 
         if self.amount_select == 'property_input':
             input_line = localdict['inputs'].get(self.code)
@@ -244,26 +261,25 @@ result_rate = 10''')
 
         if self.amount_select == 'fix':
             try:
-                return self.amount_fix or 0.0, float(safe_eval(self.quantity, localdict)), 100.0, localdict.get('explanation_info', {})
+                return self.amount_fix or 0.0, float(_safe_eval_rule(self.quantity, localdict)), 100.0, localdict.get('explanation_info', {})
             except Exception as e:
                 self._raise_error(localdict, _("Wrong quantity defined for:"), e)
         if self.amount_select == 'percentage':
             try:
-                return (float(safe_eval(self.amount_percentage_base, localdict)),
-                        float(safe_eval(self.quantity, localdict)),
+                return (float(_safe_eval_rule(self.amount_percentage_base, localdict)),
+                        float(_safe_eval_rule(self.quantity, localdict)),
                         self.amount_percentage or 0.0, localdict.get('explanation_info', {}))
             except Exception as e:
                 self._raise_error(localdict, _("Wrong percentage base or quantity defined for:"), e)
         # python code
         try:
-            safe_eval(self.amount_python_compute or 0.0, localdict, mode='exec')
+            _safe_eval_rule(self.amount_python_compute or 0.0, localdict, mode='exec')
             return float(localdict['result']), localdict.get('result_qty', 1.0), localdict.get('result_rate', 100.0), localdict.get('explanation_info', {})
         except Exception as e:
             self._raise_error(localdict, _("Wrong python code defined for:"), e)
 
     def _satisfy_condition(self, localdict):
         self.ensure_one()
-        localdict['localdict'] = localdict
         if self.condition_select == 'none':
             return True
         if self.condition_select == 'domain':
@@ -273,7 +289,7 @@ result_rate = 10''')
             return bool(input_line and input_line.amount)
         # python code
         try:
-            safe_eval(self.condition_python, localdict, mode='exec')
+            _safe_eval_rule(self.condition_python, localdict, mode='exec')
             return localdict.get('result', False)
         except Exception as e:
             self._raise_error(localdict, _("Wrong python condition defined for:"), e)
@@ -428,7 +444,17 @@ result_rate = 10''')
         ):
             rules_created_by_system._set_all_external_identifiers_noupdate(True)
             vals["modified_by_user"] = True
-        result = super().write(vals)
+        if 'code' in vals:  # Avoid memory error on module update if code is the same
+            same_code_rules = self.filtered(lambda r: r.code == vals['code'])
+            diff_code_rules = self - same_code_rules
+            vals_without_code = {k: v for k, v in vals.items() if k != 'code'}
+            result = True
+            if vals_without_code:
+                result = super(HrSalaryRule, same_code_rules).write(vals_without_code)
+            if diff_code_rules:
+                result = super(HrSalaryRule, diff_code_rules).write(vals)
+        else:
+            result = super().write(vals)
         self._sync_properties_definition()
         return result
 

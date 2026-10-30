@@ -2193,3 +2193,20 @@ registry.category("web_tour.tours").add("test_scan_mo_split_barcode", {
         },
     ],
 });
+
+registry.category("web_tour.tours").add("test_batch_group_lines_by_product_except_kits", {
+    steps: () => [
+        {
+            trigger: ".o_barcode_client_action",
+            run: () => {
+                const lines = helper.getLines({ barcode: "compo01" });
+                helper.assert(lines.length, 2, "The component should have two lines");
+                const groupedLine = lines.find((line) => line.querySelector(".o_toggle_sublines"));
+                const kitLine = lines.find((line) => line !== groupedLine);
+                helper.assertLineQty(groupedLine, "0/2");
+                helper.assertLineQty(kitLine, "0/1");
+                helper.assertButtonIsVisible(kitLine, "toggle_sublines", false);
+            },
+        },
+    ],
+});

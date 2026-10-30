@@ -48,36 +48,6 @@ export class TaskGanttRendererCommon extends GanttRenderer {
         return enrichedPill;
     }
 
-    /**
-     * Sparse task rows have no group-by field and incorrectly reused the Total bar.
-     *
-     * @override
-     */
-    getRowProgressBar(groupedByField, resId) {
-        if (!groupedByField && resId) {
-            const record = this.model.data.records.find((r) => r.id === resId);
-            const allocatedHours = record?.allocated_hours ?? 0;
-            if (allocatedHours > 0) {
-                return this.model._processProgressBar({ value: 0, max_value: allocatedHours }, null);
-            }
-            return null;
-        }
-        return super.getRowProgressBar(groupedByField, resId);
-    }
-
-    /**
-     * Hide the progress-bar track on sparse task leaf rows while keeping
-     * the progress label (allocated time) in the row header.
-     *
-     * @override
-     */
-    progressBarIsVisible(row) {
-        if (!row.groupedByField && row.resId) {
-            return false;
-        }
-        return super.progressBarIsVisible(row);
-    }
-
     computeVisibleColumns() {
         super.computeVisibleColumns();
         this.columnMilestones = {}; // deadlines and milestones by project

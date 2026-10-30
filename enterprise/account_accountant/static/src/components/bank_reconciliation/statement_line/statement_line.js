@@ -52,6 +52,9 @@ export class BankRecStatementLine extends KanbanRecord {
         if (this.numberOfStatementLines === 1) {
             classes += " mt-3";
         }
+        if (this.isSelected) {
+            classes += " o_bank_rec_statement_line_selected";
+        }
         return classes;
     }
 

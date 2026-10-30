@@ -191,8 +191,6 @@ class HrContractSalaryOffer(models.Model):
             })
         monthly_wage = max(0, final_version._get_wage_from_yearly_costs(self.final_yearly_costs))
         version_vals.update({
-            'contract_date_start': final_version.contract_date_start or fields.Date.context_today(self).replace(day=1),
-            'contract_date_end': False,
             'resource_calendar_id': resource_calendar.id,
             final_version._get_contract_wage_field(): monthly_wage,
             'wage': monthly_wage,
@@ -212,7 +210,7 @@ class HrContractSalaryOffer(models.Model):
     @api.depends('salary_amount', 'budget_type')
     def _compute_final_yearly_costs(self):
         final_yearly_costs_by_offer = {}
-        with hr_version_context(self, invalidate=True) as offers:
+        with hr_version_context(self, invalidate=True, employees=self.employee_id) as offers:
             for offer in offers.with_context(is_simulation_offer=True).filtered(lambda o: o.budget_type != 'yearly_employer'):
                 version = offer._get_version()
                 gross = offer.salary_amount
@@ -244,7 +242,7 @@ class HrContractSalaryOffer(models.Model):
     @api.depends('salary_amount', 'budget_type', 'structure_id', 'resource_calendar_id')
     def _compute_salary(self) -> None:
         vals_by_offer = {}
-        with hr_version_context(self, invalidate=True) as offers:
+        with hr_version_context(self, invalidate=True, employees=self.employee_id) as offers:
             for offer in offers:
                 version = offer._get_version()
                 payslip = version._generate_salary_simulation_payslip()
@@ -405,7 +403,7 @@ class HrContractSalaryOffer(models.Model):
             if not offer.applicant_id:
                 offer.contract_template_id = offer.employee_id.version_id
 
-    @api.depends('contract_template_id')
+    @api.depends('contract_template_id', 'contract_template_id.job_id', 'contract_template_id.department_id', 'state')
     def _compute_offer_values_from_template(self):
         for offer in self:
             if offer.state != 'open':
@@ -429,7 +427,7 @@ class HrContractSalaryOffer(models.Model):
         net_offers = self.filtered(lambda o: o.contract_template_id and o.budget_type == 'monthly_net')
         if net_offers:
             net_salaries_by_offer = {}
-            with hr_version_context(net_offers) as simulated_offers:
+            with hr_version_context(net_offers, employees=net_offers.employee_id) as simulated_offers:
                 for offer in simulated_offers:
                     version = offer._get_version()
                     monthly_gross = version._get_wage_from_yearly_costs(offer.contract_template_id.final_yearly_costs)

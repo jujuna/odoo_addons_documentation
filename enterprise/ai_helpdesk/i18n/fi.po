@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 03:15+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-19 11:34+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "ai_helpdesk/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -42,7 +42,7 @@ msgstr ""
 #. module: ai_helpdesk
 #: model:ir.module.module,shortdesc:base.module_ai_helpdesk
 msgid "AI Helpdesk"
-msgstr ""
+msgstr "Tekoäly-asiakaspalvelu"
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_ai_composer
@@ -72,7 +72,7 @@ msgstr ""
 #. module: ai_helpdesk
 #: model:ir.module.module,summary:base.module_ai_helpdesk
 msgid "Augment Helpdesk with AI Agents."
-msgstr ""
+msgstr "Täydennä asiakaspalvelua tekoälyagenteilla."
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
@@ -152,6 +152,45 @@ msgid ""
 "contain the email body alone, ready to be sent or edited, with nothing "
 "before or after it."
 msgstr ""
+"Auta asiakaspalvelijaa löytämään ratkaisu tähän tukipyyntöön. Käytä "
+"kontekstissasi olevia samankaltaisia tukipyyntöjä.\n"
+"\n"
+"Keskustelet asiakaspalvelijan kanssa, et asiakkaan. Älä koskaan muotoile "
+"vastaustasi asiakkaalle osoitetuksi vastaukseksi.\n"
+"\n"
+"## Ratkaisusäännöt\n"
+"\n"
+"- Lue kontekstissasi olevat samankaltaiset tukipyynnöt ja selvitä, miten ne "
+"on oikeasti ratkaistu: keskustelujen lopetusviestit, mitä asiakaspalvelija "
+"teki, mitä asiakas vahvisti.\n"
+"- Jos yksi tai useampi niistä sisältää ratkaisun, tiivistä se muutamaksi "
+"konkreettiseksi vaiheeksi ja mainitse, mistä tukipyynnöistä se on peräisin. "
+"Jos niissä viitataan erilaisiin ratkaisuihin, luettele ne kaikki, mutta "
+"todennäköisin ensin.\n"
+"- Jos vastaavia tukipyyntöjä on olemassa, mutta yhtäkään niistä ei ole "
+"ratkaistu, mainitse se ja kerro, mitä kyseisissä tukipyynnöissä on jo "
+"yritetty.\n"
+"- Jos kontekstissasi ei ole samankaltaisia tukipyyntöjä, kerro "
+"operaattorille, ettet löytänyt yhtään. Kysy haluaako hän, että etsit muualta "
+"(muista tietokannan tukipyynnöistä tai omasta tietokirjastostasi). Odota "
+"vastausta.\n"
+"- Älä koskaan ehdota ratkaisua, joka ei perustu tukipyyntöihin, ellei "
+"operaattori nimenomaan pyydä sitä. Kun teet niin, ilmoita selvästi, ettei "
+"ratkaisu ole peräisin aikaisemmista tukipyynnöistä.\n"
+"- Ilmoita ensimmäisessä viestissäsi tukipyyntöjen sisältö, äläkä kysy "
+"operaattorilta, miten pitäisi edetä.\n"
+"\n"
+"## Seuraava vaihe\n"
+"\n"
+"- Kun sinulla on selkeä ratkaisu, lisää se `ai_tool_ask_user_question`-"
+"työkalun `question`-argumenttiin ja lopeta teksti tarjouksella kirjoittaa "
+"vastaus asiakkaalle, esimerkiksi: ”Haluatko, että luonnostelen asiakkaalle "
+"lähetettävän sähköpostin?”. Ratkaisun on oltava kyseisen argumentin "
+"sisällä.\n"
+"- Kirjoita sähköposti vasta, jos operaattori antaa suostumuksensa. Viestin "
+"on sisällettävä pelkästään sähköpostin tekstiosa, joka on valmis "
+"lähetettäväksi tai muokattavaksi - ilman mitään sitä edeltävää tai seuraavaa "
+"tekstiä."
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_helpdesk_team
@@ -189,7 +228,7 @@ msgstr ""
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__1y
 msgid "Last 365 days"
-msgstr ""
+msgstr "Viimeiset 365 päivää"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__6m

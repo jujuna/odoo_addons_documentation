@@ -2,6 +2,7 @@
 
 from datetime import date, datetime
 
+from freezegun import freeze_time
 from odoo.addons.hr_payroll.tests.common import TestPayrollBase
 from odoo.exceptions import UserError
 from odoo.tests import tagged
@@ -518,6 +519,7 @@ class TestUzbekistanPayroll(TestPayrollBase):
             "Wizard should successfully update the initial average monthly wage.",
         )
 
+    @freeze_time("2026-03-15")
     def test_existing_payslips_lock_wizard(self):
         """
         Check that having validated payslips in the last 12 months blocks wizard launch and execution with UserError.

@@ -22,6 +22,7 @@
 - ordinary work
 - actually worked
 - not included under another specific benefit code</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_non_taxable_political_service" model="hr.work.entry.type">
@@ -46,6 +47,7 @@
         <field name="dmfa_code">1</field>
         <field name="description">These are benefits paid by the employer:
 - not included under another benefit code</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_overtime" model="hr.work.entry.type">
@@ -54,7 +56,9 @@
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
         ])]"/>
+        <field name="amount_rate">1.5</field>
         <field name="l10n_be_egov3_code">1102001</field>
         <field name="l10n_be_egov3_base">both</field>
         <field name="dmfa_code">1</field>
@@ -63,29 +67,15 @@
 - beyond the established working time limits (legal and/or contractual weekly working hours)
 - whether or not they are voluntary overtime
 - in principle exceptional, temporary, and authorized under certain conditions</field>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_overtime_no_onss" model="hr.work.entry.type">
+        <!-- Horeca: voluntary overtime hours paid net, without ONSS nor withholding tax (360 hours a year with 039.00) -->
         <field name="category_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('hr_payroll.EXTRA_HOURS'),
-        ])]"/>
-        <field name="l10n_be_egov3_code">1102001</field>
-        <field name="l10n_be_egov3_base">both</field>
-        <field name="dmfa_code">-1</field>
-        <field name="description">These are hours paid by the employer:
-- actually worked
-- beyond the established working time limits (legal and/or contractual weekly working hours)
-- whether or not they are voluntary overtime
-- in principle exceptional, temporary, and authorized under certain conditions</field>
-    </record>
-
-    <record id="hr_work_entry.l10n_be_work_entry_type_overtime_no_onss_horeca" model="hr.work.entry.type">
-        <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
-            ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
-            ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.HORECA_NET_OVERTIME'),
         ])]"/>
         <field name="l10n_be_egov3_code">1102001</field>
         <field name="l10n_be_egov3_base">both</field>
@@ -95,24 +85,47 @@
 - beyond the established working time limits (legal and/or contractual weekly working hours)
 - whether or not they are voluntary overtime
 - in principle exceptional, temporary, and authorized under certain conditions</field>
+        <field name="l10n_be_drs_nature">1.4</field>
+    </record>
+
+    <record id="hr_work_entry.l10n_be_work_entry_type_overtime_no_onss_horeca" model="hr.work.entry.type">
+        <!-- Horeca: up to 360 overtime hours a year paid net, without ONSS nor withholding tax -->
+        <field name="category_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
+            ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.HORECA_NET_OVERTIME'),
+        ])]"/>
+        <field name="l10n_be_egov3_code">1102001</field>
+        <field name="l10n_be_egov3_base">both</field>
+        <field name="dmfa_code">80</field>
+        <field name="description">These are hours paid by the employer:
+- actually worked
+- beyond the established working time limits (legal and/or contractual weekly working hours)
+- whether or not they are voluntary overtime
+- in principle exceptional, temporary, and authorized under certain conditions</field>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_150" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [
             ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="request_unit">hour</field>
         <field name="requires_allocation" eval="False"/>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_200" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [
             ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="request_unit">hour</field>
         <field name="requires_allocation" eval="False"/>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_net" model="hr.work.entry.type">
@@ -122,6 +135,7 @@
         <field name="dmfa_code">81</field>
         <field name="request_unit">hour</field>
         <field name="requires_allocation" eval="False"/>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_additional_hours" model="hr.work.entry.type">
@@ -133,6 +147,7 @@
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="description">Hours worked beyond the contractual part-time schedule, without exceeding the normal full-time working limits in the company</field>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_additional_hours_50" model="hr.work.entry.type">
@@ -141,9 +156,11 @@
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="description">Hours worked beyond the contractual part-time schedule, without exceeding the normal full-time working limits in the company</field>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_additional_hours_100" model="hr.work.entry.type">
@@ -152,9 +169,11 @@
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="description">Hours worked beyond the contractual part-time schedule, without exceeding the normal full-time working limits in the company</field>
+        <field name="l10n_be_drs_nature">1.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_paid_compensatory_rest" model="hr.work.entry.type">
@@ -169,6 +188,7 @@
         <field name="description">This is compensatory rest taken by the worker
 - the hours are paid by the employer, but actually worked at another time and are beyond the average annual working time (expressed per week)
 - paid at the time the time off is taken</field>
+        <field name="l10n_be_drs_nature">1.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_unpaid_compensatory_rest" model="hr.work.entry.type">
@@ -179,6 +199,7 @@
         <field name="description">This is compensatory rest taken by the worker
 - the hours are paid by the employer at another time, and actually worked beyond the average annual working time (expressed per week)
 - paid at the time of service</field>
+        <field name="l10n_be_drs_nature">1.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_unpaid_recovered_compensatory_rest" model="hr.work.entry.type">
@@ -189,6 +210,7 @@
         <field name="description">This is compensatory rest taken by the worker
 - for hours actually worked and paid by the employer, beyond the actual weekly working hours
 - hours paid at the time of the work</field>
+        <field name="l10n_be_drs_nature">1.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_sectoral_compensatory_rest" model="hr.work.entry.type">
@@ -203,6 +225,7 @@
         <field name="description">These are compensatory rest days resulting from sectoral collective agreements on reduced working hours. Compensation for these rest days is paid by third parties, such as a subsistence security fund.
 
 The code can only be used by an employer active in a sector corresponding to the description such as construction, fuel trading and the diamond sector. Only transmit the days actually taken by the worker during the period concerned by the calculation of remuneration.</field>
+        <field name="l10n_be_drs_nature">1.2</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_bank_holiday" model="hr.work.entry.type">
@@ -218,6 +241,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="description">These are the 10 public holidays
 - on the date of the public holiday itself, and therefore effectively declared as a public holiday (no benefits)
 - or on the date of the replacement day if the day is not taken on the date of the public holiday.</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_upcomming_public_holiday" model="hr.work.entry.type">
@@ -233,6 +257,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="description">These are the 10 public holidays
 - on the date of the public holiday itself, and therefore effectively declared as a public holiday (no benefits)
 - or on the date of the replacement day if the day is not taken on the date of the public holiday.</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_extra_legal_public_holiday" model="hr.work.entry.type">
@@ -248,6 +273,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="description">These are regional and sectoral public holidays.
 - taken on the date of the extra-legal public holiday (without benefits)
 - or taken on the date of the replacement day if it is not taken on the date of the public holiday.</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <!-- 086.00 -->
@@ -256,7 +282,7 @@ The code can only be used by an employer active in a sector corresponding to the
             ref('l10n_be_hr_payroll.REMUNERATION_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
         ])]"/>
-        <field name="dmfa_code">1</field>
+        <field name="dmfa_code">10</field>
         <field name="l10n_be_egov3_code">1203003</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are public holidays
@@ -265,6 +291,7 @@ The code can only be used by an employer active in a sector corresponding to the
 - for which the employer pays compensation lower than the normal gross salary
 - without onss.
         </field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <!-- 006.11 -->
@@ -282,6 +309,7 @@ The code can only be used by an employer active in a sector corresponding to the
 - and correspond to a day of unemployment
 - for which the employer pays compensation lower than the normal gross salary.</field>
         <field name="l10n_be_economic_unemployment" eval="True"/>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_legal_leave" model="hr.work.entry.type">
@@ -310,6 +338,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="l10n_be_egov3_code">1204002</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Extra-legal sectoral holidays are additional days of vacation that workers receive in addition to legal holidays, granted through a collective labor agreement (CLA) at sectoral level.</field>
+        <field name="l10n_be_drs_nature">3.3</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_extra_legal" model="hr.work.entry.type">
@@ -324,6 +353,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="l10n_be_egov3_code">1204003</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Extra-legal holidays granted by the employer are days of vacation in addition to statutory holidays and granted to the employee by the employer. These days are not required by law, but may be offered as an additional benefit under an employment contract, a collective labor agreement (CLA), or an individual agreement.</field>
+        <field name="l10n_be_drs_nature">1</field> <!-- TODO: 3.2?-->
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_european" model="hr.work.entry.type">
@@ -336,6 +366,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="l10n_be_egov3_code">1204005</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">This code is used for employees when they receive holiday pay from their employer when they start or return to work</field>
+        <field name="l10n_be_drs_nature">3.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_sailor_time_off" model="hr.work.entry.type">
@@ -348,6 +379,7 @@ The code can only be used by an employer active in a sector corresponding to the
         <field name="l10n_be_egov3_code">1204008</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Due to the fact that the seafarers' holiday scheme is organized in a very specific way, vacation days taken are declared under a separate benefit code. Only a few declarants are affected.</field>
+        <field name="l10n_be_drs_nature">3.1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_youth_time_off" model="hr.work.entry.type">
@@ -393,6 +425,9 @@ These are the hours of absence covered by a guaranteed daily wage
 - as referred to in Article 23, 1° of the Royal Decree of June 10, 2001, providing a uniform definition of concepts relating to working time for social security purposes, pursuant to Article 39 of the Act of July 26, 1996, modernizing social security and ensuring the viability of statutory pension schemes.</field>
         <field name="leave_right">True</field>
         <field name="l10n_be_drs_nature">2.6</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_incapacity_first_week" model="hr.work.entry.type">
@@ -434,6 +469,10 @@ This applies to hours of absence from work
 - during the sickness credit period specific to the education and public sectors.
 For contract workers in the public and education sectors, it is not the employer but the insurer that pays at the end of the sickness credit period.</field>
         <field name="leave_right">True</field>
+        <field name="l10n_be_drs_nature">1.3</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_incapacity_worker_second_week" model="hr.work.entry.type">
@@ -464,6 +503,10 @@ For contract workers in the public and education sectors, it is not the employer
         <field name="description">These are the 7 days following the first 7 days of temporary complete incapacity for work (short term employee) under ordinary law
 - for which the employer pays a guaranteed salary</field>
         <field name="leave_right">True</field>
+        <field name="l10n_be_drs_nature">2.5</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_incapacity_worker_after_second_week" model="hr.work.entry.type">
@@ -476,6 +519,10 @@ For contract workers in the public and education sectors, it is not the employer
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are the days following the second week of illness or accident - for which the employer pays a supplement in addition to the health insurance coverage.</field>
         <field name="leave_right">True</field>
+        <field name="l10n_be_drs_nature">2.7</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_worker_time_off" model="hr.work.entry.type">
@@ -487,6 +534,7 @@ For contract workers in the public and education sectors, it is not the employer
         <field name="l10n_be_egov3_code">1204001</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Holidays within the framework of the coordinated laws of 28 June 1971 on annual holidays for workers, the royal decree of 30 March 1967, the royal decree of 19 November 1998 regulating the annual holidays of certain members of staff of federal administrations (this concerns statutory civil servants), but also holidays according to the regulations specific to administrative bodies (this concerns statutory civil servants).</field>
+        <field name="l10n_be_drs_nature">3.1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_common_law_illness_non_attributable_to_worker" model="hr.work.entry.type">
@@ -507,6 +555,10 @@ Absence not covered by the guaranteed salary for the following reasons:
 - insufficient seniority
 - other reason: for example, generally not entitled to the guaranteed salary (childminders, certain apprentices, etc.)</field>
         <field name="leave_right">True</field>
+        <field name="l10n_be_drs_nature">6.9</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_common_law_illness_attributable_to_worker" model="hr.work.entry.type">
@@ -522,6 +574,10 @@ Absence not covered by the guaranteed salary for the following reasons:
         <field name="description">Incapacity to work due to illness or a common-law accident outside of an adapted AMI work plan.
 Absence not covered by guaranteed salary due to lack of a medical certificate, late submission of the medical certificate, or failure to attend a checkup.</field>
         <field name="leave_right">True</field>
+        <field name="l10n_be_drs_nature">6.8</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_common_law_illness_after_legal_period" model="hr.work.entry.type">
@@ -538,6 +594,7 @@ Absence not covered by guaranteed salary due to lack of a medical certificate, l
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.2</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_prophylactic_time_off_maternity_protection" model="hr.work.entry.type">
@@ -552,6 +609,12 @@ Absence not covered by guaranteed salary due to lack of a medical certificate, l
 Days of work interruption imposed following contact with a person suffering from a contagious disease (Article 239, § 1 of the Royal Decree of 3 July 1996 implementing the law on compulsory insurance for medical care and benefits, as amended on 14 July 1994).</field>
         <field name="leave_right">True</field>
         <field name="requires_allocation" eval="False"/>
+        <field name="l10n_be_drs_nature">6.2</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_003'),
+            ref('l10n_be_hr_payroll.drs_risk_zima001_004'),
+            ref('l10n_be_hr_payroll.drs_risk_zima002_002'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_prophylactic_time_off" model="hr.work.entry.type">
@@ -569,6 +632,7 @@ Days of work interruption imposed following contact with a person suffering from
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima001_001'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.2</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_common_law_illness_ami" model="hr.work.entry.type">
@@ -583,6 +647,7 @@ Days of work interruption imposed following contact with a person suffering from
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Incapacity to work due to illness or a common law accident within the framework of an adapted AMI work plan, with the authorization of the medical advisor or a member of the mutual insurance company's multidisciplinary team</field>
         <field name="leave_right">True</field>
+        <field name="l10n_be_drs_nature">6.3</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid" model="hr.work.entry.type">
@@ -592,6 +657,7 @@ Days of work interruption imposed following contact with a person suffering from
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Work-related accidents involving employees covered by the private sector work-related accident scheme, established by the law of April 10, 1971, relating to work-related accidents.
 This code must be reported if the worker is no longer entitled to guaranteed wages. (contributes to holiday rights)</field>
+        <field name="l10n_be_drs_nature">6.1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_accident_unassimilated" model="hr.work.entry.type">
@@ -604,7 +670,8 @@ This code must be reported if the worker is no longer entitled to guaranteed wag
         
         <field name="description">Work-related accidents involving employees covered by the private sector work-related accident scheme, established by the law of April 10, 1971, relating to work-related accidents.
 This code must be reported if the worker is no longer entitled to guaranteed wages. (doesn't contribute to holiday rights)</field>
-        </record>
+                <field name="l10n_be_drs_nature">6.1</field>
+    </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_occupational_disease_unpaid" model="hr.work.entry.type">
         <field name="category_ids" eval="[(5, 0, 0)]"/>
@@ -613,6 +680,7 @@ This code must be reported if the worker is no longer entitled to guaranteed wag
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Occupational illnesses of employees covered by the private sector occupational illness scheme, established by the Coordinated Laws of June 3, 1970, on compensation for occupational illnesses.
 This code must be declared if the worker is no longer entitled to guaranteed wages.</field>
+        <field name="l10n_be_drs_nature">6.1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_accident_first_week" model="hr.work.entry.type">
@@ -629,6 +697,7 @@ This code must be declared if the worker is no longer entitled to guaranteed wag
 - as referred to in Article 25 of the Royal Decree of 10 June 2001 providing a uniform definition of concepts relating to working time for social security purposes, pursuant to Article 39 of the Act of 26 July 1996 modernizing social security and ensuring the viability of statutory pension schemes,
 - due to occupational illness, work-related accident, or accident on the way to work,
 - with maintenance of normal pay pursuant to Articles 54 or 72 of the Act of 3 July 1978 on employment contracts.</field>
+        <field name="l10n_be_drs_nature">2.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_accident_guaranteed_monthly" model="hr.work.entry.type">
@@ -646,11 +715,12 @@ This refers to hours of absence from work
 - referred to in Article 27 of the Royal Decree of June 10, 2001, providing a uniform definition of working time concepts for social security purposes, pursuant to Article 39 of the Act of July 26, 1996, modernizing social security and ensuring the viability of statutory pension schemes, during the first 30 days of incapacity for work due to illness or accident (see Article 70 of the Act of July 3, 1978, relating to employment contracts)
 - due to an occupational illness, an accident at work, or an accident on the way to work,
 - with continued normal pay</field>
+        <field name="l10n_be_drs_nature">2.6</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_accident_second_week" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.REPLACEMENT_REVENUE_BASE'),
+            ref('l10n_be_hr_payroll.WORK_ACCIDENT_BASE'),
         ])]"/>
         <field name="dmfa_code">11</field>
         <field name="l10n_be_egov3_code">1206004</field>
@@ -659,11 +729,12 @@ This refers to hours of absence from work
 - during the 23 calendar days following the 7-day period,
 - due to occupational illness, work-related accident, or accident on the way to work,
 - with continued normal pay pursuant to Articles 54 or 72 of the Act of July 3, 1978, on employment contracts</field>
+        <field name="l10n_be_drs_nature">2.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_work_accident_second_week_short_term_employee" model="hr.work.entry.type">
         <field name="category_ids" eval="[(6, 0, [
-            ref('l10n_be_hr_payroll.REPLACEMENT_REVENUE_BASE'),
+            ref('l10n_be_hr_payroll.WORK_ACCIDENT_BASE'),
         ])]"/>
         <field name="dmfa_code">11</field>
         <field name="l10n_be_egov3_code">1206004</field>
@@ -672,6 +743,7 @@ This refers to hours of absence from work
 - during the 23 calendar days following the 7-day period,
 - due to occupational illness, work-related accident, or accident on the way to work,
 - with continued normal pay pursuant to Articles 54 or 72 of the Act of July 3, 1978, on employment contracts</field>
+        <field name="l10n_be_drs_nature">2.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_dismissal" model="hr.work.entry.type">
@@ -687,6 +759,7 @@ This refers to hours of absence from work
             ref('l10n_be_hr_payroll.drs_risk_wech002_010'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_010'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.10</field>
     </record>
 
     <!-- 152.00 -->
@@ -704,6 +777,7 @@ It is a temporary and unforeseeable event occurring within the company and relat
             ref('l10n_be_hr_payroll.drs_risk_wech002_003'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_003'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.3</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_force_majeure" model="hr.work.entry.type">
@@ -720,6 +794,7 @@ Force majeure is defined as a sudden, unforeseeable event, beyond the control of
             ref('l10n_be_hr_payroll.drs_risk_wech002_004'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_004'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_force_majeure_medical" model="hr.work.entry.type">
@@ -736,6 +811,7 @@ Force majeure is defined as a sudden, unforeseeable event, beyond the control of
             ref('l10n_be_hr_payroll.drs_risk_wech002_005'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_005'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_collective_closure" model="hr.work.entry.type">
@@ -751,6 +827,7 @@ Force majeure is defined as a sudden, unforeseeable event, beyond the control of
             ref('l10n_be_hr_payroll.drs_risk_wech002_006'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_006'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.6</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_collective_closure_agreeement" model="hr.work.entry.type">
@@ -766,6 +843,7 @@ Force majeure is defined as a sudden, unforeseeable event, beyond the control of
             ref('l10n_be_hr_payroll.drs_risk_wech002_007'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_007'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_collective_closure_reduction" model="hr.work.entry.type">
@@ -781,10 +859,11 @@ Force majeure is defined as a sudden, unforeseeable event, beyond the control of
             ref('l10n_be_hr_payroll.drs_risk_wech002_008'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_008'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.8</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_unemployment_strike" model="hr.work.entry.type">
-        <field name="dmfa_code">71</field>
+        <field name="dmfa_code">70</field>
         <field name="l10n_be_egov3_code">2207008</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Workers who are directly or indirectly unemployed as a result of social action (strike or lockout) may receive temporary unemployment benefits due to a strike or lockout if certain conditions are met.
@@ -795,6 +874,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.drs_risk_wech002_009'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_009'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.9</field>
     </record>
 
     <!-- 137.00 -->
@@ -811,6 +891,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.drs_risk_wech002_001'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_001'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_temporary_economic_unemployement_employee" model="hr.work.entry.type">
@@ -822,6 +903,11 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="l10n_be_economic_unemployment" eval="True"/>
         <field name="include_public_holidays_in_duration" eval="True"/>
         <field name="requires_allocation" eval="False"/>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_wech002_011'),
+            ref('l10n_be_hr_payroll.drs_risk_wech005_011'),
+        ])]"/>
+        <field name="l10n_be_drs_nature">5.11</field>
     </record>
 
     <!-- 151.00 -->
@@ -838,6 +924,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.drs_risk_wech002_002'),
             ref('l10n_be_hr_payroll.drs_risk_wech005_002'),
         ])]"/>
+        <field name="l10n_be_drs_nature">5.2</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_non_provided_service_childminders" model="hr.work.entry.type">
@@ -884,6 +971,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="description">These are hours paid by the employer
 - worked as part of training agreed with the employer, with the exception of training as part of social advancement and educational leave.
 - not included under another specific benefit code</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_training_social_promotion" model="hr.work.entry.type">
@@ -892,12 +980,13 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
         ])]"/>
-        <field name="dmfa_code">1</field>
+        <field name="dmfa_code">13</field>
         <field name="l10n_be_egov3_code">1209001</field>
         <field name="l10n_be_egov3_base">both</field>
         <field name="description">These are hours of absence from work
 - following a suspension of the employment contract due to participation in courses within the framework of social advancement (as provided for in Article 28 4° a of the Law of July 3, 1978)
 - not paid by the employer</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_training_time_off" model="hr.work.entry.type">
@@ -913,6 +1002,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="description">These are hours of absence from work
 - following a suspension of the employment contract due to participation in courses under educational leave (as provided for in Article 28 4° b of the Law of July 3, 1978)
 - paid by the employer</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_training_time_off_with_meal_voucher" model="hr.work.entry.type">
@@ -929,6 +1019,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
 - following a suspension of the employment contract due to participation in courses under educational leave (as provided for in Article 28 4° b of the Law of July 3, 1978)
 - paid by the employer
 - with meal voucher</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
 
@@ -944,6 +1035,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="description">These are hours of absence from work
 - following a suspension of the employment contract due to participation in courses under educational leave (as provided for in Article 28 4° b of the Law of July 3, 1978)
 - paid by the employer</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_flemish_training_time_off_with_meal_voucher" model="hr.work.entry.type">
@@ -960,6 +1052,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
 - following a suspension of the employment contract due to participation in courses under educational leave (as provided for in Article 28 4° b of the Law of July 3, 1978)
 - paid by the employer
 - with meal voucher</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_maternity" model="hr.work.entry.type">
@@ -971,6 +1064,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima001_002'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_maternity_time_off_converted" model="hr.work.entry.type">
@@ -983,6 +1077,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima001_005'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.4</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_breast_feeding" model="hr.work.entry.type">
@@ -995,6 +1090,10 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="l10n_be_egov3_code">2210003</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Hours of interruption of work for the purpose of breastfeeding or expressing milk in accordance with CCT 80 of November 27, 2001 establishing a right to breastfeeding breaks amended by CCT 80 bis of October 13, 2010.</field>
+        <field name="l10n_be_drs_nature">6.10</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima003_001'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_breast_feeding_unassimilated" model="hr.work.entry.type">
@@ -1008,6 +1107,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="l10n_be_egov3_code">2210003</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Hours of interruption of work for the purpose of breastfeeding or expressing milk in accordance with CCT 80 of November 27, 2001 establishing a right to breastfeeding breaks amended by CCT 80 bis of October 13, 2010.</field>
+        <field name="l10n_be_drs_nature">6.10</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_paternity_company" model="hr.work.entry.type">
@@ -1021,6 +1121,10 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="l10n_be_egov3_code">2210004</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">The right to maternity leave (formerly also called "paternity leave") provided for in Article 30, §2 et seq. of the law of 3 July 1978 relating to employment contracts applies to all workers employed under an employment contract covered by the law of 3 July 1978 relating to employment contracts. During the first three days of maternity leave, the worker retains his or her full salary at the expense of his or her employer.</field>
+        <field name="l10n_be_drs_nature">1</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_006'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_paternity_legal" model="hr.work.entry.type">
@@ -1034,6 +1138,7 @@ Thus, workers can only receive benefits following a positive decision by the ONE
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima001_006'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.10</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_adoption_company" model="hr.work.entry.type">
@@ -1042,12 +1147,16 @@ Thus, workers can only receive benefits following a positive decision by the ONE
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
         ])]"/>
-        <field name="dmfa_code">52</field>
+        <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">2210006</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">The right to adoption leave referred to in Article 30ter of the Law of July 3, 1978 on Employment Contracts applies to all workers under an employment contract within the meaning of the Law of July 3, 1978 on Employment Contracts.
 During the first three calendar days of adoption leave, the worker is entitled to retain their normal salary, which is paid by the employer. Article 30sexies of the Law of July 3, 1978 on Employment Contracts grants a worker who has been officially designated as a foster parent and who, following long-term foster care, welcomes a minor child into their family, a one-time right to foster parent leave of up to six consecutive weeks to care for the child.
 This right to adoption leave applies to all workers under an employment contract within the meaning of the Law of July 3, 1978 on Employment Contracts. During the first three calendar days of parental leave, the worker is entitled to maintain their normal salary at the employer's expense.</field>
+        <field name="l10n_be_drs_nature">1</field>
+        <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
+            ref('l10n_be_hr_payroll.drs_risk_zima001_007'),
+        ])]"/>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_adoption_legal" model="hr.work.entry.type">
@@ -1065,6 +1174,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima001_007'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.11</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_foster_care" model="hr.work.entry.type">
@@ -1073,6 +1183,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">2210008</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Days of absence for foster parents who receive daily compensation from the ONEM for foster care (article 30quater of the law of July 3, 1978 and the Royal Decree of October 27, 2008).</field>
+        <field name="l10n_be_drs_nature">9</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_available_not_working" model="hr.work.entry.type">
@@ -1104,6 +1215,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
 - in construction
 - when activities have actually begun
 - for which the employer pays incomplete wages because the day was not fully worked</field>
+        <field name="l10n_be_drs_nature">2.3</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_construction_imperative_maintained_salary" model="hr.work.entry.type">
@@ -1119,6 +1231,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
 - pursuant to the suspension of the performance of the employment contract referred to in Article 37 of the Royal Decree of 10 June 2001 providing a uniform definition of concepts relating to working time for social security purposes, pursuant to Article 39 of the Law of 26 July 1996 modernizing social security and ensuring the viability of statutory pension schemes,
 - pursuant to Article 30bis of the Law of 3 July 1978 relating to employment contracts
 - with maintenance of normal pay</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_environmental_protection" model="hr.work.entry.type">
@@ -1133,6 +1246,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="description">These are hours of absence paid by the employer
 - due to a technical problem in the company
 - or following a company closure for environmental reasons.</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_union_mission" model="hr.work.entry.type">
@@ -1146,6 +1260,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are hours paid by the employer
 - whether the employer pays the employee for their absence on union business or for the time they must devote to union activities.</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_justified_reason_paid" model="hr.work.entry.type">
@@ -1159,6 +1274,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are hours of justified absence paid by the employer
 - for a reason not listed elsewhere</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_small_unemployment" model="hr.work.entry.type">
@@ -1173,6 +1289,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are hours due to an absence considered as short-time work
 [taxable]</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_end_of_carreer_exemption" model="hr.work.entry.type">
@@ -1202,6 +1319,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
 - pursuant to the suspension of the performance of the employment contract referred to in Article 46 of the Royal Decree of 10 June 2001 providing a uniform definition of concepts relating to working time for social security purposes, pursuant to Article 39 of the Law of 26 July 1996 modernizing social security and ensuring the viability of statutory pension schemes,
 - pursuant to Article 30bis of the Law of 3 July 1978 relating to employment contracts
 - without maintaining normal pay</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_justified_reason_unpaid" model="hr.work.entry.type">
@@ -1210,6 +1328,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299099</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Justified absence from the employer for which the employer has not paid remuneration and which is not covered by social security. - due to a reason not cited elsewhere</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_social_judge" model="hr.work.entry.type">
@@ -1224,6 +1343,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="description">These are hours of absence - pursuant to the suspension of the performance of the employment contract referred to in Article 40 of the Royal Decree of 10 June 2001 providing a uniform definition of concepts relating to working time for social security purposes, pursuant to Article 39 of the Law of 26 July 1996 modernizing social security and ensuring the viability of statutory pension schemes,
 - pursuant to Article 28, 3° of the Law of 3 July 1978 relating to employment contracts
 - not covered by the employer</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_strike" model="hr.work.entry.type">
@@ -1233,6 +1353,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Il s’agit des jours de grève auxquels le travailleur a participé et les jours où le travailleur était absent du travail en raison d'un lock-out. L’employeur ne paie pas de salaire pour ces jours.</field>
         <field name="leave_right" eval="True"/>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_union_mission_unpaid" model="hr.work.entry.type">
@@ -1241,6 +1362,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299005</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Union mission days for which the employer has not paid wages.</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_civic_duty_unpaid" model="hr.work.entry.type">
@@ -1249,6 +1371,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299006</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Days of civic obligation for which no salary is paid.</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_public_mandate_unpaid" model="hr.work.entry.type">
@@ -1257,6 +1380,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299007</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Days of public mandate for which no salary is paid.</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_militia_obligation" model="hr.work.entry.type">
@@ -1265,6 +1389,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299008</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">Days of public mandate for which no salary is paid.</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_unjustified_reason" model="hr.work.entry.type">
@@ -1275,6 +1400,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299009</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are days or hours not worked, but which were clearly provided for in the employment contract or statutory relationship (other than days of inactivity).</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_normal_inactivity" model="hr.work.entry.type">
@@ -1287,6 +1413,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1299010</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are days of inactivity in the working schedule within the framework of the employment contract or statutory relationship.</field>
+        <field name="l10n_be_drs_nature">8</field>
     </record>
 
     <record id="hr_work_entry.be_hr_work_entry_type_out_of_contract" model="hr.work.entry.type">
@@ -1307,6 +1434,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
         ])]"/>
         <field name="leave_right">True</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_solicitation_time_off" model="hr.work.entry.type">
@@ -1318,6 +1446,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         ])]"/>
         <field name="leave_right" eval="True"/>
         <field name="dmfa_code">1</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_home_working" model="hr.work.entry.type">
@@ -1329,6 +1458,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.REPRESENTATION_FEES'),
         ])]"/>
         <field name="dmfa_code">1</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.be_work_entry_type_unpaid_leave" model="hr.work.entry.type">
@@ -1337,6 +1467,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.UNASSIMILATED'),
         ])]"/>
         <field name="dmfa_code">30</field>
+        <field name="l10n_be_drs_nature">7</field>
     </record>
 
     <!-- 020.49 -->
@@ -1348,6 +1479,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         ])]"/>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_economic_unemployment" eval="True"/>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_training" model="hr.work.entry.type">
@@ -1360,6 +1492,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.REPRESENTATION_FEES'),
         ])]"/>
         <field name="dmfa_code">1</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_long_sick" model="hr.work.entry.type">
@@ -1368,6 +1501,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         ])]"/>
         <!-- 50, not 30 -->
         <field name="dmfa_code">50</field>
+        <field name="l10n_be_drs_nature">6.2</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_medical_assistance" model="hr.work.entry.type">
@@ -1413,6 +1547,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="description">This is compensatory rest taken by the worker
 - for hours actually worked and paid by the employer, beyond the actual weekly working hours
 - hours paid at the time the time off is taken</field>
+        <field name="l10n_be_drs_nature">1.5</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_phc" model="hr.work.entry.type">
@@ -1432,8 +1567,8 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_is_time_credit" eval="True"/>
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima002_001'),
-            ref('l10n_be_hr_payroll.drs_risk_zima002_002'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.3</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_partial_incapacity_unassimilated" model="hr.work.entry.type">
@@ -1445,8 +1580,8 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_is_time_credit" eval="True"/>
         <field name="l10n_be_drs_risk_ids" eval="[(6, 0, [
             ref('l10n_be_hr_payroll.drs_risk_zima002_001'),
-            ref('l10n_be_hr_payroll.drs_risk_zima002_002'),
         ])]"/>
+        <field name="l10n_be_drs_nature">6.3</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_public_holiday_working_without_recovery" model="hr.work.entry.type">
@@ -1461,6 +1596,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1101001</field>
         <field name="l10n_be_egov3_base">daily</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_public_holiday_working_with_recovery" model="hr.work.entry.type">
@@ -1475,6 +1611,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1101001</field>
         <field name="l10n_be_egov3_base">daily</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_death_close_family" model="hr.work.entry.type">
@@ -1484,6 +1621,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1298006</field>
         <field name="l10n_be_egov3_base">daily</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_postponed_paid_time_off_n1" model="hr.work.entry.type">
@@ -1492,6 +1630,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1204006</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">These are the vacation days taken during the first 12 months following the vacation year, covered only by the holiday pay paid at the end of the vacation year or by the holiday voucher, in case the vacation days cannot be taken during the vacation year itself, for example due to illness or incapacity for work (only for the private sector vacation scheme).</field>
+        <field name="l10n_be_drs_nature">3.6</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_postponed_paid_time_off_n2" model="hr.work.entry.type">
@@ -1500,6 +1639,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="l10n_be_egov3_code">1204007</field>
         <field name="l10n_be_egov3_base">daily</field>
         <field name="description">This benefit code corresponds to the taking of any remaining carried-over vacation days from the 13th month to the 24th month after the vacation year (only for the private sector vacation scheme).</field>
+        <field name="l10n_be_drs_nature">3.6</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_guaranteed_wage_interrupted_day_illness" model="hr.work.entry.type">
@@ -1511,6 +1651,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1101001</field>
         <field name="l10n_be_egov3_base">daily</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_schooldays" model="hr.work.entry.type">
@@ -1522,6 +1663,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1101001</field>
         <field name="l10n_be_egov3_base">daily</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_paid_absence" model="hr.work.entry.type">
@@ -1533,6 +1675,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1298099</field>
         <field name="l10n_be_egov3_base">daily</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_holiday_previous_vacation_credit_year" model="hr.work.entry.type">
@@ -1544,6 +1687,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1204001</field>
         <field name="l10n_be_egov3_base">daily</field>
+        <field name="l10n_be_drs_nature">3.1</field> <!-- TODO: 3.6?-->
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_political_leave" model="hr.work.entry.type">
@@ -1556,6 +1700,7 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.REPRESENTATION_FEES'),
         ])]"/>
         <field name="dmfa_code">1</field>
+        <field name="l10n_be_drs_nature">1</field>
     </record>
 
     <record id="hr_work_entry.l10n_be_work_entry_type_overtime_recoverable" model="hr.work.entry.type">
@@ -1564,11 +1709,35 @@ From the fourth day of foster parent leave, the employee no longer receives a sa
             ref('l10n_be_hr_payroll.ONSS_BASE'),
             ref('l10n_be_hr_payroll.WITHHOLDING_BASE'),
             ref('hr_payroll.EXTRA_HOURS'),
+            ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'),
         ])]"/>
+        <!-- the hours are recovered later: only the 50% premium is paid with the overtime -->
+        <field name="amount_rate">0.5</field>
         <field name="dmfa_code">1</field>
         <field name="l10n_be_egov3_code">1102001</field>
         <field name="l10n_be_egov3_base">both</field>
+        <field name="l10n_be_drs_nature">1.5</field>
     </record>
+
+    <!-- The work entry types of hr_work_entry are not updated: their tax categories reach the existing databases -->
+    <function model="hr.work.entry.type" name="write">
+        <value eval="[
+            ref('hr_work_entry.be_work_entry_type_overtime'),
+            ref('hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_150'),
+            ref('hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_200'),
+            ref('hr_work_entry.l10n_be_work_entry_type_overtime_recoverable'),
+            ref('hr_work_entry.be_work_entry_type_additional_hours_50'),
+            ref('hr_work_entry.be_work_entry_type_additional_hours_100'),
+        ]"/>
+        <value eval="{'category_ids': [(4, ref('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'))]}"/>
+    </function>
+    <function model="hr.work.entry.type" name="write">
+        <value eval="[
+            ref('hr_work_entry.l10n_be_work_entry_type_overtime_no_onss'),
+            ref('hr_work_entry.l10n_be_work_entry_type_overtime_no_onss_horeca'),
+        ]"/>
+        <value eval="{'category_ids': [(4, ref('l10n_be_hr_payroll.HORECA_NET_OVERTIME'))]}"/>
+    </function>
 
 </data>
 </odoo>

@@ -4,7 +4,7 @@ import logging
 import math
 
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date
 from functools import reduce
 from itertools import zip_longest
 
@@ -438,18 +438,12 @@ class HrPayslip(models.Model):
 
     @api.depends('employee_id', 'date_from', 'date_to', 'employee_id.version_ids')
     def _compute_allowed_version_ids(self):
-        payslip_domains = []
         valid_payslips = self.filtered(lambda p: p.date_from and p.date_to and p.employee_id)
-        for payslip in valid_payslips:
-            payslip_domains.append([
-                ('employee_id', '=', payslip.employee_id.id),
-                ('date_start', '<=', payslip.date_to),
-                '|', ('date_end', '=', False), ('date_end', '>=', payslip.date_from),
-            ])
-
-        domain = Domain.OR(payslip_domains)
-
-        all_candidate_versions = self.env['hr.version'].search(domain).sorted('date_start')
+        # Search on stored fields only, searching on date_start/date_end is costly
+        all_candidate_versions = self.env['hr.version'].search([
+            ('employee_id', 'in', valid_payslips.employee_id.ids),
+            ('date_version', '<=', max(valid_payslips.mapped('date_to'))),
+        ]).sorted('date_start') if valid_payslips else self.env['hr.version']
         versions_by_employee = defaultdict(lambda: self.env['hr.version'])
         for version in all_candidate_versions:
             versions_by_employee[version.employee_id.id] |= version
@@ -463,6 +457,8 @@ class HrPayslip(models.Model):
             valid_versions = self.env['hr.version']
 
             for version in versions_by_employee[payslip.employee_id.id]:
+                if version.date_start > payslip.date_to or (version.date_end and version.date_end < payslip.date_from):
+                    continue
                 key = version._get_version_lookup_key()
                 if not versions_seen[key]:
                     valid_versions |= version
@@ -514,31 +510,30 @@ class HrPayslip(models.Model):
         over the version's property value. No-op if the structure has no rule
         with this code.
         """
-        self.ensure_one()
-        rule = self.struct_id.rule_ids.filtered(lambda r: r.code == code)[:1]
-        if not rule:
-            return
-        line = self.input_line_ids.filtered(lambda l: l.salary_rule_id == rule)[:1]
-        try:
-            amount = float(value or 0.0)
-        except (TypeError, ValueError):
-            amount = 0.0
-        if not amount:
-            if line:
-                self.update({'input_line_ids': [Command.delete(line.id)]})
-            return
-        if line:
-            line.amount = amount
-        else:
-            self.update({
-                'input_line_ids': [Command.create({'name': rule.input_name, 'salary_rule_id': rule.id, 'amount': amount})],
-            })
+        self._set_input_values({code: value})
 
     def _set_input_values(self, values):
         """Batch version of _set_input_value: {code: value}."""
         self.ensure_one()
+        commands = []
         for code, value in values.items():
-            self._set_input_value(code, value)
+            rule = self.struct_id.rule_ids.filtered(lambda r: r.code == code)[:1]
+            if not rule:
+                continue
+            line = self.input_line_ids.filtered(lambda l: l.salary_rule_id == rule)[:1]
+            try:
+                amount = float(value or 0.0)
+            except (TypeError, ValueError):
+                amount = 0.0
+            if not amount:
+                if line:
+                    commands.append(Command.delete(line.id))
+            elif line:
+                line.amount = amount
+            else:
+                commands.append(Command.create({'name': rule.input_name, 'salary_rule_id': rule.id, 'amount': amount}))
+        if commands:
+            self.update({'input_line_ids': commands})
 
     def _compute_is_regular(self):
         for payslip in self:
@@ -549,8 +544,12 @@ class HrPayslip(models.Model):
         non_validated = self.filtered(lambda slip: slip.state not in ("validated", "paid"))
         non_validated.is_wrong_version = False
         for payslip in (self - non_validated):
+            # Several contracts can overlap the period, compare with the version of the payslip contract
+            versions = payslip.employee_id._get_versions_with_contract_overlap_with_period(payslip.date_from, payslip.date_to)
+            expected_version = versions.filtered(lambda v: v.contract_date_start == payslip.version_id.contract_date_start)[:1] \
+                or payslip.employee_id._get_version(date=payslip.date_from)
             payslip.is_wrong_version = payslip.employee_id and payslip.version_id \
-                                        and payslip.version_id != payslip.employee_id._get_version(date=payslip.date_from)
+                                        and payslip.version_id != expected_version
 
     @api.depends('has_wrong_data', 'is_wrong_version')
     def _compute_keep_wrong_version(self):
@@ -626,30 +625,45 @@ class HrPayslip(models.Model):
     def _get_net_wage_line_codes(self):
         return {'NET'}
 
-    @api.depends('line_ids.total', 'struct_id.rule_ids.appears_on_employee_cost_dashboard')
+    @api.depends('line_ids.total')
     def _compute_basic_net(self):
-        to_compute_payslips = self.filtered(lambda p: p.state in ('draft', 'validated')).with_prefetch()
+        to_compute_payslips = self.filtered(lambda p: p.state in ('draft')).with_prefetch()
+        if not to_compute_payslips:
+            return
+
         basic_codes = self._get_basic_wage_line_codes()
         gross_codes = self._get_gross_wage_line_codes()
         net_codes = self._get_net_wage_line_codes()
-        line_values = (to_compute_payslips._origin)._get_line_values([*basic_codes, *gross_codes, *net_codes])
-        employer_cost_codes = set(self.env['hr.salary.rule'].search([
-            ('appears_on_employee_cost_dashboard', '=', True)
-        ]).mapped('code'))
+        line_values = to_compute_payslips._origin._get_line_values([*basic_codes, *gross_codes, *net_codes])
+        employer_codes_by_structure = {
+            structure: structure.rule_ids.filtered('appears_on_employee_cost_dashboard').mapped('code')
+            for structure in to_compute_payslips.struct_id
+        }
+        employer_cost_codes = list(set(
+            code for codes in employer_codes_by_structure.values() for code in codes
+        ))
         employer_cost_values = {}
         if employer_cost_codes:
-            employer_cost_values = (to_compute_payslips._origin)._get_line_values(employer_cost_codes)
+            employer_cost_values = to_compute_payslips._origin._get_line_values(employer_cost_codes)
         for payslip in to_compute_payslips:
-            employer_cost_total = 0.0
-            payslip_employer_codes = payslip.struct_id.rule_ids.filtered(
-                'appears_on_employee_cost_dashboard'
-            ).mapped('code')
-            for code in payslip_employer_codes:
-                employer_cost_total += employer_cost_values[code][payslip._origin.id]['total']
-            payslip.write({
-                'basic_wage': sum(line_values[code][payslip._origin.id]['total'] for code in basic_codes),
-                'gross_wage': sum(line_values[code][payslip._origin.id]['total'] for code in gross_codes),
-                'net_wage': sum(line_values[code][payslip._origin.id]['total'] for code in net_codes),
+            payslip_id = payslip._origin.id
+            if not payslip_id:
+                payslip.update({
+                    'basic_wage': 0.0,
+                    'gross_wage': 0.0,
+                    'net_wage': 0.0,
+                    'employer_cost': 0.0,
+                })
+                continue
+            payslip_employer_codes = employer_codes_by_structure.get(payslip.struct_id, [])
+            employer_cost_total = sum(
+                employer_cost_values[code][payslip_id]['total']
+                for code in payslip_employer_codes
+            )
+            payslip.update({
+                'basic_wage': sum(line_values[code][payslip_id]['total'] for code in basic_codes),
+                'gross_wage': sum(line_values[code][payslip_id]['total'] for code in gross_codes),
+                'net_wage': sum(line_values[code][payslip_id]['total'] for code in net_codes),
                 'employer_cost': employer_cost_total,
             })
 
@@ -742,12 +756,17 @@ class HrPayslip(models.Model):
                     line = self.env['hr.payslip.line'].browse(line_id)
                     if line.slip_id.id != payslip.id:
                         continue
+                    explanation = line.explanation
+                    # A line edited a second time already starts with this label.
+                    if explanation and not line.manually_modified:
+                        explanation = self.env._("Manually modified. Explanation before the change:\n%(explanation)s", explanation=explanation)
                     overrides[line.code] = {
                         'name': line.name,
                         'amount': line.amount,
                         'quantity': line.quantity,
                         'rate': line.rate,
                         'manually_modified': True,
+                        'explanation': explanation,
                     }
                 if overrides:
                     payslip._recompute_with_forced_lines(overrides)
@@ -794,7 +813,7 @@ class HrPayslip(models.Model):
         all_overrides = {}
         for line in self.line_ids:
             if line.sequence < min_sequence:
-                all_overrides[line.code] = {'name': line.name, 'amount': line.amount, 'quantity': line.quantity, 'rate': line.rate}
+                all_overrides[line.code] = {'name': line.name, 'amount': line.amount, 'quantity': line.quantity, 'rate': line.rate, 'explanation': line.explanation, 'manually_modified': line.manually_modified}
             else:
                 all_overrides[line.code] = {'name': line.name}
         all_overrides.update(forced_line_vals)
@@ -908,17 +927,20 @@ class HrPayslip(models.Model):
         employee_attachments = defaultdict(lambda: self.env['ir.attachment'])
         for employee, attachment in zip(employees, new_pdfs, strict=True):
             employee_attachments[employee] |= attachment
+        registered_payslip_ids = set()
         for pdf in new_pdfs:
+            if pdf.res_id in registered_payslip_ids:
+                continue
+            registered_payslip_ids.add(pdf.res_id)
             pdf.register_as_main_attachment(force=True)
         if self.env.context.get('is_test_print'):
             return
 
         self._pdf_post_create(employee_attachments)
         # Send email to employees (after attachment is created to include it in the mail by other bridge module)
-        for payslips in mapped_reports.values():
-            for payslip in payslips.filtered(lambda p: p._check_send_payslip_mail()):
-                if template := payslip._get_email_template():
-                    template.send_mail(payslip.id, email_layout_xmlid='mail.mail_notification_light')
+        for payslip in self.filtered(lambda p: p._check_send_payslip_mail()):
+            if template := payslip._get_email_template():
+                template.send_mail(payslip.id, email_layout_xmlid='mail.mail_notification_light')
 
         notification_message = self.env.context.get('pdf_generation_message', self.env._("PDFs are generated"))
         return self._show_notification(notification_message, 'success')
@@ -953,7 +975,8 @@ class HrPayslip(models.Model):
 
     def _prepare_payslip_pdf_content(self, report, languages):
         self.ensure_one()
-        pdf_content, _ = self.env['ir.actions.report'].sudo().with_context(lang=languages[0])._render_qweb_pdf(report, self.id)
+        # in the document layout of the company of the payslip, not the one of the current company
+        pdf_content, _ = self.env['ir.actions.report'].sudo().with_company(self.company_id).with_context(lang=languages[0])._render_qweb_pdf(report, self.id)
         return pdf_content
 
     def _queue_for_send(self):
@@ -976,6 +999,21 @@ class HrPayslip(models.Model):
         if 'employee_ids' in records:
             return records.mapped('employee_ids')
         return Employee
+
+    def _get_leaves_domain(self, extra_domain=None):
+        domain_list = []
+        for p in self:
+            domain = [
+                ('employee_id', '=', p.employee_id.id),
+                ('date_from', '<=', p.date_to),
+                ('date_to', '>=', p.date_from),
+            ]
+            if extra_domain:
+                extra = extra_domain(p) if callable(extra_domain) else extra_domain
+                if extra:
+                    domain = Domain.AND([domain, extra])
+            domain_list.append(domain)
+        return Domain.OR(domain_list) if domain_list else Domain.FALSE
 
     def action_payslip_done(self):
         if not self.env.user.has_group('hr_payroll.group_hr_payroll_officer'):
@@ -1004,10 +1042,25 @@ class HrPayslip(models.Model):
             raise ValidationError(self._get_error_message())
         if self.filtered(lambda slip: slip.version_id and not slip.version_id.active):
             raise ValidationError(self.env._("You can't validate a payslip linked to an archived version."))
+        # The wages are only computed on draft payslips: compute the pending ones before the state changes.
+        self.flush_recordset(['basic_wage', 'gross_wage', 'net_wage', 'employer_cost'])
         self.write({
             'state': 'validated',
             'done_date': fields.Datetime.now(),
         })
+
+        regular_payslips = self.filtered(lambda p: p.is_regular)
+        if regular_payslips:
+            domain = Domain.AND([
+                [('state', '=', 'validate'), ('payslip_state', '=', 'normal')],
+                regular_payslips._get_leaves_domain(
+                    extra_domain=lambda p: [
+                        ('work_entry_type_id', 'in', p.worked_days_line_ids.work_entry_type_id.ids),
+                    ] if p.struct_id.use_worked_day_lines else []
+                ),
+            ])
+            leaves = self.env['hr.leave'].search(domain)
+            leaves.write({'payslip_state': 'done'})
 
         for payslip in self.filtered(lambda p: not p.credit_note):
             if (payslip.is_correction_payslip and payslip.origin_payslip_id.state == 'paid'):
@@ -1024,18 +1077,14 @@ class HrPayslip(models.Model):
             actions_report = self.env['ir.actions.report']
             engine_name = actions_report._get_pdf_engine()
             pdf_state = actions_report.get_pdf_engine_state(engine_name)
-            if self.env.context.get('payslip_generate_pdf_direct') or ((
-                len(self) <= 5
-                and self.company_id.payslip_generate_and_send_trigger == 'on_confirmed'
-            ) and pdf_state != 'install'):  # If not installed, redirect PDF generation to the cron
+            if self.env.context.get('payslip_generate_pdf_direct') and pdf_state != 'install':  # If not installed, redirect PDF generation to the cron
                 self._generate_pdf()
             else:
-                for payslips in self.grouped('company_id').values():
-                    if (
-                        payslips.company_id.payslip_generate_and_send_trigger
-                        == 'on_confirmed'
-                    ):
-                        payslips._queue_for_send()
+                on_confirmed_payslips = self.filtered(lambda p: p.company_id.payslip_generate_and_send_trigger == 'on_confirmed')
+                if len(on_confirmed_payslips) <= 5 and pdf_state != 'install':
+                    on_confirmed_payslips._generate_pdf()
+                else:
+                    on_confirmed_payslips._queue_for_send()
 
     def action_validate(self):
         """ Validate the draft payslips of the recordset, computing them first if needed. """
@@ -1118,11 +1167,16 @@ class HrPayslip(models.Model):
         }
 
     def action_adjust_payslip(self):
+        if self.env.context.get('correct_paid_payslips'):
+            # This method is used in the wrong company/employee data warning
+            # as an action to correct incorrect payslips (which do not necessarily have to be paid).
+            if any(payslip.credit_note or payslip.state != 'paid' for payslip in self):
+                raise UserError(self.env._('You can only correct payslips that have been paid.'))
         view = self.env.ref('hr_payroll.hr_payslip_correction_wizard_form', raise_if_not_found=False)
         default_is_button_action = self.env.context.get('default_is_button_action')
         return {
             'type': 'ir.actions.act_window',
-            'name': self.env._('Payslip Correction'),
+            'name': self.env._('Payslip Correction') if len(self) == 1 else self.env._('Payslips Correction'),
             'res_model': 'hr.payslip.correction.wizard',
             'view_mode': 'form',
             'views': [(view.id if view else False, 'form')],
@@ -1180,7 +1234,6 @@ class HrPayslip(models.Model):
 
     def _action_refund_payslips(self):
         reverted_payslips = self.env['hr.payslip']
-        related_leaves = self.env['hr.leave']
         for payslip in self:
             reverted_payslip = payslip.copy({
                 'credit_note': True,
@@ -1202,10 +1255,14 @@ class HrPayslip(models.Model):
                 body=self.env._('This is a refunded payslip.\nFind the refund under this name: %(payslip)s', payslip=reverted_payslip.name)
             )
             payslip.is_refunded = True
-            #  set the payslip_state of related leave to 'normal'
-            related_leaves |= payslip.employee_id.leave_ids.filtered(lambda leave: leave.payslip_state == 'blocked' and leave.date_from.date() <= payslip.date_to and leave.date_to.date() >= payslip.date_from)
         reverted_payslips.action_payslip_done()
-        related_leaves.write({'payslip_state': 'normal'})
+        if self:
+            domain = Domain.AND([
+                [('payslip_state', 'in', ['blocked', 'done'])],
+                self._get_leaves_domain()
+            ])
+            related_leaves = self.env['hr.leave'].search(domain)
+            related_leaves.write({'payslip_state': 'normal'})
         return reverted_payslips
 
     def _action_correct_payslips(self):
@@ -1308,19 +1365,6 @@ class HrPayslip(models.Model):
             self.env['hr.payslip.line'].create(batch._get_payslip_lines())
 
         self._compute_worked_days_ytd()
-        if self.env.context.get('salary_simulation'):
-            return True
-        regular_payslips = self.filtered(lambda p: p.is_regular)
-        if regular_payslips:
-            employees = regular_payslips.mapped('employee_id')
-            leaves = self.env['hr.leave'].search([
-                ('employee_id', 'in', employees.ids),
-                ('state', '!=', 'refuse'),
-            ])
-            dates = regular_payslips.mapped('date_to')
-            max_date = datetime.combine(max(dates), datetime.max.time())
-            leaves_to_green = leaves.filtered(lambda leave: leave.payslip_state != 'blocked' and leave.date_to <= max_date)
-            leaves_to_green.write({'payslip_state': 'done'})
         return True
 
     def action_refresh_from_work_entries(self):
@@ -1509,6 +1553,8 @@ class HrPayslip(models.Model):
         return tuple(self.env['hr.salary.rule.category'].search([('id', 'child_of', root_category.id)]).mapped('code'))
 
     def _sum_category(self, code, from_date, to_date=None, include_children=False):
+        if to_date is None:
+            to_date = fields.Date.context_today(self)
         if not self.ids:
             return 0.0
 
@@ -1795,7 +1841,9 @@ class HrPayslip(models.Model):
                                 for vals in work_entries_vals_by_version_id[version.id]
                             ]
                             localdict = payslip._get_localdict(payslip_work_entries_vals)
-                            localdict.update(**common_localdict)
+                            # Including the batch registry creates localdict -> localdicts -> localdict,
+                            # forcing safe_eval's runtime call validation to use its slower cycle-aware traversal.
+                            localdict.update({key: value for key, value in common_localdict.items() if key != 'localdicts'})
                         for category_code, amount in force_categories_by_code.items():
                             localdict['categories'][category_code] = amount
                         localdicts[payslip.id] = localdict
@@ -1878,13 +1926,15 @@ class HrPayslip(models.Model):
                                 )
                             else:
                                 manually_modified = False
+                                amount_forced = False
                                 if manual_overrides and rule.code in manual_overrides:
                                     forced = manual_overrides[rule.code]
                                     override_name = forced['name']
                                     if 'amount' in forced:
                                         amount, qty, rate = forced['amount'], forced['quantity'], forced['rate']
                                         manually_modified = forced.get('manually_modified', False)
-                                        explanation_info = {}
+                                        explanation = forced.get('explanation', False)
+                                        amount_forced = True
                                     else:
                                         amount, qty, rate, explanation_info = rule._compute_rule(localdict)
                                 else:
@@ -1912,7 +1962,7 @@ class HrPayslip(models.Model):
                                 if rule.category_ids:
                                     localdict = rule.category_ids._sum_salary_rule_category(localdict, tot_rule - previous_amount)
                                 # create/overwrite the rule in the temporary results
-                                if rule.explanation_template:
+                                if rule.explanation_template and not amount_forced:
                                     try:
                                         explanation_info = explanation_info or {}
                                         explanation = rule.with_context(lang=self.env.user.lang).explanation_template.format(**explanation_info)
@@ -1963,7 +2013,17 @@ class HrPayslip(models.Model):
     @api.depends('employee_id', 'date_from')
     def _compute_version_id(self):
         for slip in self:
-            slip.version_id = slip.employee_id._get_version(slip.date_from) if slip.employee_id else False
+            if not slip.employee_id:
+                slip.version_id = False
+                continue
+            version = slip.employee_id._get_version(slip.date_from)
+            if slip.date_from:
+                # Take the first version in contract during the period (e.g. rehired during the period).
+                # date_to depends on the version, so the period is estimated from the version schedule.
+                schedule = version.schedule_pay or version.structure_type_id.default_schedule_pay
+                date_to = slip.date_from + self._schedule_timedelta(schedule, slip.date_from, slip.country_code)
+                version = slip.employee_id._get_versions_with_contract_overlap_with_period(slip.date_from, date_to)[:1] or version
+            slip.version_id = version
 
     @api.depends('company_id', 'date_from')
     def _compute_payroll_config_id(self):
@@ -2082,10 +2142,10 @@ class HrPayslip(models.Model):
         self.warning_count = 0
         self.issues = {}
         if (
-            not self.env.registry.ready
-            and not (config["test_enable"] or modules.module.current_test)
+            (not self.env.registry.ready or config["test_enable"] or modules.module.current_test)
             # This context key acts as an escape hatch for upgrade scripts that need to
-            # explicitly recompute payroll issues while the registry is still initializing.
+            # explicitly recompute payroll issues while the registry is still initializing,
+            # and for the tests that check the issues.
             and not (self.env.context.get("hr_payroll_force_compute_issue"))
         ):
             return
@@ -2399,7 +2459,8 @@ class HrPayslip(models.Model):
         self.ensure_one()
         payslip = self
         contract = self.version_id
-        return contract.date_start > payslip.date_to or (contract.date_end and contract.date_end < payslip.date_from)
+        return not contract.contract_date_start or contract.contract_date_start > payslip.date_to \
+            or (contract.contract_date_end and contract.contract_date_end < payslip.date_from)
 
     def _get_data_files_to_update(self):
         # Note: Use lists as modules/files order should be maintained
@@ -2637,12 +2698,11 @@ class HrPayslip(models.Model):
         return text
 
     def return_time_off_to_normal(self):
-        leaves = self.env['hr.leave'].search([
-            ('employee_id', 'in', self.version_id.employee_id.ids),
-            ('payslip_state', '=', 'blocked'),
+        domain = Domain.AND([
+            [('payslip_state', 'in', ['blocked', 'done'])],
+            self._get_leaves_domain()
         ])
-        months_to = self.mapped(lambda p: p.date_to.month)
-        leaves = leaves.filtered(lambda l: l.date_to.month in months_to)
+        leaves = self.env['hr.leave'].search(domain)
         leaves.write({
             'payslip_state': 'normal'
         })

@@ -115,7 +115,7 @@ class HrPayrollWarning(models.Model):
     def _models_connected_to_contract(self):
         return {
             "hr.employee": ("contract_date_start", "contract_date_end"),
-            "hr.version":  ("employee_id.contract_date_start", "employee_id.contract_date_end"),
+            "hr.version":  ("contract_date_start", "contract_date_end"),
             "fleet.vehicle": ("driver_id.employee_ids.contract_date_start", "driver_id.employee_ids.contract_date_end"),
         }
 
@@ -290,7 +290,7 @@ class HrPayrollWarning(models.Model):
                     (contract_date_start_field, "!=", False),
                     (contract_date_start_field, "<", period_end),
                     "|",
-                    (contract_date_end_field, "!=", False),
+                    (contract_date_end_field, "=", False),
                     (contract_date_end_field, ">", period_start),
                 ],
             )
@@ -563,10 +563,9 @@ class HrPayrollWarning(models.Model):
         })
 
         if self.model_id:
-            localdict.update({
-                'records': self.env[self.model_name].browse(localdict.get('active_ids', [])),
-                'model': self.env[self.model_name],
-            })
+            # The caller may hand over the records themselves, so that unsaved ones are also checked.
+            localdict.setdefault('records', self.env[self.model_name].browse(localdict.get('active_ids', [])))
+            localdict['model'] = self.env[self.model_name]
 
         try:
             safe_eval(self.evaluation_code, localdict, mode='exec')
@@ -637,6 +636,7 @@ class HrPayrollWarning(models.Model):
             'id': warning_id or False,
             'key': f"{schedule}_{warning_id}",
             'name': warning_data['warning_name'],
+            'sequence': warning_data['warning'].sequence,
             'description': warning_data['warning_description'] or '',
             'structure_type_suffix': (
                 self.env._("%s Scheduled Pay", schedule.title())
@@ -655,6 +655,7 @@ class HrPayrollWarning(models.Model):
             'id': self.id,
             'key': f"error_{self.id}",
             'name': self.name,
+            'sequence': self.sequence,
             'description': self.env._("This warning could not be computed."),
             'color_class': 'danger',
             'is_error': True,
@@ -691,8 +692,7 @@ class HrPayrollWarning(models.Model):
         warning_mails = []
 
         for company in companies:
-            warnings_data = self._get_next_payrun_warnings(company)
-            warnings_data.extend(self._get_applicable_payroll_warnings(company, with_email_message=True))
+            warnings_data = self._get_applicable_payroll_warnings(company, with_email_message=True)
             missed_warnings_data = [
                 warning_data for warning_data in warnings_data
                 if warning_data['warning'].closing_on != 'today' and (today - warning_data['warning_date']).days == warning_data['warning'].email_alert_days

@@ -169,3 +169,28 @@ class TestPayrollBIK(TestPayrollCommon):
             line1 = slip.line_ids.filtered(lambda l: l.code == 'ATN_MISC')
             self.assertTrue(line1)
             self.assertEqual(line1[0]['total'], 20)
+
+    def test_student_miscellaneous_benefit(self):
+        employee = self.create_employee({
+            'name': 'Student with meals',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'l10n_be_dimona_category': 'stu',
+            'wage': 2300,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'date_from': date(2025, 4, 1),
+            'date_to': date(2025, 4, 30),
+        })
+        payslip.compute_sheet()
+        baseline_net = payslip.line_ids.filtered(lambda line: line.code == 'NET').total
+        payslip._set_input_value('ATN_MISC', 20)
+        payslip.compute_sheet()
+        values = payslip._get_line_values(['ATN_MISC', 'ATN_DED', 'ONSS', 'NET'])
+        self.assertAlmostEqual(values['ATN_MISC'][payslip.id]['total'], 20, places=2)
+        self.assertAlmostEqual(values['ATN_DED'][payslip.id]['total'], -20, places=2)
+        self.assertAlmostEqual(values['ONSS'][payslip.id]['total'], -62.87, places=2)
+        # The benefit is already outside cash remuneration: showing ATN_DED must
+        # not deduct it twice. Only the solidarity contribution reduces net pay.
+        self.assertAlmostEqual(values['NET'][payslip.id]['total'], baseline_net - 0.54, places=2)

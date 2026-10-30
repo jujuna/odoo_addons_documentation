@@ -2,7 +2,6 @@ import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_valid
 import { patch } from "@web/core/utils/patch";
 import { _t } from "@web/core/l10n/translation";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { qrCodeSrc } from "@point_of_sale/utils";
 
 patch(OrderPaymentValidation.prototype, {
     async beforePostPushOrderResolve(order, order_server_ids) {
@@ -27,11 +26,6 @@ patch(OrderPaymentValidation.prototype, {
                     [order.id],
                     {}
                 );
-
-                order.l10n_ke_edi_oscu_pos_qrsrc =
-                    l10n_ke_edi_oscu_pos_data.l10n_ke_edi_oscu_pos_qrurl
-                        ? qrCodeSrc(l10n_ke_edi_oscu_pos_data.l10n_ke_edi_oscu_pos_qrurl)
-                        : undefined;
 
                 order.l10n_ke_edi_oscu_pos_date =
                     l10n_ke_edi_oscu_pos_data.l10n_ke_edi_oscu_pos_date;

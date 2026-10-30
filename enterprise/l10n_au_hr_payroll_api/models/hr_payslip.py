@@ -15,7 +15,7 @@ class Payslip(models.Model):
         return super().action_payslip_done()
 
     def _add_payslip_to_superstream(self):
-        if invalid_accounts := self.employee_id.l10n_au_super_account_ids.filtered(lambda x: x.account_active and x.fund_type == 'ARPA' and not x.fund_id.is_valid):
+        if invalid_accounts := self.employee_id.l10n_au_super_account_ids.filtered(lambda x: x.account_active and x.fund_type == 'APRA' and not x.fund_id.is_valid):
             raise UserError(_("The following employee(s) superannuation fund is not valid.\n%s", '\n'.join(invalid_accounts.employee_id.mapped('name'))))
         return super()._add_payslip_to_superstream()
 

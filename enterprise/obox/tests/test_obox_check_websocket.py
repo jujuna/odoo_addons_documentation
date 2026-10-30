@@ -16,4 +16,7 @@ class TestOboxCheckWebsocket(CommonOboxTest):
         self.obox.unlink()
 
         self.assertFalse(box.action_check_websocket())
-        self.assertFalse(self.env["obox.queue"].search([("action_type", "=", "test")]))
+        self.assertFalse(self.env["obox.queue"].search([
+            ("obox_id", "=", box.id),
+            ("action_type", "=", "test"),
+        ]))

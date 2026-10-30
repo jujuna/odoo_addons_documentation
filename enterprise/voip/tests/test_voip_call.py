@@ -428,7 +428,7 @@ class TestVoipCall(TransactionCase):
         self.assertEqual(call.duration, 0)
 
     def test_start_call_without_at_after_end_call(self):
-        """start_call(at=None) after end_call corrects start_date to now; duration is clamped to 0."""
+        """A start after the end cannot date the call: it keeps the end as its start, and no duration."""
         call = self.env["voip.call"].create({
             "phone_number": "+1234567890",
             "direction": "incoming",
@@ -437,8 +437,8 @@ class TestVoipCall(TransactionCase):
         with freeze_time("2024-01-01 12:10:00"):
             call.start_call()
         self.assertEqual(call.state, "terminated")
-        self.assertEqual(call.start_date, fields.Datetime.to_datetime("2024-01-01 12:10:00"))
-        self.assertEqual(call.duration, 0)  # max(0, past_placeholder - now) clamps to 0
+        self.assertEqual(call.start_date, fields.Datetime.to_datetime("2024-01-01 12:05:00"))
+        self.assertEqual(call.duration, 0)
 
     def test_end_date_searches(self):
         """
@@ -759,6 +759,15 @@ class TestVoipCall(TransactionCase):
 
     def test_nonzero_cost_creates_cost_line(self):
         self.assertTrue(self._store_cost("evt_nonzero", "0.3369"))
+
+    def test_a_repeated_cost_is_stored_once(self):
+        """The phone service charges a cost once per event id, and the line
+        mirrors that charge: a redelivery of the same cost adds nothing."""
+        with mute_logger("odoo.sql_db"):
+            self._store_cost("evt_repeated", "0.3369")
+            self._store_cost("evt_repeated", "0.3369")
+        self.assertEqual(
+            self.env["voip.call.cost.line"].search_count([("event_id", "=", "evt_repeated")]), 1)
 
     @mute_logger("odoo.sql_db")
     def test_duplicate_cost_event_is_ignored(self):

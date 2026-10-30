@@ -2,6 +2,7 @@
 
 from datetime import date
 import datetime
+from freezegun import freeze_time
 
 from odoo.tests.common import tagged
 from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
@@ -28,6 +29,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             resource_calendar=cls.resource_calendar
         )
 
+    @freeze_time('2024-01-01')
     def test_regular_payslip_1(self):
         self.version.write({
             'wage': 32000,
@@ -206,6 +208,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         payslip_results = {'GROSS': 20000.0, 'NET': 20000.0}
         self._validate_payslip(payslip, payslip_results)
 
+    @freeze_time('2024-01-01')
     def test_regular_payslip_with_public_holiday(self):
         self.version.write({
             'wage': 32000,

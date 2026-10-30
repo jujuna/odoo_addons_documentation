@@ -123,11 +123,18 @@ class FleetVehicle(models.Model):
         greening_factor = self.env['hr.rule.parameter']._get_parameter_from_code('co2_fee_greening_factor', fee_date) if is_greening else 1.0
 
         co2_fee = co2_fee_min
-        if fuel_type and fuel_type in ['gasoline', 'diesel', 'lpg']:
+        # hybrids burn petrol or diesel and follow the formula of their fuel; CNG and methane share the LPG one
+        formula_fuel = {
+            'full_hybrid': 'gasoline',
+            'plug_in_hybrid_gasoline': 'gasoline',
+            'plug_in_hybrid_diesel': 'diesel',
+            'cng': 'lpg',
+        }.get(fuel_type, fuel_type)
+        if formula_fuel in ['gasoline', 'diesel', 'lpg']:
             fuel_coefficient = self.env['hr.rule.parameter']._get_parameter_from_code('fuel_coefficient', fee_date)
             if co2_emission_unit == 'g/mi':
                 co2 *= MI_TO_KM_FACTOR
-            co2_fee = (((co2 * 9.0) - fuel_coefficient.get(fuel_type)) / 12.0) * indexation_ratio * greening_factor
+            co2_fee = (((co2 * 9.0) - fuel_coefficient.get(formula_fuel)) / 12.0) * indexation_ratio * greening_factor
         return max(co2_fee, co2_fee_min)
 
     @api.depends('co2', 'fuel_type', 'company_id.country_id')
@@ -167,7 +174,8 @@ class FleetVehicle(models.Model):
 
         days_in_month = monthrange(date.year, date.month)[1]
         days_in_year = 366 if isleap(date.year) else 365
-        return yearly_atn * days_in_month / days_in_year
+        # the share of the year is rounded to six decimals, as social secretariats do
+        return yearly_atn * round(days_in_month / days_in_year, 6)
 
     def _get_car_atn(self, date=None):
         if not self._from_be() or not self.acquisition_date:
@@ -199,11 +207,11 @@ class FleetVehicle(models.Model):
             max_co2_prc = self.env['hr.rule.parameter']._get_parameter_from_code('max_co2_prc', date, raise_if_not_found=False) or 0.18
 
             if date >= datetime.date(2025, 1, 1):
-                if (fuel_type in ['electric', 'hydrogen'] or
-                        (fuel_type in ['plug_in_hybrid_diesel', 'plug_in_hybrid_gasoline'] and co2 <= 50)):
+                if fuel_type in ['electric', 'hydrogen']:
                     co2_percentage = min_co2_prc
                 else:
-                    if fuel_type == 'diesel':
+                    # a plug-in hybrid follows the reference of the fuel it burns, the 4% floor covers the low emissions
+                    if fuel_type in ['diesel', 'plug_in_hybrid_diesel']:
                         co2_ref = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_diesel', date)
                     else:
                         co2_ref = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_petrol_lpg', date)

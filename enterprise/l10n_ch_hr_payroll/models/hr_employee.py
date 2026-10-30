@@ -122,7 +122,7 @@ class HrEmployee(models.Model):
     def _get_certificate_selection(self):
         if self.env.company.country_id.code != "CH":
             return super()._get_certificate_selection()
-        return super()._get_certificate_selection() + [
+        return [
             ('universityBachelor', self.env._('Swiss: University College Bachelor (university, ETH)')),
             ('universityMaster', self.env._('Swiss: University College Master (university, ETH)')),
             ('higherEducationMaster', self.env._('Swiss: University of Applied Sciences Master')),

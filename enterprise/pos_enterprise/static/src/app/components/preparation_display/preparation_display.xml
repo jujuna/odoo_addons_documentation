@@ -179,7 +179,7 @@
                     <div t-if="this.prepDisplay.posHasProducts"
                         class="bg-100 o_pdis_orders position-relative d-grid flex-grow-1 h-100 gap-3 text-reset p-3 overflow-auto"
                         t-attf-style="zoom:{{ this.state.zoom }}">
-                        <t t-foreach="this.prepDisplay.filteredOrders" t-as="order" t-key="order.prepLines[0].id">
+                        <t t-foreach="this.prepDisplay.filteredOrders" t-as="order" t-key="order._key">
                             <Order order="order" />
                         </t>
                     </div>

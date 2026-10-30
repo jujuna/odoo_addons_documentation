@@ -1,7 +1,7 @@
 import { useEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
 import { rpc, rpcBus } from "@web/core/network/rpc";
-import { effect, toRaw, onMounted, onWillUnmount, markRaw, proxy } from "@odoo/owl";
+import { effect, toRaw, onMounted, onWillUnmount, markRaw, proxy, signal } from "@odoo/owl";
 import { Reactive } from "@web_studio/client_action/utils";
 
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
@@ -15,6 +15,10 @@ import { KeepLast } from "@web/core/utils/concurrency";
  * Supports snackBar, breadcrumbs, operation stack
  */
 export class EditionFlow extends Reactive {
+    _breadcrumbs = signal.Array([]);
+    get breadcrumbs() {
+        return this._breadcrumbs();
+    }
     constructor(env, services) {
         super();
         this.env = env;
@@ -23,18 +27,18 @@ export class EditionFlow extends Reactive {
         }
         this.setup();
     }
+
     setup() {
         let requestId;
         const updateBreadcrumbs = (studio) => {
             if (studio.requestId !== requestId) {
-                this.breadcrumbs = [];
+                this._breadcrumbs.set([]);
             }
             requestId = studio.requestId;
         };
         const studio = proxy(this.studio);
         this.dispose = effect(() => updateBreadcrumbs(studio));
         this.studio = studio;
-        this.breadcrumbs = [];
         updateBreadcrumbs(studio);
     }
 

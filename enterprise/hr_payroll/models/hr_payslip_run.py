@@ -9,15 +9,6 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
 from odoo.tools.date_utils import get_month
 
-STATUS_COLOR = {
-    '00_draft': 0,
-    '01_ready': 4,  # info light blue
-    '02_close': 10,  # success green
-    '03_paid': 5,  # primary purple
-    '04_cancel': 0,  # default grey
-    False: 0,  # default grey -- for studio
-}
-
 
 class HrPayslipRun(models.Model):
     _name = 'hr.payslip.run'
@@ -231,8 +222,25 @@ class HrPayslipRun(models.Model):
 
     @api.depends('state')
     def _compute_color(self):
+        """
+        This function will set the payrun's color, which can be seen on their
+        status widget in the payrun kanban view
+        """
+        def state_to_color(state):
+            match state:
+                case '00_draft' | '01_ready':
+                    return 4  # info light blue
+                case '02_close':
+                    return 10  # success green
+                case '03_paid':
+                    return 5  # primary purple
+                case '04_cancel' | False:
+                    return 0  # default grey
+                case _:
+                    raise ValueError(f"Unknown pay run state: {state!r}")
+
         for payslip_run in self:
-            payslip_run.color = STATUS_COLOR[payslip_run.state]
+            payslip_run.color = state_to_color(payslip_run.state)
 
     @api.depends('structure_id', 'company_id')
     def _compute_date_start(self):
@@ -343,6 +351,8 @@ class HrPayslipRun(models.Model):
             },
         }
 
+    # TODO master: remove, call slip_ids.action_payslip_paid() instead
+    # will be done in task 6633055
     def action_paid(self):
         self.mapped('slip_ids').action_payslip_paid()
 
@@ -665,7 +675,10 @@ class HrPayslipRun(models.Model):
 
         action = self.env['ir.actions.act_window']._for_xml_id('hr_payroll.hr_payslip_work_days_action_report')
         action['context'] = {
-            'search_default_group_by_code': True,
+            'search_default_work_entry_type_id': True,
+            'search_default_payslip_run_id': self.id,
+            'pivot_measures': ['number_of_days', 'number_of_hours'],
+            'is_work_time_report': True,
         }
         action['domain'] = [('payslip_run_id', 'in', last_three_payruns.ids)]
         return action

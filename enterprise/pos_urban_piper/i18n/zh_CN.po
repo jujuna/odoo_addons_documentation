@@ -6,15 +6,16 @@
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:56+0000\n"
-"PO-Revision-Date: 2026-09-18 03:58+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-16 17:54+0000\n"
+"PO-Revision-Date: 2026-10-11 12:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/pos_urban_piper/zh_Hans/>\n"
+"projects/odoo-20/pos_urban_piper/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,18 +24,34 @@ msgstr ""
 "X-Generator: Weblate 2026.8.1\n"
 
 #. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid ""
+"\n"
+"Items that could not be synced:\n"
+msgstr ""
+
+#. module: pos_urban_piper
 #: model:ir.module.module,description:base.module_pos_urban_piper
 msgid ""
 "\n"
 "This module integrates with UrbanPiper to receive and manage orders from "
 "various food delivery platforms.\n"
 msgstr ""
+"\n"
+"本模块与 UrbanPiper 集成，用于接收并管理来自各食品配送平台的订单。\n"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid " - %(label)s: %(value)s\n"
+msgstr ""
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/screens/ticket_screen/ticket_screen.js:0
 msgid " Contact your provider for support."
-msgstr ""
+msgstr " 请联系您的服务商获取支持。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -58,7 +75,7 @@ msgstr "%s 是 %s 在线食品配送，适用于该地点的所有平台。"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "- %s Previous Order(s)"
-msgstr ""
+msgstr "- %s 个历史订单"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -72,6 +89,8 @@ msgid ""
 "<i class=\"oi oi-fw me-1 pe-none\" data-icon=\"menu\" role=\"img\" "
 "title=\"Products\"/>"
 msgstr ""
+"<i class=\"oi oi-fw me-1 pe-none\" data-icon=\"menu\" role=\"img\" title=\"产"
+"品\"/>"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_kanban
@@ -79,6 +98,8 @@ msgid ""
 "<i class=\"oi oi-fw me-1 pe-none\" data-icon=\"shopping_basket\" "
 "role=\"img\" title=\"Orders\"/>"
 msgstr ""
+"<i class=\"oi oi-fw me-1 pe-none\" data-icon=\"shopping_basket\" "
+"role=\"img\" title=\"订单\"/>"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_kanban
@@ -86,6 +107,8 @@ msgid ""
 "<i class=\"oi oi-fw text-muted align-items-center\" data-"
 "icon=\"location_on\" role=\"img\" title=\"City\"/>"
 msgstr ""
+"<i class=\"oi oi-fw text-muted align-items-center\" data-"
+"icon=\"location_on\" role=\"img\" title=\"城市\"/>"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_kanban
@@ -93,6 +116,8 @@ msgid ""
 "<i class=\"oi oi-fw\" data-icon=\"shopping_bag_speed\" role=\"img\" "
 "title=\"Point of Sale\"/>"
 msgstr ""
+"<i class=\"oi oi-fw\" data-icon=\"shopping_bag_speed\" role=\"img\" "
+"title=\"销售点\"/>"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_order_receipt_header
@@ -102,7 +127,7 @@ msgstr "<span class=\"text-bold\">UrbanPiper</span><br/>"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_order_change_receipt
 msgid "<span class=\"text-normal\">Quick Order</span>"
-msgstr ""
+msgstr "<span class=\"text-normal\">快速下单</span>"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_kanban
@@ -113,6 +138,11 @@ msgid ""
 "is_webhook_register\" class=\"badge rounded-pill text-bg-success\">Active</"
 "span>"
 msgstr ""
+"<span invisible=\"not use_test_mode\" class=\"badge rounded-pill text-bg-"
+"warning\">测试模式</span>\n"
+"                            <span invisible=\"use_test_mode or not "
+"is_webhook_register\" class=\"badge rounded-pill text-bg-success\">已激活</"
+"span>"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urban_piper_test_order_wizard_view_form
@@ -122,30 +152,30 @@ msgstr ""
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_order_receipt_header
 msgid "<span>Quick Order</span>"
-msgstr ""
+msgstr "<span>快速下单</span>"
 
 #. module: pos_urban_piper
 #: model:ir.model.constraint,message:pos_urban_piper.constraint_pos_config_urbanpiper_store_uniq
 msgid ""
 "A food delivery store cannot be linked to more than one Point of Sale. "
 "Please assign a unique PoS to each store."
-msgstr ""
+msgstr "一家食品配送门店不能关联多个销售点。请为每家门店分配唯一的 PoS。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__urbanpiper_apikey
 msgid "API Key"
-msgstr ""
+msgstr "API密钥"
 
 #. module: pos_urban_piper
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
 msgid "API Key is required.\n"
-msgstr ""
+msgstr "API密钥为必填项。\n"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__urbanpiper_apikey
 msgid "API key for accessing the UrbanPiper services."
-msgstr ""
+msgstr "用于访问 UrbanPiper 服务的 API 密钥。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -163,7 +193,7 @@ msgstr "已确认收到"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_needaction
 msgid "Action Needed"
-msgstr ""
+msgstr "待处理"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_order__preparation_time
@@ -173,13 +203,13 @@ msgstr "食物实际所需的准备时间。"
 #. module: pos_urban_piper
 #: model_terms:ir.actions.act_window,help:pos_urban_piper.action_pos_urbanpiper_store
 msgid "Add an UrbanPiper store"
-msgstr ""
+msgstr "添加 UrbanPiper 门店"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields.selection,name:pos_urban_piper.selection__pos_order_line__urbanpiper_tax_liability__aggregator
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_order_filter_inherit_pos_urban_piper
 msgid "Aggregator"
-msgstr ""
+msgstr "聚合平台"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -191,7 +221,7 @@ msgstr "聚合程序（由平台处理）"
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_order.py:0
 msgid "Aggregator Discount: %(currency)s %(value)s"
-msgstr ""
+msgstr "聚合平台折扣：%(currency)s %(value)s"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__delivery_provider_ids
@@ -200,18 +230,18 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urbanpiper_store_product_search_view
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Aggregators"
-msgstr ""
+msgstr "聚合平台"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_product__allowed_delivery_provider_ids
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_template__allowed_delivery_provider_ids
 msgid "Allowed Delivery Aggregators"
-msgstr ""
+msgstr "允许的配送聚合平台"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_attachment_count
 msgid "Attachment Count"
-msgstr ""
+msgstr "附件数量"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -228,23 +258,23 @@ msgstr "可用国家/地区"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__available_ptav_ids
 msgid "Available Product Options"
-msgstr ""
+msgstr "可选产品选项"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_report_pos_order__average_prep_time
 msgid "Average Preparation Time"
-msgstr ""
+msgstr "平均备餐时间"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_report_pos_order__average_prep_time
 msgid "Average preparation time for orders with delivery providers."
-msgstr ""
+msgstr "使用配送服务商的订单的平均备餐时间。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/screens/product_screen/product_screen.xml:0
 msgid "Back"
-msgstr ""
+msgstr "回退"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -266,7 +296,7 @@ msgstr "无法连接到服务器。请稍后重试。"
 msgid ""
 "Cannot update availability: the associated Point of Sale session is "
 "currently closed."
-msgstr ""
+msgstr "无法更新可用性：关联的销售点会话当前已关闭。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -290,7 +320,7 @@ msgstr "频道"
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__city
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_search
 msgid "City"
-msgstr ""
+msgstr "城市"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -302,7 +332,7 @@ msgstr "关闭"
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__company_id
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__company_id
 msgid "Company"
-msgstr ""
+msgstr "公司"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -332,12 +362,12 @@ msgstr "连接问题"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Contact Access Code"
-msgstr ""
+msgstr "联系人访问码"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_report_pos_order__urbanpiper_canceled_order_count
 msgid "Count of canceled urbanpiper orders."
-msgstr ""
+msgstr "已取消的 UrbanPiper 订单数量。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_delivery_provider__available_country_ids
@@ -347,17 +377,17 @@ msgstr "可以使用此服务提供商的国家/地区"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__country_id
 msgid "Country"
-msgstr ""
+msgstr "国家/地区"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__country_code
 msgid "Country Code"
-msgstr ""
+msgstr "国家/地区代码"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__use_create_customer
 msgid "Create Customer"
-msgstr ""
+msgstr "创建客户"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
@@ -367,6 +397,12 @@ msgstr "创建商店"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Create or update system webhooks for UrbanPiper event synchronization."
+msgstr "创建或更新系统 Webhook，用于 UrbanPiper 事件同步。"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Created"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -390,17 +426,17 @@ msgstr "创建日期"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Credentials"
-msgstr ""
+msgstr "授权认证"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__order_notification_sound
 msgid "Custom MP3 sound to play when a new online delivery order is received."
-msgstr ""
+msgstr "收到新的在线配送订单时播放的自定义 MP3 提示音。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__partner_id
 msgid "Customer"
-msgstr ""
+msgstr "客户"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -423,11 +459,17 @@ msgstr "客户电话"
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_urbanpiper_store_aggregator__default_customer_id
 msgid "Customer used for orders when 'Use Default Customer' is selected."
-msgstr ""
+msgstr "勾选“使用默认客户”时用于订单的客户。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__default_customer_id
 msgid "Default Customer"
+msgstr "默认客户"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Deleted"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -439,7 +481,7 @@ msgstr "送货地址"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__delivery_provider_id
 msgid "Delivery Aggregator"
-msgstr ""
+msgstr "配送聚合平台"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -477,7 +519,7 @@ msgstr "送货 JSON"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_order_receipt_header
 msgid "Delivery OTP :"
-msgstr ""
+msgstr "配送 OTP："
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -506,12 +548,12 @@ msgstr "交货状态"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Delivery Time"
-msgstr ""
+msgstr "配送时间"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__aggregator_lines
 msgid "Delivery aggregators and their configurations for online orders."
-msgstr ""
+msgstr "在线订单使用的配送聚合平台及其配置。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__delivery_charge
@@ -521,19 +563,19 @@ msgstr "用于测试订单的运费。"
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_report_pos_order__delivery_provider_id
 msgid "Delivery provider for online orders, e.g., UberEats, Zomato."
-msgstr ""
+msgstr "在线订单的配送服务商，例如 UberEats、Zomato。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__delivery_provider_ids
 #: model:ir.model.fields,help:pos_urban_piper.field_product_product__allowed_delivery_provider_ids
 #: model:ir.model.fields,help:pos_urban_piper.field_product_template__allowed_delivery_provider_ids
 msgid "Delivery providers associated with this UrbanPiper store."
-msgstr ""
+msgstr "与此 UrbanPiper 门店关联的配送服务商。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_urbanpiper_store_aggregator__delivery_provider_id
 msgid "Delivery providers used for online delivery through UrbanPiper."
-msgstr ""
+msgstr "通过 UrbanPiper 进行在线配送所使用的配送服务商。"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_order_change_receipt
@@ -581,17 +623,17 @@ msgstr "显示名称"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_template_attribute_line__display_type
 msgid "Display Type"
-msgstr ""
+msgstr "显示类型"
 
 #. module: pos_urban_piper
 #: model:pos.urbanpiper.store,name:pos_urban_piper.pos_urbanpiper_demo_store
 msgid "Downtown Shop"
-msgstr ""
+msgstr "市中心门店"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_preset
 msgid "Easily load a set of configuration options"
-msgstr ""
+msgstr "轻松加载一组配置选项"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields.selection,name:pos_urban_piper.selection__product_template__urbanpiper_meal_type__3
@@ -603,19 +645,19 @@ msgstr "蛋奶素食者"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Email"
-msgstr ""
+msgstr "电子邮件"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_template_attribute_line__is_urbanpiper_multi_modifiers
 msgid "Enable or disable support for multiple modifiers in UrbanPiper."
-msgstr ""
+msgstr "启用或禁用 UrbanPiper 对多个修饰项的支持。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__use_test_mode
 msgid ""
 "Enable test mode to synchronize the store with UrbanPiper's test environment "
 "(Atlas)."
-msgstr ""
+msgstr "启用测试模式，将门店与 UrbanPiper 的测试环境（Atlas）同步。"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
@@ -625,7 +667,7 @@ msgstr "输入您的 API 密钥"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Enter your API access Username"
-msgstr ""
+msgstr "输入您的 API 访问用户名"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -637,7 +679,7 @@ msgstr "更新状态时发生错误。"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/services/pos_store.js:0
 msgid "Error to send delivery order in preparation display."
-msgstr ""
+msgstr "在备餐显示界面中发送配送订单时出错。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -646,31 +688,37 @@ msgid "Error to send in preparation display."
 msgstr "发送到准备显示屏时出错。"
 
 #. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Errors"
+msgstr ""
+
+#. module: pos_urban_piper
 #: model:ir.model.fields.selection,name:pos_urban_piper.selection__pos_urbanpiper_store__tax_type__total_excluded
 msgid "Exclusive"
-msgstr ""
+msgstr "不含税"
 
 #. module: pos_urban_piper
 #. odoo-python
 #: code:addons/pos_urban_piper/utils/urbanpiper_connector.py:0
 msgid "Failed to parse server response."
-msgstr ""
+msgstr "解析服务器响应失败。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/product_info_popup/product_info_popup.js:0
 msgid "Failed to update food delivery availability."
-msgstr ""
+msgstr "更新食品配送可用性失败。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__order_notification_filename
 msgid "Filename for Order Notification Sound"
-msgstr ""
+msgstr "订单提示音文件名"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Fill this form to get Username and API Key"
-msgstr ""
+msgstr "填写此表单以获取用户名和 API 密钥"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.res_config_settings_view_form_pos_urban_piper
@@ -680,38 +728,38 @@ msgstr "填写此表单以获取用户名和 API 密钥"
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__discount_amount
 msgid "Fixed discount applied on the entire order."
-msgstr ""
+msgstr "应用于整单的固定折扣。"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Flush and Sync Menu"
-msgstr ""
+msgstr "清空并同步菜单"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "关注者"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_partner_ids
 msgid "Followers (Partners)"
-msgstr ""
+msgstr "关注者（合作伙伴）"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/screens/ticket_screen/order_details_dialog/order_details_dialog.js:0
 msgid "Food Delivery"
-msgstr ""
+msgstr "食品配送"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.product_template_search_view_inherit_pos_urban_piper
 msgid "Food Delivery Location"
-msgstr ""
+msgstr "食品配送地点"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.res_config_settings_view_form_pos_urban_piper
 msgid "Food Delivery Store"
-msgstr ""
+msgstr "食品配送门店"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_order__prep_time
@@ -728,7 +776,7 @@ msgstr "食物已准备好"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_report_pos_order__delivery_provider_id
 msgid "Food delivery Aggregator"
-msgstr ""
+msgstr "食品配送聚合平台"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -739,12 +787,12 @@ msgstr "履行方式"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__has_active_store_session
 msgid "Has Active Store Session"
-msgstr ""
+msgstr "有进行中的门店会话"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__has_message
 msgid "Has Message"
-msgstr ""
+msgstr "有消息"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -780,23 +828,23 @@ msgstr "ID"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_preset__identification
 msgid "Identification"
-msgstr ""
+msgstr "ID"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr ""
+msgstr "如果勾选此项，则需要查看新消息。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__message_has_error
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "如果勾选此项， 某些消息将出现发送错误。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields.selection,name:pos_urban_piper.selection__pos_urbanpiper_store__tax_type__total_included
 msgid "Inclusive"
-msgstr ""
+msgstr "含税"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_product__is_alcoholic_on_urbanpiper
@@ -809,26 +857,26 @@ msgstr "表明产品是否含有酒精。"
 msgid ""
 "Indicates if the webhook registered or refresh cron job needs to be run for "
 "this store."
-msgstr ""
+msgstr "指示是否需要为该门店运行 Webhook 注册或刷新定时任务。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_urbanpiper_store_aggregator__use_create_customer
 msgid ""
 "Indicates whether a customer should be created for this aggregator if it is "
 "not created before."
-msgstr ""
+msgstr "指示若此前未创建客户，是否应为此聚合平台创建客户。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_order_line__urbanpiper_tax_liability
 msgid ""
 "Indicates whether the aggregator or the merchant is responsible for paying "
 "taxes for this online delivery order line."
-msgstr ""
+msgstr "指示此在线配送订单明细的税款由聚合平台还是商家承担。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_urbanpiper_store_aggregator__is_online
 msgid "Indicates whether this aggregator is currently active on UrbanPiper."
-msgstr ""
+msgstr "指示此聚合平台当前是否在 UrbanPiper 上处于活动状态。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__delivery_instruction
@@ -856,12 +904,12 @@ msgstr "是否含酒精"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_is_follower
 msgid "Is Follower"
-msgstr ""
+msgstr "是关注者"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__is_online
 msgid "Is Online?"
-msgstr ""
+msgstr "是否在线？"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_product__is_recommended_on_urbanpiper
@@ -872,7 +920,7 @@ msgstr "是推介"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__is_webhook_register
 msgid "Is Webhook Registered?"
-msgstr ""
+msgstr "Webhook 是否已注册？"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_order__delivery_rider_json
@@ -910,18 +958,18 @@ msgstr "上次更新日期"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Leave blank to use the default notification sound."
-msgstr ""
+msgstr "留空则使用默认提示音。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Location"
-msgstr ""
+msgstr "位置"
 
 #. module: pos_urban_piper
 #: model_terms:ir.actions.act_window,help:pos_urban_piper.action_pos_urbanpiper_store
 msgid "Manage UrbanPiper stores for online food delivery configurations."
-msgstr ""
+msgstr "管理用于在线食品配送配置的 UrbanPiper 门店。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -949,22 +997,28 @@ msgstr "膳食类型"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Menu"
+msgstr "菜单"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/utils/urbanpiper_connector.py:0
+msgid "Menu sync initiated on UrbanPiper."
 msgstr ""
 
 #. module: pos_urban_piper
 #: model:ir.model.fields.selection,name:pos_urban_piper.selection__pos_order_line__urbanpiper_tax_liability__merchant
 msgid "Merchant"
-msgstr ""
+msgstr "商家"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "消息发送错误"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "消息"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_order_change_receipt
@@ -1054,27 +1108,27 @@ msgstr "未指定"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.urbanpiper_store_product_template_list_view
 msgid "Not available on any platforms."
-msgstr ""
+msgstr "在任何平台均不可用。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_needaction_counter
 msgid "Number of Actions"
-msgstr ""
+msgstr "操作数量"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_has_error_counter
 msgid "Number of errors"
-msgstr ""
+msgstr "错误数量"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr ""
+msgstr "需要采取行动的消息数量"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr ""
+msgstr "发送错误的消息的数量"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1085,7 +1139,7 @@ msgstr "出错了！"
 #. module: pos_urban_piper
 #: model:pos.preset,name:pos_urban_piper.pos_online_preset
 msgid "Online Delivery"
-msgstr ""
+msgstr "在线配送"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_delivery_provider
@@ -1115,7 +1169,7 @@ msgstr "在线订购"
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_order_form_inherit_pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_order_list_inherit_pos_urban_piper
 msgid "Online Order ID"
-msgstr ""
+msgstr "在线订单 ID"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1125,13 +1179,13 @@ msgstr ""
 msgid ""
 "Online orders cannot be deleted. If needed, reject the order instead or "
 "contact the food delivery provider."
-msgstr ""
+msgstr "在线订单无法删除。如有需要，请改为拒绝该订单，或联系食品配送服务商。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Order Details: "
-msgstr ""
+msgstr "订单详情： "
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1148,13 +1202,13 @@ msgstr "其他信息"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__discount_amount
 msgid "Order Level Discount"
-msgstr ""
+msgstr "整单折扣"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__order_notification_sound
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Order Notification Sound"
-msgstr ""
+msgstr "订单提示音"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1172,13 +1226,13 @@ msgstr "订单时间"
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_order.py:0
 msgid "Order cancelled by %(cancelled_by)s due to %(cancellation_reason)s"
-msgstr ""
+msgstr "订单已被 %(cancelled_by)s 取消，原因：%(cancellation_reason)s"
 
 #. module: pos_urban_piper
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_order.py:0
 msgid "Order cancelled due to %s"
-msgstr ""
+msgstr "订单已取消，原因：%s"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1190,12 +1244,12 @@ msgstr "未能从服务器载入订单"
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_kanban
 msgid "Orders"
-msgstr ""
+msgstr "订单"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_order__source
 msgid "Origin"
-msgstr ""
+msgstr "原始"
 
 #. module: pos_urban_piper
 #: model:product.template,name:pos_urban_piper.product_other_charges_product_template
@@ -1217,17 +1271,17 @@ msgstr "超出送货范围"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urbanpiper_store_product_search_view
 msgid "POS Category"
-msgstr ""
+msgstr "POS类别"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urbanpiper_store_product_search_view
 msgid "POS Product Category"
-msgstr ""
+msgstr "POS产品类别"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__store_identifier
 msgid "POS Store ID"
-msgstr ""
+msgstr "POS 门店 ID"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__packaging_charge
@@ -1248,7 +1302,7 @@ msgstr "用于测试订单的包装费用。"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Paid"
-msgstr ""
+msgstr "已支"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1265,7 +1319,7 @@ msgstr "付款方式"
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_urbanpiper_store_aggregator__payment_method_id
 msgid "Payment method used for online order payments."
-msgstr ""
+msgstr "用于在线订单付款的付款方式。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1276,7 +1330,7 @@ msgstr "Paytm"
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__line_discount
 msgid "Percentage discount applied on the product line."
-msgstr ""
+msgstr "应用于产品明细的百分比折扣。"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urban_piper_test_order_wizard_view_form
@@ -1287,7 +1341,7 @@ msgstr "下订单"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/debug/debug_widget.xml:0
 msgid "Place UrbanPiper Test Order"
-msgstr ""
+msgstr "下 UrbanPiper 测试订单"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1299,7 +1353,7 @@ msgstr "已下单"
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_urbanpiper_store
 msgid "PoS UrbanPiper Store"
-msgstr ""
+msgstr "PoS UrbanPiper 门店"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__config_id
@@ -1309,7 +1363,7 @@ msgstr "POS"
 #. module: pos_urban_piper
 #: model:ir.module.module,shortdesc:base.module_pos_urban_piper
 msgid "Point of Sale - UrbanPiper"
-msgstr ""
+msgstr "销售点 - UrbanPiper"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_category
@@ -1324,32 +1378,32 @@ msgstr "POS 配置"
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_order
 msgid "Point of Sale Order"
-msgstr ""
+msgstr "POS 订单"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_order_line
 msgid "Point of Sale Order Line"
-msgstr ""
+msgstr "POS 销售订单明细"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_order_receipt
 msgid "Point of Sale Order Receipt Generator"
-msgstr ""
+msgstr "POS 销售订单收据生成器"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_report_pos_order
 msgid "Point of Sale Orders Report"
-msgstr ""
+msgstr "POS订单报表"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_payment
 msgid "Point of Sale Payment"
-msgstr ""
+msgstr "POS 支付"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_payment_method
 msgid "Point of Sale Payment Method"
-msgstr ""
+msgstr "POS 销售点付款方式"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_session
@@ -1360,14 +1414,14 @@ msgstr "POS会话"
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
 msgid "Point of Sale is required.\n"
-msgstr ""
+msgstr "销售点为必填项。\n"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__config_id
 msgid ""
 "Point of Sale used to manage online food delivery orders for this UrbanPiper "
 "store."
-msgstr ""
+msgstr "用于为此 UrbanPiper 门店管理在线食品配送订单的销售点。"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_prep_display
@@ -1378,7 +1432,7 @@ msgstr "POS 准备工作显示"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Posted"
-msgstr ""
+msgstr "已过账"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1389,7 +1443,7 @@ msgstr "预付"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Preparation Time"
-msgstr ""
+msgstr "备餐时间"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_order__prep_time
@@ -1399,13 +1453,13 @@ msgstr "UrbanPiper 提供的食物准备时间。"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_order_change_receipt
 msgid "Preparation time:"
-msgstr ""
+msgstr "备餐时间："
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__preset_id
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_search
 msgid "Preset"
-msgstr ""
+msgstr "预制"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__preset_id
@@ -1416,6 +1470,11 @@ msgid ""
 " - Fiscal Position\n"
 " - Schedule (store timings)\n"
 msgstr ""
+"用于食品配送订单的预制。\n"
+"以下属性取自该预制：\n"
+" - 价格表（用作门店的全局价格表）\n"
+" - 财务位置\n"
+" - 时间表（门店营业时间）\n"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__pricelist_id
@@ -1430,6 +1489,8 @@ msgid ""
 "menu syncing.\n"
 "If not set, product prices will be based on the store preset pricelist"
 msgstr ""
+"UrbanPiper 配送聚合平台在菜单同步期间用于更新价格的价格表。\n"
+"若未设置，产品价格将基于门店预制的价格表"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_product_template
@@ -1441,12 +1502,12 @@ msgstr "产品"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__line_discount
 msgid "Product Level Discount"
-msgstr ""
+msgstr "产品级折扣"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.urbanpiper_store_product_template_list_view
 msgid "Product Name"
-msgstr ""
+msgstr "产品名称"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__ptav_ids
@@ -1456,12 +1517,12 @@ msgstr "产品选项"
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_product_template_attribute_line
 msgid "Product Template Attribute Line"
-msgstr ""
+msgstr "产品模板属性明细行"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_product_template_attribute_value
 msgid "Product Template Attribute Value"
-msgstr ""
+msgstr "产品模板属性值"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_template_attribute_value__urbanpiper_meal_type
@@ -1477,7 +1538,7 @@ msgstr "产品缺货"
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__ptav_ids
 msgid "Product options for test order."
-msgstr ""
+msgstr "测试订单的产品选项。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_product__urbanpiper_meal_type
@@ -1490,12 +1551,12 @@ msgstr "产品类型，例如素食、非素食等。"
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.urbanpiper_store_product_template_list_view
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_kanban
 msgid "Products"
-msgstr ""
+msgstr "产品"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_delivery_provider__avatar_128
 msgid "Provider Avatar"
-msgstr ""
+msgstr "服务商头像"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_delivery_provider__image_128
@@ -1527,7 +1588,7 @@ msgstr "快速下单"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__rating_ids
 msgid "Ratings"
-msgstr ""
+msgstr "点评"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_product__is_recommended_on_urbanpiper
@@ -1538,12 +1599,12 @@ msgstr "美食平台推介的产品。"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.report_invoice_document_pos_urban_piper
 msgid "Reference"
-msgstr ""
+msgstr "参考"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Refresh Webhook"
-msgstr ""
+msgstr "刷新 Webhook"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
@@ -1559,7 +1620,7 @@ msgstr "拒绝"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_report_pos_order__urbanpiper_canceled_order_count
 msgid "Reject Food delivery orders"
-msgstr ""
+msgstr "拒绝食品配送订单"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1576,7 +1637,7 @@ msgstr "%(providerName)s 不允许拒绝此订单"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Replace the existing UrbanPiper menu with the latest menu on Atlas."
-msgstr ""
+msgstr "用 Atlas 上的最新菜单替换现有的 UrbanPiper 菜单。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_order__delivery_provider_id
@@ -1593,7 +1654,7 @@ msgstr "负责处理测试订单的送货服务商，如 UberEats、Zomato。"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/screens/ticket_screen/ticket_screen.xml:0
 msgid "Review"
-msgstr ""
+msgstr "审查"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1605,25 +1666,25 @@ msgstr "审核订单"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Rider Info"
-msgstr ""
+msgstr "骑手信息"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Rider Mask Code"
-msgstr ""
+msgstr "骑手识别码"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Rider Name"
-msgstr ""
+msgstr "骑手姓名"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/popups/order_info_popup/order_info_popup.js:0
 msgid "Rider Phone"
-msgstr ""
+msgstr "骑手电话"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1634,40 +1695,40 @@ msgstr "外送骑手不可用"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr ""
+msgstr "短信发送错误"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.urbanpiper_store_product_template_list_view
 msgid "Sales Price"
-msgstr ""
+msgstr "销售价格"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/pos_preparation_display_override/components/order/order.xml:0
 msgid "Scheduled At:"
-msgstr ""
+msgstr "计划于："
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/services/pos_store.js:0
 msgid "Scheduled Delivery Order"
-msgstr ""
+msgstr "计划配送订单"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/screens/ticket_screen/ticket_screen.xml:0
 msgid "Scheduled time:"
-msgstr ""
+msgstr "计划时间："
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.product_template_only_form_view_inherit_pos_urban_piper
 msgid "Select food delivery aggregators."
-msgstr ""
+msgstr "选择食品配送聚合平台。"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.product_template_only_form_view_inherit_pos_urban_piper
 msgid "Select store for online orders."
-msgstr ""
+msgstr "为在线订单选择门店。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_product__urbanpiper_pos_platform_ids
@@ -1675,18 +1736,18 @@ msgstr ""
 msgid ""
 "Select the online food delivery platforms on which this product will be "
 "available."
-msgstr ""
+msgstr "选择此产品可上架的在线食品配送平台。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_template_attribute_value__urbanpiper_store_ids
 msgid "Set the online food delivery stores for this product option to be sold."
-msgstr ""
+msgstr "设置此产品选项可供销售的在线食品配送门店。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_product__urbanpiper_store_ids
 #: model:ir.model.fields,help:pos_urban_piper.field_product_template__urbanpiper_store_ids
 msgid "Set the online food delivery stores for this product to be sold."
-msgstr ""
+msgstr "设置此产品可供销售的在线食品配送门店。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_delivery_provider__journal_code
@@ -1707,6 +1768,9 @@ msgid ""
 "- Inclusive: Tax collection by Merchant\n"
 "- Exclusive: Tax collection by Aggregator"
 msgstr ""
+"指定 UrbanPiper 订单的税款是包含在价格中还是单独加收。\n"
+"- 含税：由商家代收税款\n"
+"- 不含税：由聚合平台代收税款"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1720,41 +1784,47 @@ msgid "Status of the order as provided by UrbanPiper."
 msgstr "订单的状态，由 UrbanPiper 提供。"
 
 #. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Store %(action)s completed on UrbanPiper."
+msgstr ""
+
+#. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__aggregator_lines
 msgid "Store Aggregators"
-msgstr ""
+msgstr "门店聚合平台"
 
 #. module: pos_urban_piper
 #: model:ir.model.constraint,message:pos_urban_piper.constraint_pos_urbanpiper_store_urbanpiper_store_identifier_uniq
 msgid "Store ID must be unique to configure the Online Food Delivery Store."
-msgstr ""
+msgstr "门店 ID 必须唯一，才能配置在线食品配送门店。"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Store Info"
-msgstr ""
+msgstr "门店信息"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__store_order_count
 msgid "Store Order Count"
-msgstr ""
+msgstr "门店订单数量"
 
 #. module: pos_urban_piper
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
 msgid "Store Orders"
-msgstr ""
+msgstr "门店订单"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__store_product_count
 msgid "Store Product Count"
-msgstr ""
+msgstr "门店产品数量"
 
 #. module: pos_urban_piper
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
 msgid "Store Products"
-msgstr ""
+msgstr "门店产品"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1770,15 +1840,29 @@ msgstr "商店已关闭"
 
 #. module: pos_urban_piper
 #. odoo-python
-#: code:addons/pos_urban_piper/utils/urbanpiper_connector.py:0
-msgid "Store menu successfully synced on UrbanPiper (%s products)"
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Store menu synced successfully on UrbanPiper.\n"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid ""
+"Store sync failed on UrbanPiper.\n"
+"Error: %(error)s"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Store sync initiated on UrbanPiper."
 msgstr ""
 
 #. module: pos_urban_piper
 #: model:ir.actions.act_window,name:pos_urban_piper.action_pos_urbanpiper_store
 #: model:ir.ui.menu,name:pos_urban_piper.menu_pos_urban_piper_store
 msgid "Stores"
-msgstr ""
+msgstr "门店"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
@@ -1788,7 +1872,7 @@ msgstr "同步菜单"
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_order__preparation_time
 msgid "Taken Preparation Time"
-msgstr ""
+msgstr "已用备餐时间"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1805,12 +1889,12 @@ msgstr "Talabat 简短代码"
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_account_tax
 msgid "Tax"
-msgstr ""
+msgstr "税项"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__tax_type
 msgid "Tax Type"
-msgstr ""
+msgstr "税项类别"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_delivery_provider__technical_name
@@ -1827,12 +1911,12 @@ msgstr "测试送餐订单"
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__use_test_mode
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Test Mode"
-msgstr ""
+msgstr "测试模式"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__partner_id
 msgid "Test order customer"
-msgstr ""
+msgstr "测试订单客户"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_test_order_wizard__product_id
@@ -1850,51 +1934,41 @@ msgid ""
 "The ISO country code in two chars. \n"
 "You can use this field for quick search."
 msgstr ""
+"ISO国家/地区代码包含两个字符。\n"
+"可以使用该字段进行快速搜索。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_res_config_settings__pos_urbanpiper_store_id
 msgid "The Urbanpiper Store, which is used for online food delivery."
-msgstr ""
+msgstr "用于在线食品配送的 UrbanPiper 门店。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_product_template_attribute_line__display_type
 msgid "The display type used in the Product Configurator."
-msgstr ""
+msgstr "产品配置器中使用的显示类型。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__minimum_preparation_time
 msgid ""
 "The minimum amount of time the customer must wait for the order to be "
 "prepared."
-msgstr ""
-
-#. module: pos_urban_piper
-#. odoo-python
-#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
-msgid "The store has been successfully updated on UrbanPiper."
-msgstr ""
+msgstr "顾客等待订单备餐完成的最短时间。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__urbanpiper_username
 msgid "The username of the UrbanPiper API account."
-msgstr ""
+msgstr "UrbanPiper API 账户的用户名。"
 
 #. module: pos_urban_piper
 #. odoo-python
 #: code:addons/pos_urban_piper/utils/urbanpiper_connector.py:0
 msgid "There are no products to sync."
-msgstr ""
-
-#. module: pos_urban_piper
-#. odoo-python
-#: code:addons/pos_urban_piper/models/pos_order.py:0
-msgid "This delivery order has already been printed automatically."
-msgstr ""
+msgstr "没有可同步的产品。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__urbanpiper_synced_json
 msgid "To keep track of synced urbanpiper menu like products, options etc.)"
-msgstr ""
+msgstr "用于跟踪已同步的 UrbanPiper 菜单，如产品、选项等）。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -1911,12 +1985,12 @@ msgstr "完全不匹配"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urbanpiper_store_product_search_view
 msgid "Unavailable"
-msgstr ""
+msgstr "不可用"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__store_identifier
 msgid "Unique POS store ID for UrbanPiper (Atlas) integration."
-msgstr ""
+msgstr "用于 UrbanPiper（Atlas）集成的唯一 POS 门店 ID。"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_order__delivery_identifier
@@ -1927,16 +2001,22 @@ msgstr "送货的独特识别码，由 UrbanPiper 提供。"
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_order.py:0
 msgid "Unknown reason"
-msgstr ""
+msgstr "未知原因"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urbanpiper_store_product_search_view
 msgid "Unsynced Products"
-msgstr ""
+msgstr "未同步产品"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Update Store"
+msgstr "更新门店"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Updated"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -1953,37 +2033,37 @@ msgstr ""
 msgid ""
 "UrbanPiper Aggregators and their related information for Online Food "
 "Delivery Stores"
-msgstr ""
+msgstr "UrbanPiper 聚合平台及其在线食品配送门店的相关信息"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urban_piper_webhook__event_name
 msgid "UrbanPiper Event Name"
-msgstr ""
+msgstr "UrbanPiper 事件名称"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_template_attribute_line__urbanpiper_max_qty
 msgid "UrbanPiper Max Qty"
-msgstr ""
+msgstr "UrbanPiper 最大数量"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_template_attribute_line__urbanpiper_min_qty
 msgid "UrbanPiper Min Qty"
-msgstr ""
+msgstr "UrbanPiper 最小数量"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_template_attribute_line__is_urbanpiper_multi_modifiers
 msgid "UrbanPiper Multi-Modifiers"
-msgstr ""
+msgstr "UrbanPiper 多修饰项"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__payment_method_id
 msgid "UrbanPiper Payment Method"
-msgstr ""
+msgstr "UrbanPiper 付款方式"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_order__urbanpiper_printed
 msgid "UrbanPiper Preparation Ticket Printed"
-msgstr ""
+msgstr "UrbanPiper 备餐单已打印"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_config__urbanpiper_store_id
@@ -1992,7 +2072,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__store_id
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.pos_urbanpiper_store_product_search_view
 msgid "UrbanPiper Store"
-msgstr ""
+msgstr "UrbanPiper 门店"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_product__urbanpiper_store_ids
@@ -2000,23 +2080,23 @@ msgstr ""
 #: model:ir.model.fields,field_description:pos_urban_piper.field_product_template_attribute_value__urbanpiper_store_ids
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_list
 msgid "UrbanPiper Stores"
-msgstr ""
+msgstr "UrbanPiper 门店"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__urbanpiper_synced_json
 msgid "UrbanPiper Sync Metadata"
-msgstr ""
+msgstr "UrbanPiper 同步元数据"
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_order_line__urbanpiper_tax_liability
 msgid "UrbanPiper Tax Liability"
-msgstr ""
+msgstr "UrbanPiper 税款承担方"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/components/debug/debug_widget.xml:0
 msgid "UrbanPiper Test Order"
-msgstr ""
+msgstr "UrbanPiper 测试订单"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_urban_piper_webhook
@@ -2038,12 +2118,12 @@ msgstr ""
 msgid ""
 "UrbanPiper store linked to this point of sale for handling online delivery "
 "orders"
-msgstr ""
+msgstr "关联到此销售点、用于处理在线配送订单的 UrbanPiper 门店"
 
 #. module: pos_urban_piper
 #: model:ir.actions.server,name:pos_urban_piper.cron_update_urban_piper_webhook_urls_ir_actions_server
 msgid "UrbanPiper: Update Webhook URLs"
-msgstr ""
+msgstr "UrbanPiper：更新 Webhook URL"
 
 #. module: pos_urban_piper
 #: model:ir.model,name:pos_urban_piper.model_pos_urbanpiper_test_order_wizard
@@ -2059,7 +2139,7 @@ msgstr "用户名"
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
 msgid "Username is required.\n"
-msgstr ""
+msgstr "用户名为必填项。\n"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -2083,8 +2163,8 @@ msgstr "信用卡钱包"
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
 msgid ""
-"You cannot change the Point of Sale while a store session is still open and "
-"the store has already been synchronizedPlease close the active session first."
+"You cannot change the store while its Point of Sale has an active session.\n"
+"Please close the active session first."
 msgstr ""
 
 #. module: pos_urban_piper
@@ -2094,27 +2174,47 @@ msgid ""
 "You cannot delete this store while its session is still open.\n"
 "Please close the active session first."
 msgstr ""
+"门店会话仍处于开启状态时，无法删除该门店。\n"
+"请先关闭当前会话。"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "creation"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "deleted"
+msgstr ""
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/services/pos_store.js:0
 msgid "disabled"
-msgstr ""
+msgstr "已停用"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.res_config_settings_view_form_pos_urban_piper
 msgid "e.g. Downtown Shop"
-msgstr ""
+msgstr "例如 市中心门店"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "e.g. Odoo Cafe - Ahmedabad"
-msgstr ""
+msgstr "例如 Odoo 咖啡馆 - 艾哈迈达巴德"
 
 #. module: pos_urban_piper
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/services/pos_store.js:0
 msgid "enabled"
+msgstr "已启用"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "errors"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -2125,7 +2225,35 @@ msgstr ""
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "minutes"
+msgstr "分钟"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "update"
 msgstr ""
 
-msgid "Edit"
-msgstr "编辑"
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "updated"
+msgstr ""
+
+#~ msgid "Store menu successfully synced on UrbanPiper (%s products)"
+#~ msgstr "门店菜单已成功同步到 UrbanPiper（%s 个产品）"
+
+#~ msgid "The store has been successfully updated on UrbanPiper."
+#~ msgstr "门店已在 UrbanPiper 上成功更新。"
+
+#~ msgid "This delivery order has already been printed automatically."
+#~ msgstr "此配送订单已自动打印。"
+
+#~ msgid ""
+#~ "You cannot change the Point of Sale while a store session is still open "
+#~ "and the store has already been synchronizedPlease close the active "
+#~ "session first."
+#~ msgstr ""
+#~ "门店会话仍处于开启状态且门店已同步时，无法更改销售点。请先关闭当前会话。"
+
+#~ msgid "Edit"
+#~ msgstr "编辑"

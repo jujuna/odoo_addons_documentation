@@ -325,10 +325,15 @@ const salaryConfigTourPersonalInfo = () => [
     {
         content: "Set Public Transportation Amount",
         trigger: 'input[name="bus_transport_reimbursed_amount_manual"]',
-        run: "edit 100 && click label:contains(Transportation)",
+        run: "edit 100 && click label:contains(Bus)",
     },
     {
-        trigger: 'span[name="Gross"][value="2617.16"]',
+        content: "Set Public Transportation Amount",
+        trigger: 'input[name="bus_transport_employee_kilometer_manual"]',
+        run: "edit 10 && click label:contains(Bus)",
+    },
+    {
+        trigger: 'span[name="Gross"][value="2610.38"]',
     },
 ];
 
@@ -425,7 +430,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 10 && click label:contains(bus)",
         },
         {
-            trigger: 'span[name="Gross"][value="2961.69"]',
+            trigger: 'span[name="Gross"][value="2972.49"]',
         },
         {
             content: "Unchoose Public Transportation",
@@ -446,7 +451,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
             run: "edit 60 && click label:contains(train)",
         },
         {
-            trigger: 'span[name="Gross"][value="2909.37"]',
+            trigger: 'span[name="Gross"][value="2913.05"]',
         },
         {
             content: "Unchoose Train Transportation",
@@ -467,15 +472,15 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
         {
             content: "Change km_home_work on personal info",
             trigger: 'input[name="private_car_reimbursed_amount_manual"]',
-            run: "edit 75 && click label:contains(Transportation)",
+            run: "edit 75 && click label.col-form-label:contains(Company Car)",
         },
         {
-            trigger: 'span[name="Gross"][value="2931.71"]',
+            trigger: 'span[name="Gross"][value="2934.17"]',
         },
         {
             content: "Reset 150 km",
             trigger: 'input[name="private_car_reimbursed_amount_manual"]',
-            run: "edit 150 && click label:contains(Transportation)",
+            run: "edit 150 && click label.col-form-label:contains(Company Car)",
         },
         {
             trigger: 'span[name="Gross"][value="2892.42"]',
@@ -483,7 +488,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour", {
         {
             content: "Unchoose Private Car Transportation",
             trigger: 'input[name="private_car_reimbursed_amount_manual"]',
-            run: "edit 0 && click label:contains(Transportation)",
+            run: "edit 0 && click label.col-form-label:contains(Company Car)",
         },
         {
             trigger: 'span[name="Gross"][value="3000"]',
@@ -620,7 +625,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_sign_again", {
         },
         {
             content: "Choose a car",
-            trigger: "input[id=radio_field_1_available]",
+            trigger: ".o_field_widget[name='new_car_options'] .o_radio_input[data-value='available']",
             run: "click",
         },
         {
@@ -646,7 +651,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_sign_again", {
             expectUnloadPage: true,
         },
         {
-            trigger: 'span[name="Gross"][value="2941.75"]',
+            trigger: 'span[name="Gross"][value="2934.97"]',
         },
         {
             content: "Choose a car",
@@ -664,7 +669,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_sign_again", {
             },
         },
         {
-            trigger: 'span[name="Gross"][value="2617.16"]',
+            trigger: 'span[name="Gross"][value="2610.38"]',
         },
         ...salaryConfigTourSubmitAndSign()
     ],
@@ -851,16 +856,6 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_2", {
         {
             content: "Add Salary Structure",
             trigger: ".nav-link:contains('Payroll')",
-            run: "click",
-        },
-        {
-            content: "Salary Structure Type",
-            trigger: ".o_field_widget.o_field_many2one[name=structure_type_id] input",
-            run: `edit CP200 BE`,
-        },
-        {
-            isActive: ["auto"],
-            trigger: ".ui-autocomplete > li > a:contains('CP200 BE')",
             run: "click",
         },
         {
@@ -1304,7 +1299,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_with_mobility_b
             run: "range 10",
         },
         {
-            trigger: 'span[name="Gross"][value="2539.25"]',
+            trigger: 'span[name="Gross"][value="2532.67"]',
         },
         {
             content: "Take Mobility Budget",

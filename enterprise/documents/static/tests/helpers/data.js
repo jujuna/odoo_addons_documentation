@@ -78,9 +78,10 @@ export class DocumentsDocument extends models.ServerModel {
     res_model_name = fields.Char({ readonly: true, store: false });
     type = fields.Selection({
         selection: [
+            ["url", "URL"],
             ["binary", "File"],
-            ["url", "Url"],
             ["folder", "Folder"],
+            ["request", "Request"],
         ],
         default: "binary",
     });

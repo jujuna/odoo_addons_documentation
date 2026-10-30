@@ -8,7 +8,6 @@ class EquityTransaction(models.Model):
     _name = 'equity.transaction'
     _inherit = ['mail.thread']
     _description = "Equity Transaction"
-    _check_company_auto = True
 
     company_id = fields.Many2one(
         'res.company',
@@ -68,13 +67,13 @@ class EquityTransaction(models.Model):
     )
     notes = fields.Text()
 
-    seller_id = fields.Many2one(comodel_name='res.partner', string="Seller", tracking=True, check_company=True)
+    seller_id = fields.Many2one(comodel_name='res.partner', string="Seller", tracking=True, domain="[] if not company_id else ['|', ('company_id', '=', False), ('company_id', 'parent_of', company_id)]")
     subscriber_id = fields.Many2one(
         comodel_name='res.partner',
         string="Subscriber",
         tracking=True,
-        check_company=True,
         help="Recipient of the securities of the transaction.",
+        domain="[] if not company_id else ['|', ('company_id', '=', False), ('company_id', 'parent_of', company_id)]",
     )
     subscriber_id_placeholder = fields.Char(compute='_compute_subscriber_id_placeholder')
 
@@ -83,6 +82,17 @@ class EquityTransaction(models.Model):
 
     attachment_ids = fields.One2many(comodel_name='ir.attachment', inverse_name='res_id', string="Attachments")
     attachment_number = fields.Integer(compute='_compute_attachment_number')
+
+    @api.constrains('seller_id', 'subscriber_id', 'partner_id')
+    def _check_seller_subscriber_company(self):
+        for transaction in self:
+            if (company := transaction.company_id):
+                for partner in (transaction.seller_id, transaction.subscriber_id):
+                    if partner and not partner.filtered_domain(partner._check_company_domain(company)):
+                        raise ValidationError(self.env._(
+                            "%(partner)s does not belong to a company compatible with this transaction.",
+                            partner=partner.display_name,
+                        ))
 
     @api.constrains('seller_id', 'subscriber_id')
     def _check_seller_and_subscriber(self):
@@ -115,7 +125,7 @@ class EquityTransaction(models.Model):
     @api.depends('date')
     def _compute_expiration_date(self):
         for transaction in self.filtered(lambda t: t.date):
-            transaction.expiration_date = transaction.date.replace(year=transaction.date.year + 3)
+            transaction.expiration_date = transaction.date + relativedelta(years=3)
 
     @api.depends('transaction_type', 'securities', 'expiration_date', 'security_class_id.class_type')
     def _compute_expiration_diff(self):

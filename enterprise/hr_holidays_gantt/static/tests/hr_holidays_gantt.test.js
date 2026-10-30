@@ -3,7 +3,7 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
 import { click, queryAllTexts, waitFor } from "@odoo/hoot-dom";
 import { SELECTORS, hoverGridCell, mountGanttView } from "@web_gantt/../tests/web_gantt_test_helpers";
-import { advanceTime, animationFrame, mockDate } from "@odoo/hoot-mock";
+import { advanceTime, animationFrame, mockDate, mockTimeZone } from "@odoo/hoot-mock";
 import { contains, makeMockServer, mountView, onRpc } from "@web/../tests/web_test_helpers";
 import { startServer } from "@mail/../tests/mail_test_helpers";
 import { defineHrHolidaysGanttModels } from "@hr_holidays_gantt/../tests/hr_holidays_gantt_test_helpers";
@@ -15,6 +15,40 @@ defineHrHolidaysGanttModels();
 beforeEach(() => {
     mockDate("2025-01-01 12:00:00", +0);
     HrHolidaysGanttLeave._records = [];
+});
+
+test("Gantt reads and quick-adds use the grid timezone", async () => {
+    mockTimeZone("Australia/Sydney");
+    const pyEnv = await startServer();
+    const employeeId = pyEnv["hr.employee"].create({ name: "Test Employee" });
+    pyEnv["hr.leave"].create({
+        display_name: "Leave",
+        employee_id: employeeId,
+        date_from: "2025-01-06 00:00:00",
+        date_to: "2025-01-07 00:00:00",
+        state: "confirm",
+        work_entry_type_id: 55,
+    });
+    onRpc("get_employee_available_leave_types", () => [{
+        id: 55, name: "Paid Leave", display_code: "PL", requires_allocation: false,
+    }]);
+    onRpc("get_gantt_data", ({ kwargs, parent }) => {
+        expect(kwargs.context.tz).toBe("Australia/Sydney");
+        return parent();
+    });
+    onRpc("create", ({ model, kwargs }) => {
+        if (model === "hr.leave") {
+            expect(kwargs.context.tz).toBe("Australia/Sydney");
+            expect.step("leave created");
+            return [1];
+        }
+    });
+
+    await mountGanttView({ resModel: "hr.leave", context: { tz: "Europe/Brussels" } });
+    await click(".o_gantt_cell");
+    await waitFor(".o_hr_holidays_gantt_quick_add_btn");
+    await click(".o_hr_holidays_gantt_quick_add_btn");
+    expect.verifySteps(["leave created"]);
 });
 
 test("Model displays correct quick add buttons for the available leave types", async () => {

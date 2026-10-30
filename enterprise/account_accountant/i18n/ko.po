@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:46+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
 "PO-Revision-Date: 2026-09-17 22:35+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
@@ -554,8 +554,8 @@ msgstr "이 날짜 이전의 판매 항목은 분개 순서에 따라 나중에 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
-msgid "Are you sure you want to delete this statement line?"
-msgstr "이 명세서 내역을 정말로 삭제할까요?"
+msgid "Are you sure you want to delete this transaction?"
+msgstr ""
 
 #. module: account_accountant
 #. odoo-javascript
@@ -763,8 +763,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.bank_rec_auto_reconcile_wizard_view_form
 msgid ""
 "Choose a journal and a starting date. The system will try to automatically\n"
-"                    reconcile all unreconciled bank statement lines from "
-"that date until today."
+"                    reconcile all unreconciled bank transactions from that "
+"date until today."
 msgstr ""
 
 #. module: account_accountant
@@ -794,6 +794,12 @@ msgstr "회계사를 찾거나 Odoo에 회계 서비스를 등록하려면 여�
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
 msgid "Click on the statement to unfold it."
+msgstr ""
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
+msgid "Click to select"
 msgstr ""
 
 #. module: account_accountant
@@ -2506,6 +2512,12 @@ msgid "Review"
 msgstr "검토"
 
 #. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/account_bank_statement.py:0
+msgid "Review Statements"
+msgstr ""
+
+#. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "Revoke"
 msgstr "취소"
@@ -2735,19 +2747,9 @@ msgid "Statement"
 msgstr "명세서"
 
 #. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
-msgid "Statement Line"
-msgstr "명세서 라인"
-
-#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__statement_line_attachment_ids
 msgid "Statement Line Attachment"
 msgstr ""
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
-msgid "Statement Lines"
-msgstr "명세서 라인"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
@@ -3055,8 +3057,8 @@ msgstr "이동 후: %s"
 
 #. module: account_accountant
 #: model:ir.actions.server,name:account_accountant.auto_reconcile_bank_statement_line_ir_actions_server
-msgid "Try to reconcile automatically your statement lines"
-msgstr "명세서 내역을 자동으로 조정하세요."
+msgid "Try to reconcile automatically your transactions"
+msgstr ""
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_mail_mail__message_type
@@ -3365,6 +3367,18 @@ msgstr "보조 통화"
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_journal_dashboard_kanban_view
 msgid "to reconcile"
 msgstr "조정하기"
+
+#~ msgid "Are you sure you want to delete this statement line?"
+#~ msgstr "이 명세서 내역을 정말로 삭제할까요?"
+
+#~ msgid "Statement Line"
+#~ msgstr "명세서 라인"
+
+#~ msgid "Statement Lines"
+#~ msgstr "명세서 라인"
+
+#~ msgid "Try to reconcile automatically your statement lines"
+#~ msgstr "명세서 내역을 자동으로 조정하세요."
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "은행거래명세서 내역"

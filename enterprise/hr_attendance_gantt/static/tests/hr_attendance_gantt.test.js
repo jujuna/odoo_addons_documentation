@@ -542,3 +542,99 @@ test("Progress bar shown for employees without attendances", async () => {
     expect(emptyLabel.textContent).toEqual("0h / 8h");
     expect(emptyLabel).not.toHaveClass("text-warning");
 });
+
+test("Monday attendance is shown in weekly gantt when first day of week is Monday", async () => {
+    // Customer records are 0-duration at local midnight (pill label "00:00 (00:00:00-00:00:00)").
+    // With week_start=Monday, that check_out equals the week start and was excluded by `>`.
+    mockDate("2018-12-19 12:00:00", +0);
+    defineParams({
+        lang_parameters: {
+            time_format: "%I:%M:%S",
+            week_start: 1,
+        },
+    });
+    Attendances._records = [
+        {
+            id: 9,
+            check_in: "2018-12-16 22:00:00",
+            check_out: "2018-12-17 00:00:00",
+            name: "Sunday Overnight Attendance",
+            employee_id: 1,
+        },
+        {
+            id: 10,
+            check_in: "2018-12-17 00:00:00",
+            check_out: "2018-12-17 00:00:00",
+            name: "Monday Attendance",
+            employee_id: 1,
+        },
+        {
+            id: 11,
+            check_in: "2018-12-19 00:00:00",
+            check_out: "2018-12-19 00:00:00",
+            name: "Wednesday Attendance",
+            employee_id: 1,
+        },
+    ];
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
+        const ids = result.records.map((record) => record.id);
+        expect(ids).toInclude(10);
+        expect(ids).not.toInclude(9);
+        return result;
+    });
+    await mountGanttView({
+        resModel: "attendances",
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" date_stop="check_out" default_group_by="employee_id" default_scale="week" default_range="week"/>`,
+    });
+    const { groupHeaders, rows } = getGridContent();
+    expect(groupHeaders.map((header) => header.title)).toEqual(["Week 51, Dec 17 - Dec 23"]);
+    const titles = rows.flatMap((row) => (row.pills || []).map((pill) => pill.title));
+    expect(titles).toInclude("Monday Attendance");
+    expect(titles).toInclude("Wednesday Attendance");
+    expect(titles).not.toInclude("Sunday Overnight Attendance");
+});
+
+test("Zero-duration attendance at the start of a future week is shown", async () => {
+    mockDate("2018-12-12 12:00:00", +0);
+    defineParams({
+        lang_parameters: {
+            time_format: "%I:%M:%S",
+            week_start: 1,
+        },
+    });
+    Attendances._records = [
+        {
+            id: 9,
+            check_in: "2018-12-16 22:00:00",
+            check_out: "2018-12-17 00:00:00",
+            name: "Future Sunday Overnight Attendance",
+            employee_id: 1,
+        },
+        {
+            id: 10,
+            check_in: "2018-12-17 00:00:00",
+            check_out: "2018-12-17 00:00:00",
+            name: "Future Monday Attendance",
+            employee_id: 1,
+        },
+        {
+            id: 11,
+            check_in: "2018-12-19 00:00:00",
+            check_out: "2018-12-19 00:00:00",
+            name: "Future Wednesday Attendance",
+            employee_id: 1,
+        },
+    ];
+    await mountGanttView({
+        resModel: "attendances",
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" date_stop="check_out" default_group_by="employee_id" default_scale="week" default_range="week"/>`,
+        context: { initialDate: "2018-12-17 08:00:00" },
+    });
+    const { groupHeaders, rows } = getGridContent();
+    expect(groupHeaders.map((header) => header.title)).toEqual(["Week 51, Dec 17 - Dec 23"]);
+    const titles = rows.flatMap((row) => (row.pills || []).map((pill) => pill.title));
+    expect(titles).toInclude("Future Wednesday Attendance");
+    expect(titles).toInclude("Future Monday Attendance");
+    expect(titles).not.toInclude("Future Sunday Overnight Attendance");
+});

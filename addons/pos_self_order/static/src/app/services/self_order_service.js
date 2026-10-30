@@ -89,11 +89,7 @@ export class SelfOrder extends Reactive {
             await this.initMobileData();
         }
 
-        this.data.connectWebSocket("SESSION_STATE_CHANGED", () => {
-            if (!session.test_mode) {
-                window.location.reload();
-            }
-        });
+        this.data.connectWebSocket("SESSION_STATE_CHANGED", () => this.onSessionStateChanged());
         this.data.connectWebSocket("ORDER_STATE_CHANGED", () => this.getUserDataFromServer());
         this.data.connectWebSocket("SNOOZE_CHANGED", async (payload) => {
             const { deleted_ids, records } = payload;
@@ -120,17 +116,14 @@ export class SelfOrder extends Reactive {
             }
         });
         if (this.config.self_ordering_mode === "kiosk") {
-            this.data.connectWebSocket("STATUS", ({ status }) => {
-                if (status === "closed") {
-                    this.ordering = false;
-                } else {
-                    // reload to get potential new settings
-                    // more easier than RPC for now
-                    window.location.reload();
-                }
+            this.data.connectWebSocket("STATUS", async ({ status }) => {
+                await this.handleKioskSessionStatusChange(status);
             });
             this.data.connectWebSocket("PAYMENT_STATUS", ({ payment_result, data }) => {
                 if (payment_result === "Success") {
+                    const [orderData] = data["pos.order"];
+                    const localOrder = this.models["pos.order"].get(orderData.id);
+                    orderData.partner_id = localOrder?.raw.partner_id || false;
                     this.models.connectNewData(data);
                     const order = this.models["pos.order"].find(
                         (o) => o.access_token === data["pos.order"][0].access_token
@@ -183,6 +176,22 @@ export class SelfOrder extends Reactive {
             this.addToCart(productTemplate, 1, "", {}, {});
             this.router.navigate("cart");
         });
+    }
+
+    async onSessionStateChanged() {
+        if (!session.test_mode) {
+            window.location.reload();
+        }
+    }
+    async handleKioskSessionStatusChange(status) {
+        if (status === "closed") {
+            this.pos_session = [];
+            this.ordering = false;
+        } else {
+            // reload to get potential new settings
+            // more easier than RPC for now
+            window.location.reload();
+        }
     }
 
     /**
@@ -338,6 +347,7 @@ export class SelfOrder extends Reactive {
                 options.categories[date].subCategories[slot.periode].options.push({
                     id: slot.datetime.toFormat("yyyy-MM-dd HH:mm:ss"),
                     name: this.getTime(slot.datetime),
+                    disabled: slot.isFull,
                 });
             }
         }
@@ -358,7 +368,7 @@ export class SelfOrder extends Reactive {
         try {
             const presetAvailabilities = await rpc(`/pos-self-order/get-slots`, {
                 access_token: this.access_token,
-                preset_id: this.currentOrder?.preset_id?.id,
+                preset_id: preset.id,
             });
             const localUsage = orderUsageUTCtoLocalUtil(presetAvailabilities.usage_utc);
             preset.computeAvailabilities(localUsage);

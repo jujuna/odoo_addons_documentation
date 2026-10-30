@@ -511,7 +511,29 @@ class TestExpenseStripeCommon(TestExpenseCommon):
 
         self.assertRecordValues(card, [{'state': 'active', 'is_delivered': True}])
 
-    def test_create_employee_cardholder(self):
+    def test_transfer_messages_to_card(self):
+        self.setup_account_creation(funds_amount=10000)
+        card = self.create_card(create_cardholder=False)
+
+        action = card.with_user(self.expense_user_manager).action_open_cardholder_wizard()
+        wizard = self.env['hr.expense.stripe.cardholder.wizard'].with_context(action['context']).browse(action['res_id'])
+
+        self.env['mail.message'].sudo().create({
+            'model': 'hr.expense.stripe.cardholder.wizard',
+            'res_id': wizard.id,
+            'body': 'Message',
+        })
+
+        nb_messages_before = len(card.message_ids)
+
+        with self.assertRaises(AccessError):
+            wizard.with_user(self.expense_user_employee)._transfer_messages_to_card()
+
+        wizard.with_user(self.expense_user_manager)._transfer_messages_to_card()
+
+        self.assertEqual(len(card.message_ids), nb_messages_before + 1)
+
+    def test_create_cardholder_no_user(self):
         """ Test that creating a cardholder for an employee without user raises an error """
         self.setup_account_creation(funds_amount=10000)
         new_employee = self.env['hr.employee'].sudo().create([{

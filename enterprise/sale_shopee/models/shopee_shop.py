@@ -1127,27 +1127,32 @@ class ShopeeShop(models.Model):
         return "\n".join(lines)
 
     def _find_or_create_pricelist(self, currency):
-        """Find or create the pricelist.
+        """Find or create an empty pricelist for this marketplace and currency.
+
+        The sale order currency comes from the pricelist. Another list in the same
+        currency can carry discount rules, which change the imported total.
 
         :param res.currency currency: The currency of the pricelist
         :rtype: product.pricelist
         """
         self.ensure_one()
+        pricelist_name = f"Shopee {currency.name}"
         pricelist = (
             self
             .env["product.pricelist"]
             .with_context(active_test=False)
             .search(
                 [
-                    *self.env["product.pricelist"]._check_company_domain(self.company_id),
+                    ("name", "=", pricelist_name),
                     ("currency_id", "=", currency.id),
+                    *self.env["product.pricelist"]._check_company_domain(self.company_id),
                 ],
                 limit=1,
             )
         )
         if not pricelist:
             pricelist = self.env["product.pricelist"].create({
-                "name": self.env._("Shopee Pricelist %(currency)s", currency=currency.name),
+                "name": pricelist_name,
                 "active": False,
                 "currency_id": currency.id,
                 "company_id": self.company_id.id,

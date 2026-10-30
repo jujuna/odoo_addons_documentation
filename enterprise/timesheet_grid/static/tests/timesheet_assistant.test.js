@@ -21,7 +21,6 @@ import { TimesheetsAssistant } from "@timesheet_grid/components/aw_timesheet/aw_
 import { TimesheetAssistantModel } from "@timesheet_grid/components/aw_timesheet/aw_timesheet_model";
 import { FakeEventsPlugin } from "@timesheet_grid/components/aw_timesheet/fake_events_plugin";
 import { FrequencyViewerLocalConfig } from "@timesheet_grid/components/aw_timesheet/frequency_viewer/frequency_viewer_local_config";
-
 import { defineTimesheetModels } from "./hr_timesheet_models";
 import { setupTimesheetEnvironment } from "./timesheet_timer_helpers";
 
@@ -54,6 +53,33 @@ async function openAssistant() {
         type: "ir.actions.client",
         tag: "hr_timesheet_activitywatch_action",
     });
+}
+
+const timesheetFormSelector =
+    "div[name='timesheets_section'] > div > .o_activitywatch_sync_timesheet_edition_form";
+
+async function editManualTimesheet(unitAmount) {
+    await contains("div[name='timesheets_section'] > div > a").click();
+    await contains(`${timesheetFormSelector} div[name='unit_amount'] input`).edit(unitAmount);
+    await contains(`${timesheetFormSelector} button:contains('Save')`).click();
+}
+
+/**
+ * @param {[string, string, string?][]} rows [description, duration, project / task (chronological view only)]
+ * @param {string} [parent] restricts the check to the rows inside this element
+ */
+function checkSuggestions(rows, parent = ".o_suggestions_content") {
+    const suggestion = `${parent} .o_suggestions_suggestion`;
+    expect(suggestion).toHaveCount(rows.length);
+    for (let i = 0; i < rows.length; i++) {
+        const [description, duration, project] = rows[i];
+        const descriptionSelector = `${suggestion}:eq(${i}) .o_suggestions_suggestion_description`;
+        expect(descriptionSelector).toHaveText(description);
+        expect(`${suggestion}:eq(${i}) time`).toHaveText(duration);
+        if (project) {
+            expect(`${descriptionSelector} + div`).toHaveText(project);
+        }
+    }
 }
 
 const env = setupTimesheetEnvironment();
@@ -256,16 +282,14 @@ test("Timesheet Assistant right panel edit timesheet", async () => {
     expect("div[name='timesheets_section'] > div > a > span").toHaveText("1h 00m");
 
     await contains("div[name='timesheets_section'] > div > a").click();
-    const formSelector =
-        "div[name='timesheets_section'] > div > .o_activitywatch_sync_timesheet_edition_form";
-    expect(formSelector).toHaveCount(1, {
+    expect(timesheetFormSelector).toHaveCount(1, {
         message: "A form view should have opened where the clicked timesheet was",
     });
 
-    await contains(`${formSelector} .field-description textarea`).edit("Test 2");
-    await contains(`${formSelector} div[name='unit_amount'] input`).edit("3");
-    await contains(`${formSelector} button:contains('Save')`).click();
-    expect(formSelector).toHaveCount(0, {
+    await contains(`${timesheetFormSelector} .field-description textarea`).edit("Test 2");
+    await contains(`${timesheetFormSelector} div[name='unit_amount'] input`).edit("3");
+    await contains(`${timesheetFormSelector} button:contains('Save')`).click();
+    expect(timesheetFormSelector).toHaveCount(0, {
         message: "The form should have closed",
     });
     expect("div[name='timesheets_section'] > div > a > span").toHaveText("3h 00m");
@@ -362,8 +386,8 @@ test("Side activity rules grouping", async () => {
     await reload();
 
     checkGroups([
-        { title: "Project 2", suggestions: [/Activity B/, /Activity C/] },
-        { title: "Unmatched", suggestions: [/Activity A/] },
+        { title: "Project 2", suggestions: [/Activity B/] },
+        { title: "Unmatched", suggestions: [/Activity A/, /Activity C/] },
     ]);
 });
 
@@ -460,7 +484,7 @@ test("Timesheet Assistant: editing then deleting a manual timesheet syncs the Ch
     pyEnv["aw.rule"].create({
         name: "Project 1 rule",
         regex: "https://p1\\.example\\.com",
-        type: "code",
+        type: "development",
         template: "Working on Project 1",
         project_id: 1,
         task_id: 1,
@@ -504,14 +528,12 @@ test("Timesheet Assistant: editing then deleting a manual timesheet syncs the Ch
             "opening the assistant with a pre-existing, non-assistant timesheet should not crash",
     });
     expect(".o_suggestions_suggestion_description").toHaveText("Working on Project 1");
-    expect(".o_suggestions_suggestion time").toHaveText("0h 30m");
+    expect(".o_suggestions_suggestion time").toHaveText("0h 24m", {
+        message: "the manual timesheet should already be deducted from the suggestion on load",
+    });
     expect("div[name='timesheets_section'] > div > a").toHaveCount(1);
 
-    await contains("div[name='timesheets_section'] > div > a").click();
-    const formSelector =
-        "div[name='timesheets_section'] > div > .o_activitywatch_sync_timesheet_edition_form";
-    await contains(`${formSelector} div[name='unit_amount'] input`).edit("0.4");
-    await contains(`${formSelector} button:contains('Save')`).click();
+    await editManualTimesheet("0.4");
 
     expect(".o_suggestions_suggestion").toHaveCount(1, {
         message: "editing the manual timesheet should not crash nor remove the suggestion",
@@ -522,7 +544,7 @@ test("Timesheet Assistant: editing then deleting a manual timesheet syncs the Ch
     });
 
     await contains("div[name='timesheets_section'] > div > a").click();
-    await contains(`${formSelector} button:contains('Delete')`).click();
+    await contains(`${timesheetFormSelector} button:contains('Delete')`).click();
 
     expect("div[name='timesheets_section'] > div > a").toHaveCount(0);
     expect(".o_suggestions_suggestion").toHaveCount(1, {
@@ -541,7 +563,7 @@ test("Timesheet Assistant: a manual timesheet that fully consumes a Chronologica
     pyEnv["aw.rule"].create({
         name: "Project 1 rule",
         regex: "https://p1\\.example\\.com",
-        type: "code",
+        type: "development",
         template: "Working on Project 1",
         project_id: 1,
         task_id: 1,
@@ -579,12 +601,8 @@ test("Timesheet Assistant: a manual timesheet that fully consumes a Chronologica
     await openAssistant();
     expect(".o_suggestions_suggestion").toHaveCount(1);
 
-    await contains("div[name='timesheets_section'] > div > a").click();
-    const formSelector =
-        "div[name='timesheets_section'] > div > .o_activitywatch_sync_timesheet_edition_form";
     // Raise the manual timesheet so it consumes the suggestion down to less than a minute.
-    await contains(`${formSelector} div[name='unit_amount'] input`).edit("0.49");
-    await contains(`${formSelector} button:contains('Save')`).click();
+    await editManualTimesheet("0.49");
 
     expect(".o_suggestions_suggestion").toHaveCount(0, {
         message:
@@ -594,6 +612,7 @@ test("Timesheet Assistant: a manual timesheet that fully consumes a Chronologica
 
 test("Timesheet Assistant Gmail activity", async () => {
     const now = new Date();
+    const blacklist = TimesheetAssistantModel.prototype.blacklistEmails;
     localStorage.clear();
 
     localStorage.setItem(
@@ -733,26 +752,49 @@ test("Timesheet Assistant Gmail activity", async () => {
             },
         },
     ];
+    if (blacklist) {
+        events.push({
+            timestamp: new Date(now - 10 * 1000).toISOString(),
+            duration: 60,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox/msg2",
+                title: "Gmail - Reading",
+                gmail_activity: "reading_email",
+                from: `Blacklisted (${blacklist.values().next().value})`,
+                subject: "Subject A",
+            },
+        });
+    }
 
     onRpc("http://localhost:5600/api/0/buckets/*", () => ({
         web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
     }));
 
-    onRpc("account.analytic.line", "resolve_gmail_partners", () => ({
-        "partnerA@example.com": {
-            partner_name: "Partner A",
-            project_id: 1,
-        },
-        "partnerB@example.com": {
-            partner_name: "Partner B",
-            project_id: 2,
-        },
-        "partnerC@example.com": {
-            partner_name: "Partner C",
-            project_id: 3,
-            task_id: 1,
-        },
-    }));
+    onRpc("account.analytic.line", "resolve_gmail_partners", ({ args }) => {
+        expect(args[0]).toInclude("partnerA@example.com", {
+            message: "The address should be extracted from the trailing parentheses",
+        });
+        expect(args[0]).not.toInclude(blacklist.values().next().value, {
+            message: "Blacklist email should not be sent to resolve",
+        });
+
+        const resolve = {
+            "partnerA@example.com": {
+                partner_name: "Partner A",
+                project_id: 1,
+            },
+            "partnerB@example.com": {
+                partner_name: "Partner B",
+                project_id: 2,
+            },
+            "partnerC@example.com": {
+                partner_name: "Partner C",
+                project_id: 3,
+                task_id: 1,
+            },
+        };
+        return resolve;
+    });
 
     onRpc("account.analytic.line", "resolve_assistant_models_targets", () => ({
         "project.project": {
@@ -781,13 +823,13 @@ test("Timesheet Assistant Gmail activity", async () => {
     //   - T4 + T5 (4m): Composing email to Partner B
     //   - T10 (2m): Reading email: "Subject E" (no recipient at all - matched purely by the
     //     learned "Subject E" frequency)
-    // Project 3 / Task 1 (0h 05m):
-    //   - T3 + T6 + T8 (5m): Composing email to Partner A, Partner C, and 1 more: "Draft A - Final"
-    //     (T7 stays unmatched without impacting the next events, so T8 - a side-activity - is
-    //     still attributed to the last real key event, which is "Draft A - Final")
-    // Unmatched (0h 02m):
-    //   - T7 (2m): Reading email from Unknown: "Subject D" (no learned frequency for "Subject D"
-    //     and an unresolvable sender)
+    // Project 3 / Task 1 (0h 04m):
+    //   - T3 + T6 (4m): Composing email to Partner A, Partner C, and 1 more: "Draft A - Final"
+    // Unmatched (0h 03m):
+    //   - T7 + T8 (3m): Reading email from Unknown: "Subject D" (no learned frequency for
+    //     "Subject D" and an unresolvable sender). T7 stays unmatched without impacting the next
+    //     events, so T8 - a side-activity - is attributed to "Draft A - Final", but it is clipped
+    //     to 40s by T7 and thus aggregated to the previous chronological block, which is T7.
 
     const expected = [
         {
@@ -809,15 +851,21 @@ test("Timesheet Assistant Gmail activity", async () => {
             suggestions: [
                 [
                     'Composing email to Partner A, Partner C, and 1 more: "Draft A - Final"',
-                    "0h 05m",
+                    "0h 04m",
                 ],
             ],
         },
         {
             title: "Unmatched",
-            suggestions: [['Reading email from Unknown: "Subject D"', "0h 02m"]],
+            suggestions: [['Reading email from Unknown: "Subject D"', "0h 03m"]],
         },
     ];
+    if (blacklist) {
+        expected[expected.length - 1].suggestions.push([
+            'Reading email from Blacklisted: "Subject A"',
+            "0h 01m",
+        ]);
+    }
 
     expect(".o_suggestions_content div[role='heading']").toHaveCount(expected.length);
     let suggestionIndex = 0;
@@ -961,6 +1009,7 @@ test("Timesheet Assistant masking - surfacing ActivityWatch after ignore", async
         },
     ]);
     await openAssistant();
+    await reload();
 
     expect(".o_suggestions_suggestion").toHaveCount(1);
     expect(".o_suggestions_suggestion_description").toHaveText("Team Meeting");
@@ -1145,7 +1194,7 @@ test("Timesheet Assistant matching - frequency learning flow", async () => {
         {
             id: 1,
             regex: "https://test.com/(.)",
-            type: "code",
+            type: "development",
             template: "Task $1",
             always_active: false,
         },
@@ -1287,14 +1336,6 @@ test("Timesheet Assistant - small event after AFK is packed into the next activi
         },
     ]);
 
-    const checkSuggestions = (elements) => {
-        expect(".o_suggestions_suggestion").toHaveCount(elements.length);
-        for (let i = 0; i < elements.length; i++) {
-            expect(`.o_suggestions_suggestion_description:eq(${i})`).toHaveText(elements[i][0]);
-            expect(`.o_suggestions_suggestion:eq(${i}) time`).toHaveText(elements[i][1]);
-        }
-    };
-
     await openAssistant();
     checkSuggestions([
         ["Away", "0h 10m"],
@@ -1405,20 +1446,236 @@ test("Timesheet Assistant - Aggregate key events", async () => {
         },
     ]);
 
-    const checkSuggestions = (elements) => {
-        expect(".o_suggestions_suggestion").toHaveCount(elements.length);
-        for (let i = 0; i < elements.length; i++) {
-            expect(`.o_suggestions_suggestion_description:eq(${i})`).toHaveText(elements[i][0]);
-            expect(`.o_suggestions_suggestion:eq(${i}) time`).toHaveText(elements[i][1]);
-        }
-    };
-
     await openAssistant();
     checkSuggestions([
         ["Away", "0h 20m"],
         ["Event A", "0h 04m"],
         ["Away", "0h 01m"],
         ["Event A", "0h 01m"],
+    ]);
+});
+
+test("Timesheet Assistant - aggregate small events", async () => {
+    //      Time →   -30m        -20m        -10m                                                           now
+    //                |------------|------------|----------------------------------------------------------|
+    //
+    //      RAW  :    [A1==========][B1=========][A2][B2][A3][B3]
+    //      Expected result on both chronological and grouped views (the small events are
+    //      aggregated to the previous block)
+    //      10 min A, 12 min B
+    const now = luxon.DateTime.now();
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () => [
+        {
+            timestamp: new Date(now - 30 * 60 * 1000).toISOString(),
+            duration: 10 * 60,
+            data: {
+                url: "https://www.example.com/A",
+                title: "Big Event A",
+            },
+        },
+        {
+            timestamp: new Date(now - 20 * 60 * 1000).toISOString(),
+            duration: 10 * 60,
+            data: {
+                url: "https://www.example.com/B",
+                title: "Big Event B",
+            },
+        },
+        {
+            timestamp: new Date(now - 10 * 60 * 1000).toISOString(),
+            duration: 0.5 * 60,
+            data: {
+                url: "https://www.example.com/A",
+                title: "Big Event A",
+            },
+        },
+        {
+            timestamp: new Date(now - 9.5 * 60 * 1000).toISOString(),
+            duration: 0.5 * 60,
+            data: {
+                url: "https://www.example.com/B",
+                title: "Big Event B",
+            },
+        },
+        {
+            timestamp: new Date(now - 9 * 60 * 1000).toISOString(),
+            duration: 0.5 * 60,
+            data: {
+                url: "https://www.example.com/A",
+                title: "Big Event A",
+            },
+        },
+        {
+            timestamp: new Date(now - 8.5 * 60 * 1000).toISOString(),
+            duration: 0.5 * 60,
+            data: {
+                url: "https://www.example.com/B",
+                title: "Big Event B",
+            },
+        },
+    ]);
+
+    await openAssistant();
+    checkSuggestions([
+        ["Big Event A", "0h 10m"],
+        ["Big Event B", "0h 12m"],
+    ]);
+    await click("button[name='action_groupby_project']");
+    await animationFrame();
+    checkSuggestions([
+        ["Big Event A", "0h 10m"],
+        ["Big Event B", "0h 12m"],
+    ]);
+
+    // We delete the Big Event B suggestion from the grouped view, this removes the Big Event B block
+    // from the chronological view too, including the 1 min of Big Event A aggregated to it.
+    await contains(".o_suggestions_suggestion:eq(1) .o_aw_btn_remove", { visible: false }).click();
+    await click("button[name='action_groupby_timeline']");
+    await animationFrame();
+    checkSuggestions([["Big Event A", "0h 10m"]]);
+    expect(".text-danger:eq(1)").toHaveText("0h 10m");
+
+    // On reload, the suggestion in the chronological view should still be 10 min. The extra min is
+    // still aggregated to the Big Event B block, which is discarded on load since it is consumed.
+    await reload();
+    checkSuggestions([["Big Event A", "0h 10m"]]);
+    expect(".text-danger:eq(1)").toHaveText("0h 10m");
+});
+
+async function setupKeyEventGroupTest(webEvents, afkEvents = []) {
+    const today = luxon.DateTime.now().startOf("day").plus({ hours: 10 });
+    pyEnv["aw.rule"].create([
+        {
+            name: "Mail Rule",
+            regex: "https://mail.example.com",
+            type: "odoo",
+            template: "Reading emails",
+        },
+        {
+            name: "DB Rule",
+            regex: "https://db.example.com",
+            type: "odoo",
+            template: "Working on db",
+        },
+    ]);
+    onRpc("http://localhost:5600/api/0/buckets/", () => ({
+        afk: { type: "afkstatus", id: "afk", client: "aw-watcher-afk" },
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+    const toEvents = (list) => {
+        const events = [];
+        let time = today;
+        for (const [data, duration] of list) {
+            if (data) {
+                events.push({ timestamp: time.toISO(), duration, data });
+            }
+            time = time.plus({ milliseconds: duration * 1000 });
+        }
+        return events.reverse();
+    };
+    onRpc("http://localhost:5600/api/0/buckets/web/events", () => toEvents(webEvents));
+    onRpc("http://localhost:5600/api/0/buckets/afk/events", () => toEvents(afkEvents));
+    await openAssistant();
+}
+
+const MAIL = { title: "Inbox", url: "https://mail.example.com" };
+const DB = { title: "Odoo", url: "https://db.example.com" };
+const OTHER = { title: "Unmatched page", url: "https://other.example.com" };
+const AFK = { status: "afk" };
+
+function checkKeyEventGroupSuggestions(elements) {
+    expect(".o_suggestions_suggestion").toHaveCount(elements.length);
+    for (let i = 0; i < elements.length; i++) {
+        expect(`.o_suggestions_suggestion_description:eq(${i})`).toHaveText(elements[i][0]);
+        expect(`.o_suggestions_suggestion:eq(${i}) time`).toHaveText(elements[i][1]);
+    }
+}
+
+test("Timesheet Assistant: very short key events don't cut the current activity", async () => {
+    await setupKeyEventGroupTest([
+        [MAIL, 120],
+        [DB, 40],
+        [MAIL, 0.3],
+        [DB, 40],
+        [MAIL, 0.3],
+        [DB, 40],
+    ]);
+    checkKeyEventGroupSuggestions([
+        ["Reading emails", "0h 02m"],
+        ["Working on db", "0h 02m"],
+    ]);
+});
+
+test("Timesheet Assistant: non key events are part of the key event group", async () => {
+    await setupKeyEventGroupTest([
+        [MAIL, 120],
+        [DB, 40],
+        [OTHER, 40],
+        [DB, 40],
+    ]);
+    checkKeyEventGroupSuggestions([
+        ["Reading emails", "0h 02m"],
+        ["Working on db", "0h 02m"],
+    ]);
+});
+
+test("Timesheet Assistant: short afk events are part of the key event group", async () => {
+    await setupKeyEventGroupTest(
+        [
+            [MAIL, 120],
+            [DB, 40],
+            [null, 30],
+            [DB, 40],
+        ],
+        [
+            [null, 160],
+            [AFK, 30],
+        ]
+    );
+    checkKeyEventGroupSuggestions([
+        ["Reading emails", "0h 02m"],
+        ["Working on db", "0h 02m"],
+    ]);
+});
+
+test("Timesheet Assistant: a key event group shorter than a minute goes to the previous activity", async () => {
+    await setupKeyEventGroupTest([
+        [MAIL, 120],
+        [DB, 20],
+        [OTHER, 20],
+    ]);
+    checkKeyEventGroupSuggestions([["Reading emails", "0h 03m"]]);
+});
+
+test("Timesheet Assistant: a task without project doesn't cut the key event group", async () => {
+    // a task without project is not a key event, it must not split the "Working on db" group
+    onRpc("account.analytic.line", "get_assistant_data", () => ({
+        rounding_values: { minimum: 15, rounding: 15 },
+        odoo_models_data: [
+            {
+                model: "project.task",
+                label: "Task",
+                template: "Working on $1",
+                url_regex: `${window.location.origin}/odoo/tasks/(\\d+)`,
+            },
+        ],
+    }));
+    onRpc("account.analytic.line", "resolve_assistant_models_targets", () => ({
+        "project.task": { 7: { task_id: 7, task_name: "Private task" } },
+    }));
+    await setupKeyEventGroupTest([
+        [MAIL, 120],
+        [DB, 50],
+        [{ title: "Odoo", url: `${window.location.origin}/odoo/tasks/7` }, 5],
+        [DB, 50],
+    ]);
+    checkKeyEventGroupSuggestions([
+        ["Reading emails", "0h 02m"],
+        ["Working on db", "0h 02m"],
     ]);
 });
 
@@ -1743,14 +2000,6 @@ test("Timesheet Assistant: afk events", async () => {
         2
     );
 
-    const checkSuggestions = (elements) => {
-        expect(".o_suggestions_suggestion").toHaveCount(elements.length);
-        for (let i = 0; i < elements.length; i++) {
-            expect(`.o_suggestions_suggestion_description:eq(${i})`).toHaveText(elements[i][0]);
-            expect(`.o_suggestions_suggestion:eq(${i}) time`).toHaveText(elements[i][1]);
-        }
-    };
-
     checkSuggestions([
         ["Odoo Test", "1h 00m"],
         ["Away", "0h 51m"],
@@ -1853,14 +2102,6 @@ test("Timesheet Assistant: always active events block afk", async () => {
     await openAssistant();
     expect(".o_suggestions_content .o_suggestions_suggestion").toHaveCount(4);
 
-    const checkSuggestions = (elements) => {
-        expect(".o_suggestions_suggestion").toHaveCount(elements.length);
-        for (let i = 0; i < elements.length; i++) {
-            expect(`.o_suggestions_suggestion_description:eq(${i})`).toHaveText(elements[i][0]);
-            expect(`.o_suggestions_suggestion:eq(${i}) time`).toHaveText(elements[i][1]);
-        }
-    };
-
     checkSuggestions([
         ["Always Active", "0h 20m"],
         ["Not Always Active", "0h 05m"],
@@ -1884,7 +2125,7 @@ test("Timesheet Assistant hover auto select", async () => {
                     duration: 3600,
                     start: start1,
                     stop: start1.plus({ seconds: 3600 }),
-                    type: "code",
+                    type: "development",
                     data: { app: "Terminal", title: "Terminal" },
                 },
             ],
@@ -1902,7 +2143,7 @@ test("Timesheet Assistant hover auto select", async () => {
                     duration: 3600,
                     start: start3,
                     stop: start3.plus({ seconds: 3600 }),
-                    type: "word",
+                    type: "document",
                     data: { app: "Chrome", title: "Meeting Notes", url: "https://docs.google.com" },
                 },
             ],
@@ -2074,7 +2315,7 @@ test("Timesheet Assistant Suggestions Section View", async () => {
         {
             id: 1,
             regex: "^(.*?)\\|https://p1\\.com",
-            type: "code",
+            type: "development",
             template: "$1",
             project_id: [1],
             always_active: false,
@@ -2082,7 +2323,7 @@ test("Timesheet Assistant Suggestions Section View", async () => {
         {
             id: 2,
             regex: "^(.*?)\\|https://p2\\.com",
-            type: "code",
+            type: "development",
             template: "$1",
             project_id: [2],
             always_active: false,
@@ -2090,7 +2331,7 @@ test("Timesheet Assistant Suggestions Section View", async () => {
         {
             id: 3,
             regex: "^(.*?)\\|https://p3\\.com",
-            type: "code",
+            type: "development",
             template: "$1",
             project_id: [3],
             always_active: false,
@@ -2098,14 +2339,14 @@ test("Timesheet Assistant Suggestions Section View", async () => {
         {
             id: 4,
             regex: "mail\\.google\\.com",
-            type: "communication",
+            type: "messaging",
             template: "Checking Emails",
             always_active: false,
         },
         {
             id: 5,
             regex: "app\\.slack\\.com",
-            type: "communication",
+            type: "messaging",
             template: "Team Chat",
             always_active: false,
         },
@@ -2245,7 +2486,7 @@ test("Timesheet Assistant: merge descriptions for Discord DM from the same templ
         regex:
             "(?:@(.*?)\\s*-\\s*Discord)|" +
             "(?:(?:\\(\\d+\\)\\s)?Discord\\s\\|\\s@(.*?)\\|https:\\/\\/discord\\.com\\/channels\\/.*)",
-        type: "communication",
+        type: "messaging",
         template: "Discussing with @$1",
         always_active: false,
     });
@@ -2290,7 +2531,7 @@ test("Timesheet Assistant: merge Google Docs suggestions that has the same templ
     pyEnv["aw.rule"].create({
         name: "Google Docs",
         regex: "(.*) - Google Docs\\|https:\\/\\/docs\\.google\\.com",
-        type: "word",
+        type: "document",
         template: "Working on $1",
         always_active: false,
     });
@@ -2387,7 +2628,7 @@ test("Timesheet Assistant: merge Gmail suggestions that has the same template", 
     await animationFrame();
 
     expect(".o_activitywatch_sync_timesheet_creation_form .field-description textarea").toHaveValue(
-        'Reading email from Partner A and Partner B: "Subject A and Subject B"'
+        'Reading email from Partner A: "Subject A" and from Partner B: "Subject B"'
     );
 });
 
@@ -2466,6 +2707,11 @@ test("Timesheet Assistant total-hours color reflects working hours (right panel 
             timesheets: pyEnv["account.analytic.line"].web_search_read(domain, specification),
         };
     });
+    onRpc("account.analytic.line", "resolve_assistant_models_targets", () => ({
+        "project.project": {
+            1: { project_id: 1, project_name: "Opera Project" },
+        },
+    }));
 
     // Right panel: a single 3h timesheet.
     pyEnv["account.analytic.line"].create([
@@ -2768,14 +3014,6 @@ test("Timesheet Assistant chronological view", async () => {
 
     await openAssistant();
 
-    const checkSuggestions = (elements) => {
-        expect(".o_suggestions_suggestion").toHaveCount(elements.length);
-        for (let i = 0; i < elements.length; i++) {
-            expect(`.o_suggestions_suggestion_description:eq(${i})`).toHaveText(elements[i][0]);
-            expect(`.o_suggestions_suggestion:eq(${i}) time`).toHaveText(elements[i][1]);
-        }
-    };
-
     checkSuggestions([
         ["Coding A", "0h 10m"],
         ["Away", "0h 10m"],
@@ -2804,10 +3042,9 @@ test("Timesheet Assistant chronological view", async () => {
     const consumedEvents = JSON.parse(localStorage.getItem("aw_taken_deleted_events"));
     expect(consumedEvents).toEqual({
         '{"title":"Coding A","day":"2019-03-11"}': {
-            duration: 600,
             isConsumed: false,
             timelineStartTimes: ["2019-03-11T10:30:00.000+01:00"],
-            timelineDuration: 600,
+            timelineDurations: { "2019-03-11T10:30:00.000+01:00": 600 },
         },
     });
 
@@ -2863,6 +3100,17 @@ test("Timesheet Assistant - keeps manual project selection when selecting anothe
                 subject: "Webocalypse Now stuff",
             },
         },
+        {
+            timestamp: new Date(now - 300 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox/msg2",
+                title: "Gmail - Reading",
+                gmail_activity: "reading_email",
+                from: "Partner C (partnerC@example.com)",
+                subject: "BS task stuff",
+            },
+        },
     ];
 
     onRpc("http://localhost:5600/api/0/buckets/*", () => ({
@@ -2874,12 +3122,20 @@ test("Timesheet Assistant - keeps manual project selection when selecting anothe
             partner_name: "Partner B",
             project_id: 2, // Resolves to Webocalypse Now
         },
+        "partnerC@example.com": {
+            partner_name: "Partner C",
+            project_id: 1,
+            task_id: 1,
+        },
     }));
 
     onRpc("account.analytic.line", "resolve_assistant_models_targets", () => ({
         "project.project": {
             1: { project_id: 1, project_name: "P1" },
             2: { project_id: 2, project_name: "Webocalypse Now" },
+        },
+        "project.task": {
+            1: { project_id: 1, project_name: "P1", task_id: 1, task_name: "BS task" },
         },
     }));
 
@@ -2891,6 +3147,7 @@ test("Timesheet Assistant - keeps manual project selection when selecting anothe
     expect(".o_suggestions_suggestion_description:contains('Webocalypse Now stuff')").toHaveCount(
         1
     );
+    expect(".o_suggestions_suggestion_description:contains('BS task stuff')").toHaveCount(1);
 
     await contains(".o_suggestions_suggestion:contains('Random Web Activity')").click();
 
@@ -2903,6 +3160,16 @@ test("Timesheet Assistant - keeps manual project selection when selecting anothe
     await contains(".o_suggestions_suggestion:contains('Webocalypse Now stuff')").click();
     expect("div[name='project_id'] input").toHaveValue("P1", {
         message: "P1 should remain selected after clicking a suggestion mapped to Webocalypse Now",
+    });
+    expect("div[name='task_id'] input").toHaveValue("", {
+        message:
+            "The task should remain empty after clicking a suggestion mapped to Webocalypse Now",
+    });
+
+    await contains(".o_suggestions_suggestion:contains('BS task stuff')").click();
+    expect("div[name='project_id'] input").toHaveValue("P1");
+    expect("div[name='task_id'] input").toHaveValue("BS task", {
+        message: "BS task should be selected on the form",
     });
 });
 
@@ -3147,7 +3414,6 @@ test("Timesheet Assistant: updates timesheet when date is changed", async () => 
 
     await reload();
 
-
     expect("div[name='timesheets_section'] > div > a").toHaveCount(1);
     expect(".o_activity_watch_timesheet_right_tots").toHaveText(
         `Total
@@ -3158,12 +3424,9 @@ over
 
     await contains("div[name='timesheets_section'] > div > a").click();
 
-    const formSelector =
-        "div[name='timesheets_section'] > div > .o_activitywatch_sync_timesheet_edition_form";
+    expect(timesheetFormSelector).toHaveCount(1);
 
-    expect(formSelector).toHaveCount(1);
-
-    await contains(`${formSelector} div[name='task_field'] .o_external_button`, {
+    await contains(`${timesheetFormSelector} div[name='task_field'] .o_external_button`, {
         visible: false,
     }).click();
     expect(".o_dialog").toHaveCount(1);
@@ -3196,4 +3459,893 @@ over
 over
 7h 36m`
     );
+});
+
+test("Timesheet Assistant: ignores empty ActivityWatch events without app or title", async () => {
+    const today = luxon.DateTime.now().startOf("day").plus({ hours: 10 });
+
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        window: { type: "currentwindow", id: "window", client: "aw-watcher-window" },
+    }));
+
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () => [
+        {
+            // 1. Empty boot event (Should be ignored)
+            timestamp: today.minus({ minutes: 20 }).toISO(),
+            duration: 300,
+            data: { app: "", title: "" },
+        },
+        {
+            // 2. Whitespace event (Should be ignored)
+            timestamp: today.minus({ minutes: 15 }).toISO(),
+            duration: 300,
+            data: { app: "   ", title: "   " },
+        },
+        {
+            // 3. Valid event (Should be kept)
+            timestamp: today.minus({ minutes: 10 }).toISO(),
+            duration: 600,
+            data: { app: "Google Chrome", title: "Odoo - Task" },
+        },
+    ]);
+
+    await openAssistant();
+
+    // Verify only the 1 valid suggestion is rendered (ignoring the 2 empty/whitespace events)
+    expect(".o_suggestions_suggestion").toHaveCount(1, {
+        message: "Empty and whitespace-only window events should be completely ignored",
+    });
+
+    // Verify the data of the valid event mapped correctly
+    expect(".o_suggestions_suggestion_description").toHaveText("Odoo - Task");
+    expect(".o_suggestions_suggestion time").toHaveText("0h 10m");
+});
+
+test("Timesheet Assistant: avoid duplicate descriptions for suggestions with the same name", async () => {
+    const now = new Date();
+    localStorage.clear();
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () => [
+        {
+            timestamp: new Date(now - 1200 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox/msg1",
+                title: "Gmail - Reading",
+                gmail_activity: "reading_email",
+            },
+        },
+        {
+            timestamp: new Date(now - 600 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox/msg2",
+                title: "Gmail - Reading",
+                gmail_activity: "reading_email",
+            },
+        },
+    ]);
+
+    await openAssistant();
+    await contains(".o_suggestions_suggestion:eq(0)").click();
+    await contains(".o_suggestions_suggestion:eq(2)").click();
+    await animationFrame();
+    expect(".o_activitywatch_sync_timesheet_creation_form .field-description textarea").toHaveValue(
+        "Reading email"
+    );
+});
+
+test("Timesheet Assistant: format grouped reading email activities", async () => {
+    const now = new Date();
+    localStorage.clear();
+
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () => [
+        {
+            timestamp: new Date(now - 1800 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox/msg1",
+                title: "Gmail - Reading",
+                gmail_activity: "reading_email",
+                from: "John (john@example.com)",
+                subject: "Subject A",
+            },
+        },
+        {
+            timestamp: new Date(now - 1200 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox/msg2",
+                title: "Gmail - Reading",
+                gmail_activity: "reading_email",
+                from: "Alice (alice@example.com)",
+                subject: "Subject B",
+            },
+        },
+        {
+            timestamp: new Date(now - 600 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox/msg3",
+                title: "Gmail - Reading",
+                gmail_activity: "reading_email",
+                from: "David (david@example.com)",
+                subject: "Subject C",
+            },
+        },
+    ]);
+
+    await openAssistant();
+    await contains(".o_suggestions_suggestion:eq(0)").click();
+    await contains(".o_suggestions_suggestion:eq(2)").click();
+    await contains(".o_suggestions_suggestion:eq(4)").click();
+    await animationFrame();
+
+    expect(".o_activitywatch_sync_timesheet_creation_form .field-description textarea").toHaveValue(
+        'Reading email from John: "Subject A", from Alice: "Subject B", and from David: "Subject C"'
+    );
+});
+
+test("Timesheet Assistant: format grouped composing email activities", async () => {
+    const now = new Date();
+    localStorage.clear();
+
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () => [
+        {
+            timestamp: new Date(now - 1800 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox?compose=ID_A",
+                title: "Gmail - Compose",
+                gmail_activity: "composing_email",
+                to: ["John (john@example.com)"],
+                subject: "Subject A",
+            },
+        },
+        {
+            timestamp: new Date(now - 1200 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox?compose=ID_B",
+                title: "Gmail - Compose",
+                gmail_activity: "composing_email",
+                to: ["Alice (alice@example.com)"],
+                subject: "Subject B",
+            },
+        },
+        {
+            timestamp: new Date(now - 600 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                url: "https://mail.google.com/mail/u/0/#inbox?compose=ID_C",
+                title: "Gmail - Compose",
+                gmail_activity: "composing_email",
+                to: ["David (david@example.com)"],
+                subject: "Subject C",
+            },
+        },
+    ]);
+
+    await openAssistant();
+    await contains(".o_suggestions_suggestion:eq(0)").click();
+    await contains(".o_suggestions_suggestion:eq(2)").click();
+    await contains(".o_suggestions_suggestion:eq(4)").click();
+    await animationFrame();
+
+    expect(".o_activitywatch_sync_timesheet_creation_form .field-description textarea").toHaveValue(
+        'Composing email to John: "Subject A", to Alice: "Subject B", and to David: "Subject C"'
+    );
+});
+
+test("Timesheet Assistant: non-key events display the Other icon or the active key event icon", async () => {
+    const now = new Date();
+    pyEnv["aw.rule"].create({
+        name: "Activity Rule",
+        regex: "https://www.example.com/Activity",
+        type: "odoo",
+        template: "Activity",
+    });
+
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () => [
+        {
+            // non-key event before any key event: Other icon
+            timestamp: new Date(now - 30 * 60 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                title: "#other",
+                url: "https://xyz.com",
+            },
+        },
+        {
+            // key event
+            timestamp: new Date(now - 20 * 60 * 1000).toISOString(),
+            duration: 300,
+            data: {
+                title: "Activity",
+                url: "https://www.example.com/Activity",
+            },
+        },
+        {
+            // non-key event starting a new block after an AFK gap: inherits the key event icon
+            timestamp: new Date(now - 10 * 60 * 1000).toISOString(),
+            duration: 120,
+            data: {
+                title: "Untracked page",
+                url: "https://xyz.com",
+            },
+        },
+    ]);
+
+    await openAssistant();
+    await animationFrame();
+
+    expect(".o_suggestions_suggestion i.text-muted").toHaveCount(1);
+    expect(".o_suggestions_suggestion i.text-primary").toHaveCount(2);
+
+    await click("button[name='action_groupby_project']");
+    await waitFor("button[name='action_groupby_project'].active");
+
+    expect(".o_suggestions_suggestion i.text-muted").toHaveCount(1);
+    expect(".o_suggestions_suggestion i.text-primary").toHaveCount(1);
+});
+
+/**
+ * Chronological and project views are built from the same records: a project/task total in the
+ * project view must always be the sum of its rows in the chronological view.
+ * - "Working on A" is matched to a project only (Webocalypse Now)
+ * - "Working on B" is matched to a project and a task (P1 / BS task)
+ *
+ * @param {[number, number, "a"|"b"][]} events [start offset (s), duration (s), site]
+ */
+function setupViewsConsistency(events) {
+    const today = luxon.DateTime.now().startOf("day").plus({ hours: 10 });
+    localStorage.setItem("aw_suggestion_pref", "timeline");
+    pyEnv["aw.rule"].create({
+        name: "Project only rule",
+        regex: "https://a\\.example\\.com",
+        type: "development",
+        template: "Working on A",
+        project_id: 2,
+    });
+    pyEnv["aw.rule"].create({
+        name: "Project and task rule",
+        regex: "https://b\\.example\\.com",
+        type: "development",
+        template: "Working on B",
+        project_id: 1,
+        task_id: 1,
+    });
+    onRpc("http://localhost:5600/api/0/buckets/*", () => ({
+        web: { type: "web.tab.current", id: "web", client: "aw-watcher-web" },
+    }));
+    onRpc("http://localhost:5600/api/0/buckets/*/events*", () =>
+        events.map(([offset, duration, site]) => ({
+            timestamp: today.plus({ seconds: offset }).toISO(),
+            duration,
+            data: { title: `Site ${site}`, url: `https://${site}.example.com` },
+        }))
+    );
+    onRpc("account.analytic.line", "resolve_assistant_models_targets", () => ({
+        "project.project": {
+            1: { project_id: 1, project_name: "P1", allow_timesheets: true },
+            2: { project_id: 2, project_name: "Webocalypse Now", allow_timesheets: true },
+        },
+        "project.task": {
+            1: { project_id: 1, project_name: "P1", task_id: 1, task_name: "BS task" },
+        },
+    }));
+    return today;
+}
+
+/**
+ * @param {[string, string, [string, string][]][]} groups [title, duration, rows of the group]
+ */
+function checkGroups(groups) {
+    const heading = ".o_suggestions_content div[role='heading']";
+    expect(heading).toHaveCount(groups.length);
+    for (let i = 0; i < groups.length; i++) {
+        const [title, duration, rows] = groups[i];
+        expect(`${heading}:eq(${i}) span:first-child`).toHaveText(title);
+        expect(`${heading}:eq(${i}) time`).toHaveText(duration);
+        checkSuggestions(rows, `${heading}:eq(${i}) + .list-group`);
+    }
+}
+
+function checkSuggestionsTotal(total) {
+    expect(".o_suggestions_content div[title^='Total:'] b").toHaveText(total);
+}
+
+async function switchView(view) {
+    await click(`button[name='action_groupby_${view}']`);
+    await animationFrame();
+}
+
+test("Timesheet Assistant: chronological and project views stay consistent on delete and take", async () => {
+    onRpc("account.analytic.line", "get_assistant_data", () => ({
+        rounding_values: { minimum: 1, rounding: 1 },
+        odoo_models_data: [],
+    }));
+    //      RAW  : [A 10m29s][B 5m31s][A 45s][A 10m29s][B 10m]
+    //      The 45s of A are in the same key event group as the next A, and each block is rounded
+    //      to the minute: [A 10m][B 6m][A 11m][B 10m] The project view sums up those exact rows.
+    setupViewsConsistency([
+        [0, 629, "a"],
+        [629, 331, "b"],
+        [960, 45, "a"],
+        [1005, 629, "a"],
+        [1634, 600, "b"],
+    ]);
+    await openAssistant();
+
+    checkSuggestions([
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 06m", "P1 / BS task"],
+        ["Working on A", "0h 11m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+    ]);
+    checkSuggestionsTotal("0h 37m");
+
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 16m", [["Working on B", "0h 16m"]]],
+        ["Webocalypse Now", "0h 21m", [["Working on A", "0h 21m"]]],
+    ]);
+    checkSuggestionsTotal("0h 37m");
+
+    // deleting a row in the chronological view removes exactly that row from the project view
+    await switchView("timeline");
+    await contains(".o_suggestions_suggestion:eq(0) .o_aw_btn_remove", { visible: false }).click();
+    checkSuggestions([
+        ["Working on B", "0h 06m", "P1 / BS task"],
+        ["Working on A", "0h 11m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+    ]);
+    checkSuggestionsTotal("0h 27m");
+
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 16m", [["Working on B", "0h 16m"]]],
+        ["Webocalypse Now", "0h 11m", [["Working on A", "0h 11m"]]],
+    ]);
+    checkSuggestionsTotal("0h 27m");
+
+    // taking a row in the project view takes all its chronological rows, with their exact total
+    await contains(".o_suggestions_suggestion:eq(0) .o_aw_btn_take", { visible: false }).click();
+    await advanceTime(250);
+    await animationFrame();
+    const [timesheet] = pyEnv["account.analytic.line"].search_read([["name", "=", "Working on B"]]);
+    expect(timesheet.unit_amount).toBe(16 / 60);
+    expect(timesheet.project_id).toEqual([1, "P1"]);
+    expect(timesheet.task_id).toEqual([1, "BS task"]);
+    checkGroups([["Webocalypse Now", "0h 11m", [["Working on A", "0h 11m"]]]]);
+    checkSuggestionsTotal("0h 11m");
+
+    await switchView("timeline");
+    checkSuggestions([["Working on A", "0h 11m", "Webocalypse Now / No Task"]]);
+    checkSuggestionsTotal("0h 11m");
+
+    await reload();
+    checkSuggestions([["Working on A", "0h 11m", "Webocalypse Now / No Task"]]);
+    checkSuggestionsTotal("0h 11m");
+    await switchView("project");
+    checkGroups([["Webocalypse Now", "0h 11m", [["Working on A", "0h 11m"]]]]);
+    checkSuggestionsTotal("0h 11m");
+});
+
+test("Timesheet Assistant: project view totals are the sum of the rounded chronological rows", async () => {
+    //      RAW  : [A 1m29s][B 10m][A 1m29s]
+    //   minute  : [A 1m][B 10m][A 1m]
+    //      A is displayed as 1m twice in the chronological view, so its project total is 2m
+    //      (and not the 3m that the 2m58s of raw activity would give).
+    setupViewsConsistency([
+        [0, 89, "a"],
+        [89, 600, "b"],
+        [689, 89, "a"],
+    ]);
+    await openAssistant();
+
+    checkSuggestions([
+        ["Working on A", "0h 01m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 01m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 12m");
+
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 02m", [["Working on A", "0h 02m"]]],
+    ]);
+    checkSuggestionsTotal("0h 12m");
+
+    // deleting a row in the project view removes all its chronological rows
+    await contains(".o_suggestions_suggestion:eq(1) .o_aw_btn_remove", { visible: false }).click();
+    checkGroups([["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]]]);
+    checkSuggestionsTotal("0h 10m");
+
+    await switchView("timeline");
+    checkSuggestions([["Working on B", "0h 10m", "P1 / BS task"]]);
+    checkSuggestionsTotal("0h 10m");
+
+    await reload();
+    checkSuggestions([["Working on B", "0h 10m", "P1 / BS task"]]);
+    checkSuggestionsTotal("0h 10m");
+});
+
+test("Timesheet Assistant: manual timesheets on a project without task are deducted from both views", async () => {
+    //      RAW  : [A 30m][B 10m], with a 6m manual timesheet on the project of A (no task)
+    const today = setupViewsConsistency([
+        [0, 1800, "a"],
+        [1800, 600, "b"],
+    ]);
+    pyEnv["account.analytic.line"].create({
+        user_id: serverState.userId,
+        name: "Manual entry",
+        date: today.toISODate(),
+        project_id: 2,
+        unit_amount: 0.1,
+        company_id: user.activeCompany.id,
+    });
+    await openAssistant();
+
+    checkSuggestions([
+        ["Working on A", "0h 24m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+    ]);
+    checkSuggestionsTotal("0h 34m");
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 24m", [["Working on A", "0h 24m"]]],
+    ]);
+    checkSuggestionsTotal("0h 34m");
+
+    await editManualTimesheet("0.25");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 15m", [["Working on A", "0h 15m"]]],
+    ]);
+    checkSuggestionsTotal("0h 25m");
+    await switchView("timeline");
+    checkSuggestions([
+        ["Working on A", "0h 15m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+    ]);
+    checkSuggestionsTotal("0h 25m");
+
+    await contains("div[name='timesheets_section'] > div > a").click();
+    await contains(`${timesheetFormSelector} button:contains('Delete')`).click();
+    checkSuggestions([
+        ["Working on A", "0h 30m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+    ]);
+    checkSuggestionsTotal("0h 40m");
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 30m", [["Working on A", "0h 30m"]]],
+    ]);
+    checkSuggestionsTotal("0h 40m");
+});
+
+test("Timesheet Assistant: adding then deleting a manual timesheet hides then restores the rows it consumed", async () => {
+    //      Time →                   10:00     10:10     10:20     10:30
+    //                               |---------|---------|---------|
+    //      RAW                    : [A1=10m===][B==10m==][A2=10m==]
+    //      add timesheet 15m on A : [A1 hidden][B==10m==][A2==5m==]
+    //      delete it              : [A1=10m===][B==10m==][A2=10m==]
+    //      x: time deducted by the manual timesheet, a row left with less than a minute is hidden
+    setupViewsConsistency([
+        [0, 600, "a"],
+        [600, 600, "b"],
+        [1200, 600, "a"],
+    ]);
+    await openAssistant();
+    checkSuggestions([
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+
+    // a 15m manual timesheet on the project of A consumes the first A row, then 5m of the second
+    await contains(".o_activity_watch_timesheet_right button:contains('New')").click();
+    await selectFieldDropdownItem("project_id", "Webocalypse Now");
+    await contains(
+        ".o_activitywatch_sync_timesheet_creation_form div[name='unit_amount'] input"
+    ).edit("0.25");
+    await contains(
+        ".o_activitywatch_sync_timesheet_creation_form button:contains('Create')"
+    ).click();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 05m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 15m");
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 05m", [["Working on A", "0h 05m"]]],
+    ]);
+    checkSuggestionsTotal("0h 15m");
+
+    // deleting it gives the time back to the rows it was taken from, the hidden one included
+    await contains("div[name='timesheets_section'] > div > a").click();
+    await contains(`${timesheetFormSelector} button:contains('Delete')`).click();
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 20m", [["Working on A", "0h 20m"]]],
+    ]);
+    checkSuggestionsTotal("0h 30m");
+    await switchView("timeline");
+    checkSuggestions([
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 30m");
+});
+
+test("Timesheet Assistant: changing the duration of a manual timesheet hides and shows back the rows it consumes", async () => {
+    //      Time →       10:00     10:10     10:20     10:30
+    //                   |---------|---------|---------|
+    //      RAW        : [A1======][B=======][A2======]     A 10m, B 10m, A 10m
+    //      6m on A    : [xxxxA1==][B=======][A2======]     A 4m, B 10m, A 10m
+    //      set to 15m : [xxxxxxxx][B=======][xxxxA2==]     A1 hidden, B 10m, A 5m
+    //      set to 6m  : [xxxxA1==][B=======][A2======]     A 4m, B 10m, A 10m
+    //      set to 3m  : [xxA1====][B=======][A2======]     A 7m, B 10m, A 10m
+    //      set to 30m : [xxxxxxxx][B=======][xxxxxxxx]     both A hidden, 20m tracked
+    //      set to 6m  : [xxxxA1==][B=======][A2======]     A 4m, B 10m, A 10m
+    //      x: time deducted by the manual timesheet, a row left with less than a minute is hidden
+    const today = setupViewsConsistency([
+        [0, 600, "a"],
+        [600, 600, "b"],
+        [1200, 600, "a"],
+    ]);
+    pyEnv["account.analytic.line"].create({
+        user_id: serverState.userId,
+        name: "Manual entry",
+        date: today.toISODate(),
+        project_id: 2,
+        unit_amount: 0.1,
+        company_id: user.activeCompany.id,
+    });
+    await openAssistant();
+    checkSuggestions([
+        ["Working on A", "0h 04m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 24m");
+
+    // increased to 15m: the first A row is hidden, the second one is shortened
+    await editManualTimesheet("0.25");
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 05m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 15m");
+
+    // reduced back to 6m: the first A row shows up again
+    await editManualTimesheet("0.1");
+    checkSuggestions([
+        ["Working on A", "0h 04m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 24m");
+
+    // reduced to 3m: the first A row gets longer, without being hidden in between
+    await editManualTimesheet("0.05");
+    checkSuggestions([
+        ["Working on A", "0h 07m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 27m");
+
+    // increased to 30m, more than the 20m tracked on A: both A rows are hidden
+    await editManualTimesheet("0.5");
+    checkSuggestions([["Working on B", "0h 10m", "P1 / BS task"]]);
+    checkSuggestionsTotal("0h 10m");
+    await switchView("project");
+    checkGroups([["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]]]);
+    checkSuggestionsTotal("0h 10m");
+
+    // reduced back to 6m: the 10m logged beyond the tracked time are not given back twice
+    await editManualTimesheet("0.1");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 14m", [["Working on A", "0h 14m"]]],
+    ]);
+    checkSuggestionsTotal("0h 24m");
+    await switchView("timeline");
+    checkSuggestions([
+        ["Working on A", "0h 04m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 24m");
+});
+
+test("Timesheet Assistant: taking a project row keeps its hidden rows, which show up again when the manual timesheet is deleted", async () => {
+    //      Time →         10:00     10:10     10:20     10:30
+    //                     |---------|---------|---------|
+    //      RAW          : [A1======][B=======][A2======]     A 10m, B 10m, A 10m
+    //      15m on A     : [xxxxxxxx][B=======][xxxxA2==]     A1 hidden, B 10m, A 5m
+    //      take A       : [xxxxxxxx][B=======]               A1 stays hidden, B 10m
+    //      delete 15m   : [A1======][B=======]               A 10m, B 10m
+    //      x: time deducted by the manual timesheet, a row left with less than a minute is hidden
+    onRpc("account.analytic.line", "get_assistant_data", () => ({
+        rounding_values: { minimum: 1, rounding: 1 },
+        odoo_models_data: [],
+    }));
+    const today = setupViewsConsistency([
+        [0, 600, "a"],
+        [600, 600, "b"],
+        [1200, 600, "a"],
+    ]);
+    pyEnv["account.analytic.line"].create({
+        user_id: serverState.userId,
+        name: "Manual entry",
+        date: today.toISODate(),
+        project_id: 2,
+        unit_amount: 0.25,
+        company_id: user.activeCompany.id,
+    });
+    await openAssistant();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 05m", "Webocalypse Now / No Task"],
+    ]);
+
+    // taking the A row only takes its visible part, the hidden A1 stays in the group
+    await switchView("project");
+    await contains(".o_suggestions_suggestion:eq(1) .o_aw_btn_take", { visible: false }).click();
+    await advanceTime(250);
+    await animationFrame();
+    const [timesheet] = pyEnv["account.analytic.line"].search_read([["name", "=", "Working on A"]]);
+    expect(timesheet.unit_amount).toBe(5 / 60);
+    checkGroups([["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]]]);
+    checkSuggestionsTotal("0h 10m");
+
+    // deleting the manual timesheet gives A1 its time back
+    await contains("div[name='timesheets_section'] > div > a:contains('Manual entry')").click();
+    await contains(`${timesheetFormSelector} button:contains('Delete')`).click();
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 10m", [["Working on A", "0h 10m"]]],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+    await switchView("timeline");
+    checkSuggestions([
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+});
+
+test("Timesheet Assistant: taking a row partially consumed by a manual timesheet keeps the same totals after a reload", async () => {
+    //      Time →         10:00     10:10     10:20     10:30
+    //                     |---------|---------|---------|
+    //      RAW          : [A1======][B=======][A2======]     A 10m, B 10m, A 10m
+    //      6m on A      : [xxxxA1==][B=======][A2======]     A 4m, B 10m, A 10m
+    //      take A1      :           [B=======][A2======]     B 10m, A 10m
+    //      reload       :           [B=======][A2======]     B 10m, A 10m (the 6m are already
+    //                                                        accounted for by A1)
+    //      x: time deducted by the manual timesheet
+    onRpc("account.analytic.line", "get_assistant_data", () => ({
+        rounding_values: { minimum: 1, rounding: 1 },
+        odoo_models_data: [],
+    }));
+    const today = setupViewsConsistency([
+        [0, 600, "a"],
+        [600, 600, "b"],
+        [1200, 600, "a"],
+    ]);
+    pyEnv["account.analytic.line"].create({
+        user_id: serverState.userId,
+        name: "Manual entry",
+        date: today.toISODate(),
+        project_id: 2,
+        unit_amount: 0.1,
+        company_id: user.activeCompany.id,
+    });
+    await openAssistant();
+    checkSuggestions([
+        ["Working on A", "0h 04m", "Webocalypse Now / No Task"],
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 24m");
+
+    await contains(".o_suggestions_suggestion:eq(0) .o_aw_btn_take", { visible: false }).click();
+    await advanceTime(250);
+    await animationFrame();
+    const [timesheet] = pyEnv["account.analytic.line"].search_read([["name", "=", "Working on A"]]);
+    expect(timesheet.unit_amount).toBe(4 / 60);
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+
+    // 20m tracked on A = 6m manual + 4m taken + 10m left: the reload must not deduct the 6m again
+    await reload();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 10m", [["Working on A", "0h 10m"]]],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+});
+
+test("Timesheet Assistant: a manual timesheet created after a take is deducted from the remaining rows, before and after a reload", async () => {
+    //      Time →         10:00     10:10     10:20     10:30
+    //                     |---------|---------|---------|
+    //      RAW          : [A1======][B=======][A2======]     A 10m, B 10m, A 10m
+    //      take A1      :           [B=======][A2======]     B 10m, A 10m
+    //      6m on A      :           [B=======][xxxxA2==]     B 10m, A 4m
+    //      reload       :           [B=======][xxxxA2==]     B 10m, A 4m (A1 absorbed nothing)
+    //      x: time deducted by the manual timesheet
+    onRpc("account.analytic.line", "get_assistant_data", () => ({
+        rounding_values: { minimum: 1, rounding: 1 },
+        odoo_models_data: [],
+    }));
+    setupViewsConsistency([
+        [0, 600, "a"],
+        [600, 600, "b"],
+        [1200, 600, "a"],
+    ]);
+    await openAssistant();
+
+    await contains(".o_suggestions_suggestion:eq(0) .o_aw_btn_take", { visible: false }).click();
+    await advanceTime(250);
+    await animationFrame();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+
+    await contains(".o_activity_watch_timesheet_right button:contains('New')").click();
+    await selectFieldDropdownItem("project_id", "Webocalypse Now");
+    await contains(
+        ".o_activitywatch_sync_timesheet_creation_form div[name='unit_amount'] input"
+    ).edit("0.1");
+    await contains(
+        ".o_activitywatch_sync_timesheet_creation_form button:contains('Create')"
+    ).click();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 04m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 14m");
+
+    await reload();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 04m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 14m");
+});
+
+test("Timesheet Assistant: the time given back to a taken row is deducted again by the next manual timesheet", async () => {
+    //      Time →         10:00     10:10     10:20     10:30
+    //                     |---------|---------|---------|
+    //      RAW          : [A1======][B=======][A2======]     A 10m, B 10m, A 10m
+    //      6m on A      : [xxxxA1==][B=======][A2======]     A 4m, B 10m, A 10m
+    //      take A1      : [xxxx####][B=======][A2======]     B 10m, A 10m
+    //      delete 6m    : [    ####][B=======][A2======]     B 10m, A 10m (the 6m are given back
+    //                                                        to A1, which stays hidden)
+    //      new 6m on A  : [xxxx####][B=======][A2======]     B 10m, A 10m (20m tracked on A =
+    //                                                        4m taken + 6m manual + 10m left)
+    //      reload       : [xxxx####][B=======][A2======]     B 10m, A 10m
+    //      x: time deducted by the manual timesheet, #: taken
+    onRpc("account.analytic.line", "get_assistant_data", () => ({
+        rounding_values: { minimum: 1, rounding: 1 },
+        odoo_models_data: [],
+    }));
+    const today = setupViewsConsistency([
+        [0, 600, "a"],
+        [600, 600, "b"],
+        [1200, 600, "a"],
+    ]);
+    pyEnv["account.analytic.line"].create({
+        user_id: serverState.userId,
+        name: "Manual entry",
+        date: today.toISODate(),
+        project_id: 2,
+        unit_amount: 0.1,
+        company_id: user.activeCompany.id,
+    });
+    await openAssistant();
+    await contains(".o_suggestions_suggestion:eq(0) .o_aw_btn_take", { visible: false }).click();
+    await advanceTime(250);
+    await animationFrame();
+
+    await contains("div[name='timesheets_section'] > div > a:contains('Manual entry')").click();
+    await contains(`${timesheetFormSelector} button:contains('Delete')`).click();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+
+    await contains(".o_activity_watch_timesheet_right button:contains('New')").click();
+    await selectFieldDropdownItem("project_id", "Webocalypse Now");
+    await contains(
+        ".o_activitywatch_sync_timesheet_creation_form div[name='unit_amount'] input"
+    ).edit("0.1");
+    await contains(
+        ".o_activitywatch_sync_timesheet_creation_form button:contains('Create')"
+    ).click();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+
+    await reload();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 10m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 20m");
+});
+
+test("Timesheet Assistant: the time taken or deleted from the project view in the legacy format is still removed", async () => {
+    //      Time →         10:00     10:10     10:20     10:30
+    //                     |---------|---------|---------|
+    //      RAW          : [A1======][B=======][A2======]     A 10m, B 10m, A 10m
+    //      stored       : A1 taken from the chronological view (by its start), then 5m of A taken
+    //                     from the project view (only in the duration)
+    //      result       : [########][B=======][#####A2=]     B 10m, A 5m
+    //      #: taken
+    const today = setupViewsConsistency([
+        [0, 600, "a"],
+        [600, 600, "b"],
+        [1200, 600, "a"],
+    ]);
+    localStorage.setItem(
+        "aw_taken_deleted_events",
+        JSON.stringify({
+            [JSON.stringify({ title: "Working on A", day: today.toISODate() })]: {
+                isConsumed: true,
+                duration: 900,
+                timelineDuration: 600,
+                timelineStartTimes: [today.toISO()],
+            },
+        })
+    );
+    await openAssistant();
+    checkSuggestions([
+        ["Working on B", "0h 10m", "P1 / BS task"],
+        ["Working on A", "0h 05m", "Webocalypse Now / No Task"],
+    ]);
+    checkSuggestionsTotal("0h 15m");
+    await switchView("project");
+    checkGroups([
+        ["P1 / BS task", "0h 10m", [["Working on B", "0h 10m"]]],
+        ["Webocalypse Now", "0h 05m", [["Working on A", "0h 05m"]]],
+    ]);
+    checkSuggestionsTotal("0h 15m");
 });

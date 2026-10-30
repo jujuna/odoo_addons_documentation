@@ -1,5 +1,5 @@
-import { describe, expect, test } from "@odoo/hoot";
-import { click, queryAll } from "@odoo/hoot-dom";
+import { beforeEach, describe, expect, test } from "@odoo/hoot";
+import { click, queryAll, queryAllAttributes } from "@odoo/hoot-dom";
 import { advanceTime, runAllTimers } from "@odoo/hoot-mock";
 
 import {
@@ -53,6 +53,37 @@ planningModels.PlanningSlot._records = [{
     start_datetime: "2026-02-02 08:00:00",
     end_datetime: "2026-02-02 12:00:00",
 }]
+
+const kanbanViewWithSearchPanelParams = {
+    resModel: "product.product",
+    type: "kanban",
+    viewId: false,
+    searchViewArch: `
+        <search>
+            <searchpanel>
+                <field name="type"/>
+            </searchpanel>
+        </search>
+    `,
+    context: {
+        product_catalog_order_model: "sale.order",
+        show_sections: true,
+    },
+};
+
+const getSectionOrder = () => queryAllAttributes(".o_search_panel li.o_section", "data-id");
+
+beforeEach(() => {
+    onRpc("get_catalog_section_data", () => ({
+        name: "S0001",
+        amountUntaxed: 450,
+        sections: [
+            { id: false, name: "No Section", sequence: 9, line_count: 2 },
+            { id: 1, name: "section A", sequence: 12, line_count: 0 },
+            { id: 2, name: "section B", sequence: 13, line_count: 0 },
+        ],
+    }));
+});
 
 describe.current.tags("desktop");
 defineModels({
@@ -385,4 +416,54 @@ test("Should not display unit price without any sales access", async () => {
         },
     });
     expect(`.o_product_catalog_price`).toHaveCount(0, { message: "Unit price should not be visible" });
+});
+
+test("should allow users with the Sales group to manage search panel sections", async () => {
+    onRpc("has_group", ({ args }) => args[1] === "sales_team.group_sale_salesman");
+    onRpc("resequence_sections", () => {
+        expect.step("resequence");
+        return true;
+    });
+    await mountView({
+        ...kanbanViewWithSearchPanelParams,
+    });
+
+    expect('.o_search_panel button:contains("Add Section")').toBeDisplayed({
+        message: "The 'Add Section' button should be visible",
+    });
+    expect(".o_search_panel .o_section_dropdown_button").toHaveCount(3, {
+        message: "The dropdown section icon should be displayed",
+    });
+    await contains(".o_search_panel li.o_section[data-id='1']").dragAndDrop(
+        ".o_search_panel li.o_section[data-id='2']"
+    );
+    expect(getSectionOrder()).toEqual([null, "2", "1"], {
+        message: "Sections order should change after dragging section A onto section B",
+    });
+    expect.verifySteps(["resequence"]);
+});
+
+test("should prevent users without the Sales group from managing search panel sections", async () => {
+    onRpc("has_group", ({ args }) => {
+        if (args[1] === "sales_team.group_sale_salesman") {
+            return false;
+        }
+    });
+    await mountView({
+        ...kanbanViewWithSearchPanelParams,
+    });
+    const orderBefore = getSectionOrder();
+
+    expect('.o_search_panel button:contains("Add Section")').toHaveCount(0, {
+        message: "The 'Add Section' button should not be visible",
+    });
+    expect(".o_search_panel .o_section_dropdown_button").toHaveCount(0, {
+        message: "The dropdown section icon should be displayed",
+    });
+    await contains(".o_search_panel li.o_section[data-id='1']").dragAndDrop(
+        ".o_search_panel li.o_section[data-id='2']"
+    );
+    expect(getSectionOrder()).toEqual(orderBefore, {
+        message: "Sections keep their order, drag is disabled",
+    });
 });

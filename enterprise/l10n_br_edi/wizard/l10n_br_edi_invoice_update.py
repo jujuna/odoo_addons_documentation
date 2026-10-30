@@ -82,6 +82,8 @@ class L10n_Br_EdiInvoiceUpdate(models.TransientModel):
             success_message = _('E-invoice corrected successfully for reason "%s".', self.reason)
             iap_args["seq"] = move.l10n_br_edi_last_correction_number + 1
             response = move._l10n_br_iap_correct_invoice_goods(iap_args)
+            if error := move._l10n_br_get_error_from_response(response):
+                raise ValidationError(error)
             if not response["xml"]["base64"]:
                 raise ValidationError(response["status"]["desc"])
             attachments |= self.env["ir.attachment"].create(

@@ -4,7 +4,11 @@ import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { hasMobileNative, mobileNative } from "@pos_mobile_android/app/utils/native";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
+import { delay } from "@web/core/utils/concurrency";
+
+const SYNC_ATTEMPTS = 5;
+const SYNC_DELAY = 1000;
 
 export function localPrinterDomain(serialNumber) {
     const domain = [["type", "=", "printer"]];
@@ -15,16 +19,8 @@ export function localPrinterDomain(serialNumber) {
     return domain;
 }
 
-function waitForReturn() {
-    return new Promise((resolve) => {
-        const onVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                document.removeEventListener("visibilitychange", onVisibilityChange);
-                resolve();
-            }
-        };
-        document.addEventListener("visibilitychange", onVisibilityChange);
-    });
+export function chosenPrinterDomain(serialNumber, identifier) {
+    return [...localPrinterDomain(serialNumber), ["identifier", "=", identifier]];
 }
 
 export class OboxAddLocalPrinter extends Component {
@@ -35,22 +31,67 @@ export class OboxAddLocalPrinter extends Component {
         super.setup();
         this.notification = useService("notification");
         this.orm = useService("orm");
-        this.available = hasMobileNative("openDeviceManager");
+        this.available = Boolean(mobileNative.chooseDevice || mobileNative.openDeviceManager);
     }
 
     async addLocalPrinter() {
+        if (mobileNative.chooseDevice) {
+            return this.chooseLocalPrinter();
+        }
         try {
-            const returned = waitForReturn();
             await mobileNative.openDeviceManager({
                 url: browser.location.origin,
                 return_when_done: true,
             });
-            await returned;
         } catch {
             this.notification.add(_t("Could not open the device manager"), { type: "danger" });
             return;
         }
         await this.selectLocalPrinter();
+    }
+
+    async chooseLocalPrinter() {
+        let chosen;
+        try {
+            chosen = await mobileNative.chooseDevice({
+                url: browser.location.origin,
+                type: "printer",
+            });
+        } catch {
+            this.notification.add(_t("Could not open the device manager"), { type: "danger" });
+            return;
+        }
+        if (!chosen) {
+            return;
+        }
+        const printer = await this.findChosenPrinter(chosen.identifier);
+        if (!printer) {
+            this.notification.add(
+                _t("Odoo does not know this printer yet. Try again in a moment."),
+                {
+                    type: "warning",
+                }
+            );
+            return;
+        }
+        await this.props.record.update({
+            printer_type: "obox",
+            obox_device_id: { id: printer.id, display_name: printer.display_name },
+        });
+    }
+
+    async findChosenPrinter(identifier) {
+        const domain = chosenPrinterDomain(await this.getLocalSerialNumber(), identifier);
+        for (let attempt = 0; attempt < SYNC_ATTEMPTS; attempt++) {
+            const { records } = await this.orm.webSearchRead("obox.device", domain, {
+                specification: { display_name: {} },
+                limit: 1,
+            });
+            if (records.length) {
+                return records[0];
+            }
+            await delay(SYNC_DELAY);
+        }
     }
 
     // Select the last printer that was added to the device manager for the current obox, if any.
@@ -63,6 +104,7 @@ export class OboxAddLocalPrinter extends Component {
         const printer = serialNumber && (await this.findLastPrinter(serialNumber));
         if (printer) {
             await record.update({
+                printer_type: "obox",
                 obox_device_id: { id: printer.id, display_name: printer.display_name },
             });
         }
@@ -78,7 +120,7 @@ export class OboxAddLocalPrinter extends Component {
     }
 
     async getLocalSerialNumber() {
-        if (!hasMobileNative("getDeviceManagerStatus")) {
+        if (!mobileNative.getDeviceManagerStatus) {
             return null;
         }
         try {

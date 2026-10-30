@@ -64,6 +64,7 @@ class AccountMove(models.Model):
                 # Invoices for renewed contract can be posted when the delivered products arrived after the renewal date.
                 last_invoice_end_date = subscription.invoice_ids.invoice_line_ids.filtered(lambda aml: aml.subscription_id == subscription and aml.sale_line_ids and all(sale_line.order_id.subscription_state != '7_upsell' for sale_line in aml.sale_line_ids))._get_max_invoiced_date()
                 subscription.next_invoice_date = last_invoice_end_date + relativedelta(days=1) if last_invoice_end_date else subscription.start_date
+                subscription.invoice_overages = False
                 if subscription.order_line._is_all_postpaid():
                     # If all recurring lines are postpaid, we don't rely on deferred_end_date
                     subscription.next_invoice_date += subscription.plan_id.billing_period

@@ -500,6 +500,42 @@ class BelgiumPartnerVatListingTest(TestAccountReportsCommon):
             options,
         )
 
+    def test_audit_excludes_exempted_tax(self):
+        self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
+        ChartTemplate = self.env['account.chart.template'].with_company(self.company)
+        tax_e = ChartTemplate.ref('attn_VAT-OUT-00-S')
+        tax_z = ChartTemplate.ref('attn_VAT-OUT-00-L')
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a_be.id,
+            'invoice_date': '2022-06-29',
+            'invoice_line_ids': [
+                Command.create({'name': tax.name, 'price_unit': 1000.0, 'tax_ids': tax.ids})
+                for tax in (tax_e, tax_z, tax_z)
+            ],
+        })
+        invoice.action_post()
+        options = self._generate_options(self.report, '2022-06-01', '2022-06-30')
+        lines = self.report._get_lines(options)
+
+        self.assertLinesValues(
+            lines,
+            #   Name                        Turnover            VAT amount
+            [   0,                          1,                  2],
+            [
+                ('Partner VAT Listing',     2000.0,             0.0),
+                ('BE0246697724',            2000.0,             0.0),
+            ],
+            options,
+        )
+
+        partner_line_id = next(line.id for line in lines if line.name == 'BE0246697724')
+        action = self.env[self.report.custom_handler_model_name].partner_vat_listing_open_invoices(options, {'line_id': partner_line_id})
+        audited_lines = self.env['account.move.line'].search(action['domain'])
+        self.assertEqual(audited_lines, invoice.invoice_line_ids.filtered(lambda line: line.tax_ids == tax_z))
+        self.assertEqual(sum(audited_lines.mapped('balance')), -2000.0)
+
     def test_turnover_custom_groupby(self):
         def get_base_line_name(invoice):
             return invoice.line_ids.filtered(lambda x: x.account_id.internal_group == 'income').display_name

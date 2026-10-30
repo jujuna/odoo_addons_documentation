@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 00:00+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-23 07:33+0000\n"
 "Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "planning_field_service/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -35,17 +35,7 @@ msgstr "%(display_name)s (%(partner_city)s)"
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "%(employee)s requested a replacement for this shift."
-msgstr ""
-
-#. module: planning_field_service
-#. odoo-javascript
-#: code:addons/planning_field_service/static/src/js/tours/planning_field_service_tour.js:0
-msgid ""
-"<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "
-"equipment if needed.</i>"
-msgstr ""
-"<b>Tetapkan sumber daya</b><br/><i> Tambahkan beberapa teknisi atau pesan "
-"peralatan jika perlu.</i>"
+msgstr "%(employee)s meminta pengganti untuk shift ini."
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -117,6 +107,8 @@ msgid ""
 "<b>Start onsite</b><br/><i>Start the shift when you arrive at the customer "
 "location.</i>"
 msgstr ""
+"<b>Mulai di lokasi</b><br/><i>Mulai shift saat Anda tiba di lokasi "
+"pelanggan.</i>"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_details
@@ -210,6 +202,8 @@ msgid ""
 "<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
 "                                Back to Shift"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
+"                                Kembali ke Shift"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
@@ -224,6 +218,15 @@ msgid ""
 "icon=\"sentiment_sad\" invisible=\"rating_avg &gt;= 2.33\" title=\"Unhappy\"/"
 ">"
 msgstr ""
+"<i class=\"oi oi-fw o_button_icon text-success\" data-"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" "
+"title=\"Puas\"/>\n"
+"                    <i class=\"oi oi-fw o_button_icon text-warning\" data-"
+"icon=\"sentiment_neutral\" invisible=\"rating_avg &lt; 2.33 or rating_avg "
+"&gt;= 3.66\" title=\"Netral\"/>\n"
+"                    <i class=\"oi oi-fw o_button_icon text-danger\" data-"
+"icon=\"sentiment_sad\" invisible=\"rating_avg &gt;= 2.33\" title=\"Tidak "
+"Puas\"/>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -231,6 +234,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"check\"/>\n"
 "                                Sign Report"
 msgstr ""
+"<i class=\"oi\" data-icon=\"check\"/>\n"
+"                                Laporan Tanda Tangan"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -238,6 +243,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"print\"/>\n"
 "                                Print"
 msgstr ""
+"<i class=\"oi\" data-icon=\"print\"/>\n"
+"                                Cetak"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_report
@@ -539,14 +546,14 @@ msgstr "Tambahkan/Hapus Pengikut"
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_address
 msgid "Address (without name)"
-msgstr ""
+msgstr "Alamat (tanpa nama)"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_all
 msgid "All"
-msgstr ""
+msgstr "Semua"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__allocated_hours
@@ -587,19 +594,19 @@ msgstr "Per Sumber Daya"
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_carpenter
 msgid "Carpenter"
-msgstr ""
+msgstr "Tukang Kayu"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_city
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_city
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "City"
-msgstr ""
+msgstr "Kota"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Close"
-msgstr ""
+msgstr "Tutup"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_company
@@ -893,6 +900,11 @@ msgid "Followers (Partners)"
 msgstr "Pengikut (Partner)"
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Future Activities"
+msgstr ""
+
+#. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "GPS Coordinates: %(localisation_start)s (%(latitude)s, %(longitude)s)"
@@ -1025,6 +1037,11 @@ msgid "Landscaper"
 msgstr ""
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Late Activities"
+msgstr ""
+
+#. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_latitude
 msgid "Live Latitude"
 msgstr ""
@@ -1144,6 +1161,11 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_my
 msgid "My"
+msgstr ""
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "My Activities"
 msgstr ""
 
 #. module: planning_field_service
@@ -1503,6 +1525,11 @@ msgid "Shifts to Schedule"
 msgstr ""
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Show all records whose next activity date is past"
+msgstr ""
+
+#. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Sign Field Service Report"
 msgstr "Tanda Tangan Laporan Layanan Lapangan"
@@ -1692,6 +1719,11 @@ msgid "To Review"
 msgstr ""
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Today Activities"
+msgstr ""
+
+#. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Token invalid"
@@ -1878,6 +1910,13 @@ msgid ""
 msgstr ""
 "{{ object.company_id.name or object.user_id.company_id.name }}: Permintaan "
 "Penilaian Layanan"
+
+#~ msgid ""
+#~ "<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "
+#~ "equipment if needed.</i>"
+#~ msgstr ""
+#~ "<b>Tetapkan sumber daya</b><br/><i> Tambahkan beberapa teknisi atau pesan "
+#~ "peralatan jika perlu.</i>"
 
 #~ msgid "Field Service Resources Changed"
 #~ msgstr "Perubahan Sumber Daya Layanan Lapangan"

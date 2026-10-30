@@ -220,11 +220,27 @@ class TestUBLTR(TestUBLTRCommon):
 
         self.env["account.edi.xml.ubl.tr"]._import_fill_invoice(invoice, tree, 1)
 
-        product_line = invoice.invoice_line_ids.filtered(lambda l: l.name == 'product_a')[:1]
+        product_line = invoice.invoice_line_ids.filtered(lambda l: l.product_id == self.product_a)[:1]
         global_discount_line = invoice.invoice_line_ids.filtered(lambda l: l.name == "Discount")[:1]
 
         self.assertEqual(product_line.discount, 12.0)
         self.assertFalse(global_discount_line, "Nilvera moves should not have any global discount line")
+
+    def test_import_invoice_notes_and_payment_terms(self):
+        invoice = self.env["account.move"].create({"move_type": "in_invoice"})
+
+        with file_open("l10n_tr_nilvera_einvoice/tests/test_files/fetching/invoice.xml", "rb") as xml_file:
+            tree = self.get_xml_tree_from_string(xml_file.read())
+
+        self.env["account.edi.xml.ubl.tr"]._import_fill_invoice(invoice, tree, 1)
+
+        note_lines = invoice.invoice_line_ids.filtered(lambda line: line.display_type == 'line_note')
+        self.assertEqual(note_lines.mapped('name'), [
+            'YALNIZ : YÜZONBEŞ TRY SIFIR KURUŞ',
+            'YALNIZ : YÜZONBEŞ USD SIFIR SENT',
+            'KUR : 1.000000 TL',
+        ])
+        self.assertEqual(invoice.narration, '<p>Payment within 30 days</p>')
 
     def test_xml_invoice_earchive_ecommerce_sale_without_transfer(self):
         with freeze_time('2025-03-05'):

@@ -45,7 +45,7 @@
                     <field name="sale_warning_text" class="fw-bold"/>
                 </div>
             </xpath>
-            <xpath expr="//button[@name='action_complete']" position="after">
+            <xpath expr="//header/t[button[@name='action_complete']]" position="after">
                 <t groups="planning.group_field_service_allow_material">
                     <button
                         name="action_view_material"
@@ -131,6 +131,22 @@
                 <xpath expr="//filter[@name='group_by_sale_order']" position="move"/>
             </xpath>
         </field>
+    </record>
+
+    <record id="planning.planning_action_my_calendar" model="ir.actions.act_window">
+        <field name="context">{
+            'search_default_my_shifts': 1,
+            'my_planning_action': 1,
+            'planning_expand_resource': 1,
+            'planning_expand_role': 1,
+            'planning_expand_project': 1,
+            'planning_expand_task': 1,
+            'planning_expand_sale_line_id': 1,
+            'search_default_start_datetime': 'today',
+            'search_default_unpublished_shifts': 1,
+            'search_default_published_shifts': 1,
+            'search_default_in_progress_filter': 1,
+        }</field>
     </record>
 
     <record id="planning_action_schedule_by_sale_order_item_view_map" model="ir.actions.act_window.view">

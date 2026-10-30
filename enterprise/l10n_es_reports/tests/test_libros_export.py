@@ -42,6 +42,7 @@ class TestLibrosExport(TestAccountReportsCommon):
         cls.tax_dua_ignore = cls.env.ref(f'account.{company_id}_account_tax_template_p_iva_isub')
         cls.tax_dua_group = cls.env.ref(f'account.{company_id}_account_tax_template_p_iva10_ibc_group')
         cls.tax_dua_rentencion = cls.env.ref(f'account.{company_id}_account_tax_template_p_irpf20')
+        cls.tax_21_isp = cls.env.ref(f'account.{company_id}_account_tax_template_p_iva21_isp')
 
     def get_libros_sheet_line_vals(self):
         report = self.env.ref('l10n_es_reports.l10n_es_vat_books_report')
@@ -223,7 +224,7 @@ class TestLibrosExport(TestAccountReportsCommon):
         self.assertEqual(len(line_vals_list), 1)
         amount_vals = self.get_amount_vals(line_vals_list[0])
         self.assertDictEqual(amount_vals, {
-            'expense_deductible': 1000.0, 'total_amount': 1210.0, 'base_amount': 1000.0, 'tax_rate': 21.0,
+            'expense_deductible': 1000.0, 'total_amount': 1000.0, 'base_amount': 1000.0, 'tax_rate': 21.0,
             'taxed_amount': 210.0, 'tax_deductible': 210.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
             'withholding_type': 0.0, 'withholding_amount': 0.0,
         })
@@ -442,3 +443,25 @@ class TestLibrosExport(TestAccountReportsCommon):
 
         with self.assertRaisesRegex(RedirectWarning, "Please configure the \"IAE Group or Heading\" of your company."):
             self.env['l10n_es.vat.books.report.handler'].export_libros_de_iva(options)
+
+    def test_libros_export_isp_bill_total_equals_base(self):
+        """For Reverse Charge (Inversión del Sujeto Pasivo) purchase bills, 'Total Factura'
+        must equal 'Base Imponible'.
+        """
+        self._create_invoice_one_line(
+            move_type='in_invoice',
+            partner_id=self.partner_a,
+            price_unit=54,
+            tax_ids=self.tax_21_isp,
+            post=True,
+            invoice_date=fields.Date.from_string('2019-06-15'),
+        )
+        exp_line_vals = self.get_libros_sheet_line_vals()[1]
+        line_vals_list = [exp_line_vals[m][t] for m in exp_line_vals for t in exp_line_vals[m]]
+        self.assertEqual(len(line_vals_list), 1)
+        amount_vals = self.get_amount_vals(line_vals_list[0])
+        self.assertDictEqual(amount_vals, {
+            'expense_deductible': 54.0, 'total_amount': 54.0, 'base_amount': 54.0, 'tax_rate': 21.0,
+            'taxed_amount': 11.34, 'tax_deductible': 11.34, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
+            'withholding_type': 0.0, 'withholding_amount': 0.0,
+        })

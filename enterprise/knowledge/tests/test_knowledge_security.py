@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import exceptions
+from odoo import Command, exceptions
 from odoo.addons.knowledge.tests.common import KnowledgeArticlePermissionsCase
 from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.tests.common import tagged, users
@@ -311,6 +311,35 @@ class TestKnowledgeSecurity(KnowledgeArticlePermissionsCase):
         cover.unlink()
 
     @mute_logger('odoo.addons.base.models.ir_access')
+    @users('employee')
+    def test_create_private_article_with_message(self):
+        target_article = self.article_read_contents[3]
+        message = target_article.with_user(self.user_admin).message_post(
+            body='Original message',
+        ).with_user(self.env.user)
+
+        with self.assertRaises(exceptions.AccessError):
+            message.write({'body': 'Updated message'})
+
+        with self.assertRaises(exceptions.AccessError):
+            self.env['knowledge.article'].create({
+                'name': 'Private Article',
+                'internal_permission': 'none',
+                'article_member_ids': [Command.create({
+                    'partner_id': self.env.user.partner_id.id,
+                    'permission': 'write',
+                })],
+                'message_ids': [Command.update(message.id, {
+                    'body': 'Updated message',
+                })],
+            })
+
+        self.assertEqual(
+            message.with_user(self.user_admin).body,
+            '<p>Original message</p>',
+        )
+
+    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
     @users('employee')
     def test_models_as_user_copy(self):
         article_hidden = self.article_read_contents[3].with_env(self.env)

@@ -282,6 +282,23 @@ class CurrencyTestCase(TransactionCase):
         self.assertEqual(gel.rate_ids[-1].rate, 1.0)
         self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)
 
+    def test_live_currency_update_cbb(self):
+        bhd = self.env.ref('base.BHD')
+        bhd.active = True
+        usd = self.env.ref('base.USD')
+        usd.active = True
+        self.test_company.write({
+            'currency_provider': 'cbb',
+            'currency_id': bhd.id,
+        })
+        bhd_rates_count = len(bhd.rate_ids)
+        usd_rates_count = len(usd.rate_ids)
+        res = self.test_company.update_currency_rates()
+        self.assertTrue(res)
+        self.assertEqual(len(bhd.rate_ids), bhd_rates_count + 1)
+        self.assertEqual(bhd.rate_ids[-1].rate, 1.0)
+        self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)
+
     def test_live_currency_update_cbar(self):
         azn = self.env.ref('base.AZN')
         azn.active = True

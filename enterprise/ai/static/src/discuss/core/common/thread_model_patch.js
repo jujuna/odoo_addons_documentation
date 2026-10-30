@@ -16,19 +16,20 @@ patch(Thread.prototype, {
     },
 
     async requestAiSessionAdvance(route, body) {
-        const sourceSession = body.session_id
-            ? this.store["ai.session"].get(body.session_id)
-            : this.channel?.aiRootSession;
         let acknowledgement;
         try {
-            acknowledgement = await rpc(route, {
-                channel_id: this.id,
-                ai_session_identifier: aiSessionIdentifier,
-                debug: this.store.debugMode.isActive(),
-                current_view_info: await getData("view"),
-                ai_session_config: this.channel?.aiSession?.config,
-                ...body,
-            });
+            acknowledgement = await rpc(
+                route,
+                {
+                    channel_id: this.id,
+                    ai_session_identifier: aiSessionIdentifier,
+                    debug: this.store.debugMode.isActive(),
+                    current_view_info: await getData("view"),
+                    ai_session_config: this.channel?.aiSession?.config,
+                    ...body,
+                },
+                { silent: true }
+            );
         } catch (error) {
             this.channel.isAiSubmitting = false;
             const session = this.channel?.aiRootSession;
@@ -38,10 +39,6 @@ patch(Thread.prototype, {
                 this.channel.isAiGenerating = false;
             }
             throw error;
-        }
-        const currentSession = sourceSession || (!body.session_id && this.channel?.aiRootSession);
-        if (currentSession?.exists()) {
-            currentSession.loop_state = acknowledgement.loop_state;
         }
         return acknowledgement;
     },
@@ -83,7 +80,7 @@ patch(Thread.prototype, {
                     {
                         ai_session_config: this.ai_session_config,
                         mail_message_id: message.id,
-                    },
+                    }
                 );
                 loopStateFromAcknowledgement = acknowledgement.loop_state;
             } finally {

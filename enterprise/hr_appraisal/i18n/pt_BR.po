@@ -15,11 +15,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 01:19+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/hr_appraisal/pt_BR/>\n"
+"POT-Creation-Date: 2026-10-02 17:46+0000\n"
+"PO-Revision-Date: 2026-10-01 01:34+0000\n"
+"Last-Translator: \"Maitê Dietze (madi)\" <madi@odoo.com>\n"
+"Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/"
+"odoo-20/hr_appraisal/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,6 +56,35 @@ msgid ""
 "viewed in a PDF form.\n"
 "* Meeting Requests are created manually according to employees appraisals.\n"
 msgstr ""
+"\n"
+"Avaliações periódicas de funcionários\n"
+"==============================\n"
+"\n"
+"Ao usar esse aplicativo, você pode manter o processo motivacional fazendo "
+"avaliações periódicas do desempenho de seus funcionários. A avaliação "
+"regular dos recursos humanos pode beneficiar tanto os funcionários quanto a "
+"organização.\n"
+"\n"
+"Um plano de avaliação pode ser atribuído a cada funcionário. Esses planos "
+"definem a frequência e a maneira como você gerencia a avaliação pessoal "
+"periódica.\n"
+"\n"
+"Características principais\n"
+"------------\n"
+"* Capacidade de criar avaliações de funcionários.\n"
+"* Uma avaliação pode ser criada pelo gerente de um funcionário ou "
+"automaticamente com base na programação definida no formulário do "
+"funcionário.\n"
+"* A avaliação é feita de acordo com um plano no qual várias pesquisas podem "
+"ser criadas. Cada pesquisa pode ser respondida por um nível específico na "
+"hierarquia dos funcionários. A revisão e a avaliação finais são feitas pelo "
+"gerente.\n"
+"* O gerente, o colega, o colaborador e o próprio funcionário recebem e-mails "
+"para realizar uma avaliação periódica.\n"
+"* Todos os formulários de avaliação preenchidos por funcionários, colegas e "
+"colaboradores podem ser visualizados em formato PDF.\n"
+"* As solicitações de reunião são criadas manualmente de acordo com as "
+"avaliações dos funcionários.\n"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1176,7 +1205,7 @@ msgstr "Todas as empresas"
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Already Processed"
-msgstr ""
+msgstr "Já processado"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
@@ -1430,7 +1459,7 @@ msgstr "Solicitar o preenchimento da pesquisa a outros funcionários"
 #. module: hr_appraisal
 #: model:ir.module.module,summary:base.module_hr_appraisal
 msgid "Assess your employees"
-msgstr ""
+msgstr "Avalie seus funcionários"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -2305,7 +2334,7 @@ msgstr "Marcar como concluído"
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Ícone de símbolos de material, por exemplo, lista de verificação"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2421,7 +2450,7 @@ msgstr "Data da próxima avaliação"
 #. module: hr_appraisal
 #: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
 msgid "No"
-msgstr ""
+msgstr "Não"
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2711,6 +2740,13 @@ msgid "Reset"
 msgstr "Redefinir"
 
 #. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid ""
+"Resetting the appraisal will erase all manually entered content in the "
+"Employee and Manager Feedback sections. Do you want to continue?"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_user_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_user_id
 msgid "Responsible User"
@@ -2778,7 +2814,7 @@ msgstr "Enviar"
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
 msgid "Send By Email"
-msgstr ""
+msgstr "Enviar por e-mail"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -2857,7 +2893,7 @@ msgstr "Habilidades interpessoais"
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Some appraisals were already in another state and were skipped."
-msgstr ""
+msgstr "Algumas avaliações já estavam em outro estado e foram ignoradas."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
@@ -3084,6 +3120,8 @@ msgid ""
 "Unfortunately you don't have access to modify the value of the following "
 "field: %(inaccessible_field)s"
 msgstr ""
+"Infelizmente, você não tem acesso para modificar o valor do campo a seguir: %"
+"(inaccessible_field)s"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3092,6 +3130,8 @@ msgid ""
 "Unfortunately you don't have access to modify the value of the following "
 "fields: %(inaccessible_fields)s"
 msgstr ""
+"Infelizmente, você não tem acesso para modificar o valor dos seguintes "
+"campos: %(inaccessible_fields)s"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3244,7 +3284,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "You cannot modify a finished appraisal."
-msgstr ""
+msgstr "Não é possível modificar uma avaliação já concluída."
 
 #. module: hr_appraisal
 #. odoo-python

@@ -6,9 +6,6 @@
         <field name="priority">20</field>
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='stage_id']" position="attributes">
-                <attribute name="class">ms-2</attribute>
-            </xpath>
             <xpath expr="//div[./field[@name='partner_phone']]" position="after">
                 <field name="use_helpdesk_timesheet" invisible="1"/>
                 <field name="project_id" invisible="1"/>

@@ -3,15 +3,16 @@
 # * ai_mcp
 #
 # "Junko Augias (juau)" <juau@odoo.com>, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 05:07+0000\n"
+"POT-Creation-Date: 2026-10-02 17:48+0000\n"
+"PO-Revision-Date: 2026-10-16 03:33+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
-"ai_mcp/ja/>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/ai_mcp/"
+"ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,19 +85,28 @@ msgid ""
 "    2. NEVER add your token in a text field on your MCP client. ALWAYS use "
 "fields of type Credential or Password as they are encrypted.\n"
 msgstr ""
+"\n"
+"- Odoo MCP サーバに接続するには：\n"
+"    1. MCPサーバの URL を、OdooのURL にサフィックス「/mcp」を付けたものに管理"
+"設定します。たとえば、OdooのURL が「https://example.odoo.com」の場合、MCP "
+"サーバの URL は「https://example.odoo.com/mcp」となります。\n"
+"    2. お好みの MCP クライアントで認証トークンとして使用する API キーを生成し"
+"ます：\n"
+"        a. Odoo にログインします。\n"
+"        b. ユーザアバターをクリックします。\n"
+"        c. セキュリティタブに移動します。\n"
+"        d. API キーを生成します。適用範囲をMCPに設定します。\n"
+"- 重要：\n"
+"    1. トークンを絶対に他人と共有しないでください。トークンにアクセスできた人"
+"は、あなたになりすましてMCPサーバーを利用できます。\n"
+"    2. MCPクライアントのテキストフィールドにトークンを絶対に追加しないでくだ"
+"さい。暗号化される「Credential（認証情報）」または「Password（パスワード）」"
+"タイプのフィールドを必ず使用してください。\n"
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "/mcp"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "<Pick a name>"
-msgstr ""
+msgstr "/mcp"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.view_users_form_mcp
@@ -106,16 +116,19 @@ msgid ""
 "                    Connect via RPC or MCP\n"
 "                </span>"
 msgstr ""
+"<span class=\"text-muted\">\n"
+"                    RPCまたはMCP経由で接続\n"
+"               </span>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "<span class=\"visually-hidden\">Authorizing...</span>"
-msgstr ""
+msgstr "<span class=\"visually-hidden\">承認中...</span>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "<strong>Header: </strong>"
-msgstr ""
+msgstr "<strong>ヘッダー：</strong>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
@@ -123,11 +136,13 @@ msgid ""
 "<strong>Server Name: </strong>\n"
 "                                <span>&lt;Pick a name&gt;</span>"
 msgstr ""
+"<strong>サーバ名:</strong>\n"
+"                                <span>&lt; 名前を選択してください&gt;</span>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "<strong>Server URL: </strong>"
-msgstr ""
+msgstr "<strong>サーバURL：</strong>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
@@ -135,16 +150,20 @@ msgid ""
 "<strong>To connect via MCP, add these details to your AI Assistant's "
 "settings:</strong>"
 msgstr ""
+"<strong>MCP経由で接続するには、AIアシスタントの設定に以下の詳細を追加してくだ"
+"さい：</strong>"
 
 #. module: ai_mcp
 #: model_terms:ir.actions.act_window,help:ai_mcp.oauth_client_action
 msgid "A client registered here can generate access tokens through OAuth."
 msgstr ""
+"ここに登録されたクライアントは、OAuth を介してアクセストークンを生成できます"
+"。"
 
 #. module: ai_mcp
 #: model:ir.module.module,shortdesc:base.module_ai_mcp
 msgid "AI MCP Server"
-msgstr ""
+msgstr "AI MCP サーバ"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ai_tool
@@ -164,43 +183,43 @@ msgstr "APIキー説明"
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__active
 msgid "Active"
-msgstr ""
+msgstr "有効"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "Allow"
-msgstr ""
+msgstr "許可"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "Allow Dynamic Client Registration (DCR)"
-msgstr ""
+msgstr "動的クライアント登録(DCR)を許可"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_res_config_settings__mcp_enable_dcr
 msgid "Allow MCP clients to register automatically."
-msgstr ""
+msgstr "MCPクライアントの自動登録を許可します。"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_res_config_settings__mcp_allowed_cimd_urls
 msgid "Allowed Client ID Metadata Document (CIMD)"
-msgstr ""
+msgstr "許可されるClient IDメタデータドキュメント(CIMD)"
 
 #. module: ai_mcp
 #: model:ir.model.constraint,message:ai_mcp.constraint_oauth_client_client_id_unique
 msgid "Another client is already registered with this client ID."
-msgstr ""
+msgstr "このClient IDは既に別のクライアントに登録されています。"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__apikey_expiration_date
 msgid "Apikey Expiration Date"
-msgstr ""
+msgstr "Apikey有効期限"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_search
 msgid "Archived"
-msgstr ""
+msgstr "アーカイブ済"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_oauth_client__active
@@ -208,24 +227,25 @@ msgid ""
 "Archiving a client makes the authorization server block any new "
 "authorization or token request made with its client_id."
 msgstr ""
+"クライアントをアーカイブすると、認証サーバはそのクライアントの client_id を使"
+"用して行われる新しい認証要求やトークン要求をすべてブロックするようになります"
+"。"
 
 #. module: ai_mcp
 #: model:ir.model.constraint,message:ai_mcp.constraint_oauth_client_redirect_uris_not_empty
 msgid "At least one redirect URI is required."
-msgstr ""
+msgstr "少なくとも1つのリダイレクトURIが必要です。"
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "At least one redirect_uri is required."
-msgstr ""
+msgstr "少なくとも1つのredirect_uriが必要です。"
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "Authorization: Bearer"
-msgstr ""
+msgstr "Authorization: Bearer"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ir_actions_server__use_in_mcp
@@ -240,53 +260,55 @@ msgid ""
 "CIMD URL %(url)s isn't allowed. If you want this client to be able to "
 "connect, allow its URL in the settings."
 msgstr ""
+"CIMD URL%(url)s は許可されていません。このクライアントが接続できるようにする"
+"には、管理設定でそのURLを許可してください。"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__client_id
 msgid "Client"
-msgstr ""
+msgstr "クライアント"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__client_id
 msgid "Client ID"
-msgstr ""
+msgstr "Client ID"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__client_name
 msgid "Client Name"
-msgstr ""
+msgstr "クライアント名"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__code_challenge
 msgid "Code Challenge"
-msgstr ""
+msgstr "Code Challenge"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "構成設定"
 
 #. module: ai_mcp
 #: model:ir.module.module,summary:base.module_ai_mcp
 msgid "Connect Odoo to any external server via the MCP"
-msgstr ""
+msgstr "MCPを介してOdooを任意の外部サーバに接続"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__create_uid
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "作成者"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__create_date
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__create_date
 msgid "Created on"
-msgstr ""
+msgstr "作成日"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "Deny"
-msgstr ""
+msgstr "却下"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ai_mcp_request_dispatcher__display_name
@@ -313,12 +335,12 @@ msgstr ""
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_res_config_settings__mcp_enable_dcr
 msgid "Dynamic Client Registration"
-msgstr ""
+msgstr "動的クライアント登録(DCR)"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__expiration_date
 msgid "Expiration Date"
-msgstr ""
+msgstr "有効期限"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_oauth_authorization_code__apikey_expiration_date
@@ -326,22 +348,18 @@ msgid ""
 "Expiration date the user consented to for the API key this code will be "
 "redeemed for. Empty for an API key that never expires."
 msgstr ""
+"このコードと引き換えに発行される API キーに対して、ユーザが同意した有効期限。"
+"無期限の API キーの場合は空欄にします。"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "Grant Access"
-msgstr ""
+msgstr "アクセス付与"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Header:"
-msgstr ""
+msgstr "HTTPルーティング"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ai_mcp_request_dispatcher__id
@@ -359,25 +377,25 @@ msgstr "ID"
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "Invalid CIMD URL %s"
-msgstr ""
+msgstr "無効なCIMD URL%s"
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "Invalid CIMD URL %s."
-msgstr ""
+msgstr "無効なCIMD URL%s"
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/models/oauth_authorization_code.py:0
 msgid "Invalid PKCE code_verifier"
-msgstr ""
+msgstr "無効な PKCE code_verifier"
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/models/oauth_authorization_code.py:0
 msgid "Invalid authorization code"
-msgstr ""
+msgstr "無効な認証コード"
 
 #. module: ai_mcp
 #. odoo-python
@@ -385,6 +403,8 @@ msgstr ""
 msgid ""
 "Invalid redirect_uri %(uri)s: a redirect_uri must not include a fragment."
 msgstr ""
+"無効な redirect_uri%(uri)s: redirect_uri にはフラグメントを含めてはなりません"
+"。"
 
 #. module: ai_mcp
 #. odoo-python
@@ -393,28 +413,30 @@ msgid ""
 "Invalid redirect_uri %(uri)s: only https:// URIs are allowed (or http:// for "
 "a loopback address)."
 msgstr ""
+"無効な redirect_uri%(uri)s: 許可されるのは https:// の URI のみです（"
+"ループバックアドレスの場合は http://）。"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__write_uid
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "最終更新者"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__write_date
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "最終更新日"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "Lets any MCP client register itself and request tokens."
-msgstr ""
+msgstr "任意のMCPクライアントが自身を登録し、トークンを依頼できるようにします。"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_layout
 msgid "Logo"
-msgstr ""
+msgstr "ロゴ"
 
 #. module: ai_mcp
 #: model:ir.model.fields.selection,name:ai_mcp.selection__res_users_apikeys_description__scope__mcp
@@ -424,7 +446,7 @@ msgstr "MCP"
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "MCP OAuth"
-msgstr ""
+msgstr "MCP OAuth"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ai_mcp_request_dispatcher
@@ -434,35 +456,37 @@ msgstr "MCP申請ディスパッチャー"
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_oauth_authorization_code
 msgid "OAuth 2.1 Authorization Code"
-msgstr ""
+msgstr "OAuth 2.1 認証コード"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_oauth_client
 msgid "OAuth Client Application"
-msgstr ""
+msgstr "OAuthクライアントアプリケーション"
 
 #. module: ai_mcp
 #: model:ir.actions.act_window,name:ai_mcp.oauth_client_action
 #: model:ir.ui.menu,name:ai_mcp.oauth_client_menu
 msgid "OAuth Clients"
-msgstr ""
+msgstr "OAuthクライアント"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_res_config_settings__mcp_allowed_cimd_urls
 msgid "One client ID metadata document URL per line."
-msgstr ""
+msgstr "Client IDメタデータドキュメントのURLを1行に1つずつ入力してください。"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_oauth_client__redirect_uris
 msgid ""
 "One redirect URI per line. Must be HTTPS, except for http:// loopback URIs."
 msgstr ""
+"1行につき1つのリダイレクトURIを指定してください。http://のループバックURIを除"
+"き、HTTPSでなければなりません。"
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "Only internal users are allowed to use oauth for mcp"
-msgstr ""
+msgstr "MCPのOAuthを利用できるのは社内ユーザのみです"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
@@ -470,11 +494,13 @@ msgid ""
 "Only the AI clients whose metadata URL (CIMD) is listed below can get OAuth "
 "tokens for your MCP server."
 msgstr ""
+"以下にメタデータURL(CIMD)が記載されている AIクライアントのみが、お使いの MCP "
+"サーバーの OAuth トークンを取得できます。"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_layout
 msgid "Powered by <span>Odoo</span>"
-msgstr ""
+msgstr "Powered by <span>Odoo</span>"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ir_actions_server__is_readonly
@@ -485,22 +511,22 @@ msgstr "読み取り専用ツール"
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 msgid "Redirect URIs"
-msgstr ""
+msgstr "リダイレクトURI"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__redirect_uri
 msgid "Redirect Uri"
-msgstr ""
+msgstr "リダイレクトURI"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__redirect_uris
 msgid "Redirect Uris"
-msgstr ""
+msgstr "リダイレクトURI"
 
 #. module: ai_mcp
 #: model_terms:ir.actions.act_window,help:ai_mcp.oauth_client_action
 msgid "Register a client"
-msgstr ""
+msgstr "クライアントを登録"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_res_users_apikeys_description__scope
@@ -513,18 +539,6 @@ msgid "Server Action"
 msgstr "サーバアクション"
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Server Name:"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Server URL:"
-msgstr ""
-
-#. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/models/ir_actions_server.py:0
 msgid "The action '%s' cannot be used as an MCP tool."
@@ -535,7 +549,7 @@ msgstr "アクション「%s 」は、MCPツールとして使用できません
 #: code:addons/ai_mcp/models/oauth_client.py:0
 msgid ""
 "The client ID is generated once at registration and can never be changed."
-msgstr ""
+msgstr "Client IDは登録時に一度だけ生成され、変更することはできません。"
 
 #. module: ai_mcp
 #. odoo-python
@@ -544,17 +558,13 @@ msgid ""
 "The client_id of the metadata document does not match the URL %(url)s it was "
 "fetched from."
 msgstr ""
+"メタデータドキュメントの client_id が、そのドキュメントが取得された URL%(url)"
+"s と一致しません。"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 msgid "The redirect URIs one per line"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "To connect via MCP, add these details to your AI Assistant's settings:"
-msgstr ""
+msgstr "リダイレクトURIを1行に1つずつ入力してください"
 
 #. module: ai_mcp
 #. odoo-python
@@ -562,31 +572,33 @@ msgstr ""
 msgid ""
 "Unsupported token_endpoint_auth_method, The only supported option is 'none'"
 msgstr ""
+"token_endpoint_auth_method がサポートされていません。サポートされている唯一の"
+"オプションは 'none' です"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__user_id
 msgid "User"
-msgstr ""
+msgstr "ユーザ"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "You will be redirected to"
-msgstr ""
+msgstr "以下のページにリダイレクトされます:"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "access expires after:"
-msgstr ""
+msgstr "アクセス有効期限："
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 msgid "e.g. Claude Desktop"
-msgstr ""
+msgstr "例：Claude Desktop"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "e.g. https://claude.ai/oauth/mcp-oauth-client-metadata"
-msgstr ""
+msgstr "例：https://claude.ai/oauth/mcp-oauth-client-metadata"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
@@ -595,3 +607,7 @@ msgid ""
 "                account for\n"
 "                <strong>MCP (Model Context Protocol)</strong>."
 msgstr ""
+"がOdoo\n"
+"                アカウント\n"
+"                <strong>MCP (Model Context Protocol)</strong>用にアクセス権を"
+"要求しています。"

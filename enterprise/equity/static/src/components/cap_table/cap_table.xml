@@ -4,7 +4,7 @@
         <div class="d-flex flex-column h-100 o_cap_table">
             <ControlPanel>
                 <t t-set-slot="control-panel-buttons">
-                    <button class="btn btn-primary" t-on-click="() => this.createTransaction()">New Transaction</button>
+                    <button t-if="this.isEquityManager" class="btn btn-primary" t-on-click="() => this.createTransaction()">New Transaction</button>
                 </t>
             </ControlPanel>
 
@@ -65,7 +65,7 @@
             alt="Contact"/>
         <a t-if="cell.onClick" t-on-click="() => cell.onClick()" t-out="cell.label" class="ms-1"/>
         <span t-else="" t-out="cell.label" class="ms-1"/>
-        <a t-if="cell.partnerId"
+        <a t-if="this.isEquityManager and cell.partnerId"
             class="hover-button float-end"
             t-on-click="() => this.sendToPartner(cell.partnerId)">
             <i class="oi oi-filled" data-icon="send"/> Send </a>

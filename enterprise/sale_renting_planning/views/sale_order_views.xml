@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="sale_renting.rental_order_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/list" position="inside">
-                <field name="planning_slot_ids" column_invisible="1"/> <!-- Needed to write on that field thanks to the context -->
+                <field name="planning_slot_ids" column_invisible="1" invisible="1"/> <!-- Needed to write on that field thanks to the context -->
             </xpath>
             <xpath expr="//field[@name='order_line']/kanban" position="inside">
                 <field name="planning_slot_ids" invisible="1"/> <!-- Needed to write on that field thanks to the context -->

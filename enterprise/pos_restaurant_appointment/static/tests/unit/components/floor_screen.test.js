@@ -18,7 +18,8 @@ describe("pos_restaurant_appointment floor_plan.js", () => {
         const appointmentOfTable3 = store.models["restaurant.table"].get(3).firstAppointment;
         expect(appointmentOfTable2.id).toEqual(1);
 
-        expect(appointmentOfTable3.id).toEqual(3);
+        // Table 3 only has checked-in and no-show bookings.
+        expect(appointmentOfTable3).toBe(false);
 
         expect(fs.isCustomerLate(appointmentOfTable2)).toBe(true);
         expect(fs.isCustomerLate(appointmentOfTable3)).toBe(false);
@@ -69,5 +70,15 @@ describe("pos_restaurant_appointment floor_plan.js", () => {
         expect(queryAll(`.o_fp_table[data-table_id="${table.id}"] .table-timer-badge`).length).toBe(
             0
         );
+    });
+
+    test("a checked-in booking no longer occupies its table", async () => {
+        const store = await setupPosEnv();
+        const table = store.models["restaurant.table"].get(2);
+        const appointment = table.firstAppointment;
+        expect(appointment.id).toEqual(1);
+
+        appointment.appointment_status = "attended";
+        expect(table.firstAppointment).toBe(false);
     });
 });

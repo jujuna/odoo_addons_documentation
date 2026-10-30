@@ -503,6 +503,7 @@ class TestPayslipComputation(TestPayslipContractBase):
         payslip.compute_sheet()
 
     def test_payslip_warning_message_without_duration_dates(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         payslip = self.env['hr.payslip'].create({
             'employee_id': self.richard_emp.id,
             'version_id': self.contract_cdi.id,
@@ -545,6 +546,7 @@ class TestPayslipComputation(TestPayslipContractBase):
         self.assertFalse(bonus_line.category_ids, "Bonus line should have no category")
 
     def test_zero_or_negative_payslip(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         # Creating new employee with new pay structures without benefits/allowances to ensure zero value payslip.
         self.structure_type_developer = self.env['hr.payroll.structure.type'].create({
             'name': 'Employee',
@@ -587,6 +589,7 @@ class TestPayslipComputation(TestPayslipContractBase):
     def test_duplicate_payslips_duplicate_deletion(self):
         """ If there are multiple duplciate payslips(in this case 2 payslip), And if we delete any one payslips
             duplicate warning should not appear on the original payslip """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         rich_payslip1 = self.env['hr.payslip'].create({
             'employee_id': self.richard_emp.id,
             'version_id': self.contract_cdi.id,
@@ -889,6 +892,46 @@ class TestPayslipComputation(TestPayslipContractBase):
         self.assertEqual(basic_line_reset.amount, original_basic_amount, "The BASIC amount should be reset to its computed value.")
         self.assertEqual(net_line_reset.total, original_net_total, "The NET total should be reset to its computed value.")
 
+    def test_payslip_manual_line_edit_keeps_previous_explanations(self):
+        self.hra_rule.write({
+            'amount_select': 'code',
+            'amount_python_compute': "result = version.wage * 0.4\nexplanation_info = {'wage': version.wage}",
+            'explanation_template': "Wage ({wage}) * 40%",
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.richard_emp.id,
+            'version_id': self.contract_cdi.id,
+            'struct_id': self.developer_pay_structure.id,
+            'date_from': date(2016, 4, 1),
+            'date_to': date(2016, 4, 30),
+        })
+        payslip.compute_sheet()
+
+        def get_line(code):
+            return payslip.line_ids.filtered(lambda line: line.code == code)
+
+        def edit_amount(code, amount):
+            payslip.write({'line_ids': [Command.update(get_line(code).id, {'amount': amount})]})
+
+        hra_explanation = f"Wage ({self.contract_cdi.wage}) * 40%"
+        self.assertEqual(get_line('HRA').explanation, hra_explanation)
+
+        edit_amount('PT', -300.0)
+        self.assertEqual(get_line('HRA').explanation, hra_explanation)
+        self.assertFalse(get_line('PT').explanation)
+
+        edited_explanation = f"Manually modified. Explanation before the change:\n{hra_explanation}"
+        edit_amount('HRA', 1000.0)
+        self.assertEqual(get_line('HRA').explanation, edited_explanation)
+        edit_amount('HRA', 1100.0)
+        self.assertEqual(get_line('HRA').explanation, edited_explanation)
+
+        # Editing a later line keeps HRA flagged, so the next HRA edit does not add the label twice.
+        edit_amount('PT', -400.0)
+        self.assertTrue(get_line('HRA').manually_modified)
+        edit_amount('HRA', 1200.0)
+        self.assertEqual(get_line('HRA').explanation, edited_explanation)
+
     def test_onchange_remove_payslip_dates(self):
         """Ensure clearing payslip dates does not change the payslip version."""
         self.assertTrue(self.richard_emp.version_id.contract_date_start)
@@ -899,3 +942,41 @@ class TestPayslipComputation(TestPayslipContractBase):
         slip_form.date_to = False
 
         self.assertEqual(slip_form.version_id, self.richard_emp._get_version(False))
+
+    def test_multiple_payslip_computation_is_correct(self):
+        self.richard_emp.write({
+            'wage': '3000',
+            'contract_date_start': date(2026, 1, 1),
+            'contract_date_end': False,
+        })
+
+        payslips = self.env['hr.payslip'].create([
+            {
+                'name': 'October',
+                'employee_id': self.richard_emp.id,
+                'version_id': self.contract_cdi.id,
+                'struct_id': self.developer_pay_structure.id,
+                'date_from': date(2026, 10, 1),
+                'date_to': date(2026, 10, 31)
+            },
+            {
+                'name': 'September',
+                'employee_id': self.richard_emp.id,
+                'version_id': self.contract_cdi.id,
+                'struct_id': self.developer_pay_structure.id,
+                'date_from': date(2026, 9, 1),
+                'date_to': date(2026, 9, 30)
+            }
+        ])
+
+        payslips.compute_sheet()
+
+        self.assertEqual(payslips[0].basic_wage, 3000)
+        self.assertEqual(payslips[1].basic_wage, 3000)
+
+        self.richard_emp.write({'wage': '3690'})
+
+        payslips.compute_sheet()
+
+        self.assertEqual(payslips[0].basic_wage, 3690)
+        self.assertEqual(payslips[1].basic_wage, 3690)

@@ -13,3 +13,17 @@ export const payslipLines2ManyField = {
 };
 
 registry.category("fields").add("payslip_lines_2many", payslipLines2ManyField);
+
+// loads the style of the salary rule of a payslip line, applied on its row by the payslip lines list
+registry.category("fields").add("salary_rule_style", {
+    ...registry.category("fields").get("many2one"),
+    relatedFields: [
+        { name: "bold", type: "boolean" },
+        { name: "italic", type: "boolean" },
+        { name: "underline", type: "boolean" },
+        { name: "indented", type: "boolean" },
+        { name: "space_above", type: "boolean" },
+        { name: "title", type: "boolean" },
+        { name: "color", type: "char" },
+    ],
+});

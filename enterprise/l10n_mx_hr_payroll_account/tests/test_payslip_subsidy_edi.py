@@ -20,6 +20,7 @@ class TestPayslipSubsidyEdi(TestPayslipValidation):
         })
 
     def _assert_subsidy_warning(self, payslip, expected):
+        payslip.with_context(hr_payroll_force_compute_issue=True)._compute_issues()
         warnings = payslip.issues.values()
         has_warning = any("Salary Limit for Employment Subsidy" in (w.get('message') or "") for w in warnings)
 

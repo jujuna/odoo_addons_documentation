@@ -62,9 +62,10 @@
                 <div invisible="not planned_date_begin"  t-attf-class="d-flex align-items-center #{cls}">
                     <field name="planned_date_begin" widget="daterange" options="{'end_date_field': 'date_deadline'}" class="w-100"/>
                 </div>
-                <field name="planning_overlap" class="text-danger o_planning_overlap"
-                    invisible="not context.get('is_form_gantt', False)"/>
             </field>
+            <xpath expr="//div[hasclass('o_project_deadline_wrap')]" position="after">
+                <field name="planning_overlap" class="text-danger o_planning_overlap" invisible="not context.get('is_form_gantt', False)"/>
+            </xpath>
         </field>
     </record>
 

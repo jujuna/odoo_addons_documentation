@@ -23,11 +23,11 @@ export class CalendarEvent extends models.Model {
     resource_ids = fields.Many2many({ string: "Resources", relation: "appointment.resource" });
     appointment_status = fields.Selection({
         selection: [
-            ['cancelled', 'Cancelled'],
-            ['request', 'Request'],
-            ['booked', 'Booked'],
-            ['attended', 'Checked-In'],
-            ['no_show', 'No Show'],
+            ["cancelled", "Cancelled"],
+            ["request", "Request"],
+            ["booked", "Booked"],
+            ["attended", "Checked-In"],
+            ["no_show", "No Show"],
         ],
         string: "Appointment Status",
     });
@@ -46,7 +46,7 @@ export class CalendarEvent extends models.Model {
             start: "2022-01-12 10:00:00",
             stop: "2022-01-12 11:00:00",
             allday: false,
-            appointment_status: 'booked',
+            appointment_status: "booked",
             partner_ids: [100, 214],
         },
         {
@@ -58,7 +58,7 @@ export class CalendarEvent extends models.Model {
             start: "2022-01-05 10:00:00",
             stop: "2022-01-05 11:00:00",
             allday: false,
-            appointment_status: 'booked',
+            appointment_status: "booked",
             partner_ids: [214, 216],
         },
         {
@@ -70,7 +70,7 @@ export class CalendarEvent extends models.Model {
             start: "2022-01-05 10:00:00",
             stop: "2022-01-05 11:00:00",
             allday: false,
-            appointment_status: 'booked',
+            appointment_status: "booked",
             partner_ids: [216, 100, 214, 217],
         },
     ];
@@ -82,32 +82,13 @@ export class CalendarEvent extends models.Model {
 export class AppointmentType extends models.ServerModel {
     _name = "appointment.type";
 
-    name = fields.Char();
     appointment_duration = fields.Float({ default: 1 });
-    // mirror the real model's `user.tz` default with the current viewer timezone, so slots
-    // aren't spuriously converted; timezone-specific tests override it explicitly
     appointment_tz = fields.Char({ default: () => luxon.Settings.defaultZone.name });
     website_url = fields.Char();
-    staff_user_ids = fields.Many2many({ relation: "res.users" });
     website_published = fields.Boolean();
     user_can_manage_slots = fields.Boolean({ default: true });
-    start_datetime = fields.Datetime();
-    end_datetime = fields.Datetime();
     slot_creation_interval = fields.Float({ default: 1 });
-    slot_ids = fields.One2many({ relation: "appointment.slot" });
-    schedule_based_on = fields.Selection({
-        selection: [
-            ["users", "Users"],
-            ["resources", "Resources"],
-        ],
-        default: "users",
-    });
-    category = fields.Selection({
-        selection: [
-            ["website", "Website"],
-            ["custom", "Specific Slots"],
-        ],
-    });
+    schedule_based_on = fields.Selection({ default: "users" });
 
     _records = [
         {
@@ -117,7 +98,7 @@ export class AppointmentType extends models.ServerModel {
             website_published: true,
             schedule_based_on: "users",
             staff_user_ids: [214, 216],
-            category: "website",
+            category: "recurring",
         },
         {
             id: 2,
@@ -126,7 +107,7 @@ export class AppointmentType extends models.ServerModel {
             website_published: true,
             schedule_based_on: "users",
             staff_user_ids: [100],
-            category: "website",
+            category: "recurring",
         },
     ];
 }
@@ -137,32 +118,6 @@ class AppointmentResource extends models.Model {
 
 export class AppointmentSlot extends models.ServerModel {
     _name = "appointment.slot";
-
-    appointment_type_id = fields.Many2one({ relation: "appointment.type" });
-    start_datetime = fields.Datetime({ string: "Start" });
-    end_datetime = fields.Datetime({ string: "End" });
-    duration = fields.Float({ string: "Duration" });
-    slot_type = fields.Selection({
-        string: "Slot Type",
-        selection: [
-            ["recurring", "Regular"],
-            ["unique", "One Shot"],
-        ],
-    });
-    allday = fields.Boolean();
-    weekday = fields.Selection({
-        selection: [
-            ["1", "Monday"],
-            ["2", "Tuesday"],
-            ["3", "Wednesday"],
-            ["4", "Thursday"],
-            ["5", "Friday"],
-            ["6", "Saturday"],
-            ["7", "Sunday"],
-        ],
-    });
-    start_hour = fields.Float();
-    end_hour = fields.Float();
 }
 
 export class ResPartner extends mailModels.ResPartner {

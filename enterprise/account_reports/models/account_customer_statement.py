@@ -17,13 +17,21 @@ class CustomerStatementCustomHandler(models.AbstractModel):
         })
         options['custom_display_config']['css_custom_class'] += ' customer_statement'
 
+        if options.get('export_mode') == 'print' and options.get('export_format') == 'pdf':
+            options['column_headers'] = []  # date will already be included in the PDF header
+            options['unfold_all'] = True  # lines are computed once for all the partners, then split into one document per partner
+
         if self.env.ref('account_reports.pdf_export_main_customer_report', raise_if_not_found=False):
             options['custom_display_config'].setdefault('pdf_export', {})['pdf_export_main'] = 'account_reports.pdf_export_main_customer_report'
+            options['custom_display_config']['css_custom_class'] += ' customer_report'
 
     def _get_subformulas_rules(self):
         return super()._get_subformulas_rules() | {
             'amount': {'field': 'balance', 'from_beginning': True}
         }
+
+    def _get_documents_to_print(self, report, options, lines):
+        return self._get_documents_to_print_per_partner(report, options, lines, 'amount')
 
     def action_send_statements(self, options):
         template = self.env.ref('account_reports.email_template_customer_statement', False)

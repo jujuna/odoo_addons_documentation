@@ -200,7 +200,7 @@ class HrContractSalary(main.HrContractSalary):
         if force_car:
             available_cars |= force_car
             available_cars |= force_additional_car
-        available_bikes |= version.bike_id
+        available_bikes |= version.bike_id.filtered(lambda bike: any(log.state == 'open' for log in bike.log_contracts))
 
         def generate_dropdown_group_data(available, can_be_requested, vehicles_to_show, vehicle_type='Car'):
             # Creates the necessary data for the dropdown group, looks like this
@@ -374,7 +374,7 @@ class HrContractSalary(main.HrContractSalary):
         else:
             initial_values['fold_temporary_car_total_depreciated_cost'] = False
 
-        if version.bike_id:
+        if version.bike_id and version.bike_id.log_contracts.filtered(lambda log: log.state == 'open'):
             initial_values['select_company_bike_depreciated_cost'] = 'old-%s' % version.bike_id.id
         elif version.new_bike_model_id:
             initial_values['select_company_bike_depreciated_cost'] = 'new-%s' % version.new_bike_model_id.id
@@ -434,8 +434,6 @@ class HrContractSalary(main.HrContractSalary):
         new_version, version_diff = super().create_new_version(version_vals, offer, benefits, no_write=no_write, **kw)
         if offer.country_code != 'BE':
             return new_version, version_diff
-        if new_version.l10n_be_time_credit:
-            new_version.date_end = version_vals.get('date_end')
         if new_version.car_id.id != version_vals.get('car_id'):
             # If the chosen car is different from the one in the current version, add the car model name to the diff
             car = self.env['fleet.vehicle'].sudo().browse(version_vals.get('car_id'))
@@ -550,16 +548,6 @@ class HrContractSalary(main.HrContractSalary):
                 result['wishlist_warning'] = self.env._("Your monthly gross wage will be below the minimum legal amount %(min_gross)s €", min_gross=minimum_gross_wage)
 
         return result
-
-    def _get_payslip_line_values(self, payslip):
-        res = super()._get_payslip_line_values(payslip)
-        if payslip.country_code != 'BE':
-            return res
-        new_SALARY_amount = sum(line['total'] for line in res if line['code'] in ['BASIC', 'COMMISSION'])
-        for line in res:
-            if line['code'] == 'SALARY':
-                line['total'] == new_SALARY_amount
-        return res
 
     def _get_personal_infos_langs(self, version, personal_info):
         active_langs = super()._get_personal_infos_langs(version, personal_info)

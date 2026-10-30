@@ -72,11 +72,8 @@ class EditBillableTimeTarget(models.Model):
                 CREATE OR REPLACE VIEW %s AS (
                         SELECT %s
                           FROM hr_employee e
-                          JOIN (
-                              SELECT DISTINCT ON (employee_id) *
-                              FROM hr_version
-                              ORDER BY employee_id, date_version DESC
-                          ) v ON v.employee_id = e.id
+                          JOIN hr_version v
+                            ON v.id = e.current_version_id
                     INNER JOIN res_company company
                             ON e.company_id = company.id
                          WHERE company.timesheet_show_rates IS TRUE

@@ -57,6 +57,11 @@ class L10nBeJointCommittee(models.Model):
         """
         Activates related payroll records when a joint committee is activated.
         """
+        # first, so that their salary rules are not considered as linked to archived benefits only
+        self.env["hr.contract.salary.benefit"].with_context(active_test=False).search([
+            ("l10n_be_joint_committee_ids", "in", self.ids),
+            ("active", "=", False),
+        ]).active = True
         joint_committee_domain = [
             ("l10n_be_joint_committee_ids", "in", self.ids + [False]),
             ("country_id", "=", self.env.ref('base.be').id),
@@ -117,3 +122,5 @@ class L10nBeJointCommittee(models.Model):
                 )
             records_to_deactivate = candidates.filtered(lambda r: not any(joint_committee.active for joint_committee in r.l10n_be_joint_committee_ids))
             records_to_deactivate.active = False
+        benefits = self.env["hr.contract.salary.benefit"].search([("l10n_be_joint_committee_ids", "in", self.ids)])
+        benefits.filtered(lambda benefit: not any(joint_committee.active for joint_committee in benefit.l10n_be_joint_committee_ids)).active = False

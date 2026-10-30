@@ -114,3 +114,42 @@ class TestAccountBankStatementImportCSV(AccountTestInvoicingCommon):
         csv_fields = ['date', False, 'payment_ref', 'balance']
         with self.assertRaisesRegex(ValidationError, "Make sure that an Amount or Debit and Credit is in the file."):
             self._import_file('account_bank_statement_import_csv/test_csv_file/test_csv_without_amount.csv', csv_fields)
+
+    def test_csv_file_import_batched_desc(self):
+        csv_fields = ["payment_ref", "amount", "date"]
+        self._import_file("account_bank_statement_import_csv/test_csv_file/test_desc.csv", csv_fields)
+        imported_statement = self.env['account.bank.statement'].search([('company_id', '=', self.env.company.id)])
+        self.assertRecordValues(imported_statement.line_ids.sorted(lambda line: (line.date, line.payment_ref), reverse=True), [
+            {"payment_ref": "REF01", "amount": 1.2, "date": fields.Date.from_string('2026-09-25')},
+            {"payment_ref": "REF02", "amount": 3.4, "date": fields.Date.from_string('2026-09-24')},
+            {"payment_ref": "REF03", "amount": 5.6, "date": fields.Date.from_string('2026-09-23')},
+            {"payment_ref": "REF04", "amount": 7.8, "date": fields.Date.from_string('2026-09-22')},
+            {"payment_ref": "REF05", "amount": 10.0, "date": fields.Date.from_string('2026-09-21')},
+            {"payment_ref": "REF06", "amount": 12.2, "date": fields.Date.from_string('2026-09-20')},
+            {"payment_ref": "REF07", "amount": 14.4, "date": fields.Date.from_string('2026-09-19')},
+            {"payment_ref": "REF08", "amount": 16.6, "date": fields.Date.from_string('2026-09-18')},
+            {"payment_ref": "REF09", "amount": 18.8, "date": fields.Date.from_string('2026-09-17')},
+            {"payment_ref": "REF10", "amount": 21.0, "date": fields.Date.from_string('2026-09-16')},
+            {"payment_ref": "REF11", "amount": 23.2, "date": fields.Date.from_string('2026-09-15')},
+            {"payment_ref": "REF12", "amount": 25.4, "date": fields.Date.from_string('2026-09-14')},
+            {"payment_ref": "REF13", "amount": 27.6, "date": fields.Date.from_string('2026-09-13')},
+            {"payment_ref": "REF14", "amount": 29.8, "date": fields.Date.from_string('2026-09-12')},
+            {"payment_ref": "REF15", "amount": 32.0, "date": fields.Date.from_string('2026-09-11')},
+            {"payment_ref": "REF16", "amount": 34.2, "date": fields.Date.from_string('2026-09-10')},
+            {"payment_ref": "REF17", "amount": 36.4, "date": fields.Date.from_string('2026-09-09')},
+            {"payment_ref": "REF18", "amount": 38.6, "date": fields.Date.from_string('2026-09-08')},
+            {"payment_ref": "REF19", "amount": 40.8, "date": fields.Date.from_string('2026-09-07')},
+            {"payment_ref": "REF20", "amount": 43.0, "date": fields.Date.from_string('2026-09-06')},
+            {"payment_ref": "REF21", "amount": 45.2, "date": fields.Date.from_string('2026-09-05')},
+            {"payment_ref": "REF22", "amount": 47.4, "date": fields.Date.from_string('2026-09-04')},
+            {"payment_ref": "REF23", "amount": 49.6, "date": fields.Date.from_string('2026-09-03')},
+            {"payment_ref": "REF24", "amount": 51.8, "date": fields.Date.from_string('2026-09-02')},
+            {"payment_ref": "REF25", "amount": 54.0, "date": fields.Date.from_string('2026-09-01')},
+            {"payment_ref": "REF26", "amount": 56.2, "date": fields.Date.from_string('2026-08-31')},
+            {"payment_ref": "REF27", "amount": 58.4, "date": fields.Date.from_string('2026-08-30')},
+            {"payment_ref": "REF28", "amount": 60.6, "date": fields.Date.from_string('2026-08-29')},
+            {"payment_ref": "REF29", "amount": 62.8, "date": fields.Date.from_string('2026-08-28')},
+            {"payment_ref": "REF30", "amount": 65.0, "date": fields.Date.from_string('2026-08-27')},
+            {"payment_ref": "REF31", "amount": 67.2, "date": fields.Date.from_string('2026-08-26')},
+            {"payment_ref": "REF32", "amount": 69.4, "date": fields.Date.from_string('2026-08-25')}
+        ])

@@ -84,9 +84,9 @@
                 <field name="bce_code" string="Code" required="1"
                    filter_domain="['|', ('bce_code', 'ilike', self), ('nace_code_id', 'ilike', self)]"/>
                 <filter name="filter_active" string="Active" 
-                    domain="['&amp;', '|', ('date_start', '=', False), ('date_start', '&lt;=', context_today()), '|', ('date_end', '=', False), ('date_end', '&gt;=', context_today())]"/>
+                    domain="['&amp;', '|', ('date_start', '=', False), ('date_start', '&lt;=', 'now'), '|', ('date_end', '=', False), ('date_end', '&gt;=', 'now')]"/>
                 <filter name="filter_inactive" string="Inactive" 
-                    domain="['|', ('date_start', '&gt;', context_today()), '&amp;', ('date_end', '!=', False), ('date_end', '&lt;', context_today())]"/>
+                    domain="['|', ('date_start', '&gt;', 'now'), '&amp;', ('date_end', '!=', False), ('date_end', '&lt;', 'now')]"/>
                 <group>
                     <filter name="group_company" string="Company" domain="[]" context="{'group_by': 'company_id'}"/>
                     <filter name="group_type" string="Type" domain="[]" context="{'group_by': 'location_type'}"/>

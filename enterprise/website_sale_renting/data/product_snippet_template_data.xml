@@ -7,7 +7,7 @@
             <span t-if="data.get('is_rental')" class="fw-bold">From</span>
         </span>
         <xpath expr="//del" position="attributes">
-            <attribute name="t-if">not data.get('is_rental') and data.get('has_discounted_price')</attribute>
+            <attribute name="t-if" separator=" and " add="not data.get('is_rental')"/>
         </xpath>
         <xpath expr="//del" position="after">
             <span t-if="data.get('is_rental')" class="fw-bold">

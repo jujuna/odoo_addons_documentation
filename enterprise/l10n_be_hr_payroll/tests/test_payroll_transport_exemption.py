@@ -60,8 +60,29 @@ class TestPayrollTransportExemption(TestPayrollCommon):
         self.assertTrue(car_priv.total, "The private car reimbursement should be paid")
         self.assertAlmostEqual(self._get_line(payslip, 'GROSS').total, gross_without + car_priv.total, 2,
             "The reimbursement should be added to the withholding tax base")
-        expected_deduction = -min(500, 12 * car_priv.total)
+        # Annexe III 2026: up to 41.70 a month
+        expected_deduction = -min(12 * 41.7, 12 * car_priv.total)
         self.assertAlmostEqual(self._get_line(payslip, 'TRANSPORT_TAX_DED').total, expected_deduction, 2)
+
+    def test_private_car_withholding_exemption_2025(self):
+        # The withholding tax of 2025 exempts up to 41.70 a month (Annexe III), although the yearly exemption of the
+        # 2025 income is 490: the fiche 281.10 keeps 490.
+        with freeze_time('2025-01-20'):
+            self.transport_employee.version_id.generate_work_entries(date(2025, 1, 1), date(2025, 1, 31))
+            self.transport_employee.version_id.write({'private_car_employee_kilometer': 25})
+            payslip = self.env['hr.payslip'].create({
+                'name': 'Transport Payslip January 2025',
+                'employee_id': self.transport_employee.id,
+                'company_id': self.belgian_company.id,
+                'version_id': self.transport_employee.version_id.id,
+                'date_from': date(2025, 1, 1),
+                'date_to': date(2025, 1, 31),
+            })
+            payslip.compute_sheet()
+        car_priv = self._get_line(payslip, 'CAR.PRIV').total
+        self.assertGreater(car_priv, 41.7, "Premise: the reimbursement is above the monthly exemption")
+        self.assertAlmostEqual(self._get_line(payslip, 'TRANSPORT_TAX_DED').total, -500.4, 2)
+        self.assertEqual(payslip._rule_parameter('pricate_car_taxable_threshold'), 490)
 
     def test_private_car_fully_exempt_does_not_increase_withholding(self):
         # A private-car reimbursement fully below the yearly exemption cap is added to the
@@ -86,14 +107,45 @@ class TestPayrollTransportExemption(TestPayrollCommon):
         self.assertAlmostEqual(self._get_line(payslip, 'NET').total, net_without + car_priv, 2,
             "The reimbursement is still fully paid to the employee")
 
-    def test_fuel_card_commute_deduction(self):
+    def test_fuel_card_commute_taxed_in_full(self):
+        # The commuting fuel card is taxable pay: it is not a reimbursement of the commuting costs, so it
+        # gets no share of the yearly transport exemption.
         with freeze_time('2026-01-20'):
+            baseline = self._compute_january_payslip()
+            gross_without = self._get_line(baseline, 'GROSS').total
             payslip = self._compute_january_payslip()
             payslip._set_input_value('FUEL_CARD_COMMUTE', 30.0)
             payslip.compute_sheet()
         self.assertAlmostEqual(self._get_line(payslip, 'FUEL_CARD_COMMUTE').total, 30.0, 2)
-        # min(500 (2026 threshold), 12 x 30 = 360) = 360
-        self.assertAlmostEqual(self._get_line(payslip, 'TRANSPORT_TAX_DED').total, -360.0, 2)
+        self.assertAlmostEqual(self._get_line(payslip, 'GROSS').total, gross_without + 30.0, 2)
+        self.assertFalse(self._get_line(payslip, 'TRANSPORT_TAX_DED').total,
+            "The fuel card alone does not open the transport exemption")
+
+    def test_fuel_card_commute_beside_private_car(self):
+        # The fuel card does not replace the private car reimbursement: both are paid, and the
+        # exemption only covers the reimbursement.
+        self.transport_employee.version_id.write({'private_car_employee_kilometer': 10})
+        with freeze_time('2026-01-20'):
+            payslip = self._compute_january_payslip()
+            payslip._set_input_value('FUEL_CARD_COMMUTE', 30.0)
+            payslip.compute_sheet()
+        car_priv = self._get_line(payslip, 'CAR.PRIV').total
+        self.assertTrue(car_priv, "The private car reimbursement is paid beside the fuel card")
+        self.assertLess(12 * car_priv, 500, "Premise: the reimbursement alone stays below the yearly exemption cap")
+        self.assertAlmostEqual(self._get_line(payslip, 'FUEL_CARD_COMMUTE').total, 30.0, 2)
+        self.assertAlmostEqual(self._get_line(payslip, 'TRANSPORT_TAX_DED').total, -12 * car_priv, 2)
+
+    def test_private_car_cp302_student(self):
+        # Before the daily scale of February 2026, CP 302 pays its students the private car allowance of its other
+        # workers, 70% of the train price, not the 50% of CP 200.
+        version = self.transport_employee.version_id
+        version.write({
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302').id,
+            'l10n_be_dimona_category': 'stu',
+            'private_car_employee_kilometer': 10,
+        })
+        version = version.with_context(payslip_date=date(2025, 6, 1))
+        self.assertAlmostEqual(version._get_private_car_reimbursed_amount(), version._get_train_equivalent_amount(10) * 0.7, 2)
 
     def test_cycle_reimbursement_within_exempt_rate(self):
         self.transport_employee.version_id.write({
@@ -128,3 +180,44 @@ class TestPayrollTransportExemption(TestPayrollCommon):
         self.assertTrue(cycle_tax.total)
         expected_deduction = -min(500, 12 * cycle_tax.total)
         self.assertAlmostEqual(self._get_line(payslip, 'TRANSPORT_TAX_DED').total, expected_deduction, 2)
+
+    @freeze_time('2026-10-20')
+    def test_cycle_reimbursement_payslip_reference_date(self):
+        version = self.transport_employee.version_id
+        version.bike_transport_employee_kilometer = 10
+        # Recomputing an older payslip must not pick the rate effective in October.
+        for date_from, date_to, daily_amount in (
+            (date(2026, 8, 1), date(2026, 8, 31), 5.4),
+            (date(2026, 9, 1), date(2026, 9, 30), 5.4),
+            (date(2026, 10, 1), date(2026, 10, 31), 6.4),
+        ):
+            version.generate_work_entries(date_from, date_to)
+            payslip = self.env['hr.payslip'].create({
+                'employee_id': self.transport_employee.id,
+                'company_id': self.belgian_company.id,
+                'version_id': version.id,
+                'date_from': date_from,
+                'date_to': date_to,
+            })
+            for computation_date in ('2026-09-20', '2026-10-20'):
+                with self.subTest(date_from=date_from, computation_date=computation_date), freeze_time(computation_date):
+                    payslip.compute_sheet()
+                    cycle = self._get_line(payslip, 'CYCLE')
+                    self.assertGreater(cycle.quantity, 0)
+                    self.assertAlmostEqual(cycle.amount, daily_amount, 2)
+                    self.assertFalse(self._get_line(payslip, 'CYCLE.TAX').total)
+
+    @freeze_time('2026-10-20')
+    def test_cycle_reimbursement_salary_package_current_date(self):
+        version = self.transport_employee.version_id
+        version.bike_transport_employee_kilometer = 10
+        self.assertAlmostEqual(version.bike_reimbursed_amount, 6.4, 2)
+        self.assertAlmostEqual(version._get_bike_reimbursed_amount(reference_date=date(2026, 8, 31)), 5.4, 2)
+        self.assertAlmostEqual(version.bike_reimbursed_amount, 6.4, 2)
+
+    @freeze_time('2026-10-20')
+    def test_cycle_reimbursement_daily_cap_reference_date(self):
+        version = self.transport_employee.version_id
+        version.bike_transport_employee_kilometer = 50
+        self.assertAlmostEqual(version._get_bike_reimbursed_amount(reference_date=date(2025, 8, 31)), 8, 2)
+        self.assertAlmostEqual(version._get_bike_reimbursed_amount(reference_date=date(2026, 8, 31)), 10.8, 2)

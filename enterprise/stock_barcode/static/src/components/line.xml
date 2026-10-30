@@ -44,7 +44,7 @@
     <t t-name="stock_barcode.LineQuantity">
         <div class="d-flex justify-content-between align-items-end">
             <div name="quantity">
-                <span class="o_packaging text-muted" t-if="this.line.packaging_uom_id &amp;&amp; this.line.packaging_uom_id.id !== this.line.uom_id.id">
+                <span class="o_packaging text-muted" t-if="this.displayPackaging">
                     Packaging: <span t-out="this.line.packaging_uom_qty"/> <span t-out="this.line.packaging_uom_id.name"/>
                 </span>
                 <br/>
@@ -72,42 +72,46 @@
             </button>
         </div>
         <div t-else="" class="d-flex flex-nowrap gap-2">
-            <!-- Workaround: empty button use to set the container height and avoid flickering when real buttons are rendered -->
-            <button class="o_line_button btn px-0" style="min-width:0"/>
-
+            <t t-set="previousButtonRendered" t-value="false"/>
             <button t-if="this.displayDeleteButton" name="deleteButton"
                     t-on-click="this.delete"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"
                     class="o_line_button o_delete_line btn btn-danger">
+                <t t-set="previousButtonRendered" t-value="true"/>
                 <span class="oi oi-lg oi-filled" data-icon="delete"/>
             </button>
-            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
             <button t-if="this.isSelected &amp;&amp; this.env.model.toggleAsCounted &amp;&amp; (!this.quantityIsSet || !this.qtyDone)"
                     t-on-click="this.toggleAsCounted"
                     t-attf-class="o_line_button btn btn-{{this.quantityIsSet ? 'warning o_unset' : 'light o_count_zero'}}">
+                <t t-set="previousButtonRendered" t-value="true"/>
                 <span t-if="this.quantityIsSet" class="oi oi-lg" data-icon="question_mark"/>
                 <span t-else="">0</span>
             </button>
-            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
+            <span t-elif="previousButtonRendered" class="o_line_button btn opacity-0"/>
             <button t-if="this.isSelected &amp;&amp; this.qtyDone &amp;&amp; !this.isPackage" name="decrementButton"
                     class="o_line_button o_remove_unit btn btn-light"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"
                     t-on-click="() => this.addQuantity(-1)">
+                <t t-set="previousButtonRendered" t-value="true"/>
                 -1
             </button>
-            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
+            <span t-elif="previousButtonRendered" class="o_line_button btn opacity-0"/>
             <button t-if="this.displayIncrementButton" name="incrementButton"
                     class="o_line_button o_add_quantity btn btn-light"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"
-                    t-on-click="() => this.addQuantity(1)">+1</button>
-            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
+                    t-on-click="() => this.addQuantity(1)">
+                <t t-set="previousButtonRendered" t-value="true"/>
+                +1
+            </button>
+            <span t-elif="previousButtonRendered" class="o_line_button btn opacity-0"/>
             <button t-if="this.displayFulfillbutton &amp;&amp; this.showRemainingQty" name="fulfillButton"
                     t-on-click="() => this.addQuantity(this.incrementQty)"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"
                     t-attf-class="o_line_button o_add_remaining_quantity btn btn-{{this.isSelected ? 'light' : 'secondary'}}">
+                <t t-set="previousButtonRendered" t-value="true"/>
                 <t t-if="this.incrementQty > 0">+</t><t t-out="this.incrementQty"/>
             </button>
-            <span t-else="" class="o_line_button btn" style="visibility: hidden;"/>
+            <span t-elif="previousButtonRendered" class="o_line_button btn opacity-0"/>
             <button t-if="this.displayCompletePackageButton" name="completePackageButton"
                     t-on-click="() => this.completePackage()"
                     t-att-disabled="!this.env.model.lineCanBeEdited(this.line)"

@@ -205,6 +205,24 @@ test("pressing Enter in the input doesn't make a call if the trimmed input is em
     expect(pyEnv["voip.call"].search_count([])).toBe(0);
 });
 
+test("clicking DTMF keys during a demo call updates the keypad input", async () => {
+    await start();
+    const userAgent = getService("voip").userAgent;
+    await userAgent.makeCall({ phone_number: "0123456789" });
+    await contains(".o-voip-InCallView button:has([data-icon='pause']):enabled");
+    const session = userAgent.frontSession;
+    expect(session.__sipJsSession.isMock).toBe(true);
+
+    await click(".o-voip-InCallView button:has([data-icon='dialpad'])");
+    await click(".o-voip-Keypad-digitBtn:nth-child(1)");
+    await contains(".o-voip-Keypad-input[readonly]", { value: "1" });
+    await click(".o-voip-Keypad-digitBtn:nth-child(10)");
+    await click(".o-voip-Keypad-digitBtn:nth-child(12)");
+    await contains(".o-voip-Keypad-input[readonly]", { value: "1*#" });
+    expect(userAgent.frontSession).toBe(session);
+    expect(session.isOngoing).toBe(true);
+});
+
 test("Search by T9 code works", async () => {
     const pyEnv = await startServer();
     pyEnv["res.partner"].create([

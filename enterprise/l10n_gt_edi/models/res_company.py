@@ -14,6 +14,8 @@ class ResCompany(models.Model):
             ("AGE", "AGE: Agro-export Regime"),
             ("ECA", "ECA: Coffee Exporter"),
             ("EXI", "EXI: VAT Exempt (Entities or institutions legally exempt from VAT)"),
+            ("PRIM", "PRIM: Primary Regime"),
+            ("PECU", "PECU: Livestock Regime"),
         ],
         string="VAT Affiliation",
         compute="_compute_l10n_gt_edi_default_fields",
@@ -28,6 +30,8 @@ class ResCompany(models.Model):
         AGE - Electronic Agricultural Regime - Same as the agricultural regime, but for taxpayers who operate electronically, facilitating tax declaration and control processes.
         ECA - Exporter of Goods and Services - Explanation: For companies that export. It allows you to request tax credit refunds for exports and enjoy certain tax benefits.
         EXI - Exempt for Specific Income - Explanation: Applies to sectors or activities exempt from taxes according to special legislation, such as diplomatic services and certain exports of specific goods or services.
+        PRIM - Primary Regime.
+        PECU - Livestock Regime.
         """,
     )
     l10n_gt_edi_phrase_ids = fields.Many2many(

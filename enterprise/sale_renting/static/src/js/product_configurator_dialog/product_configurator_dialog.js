@@ -19,4 +19,13 @@ patch(ProductConfiguratorDialog.prototype, {
         }
         return params;
     },
+
+    _getAdditionalDialogProps() {
+        const props = super._getAdditionalDialogProps();
+        if (this.saleRentingProps.start_date && this.saleRentingProps.end_date) {
+            props.start_date = this.saleRentingProps.start_date;
+            props.end_date = this.saleRentingProps.end_date;
+        }
+        return props;
+    },
 });

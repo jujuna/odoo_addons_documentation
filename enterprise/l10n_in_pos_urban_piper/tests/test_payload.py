@@ -70,3 +70,5 @@ class TestL10nINUrbanPiperPayload(CommonPosUrbanPiperTest):
         self.assertEqual(len(items), 2)
         self.assertEqual(items[0]['tags'].get('zomato', []), ['alcohol-absent', 'allergen-milk'])
         self.assertEqual(items[1]['tags'].get('default', []), ['packaged-good'])
+
+        self.assertEqual(self.urbanpiper_store.tax_type, 'total_excluded')

@@ -4,7 +4,7 @@ from collections import defaultdict
 from markupsafe import Markup
 
 from odoo import api, fields, models, Command
-from odoo.exceptions import UserError, ValidationError, RedirectWarning
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, _, SQL
 from odoo.tools.misc import formatLang
 from dateutil.relativedelta import relativedelta
@@ -135,12 +135,12 @@ class AccountMove(models.Model):
         # log the post of a depreciation
         posted._log_depreciation_asset()
 
-        # look for any asset to create, in case we just posted a bill on an account
-        # configured to automatically create assets
-        posted.sudo()._auto_create_asset()
-
         # update asset in case bill has asset and values changed
+        # (before creating new assets, so that those are not updated right away)
         posted.sudo()._auto_update_asset()
+
+        # look for any asset to create, in case we just posted a bill on a fixed asset account
+        posted.sudo()._auto_create_asset()
 
         return posted
 
@@ -223,34 +223,14 @@ class AccountMove(models.Model):
                 if (
                     move_line.account_id
                     and move_line.account_id.can_create_asset
-                    and move_line.account_id.depreciation_model_id
                     and not (move_line.currency_id or move.currency_id).is_zero(move_line.price_total)
                     and not move_line.asset_ids
                     and not move_line.tax_line_id
                     and move_line.price_total > 0
                     and not (move.move_type in ('out_invoice', 'out_refund') and move_line.account_id.internal_group == 'asset')
                 ):
-                    if not move_line.name:
-                        if move_line.product_id:
-                            move_line.name = move_line.product_id.display_name
-                        else:
-                            raise UserError(_('Journal Items of %(account)s should have a label in order to generate an asset', account=move_line.account_id.display_name))
-
-                    if (
-                        move_line.account_id.depreciation_model_id.method != 'no_depreciation'
-                        and not (
-                            move_line.account_id.asset_depreciation_account_id
-                            and move_line.account_id.asset_expense_account_id
-                        )
-                    ):
-                        raise UserError(self.env._(
-                            "Account %(account)s should have accumulated depreciation and depreciation"
-                            " expense accounts set in order to generate an asset",
-                            account=move_line.account_id.display_name,
-                        ))
-
                     vals = {
-                        'name': move_line.name,
+                        'name': move_line.name or move_line.product_id.display_name or move.name,
                         'company_id': move_line.company_id.id,
                         'currency_id': move_line.company_currency_id.id,
                         'analytic_distribution': move_line.analytic_distribution,
@@ -263,10 +243,12 @@ class AccountMove(models.Model):
 
         assets = self.env['account.asset'].with_context({}).create(create_list)
         for asset, vals in zip(assets, create_list):
-            # Create variants if depreciation ledger is defined on the account
-            asset._create_variants(asset.account_asset_id.ledger_depreciation_model_ids)
-
-            asset.validate()
+            # Create variants if depreciation ledger is defined on the account. They mirror the
+            # depreciation of the main variant, which a "No depreciation" asset doesn't have.
+            if asset.model_id.method != 'no_depreciation':
+                asset._create_variants(asset.account_asset_id.ledger_depreciation_model_ids)
+            if asset._can_be_auto_validated():
+                asset.validate()
             invoice = asset.original_move_line_ids.move_id
             if invoice:
                 asset.message_post(body=Markup(_('Asset created from invoice: <b>%s</b>')) % invoice._get_html_link())
@@ -283,7 +265,7 @@ class AccountMove(models.Model):
             assets_to_update = self.env['account.asset']
             for line in move.line_ids.filtered(lambda aml: aml.asset_ids):
                 line.asset_ids.write({
-                    'name': line.name,
+                    'name': line.name or move.name,
                     'company_id': line.company_id.id,
                     'currency_id': line.company_currency_id.id,
                     'analytic_distribution': line.analytic_distribution,
@@ -305,12 +287,14 @@ class AccountMove(models.Model):
                         asset.name
                     ))
                 # Line account changed to a non fixed asset account so we delete the asset
-                if not (line_account.can_create_asset and asset.original_move_line_ids.depreciation_model_id):
+                if not line_account.can_create_asset:
                     assets_to_ignore += asset
 
             assets_to_update -= assets_to_ignore
             assets_to_ignore.set_to_cancelled()
-            assets_to_update.validate()
+            # The model recomputed from an account without depreciation model is empty
+            assets_to_update._set_no_depreciation_model_if_empty()
+            assets_to_update.filtered(lambda a: a._can_be_auto_validated()).validate()
             for asset in assets_to_update:
                 asset.message_post(body=_('Asset updated from invoice: %s', move._get_html_link()))
                 asset._post_non_deductible_tax_value()
@@ -461,15 +445,8 @@ class AccountMoveLine(models.Model):
             raise UserError(_("All the lines should be from the same account"))
         if not account.can_create_asset:
             raise UserError(self.env._(
-                "Account %(name)s cannot be used to create an asset. "
-                "The account must be of the Fixed Asset type.",
+                "Account %(name)s cannot be used to create an asset. The account must be of the Fixed Asset type.",
                 name=account.display_name))
-        if not (account.depreciation_model_id and account.asset_depreciation_account_id and account.asset_expense_account_id):
-            raise RedirectWarning(
-                message=self.env._("Account %(name)s not setup to generate assets. Depreciation model and asset accounts need to be set on account.", name=account.display_name),
-                action=account._get_records_action(),
-                button_text=self.env._("Go to Account"),
-            )
         ctx = self.env.context.copy()
         ctx.update({
             'default_original_move_line_ids': [(6, False, self.env.context['active_ids'])],
@@ -484,12 +461,15 @@ class AccountMoveLine(models.Model):
             "context": ctx,
         }
 
-    @api.depends('account_id')
+    # `product_id`: selecting a product recomputes `account_id` in the
+    # `_inverse_product_id` onchange through `add_to_compute`, which does
+    # not trigger the fields depending on `account_id`
+    @api.depends('account_id', 'product_id')
     def _compute_depreciation_model_id(self):
         for line in self:
             line.depreciation_model_id = line.account_id.depreciation_model_id
 
-    @api.depends('account_id', 'account_id.depreciation_model_id')
+    @api.depends('account_id', 'account_id.depreciation_model_id', 'product_id')
     def _compute_display_depreciation_model(self):
         for line in self:
             line.display_depreciation_model = bool(line.account_id.depreciation_model_id) and line.move_id.is_invoice()
@@ -527,21 +507,3 @@ class AccountMoveLine(models.Model):
 
         for record in self:
             record.non_deductible_tax_value = res.get(record._origin.id, 0.0)
-
-    def write(self, vals):
-        initial_accounts = {line.id: line.account_id.id for line in self}
-        result = super().write(vals)
-
-        lines_changed = self.filtered(lambda line: line.account_id.id != initial_accounts[line.id])
-        if lines_changed:
-            lines_with_assets = lines_changed.filtered(lambda line: line.asset_ids)
-            lines_with_no_assets = lines_changed.filtered(lambda line: not line.asset_ids and line.account_id.depreciation_model_id)
-            # Create assets for move lines
-            if lines_with_no_assets:
-                lines_with_no_assets.move_id.sudo()._auto_create_asset()
-            # Update asset values or delete assets
-            if lines_with_assets:
-                lines_with_assets.asset_ids.filtered(lambda a: a.state == 'open').set_to_cancelled()
-                lines_with_assets.move_id.sudo()._auto_update_asset()
-
-        return result

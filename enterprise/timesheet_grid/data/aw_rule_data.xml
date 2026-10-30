@@ -10,6 +10,96 @@
         <field name="always_active" eval="0"/>
     </record>
 
+    <record id="aw_rule_microsoft_teams_chat" model="aw.rule">
+        <field name="sequence">11</field>
+        <field name="name">Microsoft Teams Chat</field>
+        <field name="regex">^Chat \| (.+?) \| Microsoft Teams\|https:\/\/teams\.live\.com\/v2\/</field>
+        <field name="type">messaging</field>
+        <field name="template">Messaging $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_microsoft_teams_meet" model="aw.rule">
+        <field name="sequence">12</field>
+        <field name="name">Microsoft Teams Meet</field>
+        <field name="regex">^Meet \| (.+?) \| Microsoft Teams\|https:\/\/teams\.live\.com\/v2\/</field>
+        <field name="type">meeting</field>
+        <field name="template">[CALL] $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_microsoft_teams_chat_desktop_app" model="aw.rule">
+        <field name="sequence">13</field>
+        <field name="name">Microsoft Teams Chat Desktop App</field>
+        <field name="regex">^Chat \| (.+?) \| Microsoft Teams</field>
+        <field name="type">messaging</field>
+        <field name="template">Messaging $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_microsoft_teams_meet_desktop_app" model="aw.rule">
+        <field name="sequence">14</field>
+        <field name="name">Microsoft Teams Meet Desktop App</field>
+        <field name="regex">^Meet \| (.+?) \| Microsoft Teams</field>
+        <field name="type">meeting</field>
+        <field name="template">[CALL] $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_onlyoffice_presentation" model="aw.rule">
+        <field name="sequence">15</field>
+        <field name="name">ONLYOFFICE Presentation</field>
+        <field name="regex">^(.+?\.(?:pptx|ppt|odp|odg|otp|ppsm|pptm|ppsx|pps|potx|pot|potm|fodp|dps|dpt|sxi|key))\s—\s*ONLYOFFICE</field>
+        <field name="type">presentation</field>
+        <field name="template">Working on $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_onlyoffice_spreadsheet" model="aw.rule">
+        <field name="sequence">16</field>
+        <field name="name">ONLYOFFICE Spreadsheet</field>
+        <field name="regex">^(.+?\.(?:xlsx|xls|xlsm|xlsb|ods|ots|xltx|xltm|xml|fods|et|ett|sxc|numbers))\s—\s*ONLYOFFICE</field>
+        <field name="type">spreadsheet</field>
+        <field name="template">Working on $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_onlyoffice_generic" model="aw.rule">
+        <field name="sequence">17</field>
+        <field name="name">ONLYOFFICE Generic</field>
+        <field name="regex">^(.+?)\s—\s*ONLYOFFICE</field>
+        <field name="type">document</field>
+        <field name="template">Working on $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_wps_presentation" model="aw.rule">
+        <field name="sequence">18</field>
+        <field name="name">WPS Presentation</field>
+        <field name="regex">^(.+?\.(?:dps|dpt|ppt|pps|pot|pptx|ppsx|potx))\s-\s*WPS Office</field>
+        <field name="type">presentation</field>
+        <field name="template">Working on $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_wps_spreadsheet" model="aw.rule">
+        <field name="sequence">19</field>
+        <field name="name">WPS Spreadsheet</field>
+        <field name="regex">^(.+?\.(?:et|ett|xls|xlt|xlsx|xlsm|xltx|xltm|xlsb))\s-\s*WPS Office</field>
+        <field name="type">spreadsheet</field>
+        <field name="template">Working on $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
+    <record id="aw_rule_wps_generic" model="aw.rule">
+        <field name="sequence">21</field>
+        <field name="name">WPS Generic</field>
+        <field name="regex">^(.+?)\s-\s*WPS Office</field>
+        <field name="type">document</field>
+        <field name="template">Working on $1</field>
+        <field name="always_active" eval="0"/>
+    </record>
+
     <record id="aw_rule_gmail_inbox" model="aw.rule">
         <field name="sequence">20</field>
         <field name="name">Gmail</field>

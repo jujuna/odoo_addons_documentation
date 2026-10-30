@@ -448,3 +448,30 @@ class TestDecemberRegularization(TestPayrollCommon):
                           "SIMPLE_DECEMBER input line should not be duplicated on recompute.")
         self.assertEqual(len(double_december_basic_inputs), 1,
                           "DOUBLE_DECEMBER_BASIC input line should not be duplicated on recompute.")
+
+    def test_07_departure_n1_simple_holiday_pay_from_gross_reference(self):
+        """
+        The payroll of the previous year is not in Odoo: the departure passes the gross reference remuneration of
+        that year as GROSS_REF, and the simple holiday pay balance of the N-1 payslip follows it (7.67 %).
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Employee Without Previous Payroll',
+            'company_id': self.belgian_company.id,
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'wage': 3000,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+        })
+        departure_payslip_n1 = self.env['hr.payslip'].create({
+            'name': 'Holiday pay N-1',
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            'struct_id': self.structure_holidays_n1.id,
+            'date_from': date(2026, 9, 1),
+            'date_to': date(2026, 9, 30),
+        })
+        departure_payslip_n1._set_input_values({'GROSS_REF': 40000})
+        departure_payslip_n1.compute_sheet()
+        simple_line = departure_payslip_n1.line_ids.filtered(lambda l: l.code == 'PAY_SIMPLE')
+        self.assertAlmostEqual(simple_line.total, 3068.0, places=2,
+                               msg="The simple holiday pay balance should follow the gross reference of the previous year")

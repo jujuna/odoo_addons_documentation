@@ -5,7 +5,7 @@
         <field name="name">planning.slot.list</field>
         <field name="model">planning.slot</field>
         <field name="arch" type="xml">
-            <list string="Shift List" multi_edit="1" sample="1" editable="bottom" js_class="planning_tree" open_form_view="True">
+            <list string="Shift List" multi_edit="1" sample="1" js_class="planning_tree">
                 <header>
                     <button name="action_planning_publish_and_send" class="btn btn-secondary mx-1"
                         string="Publish" type="object" groups="planning.group_planning_manager" invisible="context.get('my_planning_action')"/>
@@ -537,6 +537,7 @@
                        filter_field="checked"
                        groups="planning.group_planning_user"
                 />
+                <field name="is_hatched" invisible="1"/>
                 <popover card_id="%(planning.planning_view_card_inherit)d"/>
             </calendar>
         </field>
@@ -753,8 +754,17 @@
         <field name="res_model">planning.slot</field>
         <field name="path">my-planning</field>
         <field name="view_mode">calendar,gantt,list,form,kanban</field>
-        <field name="mobile_view_mode">calendar</field>
-        <field name="context">{'search_default_my_shifts': 1, 'my_planning_action': 1, 'planning_expand_resource': 1, 'planning_expand_role': 1}</field>
+        <field name="mobile_view_mode">kanban</field>
+        <field name="context">{
+            'search_default_my_shifts': 1,
+            'my_planning_action': 1,
+            'planning_expand_resource': 1,
+            'planning_expand_role': 1,
+            'planning_expand_project': 1,
+            'planning_expand_task': 1,
+            'planning_expand_sale_line_id': 1,
+            'search_default_start_datetime': 'today',
+        }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No shifts found. Let's create one!

@@ -7,6 +7,7 @@ from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup, escape
 from psycopg2.extensions import TransactionRollbackError
+from psycopg2.errors import SerializationFailure
 
 from odoo import _, api, fields, models, modules
 from odoo.exceptions import UserError, ValidationError
@@ -402,7 +403,6 @@ class SaleOrder(models.Model):
         for order in self:
             order.is_closing = (
                 order.subscription_state in SUBSCRIPTION_PROGRESS_STATE
-                and order.user_closable
                 and order.end_date
                 and order.next_invoice_date
                 and order.end_date <= order.next_invoice_date
@@ -1871,14 +1871,18 @@ class SaleOrder(models.Model):
         if need_cron_trigger:
             self._subscription_launch_cron_parallel(batch_size)
         else:
-            # Cron has ended properly make sure to clean up the flags
-            subscriptions_to_reset = self.search(['|', ('is_batch', '=', True), ('is_invoice_cron', '=', True)])
-            subscriptions_to_reset.write({
-                'is_invoice_cron': False,
-                'is_batch': False,
-                'user_pause_start': False
-            })
-            self._subscription_commit_cursor(auto_commit)
+            try:
+                # Cron has ended properly make sure to clean up the flags
+                subscriptions_to_reset = self.search(['|', ('is_batch', '=', True), ('is_invoice_cron', '=', True)])
+                subscriptions_to_reset.write({
+                    'is_invoice_cron': False,
+                    'is_batch': False,
+                    'user_pause_start': False
+                })
+                self._subscription_commit_cursor(auto_commit)
+            except SerializationFailure:
+                self._subscription_rollback_cursor(auto_commit)
+                _logger.error("Reset of is_invoice_cron or is_batch failed, will retry next time")
         return account_moves
 
     def _create_invoices(self, *args, **kwargs):

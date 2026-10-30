@@ -618,8 +618,11 @@ services reception has been received as well.
         }
 
         if self.company_id.l10n_cl_dte_service_provider == 'SIIDEMO':
-            self.message_post(body=_(
-                '<strong>WARNING: Simulating %s in Demo Mode</strong>') % action_response[status_type].description)
+            self.message_post(
+                body=Markup("<strong>%s</strong>") % _(
+                "WARNING: Simulating %s in Demo Mode",
+                action_response[status_type].description)
+            )
             self.l10n_cl_dte_acceptation_status = 'accepted_goods' if \
                 self.l10n_cl_dte_acceptation_status in accepted_statuses and status_type in accepted_statuses \
                 else status_type
@@ -651,9 +654,14 @@ services reception has been received as well.
                 self.l10n_cl_dte_acceptation_status in accepted_statuses and status_type in accepted_statuses \
                 else status_type
             self._l10n_cl_send_dte_reception_status(status_type)
-            msg = _('Document %s was accepted with the following response:') % (
-                action_response[status_type].description) + '<br/><strong>%s: %s.</strong>' % (
-                cod_response, description_response)
+            msg = _(
+                "Document %(document)s was accepted with the following response: %(response)s",
+                document=action_response[status_type].description,
+                response=Markup('<br/><strong>%s: %s.</strong>') % (
+                    cod_response,
+                    description_response,
+                ),
+            )
             if self.company_id.l10n_cl_dte_service_provider == 'SIIDEMO':
                 msg += _(' -- Response simulated in Demo Mode')
         else:
@@ -752,6 +760,8 @@ services reception has been received as well.
     def _l10n_cl_create_partner_dte(self):
         dte_signed, file_name = self._l10n_cl_create_dte_envelope(
             '55555555-5' if self.partner_id.l10n_cl_sii_taxpayer_type == '4' else self.partner_id.vat)
+        if not dte_signed:
+            return False
         dte_partner_attachment = self.env['ir.attachment'].create({
             'name': file_name,
             'res_model': self._name,
@@ -765,6 +775,8 @@ services reception has been received as well.
         return dte_partner_attachment
 
     def _l10n_cl_create_dte_envelope(self, receiver_rut='60803000-K'):
+        if not self.sudo().l10n_cl_dte_file:
+            return False, False
         file_name = 'F{}T{}.xml'.format(self.l10n_latam_document_number, self.l10n_latam_document_type_id.code)
         digital_signature_sudo = self.company_id.sudo()._get_digital_signature(user_id=self.env.user.id)
         template = self.l10n_latam_document_type_id._is_doc_type_voucher() and self.env.ref(
@@ -795,6 +807,8 @@ services reception has been received as well.
     def _l10n_cl_send_dte_to_partner(self):
         # We need a DTE with the partner vat as RutReceptor to be sent to the partner
         dte_partner_attachment = self._l10n_cl_create_partner_dte()
+        if not dte_partner_attachment:
+            return
         self.env.ref('l10n_cl_edi.l10n_cl_edi_email_template_invoice').send_mail(
             self.id, force_send=True, email_values={'attachment_ids': [dte_partner_attachment.id]})
         self.l10n_cl_dte_partner_status = 'sent'
@@ -1108,7 +1122,7 @@ services reception has been received as well.
             return invoice._reason_cannot_decode_has_invoice_lines()
 
         xml_tree = file_data['xml_tree']
-        invoice.l10n_cl_dte_file = file_data['attachment']
+        invoice.sudo().l10n_cl_dte_file = file_data['attachment']
         invoice.l10n_cl_dte_acceptation_status = 'received'
 
         company_vat = self.company_id._l10n_cl_get_root_company().vat

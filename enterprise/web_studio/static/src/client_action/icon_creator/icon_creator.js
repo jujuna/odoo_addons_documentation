@@ -110,7 +110,7 @@ export class IconCreator extends Component {
         this.props.onIconChange({
             type: "base64",
             uploaded_attachment_id: file.id,
-            webIconData: "data:image/png;base64," + res[0].raw.replace(/\s/g, ""),
+            webIconData: "data:image/png;base64," + res[0].raw.content.replace(/\s/g, ""),
         });
     }
 

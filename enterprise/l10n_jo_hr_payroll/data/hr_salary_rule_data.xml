@@ -249,7 +249,7 @@ if employee.is_non_resident:
 elif employee.l10n_jo_is_blind:
     exemption_amount = GROSS * 12
 elif employee.l10n_jo_has_dependants:
-    exemption_amount += 12000
+    exemption_amount += payslip._rule_parameter('l10n_jo_dependants_exemption_amount')
 result = max((GROSS * 12) - exemption_amount, 0)
         </field>
         <field name="struct_ids" eval="[(6, 0, [

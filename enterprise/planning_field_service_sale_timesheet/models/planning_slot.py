@@ -202,9 +202,17 @@ class PlanningSlot(models.Model):
         res = super().write(vals)
         if 'under_warranty' in vals:
             ongoing_interventions = self.filtered(lambda s: s.state != '4_completed' and s.sale_order_id and not s.sale_order_id.locked)
-            lines = ongoing_interventions.sale_order_id.order_line.filtered(lambda l: l.planning_slot_id in ongoing_interventions and l.qty_invoiced == 0)
+            # include sale_line_id: the SO service line is often linked without planning_slot_id
+            lines = ongoing_interventions.sale_order_id.order_line.filtered(
+                lambda l: l.qty_invoiced == 0 and (
+                    l.planning_slot_id in ongoing_interventions or l in ongoing_interventions.sale_line_id
+                )
+            )
             if vals['under_warranty']:
-                lines.sudo().write({'price_unit': 0, 'technical_price_unit': 0})
+                lines.filtered(lambda l: l._should_reset_under_warranty()).sudo().write({
+                    'price_unit': 0,
+                    'technical_price_unit': 0,
+                })
             else:
                 lines.with_context(force_price_recomputation=True).sudo()._compute_price_unit()
         return res
@@ -303,7 +311,7 @@ class PlanningSlot(models.Model):
             'intervention_id': self.id,  # avoid 'default_' context key as we are going to create SOL with this context
             'pricelist': self_with_company.partner_id.property_product_pricelist.id,
             'order_id': order_sudo.id,
-            **order_sudo.sudo().with_context(child_field='order_line')._get_action_add_from_catalog_extra_context(),
+            **order_sudo.sudo().with_context(child_field='order_line', intervention_id=self.id)._get_action_add_from_catalog_extra_context(),
             'default_invoice_policy': 'delivery',
             'search_default_fsm_quantity': self.state == '4_completed',
             'child_field': 'order_line',
@@ -509,7 +517,7 @@ class PlanningSlot(models.Model):
                 'so_line': self.sale_line_id.id,
                 'is_so_line_edited': True,
             })
-            if self.under_warranty:
+            if self.under_warranty and self.sale_line_id._should_reset_under_warranty():
                 self.sale_line_id.price_unit = 0
 
         return sale_order_lines
@@ -522,7 +530,7 @@ class PlanningSlot(models.Model):
             ('order_id', 'in', self.sale_order_id.sudo().filtered(lambda so: so.state == 'sale').ids),
         ])
         if self.under_warranty:
-            sale_order_lines.price_unit = 0
+            sale_order_lines.filtered(lambda l: l._should_reset_under_warranty()).price_unit = 0
         for sol in sale_order_lines:
             # if a SOL with service product that has invoicing policy based on milestones,
             # the delivered quantity will be computed based on the milestones reached

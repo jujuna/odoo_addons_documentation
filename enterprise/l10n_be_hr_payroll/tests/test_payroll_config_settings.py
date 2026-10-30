@@ -98,6 +98,16 @@ class TestL10nBePayrollConfigSettings(TestBelgiumCommon):
             self.category_00010.allowed_worker_code_ids,
         )
 
+    def test_company_size_from_employees_when_configuring(self):
+        """The configuration exists before the employees: opening the form defaults the size."""
+        self.assertFalse(self.config.onss_importance_code)
+        self.env['hr.employee'].create([{'name': f'Employee {i}', 'company_id': self.be_company.id} for i in range(5)])
+        self.config.action_open_hr_payroll_localization_form()
+        self.assertEqual(self.config.onss_importance_code, '2')
+        self.config.onss_importance_code = '4'
+        self.config.action_open_hr_payroll_localization_form()
+        self.assertEqual(self.config.onss_importance_code, '4', "a size set by the user is kept")
+
     # ------------------------------------------------------------------
     # Versioning
     # ------------------------------------------------------------------

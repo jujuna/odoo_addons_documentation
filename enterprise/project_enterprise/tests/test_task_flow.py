@@ -118,7 +118,7 @@ class TestTaskFlow(TransactionCase):
                 with Form(self.env["project.task"].with_context({
                     'default_planned_date_begin': datum["dates"][0],
                     'default_date_deadline': datum["dates"][1],
-                    'scale': scale,
+                    'use_working_schedule': scale in ("month", "year"),
                 }), form_view) as task:
                     task.name = "Test"
                     task.user_ids = self.project_user
@@ -129,6 +129,40 @@ class TestTaskFlow(TransactionCase):
                     self.assertEqual(task.allocated_hours, datum["second_expected_allocated_hours"], "Allocated hours should be computed when the planned dates are modified")
                     task.planned_date_begin = False
                     self.assertEqual(task.allocated_hours, 0.0, "Allocated hours should be 0 as there is no planned_date_begin")
+
+    @freeze_time('2023-01-02')
+    def test_default_allocated_hours_when_creating_task_on_all_day_cell(self):
+        """ Scheduling a task on a cell that has no specific time of day (e.g. the all-day slot
+            of the "day"/"week" scale in the calendar view) should compute the planned dates
+            according to the working calendar, just like the "month"/"year" scale does, even
+            though the scale itself isn't "month" or "year".
+        """
+        form_view = self.env["ir.ui.view"].create({
+            "name": "Test Form",
+            "model": "project.task",
+            "type": "form",
+            "inherit_id": self.env.ref("project.view_task_form2").id,
+            "arch": """
+                <form position="inside">
+                    <field name="allocated_hours"/>
+                </form>
+            """,
+        })
+
+        with Form(self.env["project.task"].with_context({
+            'default_planned_date_begin': datetime(2023, 1, 2),
+            'default_date_deadline': datetime(2023, 1, 6, 23, 59, 59),
+            'use_working_schedule': True,
+        }), form_view) as task:
+            task.name = "Test"
+            task.user_ids = self.project_user
+            task.project_id = self.project_test
+            self.assertEqual(
+                (task.planned_date_begin, task.date_deadline),
+                (datetime(2023, 1, 2, 7, 0), datetime(2023, 1, 6, 16, 0, 0)),
+                "Scheduling on an all-day cell should compute the planned dates according to the user "
+                "calendar, regardless of the scale of the view that triggered the creation.",
+            )
 
     def test_planning_overlap(self):
         task_A = self.env['project.task'].create({

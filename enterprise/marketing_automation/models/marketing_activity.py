@@ -139,7 +139,7 @@ class MarketingActivity(models.Model):
         ('bounce', 'Bounced')], inverse="_inverse_trigger_type_ui", compute="_compute_trigger_type_ui", store=False)
     allowed_trigger_type_ui = fields.Json('Allowed Trigger Types', compute='_compute_allowed_trigger_type_ui')
     trigger_category_ui = fields.Selection([('mail', 'Email')], compute="_compute_trigger_category_ui")
-    # Trigerring activity tree
+    # Triggering activity tree
     triggering_activity_id = fields.Many2one("marketing.activity",
         help="Activity to check for the trigger", index="btree_not_null")
     triggering_activity_allowed_ids = fields.Many2many(
@@ -300,6 +300,12 @@ class MarketingActivity(models.Model):
                     activity_id=activity.id)
             else:
                 activity.name = _("Marketing Activity: %(activity_type)s", activity_type=activity.activity_type)
+
+    @api.constrains('activity_domain')
+    def _check_activity_domain(self):
+        """ Check that the filter domain is valid for the current user """
+        for activity in self:
+            self.env['marketing.campaign']._check_restricted_domain(activity.model_name, activity.activity_domain)
 
     @api.depends('activity_type')
     def _compute_mass_mailing_id_mailing_type(self):

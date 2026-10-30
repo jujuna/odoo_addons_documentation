@@ -545,6 +545,10 @@
             <t t-foreach="worker.occupations" t-as="occupation">
                 <t t-call="l10n_be_hr_payroll.Occupation"/>
             </t>
+            <t t-if="worker.activation_information">
+                <t t-set="activation" t-value="worker.activation_information"/>
+                <t t-call="l10n_be_hr_payroll.ActivationInformation"/>
+            </t>
             <t t-foreach="worker.contributions" t-as="contribution">
                 <t t-call="l10n_be_hr_payroll.WorkerContribution"/>
             </t>
@@ -707,8 +711,39 @@
         - 90412 ScaleSalary
         - 90413 AdditionalScaleSalary
         - 90438 ReorgMeasureInformation
-        - 90578 ActivationInformation
      -->
+
+    <template id="ActivationInformation">
+        <!-- 90578: Bloc fonctionnel contenant les données permettant de calculer la cotisation d'activation.
+            Cardinalité 1 si la zone « Notion de dispense de prestations » (00826) = 2 ou 7 dans au moins 1 bloc Occupation-Informations (90313).
+        -->
+        <ActivationInformation>
+            <!-- 01191
+                DESCRIPTION:    Il s'agit de la date de début à partir de laquelle commence la dispense des prestations.
+                DOMAINE DE DEFINITION:  Au plus tôt le 28 septembre 2017.
+                PRESENCE:   Indispensable
+            -->
+            <ServiceExemptionStartDate t-out="activation.service_exemption_start_date"/>
+            <!-- 01192
+                DESCRIPTION:    Il s'agit de la date de début à partir de laquelle la situation de formation est considérée comme valable.
+                DOMAINE DE DEFINITION:  Au plus tôt le 28 septembre 2017. La date de début de situation de la formation doit être plus grande ou égale à la date de début de la dispense des prestations.
+                PRESENCE:   Indispensable
+            -->
+            <TrainingSituationStartDate t-out="activation.training_situation_start_date"/>
+            <!-- 01193
+                DESCRIPTION:    Mesure prévue pour la formation des travailleurs dispensés de prestations.
+                DOMAINE DE DEFINITION:  0 = pas de formation suivie par le travailleur, 1 = formation obligatoire suivie par le travailleur, 2 = obligation de suivre un reclassement professionnel
+                PRESENCE:   Indispensable
+            -->
+            <TrainingSituation t-out="activation.training_situation"/>
+            <!-- 01244
+                DESCRIPTION:    Mention du pourcentage des travailleurs avec cotisation d'activation
+                DOMAINE DE DEFINITION:  0 = moins de 10%, 1 = au moins 10%
+                PRESENCE:   Obligatoire si le trimestre de la déclaration est postérieur ou égal à 2023/1.
+            -->
+            <ActivationPercentageStatus t-out="activation.activation_percentage_status"/>
+        </ActivationInformation>
+    </template>
 
     <template id="StudentContribution">
         <!-- 90003: Bloc fonctionnel permettant de déclarer la cotisation de solidarité due pour un étudiant. -->
@@ -808,7 +843,7 @@
                 . JJ est le jour
             -->
             <t t-if="contribution.first_hiring_date != -1">
-                <FirstHiringDate t-out="first_hiring_date"/>
+                <FirstHiringDate t-out="contribution.first_hiring_date"/>
             </t>
         </WorkerContribution>
     </template>
@@ -1231,7 +1266,7 @@
                 PRESENCE:   Obligatoire si il s’agit d'un membre du personnel d’un employeur déclaré avec la catégorie employeur 105, 205 ou 305 qui a acquis ces jours de vacances.
                 Cette donnée ne peut pas être utilisée pour les déclarations antérieures au 1er trimestre 2018.
              -->
-            <HolidayDaysNumber t-if="info.six_months_illness_date != -1" t-out="info.holiday_days_number"/>
+            <HolidayDaysNumber t-if="info.holiday_days_number != -1" t-out="info.holiday_days_number"/>
 
             <!-- 00728
                 DESCRIPTION:
@@ -1945,6 +1980,10 @@
                                                 <tr>
                                                     <td>Mean Working Hours:</td>
                                                     <td style="text-align: right;"><t t-out="pretty_format(occupation.mean_working_hours)"/></td>
+                                                </tr>
+                                                <tr t-if="occupation.retired != '0'">
+                                                    <td>Retired</td>
+                                                    <td style="text-align: right;"><t t-out="occupation.retired"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Part Time:</td>

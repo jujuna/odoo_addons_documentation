@@ -49,6 +49,17 @@ class Base_ImportImport(models.TransientModel):
     def _convert_to_float(self, value):
         return float(value) if value else 0.0
 
+    def _convert_import_data(self, fields, options):
+        # Override to avoid the skip so it can be done later
+        if not self.env.context.get('default_journal_id') or not options.get('bank_stmt_import'):
+            return super()._convert_import_data(fields, options)
+
+        oldskip = options.pop("skip", 0)
+        res = super()._convert_import_data(fields, options)
+        options["skip"] = oldskip
+
+        return res
+
     def _parse_import_data(self, data, import_fields, options):
         # EXTENDS base
         data = super()._parse_import_data(data, import_fields, options)
@@ -82,6 +93,8 @@ class Base_ImportImport(models.TransientModel):
                     data = data[::-1]  # reverse data if dates are in descending order to make them ascending
                 else:  # If dates are not sorted at all, we throw an error
                     raise UserError(_('Rows must be sorted by date.'))
+
+        data = data[options.get("skip"):]  # skipping rows *after* the order is potentially reversed
 
         if 'debit' in import_fields and 'credit' in import_fields:
             index_debit = import_fields.index('debit')

@@ -3,30 +3,15 @@ import { createSpreadsheet } from "@documents_spreadsheet/../tests/helpers/sprea
 import { describe, expect, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
 import { onRpc } from "@web/../tests/web_test_helpers";
+import { TEST_LOCALES } from "@spreadsheet/../tests/helpers/locale";
 
 defineDocumentSpreadsheetModels();
 
 describe.current.tags("desktop");
 
-const en_US = {
-    name: "English (US)",
-    code: "en_US",
-    thousandsSeparator: ",",
-    decimalSeparator: ".",
-    dateFormat: "m/d/yyyy",
-    timeFormat: "hh:mm:ss a",
-    formulaArgSeparator: ",",
-};
+const en_US = TEST_LOCALES.en_US;
 
-const fr_FR = {
-    name: "French",
-    code: "fr_FR",
-    thousandsSeparator: " ",
-    decimalSeparator: ",",
-    dateFormat: "dd/mm/yyyy",
-    timeFormat: "hh:mm:ss",
-    formulaArgSeparator: ";",
-};
+const fr_FR = TEST_LOCALES.fr_FR;
 
 test("No locale icon if user locale matched spreadsheet locale", async function () {
     onRpc("/spreadsheet/data/*", () => ({

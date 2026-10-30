@@ -288,6 +288,35 @@ class TestCommittedAchievedAmount(TestAccountBudgetPurchaseCommon):
         bill.action_post()
         self.assertBudgetLine(plan_a_line, committed=1000, achieved=700)
 
+    def test_budget_analytic_receipt_from_po(self):
+        """ Test with a receipt linked to a PO. """
+        # Draft the test purchase order.
+        self.purchase_order.button_draft()
+        # Create a new purchase order
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': self.partner_a.id,
+            'date_order': '2019-01-10',
+            'order_line': [
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'product_qty': 10,
+                    'analytic_distribution': {self.analytic_account_partner_a.id: 100},
+                }),
+            ]
+        })
+        purchase_order.button_confirm()
+        plan_a_line = self.budget_analytic_expense.budget_line_ids[0]
+        self.assertBudgetLine(plan_a_line, committed=1000, achieved=0)
+
+        # Create receipt for 5 units
+        purchase_order.order_line.qty_received = 5
+        receipt = self.env['account.move'].browse(purchase_order.action_create_invoice()['res_id'])
+        receipt.invoice_date = '2019-01-10'
+        receipt.move_type = 'in_receipt'
+        self.assertBudgetLine(plan_a_line, committed=1000, achieved=0)
+        receipt.action_post()
+        self.assertBudgetLine(plan_a_line, committed=1000, achieved=500)
+
     def test_multiple_bills_from_po_multiple_uom(self):
         """ Test with multiple bills linked to a PO and multiple UoM. """
         self.purchase_order.button_draft()

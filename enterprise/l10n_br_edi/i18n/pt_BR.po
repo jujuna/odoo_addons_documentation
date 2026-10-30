@@ -1,16 +1,17 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* l10n_br_edi
+# * l10n_br_edi
 #
+# "Maitê Dietze (madi)" <madi@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 18:18+0000\n"
-"PO-Revision-Date: 2026-09-18 04:59+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-07 02:33+0000\n"
+"Last-Translator: \"Maitê Dietze (madi)\" <madi@odoo.com>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/odoo-"
-"master/l10n_br_edi/pt_BR/>\n"
+"20/l10n_br_edi/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,6 +27,10 @@ msgid ""
 "========================\n"
 "Provides electronic invoicing for Brazil through Avatax.\n"
 msgstr ""
+"\n"
+"EDI Financeiro - Brasil\n"
+"========================\n"
+"Fornece faturamento eletrônico para o Brasil por meio do Avatax.\n"
 
 #. module: l10n_br_edi
 #: model:mail.template,body_html:l10n_br_edi.mail_template_move_update
@@ -72,6 +77,46 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 12px;\">\n"
+"        Prezado\n"
+"       <t t-if=\"object.partner_id.parent_id\">\n"
+"            <t t-out=\"object.partner_id.name or ''\"> Brandon Freeman</t> "
+"(<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>),\n"
+"       </t>\n"
+"        <t t-else=\"\"> \n"
+"           <t t-out=\"object.partner_id.name or ''\"> Brandon Freeman</t>,\n"
+"       </t>\n"
+"        <br/> <br/> \n"
+"\n"
+"        Esperamos que esteja bem. Há uma atualização referente à\n"
+"        fatura <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">"
+"INV/2021/05/0005</span>\n"
+"        <t t-if=\"object.invoice_origin\">\n"
+"            (com referência: <t t-out=\"object.invoice_origin or ''\">"
+"SUB003</t>)\n"
+"       </t> \n"
+"        datada de <t t-out=\"format_date(object.invoice_date) or ''\">01/01/"
+"2024</t>.\n"
+"       <br/><br/> \n"
+"\n"
+"        Esta fatura foi\n"
+"       <t t-if=\"ctx.get('wizard_mode') == 'cancel'\"> cancelada.</t>\n"
+"        <t t-else=\"\">corrigida.</t>\n"
+"       Consulte os documentos em anexo para mais detalhes.\n"
+"       <br/><br/> \n"
+"\n"
+"        Não hesite em entrar em contato conosco caso tenha alguma dúvida.\n"
+"       <br/><br/> \n"
+"        Atenciosamente,\n"
+"       <t t-if=\"not is_html_empty(object.user_id.signature)\">\n"
+"            <br/> <br/>\n"
+"            <div data-o-mail-quote=\"1\"> --<br data-o-mail-quote=\"1\"/><t "
+"t-out=\"object.user_id.signature or ''\">Mitchell Admin</t></div>\n"
+"       </t>\n"
+"    </p> \n"
+"</div>\n"
+"            "
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.account_move_form_inherit_l10n_br_edi
@@ -79,6 +124,9 @@ msgid ""
 "<i class=\"oi\" data-icon=\"warning\" role=\"img\" title=\"EDI (Brazil)\"/>\n"
 "                            <span class=\"mx-1\">E-invoicing (Brazil)</span>"
 msgstr ""
+"<i class=\"oi\" data-icon=\"warning\" role=\"img\" title=\"EDI (Brazil)\"/>\n"
+"                            <span class=\"mx-1\">Faturamento eletrônico "
+"(Brasil)</span>"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_last_edi_status__accepted
@@ -94,27 +142,26 @@ msgstr "Chave de acesso"
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_account_chart_template
 msgid "Account Chart Template"
-msgstr ""
+msgstr "Modelo de plano da contas"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_nbs_code__active
 msgid "Active"
-msgstr ""
+msgstr "Ativo"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_partner__l10n_br_is_cashback_applied
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_users__l10n_br_is_cashback_applied
 msgid "Apply Cashback"
-msgstr ""
+msgstr "Aplicar reembolso"
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.l10n_br_nbs_code_view_search
 msgid "Archived"
-msgstr ""
+msgstr "Arquivado"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type_tax_override__l10n_br_avatax_code
-#, fuzzy
 msgid "Avatax Code"
 msgstr "Código Avatax"
 
@@ -138,7 +185,7 @@ msgstr "Transferência bancária, carteira digital"
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type_tax_override__benefit_code
 msgid "Benefit Code"
-msgstr ""
+msgstr "Código de benefício"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__15
@@ -203,6 +250,8 @@ msgid ""
 "Brazil: Brazilian Service Classification (NBS) code required for services in "
 "the tax reform."
 msgstr ""
+"Brasil: É necessário o código da Classificação de Serviços do Brasil (NBS) "
+"para os serviços incluídos na reforma tributária."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_account_move_line__l10n_br_cfop
@@ -223,12 +272,15 @@ msgid ""
 "of LC 214/25 for the calculation of the presumed credit. Only used for "
 "transactions with the Manaus Free Trade Zone (ZFM)"
 msgstr ""
+"Brasil: Classificação de acordo com as porcentagens definidas no art. 450, § "
+"1º, da Lei 214/25 para o cálculo do crédito presumido. Utilizada apenas para "
+"transações com a Zona Franca de Manaus (ZFM)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_res_partner__l10n_br_tax_regime
 #: model:ir.model.fields,help:l10n_br_edi.field_res_users__l10n_br_tax_regime
 msgid "Brazil: Contact FederalTax Regime"
-msgstr ""
+msgstr "Brasil: Regime de tributação federal do contato"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_account_move_line__l10n_br_cbs_ibs_deduction
@@ -236,6 +288,8 @@ msgid ""
 "Brazil: Deduction value to reduce the CBS/IBS taxable base in outbound "
 "invoices for certain operations."
 msgstr ""
+"Brasil: Valor de dedução para reduzir a base tributável do CBS/IBS em notas "
+"fiscais de saída para determinadas operações."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_account_bank_statement_line__l10n_br_presence
@@ -247,6 +301,8 @@ msgid ""
 "Brazil: Defines if the buyer was physically present during the transaction, "
 "affecting tax calculation and location."
 msgstr ""
+"Brasil: Define se o comprador estava fisicamente presente durante a "
+"transação, o que afeta o cálculo de impostos e a localização."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type__l10n_br_transaction_usage
@@ -254,6 +310,9 @@ msgid ""
 "Brazil: Defines the fiscal classification of how the good or service is used "
 "in the transaction, which may impact tax calculation and invoice request."
 msgstr ""
+"Brasil: Define a classificação fiscal de como o bem ou serviço é utilizado "
+"na transação, o que pode afetar o cálculo de impostos e a emissão da nota "
+"fiscal."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type__l10n_br_service_operation_indicator
@@ -263,12 +322,17 @@ msgid ""
 "and invoice generation. If left empty, Avalara's automatic calculation may "
 "be used, but specific municipal validations may require a manual definition."
 msgstr ""
+"Brasil: Define o código específico do indicador de operação “indOp” para o "
+"serviço (por exemplo, '050101'). Esse valor é enviado à Avalara para cálculo "
+"de impostos e geração de faturas. Se deixado em branco, o cálculo automático "
+"da Avalara poderá ser utilizado, mas validações municipais específicas podem "
+"exigir uma definição manual."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_res_partner__l10n_br_entity_type
 #: model:ir.model.fields,help:l10n_br_edi.field_res_users__l10n_br_entity_type
 msgid "Brazil: Defines the type of entity."
-msgstr ""
+msgstr "Brasil: Define o tipo de entidade."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_product_product__l10n_br_legal_uom_id
@@ -277,11 +341,13 @@ msgid ""
 "Brazil: Determines the conversion factor between the commercial unit and the "
 "taxable unit when taxes apply per quantity (ad rem)."
 msgstr ""
+"Brasil: Determina o fator de conversão entre a unidade comercial e a unidade "
+"tributável quando os impostos são aplicados por quantidade (ad rem)."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_account_move_line__l10n_br_tax_details
 msgid "Brazil: Display the tax breakdown from the calculation."
-msgstr ""
+msgstr "Brasil: Exibir a composição dos impostos a partir do cálculo."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type__is_used_movable_good
@@ -290,6 +356,9 @@ msgid ""
 "purchased from an individual who is either not a taxpayer or registered as "
 "an MEI (Individual Microentrepreneur)."
 msgstr ""
+"Brasil: Ative esta opção se o fornecimento envolver bens móveis usados "
+"adquiridos de uma pessoa física que não seja contribuinte ou que esteja "
+"registrada como MEI (Microempreendedor Individual)."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_res_partner__l10n_br_is_cashback_applied
@@ -298,6 +367,8 @@ msgid ""
 "Brazil: Enables CBS/IBS cashback calculation for eligible consumers in "
 "outbound operations."
 msgstr ""
+"Brasil: Habilita o cálculo de reembolso CBS/IBS para consumidores "
+"qualificados em operações de saída."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type_tax_override__c_class_trib
@@ -305,6 +376,8 @@ msgid ""
 "Brazil: IBS/CBS Taxation classification used to override the default value "
 "sent for tax calculation and invoicing."
 msgstr ""
+"Brasil: Classificação tributária IBS/CBS usada para substituir o valor "
+"padrão enviado para cálculo de impostos e Faturamento."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_account_move_line__l10n_br_goods_operation_type_id
@@ -313,6 +386,9 @@ msgid ""
 "in the line, determining the CFOP for that line. If no selection is made, "
 "the operation type will be inherited from the header."
 msgstr ""
+"Brasil: Se um Tipo de Operação for selecionado, ele será aplicado ao produto "
+"na linha, determinando o CFOP para essa linha. Se nenhuma seleção for feita, "
+"o tipo de operação será herdado do cabeçalho."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type__has_inbound_cbs_ibs_credit
@@ -320,6 +396,8 @@ msgid ""
 "Brazil: Indicates if CBS/IBS tax paid on inbound operations can be claimed "
 "as a tax credit."
 msgstr ""
+"Brasil: Indica se o imposto CBS/IBS pago sobre operações de importação pode "
+"ser reivindicado como crédito tributário."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_res_config_settings__l10n_br_is_cbs_ibs_taxpayer
@@ -329,6 +407,8 @@ msgid ""
 "Brazil: Indicates that this entity is subject to CBS/IBS taxation. Used for "
 "exempt operations or special regimes."
 msgstr ""
+"Brasil: Indica que esta entidade está sujeita à tributação CBS/IBS. "
+"Utilizado para operações isentas ou regimes especiais."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_product_product__l10n_br_taxable_is
@@ -337,6 +417,9 @@ msgid ""
 "Brazil: Indicates that this product is exempt from the Selective Tax (IS) "
 "due to a specific fiscal benefit, overriding the standard IS taxation rules."
 msgstr ""
+"Brasil: Indica que este produto está isento do Imposto Seletivo (IS) devido "
+"a um benefício fiscal específico, que se sobrepõe às regras padrão de "
+"tributação do IS."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type__is_donation
@@ -344,6 +427,8 @@ msgid ""
 "Brazil: Indicates whether this transaction line refers to a donation. If "
 "enabled, the NF-e will be generated with indDoacao = 1."
 msgstr ""
+"Brasil: Indica se esta linha de transação se refere a uma doação. Se "
+"ativado, a NF-e será gerada com indDoacao = 1."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_ncm_code__legal_reference
@@ -351,6 +436,8 @@ msgid ""
 "Brazil: Official technical name required for some NCM codes with specific "
 "tax rules (e.g. beverages, electronics)."
 msgstr ""
+"Brasil: É necessário o nome técnico oficial para alguns códigos NCM com "
+"regras tributárias específicas (por exemplo, bebidas, eletrônicos)."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type__l10n_br_customs_regime_id
@@ -358,6 +445,8 @@ msgid ""
 "Brazil: Optional value to be selected if the transaction for the capital "
 "good is subject to a special customs regime."
 msgstr ""
+"Brasil: Valor opcional a ser selecionado caso a transação relativa ao bem de "
+"capital esteja sujeita a um regime aduaneiro especial."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_res_config_settings__l10n_br_cbs_credit
@@ -367,6 +456,8 @@ msgid ""
 "Brazil: Percentage of presumed CBS credit for entities under Simples "
 "Nacional \"misto\" regime."
 msgstr ""
+"Brasil: Porcentagem do crédito presumido do CBS para entidades no regime “"
+"misto” do Simples Nacional."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_res_config_settings__l10n_br_ibs_credit
@@ -376,6 +467,8 @@ msgid ""
 "Brazil: Percentage of presumed IBS credit for entities under Simples "
 "Nacional \"misto\" regime."
 msgstr ""
+"Brasil: Porcentagem do crédito presumido de IBS para entidades no regime “"
+"misto” do Simples Nacional."
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.account_move_form_inherit_l10n_br_edi
@@ -383,6 +476,8 @@ msgid ""
 "Brazil: This is the operation type related to the transaction. It will "
 "identify how taxes will be computed."
 msgstr ""
+"Brasil: Este é o tipo de operação relacionado à transação. Ele identificará "
+"como os impostos serão calculados."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type__l10n_br_cfop_code
@@ -412,7 +507,7 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_br_edi.field_res_company__l10n_br_is_icbs
 #: model:ir.model.fields,help:l10n_br_edi.field_res_config_settings__l10n_br_is_icbs
 msgid "Brazil: enable the fiscal reform."
-msgstr ""
+msgstr "Brasil: aprovar a reforma fiscal."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_account_bank_statement_line__l10n_br_edi_error
@@ -435,6 +530,9 @@ msgid ""
 "and invoices. If empty, it won’t be added on the line, and the one on the "
 "header will be used."
 msgstr ""
+"Brasil: se um Tipo de Operação for selecionado, ele será adicionado aos "
+"pedidos de venda e às notas fiscais. Se estiver em branco, não será "
+"adicionado à linha, e será utilizado o valor do cabeçalho."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_product_product__l10n_br_operation_type_purchases_id
@@ -444,6 +542,9 @@ msgid ""
 "bill. If empty, it won’t be added on the line, and the one on the header "
 "will be used."
 msgstr ""
+"Brasil: se um Tipo de Operação for selecionado, ele será adicionado à fatura "
+"do fornecedor. Se estiver em branco, não será adicionado à linha, e será "
+"utilizado aquele que consta no cabeçalho."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_account_bank_statement_line__l10n_br_edi_transporter_id
@@ -504,11 +605,13 @@ msgid ""
 "Brazil: whether products in this operation are subject to the Selective Tax "
 "(IS). If left empty, the value configured on each product is used."
 msgstr ""
+"Brasil: se os produtos nesta operação estão sujeitos ao Imposto Seletivo (IS)"
+". Se deixado em branco, é utilizado o valor configurado em cada produto."
 
 #. module: l10n_br_edi
 #: model:ir.module.module,shortdesc:base.module_l10n_br_edi
 msgid "Brazilian Accounting EDI"
-msgstr ""
+msgstr "EDI Financeiro - Brasil"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -529,27 +632,27 @@ msgstr ""
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__business
 msgid "Business"
-msgstr ""
+msgstr "Empresa"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_config_settings__l10n_br_cbs_credit
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_partner__l10n_br_cbs_credit
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_users__l10n_br_cbs_credit
 msgid "CBS Presumed Credit (%)"
-msgstr ""
+msgstr "Crédito Presumido pela CBS (%)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_move_line__l10n_br_cbs_ibs_deduction
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__has_inbound_cbs_ibs_credit
 msgid "CBS/IBS Credit"
-msgstr ""
+msgstr "Crédito CBS/IBS"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_config_settings__l10n_br_is_cbs_ibs_taxpayer
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_partner__l10n_br_is_cbs_ibs_taxpayer
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_users__l10n_br_is_cbs_ibs_taxpayer
 msgid "CBS/IBS Taxpayer"
-msgstr ""
+msgstr "Contribuinte de CBS/IBS"
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.res_partner_view_form
@@ -558,6 +661,10 @@ msgid ""
 "                        This can cause a miscalculation of taxes; reset the "
 "rates or the regime."
 msgstr ""
+"As alíquotas de crédito presumidas da CBS/IBS estão definidas, mas o regime "
+"tributário não está simplificado.\n"
+"                        Isso pode causar um erro no cálculo dos impostos; "
+"redefina as alíquotas ou o regime."
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.res_config_settings_view_form
@@ -566,6 +673,10 @@ msgid ""
 "                    This can cause a miscalculation of taxes; reset the "
 "rates or the regime."
 msgstr ""
+"As alíquotas de crédito presumidas da CBS/IBS estão definidas, mas o regime "
+"tributário não está simplificado.\n"
+"                        Isso pode causar um erro no cálculo dos impostos; "
+"redefina as alíquotas ou o regime."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_move_line__l10n_br_cfop
@@ -576,7 +687,7 @@ msgstr "CFOP"
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type_tax_override__cst_code
 msgid "CST Code"
-msgstr ""
+msgstr "Código CST"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_edi_invoice_update__mode__cancel
@@ -601,7 +712,7 @@ msgstr ""
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__credit_classification__2
 msgid "Capital goods (75%)"
-msgstr ""
+msgstr "Bens de capital (75%)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__02
@@ -623,7 +734,7 @@ msgstr "Verificar status da NFS-e"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__citygovernment
 msgid "City Government"
-msgstr ""
+msgstr "Governo Municipal"
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.portal_invoice_page
@@ -633,22 +744,22 @@ msgstr "Clique em \"Download\" para documentos legais."
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_nbs_code__code
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "Empresa"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__credit_classification__4
 msgid "Computer goods and others defined in legislation (100%)"
-msgstr ""
+msgstr "Produtos de informática e outros definidos na legislação (100%)"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Configurações"
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.l10n_br_edi_cancel_range_form
@@ -659,7 +770,7 @@ msgstr "Confirmar"
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contato"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_freight_model__thirdparty
@@ -674,7 +785,7 @@ msgstr "Contratação de frete em nome do destinatário/remetente (FOB)"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__coops
 msgid "Coops"
-msgstr ""
+msgstr "Cooperativa"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_edi_invoice_update__mode__correct
@@ -689,7 +800,7 @@ msgstr "Carta de correção"
 #. module: l10n_br_edi
 #: model:ir.model,website_form_label:l10n_br_edi.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "Criar um cliente"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_customs_regime__create_uid
@@ -718,12 +829,12 @@ msgstr "Cartão de crédito"
 #. module: l10n_br_edi
 #: model:ir.ui.menu,name:l10n_br_edi.customs_regimes_menu
 msgid "Customs Regime"
-msgstr ""
+msgstr "Regime Aduaneiro"
 
 #. module: l10n_br_edi
 #: model:ir.actions.act_window,name:l10n_br_edi.l10n_br_customs_regime_action
 msgid "Customs Regimes"
-msgstr ""
+msgstr "Regimes Aduaneiros"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__04
@@ -734,7 +845,7 @@ msgstr "Cartão de débito"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__plataforma_digital_de_entrega
 msgid "Digital Delivery Platform"
-msgstr ""
+msgstr "Plataforma de distribuição digital"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_chart_template__display_name
@@ -826,6 +937,9 @@ msgid ""
 "codes are assigned to multiple taxes:\n"
 "%(details)s"
 msgstr ""
+"Cada código Avatax só pode ser usado uma vez por tipo de operação, mas os "
+"códigos a seguir são atribuídos a vários impostos:\n"
+"%(details)s"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_edi_invoice_update__send_email
@@ -835,13 +949,13 @@ msgstr "E-mail"
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.res_config_settings_view_form
 msgid "Enable Brazilian fiscal reform"
-msgstr ""
+msgstr "Habilitar a reforma fiscal brasileira"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_company__l10n_br_is_icbs
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_config_settings__l10n_br_is_icbs
 msgid "Enable ICBS"
-msgstr ""
+msgstr "Ativar ICBS"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_edi_cancel_range__end_number
@@ -852,7 +966,7 @@ msgstr "Número final"
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_partner__l10n_br_entity_type
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_users__l10n_br_entity_type
 msgid "Entity Type"
-msgstr ""
+msgstr "Tipo de entidade"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_last_edi_status__error
@@ -868,22 +982,22 @@ msgstr "Erros ao enviar a fatura eletrônica:"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_taxable_is__exempt
 msgid "Exempt"
-msgstr ""
+msgstr "Isento"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__federalgovernment
 msgid "Federal Government"
-msgstr ""
+msgstr "Governo Federal"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__credit_classification__1
 msgid "Final consumer goods (55%)"
-msgstr ""
+msgstr "Mercadorias de consumo final (55%)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__ativo_financeiro_ou_instrumento_cambial
 msgid "Financial Asset or Foreign Exchange Instrument"
-msgstr ""
+msgstr "Ativo financeiro ou instrumento de câmbio"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -900,7 +1014,7 @@ msgstr "Correção de documento fiscal"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__ativo_imobilizado
 msgid "Fixed Asset"
-msgstr ""
+msgstr "Ativo imobilizado"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__10
@@ -923,12 +1037,12 @@ msgstr ""
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__foreign
 msgid "Foreign"
-msgstr ""
+msgstr "Estrangeiro"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__livre_e_gratuita
 msgid "Free of Charge"
-msgstr ""
+msgstr "Gratuito"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_freight_model__freeshipping
@@ -963,7 +1077,7 @@ msgstr "Vale-presente"
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_partner__l10n_br_ibs_credit
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_users__l10n_br_ibs_credit
 msgid "IBS Presumed Credit (%)"
-msgstr ""
+msgstr "Crédito Presumido do IBS (%)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_chart_template__id
@@ -991,7 +1105,7 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_product__l10n_br_taxable_is
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_template__l10n_br_taxable_is
 msgid "IS taxable"
-msgstr ""
+msgstr "Incide Imposto Seletivo (IS)"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_l10n_br_edi_invoice_update
@@ -1001,7 +1115,7 @@ msgstr "Implementa a correção e o cancelamento de uma fatura."
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__contribuição_de_melhoria
 msgid "Improvement Contribution"
-msgstr ""
+msgstr "Contribuição para melhorias"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_external_tax_mixin__l10n_br_presence__5
@@ -1009,17 +1123,17 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__pos_order__l10n_br_presence__5
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__sale_order__l10n_br_presence__5
 msgid "In-person operation, for establishment (v3)"
-msgstr ""
+msgstr "Atendimento presencial, para estabelecimentos (v3)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__exportação_indireta
 msgid "Indirect Export"
-msgstr ""
+msgstr "Exportação indireta"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__individual
 msgid "Individual"
-msgstr ""
+msgstr "Indivíduo"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -1036,17 +1150,17 @@ msgstr "Pix"
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_intangible_assets_onerous
 msgid "Intangible assets and rights (onerous)"
-msgstr ""
+msgstr "Ativos intangíveis e direitos (onerosos)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__produto_intermediário
 msgid "Intermediate Product"
-msgstr ""
+msgstr "Produto intermediário"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__credit_classification__3
 msgid "Intermediate goods (90.25%)"
-msgstr ""
+msgstr "Bens intermediários (90,25%)"
 
 #. module: l10n_br_edi
 #: model:ir.actions.act_window,name:l10n_br_edi.l10n_br_edi_cancel_range_action_view_form
@@ -1061,7 +1175,7 @@ msgstr "Fatura: correção de EDI brasileiro"
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__is_donation
 msgid "Is Donation"
-msgstr ""
+msgstr "É doação"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_edi_invoice_update__is_service_invoice
@@ -1092,12 +1206,12 @@ msgstr "L10N Br: EDI é necessário"
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type_tax_override__l10n_br_operation_type_id
 msgid "L10N Br Operation Type"
-msgstr ""
+msgstr "Tipo de operação de localização (L10N Br)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__l10n_br_transaction_usage
 msgid "L10N Br Transaction Usage"
-msgstr ""
+msgstr "Uso da transação (L10N Br)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_customs_regime__write_uid
@@ -1120,18 +1234,18 @@ msgstr "Última atualização em"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__locação_dos_imóveis_localizados_nas_zonas_reabilitadas
 msgid "Lease of Properties Located in Rehabilitated Zones"
-msgstr ""
+msgstr "Locação de imóveis localizados em zonas reabilitadas"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_ncm_code__legal_reference
 msgid "Legal Reference"
-msgstr ""
+msgstr "Referência jurídica"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_product__l10n_br_legal_uom_id
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_template__l10n_br_legal_uom_id
 msgid "Legal Unit of Measure"
-msgstr ""
+msgstr "Unidade legal de medida"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__19
@@ -1142,7 +1256,7 @@ msgstr "Programa de fidelidade, cashback, crédito virtual"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__industrialização_por_encomenda
 msgid "Manufacturing by Order"
-msgstr ""
+msgstr "Fabricação sob encomenda"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__11
@@ -1153,7 +1267,7 @@ msgstr "Vale-refeição"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__mixedcapital
 msgid "Mixed Capital"
-msgstr ""
+msgstr "Capital Misto"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_account_external_tax_mixin
@@ -1187,18 +1301,18 @@ msgstr "N/A"
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_product__l10n_br_nbs_id
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_template__l10n_br_nbs_id
 msgid "NBS Code"
-msgstr ""
+msgstr "Código NBS"
 
 #. module: l10n_br_edi
 #: model:ir.actions.act_window,name:l10n_br_edi.l10n_br_nbs_code_action
 #: model:ir.ui.menu,name:l10n_br_edi.nbs_codes_menu
 msgid "NBS Codes"
-msgstr ""
+msgstr "Códigos NBS"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_l10n_br_ncm_code
 msgid "NCM Code"
-msgstr ""
+msgstr "Código NCM"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_external_tax_mixin__l10n_br_presence__4
@@ -1206,7 +1320,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__pos_order__l10n_br_presence__4
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__sale_order__l10n_br_presence__4
 msgid "NFC-e home delivery"
-msgstr ""
+msgstr "Entrega em domicílio de NFC-e"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_bank_statement_line__l10n_br_nfse_number
@@ -1241,7 +1355,7 @@ msgstr "NÃO É UM DOCUMENTO LEGAL"
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_customs_regime__name
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_nbs_code__name
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__90
@@ -1252,12 +1366,12 @@ msgstr "Nenhum pagamento"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__credit_classification__0
 msgid "No Presumed Credit"
-msgstr ""
+msgstr "Sem crédito presumido"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__operações_não_onerosas_sem_previsão_de_ibs/cbs
 msgid "Non-Onerous Transactions without IBS/CBS Applicability"
-msgstr ""
+msgstr "Transações não onerosas sem aplicabilidade do IBS/CBS"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_external_tax_mixin__l10n_br_presence__0
@@ -1265,7 +1379,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__pos_order__l10n_br_presence__0
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__sale_order__l10n_br_presence__0
 msgid "Not applicable"
-msgstr ""
+msgstr "Não aplicável"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_l10n_br_operation_type
@@ -1276,7 +1390,7 @@ msgstr "Tipo de Operação"
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_l10n_br_operation_type_tax_override
 msgid "Operation Type Tax Override"
-msgstr ""
+msgstr "Tipo de operação: Substituição de impostos"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -1287,7 +1401,7 @@ msgstr "Outro"
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_other_services_onerous
 msgid "Other services (onerous)"
-msgstr ""
+msgstr "Outros serviços (onerosos)"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_payment_method__99
@@ -1298,18 +1412,20 @@ msgstr "Outros"
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_move_line__l10n_br_goods_operation_type_id
 msgid "Override Operation Type"
-msgstr ""
+msgstr "Substituir tipo de operação"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type_tax_override__cst_code
 msgid "Overrides the CST calculated by Avalara for the selected tax."
-msgstr ""
+msgstr "Substitui o CST calculado pela Avalara para o imposto selecionado."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type_tax_override__benefit_code
 msgid ""
 "Overrides the fiscal benefit code calculated by Avalara for the selected tax."
 msgstr ""
+"Substitui o código de benefício fiscal calculado pela Avalara para o imposto "
+"selecionado."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_move__l10n_br_edi_freight_model__receivervehicle
@@ -1324,12 +1440,12 @@ msgstr "Transporte próprio em nome do remetente"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__embalagem
 msgid "Packaging"
-msgstr ""
+msgstr "Embalagem"
 
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_passenger_transport_start
 msgid "Passenger transport (start)"
-msgstr ""
+msgstr "Transporte de passageiros (início)"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_payment_method
@@ -1351,23 +1467,23 @@ msgstr "Pendente"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__pessoas_com_deficiência
 msgid "People with Disabilities"
-msgstr ""
+msgstr "Pessoas com deficiência"
 
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_physical_service_on_person
 msgid "Physical service provided to a person"
-msgstr ""
+msgstr "Serviço físico prestado a pessoa"
 
 #. module: l10n_br_edi
 #. odoo-python
 #: code:addons/l10n_br_edi/models/account_move.py:0
 msgid "Please verify the situation with your city hall before trying again."
-msgstr ""
+msgstr "Verifique a situação com a prefeitura antes de tentar novamente."
 
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_portuary_services
 msgid "Portuary services execution"
-msgstr ""
+msgstr "Execução de serviços portuários"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_bank_statement_line__l10n_br_presence
@@ -1376,7 +1492,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_br_edi.field_pos_order__l10n_br_presence
 #: model:ir.model.fields,field_description:l10n_br_edi.field_sale_order__l10n_br_presence
 msgid "Presence"
-msgstr ""
+msgstr "Presença"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_external_tax_mixin__l10n_br_presence__1
@@ -1384,33 +1500,33 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__pos_order__l10n_br_presence__1
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__sale_order__l10n_br_presence__1
 msgid "Present"
-msgstr ""
+msgstr "Presente"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__credit_classification
 msgid "Presumed Credit Classification (ZFM)"
-msgstr ""
+msgstr "Classificação Presumida de Créditos (ZFM)"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_product_template
 msgid "Product"
-msgstr ""
+msgstr "Produto"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_product__l10n_br_operation_type_purchases_id
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_template__l10n_br_operation_type_purchases_id
 msgid "Purchases Operation Type"
-msgstr ""
+msgstr "Tipo de Operação de Compras"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__ferrovia
 msgid "Railway"
-msgstr ""
+msgstr "Ferroviário"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__matéria-prima
 msgid "Raw Material"
-msgstr ""
+msgstr "Matéria-prima"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_edi_cancel_range__reason
@@ -1421,7 +1537,7 @@ msgstr "Motivo"
 #. module: l10n_br_edi
 #: model:product.template,name:l10n_br_edi.regular_consumable_product_dozen_product_template
 msgid "Regular Consumable Product Dozen"
-msgstr ""
+msgstr "Dúzia de produtos de consumo regular"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_external_tax_mixin__l10n_br_presence__2
@@ -1429,7 +1545,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__pos_order__l10n_br_presence__2
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__sale_order__l10n_br_presence__2
 msgid "Remote, internet"
-msgstr ""
+msgstr "Remoto, internet"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_external_tax_mixin__l10n_br_presence__9
@@ -1437,7 +1553,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__pos_order__l10n_br_presence__9
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__sale_order__l10n_br_presence__9
 msgid "Remote, others"
-msgstr ""
+msgstr "Remoto, outros"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__account_external_tax_mixin__l10n_br_presence__3
@@ -1445,18 +1561,18 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__pos_order__l10n_br_presence__3
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__sale_order__l10n_br_presence__3
 msgid "Remote, phone"
-msgstr ""
+msgstr "Remoto, por telefone"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__exploração_de_via
 msgid "Roadway Operation"
-msgstr ""
+msgstr "Operação rodoviária"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_product__l10n_br_operation_type_sales_id
 #: model:ir.model.fields,field_description:l10n_br_edi.field_product_template__l10n_br_operation_type_sales_id
 msgid "Sales Operation Type"
-msgstr ""
+msgstr "Tipo de Operação de Vendas"
 
 #. module: l10n_br_edi
 #: model:mail.template,description:l10n_br_edi.mail_template_move_update
@@ -1468,22 +1584,22 @@ msgstr ""
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__l10n_br_service_operation_indicator
 msgid "Service Operation Indicator"
-msgstr ""
+msgstr "Indicador de Operação do Serviço"
 
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_delivery_address
 msgid "Service at delivery address"
-msgstr ""
+msgstr "Serviço no endereço de entrega"
 
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_event_location
 msgid "Service at event location"
-msgstr ""
+msgstr "Serviço no local do evento"
 
 #. module: l10n_br_edi
 #: model:l10n_br.operation.type,name:l10n_br_edi.operation_type_sales_property_location
 msgid "Service at property location"
-msgstr ""
+msgstr "Serviço no local do bem imóvel"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -1494,22 +1610,22 @@ msgstr "Faturas de serviços só podem ser canceladas."
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_account_move_send
 msgid "Shared Send Invoice Wizard Functions"
-msgstr ""
+msgstr "Funções compartilhadas do Assistente de Envio de Fatura"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_tax_regime__simplifiedhybrid
 msgid "Simplified Hybrid"
-msgstr ""
+msgstr "Simples Nacional híbrido"
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_l10n_br_customs_regime
 msgid "Special Brazilian customs regime"
-msgstr ""
+msgstr "Regime aduaneiro especial para o Brasil"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__l10n_br_customs_regime_id
 msgid "Special Customs Regime"
-msgstr ""
+msgstr "Regime especial aduaneiro"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_edi_cancel_range__start_number
@@ -1519,7 +1635,7 @@ msgstr "Número inicial"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__res_partner__l10n_br_entity_type__stategovernment
 msgid "State Government"
-msgstr ""
+msgstr "Governo Estadual"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -1536,34 +1652,33 @@ msgstr "Crédito na loja"
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__depende_de_evento_posterior
 msgid "Subject to a Subsequent Event"
-msgstr ""
+msgstr "Sujeito a um evento subsequente"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type_tax_override__tax_id
-#, fuzzy
 msgid "Tax"
-msgstr "Imposto"
+msgstr "Impostos"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type_tax_override__c_class_trib
 msgid "Tax Classification Code"
-msgstr ""
+msgstr "Código de classificação tributária"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_move_line__l10n_br_tax_details
 msgid "Tax Details"
-msgstr ""
+msgstr "Detalhes fiscais"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__operation_tax_override_ids
 msgid "Tax Lines"
-msgstr ""
+msgstr "Linhas tributárias"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_partner__l10n_br_tax_regime
 #: model:ir.model.fields,field_description:l10n_br_edi.field_res_users__l10n_br_tax_regime
 msgid "Tax Regime"
-msgstr ""
+msgstr "Regime tributário"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -1578,21 +1693,20 @@ msgstr ""
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_taxable_is__taxable
 msgid "Taxable"
-msgstr ""
+msgstr "Tributável"
 
 #. module: l10n_br_edi
 #: model_terms:ir.ui.view,arch_db:l10n_br_edi.l10n_br_operation_type_form_inherit
 msgid "Taxes Settings"
-msgstr ""
+msgstr "Configurações de impostos"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__táxi
 msgid "Taxi"
-msgstr ""
+msgstr "Táxi"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type_tax_override__l10n_br_avatax_code
-#, fuzzy
 msgid "Technical field containing the Avatax identifier for this tax."
 msgstr "Campo técnico contendo o identificador Avatax para este imposto."
 
@@ -1618,12 +1732,12 @@ msgstr "O código CFOP em %(operation_type)s deve conter apenas dígitos (0-9)."
 #. odoo-python
 #: code:addons/l10n_br_edi/models/account_move.py:0
 msgid "The NFS-e has remained in pending status for more than 10 days."
-msgstr ""
+msgstr "NFS-e com status pendente há mais de 10 dias."
 
 #. module: l10n_br_edi
 #: model:ir.model.constraint,message:l10n_br_edi.constraint_l10n_br_nbs_code_code_unique
 msgid "The code must be unique."
-msgstr ""
+msgstr "O código deve ser único."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_edi_cancel_range__document_type_id
@@ -1686,12 +1800,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_br_edi/models/account_move.py:0
 msgid "The system has stopped checking the NFS-e status automatically."
-msgstr ""
+msgstr "O sistema parou de verificar o status da NFS-e automaticamente."
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,help:l10n_br_edi.field_l10n_br_operation_type_tax_override__tax_id
 msgid "The tax for which CST and benefit code should be overwritten."
 msgstr ""
+"O imposto para o qual o CST e o código de benefício devem ser substituídos."
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -1700,6 +1815,8 @@ msgid ""
 "This NFS-e is pending. The system automatically checks the status daily for "
 "up to 10 days. Manual checks consume 1 IAP credit per request."
 msgstr ""
+"NFS-e pendente. O sistema verifica automaticamente o status diariamente por "
+"até 10 dias. As verificações manuais consomem 1 crédito IAP por solicitação."
 
 #. module: l10n_br_edi
 #: model:ir.model,name:l10n_br_edi.model_l10n_br_edi_cancel_range
@@ -1722,12 +1839,12 @@ msgstr ""
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__gorjeta_até_15%
 msgid "Tip up to 15%"
-msgstr ""
+msgstr "Gorjeta até 15%"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__operação_equiparada_à_exportação
 msgid "Transaction Equivalent to Export"
-msgstr ""
+msgstr "Transação equivalente à exportação"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_account_bank_statement_line__l10n_br_edi_transporter_id
@@ -1745,12 +1862,12 @@ msgstr ""
 #. module: l10n_br_edi
 #: model:ir.model.fields.selection,name:l10n_br_edi.selection__l10n_br_operation_type__l10n_br_transaction_usage__projetos_de_reabilitação_urbana
 msgid "Urban Rehabilitation Projects"
-msgstr ""
+msgstr "Projetos de Reabilitação Urbana"
 
 #. module: l10n_br_edi
 #: model:ir.model.fields,field_description:l10n_br_edi.field_l10n_br_operation_type__is_used_movable_good
 msgid "Used Goods from Non-Taxpayer / MEI"
-msgstr ""
+msgstr "Mercadorias usadas de não contribuintes / MEI"
 
 #. module: l10n_br_edi
 #. odoo-python
@@ -1783,13 +1900,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_br_edi/models/account_move.py:0
 msgid "XML NFE"
-msgstr ""
+msgstr "XML NFE"
 
 #. module: l10n_br_edi
 #. odoo-python
 #: code:addons/l10n_br_edi/models/account_move_send.py:0
+#, fuzzy
 msgid "You can only electronically send invoices and bills."
-msgstr ""
+msgstr "Você só pode enviar faturas e contas eletronicamente."
 
 #. module: l10n_br_edi
 #. odoo-python

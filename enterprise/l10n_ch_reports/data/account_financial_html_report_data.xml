@@ -519,7 +519,7 @@
                         <field name="name@it">PATRIMONIO NETTO</field>
                         <field name="name@de">EIGENKAPITAL</field>
                         <field name="code">CH_28</field>
-                        <field name="aggregation_formula">CH_280.balance + CH_290_A.balance + CH_RE.balance + CH_290_C.balance</field>
+                        <field name="aggregation_formula">CH_280.balance + CH_290_A.balance + CH_RE.balance + CH_290_C.balance + CH_299.balance</field>
                         <field name="children_ids">
                             <record id="account_financial_report_line_ch_280" model="account.report.line">
                                 <field name="name">Share, corporate or foundation capital</field>
@@ -551,6 +551,7 @@
                                 <field name="name@it">Utili non distribuiti</field>
                                 <field name="name@de">Gewinnrücklagen</field>
                                 <field name="code">CH_RE</field>
+                                <field name="foldability">foldable</field>
                                 <field name="aggregation_formula">CH_297.balance + CH_290_B.balance</field>
                                 <field name="children_ids">
                                     <record id="account_financial_report_line_ch_297" model="account.report.line">
@@ -559,18 +560,18 @@
                                         <field name="name@it">Utile / Perdita portato(a) a nuovo</field>
                                         <field name="name@de">Gewinnvortrag / Verlustvortrag</field>
                                         <field name="code">CH_297</field>
-                                        <field name="action_id" ref="account_financial_report_l10n_ch_pl_action"/>
+                                        <field name="action_id" eval="False"/>
                                         <field name="expression_ids">
-                                            <record id="account_financial_report_line_ch_297_domain" model="account.report.expression">
-                                                <field name="label">domain</field>
-                                                <field name="engine">account_codes</field>
-                                                <field name="date_scope">strict_range</field>
-                                                <field name="formula">-297</field>
-                                            </record>
                                             <record id="account_financial_report_line_ch_297_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
+                                                <field name="engine">account_codes</field>
+                                                <field name="date_scope">to_beginning_of_fiscalyear</field>
+                                                <field name="formula">-297</field>
+                                            </record>
+                                            <record id="account_financial_report_line_ch_297_domain" model="account.report.expression">
+                                                <field name="label">zero</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">CH_297.domain + CH_299_B.balance</field>
+                                                <field name="formula">0</field>
                                             </record>
                                         </field>
                                     </record>
@@ -585,7 +586,7 @@
                                                 <field name="label">domain</field>
                                                 <field name="engine">domain</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
-                                                <field name="formula">[('account_id.account_type', '=', 'equity_unaffected')]</field>
+                                                <field name="formula">[('account_id.account_type', '=', 'equity_unaffected'), ('account_id.code', '!=', '2979')]</field>
                                                 <field name="subformula">-sum</field>
                                             </record>
                                             <record id="account_financial_report_line_ch_290_b_cross_report" model="account.report.expression">
@@ -640,25 +641,25 @@
                                     <record id="account_financial_report_line_ch_299_a" model="account.report.line">
                                         <field name="name">Current Year Retained Earnings</field>
                                         <field name="code">CH_299_A</field>
+                                        <field name="hide_if_zero" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_ch_299_a_balance" model="account.report.expression">
-                                                <field name="label">balance</field>
-                                                <field name="engine">domain</field>
-                                                <field name="formula">['|', ('account_id.code', '=like', '9999%'), ('account_id.account_type','=','equity_unaffected')]</field>
-                                                <field name="subformula">sum</field>
-                                                <field name="date_scope">from_fiscalyear</field>
+                                                <field name="label">zero</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">0</field>
+                                                <field name="subformula" eval="False"/>
                                             </record>
                                         </field>
                                     </record>
                                     <record id="account_financial_report_line_ch_299_cross_report" model="account.report.line">
                                         <field name="name">Current Year Unallocated Earnings</field>
                                         <field name="code">CH_299_B</field>
+                                        <field name="hide_if_zero" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_ch_299_b_balance" model="account.report.expression">
-                                                <field name="label">balance</field>
+                                                <field name="label">zero</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="formula">CH_299.balance - CH_299_A.balance</field>
-                                                <field name="date_scope">from_fiscalyear</field>
+                                                <field name="formula">0</field>
                                             </record>
                                         </field>
                                     </record>

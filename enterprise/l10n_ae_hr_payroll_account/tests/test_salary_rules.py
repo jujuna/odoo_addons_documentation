@@ -867,8 +867,6 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         })
         ae_ot_work_entry_type = self.env.ref('hr_work_entry.uae_work_entry_type_overtime')
         ae_ot_work_entry_type.sudo().write({'requires_allocation': False, 'request_unit': 'day'})
-        if 'overtime_deductible' in ae_ot_work_entry_type:
-            ae_ot_work_entry_type.overtime_deductible = False
         self.env['hr.leave'].create({
             'name': 'AE OT',
             'employee_id': self.employee_test.id,

@@ -14,6 +14,15 @@ export class Many2OneAvatarEmployeePayrollField extends Many2OneAvatarEmployeeFi
         }
         return { wage, hourlyWage, wageType};
     }
+
+    get payrollAvatarProps() {
+        return {
+            wageOverride: this.wageOverride,
+            versionId: this.props.record.data.version_id.id,
+            payslipId: this.props.record.resId,
+            payslipDate: luxon.DateTime.fromISO(this.props.record.data.date_from).toISODate(),
+        };
+    }
 }
 
 registry.category("fields").add("many2one_avatar_employee_payroll", {
@@ -27,6 +36,8 @@ registry.category("fields").add("many2one_avatar_employee_payroll", {
         { name: "wage", type: "monetary" },
         { name: "hourly_wage", type: "monetary" },
         { name: "wage_type", type: "selection" },
+        { name: "version_id", type: "many2one" },
+        { name: "date_from", type: "date" },
     ],
     extractProps(staticInfo, dynamicInfo) {
         return {

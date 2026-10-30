@@ -83,7 +83,6 @@ class TestUBLTRCommon(AccountTestInvoicingCommon):
             'name': 'EIN/2025/1',
             'invoice_date': '2025-03-03',
             'invoice_date_due': '2025-03-05',
-            'narration': '3 products',
             'invoice_line_ids': [
                 Command.create({
                     'product_id': self.product_a.id,
@@ -93,6 +92,10 @@ class TestUBLTRCommon(AccountTestInvoicingCommon):
                     'tax_ids': [Command.set(invoice_tax)],
                     **kwargs.pop('invoice_line_data', {}),
                 }),
+                Command.create({
+                    'display_type': 'line_note',
+                    'name': 'This is a note line',
+                })
             ],
             **kwargs,
         })

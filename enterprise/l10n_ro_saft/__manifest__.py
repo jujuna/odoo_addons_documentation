@@ -3,6 +3,7 @@
 {
     'name': 'Romanian SAF-T Export',
     'icon': '/account/static/description/l10n.png',
+    'version': '1.1',
     'category': 'Accounting/Localizations/Reporting',
     'description': '''
 This module enables generating the D.406 declaration from within Odoo.

@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models
 from odoo.fields import Domain
+from odoo.exceptions import UserError
 
 
 class HrPayslipRun(models.Model):
@@ -75,6 +76,18 @@ class HrPayslipRun(models.Model):
         return version_domain
 
     def _generate_payslips(self):
+        self.ensure_one()
+        struct_n_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays')
+        struct_n1_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays')
+        if self.structure_id in [struct_n_id, struct_n1_id]:
+            # Termination holidays payslips have a specific generation process
+            if not self.version_ids:
+                raise UserError(self.env._("You must have employee records in the payrun to generate payslip(s)."))
+            valid_versions = self.version_ids - self.slip_ids.version_id
+            if self.structure_id:
+                valid_versions = valid_versions.filtered(lambda c: c.structure_type_id.id == self.structure_id.type_id.id)
+            employees = valid_versions.mapped('employee_id')
+            return employees.departure_id._generate_termination_holidays(payrun_id=self.id)
         new_payslips = super()._generate_payslips()
         new_payslips._l10n_be_generate_termination_documents(payslip_run=self)
         return new_payslips

@@ -10,6 +10,7 @@ from odoo.tools.json import scriptsafe as json
 from ..utils.schema_validation import (
     validate_urbanpiper_schema,
     get_store_ref_id,
+    EVENT_TYPE_SCHEMAS,
     URBANPIPER_WEBHOOK_EVENT_MAPPING,
 )
 
@@ -19,6 +20,14 @@ class PosUrbanPiperController(http.Controller):
     def _get_urbanpiper_store(self, data, event_type):
         """Validate webhook payload and retrieve the corresponding UrbanPiper store."""
         log_urbanpiper = request.env['pos.config'].sudo().log_urbanpiper
+        if event_type not in EVENT_TYPE_SCHEMAS:
+            log_urbanpiper(
+                f'UrbanPiper Webhook: Unsupported event type "{event_type}".',
+                'UrbanPiper Unsupported Webhook Event',
+                func='_get_urbanpiper_store',
+            )
+            raise BadRequest('UrbanPiper Webhook: Unsupported event type.')
+
         is_valid, err_msg = validate_urbanpiper_schema(event_type, data)
         if not is_valid:
             log_urbanpiper(f'UrbanPiper Webhook: Invalid schema - {err_msg}', 'UrbanPiper Invalid Webhook Schema', func='_get_urbanpiper_store')
@@ -96,19 +105,22 @@ class PosUrbanPiperController(http.Controller):
                 log_urbanpiper(f"UrbanPiper: Order {data['order_id']} not found for update the status.", 'UrbanPiper Order Not Found', func='_process_webhook_data')
                 return
 
-        event_method_name = f'process_urbanpiper_{event_type}'
-        # Dynamically resolve and invoke the webhook handler based on the event type.
-        # The handler may be implemented on either `pos.config` or `pos.order`.
-        # This design allows new UrbanPiper events to be supported by simply
-        # adding a corresponding `process_urbanpiper_<event_type>` method.
-        # e.g. process_urbanpiper_order_placed, process_urbanpiper_store_action, etc.
-        event_handler = (
-            getattr(PosConfig, event_method_name, None)
-            or getattr(PosOrder, event_method_name, None)
-        )
-        if event_handler:
-            log_urbanpiper(f'Processing {event_type} webhook. {json.dumps(data)}', f'UrbanPiper Webhook received - {event_type}', 'info', func='_process_webhook_data')
-            event_handler(data, store)
+        order_handlers = {
+            'order_placed': PosOrder.process_urbanpiper_order_placed,
+            'order_status_update': PosOrder.process_urbanpiper_order_status_update,
+            'rider_status_update': PosOrder.process_urbanpiper_rider_status,
+        }
+        store_handlers = {
+            'store_action': store._process_urbanpiper_store_action,
+            'inventory_update': store._process_urbanpiper_inventory_update,
+            'store_creation': store._process_urbanpiper_store_creation,
+        }
+
+        log_urbanpiper(f'Processing {event_type} webhook. {json.dumps(data)}', f'UrbanPiper Webhook received - {event_type}', 'info', func='_process_webhook_data')
+        if order_handler := order_handlers.get(event_type):
+            order_handler(data, store)
+        elif store_handler := store_handlers.get(event_type):
+            store_handler(data)
         else:
             log_urbanpiper(
                 f'UrbanPiper Webhook: No handler implemented for event type "{event_type}".',

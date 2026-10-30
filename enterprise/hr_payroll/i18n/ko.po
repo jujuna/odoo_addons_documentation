@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
 "PO-Revision-Date: 2026-09-18 02:18+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
@@ -91,6 +91,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_version__payslips_count
 msgid "# Payslips"
 msgstr "# 급여 명세서"
+
+#. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_salary_attachment.py:0
+msgid "%(days)s days"
+msgstr ""
 
 #. module: hr_payroll
 #. odoo-python
@@ -195,6 +201,12 @@ msgstr ""
 #: model:ir.actions.report,print_report_name:hr_payroll.action_report_payslip
 msgid "'Payslip - %s' % (object.name)"
 msgstr "'급여 명세서 - %s' % (object.name)"
+
+#. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
+msgid "(current version)"
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip__state
@@ -444,6 +456,11 @@ msgid "<i class=\"oi px-2\" data-icon=\"east\" title=\"arrow\"/>"
 msgstr ""
 
 #. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_employee_view_kanban
+msgid "<i class=\"oi\" data-icon=\"east\" title=\"to\"/>"
+msgstr ""
+
+#. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 msgid "<span class=\"mb-0 fw-normal text-muted\">Show all</span>"
 msgstr ""
@@ -461,6 +478,11 @@ msgstr "<span class=\"mx-2\">/</span>"
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payroll_warning_view_form
 msgid "<span class=\"o_form_label fw-bold\">Display On</span>"
+msgstr ""
+
+#. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
+msgid "<span class=\"o_payslip_summary_unit ms-2\">Days</span>"
 msgstr ""
 
 #. module: hr_payroll
@@ -494,11 +516,6 @@ msgid ""
 "default;\" title=\"Ensure the evaluation code is generic enough to run "
 "globally on the dashboard without relying on a specific record's view "
 "context.\" invisible=\"not display_on_dashboard\"/>"
-msgstr ""
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "<span class=\"text-muted ms-1\">Net</span>"
 msgstr ""
 
 #. module: hr_payroll
@@ -812,15 +829,6 @@ msgid "A payslip adjustment has been created"
 msgstr ""
 
 #. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_employee_view_form
-msgid ""
-"A payslip adjustment is a way to define a salary input for the next "
-"payslip(s).<br/>\n"
-"                                It can be used for salary attachments, "
-"bonus, child support, ...<br/><br/>"
-msgstr ""
-
-#. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payroll_salary_increase__applied_on
 msgid ""
 "A salary of 5000$ capped to 4000$ indexed by 10% will give 5400$ as a result"
@@ -949,6 +957,11 @@ msgid "Activity type"
 msgstr "활동 유형"
 
 #. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_employee_view_form
+msgid "Add Adjustment"
+msgstr ""
+
+#. module: hr_payroll
 #: model:hr.payroll.warning,button_name:hr_payroll.hr_payroll_warning_welcome
 msgid "Add Details"
 msgstr ""
@@ -957,6 +970,11 @@ msgstr ""
 #: model:hr.payroll.warning,button_name:hr_payroll.hr_payroll_create_employee
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payrun_payslip_kanban_card_view
 msgid "Add Employees"
+msgstr ""
+
+#. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
+msgid "Add Inputs"
 msgstr ""
 
 #. module: hr_payroll
@@ -1473,6 +1491,8 @@ msgid "Benefit Type"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.xml:0
 #: model:ir.actions.act_window,name:hr_payroll.hr_contract_benefit_action
 #: model:ir.ui.menu,name:hr_payroll.salary_package_benefit
 msgid "Benefits"
@@ -1637,8 +1657,6 @@ msgid "Categories that can be added optionally on time off created by HR user"
 msgstr ""
 
 #. module: hr_payroll
-#. odoo-javascript
-#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_rule_filter
 msgid "Category"
 msgstr "카테고리"
@@ -2047,6 +2065,7 @@ msgstr "Gravie에 대한 운송 수당"
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payrun_payslip_kanban_card_view
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_correction_wizard_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
+#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
 msgid "Correct"
 msgstr ""
 
@@ -2064,12 +2083,6 @@ msgstr "영향이 있는 모든 급여명세서 수정"
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_leave_view_tree_to_defer
 msgid "Correct related payslips"
-msgstr ""
-
-#. module: hr_payroll
-#. odoo-javascript
-#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
-msgid "Correct the current version"
 msgstr ""
 
 #. module: hr_payroll
@@ -2178,7 +2191,6 @@ msgstr "급여명세서 만들기"
 
 #. module: hr_payroll
 #: model_terms:ir.actions.act_window,help:hr_payroll.hr_salary_attachment_action
-#: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_employee_view_form
 msgid "Create a Payslip Adjustment"
 msgstr ""
 
@@ -2206,12 +2218,6 @@ msgstr "새 급여 규칙 만들기"
 #: model_terms:ir.actions.act_window,help:hr_payroll.hr_rule_parameter_action
 msgid "Create a new salary rule parameter"
 msgstr "새 급여 규칙 매개변수 만들기"
-
-#. module: hr_payroll
-#. odoo-javascript
-#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
-msgid "Create new version"
-msgstr ""
 
 #. module: hr_payroll
 #: model:hr.payroll.warning,name:hr_payroll.hr_payroll_create_employee
@@ -2468,6 +2474,12 @@ msgid "Date when tracked fields were changed and need review"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
+msgid "Date:"
+msgstr ""
+
+#. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.res_config_settings_view_form
 msgid "Day where the 'Year To Date' will be reset every year."
 msgstr "매년 '연도'가 초기화되는 날입니다."
@@ -2529,11 +2541,6 @@ msgstr "신고서"
 #: model:hr.salary.rule.category,name:hr_payroll.DED
 msgid "Deduction"
 msgstr "공제금"
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "Default"
-msgstr "기본값"
 
 #. module: hr_payroll
 #: model:hr.payroll.structure,name:hr_payroll.default_structure
@@ -2762,6 +2769,11 @@ msgid "Do you want to correct this payslip or only revert it?"
 msgstr ""
 
 #. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_correction_wizard_form
+msgid "Do you want to correct those payslips or only revert them?"
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__attachment
 msgid "Document"
 msgstr "문서"
@@ -2876,9 +2888,17 @@ msgid "Earnings"
 msgstr "수익"
 
 #. module: hr_payroll
+#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_payroll/models/hr_salary_attachment.py:0
+#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
 msgid "Edit Payslip Adjustment"
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.js:0
+msgid "Edit Salary Attachment"
 msgstr ""
 
 #. module: hr_payroll
@@ -3234,6 +3254,11 @@ msgstr "예상 종료일"
 #: model:ir.model.fields,help:hr_payroll.field_hr_salary_rule__partner_id
 msgid "Eventual third party involved in the salary payment of the employees."
 msgstr "직원 급여 지급에 관련된 최종 제 3자입니다."
+
+#. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_salary_attachment_employee_view_kanban
+msgid "Every payslip"
+msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_rule__explanation_template
@@ -3602,6 +3627,13 @@ msgstr "직원 수"
 
 #. module: hr_payroll
 #. odoo-javascript
+#: code:addons/hr_payroll/static/src/js/tours/hr_payroll.js:0
+msgid ""
+"Here is the amount of worked time giving you a <strong>gross amount</strong>."
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-javascript
 #: code:addons/hr_payroll/static/src/components/dashboard/payroll_warning_card/archive_warning_dialog.xml:0
 msgid "Hide"
 msgstr ""
@@ -3896,11 +3928,6 @@ msgstr "개인 계정"
 #: model:ir.model.fields.selection,name:hr_payroll.selection__hr_payroll_warning__warning_color_class__info
 msgid "Info"
 msgstr "정보"
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "Input Data"
-msgstr "입력 데이터"
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_rule__input_name
@@ -4340,6 +4367,14 @@ msgid "Manually Modified"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_payslip.py:0
+msgid ""
+"Manually modified. Explanation before the change:\n"
+"%(explanation)s"
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.model.fields.selection,name:hr_payroll.selection__res_company__ytd_reset_month__3
 msgid "March"
 msgstr "3월"
@@ -4351,7 +4386,6 @@ msgstr ""
 
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payroll_payment_report_view_form
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payrun_payslip_kanban_card_view
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
 msgid "Mark as Paid"
 msgstr "결제 완료로 표시"
@@ -4572,6 +4606,7 @@ msgstr "순액"
 #: model:hr.salary.rule,name:hr_payroll.default_net_salary
 #: model:hr.salary.rule,name:hr_payroll.hr_payroll_structure_002_net_salary
 #: model:hr.salary.rule,name:hr_payroll.hr_payroll_structure_worker_001_net_salary
+#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 msgid "Net Salary"
 msgstr "순급여금"
 
@@ -4623,20 +4658,28 @@ msgid "New Config Record"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
+msgid "New Employee Record"
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.actions.act_window,name:hr_payroll.action_hr_payslip_run_create
 msgid "New Pay Run"
 msgstr "새 급여 지급"
 
 #. module: hr_payroll
+#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_payroll/models/hr_salary_attachment.py:0
+#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
 msgid "New Payslip Adjustment"
 msgstr ""
 
 #. module: hr_payroll
 #. odoo-javascript
-#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
-msgid "New version from"
+#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.js:0
+msgid "New Salary Attachment"
 msgstr ""
 
 #. module: hr_payroll
@@ -4705,7 +4748,6 @@ msgstr ""
 
 #. module: hr_payroll
 #: model_terms:ir.actions.act_window,help:hr_payroll.hr_salary_attachment_action
-#: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_employee_view_form
 msgid "No Payslip Adjustment ?"
 msgstr ""
 
@@ -4723,7 +4765,7 @@ msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__ignore_worked_day_lines
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
+#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
 msgid "No Worked Days"
 msgstr ""
 
@@ -4835,7 +4877,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__note
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment__description
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_salary_attachment_generate_multi_wizard__description
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 msgid "Note"
 msgstr "노트"
 
@@ -4932,7 +4973,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/views/payslip_list/hr_payslip_list_controller.xml:0
 #: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_payslip_list_view_payrun
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_employee_tree
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_filter
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
@@ -4955,20 +4995,9 @@ msgstr "담당"
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/js/tours/hr_payroll.js:0
 msgid ""
-"On the first tab is the amount of worked time giving you a <strong>gross "
-"amount</strong>."
-msgstr ""
-"첫 번째 탭에서 근무한 시간을 확인할 수 있으며 <strong>총 금액</strong>으로 표"
-"시됩니다."
-
-#. module: hr_payroll
-#. odoo-javascript
-#: code:addons/hr_payroll/static/src/js/tours/hr_payroll.js:0
-msgid ""
-"On the second tab is the computation of the rules linked to the Structure "
+"On the first tab is the computation of the rules linked to the Structure "
 "resulting in a <strong>net amount</strong>."
 msgstr ""
-"두 번째 탭에서 관련된 규칙을 계산하여 <strong>순 금액</strong>을 산출합니다."
 
 #. module: hr_payroll
 #. odoo-javascript
@@ -5023,6 +5052,11 @@ msgid "Open Pay Runs"
 msgstr ""
 
 #. module: hr_payroll
+#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
+msgid "Optional"
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_leave__options_on_work_entry_type_ids
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_work_entry_type__optional_category_ids
 #: model:ir.model.fields,field_description:hr_payroll.field_resource_calendar_leaves__options_on_work_entry_type_ids
@@ -5043,6 +5077,7 @@ msgstr "선택적으로 사유나 참조 사항"
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_leave__category_options_ids
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip_worked_days__category_options_ids
+#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_leave_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_work_days_view_search_report
 msgid "Options"
 msgstr "선택 사항"
@@ -5215,11 +5250,6 @@ msgid "Pay Run KPI"
 msgstr ""
 
 #. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payrun_payslip_kanban_card_view
-msgid "Pay Run Name"
-msgstr ""
-
-#. module: hr_payroll
 #: model:ir.actions.act_window,name:hr_payroll.action_hr_payroll_open_pay_run
 msgid "Pay Run Payslips"
 msgstr "급여 지급 급여 명세서"
@@ -5348,8 +5378,6 @@ msgid "Payment Report Format"
 msgstr "결제 보고서 형식"
 
 #. module: hr_payroll
-#. odoo-javascript
-#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
 #: model:ir.module.module,shortdesc:base.module_hr_payroll
 #: model:ir.ui.menu,name:hr_payroll.menu_hr_payroll_root
 #: model:res.groups.privilege,name:hr_payroll.res_groups_privilege_payroll
@@ -5551,8 +5579,10 @@ msgid "Payslip Adjustment count"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_payroll/models/hr_payslip.py:0
+#: code:addons/hr_payroll/static/src/core/web/avatar_card/payroll_avatar_card.xml:0
 #: model:ir.actions.act_window,name:hr_payroll.hr_salary_attachment_action_view_employee
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_employee__salary_attachment_ids
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__salary_attachment_ids
@@ -5733,6 +5763,12 @@ msgid "Payslips"
 msgstr "급여명세서"
 
 #. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_payslip.py:0
+msgid "Payslips Correction"
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip_run__payslip_generate_and_send_trigger
 #: model:ir.model.fields,field_description:hr_payroll.field_res_company__payslip_generate_and_send_trigger
 #: model:ir.model.fields,field_description:hr_payroll.field_res_config_settings__payslip_generate_and_send_trigger
@@ -5813,7 +5849,6 @@ msgstr ""
 #. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_payslip_run_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_payslip_list_view_payrun
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
 msgid "Period"
 msgstr "기간"
@@ -6431,11 +6466,6 @@ msgid "Salary Input Sections"
 msgstr "급여 입력 섹션"
 
 #. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "Salary Inputs"
-msgstr "급여 입력"
-
-#. module: hr_payroll
 #: model:ir.model,name:hr_payroll.model_hr_contract_salary_benefit
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_contract_benefit_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_contract_benefit_view_tree
@@ -6892,6 +6922,12 @@ msgid "Space on top"
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
+msgid "Specific Date"
+msgstr ""
+
+#. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.hr_version_list_search_more_view
 #: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_config_settings_view_list
 msgid "Start"
@@ -7157,6 +7193,12 @@ msgid "The contract this worked days should be applied to"
 msgstr "이 근무일을 적용해야 하는 계약"
 
 #. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_employee.py:0
+msgid "The corresponding version does not belong to employee %(name)s."
+msgstr ""
+
+#. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.payroll_hr_employee_view_form
 msgid "The default working hours are set in configuration."
 msgstr "기본 근무 시간은 설정에서 구성할 수 있습니다."
@@ -7283,10 +7325,8 @@ msgstr ""
 
 #. module: hr_payroll
 #. odoo-python
-#: code:addons/hr_payroll/models/hr_version.py:0
-msgid ""
-"The start date of the new version (%(new_start)s) cannot be in the future. "
-"It needs to be today or before."
+#: code:addons/hr_payroll/models/hr_salary_attachment.py:0
+msgid "The starting date cannot be after the estimated end date."
 msgstr ""
 
 #. module: hr_payroll
@@ -7409,6 +7449,12 @@ msgid "This message body will be sent as an email."
 msgstr ""
 
 #. module: hr_payroll
+#. odoo-javascript
+#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
+msgid "This might create a new version to track changes."
+msgstr ""
+
+#. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payroll_payment_report_wizard__include_unpaid
 msgid ""
 "This option is to allow for including other payslips in the same payment."
@@ -7480,13 +7526,6 @@ msgstr ""
 msgid ""
 "This will delete all the properties on the employees linked to this salary "
 "rule and their data. Are you sure you want to continue?"
-msgstr ""
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_employee_tree
-msgid ""
-"This will detach the selected employee(s) from the pay run and send them to "
-"Off-Cycle. Are you sure?"
 msgstr ""
 
 #. module: hr_payroll
@@ -7644,11 +7683,6 @@ msgid "Total"
 msgstr "총계"
 
 #. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "Total Amount"
-msgstr "총 금액"
-
-#. module: hr_payroll
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
 msgid "Total Basic"
 msgstr ""
@@ -7674,16 +7708,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_tree
 msgid "Total Net"
 msgstr ""
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "Total Working Days"
-msgstr "총 근무일"
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "Total Working Hours"
-msgstr "총 근무 시간"
 
 #. module: hr_payroll
 #: model:ir.model.fields,help:hr_payroll.field_hr_payslip__sum_worked_paid_days
@@ -7941,12 +7965,6 @@ msgid "Version Properties Definition"
 msgstr "버전 속성 지정"
 
 #. module: hr_payroll
-#. odoo-javascript
-#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
-msgid "Version update"
-msgstr ""
-
-#. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_rule_parameter__parameter_version_ids
 msgid "Versions"
 msgstr "버전"
@@ -7992,7 +8010,6 @@ msgstr "모든 사람에게 표시"
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_employee__wage
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__wage
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_version__wage
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 msgid "Wage"
 msgstr "임금"
 
@@ -8100,7 +8117,7 @@ msgstr "환영합니다!"
 #. module: hr_payroll
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
-msgid "What do you want to do ?"
+msgid "What is the effective date?"
 msgstr ""
 
 #. module: hr_payroll
@@ -8196,7 +8213,6 @@ msgstr ""
 
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__sum_worked_days
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 msgid "Worked Days"
 msgstr "근무일"
 
@@ -8213,11 +8229,6 @@ msgstr ""
 #. module: hr_payroll
 #: model:ir.model.fields,field_description:hr_payroll.field_hr_payslip__sum_worked_paid_hours
 msgid "Worked Paid Hours"
-msgstr ""
-
-#. module: hr_payroll
-#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
-msgid "Worked days"
 msgstr ""
 
 #. module: hr_payroll
@@ -8401,12 +8412,6 @@ msgstr ""
 #. module: hr_payroll
 #. odoo-javascript
 #: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
-msgid "You are editing an employee version with existing payslips."
-msgstr ""
-
-#. module: hr_payroll
-#. odoo-javascript
-#: code:addons/hr_payroll/static/src/js/version_update_dialog.xml:0
 msgid "You can create a new version using the button"
 msgstr ""
 
@@ -8414,6 +8419,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_payroll/models/hr_payslip_run.py:0
 msgid "You can only correct a validated or paid pay run."
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-python
+#: code:addons/hr_payroll/models/hr_payslip.py:0
+msgid "You can only correct payslips that have been paid."
 msgstr ""
 
 #. module: hr_payroll
@@ -8540,6 +8551,14 @@ msgstr ""
 
 #. module: hr_payroll
 #. odoo-python
+#: code:addons/hr_payroll/models/hr_leave.py:0
+msgid ""
+"You cannot select the option(s) '%(options)s' for the time off type '%"
+"(work_type)s'."
+msgstr ""
+
+#. module: hr_payroll
+#. odoo-python
 #: code:addons/hr_payroll/models/hr_payslip_run.py:0
 msgid ""
 "You do not have sufficient permissions to validate a Pay Run with warnings "
@@ -8631,6 +8650,7 @@ msgstr ""
 #. module: hr_payroll
 #. odoo-python
 #: code:addons/hr_payroll/models/hr_payroll_structure_type.py:0
+#: model_terms:ir.ui.view,arch_db:hr_payroll.view_hr_payslip_form
 msgid "day"
 msgstr ""
 
@@ -8793,6 +8813,38 @@ msgstr ""
 #: model:mail.template,subject:hr_payroll.mail_template_new_payslip
 msgid "{{ object.employee_id.name }}, a new payslip is available for you"
 msgstr "{{ object.employee_id.name }}, a new payslip is available for you"
+
+#~ msgid "Default"
+#~ msgstr "기본값"
+
+#~ msgid "Input Data"
+#~ msgstr "입력 데이터"
+
+#~ msgid ""
+#~ "On the first tab is the amount of worked time giving you a <strong>gross "
+#~ "amount</strong>."
+#~ msgstr ""
+#~ "첫 번째 탭에서 근무한 시간을 확인할 수 있으며 <strong>총 금액</strong>으"
+#~ "로 표시됩니다."
+
+#~ msgid ""
+#~ "On the second tab is the computation of the rules linked to the Structure "
+#~ "resulting in a <strong>net amount</strong>."
+#~ msgstr ""
+#~ "두 번째 탭에서 관련된 규칙을 계산하여 <strong>순 금액</strong>을 산출합니"
+#~ "다."
+
+#~ msgid "Salary Inputs"
+#~ msgstr "급여 입력"
+
+#~ msgid "Total Amount"
+#~ msgstr "총 금액"
+
+#~ msgid "Total Working Days"
+#~ msgstr "총 근무일"
+
+#~ msgid "Total Working Hours"
+#~ msgstr "총 근무 시간"
 
 #~ msgid ""
 #~ "Employee's working schedule.\n"

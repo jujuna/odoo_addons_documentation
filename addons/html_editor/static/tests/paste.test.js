@@ -3275,6 +3275,106 @@ describe("link", () => {
                 contentAfter: '<p>ab`<a href="http://www.xyz.com">http://www.xyz.com</a>`[]cd</p>',
             });
         });
+
+        test("should transform a mail URL when pasting a mail as text content", async () => {
+            await testEditor({
+                contentBefore: "<p>ab[]</p>",
+                stepFunction: async (editor) => {
+                    pasteText(editor, "user@domain.com");
+                },
+                contentAfter: '<p>ab<a href="mailto:user@domain.com">user@domain.com</a>[]</p>',
+            });
+        });
+
+        test("should transform a mail URL when pasting a mail as text content (2)", async () => {
+            await testEditor({
+                contentBefore: "<p>ab[]</p>",
+                stepFunction: async (editor) => {
+                    pasteText(editor, "mailto:user@domain.com");
+                },
+                contentAfter:
+                    '<p>ab<a href="mailto:user@domain.com">mailto:user@domain.com</a>[]</p>',
+            });
+        });
+
+        test("should transform a mail URL when pasting a mail as text content (3)", async () => {
+            await testEditor({
+                contentBefore: "<p>ab[]</p>",
+                stepFunction: async (editor) => {
+                    pasteText(editor, "MAILTO:user@domain.com");
+                },
+                contentAfter:
+                    '<p>ab<a href="MAILTO:user@domain.com">MAILTO:user@domain.com</a>[]</p>',
+            });
+        });
+
+        test("should transform a mail URL when pasting a mail as html content", async () => {
+            const { el } = await setupEditor("<p>ab[]</p>");
+
+            const clipboardData = new DataTransfer();
+            clipboardData.setData(
+                "text/html",
+                '<span style="color: rgb(0, 0, 0);font-weight: normal;">user@domain.com</span>'
+            );
+            clipboardData.setData("text/plain", "user@domain.com");
+            await dispatch(el, "paste", { clipboardData });
+            expect(cleanLinkArtifacts(getContent(el))).toBe(
+                '<p>ab<a href="mailto:user@domain.com">user@domain.com</a>[]</p>'
+            );
+        });
+
+        test("should transform a mail URL when pasting a mail as html content (2)", async () => {
+            const { el } = await setupEditor("<p>ab[]</p>");
+
+            const clipboardData = new DataTransfer();
+            clipboardData.setData(
+                "text/html",
+                '<span style="color: rgb(0, 0, 0);font-weight: normal;">mailto:user@domain.com</span>'
+            );
+            clipboardData.setData("text/plain", "mailto:user@domain.com");
+            await dispatch(el, "paste", { clipboardData });
+            expect(cleanLinkArtifacts(getContent(el))).toBe(
+                '<p>ab<a href="mailto:user@domain.com">mailto:user@domain.com</a>[]</p>'
+            );
+        });
+
+        test("should transform a mail URL when pasting a mail as odoo html", async () => {
+            const { el } = await setupEditor("<p>ab[]</p>");
+
+            const clipboardData = new DataTransfer();
+            clipboardData.setData("application/vnd.odoo.odoo-editor", "<p>user@domain.com</p>");
+            clipboardData.setData("text/plain", "user@domain.com");
+            await dispatch(el, "paste", { clipboardData });
+            expect(cleanLinkArtifacts(getContent(el))).toBe(
+                '<p>ab<a href="mailto:user@domain.com">user@domain.com</a>[]</p>'
+            );
+        });
+
+        test("should transform a mail URL when pasting a mail as odoo html (2)", async () => {
+            const { el } = await setupEditor("<p>ab[]</p>");
+
+            const clipboardData = new DataTransfer();
+            clipboardData.setData(
+                "application/vnd.odoo.odoo-editor",
+                "<p>mailto:user@domain.com</p>"
+            );
+            clipboardData.setData("text/plain", "mailto:user@domain.com");
+            await dispatch(el, "paste", { clipboardData });
+            expect(cleanLinkArtifacts(getContent(el))).toBe(
+                '<p>ab<a href="mailto:user@domain.com">mailto:user@domain.com</a>[]</p>'
+            );
+        });
+
+        test("should transform a mail URL when pasting multiple URLs among text", async () => {
+            await testEditor({
+                contentBefore: "<p>ab []</p>",
+                stepFunction: async (editor) => {
+                    pasteText(editor, "visit https://google.com user@domain.com");
+                },
+                contentAfter:
+                    '<p>ab visit <a href="https://google.com">https://google.com</a> <a href="mailto:user@domain.com">user@domain.com</a>[]</p>',
+            });
+        });
     });
 
     describe("range not collapsed", () => {
@@ -3792,6 +3892,22 @@ describe("Odoo editor own html", () => {
             },
         });
     });
+
+    test("should unwrap tables if scrollable tables are not allowed", async () => {
+        await testEditor({
+            contentBefore: "<p>[]<br></p>",
+            stepFunction: async (editor) => {
+                pasteOdooEditorHtml(
+                    editor,
+                    `<p>a</p><div class="o_table_wrapper"><table><tbody><tr><td><p>b</p></td></tr></tbody></table></div><p>c</p>`
+                );
+            },
+            contentAfterEdit: `<p>a</p><table><tbody><tr><td><p>b</p></td></tr></tbody></table><p>c[]</p>`,
+            config: {
+                allowScrollableTables: false,
+            },
+        });
+    });
 });
 
 describe("editable in iframe", () => {
@@ -4284,8 +4400,8 @@ describe("Paste HTML tables", () => {
                 );
             },
             contentAfter: `<table class="table table-bordered o_table">
-        <colgroup></colgroup>
-        <colgroup></colgroup>
+        <colgroup><col><col></colgroup>
+        
         <tbody><tr>
             <td><i>Italic then also BOLD</i></td>
             <td><i><s>Italic strike</s></i></td>
@@ -4745,7 +4861,7 @@ describe("paste table cells into an existing table", () => {
         expect(getContent(el)).toBe(
             unformat(`
                 <p data-selection-placeholder=""><br></p>
-                <table class="table table-bordered o_table o_selected_table">
+                <div class="o_table_wrapper"><table class="table table-bordered o_table o_selected_table">
                     <tbody>
                         <tr>
                             <td class="o_selected_td"><p>[x1</p></td>
@@ -4756,7 +4872,7 @@ describe("paste table cells into an existing table", () => {
                             <td><p>b2</p></td>
                         </tr>
                     </tbody>
-                </table>
+                </table></div>
                 <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
             `)
         );
@@ -4788,7 +4904,7 @@ describe("paste table cells into an existing table", () => {
         expect(getContent(el)).toBe(
             unformat(`
                 <p data-selection-placeholder=""><br></p>
-                <table class="table table-bordered o_table o_selected_table">
+                <div class="o_table_wrapper"><table class="table table-bordered o_table o_selected_table">
                     <tbody>
                         <tr>
                             <td class="o_selected_td"><p><strong>[x11</strong></p></td>
@@ -4799,7 +4915,7 @@ describe("paste table cells into an existing table", () => {
                             <td class="o_selected_td"><p>x22]</p></td>
                         </tr>
                     </tbody>
-                </table>
+                </table></div>
                 <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
             `)
         );
@@ -4830,7 +4946,7 @@ describe("paste table cells into an existing table", () => {
         expect(getContent(el)).toBe(
             unformat(`
                 <p data-selection-placeholder=""><br></p>
-                <table class="table table-bordered o_table">
+                <div class="o_table_wrapper"><table class="table table-bordered o_table">
                     <tbody>
                         <tr>
                             <td>
@@ -4845,7 +4961,7 @@ describe("paste table cells into an existing table", () => {
                             <td><p>b</p></td>
                         </tr>
                     </tbody>
-                </table>
+                </table></div>
                 <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
             `)
         );
@@ -4877,7 +4993,7 @@ describe("paste table cells into an existing table", () => {
         expect(getContent(el)).toBe(
             unformat(`
                 <p data-selection-placeholder=""><br></p>
-                <table class="table table-bordered o_table o_selected_table">
+                <div class="o_table_wrapper"><table class="table table-bordered o_table o_selected_table">
                     <tbody>
                         <tr>
                             <td class="o_selected_td"><p>[x11</p></td>
@@ -4888,7 +5004,7 @@ describe("paste table cells into an existing table", () => {
                             <td class="o_selected_td"><p>x22]</p></td>
                         </tr>
                     </tbody>
-                </table>
+                </table></div>
                 <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
             `)
         );
@@ -4919,7 +5035,7 @@ describe("paste table cells into an existing table", () => {
         expect(getContent(el)).toBe(
             unformat(`
                 <p data-selection-placeholder=""><br></p>
-                <table class="table table-bordered o_table o_selected_table">
+                <div class="o_table_wrapper"><table class="table table-bordered o_table o_selected_table">
                     <tbody>
                         <tr>
                             <td class="o_selected_td"><p>[x1</p></td>
@@ -4930,7 +5046,7 @@ describe("paste table cells into an existing table", () => {
                             <td><p>b2</p></td>
                         </tr>
                     </tbody>
-                </table>
+                </table></div>
                 <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
             `)
         );
@@ -4962,7 +5078,7 @@ describe("paste table cells into an existing table", () => {
         expect(getContent(el)).toBe(
             unformat(`
                 <p data-selection-placeholder=""><br></p>
-                <table class="table table-bordered o_table o_selected_table">
+                <div class="o_table_wrapper"><table class="table table-bordered o_table o_selected_table">
                     <tbody>
                         <tr>
                             <td><p>a1</p></td>
@@ -4980,7 +5096,7 @@ describe("paste table cells into an existing table", () => {
                             <td class="o_selected_td"><p>x23]</p></td>
                         </tr>
                     </tbody>
-                </table>
+                </table></div>
                 <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
             `)
         );

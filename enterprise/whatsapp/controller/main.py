@@ -69,7 +69,7 @@ class Webhook(http.Controller):
                     else:
                         _logger.warning("No Template found for this webhook : %s ", value)
 
-    @http.route('/whatsapp/webhook/', methods=['GET'], type="http", auth="public", csrf=False)
+    @http.route('/whatsapp/webhook/', methods=['GET'], type="http", auth="public", csrf=False, readonly=True)
     def webhookget(self, **kwargs):
         """
             This controller is used to verify the webhook.

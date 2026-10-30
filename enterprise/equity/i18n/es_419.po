@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-17 22:50+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-13 19:18+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/equity/es_419/>\n"
+"odoo-20/equity/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -231,8 +231,8 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span> Accionista<span invisible=\"equity_shareholders_count == 1\">s</span>"
-"</span>"
+"<span> Accionista<span invisible=\"equity_shareholders_count == 1\">s</"
+"span></span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -477,6 +477,13 @@ msgid "Cannot change security class type because it has linked transactions"
 msgstr ""
 "No es posible cambiar el tipo de clase de valores porque tiene transacciones "
 "vinculadas"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Cannot create new UBO for an existing holder"
+msgstr ""
+"No es posible crear un nuevo beneficiario final para un titular existente"
 
 #. module: equity
 #. odoo-python
@@ -1194,7 +1201,7 @@ msgstr "Plantilla de correo electrónico"
 #. module: equity
 #: model:ir.module.module,summary:base.module_equity
 msgid "Manage securities, transactions, and cap tables."
-msgstr ""
+msgstr "Gestiona valores, transacciones y tablas de capitalización."
 
 #. module: equity
 #. odoo-javascript
@@ -1522,6 +1529,12 @@ msgid "Partner Ids All Have Email"
 msgstr "Todos los ID de contacto tienen un correo electrónico"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Partner is not allowed to fill UBO form"
+msgstr "El contacto no puede completar el formulario de beneficiario final"
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model:ir.model.fields,help:equity.field_res_partner__ubo_pep
@@ -1778,7 +1791,8 @@ msgstr "Documento de respaldo"
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
 msgid ""
 "Thank you for providing your Ultimate Beneficial Owner (UBO) information."
-msgstr "Gracias por proporcionar la información de tu beneficiario final (UBO)."
+msgstr ""
+"Gracias por proporcionar la información de tu beneficiario final (UBO)."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
@@ -1814,9 +1828,9 @@ msgid ""
 "is considered as shareholder holding more than 25% of A, for Z holds - "
 "indirectly - 36 % of the shares in A."
 msgstr ""
-"La(s) persona(s) natural(es) que, en última instancia, posee(n) o controla"
-"(n) esta entidad corporativa mediante propiedad directa o indirecta o "
-"control sobre el 25% de las acciones o derechos de voto de esa entidad "
+"La(s) persona(s) natural(es) que, en última instancia, posee(n) o "
+"controla(n) esta entidad corporativa mediante propiedad directa o indirecta "
+"o control sobre el 25% de las acciones o derechos de voto de esa entidad "
 "corporativa. <br/>Ejemplo: La Empresa B y la Empresa C tienen cada una un "
 "20% de participación en la Empresa A. El particular Z posee el 90% de las "
 "acciones de la Empresa B y de la Empresa C. Z se considera accionista con "
@@ -2130,7 +2144,8 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "You must provide either the date of birth, or the ID number"
-msgstr "Debes proporcionar la fecha de nacimiento o el número de identificación"
+msgstr ""
+"Debes proporcionar la fecha de nacimiento o el número de identificación"
 
 #. module: equity
 #. odoo-javascript

@@ -84,35 +84,35 @@
                         </page>
                         <page string="Employees (274.10)" invisible="not line_274_10_ids">
                             <field name="line_274_10_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Replacement Revenues (274.18)" invisible="not line_274_18_ids">
                             <field name="line_274_18_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Economic Unemployment (274.13)" invisible="not line_274_13_ids">
                             <field name="line_274_13_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Company Executives (274.20)" invisible="not line_274_20_ids">
                             <field name="line_274_20_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Company Executives (274.30)" invisible="not line_274_30_ids">
                             <field name="line_274_30_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Doctors / Civil Engineers (274.32)" invisible="not line_274_32_ids">
                             <field name="line_274_32_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Masters (274.33)" invisible="not line_274_33_ids">
                            <field name="line_274_33_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Bachelors (274.34)" invisible="not line_274_34_ids">
                             <field name="line_274_34_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Untaxed Employees" invisible="not untaxed_employee_ids">
                             <field name="untaxed_employee_ids"/>
@@ -141,23 +141,23 @@
                             </group>
                         </page>
                         <page string="Starterjob (274.62)" name="starterjob" invisible="not line_274_62_ids">
-                            <field name="line_274_62_ids" context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                            <field name="line_274_62_ids" context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Training (274.64)" name="training">
                             <div class="alert alert-warning" role="alert" invisible="not l10n_be_training_seniority_warning_message">
                                 <field name="l10n_be_training_seniority_warning_message" nolabel="1"/>
                             </div>
                             <field name="line_274_64_ids"
-                                context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                                context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                             <group>
                                 <field name="training_employee_ids" widget="many2many_tags"/>
                             </group>
                         </page>
                         <page string="(Continuous) Team Shifts (274.74)" name="team_shift" invisible="not line_274_74_ids">
-                            <field name="line_274_74_ids" context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                            <field name="line_274_74_ids" context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Night Shifts (274.75)" name="night_shift" invisible="not line_274_75_ids">
-                            <field name="line_274_75_ids" context="{'tree_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
+                            <field name="line_274_75_ids" context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_274_xx_line_view_list'}"/>
                         </page>
                         <page string="Aid Zone (274.81)" invisible="not line_274_81_ids">
                             <group>
@@ -194,8 +194,26 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Payslips" name="payslips">
-                            <field name="payslip_ids" readonly="1"/>
+                        <page string="Payslips">
+                            <field name="payslip_ids">
+                                <list string="Payslips" create="0" edit="0" delete="0">
+                                    <field name="employee_id" widget="many2one_avatar_employee_payroll" width="300" readonly="state != 'draft'"/>
+                                    <field name="date_from" string="Period" widget="daterange" options="{'end_date_field': 'date_to', 'payrun_optional': 'hide'}" readonly="1"/>
+                                    <field name="date_to" invisible="1" column_invisible="1" readonly="1"/>
+                                    <field name="payslip_run_id" optional="hide" widget="many2one" readonly="state != 'draft'" options="{'payrun_optional': 'hide', 'no_open': 0}" placeholder="Off-Cycle"/>
+                                    <field name="l10n_be_fiscal_date" optional="hide"/>
+                                    <field name="gross_wage" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total Gross"/>
+                                    <field name="l10n_be_withholding_taxes"/>
+                                    <field
+                                        name="state_display" widget="badge"
+                                        decoration-info="state_display == '03_draft'"
+                                        decoration-success="state_display == '04_validated'"
+                                        decoration-primary="state_display == '05_paid'"
+                                        decoration-warning="state_display == '02_warning'"
+                                        decoration-danger="state_display == '01_error'"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>

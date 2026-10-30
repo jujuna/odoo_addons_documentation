@@ -367,6 +367,7 @@ class TestPayslipFlow(TestPayslipBase, HttpCase):
 
     def test_10_related_payslip_not_flagged_as_duplicate(self):
         """Refund/Correction payslips must NOT be treated as duplicates."""
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
 
         original = self.env['hr.payslip'].create({
             'employee_id': self.richard_emp.id,
@@ -547,11 +548,26 @@ class TestPayslipFlow(TestPayslipBase, HttpCase):
             self.assertTrue(attachment.raw.content.startswith(b"%PDF"))
             PdfReader(BytesIO(attachment.raw))  # must parse as valid PDF
 
+    def test_payslip_pdf_in_company_layout(self):
+        """ A payslip is printed in the document layout of its company, not the one of the current company. """
+        other_company = self.env['res.company'].create({'name': 'Other Company'})
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.richard_emp.id,
+        })
+        payslip.compute_sheet()
+        report = self.env.ref('hr_payroll.action_report_payslip')
+
+        content = payslip.with_company(other_company)._prepare_payslip_pdf_content(report, (self.env.lang, None))
+
+        self.assertIn(f'o_company_{payslip.company_id.id}_layout'.encode(), content)
+        self.assertNotIn(f'o_company_{other_company.id}_layout'.encode(), content)
+
     def test_negative_net_warning_logic(self):
         """
         Test that the warning 'Net pay is zero or negative.'
         only appears if the structure actually contains a NET rule.
         """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         structure_type = self.env['hr.payroll.structure.type'].create({
             'name': 'Test Type',
         })
@@ -648,6 +664,7 @@ class TestPayslipFlow(TestPayslipBase, HttpCase):
         self.assertEqual(jules_slip.with_context(lang='it_IT').name, 'Busta paga - Jules - agosto 2026')
 
     def test_employee_data_updated_warning_logic(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         with freeze_time("2020-11-28"):
             payslip = self.env['hr.payslip'].create({
                 'employee_id': self.richard_emp.id,
@@ -674,6 +691,7 @@ class TestPayslipFlow(TestPayslipBase, HttpCase):
         )
 
     def test_new_employee_version_warning_logic(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         with freeze_time("2020-11-28"):
             payslip = self.env['hr.payslip'].create({
                 'employee_id': self.richard_emp.id,
@@ -707,6 +725,7 @@ class TestPayslipFlow(TestPayslipBase, HttpCase):
         Test that the duplicate payslip warning does not appear when the existing payslips for the period
         are linked to a different contract than the one on the payslip being computed.
         """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         structure_type = self.env['hr.payroll.structure.type'].create({
             'name': 'Test Type',
         })

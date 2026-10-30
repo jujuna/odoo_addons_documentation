@@ -50,3 +50,12 @@ registry.category("web_tour.tours").add("PreparationDisplayFilterTour", {
             PrepDisplay.clearFilterButton(),
         ].flat(),
 });
+
+registry.category("web_tour.tours").add("PreparationDisplayAfterPresetDeletionTour", {
+    steps: () =>
+        [
+            // Loading the Kitchen Display must not crash while building its preparation lines.
+            PrepDisplay.hasOrderCard({ productName: "Letter Tray" }),
+            PrepDisplay.checkOrderCardCount(3),
+        ].flat(),
+});

@@ -106,3 +106,10 @@ class PosConfig(models.Model):
                 'noupdate': True,
             },
         ])
+
+    @api.model
+    def load_onboarding_restaurant_scenario(self, with_demo_data=True):
+        res = super().load_onboarding_restaurant_scenario(with_demo_data)
+        if config := self.browse(res.get('config_id')).exists():
+            config.available_preset_ids = config.available_preset_ids.filtered(lambda preset: preset.identification != 'online')
+        return res

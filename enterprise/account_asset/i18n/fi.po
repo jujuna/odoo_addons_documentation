@@ -31,10 +31,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:50+0000\n"
-"PO-Revision-Date: 2026-09-17 23:29+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-10-20 12:20+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "account_asset/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -64,25 +64,25 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants cancelled."
-msgstr ""
+msgstr " Kaikki variantit peruutettu."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants reopened."
-msgstr ""
+msgstr " Kaikki variantit avattu uudelleen."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants set to draft."
-msgstr ""
+msgstr " Kaikki variantit määritetty luonnokseksi."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid " in journal %s"
-msgstr ""
+msgstr " päiväkirjassa %s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__total_depreciation_entries_count
@@ -108,6 +108,8 @@ msgstr "# Kirjatut poistot"
 msgid ""
 "%(asset)s does not depreciate, so no ledger depreciation can be based on it."
 msgstr ""
+"%(asset)s arvo ei alennu, joten sen perusteella ei voida tehdä "
+"kirjanpidollista poistoa."
 
 #. module: account_asset
 #. odoo-python
@@ -125,13 +127,13 @@ msgstr "%(asset)s: Myynti"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(asset_name)s - %(journal_name)s"
-msgstr ""
+msgstr "%(asset_name)s - %(journal_name)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(pause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(pause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
@@ -147,19 +149,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(unpause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(unpause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant)s confirmed with %(model)s%(journal_message)s"
-msgstr ""
+msgstr "%(variant)s vahvistettu %(model)s%(journal_message)s kanssa"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant_name)s Cancellation:"
-msgstr ""
+msgstr "%(variant_name)s Peruutus:"
 
 #. module: account_asset
 #. odoo-python
@@ -210,7 +212,7 @@ msgstr ", %(percent)g%% jäännös "
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "- %(model)s%(journal_message)s"
-msgstr ""
+msgstr "- %(model)s%(journal_message)s"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
@@ -224,6 +226,8 @@ msgid ""
 "A Recovery Account is required on the depreciation model %(model)s: its "
 "journal %(journal)s belongs to the ledger %(ledger)s."
 msgstr ""
+"Poistomalli %(model)s vaatii palautustilin: sen päiväkirja %(journal)s "
+"kuuluu tilikirjaan %(ledger)s."
 
 #. module: account_asset
 #. odoo-python
@@ -309,6 +313,8 @@ msgid ""
 "A journal with a ledger is required to create a depreciation model in this "
 "context."
 msgstr ""
+"Tässä kontekstissa poistomallin luomiseen vaaditaan päiväkirja, jossa on "
+"tilikirja."
 
 #. module: account_asset
 #. odoo-python
@@ -317,6 +323,8 @@ msgid ""
 "A ledger sub-asset is closed together with its asset. Dispose of the asset "
 "instead."
 msgstr ""
+"Tilikirjan osa-omaisuuserä suljetaan yhdessä sen omaisuuserän kanssa. Poista "
+"omaisuuserä sen sijaan."
 
 #. module: account_asset
 #. odoo-python
@@ -337,31 +345,11 @@ msgstr "Tili"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid ""
-"Account %(account)s should have accumulated depreciation and depreciation "
-"expense accounts set in order to generate an asset"
-msgstr ""
-"Tilillä %(account)s pitäisi olla kertyneitä poistoja sekä määritettyjä "
-"poistokulutilejä, jotta omaisuuserän voi luoda"
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
 "Account %(name)s cannot be used to create an asset. The account must be of "
 "the Fixed Asset type."
 msgstr ""
 "Tiliä %(name)s ei voi käyttää omaisuuserän luomiseen. Tilityypin on oltava "
 "'käyttöomaisuus'."
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Account %(name)s not setup to generate assets. Depreciation model and asset "
-"accounts need to be set on account."
-msgstr ""
-"Tiliä %(name)s ei ole määritetty luomaan omaisuuseriä. Tilille on "
-"määritettävä poistomalli ja omaisuuserätilit."
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_chart_template
@@ -417,6 +405,8 @@ msgid ""
 "Account used to record the reversal of excess depreciation when statutory "
 "depreciation catches up or the asset is disposed of."
 msgstr ""
+"Tili, jolle kirjataan ylimääräisten poistojen peruutukset, kun lakisääteinen "
+"poisto on saavutettu tai omaisuuserä on hävitetty."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__gain_account_id
@@ -461,7 +451,7 @@ msgstr "Kirjanpitoilmoitus"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_depreciation_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__depreciation_account_id
 msgid "Accumulated Account"
-msgstr ""
+msgstr "Kertyneiden poistojen tili"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_depreciation_account_id
@@ -530,7 +520,7 @@ msgstr "Aktiivinen"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Active Asset"
-msgstr ""
+msgstr "Aktiivinen omaisuuserä"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_ids
@@ -596,13 +586,14 @@ msgstr "Kaikkien rivien pitäisi olla kirjattu"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "Also closed: %(sub_assets)s. %(message)s"
-msgstr ""
+msgstr "Suljettu myös: %(sub_assets)s. %(message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "An asset cannot have two variants linked to the same ledger"
 msgstr ""
+"Omaisuuserällä ei voi olla kahta varianttia linkitettynä samaan tilikirjaan"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__main_variant_parent_id
@@ -953,6 +944,11 @@ msgid "Can Create Asset"
 msgstr "Voi luoda omaisuuserän"
 
 #. module: account_asset
+#: model:ir.model.fields,field_description:account_asset.field_account_asset__can_edit_asset_accounts
+msgid "Can Edit Asset Accounts"
+msgstr ""
+
+#. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Cancel Asset"
 msgstr "Peruuta omaisuuserä"
@@ -1293,6 +1289,7 @@ msgstr "Poisto"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Depreciation Account"
 msgstr "Poistotili"
 
@@ -1521,8 +1518,8 @@ msgid ""
 msgstr ""
 "Varmista paikallisten verosäännösten noudattaminen poistojen osalta.\n"
 "Vahvista poistojen menetelmien, kausien sekä alkamispäivien olevan linjassa "
-"verovaatimusten kanssa (esim. lineaarinen poisto, prorata temporis -"
-"sovellus, ei kaksinkertaista menojäämäpoistoa verotuksessa)."
+"verovaatimusten kanssa (esim. lineaarinen poisto, prorata temporis "
+"-sovellus, ei kaksinkertaista menojäämäpoistoa verotuksessa)."
 
 #. module: account_asset
 #. odoo-python
@@ -1540,8 +1537,14 @@ msgstr "Kirjaukset kumottu: %(reversed_move_count)s"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_expense_id
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__expense_account_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Expense Account"
 msgstr "Kulutili"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr
+msgid "Financial instruments"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -1603,7 +1606,6 @@ msgstr "Voiton arvo"
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Go to Account"
 msgstr "Siirry tilille"
@@ -1680,7 +1682,7 @@ msgstr "Kuvake"
 #: model:ir.model.fields,help:account_asset.field_account_asset__activity_exception_icon
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "Kuvake kertoo poikkeustoimenpiteestä."
+msgstr "Poikkeustoimenpiteeseen viittaava kuvake."
 
 #. module: account_asset
 #: model:account.return.check.template,description:account_asset.account_return_check_template_asset_movement_and_accounting_treatment
@@ -1724,12 +1726,6 @@ msgstr ""
 "Tuo käyttöomaisuutesi alkuperäiset tiedot ja tähän asti kertyneet poistot."
 
 #. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid "Important Change"
-msgstr "Tärkeä muutos"
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__already_depreciated_amount_import
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__already_depreciated_amount_import
 msgid ""
@@ -1745,6 +1741,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__informational_text
 msgid "Informational Text"
 msgstr "Informatiivinen teksti"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass
+msgid "Intangible assets"
+msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__invoice_line_ids
@@ -1821,15 +1822,6 @@ msgstr "Kirjausrivi"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__original_move_line_ids
 msgid "Journal Items"
 msgstr "Kirjausrivit"
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Journal Items of %(account)s should have a label in order to generate an "
-"asset"
-msgstr ""
-"Tilin %(account)s kirjausriveillä on oltava nimike omaisuuserän luomiseksi"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__journal_id
@@ -1945,7 +1937,7 @@ msgstr "Pakollinen sarake. Tämä on omaisuuserän nimi."
 #: model:ir.model.fields,help:account_asset.field_account_asset__activity_type_icon
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr "Aineellisten symboleiden kuvake, esim. muistilista"
+msgstr "Material Symbols -kuvake, esim. muistilista"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_has_error
@@ -2148,9 +2140,12 @@ msgid "No Prorata"
 msgstr "Ei pro-rataa"
 
 #. module: account_asset
+#. odoo-javascript
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
+#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__no_depreciation
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "No depreciation"
 msgstr "Ei poistoa"
 
@@ -2329,19 +2324,12 @@ msgstr "Kausi"
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid ""
-"Please note that by doing this, you will remove this model from other "
-"companies"
-msgstr "Huomaa, että näin tekemällä poistat tämän mallin muilta yrityksiltä"
-
-#. module: account_asset
-#. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
 "Please select a different fixed asset account than the one used on the "
 "current asset."
-msgstr "Valitse eri käyttöomaisuustili kuin nykyisessä omaisuuserässä käytetty."
+msgstr ""
+"Valitse eri käyttöomaisuustili kuin nykyisessä omaisuuserässä käytetty."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__positive_revaluation
@@ -2354,10 +2342,35 @@ msgid "Posted Entries"
 msgstr "Kirjatut kirjaukset"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_sale
+msgid "Proceeds from financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_sale
+msgid "Proceeds from sale of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_sale
+msgid "Proceeds from sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_rou
+msgid "Proceeds from sale of right-of-use assets"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
 msgid "Properties"
 msgstr "Ominaisuudet"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe
+msgid "Property plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -2371,6 +2384,21 @@ msgstr "Pro-rata päivämäärä"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__purchase
 msgid "Purchase"
 msgstr "Osto"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_purch
+msgid "Purchase of financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_purch
+msgid "Purchase of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_purch
+msgid "Purchase of property, plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #: model:account.report.column,name:account_asset.account_grouped_assets_report_duration_rate
@@ -2491,12 +2519,6 @@ msgid "Select Invoice Line"
 msgstr "Valitse laskurivi"
 
 #. module: account_asset
-#. odoo-javascript
-#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
-msgid "Select a Depreciation Model"
-msgstr "Valitse poistomalli"
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__company_id
 msgid ""
 "Select a specific company to limit this model's use, or leave it empty to "
@@ -2572,7 +2594,8 @@ msgstr ""
 msgid ""
 "Starting date of the period used in the prorata calculation of the first "
 "depreciation"
-msgstr "Ensimmäisen poiston prorata-laskennassa käytettävän jakson aloituspäivä"
+msgstr ""
+"Ensimmäisen poiston prorata-laskennassa käytettävän jakson aloituspäivä"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_state
@@ -2589,10 +2612,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"Tila toimenpiteen perusteella\n"
+"Tila toimenpiteiden perusteella\n"
 "Myöhässä: Eräpäivä on jo mennyt\n"
-"Tänään: Eräpäivä on tänään\n"
-"Suunniteltu: Tulevaisuuden toimenpiteet."
+"Tänään: Toimenpiteen päivämäärä on tänään\n"
+"Suunniteltu: Tulevat toimenpiteet."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__linear
@@ -2630,8 +2653,8 @@ msgid ""
 "account %(dep_acc)s has been debited by %(dep_delta)s.\n"
 "This corresponds to %(move_count)s adjusted %(word)s."
 msgstr ""
-"Tilille %(exp_acc)s on hyvitetty %(exp_delta)s samalla kun tililtä %(dep_acc)"
-"s on veloitettu %(dep_delta)s.\n"
+"Tilille %(exp_acc)s on hyvitetty %(exp_delta)s samalla kun tililtä %"
+"(dep_acc)s on veloitettu %(dep_delta)s.\n"
 "Tämä vastaa %(move_count)s oikaisua %(word)s."
 
 #. module: account_asset
@@ -2735,6 +2758,12 @@ msgstr ""
 "\"Kulut\"."
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "The fixed asset account differs from the account on the bill. Click"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__new_account_asset_id
 msgid ""
 "The fixed asset account to transfer this asset to. The depreciation "
@@ -2742,12 +2771,6 @@ msgid ""
 msgstr ""
 "Käyttöomaisuustili, jolle tämä omaisuuserä siirretään. Tämän tilin "
 "poistoparametrejä sovelletaan uuteen omaisuuserään."
-
-#. module: account_asset
-#: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_number
-#: model:ir.model.fields,help:account_asset.field_account_depreciation_model__method_number
-msgid "The number of depreciations needed to depreciate your asset"
-msgstr "Omaisuuseräsi kokonaispoistoon tarvittavien poistojen lukumäärä"
 
 #. module: account_asset
 #. odoo-python
@@ -2812,7 +2835,7 @@ msgstr "Muunna omaisuuseräksi"
 #: model:ir.model.fields,help:account_asset.field_account_asset__activity_exception_decoration
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Tallennettu poikkeustoimenpiteen tyyppi."
+msgstr "Kirjatun poikkeustoimenpiteen tyyppi."
 
 #. module: account_asset
 #. odoo-python
@@ -3198,6 +3221,12 @@ msgid "gain/loss"
 msgstr "voitto/tappio"
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "here"
+msgstr ""
+
+#. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "loss"
@@ -3272,6 +3301,40 @@ msgstr ""
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "variant_ids.model_id"
 msgstr ""
+
+#~ msgid ""
+#~ "Account %(account)s should have accumulated depreciation and depreciation "
+#~ "expense accounts set in order to generate an asset"
+#~ msgstr ""
+#~ "Tilillä %(account)s pitäisi olla kertyneitä poistoja sekä määritettyjä "
+#~ "poistokulutilejä, jotta omaisuuserän voi luoda"
+
+#~ msgid ""
+#~ "Account %(name)s not setup to generate assets. Depreciation model and "
+#~ "asset accounts need to be set on account."
+#~ msgstr ""
+#~ "Tiliä %(name)s ei ole määritetty luomaan omaisuuseriä. Tilille on "
+#~ "määritettävä poistomalli ja omaisuuserätilit."
+
+#~ msgid "Important Change"
+#~ msgstr "Tärkeä muutos"
+
+#~ msgid ""
+#~ "Journal Items of %(account)s should have a label in order to generate an "
+#~ "asset"
+#~ msgstr ""
+#~ "Tilin %(account)s kirjausriveillä on oltava nimike omaisuuserän luomiseksi"
+
+#~ msgid ""
+#~ "Please note that by doing this, you will remove this model from other "
+#~ "companies"
+#~ msgstr "Huomaa, että näin tekemällä poistat tämän mallin muilta yrityksiltä"
+
+#~ msgid "Select a Depreciation Model"
+#~ msgstr "Valitse poistomalli"
+
+#~ msgid "The number of depreciations needed to depreciate your asset"
+#~ msgstr "Omaisuuseräsi kokonaispoistoon tarvittavien poistojen lukumäärä"
 
 #~ msgid "# Original Move Lines"
 #~ msgstr "# Alkuperäiset siirtorivit"

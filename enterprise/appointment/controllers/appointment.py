@@ -476,7 +476,7 @@ class AppointmentController(http.Controller):
 
     @http.route(['/appointment/<string:appointment_type_slug>/info'],
                 type='http', auth="public", website=True, sitemap=False)
-    def appointment_type_id_form(self, appointment_type_slug, date_time, duration, staff_user_id=None, resource_selected_id=None, available_resource_ids=None, asked_capacity=1, **kwargs):
+    def appointment_type_id_form(self, appointment_type_slug, date_time=None, duration=None, staff_user_id=None, resource_selected_id=None, available_resource_ids=None, asked_capacity=1, **kwargs):
         """
         Render the form to get information about the user for the appointment
 
@@ -904,7 +904,7 @@ class AppointmentController(http.Controller):
                 resources, date_start, date_end, with_linked_resources=False,
             )
             if resources_remaining_capacity['total_remaining_capacity'] < asked_capacity:
-                redirect_url = request.redirect('/appointment/%s?%s' % (slug(appointment_type), keep_query('*', state='failed-resource')))
+                redirect_url = '/appointment/%s?%s' % (slug(appointment_type), keep_query('*', state='failed-resource'))
         else:
             # check availability of the selected user again (in case someone else booked while the client was entering the form)
             staff_user = request.env['res.users'].sudo().search([('id', '=', int(staff_user_id))])
@@ -913,7 +913,7 @@ class AppointmentController(http.Controller):
             users_remaining_capacity = appointment_type._get_users_remaining_capacity(staff_user, date_start, date_end)
             if (staff_user and not staff_user.partner_id.calendar_verify_availability(date_start, date_end, appointment_type)) or \
                 users_remaining_capacity['total_remaining_capacity'] < asked_capacity:
-                redirect_url = request.redirect('/appointment/%s?%s' % (slug(appointment_type), keep_query('*', state='failed-staff-user')))
+                redirect_url = '/appointment/%s?%s' % (slug(appointment_type), keep_query('*', state='failed-staff-user'))
 
         return {
             'redirect_url': redirect_url,
@@ -1055,6 +1055,7 @@ class AppointmentController(http.Controller):
             return cookie
         return appointment_type.appointment_tz
 
+    # Remove in master. Use _get_max_capacity_possible_fast instead.
     def _get_max_capacity_possible(self, resources, resource_selected_id=False):
         """
             Returns the maximum capacity possible considering the resources given.
@@ -1072,6 +1073,26 @@ class AppointmentController(http.Controller):
             if not resource_selected_id or int(resource_selected_id) in resource_ids
         }
         return max(capacity_to_resources.values()) if capacity_to_resources else 1
+
+    def _get_max_capacity_possible_fast(self, resources, resource_selected_id=False):
+        """
+            Returns the maximum capacity possible considering the resources given (resources).
+            We consider all the combinations of linked resources and their capacities.
+            If the selected resource is present in resources, only consider that
+            one as it is then manually selected and slots will be computed using it alone.
+
+            :param resources: an appointment.resource recordset
+            :param resource_selected_id: id of the selected resource
+            :return: int, the maximum capacity possible with the resources given
+        """
+        if not resources:
+            return 1
+        if resource_selected_id and (
+            resource_selected := resources.filtered(lambda r: r.id == int(resource_selected_id))
+        ):
+            return resource_selected.capacity
+        possible_combinations = resources._get_best_combination_per_capacity(1, {})
+        return possible_combinations[-1][1] if possible_combinations else 1
 
     # ------------------------------------------------------------
     # APPOINTMENT TYPE JSON DATA
@@ -1207,7 +1228,7 @@ class AppointmentController(http.Controller):
             max_possible_capacity = appointment_type.user_capacity
         else:
             resource_selected_id = initial_selected_entity.id if initial_selected_entity else resource_selected_id
-            max_possible_capacity = self._get_max_capacity_possible(filter_resources, resource_selected_id)
+            max_possible_capacity = self._get_max_capacity_possible_fast(filter_resources, resource_selected_id)
 
         max_possible_capacity = min(
             request.env['ir.config_parameter'].sudo().get_int('appointment.resource_max_capacity_allowed', 20),

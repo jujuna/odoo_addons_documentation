@@ -47,13 +47,26 @@ class TestLead(crm_common.TestCrmCommon):
         })
         rental_product = sale_product.copy({'name': 'Rent Product', 'rent_periodicity': 'days'})
 
+        # As it is an "at_install" test, the country of the company is not yet set
+        # and it is requested by "account.tax" and "account.tax.group".
+        self.env.company.sudo().write({'country_id': self.env.ref('base.us')})
+        tax_su = self.env['account.tax'].sudo().create({
+            'name': 'Tax',
+            'amount': 21,
+            'amount_type': 'percent',
+            'tax_group_id': self.env['account.tax.group'].sudo().create({
+                'name': 'Tax Group',
+                'company_id': self.env.company.id,
+            }).id,
+        })
+
         base_order_vals = {'opportunity_id': lead.id, 'partner_id': self.contact_1.id}
 
         rental_order_vals = {
             **base_order_vals,
             'rental_start_date': fields.Datetime.now(),
             'rental_return_date': fields.Datetime.now() + relativedelta(days=1),
-            'order_line': [(0, 0, {'product_id': rental_product.id, 'product_uom_qty': 2})],
+            'order_line': [(0, 0, {'product_id': rental_product.id, 'product_uom_qty': 2, 'tax_ids': tax_su.ids})],
         }
 
         orders = self.env['sale.order'].create([
@@ -66,13 +79,14 @@ class TestLead(crm_common.TestCrmCommon):
 
         self.assertEqual(lead.rental_quotation_count, 1)
         self.assertEqual(lead.rental_order_count, 2)
-        self.assertEqual(lead.rental_amount_total, 2*2*100)
+        # lead.rental_amount_total = 2 order lines * 2 products * (price without tax + 21% of tax on the price)
+        self.assertEqual(lead.rental_amount_total, 2 * 2 * (100 + 21))
 
         # Check that sale_order_count and, quotation_count and sale_amount_total
         # fields on the lead does not include rental quotations / orders
         sale_order_vals = {
             **base_order_vals,
-            'order_line': [(0, 0, {'product_id': sale_product.id, 'product_uom_qty': 2})],
+            'order_line': [(0, 0, {'product_id': sale_product.id, 'product_uom_qty': 2, 'tax_ids': tax_su.ids})],
         }
         orders = self.env['sale.order'].create([sale_order_vals, sale_order_vals])
         self.assertEqual(len(lead.order_ids), 5, "'order_ids' contains all the linked orders(rental or not)")
@@ -82,12 +96,14 @@ class TestLead(crm_common.TestCrmCommon):
         orders[1].action_confirm()
         self.assertEqual(lead.quotation_count, 1, "there should be only one regular(non rental) quotation left")
         self.assertEqual(lead.sale_order_count, 1, "there should be one regular(non rental) sale order(s)")
-        self.assertEqual(lead.sale_amount_total, 2*100, "should give total for the regular(non rental) sale order(s) only")
+        # lead.sale_amount_total = 2 products * (price without tax + 21% of tax on the price)
+        self.assertEqual(lead.sale_amount_total, 2 * (100 + 21), "should give total for the regular(non rental) sale order(s) only")
 
         # Check that all the rental related computations are not affected
         self.assertEqual(lead.rental_quotation_count, 1)
         self.assertEqual(lead.rental_order_count, 2)
-        self.assertEqual(lead.rental_amount_total, 2*2*100)
+        # lead.rental_amount_total = 2 order lines * 2 products * (price without tax + 21% of tax on the price)
+        self.assertEqual(lead.rental_amount_total, 2 * 2 * (100 + 21))
 
     @users('user_sales_leads')
     def test_action_view_sale_quotation_excludes_rental_quotations(self):

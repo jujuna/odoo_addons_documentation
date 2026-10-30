@@ -2,11 +2,12 @@
 <odoo>
 
     <template id="company_information" inherit_id="account_reports.company_information" primary="True">
+        <xpath expr="//t[t[@t-out='env.company.vat']]" position="replace" mode="inner">
+            <t t-if="env.company.l10n_ph_is_vat_registered">VAT REG TIN:</t>
+            <t t-else="">NON VAT REG TIN:</t>
+            <t t-out="env.company.vat"/>
+        </xpath>
         <xpath expr="." position="inside">
-            <span>
-                <t t-if="env.company.l10n_ph_is_vat_registered">(VAT REG TIN)</t>
-                <t t-else="">(NON-VAT REG TIN)</t>
-            </span>
             <t t-if="env.company">
                 <div>Phone / Mobile: <span t-out="env.company.phone or 'N/A'"/></div>
             </t>

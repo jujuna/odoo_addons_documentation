@@ -16,8 +16,11 @@
                     Choose whether to correct this payslip, only revert it or keep it as it is
                 </div>
                 <field name="correction_choice" widget="radio" invisible="not is_multi_payslip or is_button_action"/>
-                <div name="description" invisible="not is_button_action">
+                <div name="description" invisible="not is_button_action or is_multi_payslip">
                     Do you want to correct this payslip or only revert it?
+                </div>
+                <div name="description" invisible="not is_button_action or not is_multi_payslip">
+                    Do you want to correct those payslips or only revert them?
                 </div>
                 <footer>
                     <button name="action_correct_payslips" string="Correct" type="object" class="oe_highlight"/>

@@ -95,6 +95,9 @@ class SignDocument(models.Model):
     _name = 'sign.document'
     _description = 'Signature Document'
     _order = 'sequence'
+    # A document is a PDF plus its sign items, so merging two would lose one of the PDFs.
+    _prevent_merge = True
+    _disable_data_merge = True
 
     sequence = fields.Integer()
     attachment_id = fields.Many2one('ir.attachment', string="Attachment", required=True, index=True, ondelete='restrict')

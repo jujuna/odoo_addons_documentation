@@ -84,6 +84,7 @@ class WhatsAppCalendar(WhatsAppCommon, MockOutgoingWhatsApp, CronMixinCase):
         ]:
             with self.capture_triggers('calendar.ir_cron_scheduler_alarm') as capt:
                 _event = self.env['calendar.event'].create(calendar_event)
+                self.env.cr.flush()
             self.assertEqual(len(capt.records), 1)
             self.assertLessEqual(capt.records.call_at, now)
 

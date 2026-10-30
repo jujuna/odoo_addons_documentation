@@ -145,6 +145,10 @@ export class OdooChartDataSourceConfigPanel extends Component {
     }
 
     delete() {
-        this.env.model.dispatch("DELETE_FIGURE", { figureId: this.props.figureId });
+        const figureId = this.env.model.getters.getFigureIdFromChartId(this.props.chartId);
+        this.env.model.dispatch("DELETE_FIGURE", {
+            figureId,
+            sheetId: this.env.model.getters.getFigureSheetId(figureId),
+        });
     }
 }

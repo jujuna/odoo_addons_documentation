@@ -53,7 +53,7 @@ class TestL10nDo606Export(TestAccountReportsCommon):
         cls.tax_18_purch = chart_template.ref('tax_18_purch')
         cls.tax_18_purch_serv = chart_template.ref('tax_18_purch_serv')
         cls.ret_100_tax_person = chart_template.ref('ret_100_tax_person')
-        cls.ret_10_income_person = chart_template.ref('ret_10_income_person')
+        cls.ret_15_income_person = chart_template.ref('ret_15_income_person')
         cls.tax_isc = chart_template.ref('tax_10_telco')
         cls.tax_tip = chart_template.ref('tax_tip_purch')
 
@@ -128,9 +128,9 @@ class TestL10nDo606Export(TestAccountReportsCommon):
         ]])
 
     def test_606_bill_withholdings(self):
-        # 1000 services from an individual: +180 ITBIS, -180 ITBIS withheld (R293-11), -100 ISR fees
+        # 1000 services from an individual: +180 ITBIS, -180 ITBIS withheld (R293-11), -150 ISR fees
         bill = self._create_vendor_bill(self.partner_cedula, [
-            (self.product_service, 1000.0, self.tax_18_purch_serv + self.ret_100_tax_person + self.ret_10_income_person),
+            (self.product_service, 1000.0, self.tax_18_purch_serv + self.ret_100_tax_person + self.ret_15_income_person),
         ])
         rows = self._get_rows(bill)
         row = rows[0]
@@ -140,7 +140,7 @@ class TestL10nDo606Export(TestAccountReportsCommon):
         self.assertEqual(row[10], '180.00')  # ITBIS invoiced
         self.assertEqual(row[11], '180.00')  # ITBIS withheld
         self.assertEqual(row[16], '02')  # ISR type: service fees, zero-padded
-        self.assertEqual(row[17], '100.00')  # ISR withheld
+        self.assertEqual(row[17], '150.00')  # ISR withheld
 
     def test_606_credit_note(self):
         bill = self._create_vendor_bill(self.partner_rnc, [(self.product_good, 1000.0, self.tax_18_purch)])

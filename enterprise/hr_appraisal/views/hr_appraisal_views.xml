@@ -19,7 +19,14 @@
                 <button name="action_done" string="Mark as Done" type="object" class="oe_highlight" invisible="state != '2_pending' or not is_manager or uid == employee_user_id" data-hotkey="v"/>
                 <button name="action_calendar_event" string="Schedule Meeting" invisible="state != '2_pending' or not is_manager or uid == employee_user_id" type="object"/>
                 <button name="action_send_appraisal_request" string="Send by email" invisible="uid == employee_user_id and state != '1_new' or uid != employee_user_id and state != '2_pending'" type="object" data-hotkey="g"/>
-                <button name="action_back" string="Reset" type="object" invisible="state != '2_pending' or not is_manager or uid == employee_user_id" data-hotkey="w"/>
+                <button
+                    name="action_back"
+                    confirm="Resetting the appraisal will erase all manually entered content in the Employee and Manager Feedback sections. Do you want to continue?"
+                    string="Reset"
+                    type="object"
+                    invisible="state != '2_pending' or not is_manager or uid == employee_user_id"
+                    data-hotkey="w"
+                />
                 <button name="action_reopen" string="Reopen" type="object" invisible="state != '3_done' or not is_manager or uid == employee_user_id" data-hotkey="w"/>
                 <field name="state" widget="statusbar" statusbar_visible="1_new,2_pending,3_done" options="{'fold_field': 'fold'}"/>
             </header>

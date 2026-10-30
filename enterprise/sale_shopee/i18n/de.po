@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 18:03+0000\n"
-"PO-Revision-Date: 2026-09-18 02:44+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-16 09:33+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "sale_shopee/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,22 @@ msgid ""
 "synchronize the stock level to\n"
 "  Shopee\n"
 msgstr ""
+"\n"
+"Importieren Sie Ihre Shopee-Bestellungen in Odoo und synchronisieren Sie "
+"Lieferungen\n"
+"============================================================\n"
+"\n"
+"Wichtige Funktionen\n"
+"------------\n"
+"* Importieren Sie Bestellungen aus mehreren Konten und Shops.\n"
+"* Bestellungen werden anhand ihrer internen Referenz (item_id oder model_id "
+"in Shopee) mit den Odoo-Produkten abgeglichen.\n"
+"* Unterstützung für Versand durch Shopee (Fulfillment by Shopee, FBS), "
+"Versand durch Händler (Fulfillment by Merchant, FBM) und Versand durch "
+"grenzüberschreitenden Verkäufer (Hybrid):\n"
+"* FBS: Import der kompletten Bestellungen\n"
+"* FBM/Hybrid: Lieferdaten werden von Shopee abgerufen. Verfolgen und "
+"synchronisieren Sie das Bestandslevel mit Shopee\n"
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -81,8 +97,8 @@ msgstr ""
 "                        <li>Gehen Sie in den Entwicklermodus.</li>\n"
 "                        <li>Öffnen Sie das Formular des Shopee-Kontos, über "
 "das die Bestellung getätigt wurde.</li>\n"
-"                        <li>Navigieren Sie zum Reiter der "
-"Auftragsverfolgung.</li>\n"
+"                        <li>Navigieren Sie zum Reiter der Auftragsverfolgung."
+"</li>\n"
 "                        <li>Legen Sie ein Datum für die <em>Synchronisierung "
 "der letzten Aufträge</em> fest, das vor der letzten Aktualisierung des "
 "Auftragsstatus liegt.</li>\n"
@@ -238,8 +254,8 @@ msgstr ""
 "                                    Leider müssen Sie manuell prüfen, ob der "
 "Status der Bestellung korrekt ist oder nicht.\n"
 "                                    Wenn das Problem weiterhin besteht, "
-"kontaktieren Sie den <a href=\"https://www.odoo.com/help/\">Odoo-Support </a>"
-".\n"
+"kontaktieren Sie den <a href=\"https://www.odoo.com/help/\">Odoo-Support </"
+"a>.\n"
 "                                </t>\n"
 "                            </td>\n"
 "                        </tr>\n"
@@ -344,8 +360,8 @@ msgstr ""
 "            </style>\n"
 "            <body><div>\n"
 "                <p>Die Synchronisierung des Bestands für den Shopee-Shop\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
-"\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
+"b>\n"
 "                    ist auf einige Fehler gestoßen und wurde nicht "
 "abgeschlossen.</p>\n"
 "                <p>Folgende Fehler wurden von Shopee gesendet: </p>\n"
@@ -359,8 +375,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></th>"
-"\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></"
+"th>\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -369,8 +385,8 @@ msgstr ""
 "                                    Leider müssen Sie manuell prüfen, ob die "
 "verfügbare Menge für das Produkt korrekt ist oder nicht.\n"
 "                                    Wenn das Problem weiterhin besteht, "
-"kontaktieren Sie den <a href=\"https://www.odoo.com/help/\">Odoo-Support </a>"
-".\n"
+"kontaktieren Sie den <a href=\"https://www.odoo.com/help/\">Odoo-Support </"
+"a>.\n"
 "                                </t>\n"
 "                            </td>\n"
 "                        </tr>\n"
@@ -413,7 +429,7 @@ msgstr ""
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Account"
-msgstr ""
+msgstr "Konto"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
@@ -501,7 +517,7 @@ msgstr "Verbleibende Tage der Autorisierung"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Authorize New Shop"
-msgstr ""
+msgstr "Neuen Shop autorisieren"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
@@ -564,7 +580,7 @@ msgstr "Shopee-Konten erstellen"
 #. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_shop_create
 msgid "Create Shopee Shop Wizard"
-msgstr ""
+msgstr "Assistent zum Erstellen eines Shopee-Shops"
 
 #. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
@@ -752,7 +768,7 @@ msgstr "Wenn dieses Feld leer ist, sind alle Unternehmen erlaubt."
 #. module: sale_shopee
 #: model:ir.module.module,summary:base.module_sale_shopee
 msgid "Import Shopee orders and sync deliveries"
-msgstr ""
+msgstr "Shopee-Bestellungen importieren und Lieferungen synchronisieren"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
@@ -815,7 +831,7 @@ msgstr "Sperren"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Manage Accounts"
-msgstr ""
+msgstr "Konten verwalten"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -837,12 +853,12 @@ msgstr "Neu"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "New Account"
-msgstr ""
+msgstr "Neues Konto"
 
 #. module: sale_shopee
 #: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
 msgid "New Shop"
-msgstr ""
+msgstr "Neuer Shop"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -986,6 +1002,8 @@ msgid ""
 "Select the Shopee account on which to authorize the new shop, or register "
 "another account."
 msgstr ""
+"Wählen Sie das Shopee-Konto aus, auf dem Sie den neuen Shop autorisieren "
+"möchten, oder registrieren Sie ein weiteres Konto."
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
@@ -1093,7 +1111,7 @@ msgstr "Einkäufer-ID von Shopee"
 #. module: sale_shopee
 #: model:ir.module.module,shortdesc:base.module_sale_shopee
 msgid "Shopee Connector"
-msgstr ""
+msgstr "Shopee-Konnektor"
 
 #. module: sale_shopee
 #. odoo-python
@@ -1158,13 +1176,6 @@ msgstr "Shopee-Auftrag %(shopee_order_ref)s in %(shop_name)s"
 #: model:product.template,name:sale_shopee.default_discount_product_product_template
 msgid "Shopee Order Discount"
 msgstr "Shopee-Bestellrabatt"
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-#: code:addons/sale_shopee/tests/test_shopee.py:0
-msgid "Shopee Pricelist %(currency)s"
-msgstr "Shopee-Preisliste %(currency)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_account__api_endpoint__production_brazil
@@ -1382,7 +1393,7 @@ msgstr ""
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
 msgid "The Shopee account on which the new shop is authorized."
-msgstr ""
+msgstr "Das Shopee-Konto, über das der neue Shop autorisiert ist."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
@@ -1580,3 +1591,6 @@ msgstr "shop_id"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "shopee_shop_id"
 msgstr "shopee_shop_id"
+
+#~ msgid "Shopee Pricelist %(currency)s"
+#~ msgstr "Shopee-Preisliste %(currency)s"

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-23 14:48+0000\n"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-09-27 21:41+0000\n"
 "Last-Translator: \"Maitê Dietze (madi)\" <madi@odoo.com>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/"
 "odoo-20/ai/pt_BR/>\n"
@@ -496,6 +496,15 @@ msgid ""
 "more) and at most 50 rows (max 200) are returned.\n"
 "        "
 msgstr ""
+"\n"
+"            Pesquise registros e seus valores no banco de dados.\n"
+"            Ideal para “Eu tenho...”, “Existe algum”, “Qual é o nome de”, "
+"busca por relações, ...\n"
+"            Retorna {registros, contagem_total} e uma dica de paginação "
+"quando houver mais linhas; por padrão, apenas display_name é recuperado "
+"(passe `fields` para obter mais) e no máximo 50 linhas (máximo de 200) são "
+"retornadas.\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_group
@@ -811,7 +820,7 @@ msgstr "<span>com argumentos</span>"
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_composer_unique_agent_interface_model
 msgid "A rule with this Action and Model combination already exists."
-msgstr ""
+msgstr "Já existe uma regra com essa combinação de Ação e Modelo."
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_child_wait
@@ -1110,7 +1119,7 @@ msgstr "A IA está ouvindo..."
 #. module: ai
 #: model:ir.model,name:ai.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
-msgstr ""
+msgstr "Configurações do modelo de IA (Prompt Padrão) para redação de textos."
 
 #. module: ai
 #. odoo-python
@@ -1677,6 +1686,8 @@ msgid ""
 "Default action prompt that can be attached to AI UI rules for quick access "
 "by the user."
 msgstr ""
+"Sugestão de ação padrão que pode ser anexada às regras da interface de "
+"usuário da IA para acesso rápido pelo usuário."
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_start_session
@@ -3068,6 +3079,12 @@ msgid "Something else"
 msgstr "Outra coisa"
 
 #. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Something went wrong. Please rephrase your prompt and try again."
+msgstr ""
+
+#. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__is_folder
 msgid "Source is a folder"
 msgstr "A fonte é uma pasta"
@@ -3278,6 +3295,12 @@ msgid "The record linked to the session was not found."
 msgstr "O registro vinculado à sessão não foi encontrado."
 
 #. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "The session tree has reached its active-session limit."
+msgstr ""
+
+#. module: ai
 #: model:ir.model.fields,help:ai.field_ai_prompt_button__name
 msgid "The text shown on the button"
 msgstr "O texto exibido no botão"
@@ -3315,7 +3338,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai/utils/tools_schema/validators.py:0
 msgid "The value of the parameter '%(name)s' must be at least %(minimum)s."
-msgstr ""
+msgstr "O valor do parâmetro '%(name)s' deve ser pelo menos %(minimum)s."
 
 #. module: ai
 #. odoo-python
@@ -3763,7 +3786,7 @@ msgstr ""
 
 #. module: ai
 #. odoo-python
-#: code:addons/ai/controllers/thread.py:0
+#: code:addons/ai/models/ai_session.py:0
 msgid "Your company access changed while this AI response was running."
 msgstr ""
 "O acesso da sua empresa foi alterado enquanto esta resposta de IA estava "

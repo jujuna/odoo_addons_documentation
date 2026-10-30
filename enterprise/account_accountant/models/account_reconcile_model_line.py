@@ -132,7 +132,7 @@ class AccountReconcileModelLine(models.Model):
         elif self.amount_type == 'fixed':
             sign = 1 if residual_amount_currency > 0.0 else -1
             amount_currency = currency.round(self.amount * sign)
-            balance = st_line.company_currency_id.round(self.amount * sign)
+            balance = currency._convert(amount_currency, st_line.company_currency_id, st_line.company_id, st_line.date)
         else:
             raise UserError(_("This reconciliation model can't be used in the manual reconciliation widget because its "
                               "configuration is not adapted"))

@@ -1,9 +1,16 @@
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.tools.float_utils import float_compare
 
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
+
+    is_kit_component = fields.Boolean(compute='_compute_is_kit_component')
+
+    @api.depends('bom_line_id.bom_id.type')
+    def _compute_is_kit_component(self):
+        for move in self:
+            move.is_kit_component = move.bom_line_id.bom_id.type == 'phantom'
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -14,7 +21,7 @@ class StockMove(models.Model):
         return moves
 
     def _get_fields_stock_barcode(self):
-        return super()._get_fields_stock_barcode() + ['uom_id', 'bom_line_id']
+        return super()._get_fields_stock_barcode() + ['uom_id', 'bom_line_id', 'is_kit_component']
 
     def split_uncompleted_moves(self):
         production_moves = self.filtered(lambda m: m.picking_type_id.code == 'mrp_operation')

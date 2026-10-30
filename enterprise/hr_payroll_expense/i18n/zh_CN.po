@@ -8,15 +8,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 02:22+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-11 12:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/hr_payroll_expense/zh_Hans/>\n"
+"projects/odoo-20/hr_payroll_expense/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,6 +34,11 @@ msgid ""
 "\n"
 "This application allows you to reimburse expenses in payslips.\n"
 msgstr ""
+"\n"
+"工资单中的费用报销\n"
+"=====================================\n"
+"\n"
+"此应用允许您通过工资单报销费用。\n"
 
 #. module: hr_payroll_expense
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.view_account_payment_register_form_inherit_hr_payroll_expense
@@ -66,12 +72,12 @@ msgstr "显示名称"
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/ir_actions_report.py:0
 msgid "Employee"
-msgstr ""
+msgstr "员工"
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields.selection,name:hr_payroll_expense.selection__hr_expense__payment_mode__payslip_account
 msgid "Employee (Through a Payslip)"
-msgstr ""
+msgstr "员工（通过工资单）"
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_hr_expense
@@ -109,7 +115,7 @@ msgstr "费用报销"
 #. module: hr_payroll_expense
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_expense
 msgid "Expenses in Payslips"
-msgstr ""
+msgstr "工资单中的费用"
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields,help:hr_payroll_expense.field_hr_payslip__expense_ids
@@ -153,7 +159,7 @@ msgstr ""
 msgid ""
 "Only approved and posted expenses with payslip reimbursement can be reported "
 "in the next payslip."
-msgstr ""
+msgstr "只有已批准、已过账且通过工资单报销的费用，才能在下期工资单中申报。"
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_account_payment_register
@@ -168,7 +174,7 @@ msgstr "工资单"
 #. module: hr_payroll_expense
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.product_product_expense_form_view
 msgid "Payroll"
-msgstr ""
+msgstr "工资"
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -183,12 +189,12 @@ msgstr "工资单"
 msgid ""
 "Please add a Salary Rule belonging to Expense Product \"%(name)s\" to report "
 "its expenses in the next payslip"
-msgstr ""
+msgstr "请添加一条属于费用产品“%(name)s”的工资规则，以便在下期工资单中申报其费用"
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_product_template
 msgid "Product"
-msgstr ""
+msgstr "产品"
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__refund_in_payslip
@@ -204,7 +210,7 @@ msgstr "报销费用"
 #. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__payment_mode
 msgid "Reimbursement"
-msgstr ""
+msgstr "报销"
 
 #. module: hr_payroll_expense
 #. odoo-javascript
@@ -216,18 +222,18 @@ msgstr "从工资单上移除"
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_ir_actions_report
 msgid "Report Action"
-msgstr ""
+msgstr "报表操作"
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_product_product__salary_rule_ids
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_product_template__salary_rule_ids
 msgid "Salary Rules"
-msgstr ""
+msgstr "工资规则"
 
 #. module: hr_payroll_expense
 #: model:ir.module.module,summary:base.module_hr_payroll_expense
 msgid "Submit, validate and reinvoice employee expenses"
-msgstr ""
+msgstr "提交、验证并重新开具员工费用发票"
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -247,6 +253,8 @@ msgid ""
 "'Liability Payable'.\n"
 "Please fix the following salary rule(s): %s"
 msgstr ""
+"与产品关联的工资规则的借方科目类型必须为“应付账款”。\n"
+"请修正以下工资规则：%s"
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -262,6 +270,8 @@ msgid ""
 "product.\n"
 "Please fix the following structure(s): %s"
 msgstr ""
+"您不能为同一产品在同一工资结构上分配多条工资规则。\n"
+"请修正以下工资结构：%s"
 
 #. module: hr_payroll_expense
 #. odoo-python

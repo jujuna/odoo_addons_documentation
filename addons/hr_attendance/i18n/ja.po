@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:38+0000\n"
-"PO-Revision-Date: 2026-08-31 14:50+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-s19-4/"
+"POT-Creation-Date: 2026-10-23 17:40+0000\n"
+"PO-Revision-Date: 2026-09-29 03:16+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "hr_attendance/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -136,12 +136,6 @@ msgid ""
 "<i class=\"oi oi-fw text-400\" data-icon=\"schedule\" aria-hidden=\"true\" "
 "title=\"Worked Hours\"/>"
 msgstr ""
-
-#. module: hr_attendance
-#: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
-msgid "<i class=\"oi oi-fw\" data-icon=\"arrow_forward\"/>Installation Manual"
-msgstr ""
-"<i class=\"oi oi-fw\" data-icon=\"arrow_forward\"/>インストールマニュアル"
 
 #. module: hr_attendance
 #: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
@@ -999,7 +993,10 @@ msgid "Employee name is required."
 msgstr "従業員の名前は必須です。"
 
 #. module: hr_attendance
+#. odoo-python
+#: code:addons/hr_attendance/models/hr_attendance.py:0
 #: model:ir.actions.act_window,name:hr_attendance.hr_employee_attendance_action_kanban
+#: model:ir.actions.server,name:hr_attendance.action_attendance_employee_view_access
 #: model:ir.ui.menu,name:hr_attendance.menu_hr_attendance_employee
 msgid "Employees"
 msgstr "従業員"
@@ -1280,6 +1277,11 @@ msgid "Install"
 msgstr "インストール"
 
 #. module: hr_attendance
+#: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
+msgid "Installation Manual"
+msgstr ""
+
+#. module: hr_attendance
 #. odoo-python
 #: code:addons/hr_attendance/controllers/main.py:0
 msgid ""
@@ -1325,8 +1327,8 @@ msgstr "キオスクモード"
 
 #. module: hr_attendance
 #: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
-msgid "Kiosk Mode Adress"
-msgstr "キオスクモードアドレス"
+msgid "Kiosk Mode Address"
+msgstr ""
 
 #. module: hr_attendance
 #: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
@@ -1886,7 +1888,7 @@ msgstr "サインアウト"
 #: model:ir.model.fields,field_description:hr_attendance.field_res_config_settings__single_check_in
 #: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
 msgid "Single Check-In Attendance System"
-msgstr "出勤のみ打刻の勤怠システム"
+msgstr "出勤のみ打刻システム"
 
 #. module: hr_attendance
 #: model:ir.model.fields,field_description:hr_attendance.field_hr_attendance__source_attendance_id
@@ -2152,7 +2154,7 @@ msgstr "不明"
 #. module: hr_attendance
 #: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
 msgid "Use PIN codes (defined on the Employee's profile) to check-in."
-msgstr "出勤打刻にPINコード(従業員のプロフィールに定義済)を使用"
+msgstr "出勤打刻にPINコード(従業員のプロファイルに定義済)を使用します。"
 
 #. module: hr_attendance
 #: model_terms:ir.ui.view,arch_db:hr_attendance.res_config_settings_view_form
@@ -2204,11 +2206,6 @@ msgstr "地図を表示"
 #: model:ir.model.fields.selection,name:hr_attendance.selection__hr_attendance__day_of_date__2
 msgid "Wednesday"
 msgstr "水曜"
-
-#. module: hr_attendance
-#: model_terms:ir.ui.view,arch_db:hr_attendance.hr_attendance_view_filter
-msgid "Week"
-msgstr "週"
 
 #. module: hr_attendance
 #. odoo-javascript
@@ -2398,6 +2395,17 @@ msgstr "WebSocketメッセージ処理"
 #: code:addons/hr_attendance/static/src/public_kiosk/public_kiosk_app.xml:0
 msgid "with optional PIN code"
 msgstr "オプションPINコードで"
+
+#~ msgid ""
+#~ "<i class=\"oi oi-fw\" data-icon=\"arrow_forward\"/>Installation Manual"
+#~ msgstr ""
+#~ "<i class=\"oi oi-fw\" data-icon=\"arrow_forward\"/>インストールマニュアル"
+
+#~ msgid "Kiosk Mode Adress"
+#~ msgstr "キオスクモードアドレス"
+
+#~ msgid "Week"
+#~ msgstr "週"
 
 #~ msgid "%(nb_hours)d h / %(period)s"
 #~ msgstr "%(nb_hours)d 時間 / %(period)s"

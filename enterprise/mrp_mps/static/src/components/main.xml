@@ -18,7 +18,11 @@
                 <ViewScaleSelector t-if="this.hasMPSRecords" scales="this.periodTypes" currentScale="this.currentPeriodType" setScale.bind="this.setScale"/>
             </t>
             <t t-set-slot="control-panel-actions">
-                <MrpMpsSearchBar/>
+                <SearchBar>
+                    <t t-set-slot="search-bar-additional-menu">
+                        <GroupMenu/>
+                    </t>
+                </SearchBar>
             </t>
             <t t-set-slot="control-panel-additional-actions">
                 <ActionMenus t-if="this.isRecordSelected"

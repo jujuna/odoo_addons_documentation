@@ -31,7 +31,8 @@ class HrEmployee(models.Model):
 
     def _get_appraisal_plan_starting_date(self):
         self.ensure_one()
-        return self.contract_date_start or self.date_version
+        # The date of the current version would move at each amendment
+        return self.contract_date_start or self.sudo()._get_first_version_date()
 
     def action_send_appraisal_request(self):
         context = dict(self.env.context)

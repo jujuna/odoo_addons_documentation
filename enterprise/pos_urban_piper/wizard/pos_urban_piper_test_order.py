@@ -259,7 +259,7 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
             payload['order']['details']['instructions'] = data['delivery_instruction']
         line_discounts = []
         if data['line_discount'] > 0:
-            line_discount_value = (taxes['total_included'] / data['quantity']) * data['line_discount'] / 100
+            line_discount_value = taxes['total_included'] * data['line_discount'] / 100
             line_discounts.append({
                 'is_merchant_discount': True,
                 'code': 'TEST',

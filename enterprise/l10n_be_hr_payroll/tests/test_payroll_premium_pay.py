@@ -110,7 +110,7 @@ class TestPayrollPremiumPay(TestPayrollBase, TestBelgiumCommon):
         })
 
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip_results = {'PREMNIGHT': 6.34, 'PREMSUN': 8.0, 'PREMHOL': 8.0, 'PREMTEAM': 1.14, 'PREMMISC': 8.0, 'TEMPUNEMP': 2.0, 'FLEXCAT2': 0.7, 'FLEXCAT34': 1.08, 'FLEXCAT5PLUS': 1.27, 'BASIC': 2536.53}
+        payslip_results = {'PREMNIGHT': 6.34, 'PREMSUN': 8.0, 'PREMHOL': 8.0, 'PREMTEAM': 1.14, 'PREMMISC': 0.0, 'TEMPUNEMP': 2.0, 'FLEXCAT2': 0.7, 'FLEXCAT34': 1.08, 'FLEXCAT5PLUS': 1.27, 'BASIC': 2528.53}
         self.assertAlmostEqual(sum(payslip.worked_days_line_ids.mapped('number_of_days')), 23, 5)
         self._validate_payslip(payslip, payslip_results, skip_lines=True)
 
@@ -219,6 +219,33 @@ class TestPayrollPremiumPay(TestPayrollBase, TestBelgiumCommon):
         expected = team_rate_percentage / 100 * average_hourly_wage * 4 \
             + 2.0 / 100 * premium_line.amount + 10.5 * premium_line.number_of_days
         self._validate_payslip(payslip, {'PREMTEAM': expected}, skip_lines=True)
+
+    @freeze_time('2025-01-01')
+    def test_premium_pay_misc_without_legal_rate(self):
+        # The miscellaneous premium pay has no legal rate: it pays the premium pays defined under it, here 100% of
+        # the worked time's own rate, i.e. a time paid 200%.
+        premium_misc_double = self.env['hr.salary.rule.category'].create({
+            'name': 'Premium Pay Misc - 100%',
+            'code': 'PREMIUM_PAY_MISC_100',
+            'parent_id': self.env.ref('l10n_be_hr_payroll.PREMIUM_PAY_MISC').id,
+            'country_id': self.env.ref('base.be').id,
+            'premium_percentage_hourly_rate': 100.0,
+            'optional_on_work_entry_type_ids': [Command.link(self.premium_work_entry_type.id)],
+        })
+        self.env['hr.leave'].create({
+            'employee_id': self.employee.id,
+            'work_entry_type_id': self.premium_work_entry_type.id,
+            'request_date_from': date(2025, 1, 7),
+            'request_date_to': date(2025, 1, 7),
+            'request_hour_from': 10,
+            'request_hour_to': 14,
+            'category_options_ids': [Command.link(premium_misc_double.id)],
+        })
+
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
+        premium_line = payslip.worked_days_line_ids.filtered('category_options_ids')
+        self.assertTrue(premium_line.amount)
+        self._validate_payslip(payslip, {'PREMMISC': premium_line.amount}, skip_lines=True)
 
     def _worked_days_totals(self, payslip):
         lines = payslip.worked_days_line_ids

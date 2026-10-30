@@ -341,8 +341,11 @@ class TestRentalPlanning(TestSalePlanning):
         rental_order_form.rental_return_date += relativedelta(days=1)
         rental_order = rental_order_form.save()
         self.assertEqual(planning_slot.end_datetime, rental_order.rental_return_date, "Make sure the dates are sync between planning slot and rental order")
+        self.assertEqual(planning_slot, rental_order.order_line.planning_slot_ids)
 
         rental_order.action_confirm()
+        rental_order.order_line.invalidate_recordset([])
+        self.assertEqual(planning_slot, rental_order.order_line.planning_slot_ids)
         new_slot = self.env['planning.slot'].create({
             'resource_ids': self.projector.ids,
             'role_id': self.planning_role_projector.id,
@@ -526,4 +529,4 @@ class TestRentalPlanning(TestSalePlanning):
         self.assertEqual(
             slot.state, "2_published",
             "Slot must be published only after confirming the SO."
-    )
+        )

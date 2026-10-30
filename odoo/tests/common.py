@@ -1510,22 +1510,22 @@ class TransactionCase(BaseCase):
             case_instance = self
 
             def _patched_run_wkhtmltopdf(self, args):
+                http_request_key = case_instance.http_request_key
                 with (
-                    patch.object(case_instance, 'http_request_key', 'wkhtmltopdf'),
                     release_test_lock(),
                     patch('odoo.tests.common._disable_flushing_cursor', True),
                 ):
-                    args = ['--cookie', TEST_CURSOR_COOKIE_NAME, 'wkhtmltopdf', *args]
+                    args = ['--cookie', TEST_CURSOR_COOKIE_NAME, http_request_key, *args]
                     return old_run_wkhtmltopdf(self, args)
 
             report_model = self.env.registry['ir.actions.report']
             try:
-                old_run_wkhtmltopdf = report_model._run_wkhtmltopdf
+                old_run_wkhtmltopdf = report_model._run_wkhtmltopdf__
             except AttributeError:
                 pass
             else:
                 stack.enter_context(
-                    patch.object(report_model, '_run_wkhtmltopdf', _patched_run_wkhtmltopdf),
+                    patch.object(report_model, '_run_wkhtmltopdf__', _patched_run_wkhtmltopdf),
                 )
             yield
 
@@ -2644,22 +2644,22 @@ class HttpCase(TransactionCase):
         case_instance = self
 
         def _patched_run_wkhtmltopdf(self, args):
+            http_request_key = case_instance.http_request_key
             with (
-                patch.object(case_instance, 'http_request_key', 'wkhtmltopdf'),
                 release_test_lock(),
                 patch('odoo.tests.common._disable_flushing_cursor', True),
             ):
-                args = ['--cookie', TEST_CURSOR_COOKIE_NAME, 'wkhtmltopdf', *args]
+                args = ['--cookie', TEST_CURSOR_COOKIE_NAME, http_request_key, *args]
                 return old_run_wkhtmltopdf(self, args)
 
         report_model = self.env.registry['ir.actions.report']
         try:
-            old_run_wkhtmltopdf = report_model._run_wkhtmltopdf
+            old_run_wkhtmltopdf = report_model._run_wkhtmltopdf__
         except AttributeError:
             pass
         else:
             self.startPatcher(
-                patch.object(report_model, '_run_wkhtmltopdf', _patched_run_wkhtmltopdf),
+                patch.object(report_model, '_run_wkhtmltopdf__', _patched_run_wkhtmltopdf),
             )
 
     @contextmanager

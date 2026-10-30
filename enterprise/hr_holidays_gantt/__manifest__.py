@@ -22,6 +22,8 @@
         ],
         'web.assets_backend': [
             "hr_holidays_gantt/static/src/core/common/**/*",
+            'hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.js',
+            'hr_holidays_gantt/static/src/core/web/avatar_card/hr_holidays_gantt_avatar_card.xml',
             'hr_holidays_gantt/static/src/views/gantt/hr_holidays_gantt_cog_menu.js',
         ],
         'web.assets_backend_lazy': [

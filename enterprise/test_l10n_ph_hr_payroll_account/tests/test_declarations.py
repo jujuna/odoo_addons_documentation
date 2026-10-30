@@ -215,8 +215,10 @@ class TestDeclarations(TestL10NPhHrPayrollCommon):
                 if month == 3 and day == 1:
                     payslip.version_id._set_property_input_value("DM_RICE", 2500)
                 if month == 6 and day == 1:
-                    payslip._set_input_value("NCFB", 50000)
-                    payslip._set_input_value("CA", 5000)
+                    payslip._set_input_values({
+                        "NCFB": 50000,
+                        "CA": 5000,
+                    })
                 if month == 12 and day == 1:
                     payslip._set_input_value('CA', 110_000)
                 if month == 12 and day == 16:

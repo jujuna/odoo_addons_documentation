@@ -815,6 +815,37 @@ test("Timesheet is no longer prefilled once created from the last visited task",
 });
 
 test.tags("desktop");
+test("Timesheet is no longer prefilled once the last visited task was reset away", async () => {
+    await mountWithCleanup(WebClient);
+
+    setPreFilledFormTimesheet({ task_id: 1 });
+
+    const systrayButton = contains(
+        "div.o_menu_systray button.o-dropdown i[data-icon='play_circle']"
+    );
+    await systrayButton.click();
+    await contains("div[name='ts_checkin_btn'] > button").click();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+    expect("div[name='task_id'] input").toHaveValue("BS task", {
+        mesage: "The task should be pre-filled when opening the timer systray",
+    });
+
+    await contains("button:contains('Reset')").click();
+    await tick();
+
+    await systrayButton.click(); // Close
+    await systrayButton.click(); // Re-open
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+
+    expect("div[name='task_id'] input").toHaveValue("", {
+        message: "Reopening the timer systray should not bring back the task the user reset away",
+    });
+    expect("div[name='project_id'] input").toHaveValue("", {
+        message: "The project of the task the user reset away should not come back either",
+    });
+});
+
+test.tags("desktop");
 test("Timesheet is prefilled with project and tasks", async () => {
     onRpc("web_save", ({ args }) => {
         expect(args[1].name).toBe(false);
@@ -879,6 +910,21 @@ test("Systray total-hours color reflects working hours", async () => {
      *   - total at/above the working hours      -> text-success
      *   - no working hours configured (falsy 0) -> neutral
      */
+    let workingHours = 8;
+    onRpc("/timesheet_grid/timesheet_systray_user_data", async () => {
+        const spec = pyEnv["account.analytic.line"]._get_aw_timesheet_fields_specification();
+        const domain = [["date", "=", luxon.DateTime.now().toFormat("yyyy-MM-dd")]];
+        return {
+            employee: {
+                id: serverState.userId,
+                name: "John Timesheet",
+                working_hours: workingHours,
+            },
+            timesheets: {
+                records: pyEnv["account.analytic.line"].web_search_read(domain, spec).records,
+            },
+        };
+    });
     await mountWithCleanup(WebClient);
     pyEnv["account.analytic.line"].create([
         {
@@ -896,7 +942,7 @@ test("Systray total-hours color reflects working hours", async () => {
     const totalColorSelector = "div[name='total_hours'] b";
 
     // 1) Below the working hours (2h worked, 8h expected) -> red (danger).
-    env.sessionData.timesheet_systray_employee_data.working_hours = 8;
+    workingHours = 8;
     await contains(systrayButton).click();
     await contains("div[name='ts_checkin_btn'] > button").click();
     await animationFrame();
@@ -907,7 +953,7 @@ test("Systray total-hours color reflects working hours", async () => {
     await contains(systrayButton).click(); // close
 
     // 2) At/above the working hours (2h worked, 1h expected) -> green (success).
-    env.sessionData.timesheet_systray_employee_data.working_hours = 1;
+    workingHours = 1;
     await contains(systrayButton).click();
     await animationFrame();
     expect(totalSelector).toHaveText(/Total\s*2h 00m\s*over\s*1h 00m/);
@@ -917,7 +963,7 @@ test("Systray total-hours color reflects working hours", async () => {
     await contains(systrayButton).click(); // close
 
     // 3) No working hours configured (0) -> neutral
-    env.sessionData.timesheet_systray_employee_data.working_hours = 0;
+    workingHours = 0;
     await contains(systrayButton).click();
     await animationFrame();
     expect(totalSelector).toHaveText(/Total\s*2h 00m\s*over\s*0h 00m/);
@@ -960,4 +1006,33 @@ test("Performance: No default_get or onchange RPCs when opening new or existing 
     expect.verifySteps([], {
         message: "Clicking an existing timesheet triggered an unexpected RPC.",
     });
+});
+
+test.tags("desktop");
+test("Performance: the prefilled form is built once while its onchange is in flight", async () => {
+    setPreFilledFormTimesheet({ task_id: 1 });
+    const slowOnchange = Promise.withResolvers();
+    onRpc("account.analytic.line", "onchange", async () => {
+        expect.step("onchange");
+        await slowOnchange.promise;
+    });
+
+    await mountWithCleanup(WebClient);
+    await contains("div.o_menu_systray button.o-dropdown i[data-icon='play_circle']").click();
+    await contains("div[name='ts_checkin_btn'] > button").click();
+    await tick();
+    expect.verifySteps(["onchange"], {
+        message: "The last visited task should be resolved by a single onchange.",
+    });
+
+    // The form only exists once that onchange answered: until then, anything
+    // rebuilding it sends one more.
+    await advanceTimer(3000);
+    slowOnchange.resolve();
+    await waitFor(".o_timesheet_grid_popover div[name='project_id']");
+
+    expect.verifySteps([], {
+        message: "The ticking timer should not rebuild the form of the timer systray.",
+    });
+    expect("div[name='task_id'] input").toHaveValue("BS task");
 });

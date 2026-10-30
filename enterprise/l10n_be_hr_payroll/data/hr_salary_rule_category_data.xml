@@ -19,6 +19,13 @@
         <field name="country_id" ref="base.be"/>
     </record>
 
+    <!-- Net salary declared in the DRS scenario 8 (WECH008) -->
+    <record id="WECH008_NET" model="hr.salary.rule.category">
+        <field name="name">WECH008 Net Salary</field>
+        <field name="code">WECH008_NET</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
     <!-- ONSS -->
 
     <record id="ONSS" model="hr.salary.rule.category">
@@ -92,6 +99,14 @@
     <record id="YEARLY_WITHHOLDING_BASE" model="hr.salary.rule.category">
         <field name="name">Yearly Withholding Tax Base</field>
         <field name="code">YEARLY_WITHHOLDING_BASE</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- the pay of the days a Horeca occasional worker spends in its contingent, taxed at a flat rate apart from the
+         scale and its reductions -->
+    <record id="OCCASIONAL_WITHHOLDING_BASE" model="hr.salary.rule.category">
+        <field name="name">Occasional Workers Withholding Tax Base</field>
+        <field name="code">OCCASIONAL_WITHHOLDING_BASE</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -204,6 +219,12 @@
     <record id="REPLACEMENT_REVENUE_BASE" model="hr.salary.rule.category">
         <field name="name">Replacement Revenue Base Salary</field>
         <field name="code">REPLACEMENT_REVENUE_BASE</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <record id="WORK_ACCIDENT_BASE" model="hr.salary.rule.category">
+        <field name="name">Work Accident Guaranteed Salary Base</field>
+        <field name="code">WORK_ACCIDENT_BASE</field>
         <field name="country_id" ref="base.be"/>
     </record>
 
@@ -461,6 +482,29 @@
     <record id="IP_WT" model="hr.salary.rule.category">
         <field name="name">Intellectual Property Subject to Withholding Tax</field>
         <field name="code">IP_WT</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Work entry types of the overtime giving right to the legal overtime premium: withholding tax exemptions
+         274.44/274.55 and box 18 of the 281.10. No parent, the amounts would be added to it twice. -->
+    <record id="OVERTIME_TAX_RELIEF" model="hr.salary.rule.category">
+        <field name="name">Overtime with Tax Relief</field>
+        <field name="code">OVERTIME_TAX_RELIEF</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Work entry types of the overtime of the hotel industry paid net: box 17 of the 281.10 -->
+    <record id="HORECA_NET_OVERTIME" model="hr.salary.rule.category">
+        <field name="name">Hotel Industry Overtime Paid Net</field>
+        <field name="code">HORECA_NET_OVERTIME</field>
+        <field name="country_id" ref="base.be"/>
+    </record>
+
+    <!-- Commuting reimbursements exempted from withholding tax (boxes 14a and 14d of the 281.10), part of the
+         remuneration of a student (box 26h) -->
+    <record id="EXEMPTED_COMMUTING" model="hr.salary.rule.category">
+        <field name="name">Exempted Commuting Reimbursement</field>
+        <field name="code">EXEMPTED_COMMUTING</field>
         <field name="country_id" ref="base.be"/>
     </record>
 </odoo>

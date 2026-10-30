@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import Command
 from .common import TestPlanningFieldServiceSaleTimesheetCommon
 from odoo.tests import Form, freeze_time, new_test_user
+from odoo.exceptions import AccessError
 from odoo.tools.float_utils import float_compare
 
 
@@ -542,3 +543,60 @@ class TestFsmFlowSale(TestPlanningFieldServiceSaleTimesheetCommon):
             {'price_unit': 0.0, 'invoice_status': 'no', 'planning_slot_id': self.intervention.id},
             {'price_unit': 885.0, 'invoice_status': 'invoiced', 'planning_slot_id': self.intervention.id},
         ])
+
+    def test_fsm_user_can_get_catalog_data_from_task(self):
+        fsm_product = self.service_product_ordered
+        fsm_user = self.env["res.users"].create({
+            "name": "John",
+            "login": "john",
+            "resource_ids": [Command.create({"name": "John"})],
+            "group_ids": [Command.set([
+                self.env.ref("planning.group_planning_user").id,
+                self.env.ref("sales_team.group_sale_salesman").id,
+            ])],
+        })
+        sale_order = self.env['sale.order'].create({
+            "partner_id": self.partner_1.id,
+            "order_line": [Command.create({
+                "product_id": fsm_product.id,
+                "planning_slot_id": self.intervention.id,
+                "product_uom_qty": 1
+            })],
+        })
+        fsm_slot = self.intervention
+        fsm_slot.sale_order_id = sale_order
+        sale_order.action_confirm()
+
+        other_order = self.env["sale.order"].create({
+            "partner_id": self.partner_1.id,
+            "order_line": [
+                Command.create({"display_type": "line_subsection", "name": "Other Section"}),
+                Command.create({"product_id": self.product_a.id, "product_uom_qty": 1}),
+            ],
+        })
+        order = sale_order.with_user(fsm_user).with_context(intervention_id=fsm_slot.id)
+        fsm_slot.resource_ids = fsm_user.resource_ids
+        self.assertFalse(order.has_access("read"))
+        self.assertTrue(fsm_slot.with_user(fsm_user).has_access("write"))
+
+        sections = order.get_catalog_section_data(child_field="order_line", intervention_id=fsm_slot.id)
+        self.assertIsNotNone(sections, "Expected catalog section data to be returned")
+        record_lines = order._get_product_catalog_record_lines(
+            child_field="order_line",
+            product_ids=fsm_product.ids,
+            intervention_id=fsm_slot.id
+        )
+        self.assertEqual(
+            {product.id: lines.ids for product, lines in record_lines.items()},
+            {fsm_product.id: sale_order.order_line.ids},
+        )
+
+        # the task must not grant access to the sections of an order it is not linked to
+        with self.assertRaises(AccessError):
+            other_order.with_user(fsm_user).get_catalog_section_data(child_field="order_line", intervention_id=fsm_slot.id)
+        with self.assertRaises(AccessError):
+            other_order.with_user(fsm_user)._get_product_catalog_record_lines(
+                child_field="order_line",
+                product_ids=fsm_product.ids,
+                intervention_id=fsm_slot.id
+            )

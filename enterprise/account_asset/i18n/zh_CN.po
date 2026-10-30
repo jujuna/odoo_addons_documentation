@@ -15,15 +15,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:50+0000\n"
-"PO-Revision-Date: 2026-09-17 23:31+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-10-20 07:25+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/account_asset/zh_Hans/>\n"
+"projects/odoo-20/account_asset/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,30 +42,36 @@ msgid ""
 "Keeps track of depreciations, and creates corresponding journal entries.\n"
 "\n"
 msgstr ""
+"\n"
+"资产管理\n"
+"=================\n"
+"管理公司或个人拥有的资产。\n"
+"跟踪折旧，并创建相应的日记账分录。\n"
+"\n"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants cancelled."
-msgstr ""
+msgstr " 所有变体已取消。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants reopened."
-msgstr ""
+msgstr " 所有变体已重新开启。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants set to draft."
-msgstr ""
+msgstr " 所有变体已设为草稿。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid " in journal %s"
-msgstr ""
+msgstr " 于日记账 %s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__total_depreciation_entries_count
@@ -89,7 +96,7 @@ msgstr "# 已过账的折旧分录"
 #: code:addons/account_asset/models/account_asset.py:0
 msgid ""
 "%(asset)s does not depreciate, so no ledger depreciation can be based on it."
-msgstr ""
+msgstr "%(asset)s 不计提折旧，因此无法基于它进行分类账折旧。"
 
 #. module: account_asset
 #. odoo-python
@@ -133,13 +140,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant)s confirmed with %(model)s%(journal_message)s"
-msgstr ""
+msgstr "%(variant)s 已使用 %(model)s 确认%(journal_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant_name)s Cancellation:"
-msgstr ""
+msgstr "%(variant_name)s 取消："
 
 #. module: account_asset
 #. odoo-python
@@ -159,7 +166,7 @@ msgstr "%s：折旧"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "(Choose Account)"
-msgstr ""
+msgstr "（选择科目）"
 
 #. module: account_asset
 #. odoo-python
@@ -171,7 +178,7 @@ msgstr "(无资产组)"
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
 msgid "(No Root)"
-msgstr ""
+msgstr "（无科目根）"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -182,7 +189,7 @@ msgstr "（包括"
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid ", %(percent)g%% salvage "
-msgstr ""
+msgstr ", %(percent)g%% 残值 "
 
 #. module: account_asset
 #. odoo-python
@@ -193,7 +200,7 @@ msgstr ""
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
 msgid "<span invisible=\"method_mode != 'rate'\"> per</span>"
-msgstr ""
+msgstr "<span invisible=\"method_mode != 'rate'\"> 每</span>"
 
 #. module: account_asset
 #. odoo-python
@@ -202,6 +209,8 @@ msgid ""
 "A Recovery Account is required on the depreciation model %(model)s: its "
 "journal %(journal)s belongs to the ledger %(ledger)s."
 msgstr ""
+"折旧模型 %(model)s 上需要设置转回科目：其日记账 %(journal)s 属于分类账 %"
+"(ledger)s。"
 
 #. module: account_asset
 #. odoo-python
@@ -271,6 +280,10 @@ msgid ""
 "will begin from <strong>%(date)s</strong> using the depreciation parameters "
 "configured on the new account."
 msgstr ""
+"日记账分录将在 <strong>%(date)s</strong> 将资产价值从 <strong><em>\"%"
+"(old_account)s\"</em></strong> 转移到 <strong><em>\"%(new_account)s\"</em></"
+"strong>。<br/> 当前资产将被关闭，并创建一个账面价值相同的新资产。<br/> 折旧将"
+"使用新科目上配置的折旧参数从 <strong>%(date)s</strong> 开始。"
 
 #. module: account_asset
 #. odoo-python
@@ -278,7 +291,7 @@ msgstr ""
 msgid ""
 "A journal with a ledger is required to create a depreciation model in this "
 "context."
-msgstr ""
+msgstr "在此上下文中，创建折旧模型需要关联分类账的日记账。"
 
 #. module: account_asset
 #. odoo-python
@@ -286,7 +299,7 @@ msgstr ""
 msgid ""
 "A ledger sub-asset is closed together with its asset. Dispose of the asset "
 "instead."
-msgstr ""
+msgstr "分类账子资产会随其资产一起关闭。请改为处置该资产。"
 
 #. module: account_asset
 #. odoo-python
@@ -294,7 +307,8 @@ msgstr ""
 msgid ""
 "A non deductible tax value of %(tax_value)s was added to %(name)s's initial "
 "value of %(purchase_value)s"
-msgstr "有一项不可扣减税值%(tax_value)s已加至%(name)s的初始值%(purchase_value)s"
+msgstr ""
+"有一项不可扣减税值%(tax_value)s已加至%(name)s的初始值%(purchase_value)s"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_account
@@ -305,25 +319,9 @@ msgstr "账户"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid ""
-"Account %(account)s should have accumulated depreciation and depreciation "
-"expense accounts set in order to generate an asset"
-msgstr "账户%(account)s 应设置累计折旧和折旧费用账户，以便生成资产"
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
 "Account %(name)s cannot be used to create an asset. The account must be of "
 "the Fixed Asset type."
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Account %(name)s not setup to generate assets. Depreciation model and asset "
-"accounts need to be set on account."
-msgstr ""
+msgstr "科目 %(name)s 不能用于创建资产。该科目必须是“固定资产”类型。"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_chart_template
@@ -341,7 +339,7 @@ msgstr "在折旧条目中使用的账户，用于减少资产价值。"
 msgid ""
 "Account used in the depreciation entries, to decrease the asset value. Value "
 "obtained from Fixed Asset Account."
-msgstr ""
+msgstr "折旧分录中使用的科目，用于减少资产价值。取值自固定资产科目。"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_account__asset_expense_account_id
@@ -357,8 +355,8 @@ msgid ""
 "Account used in the periodical entries, to record a part of the asset as "
 "expense. Value obtained from Fixed Asset Account."
 msgstr ""
-"定期分录所使用的科目，用于将资产的一部分计入费用。该科目取值取自固定资产科目"
-"。"
+"定期分录所使用的科目，用于将资产的一部分计入费用。该科目取值取自固定资产科"
+"目。"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__account_asset_id
@@ -373,7 +371,7 @@ msgstr "会计用于记录资产采购的原始价格。"
 msgid ""
 "Account used to record the reversal of excess depreciation when statutory "
 "depreciation catches up or the asset is disposed of."
-msgstr ""
+msgstr "用于记录当法定折旧追平或资产被处置时超额折旧转回的科目。"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__gain_account_id
@@ -416,7 +414,7 @@ msgstr "会计回执"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_depreciation_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__depreciation_account_id
 msgid "Accumulated Account"
-msgstr ""
+msgstr "累计科目"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_depreciation_account_id
@@ -428,7 +426,7 @@ msgstr "累计折旧"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "Accumulated Depreciation Account"
-msgstr ""
+msgstr "累计折旧科目"
 
 #. module: account_asset
 #. odoo-python
@@ -454,25 +452,25 @@ msgstr "所需操作"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
 msgid "Activate"
-msgstr ""
+msgstr "激活"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation"
-msgstr ""
+msgstr "激活折旧"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation for: %(asset)s"
-msgstr ""
+msgstr "为以下对象激活折旧：%(asset)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Activate Depreciation: %(asset)s"
-msgstr ""
+msgstr "激活折旧：%(asset)s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__active
@@ -485,7 +483,7 @@ msgstr "有效"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Active Asset"
-msgstr ""
+msgstr "有效资产"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_ids
@@ -551,13 +549,13 @@ msgstr "所有资料行应已过账"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "Also closed: %(sub_assets)s. %(message)s"
-msgstr ""
+msgstr "同时关闭：%(sub_assets)s。%(message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "An asset cannot have two variants linked to the same ledger"
-msgstr ""
+msgstr "一个资产不能有两个变体关联到同一分类账"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__main_variant_parent_id
@@ -598,7 +596,7 @@ msgstr "分析精度"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.depreciation_ledger_wizard_form
 msgid "Apply"
-msgstr ""
+msgstr "应用"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -644,7 +642,7 @@ msgstr "资产对应账户"
 #: model:ir.model.fields,field_description:account_asset.field_account_account__asset_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__account_depreciation_expense_id
 msgid "Asset Expense Account"
-msgstr ""
+msgstr "资产费用科目"
 
 #. module: account_asset
 #. odoo-python
@@ -707,7 +705,7 @@ msgstr "资产价值"
 #: code:addons/account_asset/models/account_asset.py:0
 #: model:ir.model,name:account_asset.model_account_asset_variant
 msgid "Asset Variant"
-msgstr ""
+msgstr "资产变体"
 
 #. module: account_asset
 #. odoo-python
@@ -716,19 +714,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_ids
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_variant_tree
 msgid "Asset Variants"
-msgstr ""
+msgstr "资产变体"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset cancelled.%(variant_message)s"
-msgstr ""
+msgstr "资产已取消。%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset confirmed with:"
-msgstr ""
+msgstr "资产已通过以下方式确认："
 
 #. module: account_asset
 #. odoo-python
@@ -740,7 +738,7 @@ msgstr "已创建资产"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid "Asset created from invoice: <b>%s</b>"
-msgstr ""
+msgstr "资产由发票创建：<b>%s</b>"
 
 #. module: account_asset
 #. odoo-python
@@ -757,19 +755,19 @@ msgstr "资产流动与会计处理"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Asset paused. "
-msgstr ""
+msgstr "资产已暂停。 "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset reset to draft.%(variant_message)s"
-msgstr ""
+msgstr "资产已重置为草稿。%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Asset set to running.%(variant_message)s"
-msgstr ""
+msgstr "资产已设为运行中。%(variant_message)s"
 
 #. module: account_asset
 #. odoo-python
@@ -787,7 +785,7 @@ msgstr "资产已售出：%s"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Asset unpaused. "
-msgstr ""
+msgstr "资产已取消暂停。 "
 
 #. module: account_asset
 #. odoo-python
@@ -822,7 +820,7 @@ msgstr "资产"
 #. module: account_asset
 #: model:ir.module.module,shortdesc:base.module_account_asset
 msgid "Assets Management"
-msgstr ""
+msgstr "资产管理"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_asset_report_handler
@@ -850,7 +848,7 @@ msgstr "处于草稿或打开状态的资产"
 msgid ""
 "At least one Journal must be linked to a Ledger in order to create an asset "
 "depreciation"
-msgstr ""
+msgstr "至少需要将一个日记账关联到分类账，才能创建资产折旧"
 
 #. module: account_asset
 #. odoo-python
@@ -906,6 +904,11 @@ msgid "Can Create Asset"
 msgstr "可创建资产"
 
 #. module: account_asset
+#: model:ir.model.fields,field_description:account_asset.field_account_asset__can_edit_asset_accounts
+msgid "Can Edit Asset Accounts"
+msgstr "可编辑资产账户"
+
+#. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Cancel Asset"
 msgstr "取消资产"
@@ -913,7 +916,7 @@ msgstr "取消资产"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Cancel Assets"
-msgstr ""
+msgstr "取消资产"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__cancelled
@@ -925,7 +928,7 @@ msgstr "已取消"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Cannot confirm current asset while main asset is not running"
-msgstr ""
+msgstr "主资产未处于运行中状态时，无法确认当前资产"
 
 #. module: account_asset
 #. odoo-python
@@ -933,7 +936,7 @@ msgstr ""
 msgid ""
 "Cannot generate depreciation board for ledger variant before main asset "
 "variant"
-msgstr ""
+msgstr "在主资产变体之前，无法为分类账变体生成折旧板"
 
 #. module: account_asset
 #. odoo-python
@@ -960,7 +963,8 @@ msgstr "特点"
 msgid ""
 "Check depreciation periods for new acquisitions and ensure consistency with "
 "similar assets. Document any changes in accounting methods."
-msgstr "核查新购资产的折旧年限，并确保与同类资产保持一致。记录会计方法的任何变更。"
+msgstr ""
+"核查新购资产的折旧年限，并确保与同类资产保持一致。记录会计方法的任何变更。"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__children_ids
@@ -983,8 +987,8 @@ msgstr ""
 "  *不计提折旧\n"
 "  *平均年限法：计算公式 = 原值 ÷ 使用年限\n"
 "  *余额递减法：计算公式 = 净值 × 递减系数\n"
-"  *余额递减转平均年限法：前期按余额递减法计算，当折旧额低于平均年限法计算值时"
-"，改为按平均年限法计提。"
+"  *余额递减转平均年限法：前期按余额递减法计算，当折旧额低于平均年限法计算值"
+"时，改为按平均年限法计提。"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_mode
@@ -1115,7 +1119,7 @@ msgstr "当前"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__current_selected_variant_id
 msgid "Current Selected Variant"
-msgstr ""
+msgstr "当前所选变体"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -1224,7 +1228,7 @@ msgstr "折旧后金额"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__already_depreciated_amount_import
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__already_depreciated_amount_import
 msgid "Depreciated at import"
-msgstr ""
+msgstr "导入时已折旧"
 
 #. module: account_asset
 #. odoo-python
@@ -1239,6 +1243,7 @@ msgstr "折旧"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Depreciation Account"
 msgstr "折旧账户"
 
@@ -1256,7 +1261,7 @@ msgstr "折旧日期"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "Depreciation Expense Account"
-msgstr ""
+msgstr "折旧费用科目"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__depreciation_move_ids
@@ -1326,7 +1331,7 @@ msgstr "折旧计划"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Depreciation activated from asset: %s"
-msgstr ""
+msgstr "已从资产激活折旧：%s"
 
 #. module: account_asset
 #. odoo-python
@@ -1334,7 +1339,7 @@ msgstr ""
 msgid ""
 "Depreciation activated. Asset value transferred from %(old_account)s to %"
 "(new_account)s."
-msgstr ""
+msgstr "折旧已激活。资产价值已从 %(old_account)s 转移到 %(new_account)s。"
 
 #. module: account_asset
 #. odoo-python
@@ -1359,12 +1364,12 @@ msgstr "折旧记项%(name)s已撤销（%(value)s）"
 #: code:addons/account_asset/models/account.py:0
 msgid ""
 "Depreciation model must contain journals that belong to an explicit ledger."
-msgstr ""
+msgstr "折旧模型必须包含属于明确分类账的日记账。"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__derived_asset_ids
 msgid "Derived Assets"
-msgstr ""
+msgstr "衍生资产"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__display_asset_accounts
@@ -1483,8 +1488,14 @@ msgstr "条目顺序颠倒：%(reversed_move_count)s"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_expense_id
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__expense_account_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Expense Account"
 msgstr "费用科目"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr
+msgid "Financial instruments"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -1504,7 +1515,7 @@ msgstr "固定资产"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Fixed asset account selected is not configured to create an asset."
-msgstr ""
+msgstr "所选固定资产科目未配置为创建资产。"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_follower_ids
@@ -1546,7 +1557,6 @@ msgstr "收益值"
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Go to Account"
 msgstr "前往账户"
@@ -1582,12 +1592,12 @@ msgstr "分组依据：资产类别"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_multi_ledger_company
 msgid "Has Ledger"
-msgstr ""
+msgstr "有分类账"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__has_locking_assets
 msgid "Has Locking Assets"
-msgstr ""
+msgstr "有锁定资产"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__has_message
@@ -1630,7 +1640,8 @@ msgstr "指示异常活动的图标。"
 msgid ""
 "Identify acquisitions, disposals, write-offs, etc. Ensure correct accounting "
 "treatment, depreciation, and capital gains processing."
-msgstr "识别资产购置、处置、核销等事项。确保会计处理、折旧及资本利得核算的准确性。"
+msgstr ""
+"识别资产购置、处置、核销等事项。确保会计处理、折旧及资本利得核算的准确性。"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__message_needaction
@@ -1649,12 +1660,12 @@ msgstr "如果勾选此项， 某些消息将出现发送错误。"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__import_account_depreciation_id
 msgid "Import Account Depreciation"
-msgstr ""
+msgstr "导入累计折旧科目"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__import_account_depreciation_expense_id
 msgid "Import Account Depreciation Expense"
-msgstr ""
+msgstr "导入折旧费用科目"
 
 #. module: account_asset
 #: model_terms:ir.actions.act_window,help:account_asset.action_account_asset_form
@@ -1662,12 +1673,6 @@ msgid ""
 "Import your fixed assets' original data and their already accumulated "
 "depreciation."
 msgstr "导入固定资产的原始数据及其已累计的折旧。"
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid "Important Change"
-msgstr "重要变更"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__already_depreciated_amount_import
@@ -1686,6 +1691,11 @@ msgid "Informational Text"
 msgstr "信息文本"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass
+msgid "Intangible assets"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__invoice_line_ids
 msgid "Invoice Line"
 msgstr "发票行"
@@ -1699,24 +1709,24 @@ msgstr "是关注者"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__is_ledger_journal
 msgid "Is Ledger Journal"
-msgstr ""
+msgstr "是分类账日记账"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_ledger_variant
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__is_ledger_variant
 msgid "Is Ledger Variant"
-msgstr ""
+msgstr "是分类账变体"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__is_main_variant
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__is_main_variant
 msgid "Is Main Variant"
-msgstr ""
+msgstr "是主变体"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__is_name_custom
 msgid "Is Name Custom"
-msgstr ""
+msgstr "名称是否自订"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__salvage_value
@@ -1762,25 +1772,19 @@ msgid "Journal Items"
 msgstr "日记账项目"
 
 #. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Journal Items of %(account)s should have a label in order to generate an "
-"asset"
-msgstr "%(account)s 的日记账项目应有标签，以便生成资产"
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__journal_id
 msgid ""
 "Journal used for asset creation. The value is stored per company, so a model "
 "shared across companies posts to the journal of the company using it."
 msgstr ""
+"用于创建资产的日记账。该值按公司存储，因此跨公司共享的模型会记入使用它的公司"
+"的日记账。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Journals"
-msgstr ""
+msgstr "日记账"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__write_uid
@@ -1810,27 +1814,27 @@ msgstr "最近活动"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Ledger"
-msgstr ""
+msgstr "分类账"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__ledger_depreciation_model_ids
 msgid "Ledger Depreciation Model"
-msgstr ""
+msgstr "分类账折旧模型"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__ledger_group_ids
 msgid "Ledger Group"
-msgstr ""
+msgstr "分类账组别"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Ledger Journal"
-msgstr ""
+msgstr "分类账日记账"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__journal_group_name
 msgid "Ledger group"
-msgstr ""
+msgstr "分类账组别"
 
 #. module: account_asset
 #. odoo-python
@@ -1861,17 +1865,17 @@ msgstr "损失科目"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_id
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Main Asset"
-msgstr ""
+msgstr "主资产"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_model_name
 msgid "Main Asset Model Name"
-msgstr ""
+msgstr "主资产模型名称"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_parent_id
 msgid "Main Variant Parent"
-msgstr ""
+msgstr "主变体父级"
 
 #. module: account_asset
 #. odoo-python
@@ -1883,7 +1887,7 @@ msgstr "必填字段。此处为资产名称。"
 #: model:ir.model.fields,help:account_asset.field_account_asset__activity_type_icon
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols 图标，例如 checklist"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_has_error
@@ -1959,7 +1963,7 @@ msgstr "月"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_form_asset_inherit
 msgid "Multi-Ledgers"
-msgstr ""
+msgstr "多分类账"
 
 #. module: account_asset
 #. odoo-python
@@ -2001,7 +2005,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/wizard/depreciation_ledger_wizard.py:0
 msgid "Need to set depreciation model to create new asset depreciation."
-msgstr ""
+msgstr "需要设置折旧模型才能创建新的资产折旧。"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__negative_revaluation
@@ -2022,12 +2026,12 @@ msgstr "出售资产的收益或亏损净值"
 #: model_terms:ir.ui.view,arch_db:account_asset.depreciation_ledger_wizard_form
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "New Depreciation"
-msgstr ""
+msgstr "新建折旧"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__new_account_asset_id
 msgid "New Fixed Asset Account"
-msgstr ""
+msgstr "新固定资产科目"
 
 #. module: account_asset
 #. odoo-python
@@ -2083,11 +2087,14 @@ msgid "No Prorata"
 msgstr "无比例"
 
 #. module: account_asset
+#. odoo-javascript
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
+#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__no_depreciation
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "No depreciation"
-msgstr ""
+msgstr "不计提折旧"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__non_deductible_tax_value
@@ -2099,7 +2106,7 @@ msgstr "不可抵扣税额"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__salvage_value_percent
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__salvage_value_percent
 msgid "Not Depreciable"
-msgstr ""
+msgstr "不可折旧"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__salvage_value
@@ -2123,7 +2130,7 @@ msgstr "备注"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Note: %s"
-msgstr ""
+msgstr "备注：%s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_needaction_counter
@@ -2187,7 +2194,8 @@ msgid ""
 "Odoo manages depreciation for your fixed assets. No depreciation was "
 "recorded for this period. Ensure assets are properly registered for "
 "automatic depreciation calculation."
-msgstr "Odoo 管理固定资产折旧。本期未记录折旧。请确保资产已正确登记以便自动计算折旧。"
+msgstr ""
+"Odoo 管理固定资产折旧。本期未记录折旧。请确保资产已正确登记以便自动计算折旧。"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__paused
@@ -2208,19 +2216,19 @@ msgid ""
 "Optional. The name or external ID of the asset group. Must exist in Odoo "
 "(e.g., Office Equipment, Vehicles, Machinery)."
 msgstr ""
-"可选。资产组的名称或外部 ID。必须在 Odoo 中存在（例如：办公设备、车辆、机械）"
-"。"
+"可选。资产组的名称或外部 ID。必须在 Odoo 中存在（例如：办公设备、车辆、机"
+"械）。"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__origin_asset_id
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Original Asset"
-msgstr ""
+msgstr "原始资产"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__original_move_lines_count
 msgid "Original Move Lines Count"
-msgstr ""
+msgstr "原始分录行数"
 
 #. module: account_asset
 #. odoo-python
@@ -2257,15 +2265,7 @@ msgstr "暂停比例日期"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_search
 msgid "Period"
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid ""
-"Please note that by doing this, you will remove this model from other "
-"companies"
-msgstr "请注意，执行此操作将导致该模型从其他公司中移除"
+msgstr "期间"
 
 #. module: account_asset
 #. odoo-python
@@ -2273,7 +2273,7 @@ msgstr "请注意，执行此操作将导致该模型从其他公司中移除"
 msgid ""
 "Please select a different fixed asset account than the one used on the "
 "current asset."
-msgstr ""
+msgstr "请选择与当前资产所使用的固定资产科目不同的科目。"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__positive_revaluation
@@ -2286,10 +2286,35 @@ msgid "Posted Entries"
 msgstr "已过账分录"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_sale
+msgid "Proceeds from financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_sale
+msgid "Proceeds from sale of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_sale
+msgid "Proceeds from sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_rou
+msgid "Proceeds from sale of right-of-use assets"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
 msgid "Properties"
 msgstr "属性"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe
+msgid "Property plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -2305,6 +2330,21 @@ msgid "Purchase"
 msgstr "采购"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_purch
+msgid "Purchase of financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_purch
+msgid "Purchase of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_purch
+msgid "Purchase of property, plant and equipment"
+msgstr ""
+
+#. module: account_asset
 #: model:account.report.column,name:account_asset.account_grouped_assets_report_duration_rate
 #: model:account.report.column,name:account_asset.asset_grouped_assets_report_duration_rate
 #: model:account.report.column,name:account_asset.assets_report_duration_rate
@@ -2312,7 +2352,7 @@ msgstr "采购"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_mode__rate
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Rate"
-msgstr ""
+msgstr "比率"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__rating_ids
@@ -2331,7 +2371,7 @@ msgstr "重估"
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_recovery_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__recovery_account_id
 msgid "Recovery Account"
-msgstr ""
+msgstr "转回科目"
 
 #. module: account_asset
 #. odoo-python
@@ -2345,7 +2385,7 @@ msgstr "相关资产"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Related Items"
-msgstr ""
+msgstr "相关项目"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__related_purchase_value
@@ -2387,7 +2427,7 @@ msgstr "撤销以后过账的折旧分录，以修改折旧"
 #. module: account_asset
 #: model:account.return.check.template,name:account_asset.account_return_check_template_review_depreciation_periods_new_acquisitions
 msgid "Review depreciation periods for new acquisitions"
-msgstr ""
+msgstr "审核新购置资产的折旧期间"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__open
@@ -2409,24 +2449,18 @@ msgstr "销售"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Same as the asset"
-msgstr ""
+msgstr "与资产相同"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "See new asset created: <b>%s</b>"
-msgstr ""
+msgstr "查看已创建的新资产：<b>%s</b>"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__select_invoice_line_id
 msgid "Select Invoice Line"
 msgstr "选择发票行"
-
-#. module: account_asset
-#. odoo-javascript
-#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
-msgid "Select a Depreciation Model"
-msgstr "选择折旧模型"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__company_id
@@ -2445,7 +2479,7 @@ msgstr "出售"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Set All to Draft"
-msgstr ""
+msgstr "全部设为草稿"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -2462,18 +2496,18 @@ msgstr "设置为正在运行"
 msgid ""
 "Set when the name is entered manually, so that it is no longer regenerated "
 "from the model's configuration."
-msgstr ""
+msgstr "手动输入名称时设置，这样名称不再根据模型配置重新生成。"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__show_duration
 msgid "Show Duration"
-msgstr ""
+msgstr "显示时长"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Show Gross Increases"
-msgstr ""
+msgstr "显示总增加额"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
@@ -2530,7 +2564,7 @@ msgstr "直线"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Sub-Assets"
-msgstr ""
+msgstr "子资产"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__book_value
@@ -2567,12 +2601,14 @@ msgid ""
 "The accumulated depreciation account (contra-asset account). Must exist in "
 "Odoo and be of \"Fixed Asset\" or \"Non-current Assets\" type."
 msgstr ""
+"累计折旧科目（资产备抵科目）。必须在 Odoo 中存在，且类型为“固定资产”或“非流动"
+"资产”。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "The activation date cannot be before the asset's acquisition date."
-msgstr ""
+msgstr "激活日期不能早于资产的购置日期。"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_period
@@ -2612,9 +2648,9 @@ msgid ""
 "Assets\" type with depreciation model, accumulated depreciation, and "
 "depreciation expense account set."
 msgstr ""
-"资产本身的资产负债表科目（例如，“151000 固定资产”）。该科目必须存在于 Odoo 中"
-"，且类型为“固定资产”或“非流动资产”，并已设置折旧模型、累计折旧及折旧费用科目"
-"。"
+"资产本身的资产负债表科目（例如，“151000 固定资产”）。该科目必须存在于 Odoo "
+"中，且类型为“固定资产”或“非流动资产”，并已设置折旧模型、累计折旧及折旧费用科"
+"目。"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__children_ids
@@ -2626,7 +2662,7 @@ msgstr "子项是该资产的价值收益"
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid ""
 "The depreciated value on the last depreciation line for variant must be 0"
-msgstr ""
+msgstr "变体的最后一条折旧行上的已折旧价值必须为 0"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__invoice_ids
@@ -2651,19 +2687,21 @@ msgid ""
 "\"630000 Depreciation Expenses\"). Must exist in Odoo and be of "
 "\"Depreciation\" or \"Expense\" type."
 msgstr ""
+"用于过账定期折旧分录的费用科目（例如“630000 折旧费用”）。必须在 Odoo 中存在，"
+"且类型为“折旧”或“费用”。"
+
+#. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "The fixed asset account differs from the account on the bill. Click"
+msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__new_account_asset_id
 msgid ""
 "The fixed asset account to transfer this asset to. The depreciation "
 "parameters of this account will be applied to the new asset."
-msgstr ""
-
-#. module: account_asset
-#: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_number
-#: model:ir.model.fields,help:account_asset.field_account_depreciation_model__method_number
-msgid "The number of depreciations needed to depreciate your asset"
-msgstr "需要折旧资产的数量，以折旧资产"
+msgstr "要将此资产转移到的固定资产科目。该科目的折旧参数将应用于新资产。"
 
 #. module: account_asset
 #. odoo-python
@@ -2675,7 +2713,7 @@ msgstr "最后一个折旧行的剩余值须为0"
 #. odoo-python
 #: code:addons/account_asset/models/account.py:0
 msgid "The same ledger cannot be linked multiple times on the same account."
-msgstr ""
+msgstr "同一分类账不能在同一科目上关联多次。"
 
 #. module: account_asset
 #. odoo-python
@@ -2736,58 +2774,58 @@ msgstr "价值增高：%(asset)s"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Value transferred from %(old_account)s to %(new_account)s."
-msgstr ""
+msgstr "价值已从 %(old_account)s 转移到 %(new_account)s。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Variant"
-msgstr ""
+msgstr "变体"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s cancelled."
-msgstr ""
+msgstr "变体 %(variant_name)s 已取消。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s reset to draft."
-msgstr ""
+msgstr "变体 %(variant_name)s 已重置为草稿。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Variant %(variant_name)s set to running."
-msgstr ""
+msgstr "变体 %(variant_name)s 已设为运行中。"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_count
 msgid "Variant Count"
-msgstr ""
+msgstr "变体数量"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__variant_ledger_names
 msgid "Variant Ledger Names"
-msgstr ""
+msgstr "变体分类账名称"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__state
 msgid "Variant Status"
-msgstr ""
+msgstr "变体状态"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Variants paused: %s. "
-msgstr ""
+msgstr "变体已暂停：%s。 "
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Variants resumed: %s. "
-msgstr ""
+msgstr "变体已恢复：%s。 "
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_group_form_view
@@ -2802,7 +2840,7 @@ msgstr "盘点资产警告"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__warning_sub_assets
 msgid "Warning Sub Assets"
-msgstr ""
+msgstr "子资产警告"
 
 #. module: account_asset
 #. odoo-python
@@ -2821,7 +2859,7 @@ msgstr "警告原价值%s"
 msgid ""
 "Whether an asset using this model is confirmed, on hold or closed, which "
 "freezes its depreciation configuration."
-msgstr ""
+msgstr "使用此模型的资产是否已确认、暂停或关闭，这会冻结其折旧配置。"
 
 #. module: account_asset
 #: model_terms:ir.actions.act_window,help:account_asset.action_account_asset_form
@@ -2831,7 +2869,7 @@ msgstr "使用我们的模板"
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_depreciation_ledger_wizard
 msgid "Wizard used to apply depreciations models on ledger assets"
-msgstr ""
+msgstr "用于将折旧模型应用到分类账资产的向导"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_period__12
@@ -2849,13 +2887,13 @@ msgstr "仅可为已设置资产模型的资产添加属性字段。"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "You can only activate a running asset that has a \"%s\" method."
-msgstr ""
+msgstr "您只能激活采用“%s”方法的运行中资产。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "You can't activate depreciation before the lock date."
-msgstr ""
+msgstr "在锁定日期之前无法激活折旧。"
 
 #. module: account_asset
 #. odoo-python
@@ -2877,14 +2915,14 @@ msgstr "在锁定日期之前，您不能重新评估资产。"
 msgid ""
 "You cannot activate depreciation on an asset that has running gross "
 "increases. Please dispose of them first."
-msgstr ""
+msgstr "无法为存在进行中总增加额的资产激活折旧。请先处置这些总增加额。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid ""
 "You cannot archive a record that has at least one variant that is not closed"
-msgstr ""
+msgstr "无法归档至少有一个变体未关闭的记录"
 
 #. module: account_asset
 #. odoo-python
@@ -2905,7 +2943,7 @@ msgstr "不能为总增长不断上升的资产自动化日记账分录。请在
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "You cannot change the state of an archived asset"
-msgstr ""
+msgstr "无法更改已归档资产的状态"
 
 #. module: account_asset
 #. odoo-python
@@ -2936,13 +2974,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "You cannot delete an asset variant that is in %s state."
-msgstr ""
+msgstr "无法删除处于 %s 状态的资产变体。"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_ledger_variant.py:0
 msgid "You cannot dispose of a sub-asset before the lock date."
-msgstr ""
+msgstr "无法在锁定日期之前处置子资产。"
 
 #. module: account_asset
 #. odoo-python
@@ -2968,7 +3006,8 @@ msgstr "不能选择与折旧账户相同的账户"
 msgid ""
 "You cannot update the account for asset '%s' because it is linked to journal "
 "items from multiple different accounts."
-msgstr "您无法更新资产“%s ”的账户信息，因为该资产与多个不同账户的日记账项目相关联。"
+msgstr ""
+"您无法更新资产“%s ”的账户信息，因为该资产与多个不同账户的日记账项目相关联。"
 
 #. module: account_asset
 #. odoo-python
@@ -2980,13 +3019,13 @@ msgstr "account_asset_id"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "account_depreciation_expense_id"
-msgstr ""
+msgstr "account_depreciation_expense_id"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "account_depreciation_id"
-msgstr ""
+msgstr "account_depreciation_id"
 
 #. module: account_asset
 #. odoo-python
@@ -2998,7 +3037,7 @@ msgstr "acquisition_date"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "activate_depreciation"
-msgstr ""
+msgstr "activate_depreciation"
 
 #. module: account_asset
 #. odoo-python
@@ -3096,6 +3135,12 @@ msgid "gain/loss"
 msgstr "收益/损失"
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "here"
+msgstr ""
+
+#. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "loss"
@@ -3128,7 +3173,7 @@ msgstr "暂停"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "per"
-msgstr ""
+msgstr "每"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
@@ -3163,13 +3208,43 @@ msgstr "销售"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "tax excl.)"
-msgstr ""
+msgstr "不含税）"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "variant_ids.model_id"
-msgstr ""
+msgstr "variant_ids.model_id"
+
+#~ msgid ""
+#~ "Account %(account)s should have accumulated depreciation and depreciation "
+#~ "expense accounts set in order to generate an asset"
+#~ msgstr "账户%(account)s 应设置累计折旧和折旧费用账户，以便生成资产"
+
+#~ msgid ""
+#~ "Account %(name)s not setup to generate assets. Depreciation model and "
+#~ "asset accounts need to be set on account."
+#~ msgstr ""
+#~ "科目 %(name)s 未设置为生成资产。需要在科目上设置折旧模型和资产科目。"
+
+#~ msgid "Important Change"
+#~ msgstr "重要变更"
+
+#~ msgid ""
+#~ "Journal Items of %(account)s should have a label in order to generate an "
+#~ "asset"
+#~ msgstr "%(account)s 的日记账项目应有标签，以便生成资产"
+
+#~ msgid ""
+#~ "Please note that by doing this, you will remove this model from other "
+#~ "companies"
+#~ msgstr "请注意，执行此操作将导致该模型从其他公司中移除"
+
+#~ msgid "Select a Depreciation Model"
+#~ msgstr "选择折旧模型"
+
+#~ msgid "The number of depreciations needed to depreciate your asset"
+#~ msgstr "需要折旧资产的数量，以折旧资产"
 
 #~ msgid "# Original Move Lines"
 #~ msgstr "# 原始移动行"

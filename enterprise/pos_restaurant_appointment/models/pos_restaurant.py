@@ -55,3 +55,21 @@ class RestaurantTable(models.Model):
     def _delete_linked_resources(self):
         for table in self:
             table.appointment_resource_id.unlink()
+
+    @api.model
+    def create_missing_ressources(self, table_ids, config_id):
+        res = self.env['restaurant.table']
+        for table in self.env['restaurant.table'].browse(table_ids):
+            if not table.appointment_resource_id:
+                table.appointment_resource_id = table.env['appointment.resource'].sudo().create({
+                    'name': f'Table {table.table_number}',
+                    'capacity': table.seats,
+                    'pos_table_ids': table,
+                    'appointment_type_ids': table.floor_id.pos_config_ids.appointment_type_id,
+                })
+                res += table
+        config = self.env['pos.config'].browse(config_id)
+        return {
+            'appointment.resource': self.env['appointment.resource']._load_pos_data_read(res.appointment_resource_id, config),
+            'restaurant.table': self._load_pos_data_read(res, config)
+        }

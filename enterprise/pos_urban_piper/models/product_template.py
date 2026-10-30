@@ -112,9 +112,9 @@ class ProductTemplate(models.Model):
         """
         data = []
 
+        company_domain = self.env['account.tax']._check_company_domain(urbanpiper_store.company_id)
         for product in self:
-            company_domain = self.env['account.tax']._check_company_domain(urbanpiper_store.company_id)
-            company_taxes = product.taxes_id.filtered_domain(company_domain)
+            company_taxes = product.sudo().taxes_id.filtered_domain(company_domain)
             product_price = product._get_urbanpiper_unit_price(urbanpiper_store)
             price_after_tax_tag = company_taxes.compute_all(product_price, product.currency_id)[urbanpiper_store.tax_type]
 

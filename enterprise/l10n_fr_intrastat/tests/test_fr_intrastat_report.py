@@ -179,6 +179,16 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
         report = self._l10n_fr_intrastat_generate_report_xml(options, self.report_handler_goods)
         self._report_compare_with_test_file(report, 'vat_summary_stmt.xml')
 
+    def test_fr_intrastat_partner_vat_of_company_country(self):
+        """ Test that declarations contain the acquirer VAT, even a French one"""
+        self.partner_a.vat = 'FR23334175221'
+        self.outwards_customer_invoice.intrastat_country_id = self.env.ref('base.de')
+        options = self._generate_options(self.report_goods)
+        self.assertIn(
+            'Dispatch - FR23334175221 - 88023000 - DE',
+            [line.name for line in self.report_goods._get_lines(options)],
+        )
+
     def test_fr_intrastat_export_errors(self):
         self.outwards_customer_invoice.intrastat_transport_mode_id = False
         self.outwards_customer_invoice.line_ids[0].update({

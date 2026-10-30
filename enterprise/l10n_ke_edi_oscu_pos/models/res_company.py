@@ -8,5 +8,5 @@ class ResCompany(models.Model):
     @api.model
     def _load_pos_data_fields(self, config):
         params = super()._load_pos_data_fields(config)
-        params += ['l10n_ke_oscu_serial_number']
+        params += ['l10n_ke_oscu_serial_number', 'l10n_ke_server_mode', 'l10n_ke_branch_code']
         return params

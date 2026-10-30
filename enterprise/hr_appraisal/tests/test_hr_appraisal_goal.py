@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import Form, tagged
+from odoo.tests import Command, Form, tagged
 from odoo.tests.common import HttpCase
 
 
@@ -48,6 +48,18 @@ class TestHrAppraisalGoal(HttpCase):
         goal_form.name = "My goal"
         goal_form.save()
 
+    def test_goal_x2many_fields_without_hr_right(self):
+        """
+        A user without HR rights must still see their subordinates and
+        managers through the goal's x2many fields.
+        """
+        goal = self.env['hr.appraisal.goal'].with_user(self.user_without_hr_right).new({
+            'name': 'My goal',
+            "manager_ids": [Command.set(self.employee_without_hr_right.ids)],
+        })
+        self.assertIn(self.employee_subordinate.id, goal.employee_autocomplete_ids.ids)
+        self.assertIn(self.employee_without_hr_right.id, goal.manager_ids.ids)
+
     def test_appraisal_goal_autocompletion(self):
         """
         See if the employee and manager fields are auto-completed correctly on
@@ -73,6 +85,26 @@ class TestHrAppraisalGoal(HttpCase):
             "Two appraisal goals with automatically filled employee and \
             manager inputs should have been created",
         )
+
+    def test_appraisal_list_goal_mark_done(self):
+        """
+        Multiple goals can be marked as done from the goals list view
+        """
+        self.env["hr.appraisal.goal"].create(
+            [
+                {"name": "Goal 1", "employee_ids": self.employee.ids},
+                {"name": "Goal 2", "employee_ids": self.employee.ids},
+            ]
+        )
+        self.start_tour(
+            f"/odoo/employees/{self.employee.id}",
+            "appraisal_goal_multi_mark_done",
+            login="admin",
+        )
+        completed_goals_count = self.env["hr.appraisal.goal"].search_count(
+            [("employee_ids", "=", self.employee.id), ("progression", "=", 100)]
+        )
+        self.assertEqual(completed_goals_count, 2, "Two Goals should be Marked as Done")
 
     def test_security_rule_goal(self):
         user1, user2, user3 = self.env['res.users'].create([

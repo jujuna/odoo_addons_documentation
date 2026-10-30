@@ -56,7 +56,7 @@ class DepreciationModel(models.Model):
         default='duration',
         help="Choose whether the straight-line depreciation is driven by a duration or an annual rate.",
     )
-    method_number = fields.Float(string="Duration", required=True, default=5, help="The number of depreciations needed to depreciate your asset")
+    method_number = fields.Float(string="Duration", required=True, default=5)
     method_period = fields.Selection(
         selection=[('1', "Month"), ('12', "Year")],
         string="Number of Months in a Period",
@@ -271,17 +271,6 @@ class DepreciationModel(models.Model):
             self.prorata_computation_type = 'constant_periods'
             self.salvage_value_percent = 0
 
-    @api.onchange('company_id')
-    def _onchange_company_id(self):
-        company_count = self.env['res.company'].search_count([])
-        if self._origin.id and not self._origin.company_id and self.company_id and company_count > 1:
-            return {
-                'warning': {
-                    'title': self.env._("Important Change"),
-                    'message': self.env._("Please note that by doing this, you will remove this model from other companies"),
-                }
-            }
-
     # -------------------------------------------------------------------------
     # LOW-LEVEL METHODS
     # -------------------------------------------------------------------------
@@ -340,6 +329,21 @@ class DepreciationModel(models.Model):
     # -------------------------------------------------------------------------
     # HELPER METHODS
     # -------------------------------------------------------------------------
+    @api.model
+    def _get_no_depreciation_model(self):
+        depreciation_model = self.with_context(active_test=False).search([
+            ('method', '=', 'no_depreciation'),
+            ('company_id', '=', False),
+        ], limit=1)
+        if depreciation_model:
+            return depreciation_model
+
+        return self.create({
+            'method': 'no_depreciation',
+            'method_number': 0,
+            'method_period': '12',
+            'method_progress_factor': 0,
+        })
 
     def _get_journal(self, company, domain=(), create_missing=True, include_parents=True):
         """ Return the journal an asset depreciating with this model should post to.

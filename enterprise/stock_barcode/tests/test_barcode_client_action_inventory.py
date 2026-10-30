@@ -119,15 +119,21 @@ class TestInventoryAdjustmentBarcodeClientAction(TestBarcodeClientAction):
         WH/stock product2 qty: 1
         WH/stock/shelf1 product2 qty: 1
         WH/stock/shelf2 product1 qty: 1
+        - Add a product with the form view on an out-of-hierarchy location
         - Validate
         """
         self.env.user.write({'group_ids': [Command.link(self.env.ref('stock.group_stock_multi_locations').id)]})
+        out_of_hierarchy_loc = self.env['stock.location'].create({
+            'name': 'Out of Hierarchy Location',
+            'usage': 'internal',
+            'location_id': False,
+        })
         self.start_tour("/odoo/barcode", 'test_inventory_adjustment_multi_location', login='admin', timeout=180)
 
         inventory_moves = self.env['stock.move'].search([('product_id', 'in', [self.product1.id, self.product2.id]),
                                                          ('is_inventory', '=', True)])
-        self.assertEqual(len(inventory_moves), 4)
-        self.assertEqual(inventory_moves.mapped('state'), ['done', 'done', 'done', 'done'])
+        self.assertEqual(len(inventory_moves), 5)
+        self.assertEqual(inventory_moves.mapped('state'), ['done', 'done', 'done', 'done', 'done'])
         inventory_move_in_WH_stock = inventory_moves.filtered(lambda l: l.location_dest_id == self.stock_location)
         self.assertEqual(set(inventory_move_in_WH_stock.mapped('product_id')), {self.product1, self.product2})
         self.assertEqual(inventory_move_in_WH_stock.filtered(lambda l: l.product_id == self.product1).quantity, 2.0)
@@ -142,6 +148,11 @@ class TestInventoryAdjustmentBarcodeClientAction(TestBarcodeClientAction):
         self.assertEqual(len(inventory_move_in_shelf2), 1)
         self.assertEqual(inventory_move_in_shelf2.product_id, self.product1)
         self.assertEqual(inventory_move_in_shelf2.quantity, 1.0)
+
+        inventory_move_in_out_loc = inventory_moves.filtered(lambda l: l.location_dest_id == out_of_hierarchy_loc)
+        self.assertEqual(len(inventory_move_in_out_loc), 1)
+        self.assertEqual(inventory_move_in_out_loc.product_id, self.product1)
+        self.assertEqual(inventory_move_in_out_loc.quantity, 1.0)
 
     def test_inventory_adjustment_tracked_product(self):
         """ Simulate the following actions:

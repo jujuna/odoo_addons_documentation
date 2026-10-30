@@ -20,10 +20,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 01:42+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-10-22 06:39+0000\n"
+"Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/"
 "account_reports/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -39,6 +39,9 @@ msgid ""
 "Accounting Reports\n"
 "==================\n"
 msgstr ""
+"\n"
+"รายงานบัญชี\n"
+"==================\n"
 
 #. module: account_reports
 #. odoo-python
@@ -56,13 +59,13 @@ msgstr "%(journal)s - %(account)s"
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "%(line_name)s - %(company)s"
-msgstr ""
+msgstr "%(line_name)s - %(company)s"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "%(line_name)s - %(company_name)s"
-msgstr ""
+msgstr "%(line_name)s - %(company_name)s"
 
 #. module: account_reports
 #. odoo-python
@@ -80,13 +83,13 @@ msgstr "%(names)s และอีกหนึ่ง"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "%(return_type_name)s %(period_suffix)s %(country_code)s"
-msgstr ""
+msgstr "%(return_type_name)s %(period_suffix)s %(country_code)s"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/wizard/fiscal_year.py:0
 msgid "%(vat_label)s Periodicity"
-msgstr ""
+msgstr "%(vat_label)s ความถี่"
 
 #. module: account_reports
 #. odoo-python
@@ -98,7 +101,7 @@ msgstr "%s ไม่ใช่ค่าตัวเลข"
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
 msgid "%s more"
-msgstr ""
+msgstr "%s เพิ่มเติม"
 
 #. module: account_reports
 #. odoo-javascript
@@ -113,6 +116,8 @@ msgid ""
 "'%(account_name)s' account balance is affected by journal items which don't "
 "originate from a bank statement or payment."
 msgstr ""
+"'%(account_name)s' "
+"ยอดเงินในบัญชีได้รับผลกระทบจากรายการบัญชีที่ไม่มาจากใบแจ้งยอดธนาคารหรือการชำระเงิน"
 
 #. module: account_reports
 #. odoo-python
@@ -847,6 +852,11 @@ msgid "Adjustment Entry"
 msgstr "บันทึกปรับปรุง"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment
+msgid "Adjustments to reconcile net profit/(loss) to net cash flows:"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__advance_tax_payment_account_id
 msgid "Advance Account"
 msgstr ""
@@ -1410,6 +1420,7 @@ msgstr "B: %s"
 #: code:addons/account_reports/models/account_trial_balance_report.py:0
 #: model:account.report.column,name:account_reports.balance_sheet_balance
 #: model:account.report.column,name:account_reports.cash_flow_report_balance
+#: model:account.report.column,name:account_reports.cash_flow_report_balance_indirect
 #: model:account.report.column,name:account_reports.executive_summary_column
 #: model:account.report.column,name:account_reports.general_ledger_report_balance
 #: model:account.report.column,name:account_reports.journal_report_balance
@@ -1511,14 +1522,14 @@ msgid "Bank Reconciliation Summary"
 msgstr ""
 
 #. module: account_reports
-#: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "รายการใบแจ้งยอดจากธนาคาร"
-
-#. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_statements
 msgid "Bank Statements"
 msgstr "รายการเดินบัญชีจากธนาคาร"
+
+#. module: account_reports
+#: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_transaction_missing_document
@@ -1614,6 +1625,11 @@ msgid ""
 msgstr ""
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow
+msgid "CASH FLOW"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_general_ledger.py:0
 msgid "CSV"
@@ -1696,6 +1712,11 @@ msgid "Cash Basis sequences"
 msgstr ""
 
 #. module: account_reports
+#: model:ir.model,name:account_reports.model_account_cash_flow_indirect_report_handler
+msgid "Cash Flow Indirect Report Custom Handler"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model,name:account_reports.model_account_cash_flow_report_handler
 msgid "Cash Flow Report Custom Handler"
 msgstr "ตัวจัดการรายงานกระแสเงินสดแบบกำหนดเอง"
@@ -1705,6 +1726,36 @@ msgstr "ตัวจัดการรายงานกระแสเงิน
 #: model:ir.actions.client,name:account_reports.action_account_report_cs
 msgid "Cash Flow Statement"
 msgstr "งบกระแสเงินสด"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_financial_activities
+msgid "Cash Flows from financing activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_investing_activities
+msgid "Cash Flows from investing activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_operational_activities
+msgid "Cash Flows from operating activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_repay_recov_cash_adv
+msgid "Cash advances made to third parties"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_bop
+msgid "Cash and cash equivalents at beginning"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_eop
+msgid "Cash and cash equivalents at end"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -2493,6 +2544,11 @@ msgid "Date considered as annotated by the annotation."
 msgstr "วันที่ถือว่ามีคำอธิบายประกอบ"
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
+msgid "Date:"
+msgstr ""
+
+#. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_form_view
 #: model_terms:ir.ui.view,arch_db:account_reports.return_creation_wizard_form
 msgid "Dates"
@@ -2621,6 +2677,11 @@ msgid "Deferred Revenues"
 msgstr ""
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_deferred_revenue
+msgid "Deferred revenue"
+msgstr ""
+
+#. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_expression_form
 msgid "Definition"
 msgstr "คำนิยาม"
@@ -2635,6 +2696,11 @@ msgstr "หน่วยล่าช้า"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_kanban_view
 msgid "Delete"
 msgstr "ลบ"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_depreciation
+msgid "Depreciation and amortisation"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -2685,6 +2751,7 @@ msgstr "แสดงตัวเขียนจดหมาย"
 #: model:ir.model.fields,field_description:account_reports.field_account_audit_account_status__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_balance_sheet_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_bank_reconciliation_report_handler__display_name
+#: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_indirect_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_change_lock_date__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_chart_template__display_name
@@ -3516,6 +3583,26 @@ msgid "Future Activities"
 msgstr "กิจกรรมในอนาคต"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_fin_instr
+msgid "Gain (-)/Loss (+) on sale of financial instruments"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_intangible_assets
+msgid "Gain (-)/Loss (+) on sale of intangible assets"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_ppe
+msgid "Gain (-)/Loss (+) on sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_rou
+msgid "Gain (-)/Loss (+) on sale of right-of-use assets"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.actions.server,name:account_reports.ir_cron_garbage_collect_snapshots_ir_actions_server
 msgid "Garbage-collect snapshots of accounting reports"
 msgstr ""
@@ -3773,6 +3860,7 @@ msgstr "IBAN"
 #: model:ir.model.fields,field_description:account_reports.field_account_audit_account_status__id
 #: model:ir.model.fields,field_description:account_reports.field_account_balance_sheet_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_bank_reconciliation_report_handler__id
+#: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_indirect_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_change_lock_date__id
 #: model:ir.model.fields,field_description:account_reports.field_account_chart_template__id
@@ -3978,6 +4066,11 @@ msgid "Income Provision for %s"
 msgstr "สำรองรายได้สำหรับ%s"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_income_tax_paid
+msgid "Income tax paid (-)/received (+)"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Inconsistent Statements"
@@ -4009,6 +4102,11 @@ msgid ""
 "Inconsistent tax on service sale to Northern Ireland. Such services must be "
 "treated strictly as a third country (non-EU) transaction, and should not use "
 "intra-community taxes."
+msgstr ""
+
+#. module: account_reports
+#: model:account.report,name:account_reports.cash_flow_report_indirect
+msgid "Indirect Cash Flow Statement"
 msgstr ""
 
 #. module: account_reports
@@ -4054,6 +4152,21 @@ msgid ""
 "Intercompany reconciliation is vital for accurate group accounting. It "
 "ensures reciprocal balances between related entities match precisely, which "
 "is necessary for eliminating internal transactions during consolidation."
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_interest_paid
+msgid "Interest paid"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_interest_received
+msgid "Interest received"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_int_dev_paid
+msgid "Interests/Dividends paid"
 msgstr ""
 
 #. module: account_reports
@@ -4105,6 +4218,7 @@ msgid "Invalid token '%(token)s' in account_codes formula '%(formula)s'"
 msgstr "โทเค็นไม่ถูกต้อง '%(token)s' ในสูตร account_codes '%(formula)s'"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_inventory
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_inventory
 #: model:ir.ui.menu,name:account_reports.account_audit_inventory_entries_menu
 msgid "Inventory"
@@ -4451,6 +4565,7 @@ msgstr ""
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.company_information
+#: model_terms:ir.ui.view,arch_db:account_reports.company_information_customer_report
 msgid "Logo"
 msgstr "โลโก้"
 
@@ -4756,6 +4871,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profit0
 #: model:account.report.line,name:account_reports.account_financial_report_net_profit0
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_net_income
 msgid "Net Profit"
 msgstr "กำไรสุทธิ"
 
@@ -4763,6 +4879,11 @@ msgstr "กำไรสุทธิ"
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_net_assets0
 msgid "Net assets"
 msgstr "สินทรัพย์สุทธิ"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_net_financial_result
+msgid "Net financial result : income (-)/cost (+)"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -4957,6 +5078,11 @@ msgstr "ยังไม่เริ่ม"
 msgid ""
 "Not all aggregation expressions could be computed. This is likely due to "
 "cyclic dependencies in their formulas."
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow_not_reconciled
+msgid "Not reconciled yet"
 msgstr ""
 
 #. module: account_reports
@@ -5188,6 +5314,16 @@ msgstr ""
 #: model:account.report.line,name:account_reports.account_financial_report_other_income0
 msgid "Other Income"
 msgstr "รายได้อื่น ๆ"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_payable
+msgid "Other payables"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_receivable
+msgid "Other receivables"
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_other
@@ -5678,6 +5814,21 @@ msgid ""
 msgstr "โปรดดำเนินการด้วยความระมัดระวัง เนื่องจากอาจมีการปรับเปลี่ยนในช่วงนี้ ("
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_borrowings
+msgid "Proceeds from borrowings"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_recov_adv
+msgid "Proceeds from recoverable advances"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_share_issuance
+msgid "Proceeds from share issuance"
+msgstr ""
+
+#. module: account_reports
 #. odoo-javascript
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
@@ -5698,6 +5849,11 @@ msgid "Profit and Loss"
 msgstr "กำไรขาดทุน"
 
 #. module: account_reports
+#: model:ir.actions.client,name:account_reports.action_account_report_pl_generic
+msgid "Profit and Loss - Generic"
+msgstr ""
+
+#. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profitability0
 msgid "Profitability"
 msgstr "การทำกำไร"
@@ -5711,6 +5867,11 @@ msgstr "ข้อกำหนดสำหรับ %(for_cur)s (1 %(comp_cur)s =
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_provision_for_impairment
 msgid "Provision for Impairment"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_provision
+msgid "Provisions"
 msgstr ""
 
 #. module: account_reports
@@ -5747,6 +5908,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__rating_ids
 msgid "Ratings"
 msgstr "การให้คะแนน"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_recep_recov_cash_adv
+msgid "Receipt of recoverable cash advances"
+msgstr ""
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.reconciled_receipts
@@ -5854,6 +6020,21 @@ msgstr "แจ้งเตือน"
 #. module: account_reports
 #: model:mail.template,subject:account_reports.email_template_tax_return_deadline
 msgid "Reminder: Upcoming {{ object.name }} Deadline - Action Required"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_borrowings
+msgid "Repayment of borrowings"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_lease
+msgid "Repayment of lease"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_recov_adv
+msgid "Repayment of recoverable advances"
 msgstr ""
 
 #. module: account_reports
@@ -6801,6 +6982,12 @@ msgid "Tax Units"
 msgstr "หน่วยภาษี"
 
 #. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "Tax and country mismatch"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_payable_account_id
 msgid ""
 "Tax current account used as a counterpart to the Tax Closing Entry when in "
@@ -7212,6 +7399,11 @@ msgid "Total CTA"
 msgstr ""
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
+msgid "Total Due:"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_general_ledger.py:0
 msgid "Total General Ledger"
@@ -7238,6 +7430,16 @@ msgstr "พาร์ทเนอร์คู่ค้า"
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_trade_payables_analytical_review
 msgid "Trade Payables Analytical Review"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_payable
+msgid "Trade payables"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_receivable
+msgid "Trade receivables"
 msgstr ""
 
 #. module: account_reports
@@ -7403,6 +7605,11 @@ msgid "Unrealized Currency Gains/Losses"
 msgstr "กำไร/ขาดทุนจากสกุลเงินที่ไม่เกิดขึ้น"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_forex
+msgid "Unrealized FX Gain (-)/Loss (+)"
+msgstr ""
+
+#. module: account_reports
 #. odoo-javascript
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
@@ -7502,6 +7709,21 @@ msgstr ""
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_account__audit_var_n_1
 msgid "Var N-1"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var
+msgid "Variation"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_cash
+msgid "Variation of Cash"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_non_cash
+msgid "Variation of NON Cash"
 msgstr ""
 
 #. module: account_reports
@@ -7651,6 +7873,11 @@ msgstr "ด้วยรายการฉบับร่าง"
 #: model:ir.actions.act_window,name:account_reports.action_view_account_audit
 #: model:ir.ui.menu,name:account_reports.menu_action_working_files
 msgid "Working Files"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment
+msgid "Working capital adjustments"
 msgstr ""
 
 #. module: account_reports
@@ -8051,6 +8278,9 @@ msgstr ""
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#~ msgid "Bank Statement Line"
+#~ msgstr "รายการใบแจ้งยอดจากธนาคาร"
 
 #~ msgid "Configure your tax accounts"
 #~ msgstr "กำหนดค่าบัญชีภาษีของคุณ"

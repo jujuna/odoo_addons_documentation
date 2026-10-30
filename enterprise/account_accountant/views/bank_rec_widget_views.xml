@@ -41,7 +41,7 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Statement Lines">
+                            <page string="Transactions">
                                 <field name="line_ids" context="{'default_journal_id': journal_id}">
                                     <list editable="bottom">
                                         <field name="date"/>
@@ -169,7 +169,7 @@
                     <field name="move_id"
                            string="Journal Entry"
                            filter_domain="['|', ('move_id.name', 'ilike', self), ('move_id.ref', 'ilike', self)]"/>
-                    <field name="statement_line_id" string="Statement Line"/>
+                    <field name="statement_line_id" string="Transaction"/>
                     <field name="activity_ids"/>
                     <separator/>
                     <filter name="cash_in" string="Cash In" domain="[('amount', '>', 0.0)]"/>

@@ -312,10 +312,7 @@ class VoipNumberSearchWizard(models.TransientModel):
     def _build_search_filters(self):
         self.ensure_one()
         filters = {
-            "filter[limit]": 10,
-            "filter[features]": ["voice"],
-            "filter[exclude_held_numbers]": True,
-            "filter[best_effort]": False,
+            "filter[phone_number_type]": self.did_number_type,
         }
         if self.starts_with:
             filters["filter[phone_number][starts_with]"] = self.starts_with
@@ -323,9 +320,6 @@ class VoipNumberSearchWizard(models.TransientModel):
             filters["filter[phone_number][ends_with]"] = self.ends_with
         if self.consecutive > 1:
             filters["filter[consecutive]"] = self.consecutive
-        filters["filter[phone_number_type]"] = self.did_number_type
-        if self.did_number_type == "toll_free":
-            filters["filter[quickship]"] = True
         return filters
 
     def action_search(self):

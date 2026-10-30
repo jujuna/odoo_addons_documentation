@@ -2,6 +2,17 @@ import { OptionsDropdown } from "@knowledge/components/options_dropdown/options_
 import { knowledgeTopbar } from "@knowledge/components/topbar/topbar";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import {
+    animationFrame,
+    beforeEach,
+    click,
+    expect,
+    queryFirst,
+    runAllTimers,
+    setInputFiles,
+    test,
+    waitFor,
+} from "@odoo/hoot";
+import {
     contains,
     defineModels,
     fields,
@@ -17,22 +28,18 @@ import {
 import { serializeDateTime } from "@web/core/l10n/dates";
 import { user } from "@web/core/user";
 
-import { expect, test, beforeEach } from "@odoo/hoot";
-import { click, queryFirst, runAllTimers, setInputFiles, waitFor } from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
-
 class KnowledgeArticle extends models.ServerModel {
     _name = "knowledge.article";
 
-    category = fields.Generic({ default: "private" });
-    user_can_write = fields.Generic({ default: true });
-    user_has_access = fields.Generic({ default: true });
+    category = fields.Selection({ default: "private" });
+    user_can_write = fields.Boolean({ default: true });
+    user_has_access = fields.Boolean({ default: true });
     last_edition_date = fields.Datetime({
         string: "Last Modified on",
         default: (record) => record.create_date,
     });
     last_edition_uid = fields.Many2one({ relation: "res.users" });
-    article_properties_definition = fields.Generic({ default: [] });
+    article_properties_definition = fields.PropertiesDefinition({ default: [] });
 
     action_send_to_trash(ids) {
         this.write(ids, { active: false, to_delete: true });
@@ -126,9 +133,7 @@ function assertOptionsDropdown(config) {
     expect(".dropdown-item:contains('Add to Templates')").toHaveCount(
         canWrite && isInternalUser ? 1 : 0
     );
-    expect(".dropdown-item[name='move_to_trash']").toHaveCount(
-        canWrite && isInternalUser ? 1 : 0
-    );
+    expect(".dropdown-item[name='move_to_trash']").toHaveCount(canWrite && isInternalUser ? 1 : 0);
 }
 beforeEach(() => {
     onRpc("knowledge.article", "has_access", () => true);

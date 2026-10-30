@@ -9,13 +9,12 @@ import { TimesheetLeaderboard } from "@sale_timesheet_enterprise/components/time
 import { TimesheetKpi } from "../timesheet_kpi/timesheet_kpi";
 
 const { DateTime } = luxon;
-const defaultDate = DateTime.local();
 
 export class TimesheetKpiLeaderboardHeader extends Component {
     static template = "sale_timesheet_enterprise.TimesheetKpiLeaderboardHeader";
     static components = { TimesheetKpi, TimesheetLeaderboard };
     props = useProps({
-        date: t.object().optional(defaultDate),
+        date: t.object().optional(),
     });
 
     setup() {
@@ -27,14 +26,18 @@ export class TimesheetKpiLeaderboardHeader extends Component {
         onWillStart(this.onWillStart);
     }
 
+    get date() {
+        return this.props.date || DateTime.local();
+    }
+
     async _fetchServiceData() {
         return Promise.all([
             this.timesheetKpiService.getKpiData({
-                periodStart: this.props.date,
+                periodStart: this.date,
                 kwargs: { context: user.context },
             }),
             this.timesheetLeaderboardService.getLeaderboardData({
-                periodStart: this.props.date,
+                periodStart: this.date,
                 kwargs: { context: user.context },
             }),
         ]);
@@ -84,7 +87,7 @@ export class TimesheetKpiLeaderboardHeader extends Component {
 
     get workedTimeKpiProps() {
         const uom = this.timesheetKpiService.data.uom;
-        const month = this.props.date.monthLong;
+        const month = this.date.monthLong;
         return {
             name: "worked_time_kpi",
             value: this.workedTime,
@@ -95,7 +98,7 @@ export class TimesheetKpiLeaderboardHeader extends Component {
 
     get billableTimeKpiProps() {
         const uom = this.timesheetKpiService.data.uom;
-        const month = this.props.date.monthLong;
+        const month = this.date.monthLong;
         return {
             name: "billable_time_kpi",
             value: this.billableTime,
@@ -109,7 +112,7 @@ export class TimesheetKpiLeaderboardHeader extends Component {
 
     get billingRateKpiProps() {
         const uom = this.timesheetKpiService.data.uom.toLowerCase();
-        const month = this.props.date.monthLong;
+        const month = this.date.monthLong;
         const billableTime = this.billableTime;
         const billableTimeTarget = this.billableTimeTarget;
         return {

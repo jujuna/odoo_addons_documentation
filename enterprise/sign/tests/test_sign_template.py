@@ -1,11 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import base64
 
+import io
 from datetime import timedelta
 
 from odoo import Command, fields
 from odoo.exceptions import AccessError, ValidationError, UserError
 from odoo.tools import file_open, mute_logger
+from odoo.tools.pdf import (
+    ArrayObject, DecodedStreamObject, DictionaryObject, NameObject, NumberObject, PdfFileReader, PdfFileWriter,
+    create_string_object, generic,
+)
 from odoo.tests import tagged, freeze_time
 from odoo.tests.common import TransactionCase, new_test_user
 
@@ -314,6 +319,44 @@ class TestSignTemplate(TransactionCase):
             with self.subTest(fname=fname):
                 with self.assertRaises(ValidationError):
                     template_id.update_from_attachment_data(attachment_data_list=[{'name': fname, 'raw': data}])
+
+    @mute_logger('pypdf.generic._link')
+    def test_upload_pdf_with_malformed_annotation_data(self):
+        """ Make sure that malformed annotation data doesn't block the upload, and form fields are still locked. """
+        writer = PdfFileWriter()
+        image = DecodedStreamObject()
+        image.set_data(b'\x00' * 12)
+        image.update({NameObject('/Type'): NameObject('/XObject'), NameObject('/Subtype'): NameObject('/Image')})
+        # /Annots pointing to an image instead of an array
+        writer.add_blank_page(595, 842)[NameObject('/Annots')] = writer._add_object(image)
+        # /Annots that is not even iterable
+        writer.add_blank_page(595, 842)[NameObject('/Annots')] = NumberObject(1)
+        writer.add_blank_page(595, 842)[NameObject('/Annots')] = ArrayObject([
+            # annotation that is not a dictionary
+            NameObject('/Invalid'),
+            # widget whose /Parent is not a dictionary
+            writer._add_object(DictionaryObject({
+                NameObject('/Subtype'): NameObject('/Widget'),
+                NameObject('/Parent'): NameObject('/Invalid'),
+            })),
+            # field whose /Ff flags are not an integer
+            writer._add_object(DictionaryObject({
+                NameObject('/Subtype'): NameObject('/Widget'),
+                NameObject('/FT'): NameObject('/Tx'),
+                NameObject('/T'): create_string_object('field'),
+                NameObject('/Ff'): generic.FloatObject('1.5'),
+            })),
+        ])
+        with io.BytesIO() as buffer:
+            writer.write(buffer)
+            pdf_data = buffer.getvalue()
+
+        res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
+            attachment_data_list=[{'name': 'malformed.pdf', 'raw': pdf_data}]
+        )
+        document = self.env['sign.template'].browse(res['id']).document_ids
+        pdf_reader = PdfFileReader(io.BytesIO(document.raw.content), strict=False)
+        self.assertEqual(pdf_reader.pages[2]['/Annots'][2].get_object()['/Ff'], 1, "The field should be read-only")
 
     def test_update_document_preserves_sign_items(self):
         """ Ensure that updating a document in a sign template creates a new template and preserves sign items. """

@@ -34,6 +34,7 @@ class TestSingleTouchPayrollApi(L10nPayrollAccountCommon, TestL10nAUPayrollAPICo
                 'l10n_au_branch_code': '100',
         })
         cls.contract_1.date_end = False
+        cls.employee_1.l10n_au_super_account_ids.fund_id.is_valid = True
         cls.env['ir.config_parameter'].sudo().set_str('l10n_au_payroll_iap.test_endpoint', 'http://127.0.0.1:8070')
         cls.proxy_user = cls.env['account_edi_proxy_client.user']._register_proxy_user(cls.company, 'l10n_au_payroll', 'demo')
         cls.proxy_user.edi_mode = 'test'

@@ -141,6 +141,54 @@ class OSSTaxReportTest(TestAccountReportsCommon):
             options,
         )
 
+    def test_tax_report_oss_france_monaco(self):
+        """ Monaco is treated as France for VAT purposes, so OSS taxes mapped by a fiscal
+        position on a France + Monaco country group must be reported under France.
+        """
+        fpos_fr = self.env['account.fiscal.position'].search([
+            ('company_id', '=', self.env.company.id),
+            ('country_id', '=', self.env.ref('base.fr').id),
+        ])
+        fpos_fr.write({
+            'country_id': False,
+            'country_group_id': self.env['res.country.group'].create({
+                'name': 'France and Monaco',
+                'country_ids': [Command.set((self.env.ref('base.fr') | self.env.ref('base.mc')).ids)],
+            }).id,
+        })
+        partner_mc = self.env['res.partner'].create({
+            'name': 'Partner MC',
+            'country_id': self.env.ref('base.mc').id,
+        })
+        self.init_invoice('out_invoice', partner=partner_mc, products=self.product_1, invoice_date=fields.Date.from_string('2021-05-24'), post=True)
+
+        report = self.env.ref('l10n_eu_oss_reports.oss_sales_report')
+        options = self._generate_options(report, '2021-04-01', '2021-06-30')
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                        Net               Tax
+            [   0,                            1,                2],
+            [
+                ("Sales",                    '',              290),
+                ("France",                   '',              400),
+                ("20.0% FR VAT (20.0%)",   2000,              400),
+                ("Total France",             '',              400),
+                ("Greece",                   '',             -240),
+                ("24.0% GR VAT (24.0%)",  -1000,             -240),
+                ("Total Greece",             '',             -240),
+                ("Luxembourg",               '',              130),
+                ("17.0% LU VAT (17.0%)",   1000,              170),
+                ("8.0% LU VAT (8.0%)",     -500,              -40),
+                ("Total Luxembourg",         '',              130),
+                ("Netherlands",              '',              0.0),
+                ("21.0% NL VAT (21.0%)",    0.0,              0.0),
+                ("Total Netherlands",        '',              0.0),
+                ("Total Sales",              '',              290),
+            ],
+            options,
+        )
+
     def test_tax_report_oss_closing(self):
         tax_return = self.env['account.return'].create({
             'name': "test return",

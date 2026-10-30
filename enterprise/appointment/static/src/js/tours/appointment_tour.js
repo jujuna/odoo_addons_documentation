@@ -117,7 +117,7 @@ registry.category("web_tour.tours").add("appointment_tour", {
             run: "click",
         },
         {
-            trigger: ".o_gantt_popover [data-icon='close']",
+            trigger: ".o_appointment_calendar_event_popover [data-icon='close']",
             content: _t("Close the appointment overview to continue."),
             run: "click",
         },

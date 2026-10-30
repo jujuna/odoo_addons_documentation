@@ -1,4 +1,6 @@
 
+import uuid
+
 from odoo import Command
 from odoo.addons.pos_enterprise.tests.test_frontend import TestPreparationDisplayHttpCommon
 from odoo.addons.pos_restaurant.tests import test_frontend
@@ -14,11 +16,6 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
     def setUp(self):
         super().setUp()
 
-        self.preset_dine_in = self.env['pos.preset'].create({
-            'name': 'Dine in',
-            'available_in_self': True,
-            'service_at': 'table',
-        })
         self.preset_takeaway = self.env['pos.preset'].create({
             'name': 'Takeaway',
             'available_in_self': True,
@@ -29,8 +26,49 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
             'self_ordering_mode': 'mobile',
             'use_presets': True,
             'default_preset_id': self.preset_takeaway.id,
-            'available_preset_ids': [(6, 0, [self.preset_takeaway.id, self.preset_dine_in.id])],
+            'available_preset_ids': [(6, 0, [self.preset_takeaway.id])],
         })
+
+    def _place_takeaway_order_with_phone(self, name="Dr Dre", phone="+32455667788"):
+        """ Place a takeaway self-order for a named customer, the way the self-order UI does.
+
+        The route is what triggers the "order received" message, so it has to be the real one.
+        """
+        self.pos_config.with_user(self.pos_user).open_ui()
+        self.pos_config.current_session_id.set_opening_control(0, "")
+
+        product = self.env['product.product'].search([('name', '=', 'Test Multi Category Product')], limit=1)
+        partner = self.env['res.partner'].create({'name': name, 'phone': phone})
+
+        params = {
+            'access_token': self.pos_config.access_token,
+            'table_identifier': False,
+            'order': {
+                'company_id': self.env.company.id,
+                'session_id': self.pos_config.current_session_id.id,
+                'state': 'draft',
+                'preset_id': self.preset_takeaway.id,
+                'partner_id': self.env['pos.order']._get_signed_self_partner_id(self.pos_config, partner.id),
+                'uuid': uuid.uuid4().hex,
+                'amount_total': product.lst_price,
+                'amount_paid': 0,
+                'amount_tax': 0,
+                'amount_return': 0,
+                'lines': [[0, 0, {
+                    'uuid': uuid.uuid4().hex,
+                    'product_id': product.id,
+                    'qty': 1,
+                    'price_unit': product.lst_price,
+                    'price_subtotal': product.lst_price,
+                    'price_subtotal_incl': product.lst_price,
+                    'tax_ids': [(6, 0, product.taxes_id.ids)],
+                }]],
+                'payment_ids': [],
+            },
+        }
+
+        result = self.make_jsonrpc_request('/pos-self-order/process-order/mobile/', params)
+        return self.env['pos.order'].browse(result['pos.order'][0]['id'])
 
     def test_sms_received_pdis(self):
         self.pdis.write({
@@ -40,12 +78,7 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
             'category_ids': [Command.set(self.env['pos.category'].search([]).ids)],
         })
 
-        self.pos_config.with_user(self.pos_user).open_ui()
-        self.pos_config.current_session_id.set_opening_control(0, "")
-        self_route = self.pos_config._get_self_order_route()
-        self.start_tour(self_route, "takeaway_order_with_phone")
-
-        order = self.env['pos.order'].search([('partner_id.phone', '=', '+32455667788')], limit=1)
+        order = self._place_takeaway_order_with_phone()
         self.assertTrue(order, "The self-order should create an order linked to the provided phone number.")
         expected_number = order.partner_id._phone_format(number=order.partner_id.phone) or order.partner_id.phone
         sms_messages = self.env['sms.sms'].search([
@@ -77,12 +110,7 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
             'category_ids': [Command.set(self.env['pos.category'].search([]).ids)],
         })
 
-        self.pos_config.with_user(self.pos_user).open_ui()
-        self.pos_config.current_session_id.set_opening_control(0, "")
-        self_route = self.pos_config._get_self_order_route()
-        self.start_tour(self_route, "takeaway_order_with_phone")
-
-        order = self.env['pos.order'].search([('partner_id.phone', '=', '+32455667788')], limit=1)
+        order = self._place_takeaway_order_with_phone()
         self.assertTrue(order, "The self-order should create an order linked to the provided phone number.")
         whatsapp_messages = self.env['whatsapp.message'].sudo().search([
             ('mobile_number', '=', order.partner_id.phone)

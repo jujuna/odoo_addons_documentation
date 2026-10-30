@@ -15,7 +15,7 @@
                     <t t-elif="budget_progress &gt;= 0.25" t-set="budget_title">Budget on track</t>
                     <t t-elif="budget_progress &gt;= 0" t-set="budget_title">Budget soon overspent</t>
                     <t t-else="" t-set="budget_title">Budget overspent</t>
-                    <button name="action_budget_spent" class="btn btn-light d-flex p-1">
+                    <button name="action_budget_spent" type="object" class="btn btn-light d-flex p-1">
                         <i role="img" aria-label="Budget"
                             t-attf-class="oi text-{{ budget_progress == -1.0 ? 'muted' : budget_progress &gt;= 0.25 ? 'success' : budget_progress &gt;= 0 ? 'warning' : 'danger' }}"
                             t-att-data-tooltip="budget_title"

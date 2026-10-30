@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import api, models
 from odoo.fields import Domain
+
+from odoo import api, models
 
 
 class HrPayslipRun(models.Model):
@@ -16,7 +17,7 @@ class HrPayslipRun(models.Model):
             Domain('employee_id', 'in', attendance_versions.employee_id.ids),
             Domain('check_out', '>=', date_start),
             Domain('check_in', '<=', date_end),
-            Domain('overtime_status', '=', 'to_approve'),
+            Domain('state', '=', 'draft'),
         ])
         if self.env['hr.attendance'].search_count(pending_overtime_domain, limit=1):
             warnings.append({

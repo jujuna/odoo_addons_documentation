@@ -222,3 +222,22 @@ class TestDashboardWarnings(TestPayrollCommon):
 
         warning_ids = self.env['hr.payroll.warning'].get_payroll_dashboard_data()['warning_ids']
         self.check_warnings(warning_ids, 'Employees with mobility budget and company car with CO2 > 0', self.new_employee)
+
+    def _get_dmfa_submission_cards(self):
+        warning_ids = self.env['hr.payroll.warning'].get_payroll_dashboard_data()['warning_ids']
+        warnings = self.env['hr.payroll.warning'].get_payroll_dashboard_warning_cards(warning_ids)
+        return [warning for warning in warnings if warning['name'].startswith('DMFA Submission')]
+
+    @freeze_time("2026-03-20")
+    def test_dmfa_submission_warning_current_quarter(self):
+        # The current quarter can't be declared yet
+        self.env.company.first_payrun_date = date(2026, 1, 15)
+        self.assertEqual(self._get_dmfa_submission_cards(), [])
+
+    @freeze_time("2026-04-10")
+    def test_dmfa_submission_warning_ended_quarter(self):
+        # An ended quarter is declared until the last day of the following month
+        self.env.company.first_payrun_date = date(2026, 3, 15)
+        cards = self._get_dmfa_submission_cards()
+        self.assertEqual([card['name'] for card in cards], ['DMFA Submission 2026 Q1'])
+        self.assertEqual(str(cards[0]['warning_date']), '2026-04-30')

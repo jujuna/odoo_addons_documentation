@@ -6,16 +6,16 @@
 # "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 # "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
-# Odoo Translation Bot <c3p@odoo.com>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-18 02:46+0000\n"
-"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-08 11:34+0000\n"
+"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/sign/es_419/>\n"
+"odoo-20/sign/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,7 +63,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sign/wizard/sign_send_request.py:0
 msgid "%(request_name)s sent by %(sender_name)s"
-msgstr ""
+msgstr "%(request_name)s enviada por %(sender_name)s"
 
 #. module: sign
 #. odoo-python
@@ -364,15 +364,6 @@ msgstr "<small class=\"text-muted\">Remitente</small>"
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
 msgstr "<small class=\"text-muted\">Signatarios</small>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<small>SMS Verification: The signatory has confirmed their control of the "
-"phone number using a unique code sent by SMS</small>"
-msgstr ""
-"<small>Verificación por SMS: El signatario confirmó que controla el número "
-"de teléfono con un código único que recibió por SMS</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -2020,20 +2011,6 @@ msgid "Email Subject"
 msgstr "Asunto del correo"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Email Verification"
-msgstr "Verificación de correo electrónico"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"Email Verification: The signatory has confirmed control of their email inbox "
-"by clicking on a unique link"
-msgstr ""
-"Verificación por correo electrónico: Quien firma confirmó que controla su "
-"bandeja de entrada con un enlace único"
-
-#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
 msgid "Email saved successfully!"
@@ -3070,7 +3047,7 @@ msgstr "Siguiente signatario ("
 #. module: sign
 #: model:res.groups.privilege,placeholder:sign.res_groups_privilege_sign
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_all_request_action
@@ -3737,11 +3714,6 @@ msgid "SMS Token"
 msgstr "Token del SMS"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "SMS Verification"
-msgstr "Verificación por SMS"
-
-#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "Ventas"
@@ -3827,6 +3799,11 @@ msgstr ""
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Buscar <span class=\"nolabel\"> (en documento)</span>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Secure Link"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4815,6 +4792,11 @@ msgid "Subject"
 msgstr "Asunto"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "System Account"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
 msgid "Tag Name"
 msgstr "Nombre de la etiqueta"
@@ -5493,8 +5475,14 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Código único por SMS"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Unique Link via Email"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5654,6 +5642,11 @@ msgstr "Valor"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "¡El valor ya existe!"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Verification method"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6087,7 +6080,7 @@ msgstr "cada"
 #. odoo-javascript
 #: code:addons/sign/static/src/core/web/activity_patch.xml:0
 msgid "from"
-msgstr ""
+msgstr "de"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
@@ -6315,6 +6308,26 @@ msgstr "usted"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{0}} Summary"
 msgstr "{{0}} Resumen"
+
+#~ msgid ""
+#~ "<small>SMS Verification: The signatory has confirmed their control of the "
+#~ "phone number using a unique code sent by SMS</small>"
+#~ msgstr ""
+#~ "<small>Verificación por SMS: El signatario confirmó que controla el "
+#~ "número de teléfono con un código único que recibió por SMS</small>"
+
+#~ msgid "Email Verification"
+#~ msgstr "Verificación de correo electrónico"
+
+#~ msgid ""
+#~ "Email Verification: The signatory has confirmed control of their email "
+#~ "inbox by clicking on a unique link"
+#~ msgstr ""
+#~ "Verificación por correo electrónico: Quien firma confirmó que controla su "
+#~ "bandeja de entrada con un enlace único"
+
+#~ msgid "SMS Verification"
+#~ msgstr "Verificación por SMS"
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr "Permitir que los signatarios se identifiquen mediante itsme®."

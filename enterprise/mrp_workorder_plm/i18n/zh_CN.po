@@ -4,15 +4,16 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:55+0000\n"
-"PO-Revision-Date: 2026-09-18 00:39+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"PO-Revision-Date: 2026-10-11 12:35+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/mrp_workorder_plm/zh_Hans/>\n"
+"projects/odoo-20/mrp_workorder_plm/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,6 +34,9 @@ msgid ""
 "PLM for workorder.\n"
 "=================================================\n"
 msgstr ""
+"\n"
+"工单的 PLM。\n"
+"=================================================\n"
 
 #. module: mrp_workorder_plm
 #. odoo-python
@@ -116,13 +120,13 @@ msgstr "新步骤建议：%s"
 #. module: mrp_workorder_plm
 #: model:ir.model.fields,field_description:mrp_workorder_plm.field_mrp_eco_routing_change__old_quality_point_id
 msgid "Old Quality Point"
-msgstr ""
+msgstr "旧质量点"
 
 #. module: mrp_workorder_plm
 #: model:ir.module.module,shortdesc:base.module_mrp_workorder_plm
 #: model:ir.module.module,summary:base.module_mrp_workorder_plm
 msgid "PLM for workorder"
-msgstr ""
+msgstr "工单 PLM"
 
 #. module: mrp_workorder_plm
 #: model:ir.model,name:mrp_workorder_plm.model_propose_change
@@ -148,7 +152,7 @@ msgstr "质量点"
 #. module: mrp_workorder_plm
 #: model:ir.model.fields,field_description:mrp_workorder_plm.field_mrp_eco_routing_change__description_reference
 msgid "Reference"
-msgstr ""
+msgstr "参考号"
 
 #. module: mrp_workorder_plm
 #: model:ir.model.fields,field_description:mrp_workorder_plm.field_mrp_eco_routing_change__title
@@ -165,6 +169,9 @@ msgid ""
 "center, or product variant. Please let your manager know if you need "
 "additional assistance for your proposed change."
 msgstr ""
+"无法将建议的步骤添加到该工单 (WO) 对应的工程变更指令（ECO），因为匹配到了多个"
+"与该工单 (WO) 相符的作业。请通过名称、工作中心或产品变体来区分这些作业。如果"
+"您对拟议的变更需要更多帮助，请告知您的经理。"
 
 #. module: mrp_workorder_plm
 #. odoo-python
@@ -176,9 +183,12 @@ msgid ""
 "was modified after the manufacturing order was created. Please let your "
 "manager know if you need additional assistance for your proposed change."
 msgstr ""
+"无法将建议的步骤添加到该工单对应的工程变更指令（ECO），因为在 ECO 的物料清单"
+"（BoM）中找不到相应的作业。如果在创建制造订单之后修改了物料清单，就可能出现这"
+"种情况。如果您对拟议的变更需要更多帮助，请告知您的经理。"
 
 #. module: mrp_workorder_plm
 #. odoo-python
 #: code:addons/mrp_workorder_plm/models/mrp_eco.py:0
 msgid "Update: %(title)s\t-\tType: %(old_type)s -> %(new_type)s"
-msgstr ""
+msgstr "更新：%(title)s\t-\t类型：%(old_type)s -> %(new_type)s"

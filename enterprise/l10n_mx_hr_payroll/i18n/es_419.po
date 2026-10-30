@@ -10,10 +10,10 @@ msgstr ""
 "Project-Id-Version: Odoo Server 17.1alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 18:21+0000\n"
-"PO-Revision-Date: 2026-09-18 05:05+0000\n"
+"PO-Revision-Date: 2026-10-09 23:33+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/l10n_mx_hr_payroll/es_419/>\n"
+"odoo-20/l10n_mx_hr_payroll/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,6 +36,17 @@ msgid ""
 "    * Employee Payslip\n"
 "    * Integrated with Leaves Management\n"
 msgstr ""
+"\n"
+"Reglas de nómina en México.\n"
+"=====================\n"
+"\n"
+"    * Detalles del empleado\n"
+"    * Contratos del empleado\n"
+"    * Contratos basados en pasaportes\n"
+"    * Préstamos y deducciones\n"
+"    * Permite configurar sueldo básico, bruto y neto\n"
+"    * Recibo de nómina del empleado\n"
+"    * Integración con la gestión de permisos\n"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.actions.report,print_report_name:l10n_mx_hr_payroll.action_report_payslip_mx
@@ -128,6 +139,8 @@ msgid ""
 "Check this box to separately break down the seventh day in the payroll "
 "calculation."
 msgstr ""
+"Selecciona esta casilla para desglosar el séptimo día por separado en el "
+"cálculo de la nómina."
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_hr_payroll_structure_mx_employee_salary_child_support
@@ -148,7 +161,7 @@ msgstr "Gratificación Anual (Aguinaldo) Exento"
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_christmas_bonus
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__l10n_mx_christmas_bonus
 msgid "Christmas bonus"
-msgstr ""
+msgstr "Aguinaldo"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__l10n_mx_hr_fonacot__status__closed
@@ -171,7 +184,7 @@ msgstr "Compañía"
 #. module: l10n_mx_hr_payroll
 #: model:ir.model,name:l10n_mx_hr_payroll.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Ajustes de configuración"
 
 #. module: l10n_mx_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.l10n_mx_hr_infonavit_form
@@ -428,13 +441,13 @@ msgstr "Ajuste del ISR"
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_company__l10n_mx_isr_calculation_method
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_config_settings__l10n_mx_isr_calculation_method
 msgid "ISR Calculation Method"
-msgstr ""
+msgstr "Método de cálculo del ISR"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_company__l10n_mx_isr_days_per_month
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_config_settings__l10n_mx_isr_days_per_month
 msgid "ISR Days per Month"
-msgstr ""
+msgstr "Días de ISR por mes"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_isr_holiday_bonus_tax
@@ -511,7 +524,7 @@ msgstr "Cálculo Intermediario"
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_payslip__l10n_mx_is_integration_factor_manual
 msgid "L10N Mx Is Integration Factor Manual"
-msgstr ""
+msgstr "Es factor de integración manual"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_payment_period_vouchers
@@ -596,7 +609,7 @@ msgstr "Fondo de Ahorro"
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_is_seventh_day
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__l10n_mx_is_seventh_day
 msgid "MX: Seventh Day"
-msgstr ""
+msgstr "MX: Séptimo día"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_ssn
@@ -635,16 +648,18 @@ msgstr "Gastos médicos para pensionados y beneficiarios"
 #: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.res_config_settings_view_form
 msgid "Method used to compute the income tax withheld on each payslip"
 msgstr ""
+"Método utilizado para calcular el impuesto sobre la renta retenido en cada "
+"recibo de nómina"
 
 #. module: l10n_mx_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.res_config_settings_view_form
 msgid "Mexican Localization"
-msgstr ""
+msgstr "Localización mexicana"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.module.module,shortdesc:base.module_l10n_mx_hr_payroll
 msgid "Mexico - Payroll"
-msgstr ""
+msgstr "México - Nómina"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_ceav_lower_upper
@@ -765,7 +780,7 @@ msgstr "Seguro Mensual"
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__res_company__l10n_mx_isr_calculation_method__monthly_with_period_factor
 msgid "Monthly Table with Period Factor"
-msgstr ""
+msgstr "Tabla mensual con factor de periodo"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_christmas_bonus_net
@@ -790,7 +805,7 @@ msgstr "Gasolina no sujeta a impuestos"
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_holiday_bonus
 msgid "Non Taxable Holiday Bonus"
-msgstr ""
+msgstr "Aguinaldo no gravado"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_meal_voucher
@@ -814,6 +829,8 @@ msgid ""
 "Number of days in a month used to compute the period factor (365 / 12 by "
 "default)."
 msgstr ""
+"Número de días de un mes utilizado para calcular el factor de periodo (365 / "
+"12 de forma predeterminada)."
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_imss_nursery
@@ -872,7 +889,7 @@ msgstr "Previsiones del periodo de la prima vacacional"
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__res_company__l10n_mx_isr_calculation_method__standard
 msgid "Period Table"
-msgstr ""
+msgstr "Tabla por periodo"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,help:l10n_mx_hr_payroll.field_res_company__l10n_mx_isr_calculation_method
@@ -884,6 +901,11 @@ msgid ""
 "monthly equivalent, and the resulting tax is converted back to the pay "
 "period."
 msgstr ""
+"Tabla por periodo: El ISR se calcula sobre el ingreso gravable con la tabla "
+"de impuestos correspondiente al periodo de pago.\n"
+"Tabla mensual con factor de periodo: El ingreso gravable se convierte a su "
+"equivalente mensual y el impuesto resultante se convierte de nuevo al "
+"periodo de pago."
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_provisions
@@ -918,7 +940,7 @@ msgstr "Reembolso"
 #. module: l10n_mx_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.view_hr_payslip_form
 msgid "Reset integration factor"
-msgstr ""
+msgstr "Restablecer factor de integración"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_imss_ceav_employee
@@ -938,7 +960,7 @@ msgstr "Jubilación, cesantía en edad avanzada o vejez IMSS (patrón)"
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_base_contribution_salary
 msgid "SBC"
-msgstr ""
+msgstr "SBC"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary_commissions
@@ -948,17 +970,17 @@ msgstr "SBC (Comisiones)"
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary_fixed_salary
 msgid "SBC (Fixed Salary)"
-msgstr ""
+msgstr "SBC (Salario fijo)"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary_other_earnings
 msgid "SBC (Other Earnings)"
-msgstr ""
+msgstr "SBC (Otras percepciones)"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary
 msgid "SBC (Total)"
-msgstr ""
+msgstr "SBC (Total)"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model,name:l10n_mx_hr_payroll.model_hr_payroll_structure_type
@@ -1002,12 +1024,12 @@ msgstr "Fondo de ahorro - Límite salarial"
 #. module: l10n_mx_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.hr_employee_view_form
 msgid "Seventh Day"
-msgstr ""
+msgstr "Séptimo día"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_seventh_day
 msgid "Seventh day"
-msgstr ""
+msgstr "Séptimo día"
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_fonacot__status
@@ -1028,7 +1050,7 @@ msgstr "Vales de gasolina sujetos a impuestos"
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_holiday_bonus_alw
 msgid "Taxable Holiday Bonus"
-msgstr ""
+msgstr "Aguinaldo gravable"
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_meal_voucher_alw
@@ -1059,7 +1081,7 @@ msgstr "La tasa del aguinaldo debe ser un porcentaje entre 0 y 100"
 #. odoo-python
 #: code:addons/l10n_mx_hr_payroll/models/res_company.py:0
 msgid "The ISR days per month must be strictly positive."
-msgstr ""
+msgstr "Los días de ISR por mes deben ser estrictamente positivos."
 
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.constraint,message:l10n_mx_hr_payroll.constraint_l10n_mx_hr_infonavit_check_positive_discount_factor
@@ -1095,7 +1117,7 @@ msgstr "El porcentaje debe ser entre 0 y 100"
 #. module: l10n_mx_hr_payroll
 #: model:ir.model,name:l10n_mx_hr_payroll.model_hr_work_entry_type
 msgid "Time Type"
-msgstr ""
+msgstr "Tipo de tiempo"
 
 #. module: l10n_mx_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.hr_contract_template_view_form

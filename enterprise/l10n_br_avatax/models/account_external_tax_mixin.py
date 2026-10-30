@@ -800,9 +800,9 @@ class AccountExternalTaxMixin(models.AbstractModel):
             for record in records:
                 service_params = record._get_l10n_br_avatax_service_params()
                 document_data = record._prepare_l10n_br_avatax_document_service_call(service_params)
-                base_lines = [data['base_line'] for data in service_params['line_data']]
+                base_lines_by_id = {data['base_line']['id']: data['base_line'] for data in service_params['line_data']}
 
-                api_response = self._l10n_br_call_avatax_taxes(company, document_data)
+                api_response = record._l10n_br_call_avatax_taxes(company, document_data)
                 error = self._l10n_br_avatax_handle_response(service_params, api_response, _(
                     'Odoo could not fetch the taxes related to %(document)s.',
                     document=record.display_name,
@@ -811,7 +811,8 @@ class AccountExternalTaxMixin(models.AbstractModel):
                     errors.append(error)
                     continue
 
-                for base_line, line_results in zip(base_lines, api_response['lines']):
+                for line_results in api_response['lines']:
+                    base_line = base_lines_by_id[int(line_results['lineCode'])]
                     # Reset manual field since it is possible that some discount lines were removed or added
                     tax_values_list = []
                     for tax_detail in line_results['taxDetails']:
@@ -973,6 +974,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         params = {
             'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+            # The service is now free, so this is not used to charge anything.
             'account_token': self.env['iap.account'].get(IAP_SERVICE_NAME).sudo().account_token,
             'avatax': {
                 'is_production': environment and environment == 'production',

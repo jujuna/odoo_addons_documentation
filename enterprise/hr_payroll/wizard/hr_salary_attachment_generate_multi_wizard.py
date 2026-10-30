@@ -19,7 +19,8 @@ class HrSalaryAttachmentGenerateMultiWizard(models.TransientModel):
     salary_rule_id = fields.Many2one('hr.salary.rule', string="Salary Rule", required=True,
         domain=[('input_usage_payslip', '=', True)])
     description = fields.Char(string="Note")
-    amount = fields.Monetary('Payslip Amount', required=True, help='Amount to pay each payslip.')
+    # in the unit of the salary rule, as on the adjustment
+    amount = fields.Float('Payslip Amount', digits=False, required=True, help='Amount to pay each payslip.')
     is_recurring = fields.Boolean('Repeat')
     date_start = fields.Date('Start Date', required=True, default=lambda r: start_of(fields.Date.context_today(r), 'month'))
     date_end = fields.Date('End Date', default=False, help='Date at which this assignment has been set as completed.')
@@ -37,6 +38,11 @@ class HrSalaryAttachmentGenerateMultiWizard(models.TransientModel):
         'CHECK (date_start <= date_end)',
         "End date may not be before the starting date.",
     )
+
+    @api.onchange('salary_rule_id')
+    def _onchange_salary_rule_id(self):
+        if not self.amount:
+            self.amount = self.salary_rule_id.input_default_value
 
     @api.depends('is_recurring', 'date_end', 'date_estimated_end')
     def _compute_remaining_time(self):

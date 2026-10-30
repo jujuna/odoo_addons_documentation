@@ -134,6 +134,13 @@ class HrJob(models.Model):
         wizard = self.env['hr.referral.link.to.share'].create({'job_id': self.id, 'channel': channel})
         return wizard.url
 
+    def _get_accessible_applicants(self):
+        accessible_applicants = self.env['hr.applicant'].with_context(active_test=False).search([
+            ('id', 'in', self.application_ids.ids),
+            ('is_accessible_to_current_user', '=', True),
+        ])
+        return accessible_applicants
+
     def action_share_external(self):
         self.ensure_one()
         wizard = self.env['hr.referral.link.to.share'].create({'job_id': self.id})

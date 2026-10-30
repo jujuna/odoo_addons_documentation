@@ -11,6 +11,16 @@ class CalendarBooking(models.Model):
 
     order_line_id = fields.Many2one("sale.order.line", 'Sale Order Line', index='btree_not_null', ondelete="cascade")
 
+    def _get_calendar_event_values(self):
+        """ Override: link the event to the sale order at creation ("Linked to") """
+        values = super()._get_calendar_event_values()
+        if self.order_line_id:
+            values.update({
+                'res_model_id': self.env['ir.model']._get_id('sale.order'),
+                'res_id': self.order_line_id.order_id.id,
+            })
+        return values
+
     def _make_event_from_paid_booking(self):
         """ Override: link calendar event to SOL when created """
         super()._make_event_from_paid_booking()

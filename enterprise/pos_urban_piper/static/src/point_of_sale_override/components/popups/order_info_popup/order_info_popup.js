@@ -81,6 +81,7 @@ export class OrderInfoPopup extends Component {
         return {
             title: _t("Customer Info"),
             icon: "person",
+            iconClass: "oi-filled",
             visible: true,
             fields: [
                 { label: _t("Customer Name"), value: deliveryCustomerData.name },

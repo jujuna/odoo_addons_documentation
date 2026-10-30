@@ -10,15 +10,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 01:20+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-02 17:46+0000\n"
+"PO-Revision-Date: 2026-10-11 06:34+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/hr_appraisal/zh_Hans/>\n"
+"projects/odoo-20/hr_appraisal/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,6 +55,25 @@ msgid ""
 "viewed in a PDF form.\n"
 "* Meeting Requests are created manually according to employees appraisals.\n"
 msgstr ""
+"\n"
+"定期员工考评\n"
+"============\n"
+"\n"
+"使用此应用，您可以通过对员工绩效进行定期考评来维持激励流程。对人力资源的定期"
+"评估既能惠及员工，也有利于您的组织。\n"
+"\n"
+"每个员工都可以分配一个考评计划。这些计划定义了您管理定期个人考评的频率和方式"
+"。\n"
+"\n"
+"主要功能\n"
+"--------\n"
+"* 能够创建员工考评。\n"
+"* 考评可由员工的经理创建，也可根据员工表单中定义的排期自动创建。\n"
+"* 考评按照一个计划进行，该计划中可创建多种调查问卷。每份问卷可由员工层级中的"
+"特定层级作答。最终审查与考评由经理完成。\n"
+"* 经理、同事、协作者以及员工本人都会收到执行定期考评的电子邮件。\n"
+"* 员工、同事、协作者填写的每份考评表单都可以 PDF 形式查看。\n"
+"* 会议请求根据员工考评手动创建。\n"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -207,6 +227,45 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        您好 <t t-out=\"ctx.get('employee_to_name')\">"
+"[employee]</t>，\n"
+"                        <br/>\n"
+"                        温馨提醒：您与 <t t-out=\"ctx.get('manager_names')"
+"\"> [Appraisers]</t>\n"
+"                        的下一次考评计划于 <t t-out=\"ctx.get('date_close')"
+"\">[deadline]</t> 进行。\n"
+"                        <br/>\n"
+"                        <t t-if=\"ctx.get('user_body')\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">[Optional "
+"comment]</t>\n"
+"                            </div>\n"
+"                        </t>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            您可以在此访问您的考评表单：\n"
+"                            <p class=\"text-center my-3 py-2 px-3\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\" margin: auto; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">"
+"\n"
+"                                    查看考评\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                        如有任何疑问或需要改期，欢迎随时联系我们。\n"
+"                        <br/>\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_signature')\"/>\n"
+"                        <br/>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
@@ -236,6 +295,29 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        <t t-out=\"ctx.get('employee_to_name')\">employee</"
+"t> 的考评已确认。\n"
+"                        <br/><br/>\n"
+"                        请根据计划日期进行考评面谈。\n"
+"                        <br/><br/>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">"
+"\n"
+"                                    查看考评\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -418,6 +500,8 @@ msgid ""
 "<span class=\"o_stat_text\">Appraisals</span>\n"
 "                        <span class=\"o_stat_value\">New</span>"
 msgstr ""
+"<span class=\"o_stat_text\">考评</span>\n"
+"                        <span class=\"o_stat_value\">新建</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
@@ -989,7 +1073,7 @@ msgstr "活动异常标示"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_plans_ids
 #: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_plans
 msgid "Activity Plans"
-msgstr ""
+msgstr "活动计划"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_state
@@ -1007,7 +1091,7 @@ msgstr "活动类型图标"
 #: model:ir.actions.act_window,name:hr_appraisal.mail_activity_type_action_config_appraisal
 #: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_type
 msgid "Activity Types"
-msgstr ""
+msgstr "活动类型"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
@@ -1027,7 +1111,7 @@ msgstr "活动类型"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
 msgid "Add Goals to Employees"
-msgstr ""
+msgstr "为员工添加目标"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.hr_appraisal_config_templates_action
@@ -1058,7 +1142,7 @@ msgstr "所有公司"
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Already Processed"
-msgstr ""
+msgstr "已处理"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
@@ -1141,7 +1225,7 @@ msgstr "评估目标"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal_tag
 msgid "Appraisal Goal Tag"
-msgstr ""
+msgstr "考评目标标签"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1157,7 +1241,7 @@ msgstr "发布的考评计划"
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.mail_activity_plan_action_appraisal
 msgid "Appraisal Plans"
-msgstr ""
+msgstr "考评计划"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_properties_definition
@@ -1179,7 +1263,7 @@ msgstr "评估请求"
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid ""
 "Appraisal Request from {{ hasattr(object, 'name') and object.name or '' }}"
-msgstr ""
+msgstr "来自 {{ hasattr(object, 'name') and object.name or '' }} 的考评请求"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_templates_action
@@ -1241,7 +1325,7 @@ msgstr "待开始的评价"
 msgid ""
 "Appraisal's managers have been updated due to the end of collaboration with "
 "an employee."
-msgstr ""
+msgstr "由于与某员工的合作已结束，其考评的经理已更新。"
 
 #. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.ir_cron_scheduler_appraisal_ir_actions_server
@@ -1306,7 +1390,7 @@ msgstr "要求向其他员工填写调查"
 #. module: hr_appraisal
 #: model:ir.module.module,summary:base.module_hr_appraisal
 msgid "Assess your employees"
-msgstr ""
+msgstr "评估您的员工"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -1391,7 +1475,7 @@ msgstr "可以看到管理器发布"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__children_progression
 msgid "Children Progression"
-msgstr ""
+msgstr "子目标进度"
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -1460,12 +1544,12 @@ msgstr "内容"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Continue"
-msgstr ""
+msgstr "继续"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
 msgid "Create a Appraisal Activity Plan"
-msgstr ""
+msgstr "创建考评活动计划"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__duration_first_appraisal
@@ -1571,7 +1655,7 @@ msgstr "删除"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Delete with children"
-msgstr ""
+msgstr "连同子目标一起删除"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_department
@@ -1643,7 +1727,7 @@ msgstr "草稿"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 msgid "Edit Feedback"
-msgstr ""
+msgstr "编辑反馈"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_mail_template
@@ -1678,7 +1762,7 @@ msgstr "员工自动完成"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee_departure
 msgid "Employee Departure"
-msgstr ""
+msgstr "员工离职"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback
@@ -1705,7 +1789,7 @@ msgstr "员工用户"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Employee to review"
-msgstr ""
+msgstr "待审核的员工"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1742,12 +1826,12 @@ msgstr "超出预期"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Expand Employee's Feedback"
-msgstr ""
+msgstr "展开员工的反馈"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Expand Manager's Feedback"
-msgstr ""
+msgstr "展开经理的反馈"
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_external
@@ -1763,12 +1847,12 @@ msgstr "填补鉴定为%s"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Fill in the employee's feedback section before"
-msgstr ""
+msgstr "请先填写员工的反馈部分"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Fill in the manager's feedback section before"
-msgstr ""
+msgstr "请先填写经理的反馈部分"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__assessment_note
@@ -1808,12 +1892,12 @@ msgstr "目标标签"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__template_goal_id
 msgid "Goal Template"
-msgstr ""
+msgstr "目标模板"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 msgid "Goal or Employee"
-msgstr ""
+msgstr "目标或员工"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1834,27 +1918,27 @@ msgstr "目标数量"
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.action_hr_appraisal_goal_template
 msgid "Goals Template"
-msgstr ""
+msgstr "目标模板"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.action_hr_appraisal_goal_template_library
 msgid "Goals Template Library"
-msgstr ""
+msgstr "目标模板库"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid "HR: Appraisal Request By Employee"
-msgstr ""
+msgstr "人力资源：员工发起的考评请求"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_reminder
 msgid "HR: Appraisal reminder"
-msgstr ""
+msgstr "人力资源：考评提醒"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_confirm
 msgid "HR: General Appraisal Confirmation"
-msgstr ""
+msgstr "人力资源：通用考评确认"
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_hardskills
@@ -1864,7 +1948,7 @@ msgstr "硬技能"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__has_edit_right
 msgid "Has Edit Right"
-msgstr ""
+msgstr "拥有编辑权限"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__has_message
@@ -1880,12 +1964,12 @@ msgstr "此员工应怎样改进？"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "How do I feel about my own role?"
-msgstr ""
+msgstr "我对自己的岗位有何感受？"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "How do I feel about the company?"
-msgstr ""
+msgstr "我对公司有何感受？"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__id
@@ -1953,7 +2037,7 @@ msgstr ""
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "If you need, ask feedback to a selection of colleagues you work with."
-msgstr ""
+msgstr "如有需要，可向与您共事的若干同事征求反馈。"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__image_1920
@@ -1989,7 +2073,7 @@ msgstr "是关注者"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__is_last_appraisal_late
 msgid "Is Last Appraisal Late"
-msgstr ""
+msgstr "上次考评是否逾期"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__is_manager
@@ -2023,7 +2107,7 @@ msgstr "语言"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "Last 365 days"
-msgstr ""
+msgstr "最近 365 天"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__last_appraisal_id
@@ -2040,7 +2124,7 @@ msgstr "上次考评状态"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__last_ongoing_appraisal_date
 msgid "Last Ongoing Appraisal Date"
-msgstr ""
+msgstr "上次进行中的考评日期"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__write_uid
@@ -2097,14 +2181,14 @@ msgstr "载入考评情境"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Load sample data"
-msgstr ""
+msgstr "加载样本数据"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "Long term (&gt; 6 months) career discussion: Where does the employee\n"
 "                    want to go, and how can you help them reach that goal?"
-msgstr ""
+msgstr "长期（&gt; 6 个月）职业发展讨论：员工希望走向何方，您如何帮助他们实现该目标？"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__template_id
@@ -2169,7 +2253,7 @@ msgstr "标记为完成"
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols 图标，例如 checklist"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2218,7 +2302,7 @@ msgstr "我的团队"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "My team"
-msgstr ""
+msgstr "我的团队"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__name
@@ -2238,7 +2322,7 @@ msgstr "需要改进"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "New Employee"
-msgstr ""
+msgstr "新建员工"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2285,19 +2369,19 @@ msgstr "下一个评价日期"
 #. module: hr_appraisal
 #: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "No Appraisals found!"
-msgstr ""
+msgstr "未找到考评！"
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "No employees to assess yet!"
-msgstr ""
+msgstr "暂无员工可评估！"
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2308,12 +2392,12 @@ msgstr "保持原样"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_completed_sibling_goals
 msgid "Number Of Completed Sibling Goals"
-msgstr ""
+msgstr "已完成的同级目标数量"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_sibling_goals
 msgid "Number Of Sibling Goals"
-msgstr ""
+msgstr "同级目标数量"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__message_needaction_counter
@@ -2347,7 +2431,7 @@ msgstr "主管：访问所有评估记录"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "On demand"
-msgstr ""
+msgstr "按需"
 
 #. module: hr_appraisal
 #: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal__state__2_pending
@@ -2372,7 +2456,7 @@ msgstr "哎唷！您只可删除草稿考评。"
 #: code:addons/hr_appraisal/static/src/views/kanban/goal_kanban/goal_kanban_view.xml:0
 #: code:addons/hr_appraisal/static/src/views/list/goal_list/goal_list_view.xml:0
 msgid "Open Library"
-msgstr ""
+msgstr "打开库"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
@@ -2383,7 +2467,7 @@ msgstr "机会"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
 msgid "Optional comment..."
-msgstr ""
+msgstr "可选备注……"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_request_appraisal__lang
@@ -2410,7 +2494,7 @@ msgstr "整体体验反馈"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__parent_id
 msgid "Parent Goal Template"
-msgstr ""
+msgstr "父级目标模板"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__parent_path
@@ -2438,7 +2522,7 @@ msgstr "之前的评估"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/component/print_menu.xml:0
 msgid "Print"
-msgstr ""
+msgstr "打印"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__note
@@ -2470,7 +2554,7 @@ msgstr "进度："
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
 msgid "Progression"
-msgstr ""
+msgstr "进度"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_properties
@@ -2485,6 +2569,8 @@ msgid ""
 "employee can achieve it. Which benefit he will get from it. Maybe some "
 "process                             or steps to help her/him."
 msgstr ""
+"提供关于该目标的可见信息、员工如何实现它、能从中获得什么好处。也许还可以补充"
+"一些流程或步骤来帮助他/她。"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -2558,13 +2644,20 @@ msgstr "要求评估"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Request an Appraisal with your manager to assess your work."
-msgstr ""
+msgstr "向您的经理请求考评，以评估您的工作。"
 
 #. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.action_appraisal_reset
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Reset"
 msgstr "重置"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid ""
+"Resetting the appraisal will erase all manually entered content in the "
+"Employee and Manager Feedback sections. Do you want to continue?"
+msgstr "重置考评将清除员工反馈和经理反馈部分中手动输入的所有内容。是否继续？"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_user_id
@@ -2613,7 +2706,7 @@ msgstr "搜索评价"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Select"
-msgstr ""
+msgstr "选择"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2634,7 +2727,7 @@ msgstr "发送"
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
 msgid "Send By Email"
-msgstr ""
+msgstr "通过电子邮件发送"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -2651,7 +2744,7 @@ msgstr "当评估确认后，自动发送给员工和经理"
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid ""
 "Sent manually to the manager by the employee who wants to do an appraisal"
-msgstr ""
+msgstr "由希望进行考评的员工手动发送给经理"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__sequence
@@ -2688,7 +2781,7 @@ msgstr "显示完整的经理反馈"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "Show all records which has been created during the last 365 days"
-msgstr ""
+msgstr "显示最近 365 天内创建的所有记录"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2698,7 +2791,7 @@ msgstr "显示所有逾期未完成活动的记录"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__sibling_goals_ratio
 msgid "Sibling Goals Ratio"
-msgstr ""
+msgstr "同级目标比例"
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_softskills
@@ -2709,7 +2802,7 @@ msgstr "非技术技能"
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Some appraisals were already in another state and were skipped."
-msgstr ""
+msgstr "部分考评已处于其他状态，已被跳过。"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
@@ -2746,17 +2839,17 @@ msgstr "大大超出预期"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__child_ids
 msgid "Sub Goal Template"
-msgstr ""
+msgstr "子目标模板"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_list
 msgid "Sub Goals"
-msgstr ""
+msgstr "子目标"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 msgid "Sub-Goals"
-msgstr ""
+msgstr "子目标"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__subject
@@ -2809,7 +2902,7 @@ msgstr "评估的状态已设置：由%s完成"
 msgid ""
 "The average timing for the goals to be completed. It will populate the "
 "estimated end date when assigned"
-msgstr ""
+msgstr "目标完成的平均时长。分配目标时，系统会据此填充预计结束日期"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_employee__next_appraisal_date
@@ -2923,7 +3016,7 @@ msgstr "未完成的目标计数"
 msgid ""
 "Unfortunately you don't have access to modify the value of the following "
 "field: %(inaccessible_field)s"
-msgstr ""
+msgstr "很遗憾，您无权修改以下字段的值：%(inaccessible_field)s"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2931,7 +3024,7 @@ msgstr ""
 msgid ""
 "Unfortunately you don't have access to modify the value of the following "
 "fields: %(inaccessible_fields)s"
-msgstr ""
+msgstr "很遗憾，您无权修改以下字段的值：%(inaccessible_fields)s"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2942,7 +3035,7 @@ msgstr "未发布"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 msgid "Update"
-msgstr ""
+msgstr "更新"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -2977,7 +3070,7 @@ msgstr "用户内容"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__usual_duration_month
 msgid "Usual Timing"
-msgstr ""
+msgstr "常用时长"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -3039,7 +3132,7 @@ msgstr "我最喜欢工作的哪些部分？最不喜欢哪些部分？"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Would you like to test with sample data or create your own employees?"
-msgstr ""
+msgstr "您想使用样本数据进行测试，还是创建自己的员工？"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3075,7 +3168,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "You cannot modify a finished appraisal."
-msgstr ""
+msgstr "您无法修改已完成的考评。"
 
 #. module: hr_appraisal
 #. odoo-python

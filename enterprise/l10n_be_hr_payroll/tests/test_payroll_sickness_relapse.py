@@ -804,6 +804,119 @@ class TestPayrollSicknessRelapse(TestPayrollCommon):
         self.assertEqual(all_leaves[2].request_date_to, date(2026, 4, 15))
         self.assertEqual(all_leaves[2].work_entry_type_id, unpaid_work_entry_type)
 
+    def test_student_worker_work_accident(self):
+        """
+        Student worker work accident leave split
+        The 7 first days: 009.00, from 8 to 30 days: 070.00, after 30 days: unpaid
+        """
+        student_worker = self.env['hr.employee'].create({
+            'name': 'Student Worker',
+            'date_version': '2026-10-01',
+            'contract_date_start': '2026-10-01',
+            'contract_date_end': '2026-12-31',
+            'fixed_term': True,
+            'wage': 2000,
+            'l10n_be_dimona_category': 'stu',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00840').id,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302').id,
+        })
+
+        self.env['hr.leave'].create({
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_first_week').id,
+            'request_date_from': date(2026, 10, 5),
+            'request_date_to': date(2026, 11, 30),
+            'employee_id': student_worker.id,
+        })
+
+        all_leaves = self.env['hr.leave'].search([
+            ('employee_id', '=', student_worker.id)
+        ]).sorted('request_date_from')
+
+        self.assertEqual(all_leaves.work_entry_type_id.mapped('code'), ['009.00', '070.00', '110.00'])
+        self.assertEqual(all_leaves[0].request_date_to, date(2026, 10, 11))
+        self.assertEqual(all_leaves[1].request_date_to, date(2026, 11, 3))
+
+    def test_student_worker_sick_time_off(self):
+        """
+        Student manual worker (840) sickness leave split, the worker scheme:
+        7 days 010.00, 7 days 082.00, 072.00 up to day 30, then unpaid
+        """
+        student_worker = self.env['hr.employee'].create({
+            'name': 'Student Worker',
+            'date_version': '2026-06-01',
+            'contract_date_start': '2026-06-01',
+            'contract_date_end': '2026-08-31',
+            'fixed_term': True,
+            'wage': 2000,
+            'l10n_be_dimona_category': 'stu',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00840').id,
+        })
+        self.env['hr.leave'].create({
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': date(2026, 7, 6),
+            'request_date_to': date(2026, 8, 14),
+            'employee_id': student_worker.id,
+        })
+        all_leaves = self.env['hr.leave'].search([('employee_id', '=', student_worker.id)]).sorted('request_date_from')
+        self.assertEqual(all_leaves.work_entry_type_id.mapped('code'), ['010.00', '082.00', '072.00', '122.00'])
+        self.assertEqual(all_leaves.mapped('request_date_to'), [date(2026, 7, 12), date(2026, 7, 19), date(2026, 8, 4), date(2026, 8, 14)])
+
+    def test_student_employee_sick_time_off(self):
+        """
+        White-collar student (841) on a contract of less than three months, the short-term employee scheme:
+        no guaranteed salary in the first month of the contract, then 7 days 010.00 and 072.01
+        """
+        student_employee = self.env['hr.employee'].create({
+            'name': 'Student Employee',
+            'date_version': '2026-07-06',
+            'contract_date_start': '2026-07-06',
+            'contract_date_end': '2026-08-31',
+            'fixed_term': True,
+            'wage': 2000,
+            'l10n_be_dimona_category': 'stu',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00841').id,
+        })
+        sick_leave_type = self.env.ref('hr_work_entry.be_work_entry_type_sick_leave')
+        self.env['hr.leave'].create([{
+            'work_entry_type_id': sick_leave_type.id,
+            'request_date_from': date(2026, 7, 13),
+            'request_date_to': date(2026, 7, 17),
+            'employee_id': student_employee.id,
+        }, {
+            'work_entry_type_id': sick_leave_type.id,
+            'request_date_from': date(2026, 8, 10),
+            'request_date_to': date(2026, 8, 20),
+            'employee_id': student_employee.id,
+        }])
+        all_leaves = self.env['hr.leave'].search([('employee_id', '=', student_employee.id)]).sorted('request_date_from')
+        self.assertEqual(all_leaves.work_entry_type_id.mapped('code'), ['122.00', '010.00', '072.01'])
+        self.assertEqual(all_leaves.mapped('request_date_to'), [date(2026, 7, 17), date(2026, 8, 16), date(2026, 8, 20)])
+
+    def test_student_employee_work_accident(self):
+        """
+        White-collar student (841) on a contract of less than three months, the short-term employee scheme:
+        7 days 009.00, 082.01 up to day 30, then unpaid
+        """
+        student_employee = self.env['hr.employee'].create({
+            'name': 'Student Employee',
+            'date_version': '2026-07-06',
+            'contract_date_start': '2026-07-06',
+            'contract_date_end': '2026-08-31',
+            'fixed_term': True,
+            'wage': 2000,
+            'l10n_be_dimona_category': 'stu',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00841').id,
+        })
+        self.env['hr.leave'].create({
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_first_week').id,
+            'request_date_from': date(2026, 7, 13),
+            'request_date_to': date(2026, 8, 20),
+            'employee_id': student_employee.id,
+        })
+        all_leaves = self.env['hr.leave'].search([('employee_id', '=', student_employee.id)]).sorted('request_date_from')
+        self.assertEqual(all_leaves.work_entry_type_id.mapped('code'), ['009.00', '082.01', '110.00'])
+        self.assertEqual(all_leaves.mapped('request_date_to'), [date(2026, 7, 19), date(2026, 8, 11), date(2026, 8, 20)])
+
     def test_worker_work_accident_02(self):
         """
         The 7 first days: paid 100%

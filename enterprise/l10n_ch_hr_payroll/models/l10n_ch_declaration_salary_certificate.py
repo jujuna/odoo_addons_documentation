@@ -2,7 +2,6 @@
 import base64
 import math
 import time
-import re
 from collections import defaultdict
 
 from odoo import _, fields, models
@@ -42,6 +41,12 @@ class L10nChSalaryCertificate(models.Model):
 
         declaration, _institutions = self.env["l10n.ch.employee.yearly.values"]._get_salary_rectificates(year=self.previous_declaration.year, month=int(self.previous_declaration.month), company_id=self.company_id, to_replace=mapped_certificates, original_date=self.original_date)
         self.l10n_ch_declare_salary_data = declaration
+
+    def _get_employee_snapshots(self):
+        return self.previous_declaration._get_employee_snapshots()
+
+    def _get_wage_statement_filename(self, employee):
+        return _("Wage_statement_correction_%(year)s_%(name)s_%(timestamp)s", year=self.year, name=employee.name, timestamp=time.time_ns())
 
     def generate_tax_accounting_reports(self):
         self.ensure_one()
@@ -90,49 +95,7 @@ class L10nChSalaryCertificate(models.Model):
 
             tax_accounting_reports.update(report.get("tax_accounting_reports", {}))
 
-        pattern = re.compile(r"_pers_([A-Za-z0-9_]+)\.pdf$")
-
-        # Let's assume we have employees grouped by registration_number
-        employees_mapped_by_registration_number = dict(
-            self.env['hr.employee']._read_group(
-                domain=[],
-                groupby=['registration_number'],
-                aggregates=['id:recordset']
-            )
-        )
-
-        employee_declaration_vals = []
-
-        for file_name, pdf_b64 in tax_accounting_reports.items():
-
-            match = pattern.search(file_name)
-            if not match:
-                continue
-            registration = match.group(1)
-            pdf_raw = BinaryBytes(base64.b64decode(pdf_b64))
-
-            employee = employees_mapped_by_registration_number.get(registration, self.env['hr.employee'])
-
-            if employee:
-                employee_declaration_vals.append({
-                    'employee_id': employee.id,
-                    'res_model': self._name,
-                    'res_id': self.id,
-                    'pdf_filename': _("Wage_statement_correction_%(year)s_%(name)s_%(timestamp)s", year=self.year, name=employee.name, timestamp=time.time_ns()),
-                    'pdf_to_generate': False,
-                    'state': 'pdf_generated',
-                    'pdf_file': pdf_raw,
-                })
-            else:
-                attachment = self.env['ir.attachment'].create({
-                    'name': f"Tax_Accounting_Report_{self.year}_{registration}.pdf",
-                    'raw': pdf_raw,
-                    'res_id': self.id,
-                    'res_model': self._name,
-                })
-                self.message_post(body=_("Employee with number %s was either archived or deleted. Wage statement will not be sent automatically.", registration), attachment_ids=[attachment.id])
-
-        self.env['hr.payroll.employee.declaration'].create(employee_declaration_vals)
+        self._save_wage_statements(tax_accounting_reports)
 
     def _compute_wage_statement_count(self):
         mapped_employee_declarations = dict(self.env['hr.payroll.employee.declaration']._read_group(domain=[('res_model', '=', self._name)], groupby=['res_id'], aggregates=['__count']))

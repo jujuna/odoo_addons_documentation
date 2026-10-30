@@ -5,6 +5,13 @@
         <field name="model">appointment.type</field>
         <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
         <field name="arch" type="xml">
+            <!-- Ensure compatibility with Appointment views that do not have the Google Bookings page. -->
+            <xpath expr="//notebook" position="after">
+                <div name="google_reserve_compatibility_hook" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='google_reserve_onboarding'] | //div[@name='google_reserve_compatibility_hook']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <page name="messages" position="after">
                 <page name="google_reserve_options" string="Google Bookings"
                     invisible="category in ['custom', 'punctual']"
@@ -16,7 +23,7 @@
                                 <span class="oi oi-fw me-1" data-icon="map"/>
                                 <span>Synchronize your establishment with Google Reserve. </span>
                                 <a
-                                    href="https://www.odoo.com/documentation/master/applications/productivity/appointments/google_reserve.html"
+                                    href="https://www.odoo.com/documentation/latest/applications/productivity/appointments/google_reserve.html"
                                     target="_blank"
                                 >Click here</a>
                                 <span> to learn more.</span>
@@ -26,7 +33,7 @@
                                 <span class="oi oi-fw me-1" data-icon="check"/>
                                 <span>Your Google Reserve Synchronization is active. </span>
                                 <a
-                                    href="https://www.odoo.com/documentation/master/applications/productivity/appointments/google_reserve.html"
+                                    href="https://www.odoo.com/documentation/latest/applications/productivity/appointments/google_reserve.html"
                                     target="_blank"
                                 >Click here</a>
                                 <span> if you encounter any issues.</span>

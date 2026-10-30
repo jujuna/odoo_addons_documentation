@@ -12,6 +12,7 @@ export const timesheetSystrayCacheService = {
             timesheets: [],
             pre_filled_form: {},
             loaded: false,
+            employee: false,
         });
 
         lazySession.getValue("timesheets_today", (value) => {
@@ -19,6 +20,9 @@ export const timesheetSystrayCacheService = {
                 state.timesheets = value.records;
             }
             state.loaded = true;
+        });
+        lazySession.getValue("timesheet_systray_employee_data", (value) => {
+            state.employee = value;
         });
 
         return {
@@ -39,6 +43,9 @@ export const timesheetSystrayCacheService = {
                         if (JSON.stringify(state.timesheets) !== JSON.stringify(newRecords)) {
                             state.timesheets = newRecords;
                         }
+                        if (data.employee) {
+                            state.employee = data.employee;
+                        }
                         state.loaded = true;
                     } finally {
                         fetchPromise = null;
@@ -53,6 +60,11 @@ export const timesheetSystrayCacheService = {
                     localStorage.getItem("timesheet.preFilledForm") || "{}"
                 );
                 return state.pre_filled_form;
+            },
+
+            clearPreFilledForm() {
+                localStorage.removeItem("timesheet.preFilledForm");
+                state.pre_filled_form = {};
             },
 
             addTimesheet(timesheet) {

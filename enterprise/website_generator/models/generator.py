@@ -6,6 +6,7 @@ import re
 import tarfile
 import time
 import traceback
+from collections import defaultdict
 from itertools import batched, islice
 from urllib.parse import urlparse
 
@@ -196,16 +197,12 @@ class Website_GeneratorRequest(models.Model):
                 if not f:
                     continue
                 image_name = member.name.removeprefix("images/")
-                public = True
-                # Customized images don't need to be shown
-                if image_name.startswith('customized'):
-                    public = False
                 att = self.env['ir.attachment'].sudo().create({
                     'name': image_name,
                     'raw': f.read(),
                     'res_id': 0,
                     'res_model': 'ir.ui.view',
-                    'public': public,
+                    'public': True,
                 })
                 attachment_map[image_name] = {
                     'id': att.id,
@@ -275,6 +272,7 @@ class Website_GeneratorRequest(models.Model):
             generation_progress = self.generation_progress
             generate_website = odoo_blocks.get('homepage') and self.import_website
             website_url = None
+            self._link_customized_images(odoo_blocks, generation_progress)
             if generate_website:
                 # Create the website before products to link the website to the products
                 self._set_website(odoo_blocks, generation_progress)
@@ -308,6 +306,27 @@ class Website_GeneratorRequest(models.Model):
             logger.exception("Error importing website")
             self._report_to_iap('report_ko', error=traceback.format_exc())
             self._send_notification()
+
+    def _link_customized_images(self, odoo_blocks, generation_progress):
+        # Like the images modified in the editor, the customized images (cropped, filtered,
+        # resized, ...) are linked to their original to hide them from the media library.
+        attachment_map = generation_progress['attachment_map']
+        customized_images_originals = odoo_blocks.get('website', {}).get('customized_images_originals', {})
+        original_id_by_attachment_id = {
+            attachment_map[filename]['id']: attachment_map[original_filename]['id']
+            for filename, original_filename in customized_images_originals.items()
+            if filename in attachment_map and original_filename in attachment_map
+        }
+        attachments = self.env['ir.attachment'].sudo().browse(
+            set(original_id_by_attachment_id) | set(original_id_by_attachment_id.values())
+        ).exists()
+        existing_ids = set(attachments.ids)
+        attachment_ids_by_original_id = defaultdict(list)
+        for attachment_id, original_id in original_id_by_attachment_id.items():
+            if attachment_id in existing_ids and original_id in existing_ids:
+                attachment_ids_by_original_id[original_id].append(attachment_id)
+        for original_id, attachment_ids in attachment_ids_by_original_id.items():
+            attachments.browse(attachment_ids).write({'original_id': original_id})
 
     def _send_notification(self, website_url=None, nbr_products_created=0, nbr_blogs_created=0):
         subject = _("Something went wrong during the import")

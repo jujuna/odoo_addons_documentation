@@ -118,6 +118,7 @@ class SignTemplate(models.Model):
                 item.id
                 for document in template.document_ids
                 for item in document.sign_item_ids
+                if item.page > -1
             ])]
 
     @api.depends('sign_item_ids.responsible_id')

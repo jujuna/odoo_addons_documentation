@@ -12,7 +12,7 @@ export class DiscussChannel extends mailModels.DiscussChannel {
     whatsapp_channel_valid_until = fields.Datetime({
         default: () => serializeDateTime(DateTime.local().plus({ days: 1 })),
     });
-    wa_account_id = fields.Generic({ default: () => 1 });
+    wa_account_id = fields.Many2one({ default: () => 1 });
 
     /** @override */
     _store_channel_fields(res) {

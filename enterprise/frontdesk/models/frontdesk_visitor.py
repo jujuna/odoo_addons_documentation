@@ -26,8 +26,8 @@ class FrontdeskVisitor(models.Model):
     company = fields.Char('Visitor Company')
     station_host_ids = fields.Many2many('hr.employee', related='station_id.host_ids')
     host_id = fields.Many2one('hr.employee', string='Host Name', check_company=True)
-    check_in = fields.Datetime(string='Check In', default=fields.Datetime.now)
-    check_out = fields.Datetime(string='Check Out')
+    check_in = fields.Datetime(string='Check In', default=fields.Datetime.now, copy=False)
+    check_out = fields.Datetime(string='Check Out', copy=False)
     duration = fields.Float('Duration', compute="_compute_duration", store=True, default=1.0)
     state = fields.Selection(string='Status',
         selection=[('checked_in', 'Checked-In'),

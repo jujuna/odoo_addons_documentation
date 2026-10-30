@@ -1,4 +1,5 @@
 import { onWillStart, Portal, providePlugins, signal, usePlugin } from "@odoo/owl";
+import { pick } from "@web/core/utils/objects";
 import { parseDateTime, serializeDateTime } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 import { useDraggable } from "@web/core/utils/draggable";
@@ -82,7 +83,21 @@ export class PlanningFieldServiceMapTimelineController extends MapController {
             shiftsToScheduleOrder: this.model.metaData.defaultOrder,
         };
         return planningFieldServiceMapTimelineGanttView.props(
-            { ...this.props, arch: this.ganttArch, context },
+            {
+                ...pick(
+                    this.props,
+                    "info",
+                    "resModel",
+                    "fields",
+                    "domain",
+                    "groupBy",
+                    "orderBy",
+                    "searchMenuTypes",
+                    "useSampleModel"
+                ),
+                arch: this.ganttArch,
+                context,
+            },
             planningFieldServiceMapTimelineGanttView,
             this.env.config
         );

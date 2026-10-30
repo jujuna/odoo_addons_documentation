@@ -3,11 +3,101 @@
 }
 
 @media (min-width: 768px) {
+  // after the salary computation lines (so that they stick to the tabs), shown on the right of the tabs
   .o_payslip_notebook .o_payslip_show_all_toggle {
     position: absolute;
     top: 0;
     right: 0.5rem;
   }
+}
+
+.o_payslip_employee_title {
+    // the avatar spans from the top of the capitals of the employee name (below the
+    // leading of the title line) to the baseline of the period
+    position: relative;
+    padding-left: 3.95rem;
+
+    .o_field_widget, h1 > div {
+        position: static;
+    }
+
+    .o_m2o_avatar {
+        position: absolute;
+        top: .51rem;
+        bottom: .65rem;
+        left: 0;
+
+        img {
+            width: auto;
+            height: 100%;
+            aspect-ratio: 1;
+        }
+    }
+}
+
+.o_payslip_summary {
+    .o_payslip_summary_figure_main, .o_payslip_summary_unit {
+        font-size: $h3-font-size;
+        font-weight: $font-weight-bold;
+        line-height: $headings-line-height;
+    }
+}
+
+.o_payslip_line_space_above > td {
+    padding-top: map-get($spacers, 4) !important;
+}
+
+.o_payslip_line_colored > td {
+    color: var(--o-payslip-line-color) !important;
+}
+
+.o_hr_payroll_line_cards {
+    // the field widget is inline-block: with a few cards it shrinks to them, and the cards with it
+    width: 100%;
+
+    .o_kanban_renderer.o_kanban_ungrouped {
+        --Kanban-padding: 0;
+
+        @include media-breakpoint-up(md) {
+            // 4 cards per row (3 gaps); flex-grow-1 on the records is important
+            .o_kanban_record:not(.o_kanban_ghost) {
+                flex: 0 0 calc((100% - 3 * var(--Kanban-gap, 0px)) / 4) !important;
+                width: auto;
+            }
+
+            // the cards have a fixed width, the ghosts would only wrap on an empty row
+            .o_kanban_ghost {
+                display: none;
+            }
+        }
+    }
+}
+
+.o_card_record.o_hr_payroll_line_card {
+    --Card-min-width: 0;
+    --Card-border-radius-top: #{$border-radius-xl};
+    --Card-border-radius-bottom: #{$border-radius-xl};
+    --Card-border-radius: #{$border-radius-xl};
+}
+
+.o_hr_payroll_line_tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding-inline: .25rem;
+    overflow: hidden;
+    border-radius: $border-radius-lg;
+    // time type color when inside .o_calendar_renderer, neutral otherwise
+    background-color: rgba(var(--o-event-bg--subtle-rgb, #{to-rgb($gray-200)}), 1);
+    font-weight: $font-weight-bold;
+    white-space: nowrap;
+
+    .oi {
+        font-size: 1.35rem;
+    }
 }
 
 .radio_grid > div {

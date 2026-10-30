@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 05:32+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-02 17:46+0000\n"
+"PO-Revision-Date: 2026-10-19 09:34+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "ai_agentic/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -68,6 +68,52 @@ msgid ""
 "is 2026-08-24)\n"
 "        "
 msgstr ""
+"\n"
+"            Luo ja päivitä pysyviä automaatioita toimenpiteille, jotka sinun "
+"tulisi suorittaa myöhemmin, toistuvasti tai tietueen tapahtuman seurauksena. "
+"Käytä tätä työkalua, kun käyttäjä pyytää sinua suorittamaan toiminnon tai "
+"lähettämään muistutuksen tulevaisuudessa, toistuvasti tai kun tietueita "
+"luodaan, muutetaan, poistetaan, niille lähetetään viestejä tai ne täyttävät "
+"määritetyt ehdot.\n"
+"            Uutta automaatiota luotaessa `name`, `description`, `trigger`, "
+"`ai_action_prompt` ja `explanation` ovat pakollisia.\n"
+"            Olemassa olevaa automaatiota muokattaessa `automation_id` ja "
+"`explanation` ovat pakollisia. Muista parametreista anna vain ne, jotka on "
+"päivitettävä.\n"
+"            ## Käynnistystyyppi\n"
+"            Suosi aikaperusteisia käynnistimiä (`on_time_created`, "
+"`on_time_updated`, `on_time`) mielummin kuin synkronisia (`on_create`, "
+"`on_create_or_write`): ne suoritetaan pian tapahtuman jälkeen sen sijaan, "
+"että ne suoritettaisiin käyttäjän tallennuksen aikana. ”Kun tukipyytö "
+"luodaan, …” on `on_time_created` 1 minuutin viiveellä; ”aina kun liidi "
+"päivitetään, …” on `on_time_updated`. Käytä `on_create` / "
+"`on_create_or_write` vain, kun käyttäjä nimenomaisesti pyytää välitöntä, "
+"synkronista toimintoa tai siirtymää tietyissä kentissä, jotka vaativat "
+"`filter_pre_domain`-parametria.\n"
+"            ## Käynnistysesimerkkejä\n"
+"            - Lisää tunniste jokaiseen uuteen tukipyyntöön (suositeltava "
+"luomiskäynnistin): `{\"trigger\": {\"type\": \"on_time_created\", "
+"\"target_model\": \"helpdesk.ticket\", \"date_offset_or_interval\": "
+"{\"amount\": 1, \"unit\": \"minutes\"}}}`\n"
+"            - Käynnistä, kun tunniste ”Bug” lisätään omiin tehtäviini "
+"(kentän muutos, joten `on_create_or_write`): `{\"trigger\": {\"type\": "
+"\"on_create_or_write\", \"observed_fields\": [\"tag_ids\"], "
+"\"filter_pre_domain\": \"[('tag_ids', 'not in', ['Bug'])]\", "
+"\"filter_domain\": \"[('tag_ids', 'in', ['Bug']), ('user_id', '=', 3)]\"}}` "
+"(jos käyttäjän tunnus on 3).\n"
+"            - Käynnistä päivä ennen odotettua sulkemispäivää: `{\"trigger\": "
+"{\"type\": \"on_time\", \"observed_fields\": \"date_deadline\", "
+"\"date_offset_or_interval\": {\"direction\": \"before\", \"amount\": 1, "
+"\"unit\": \"day\"}}}`\n"
+"            - Käynnistä luomisen yhteydessä, jos tietuetta ei ole osoitettu "
+"kenellekään: `{\"trigger\": {\"type\": \"on_time_created\", "
+"\"filter_domain\": \"[('user_id', '=', False)]\", "
+"\"date_offset_or_interval\": {\"amount\": 5, \"unit\": \"minutes\"}}}`\n"
+"            - Käynnistä joka maanantai: `{\"trigger\": {\"type\": "
+"\"on_schedule\", \"date_offset_or_interval\": {\"amount\": 7, \"unit\": "
+"\"day\", \"next_trigger_date\": \"2026-08-24 09:00:00\"}}}` (jos seuraava "
+"maanantai on 24.8.2026)\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_description:ai_agentic.ir_actions_server_ai_run_automation
@@ -98,6 +144,12 @@ msgid ""
 "* Enhance customer service with AI-powered responses\n"
 "* Automate routine tasks with intelligent workflows\n"
 msgstr ""
+"\n"
+"*Luo ja hallinnoi tekoälyagentteja erilaisissa liiketoimintatehtävissä\n"
+"* Integroi suosittuja tekoälymalleja sekä -palveluita\n"
+"* Käsittele asiakirjoja ja poimi niistä tietoa automaattisesti\n"
+"* Paranna asiakaspalvelua tekoälypohjaisilla vastauksilla\n"
+"* Automatisoi rutiinitehtäviä älykkäillä työnkuluilla\n"
 
 #. module: ai_agentic
 #. odoo-python
@@ -144,10 +196,10 @@ msgid ""
 "A powerful suite of AI tools and agents integrated directly into your Odoo "
 "environment"
 msgstr ""
+"Tehokas kokoelma tekoälytyökaluja ja agentteja, integroituna suoraan Odoo-"
+"ympäristöösi"
 
 #. module: ai_agentic
-#. odoo-javascript
-#: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 #: model:ir.module.module,shortdesc:base.module_ai_agentic
 #: model:ir.ui.menu,name:ai_agentic.ai_menu_root
 msgid "AI"
@@ -475,12 +527,12 @@ msgstr ""
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Luonut"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Luotu"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -536,7 +588,7 @@ msgstr ""
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "Keskustelukanava"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__display_name
@@ -654,12 +706,12 @@ msgstr ""
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Viimeksi päivittänyt"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Viimeksi päivitetty"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -702,12 +754,6 @@ msgstr "Nimi"
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__next_trigger_date
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Next Trigger Date"
-msgstr ""
-
-#. module: ai_agentic
-#. odoo-javascript
-#: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
-msgid "No AI Chats yet."
 msgstr ""
 
 #. module: ai_agentic

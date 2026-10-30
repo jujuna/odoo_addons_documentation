@@ -3,7 +3,7 @@ import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { hasMobileNative } from "@pos_mobile_android/app/utils/native";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
 
 export class PosSelfOpenKioskButton extends Component {
     static template = "pos_self_order_mobile.OpenKioskButton";
@@ -25,7 +25,7 @@ export class PosSelfOpenKioskButton extends Component {
     }
 
     get actionContext() {
-        return hasMobileNative("openKiosk") ? { open_in_mobile_kiosk: true } : {};
+        return mobileNative.openKiosk ? { open_in_mobile_kiosk: true } : {};
     }
 
     setup() {

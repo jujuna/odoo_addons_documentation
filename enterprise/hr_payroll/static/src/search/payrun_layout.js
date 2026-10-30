@@ -1,7 +1,8 @@
-import { usePlugin, useEffect, proxy } from "@odoo/owl";
+import { usePlugin, useEffect } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Layout } from "@web/search/layout";
 import { PayRunChatterService } from "@hr_payroll/js/payrun_chatter_service";
+import { PayslipListPlugin } from "@hr_payroll/views/payslip_list/payslip_list_plugin";
 import { PayRunControlPanel } from "@hr_payroll/search/payrun_control_panel";
 import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 
@@ -18,10 +19,10 @@ export class PayRunLayout extends Layout {
         this.components = { ...this.components, ControlPanel: PayRunControlPanel };
         this.uiService = useService("ui");
         this.payRunChatter = usePlugin(PayRunChatterService);
+        this.payslipListPlugin = usePlugin(PayslipListPlugin);
 
-        this.state = proxy({ payRunReactive: this.env.payRunReactive });
         useEffect(() => {
-            const payRunId = this.state.payRunReactive?.payRunId
+            const payRunId = this.payslipListPlugin.payRunId();
             if (payRunId) {
                 this.payRunChatter.selectPayslipRun({ resId: payRunId });
             } else {

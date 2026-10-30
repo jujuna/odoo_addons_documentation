@@ -46,20 +46,7 @@ class AccountReport(models.Model):
                 'l10n_in_reports.account_report_gstr3b',
                 'l10n_in_reports.account_report_cmp_08',
                 'l10n_in_reports.account_report_gstr4',
-            })
-        elif any(
-            company.l10n_in_gst_registration_type == 'composition'
-            for company in in_companies
-        ):
-            to_exclude.update({
-                'l10n_in_reports.account_report_gstr1',
-                'l10n_in_reports.account_report_gstr2b',
-                'l10n_in_reports.account_report_gstr3b',
-            })
-        else:
-            to_exclude.update({
-                'l10n_in_reports.account_report_cmp_08',
-                'l10n_in_reports.account_report_gstr4',
+                'l10n_in_reports.account_report_gstr_iff',
             })
 
         if not any(c.l10n_in_tcs_feature for c in in_companies):

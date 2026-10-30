@@ -19,11 +19,11 @@ class HrAppraisalGoal(models.Model):
         'hr.employee', 'hr_appraisal_goal_hr_employee_rel', 'hr_appraisal_goal_id',
         default=lambda self: self.env['hr.employee'].sudo().search([('user_id', '=', self.env.uid), ('company_id', '=', self.env.company.id)], limit=1),
         string="Employee", ondelete='cascade', tracking=True, bypass_search_access=True)
-    employee_autocomplete_ids = fields.Many2many('hr.employee', compute='_compute_employee_autocomplete', compute_sudo=True)
+    employee_autocomplete_ids = fields.Many2many('hr.employee', compute='_compute_employee_autocomplete', compute_sudo=True, bypass_search_access=True)
     company_id = fields.Many2one('res.company', related="employee_ids.company_id", store=True)
     manager_ids = fields.Many2many(
         'hr.employee', 'hr_appraisal_goal_hr_employee_manager_rel', 'hr_appraisal_goal_id',
-        string="Manager", compute="_compute_manager_ids", readonly=False, store=True, tracking=True)
+        string="Manager", compute="_compute_manager_ids", readonly=False, store=True, tracking=True, bypass_search_access=True)
     department_ids = fields.Many2many('hr.department', compute="_compute_department_ids", store=True)
     job_ids = fields.Many2many('hr.job', compute="_compute_job_ids", store=True, groups="hr.group_hr_user")
     progression = fields.Selection(selection=[

@@ -142,11 +142,9 @@ class AccountJournal(models.Model):
         """
         sources = {r[source_field]: r for r in source_records.with_context(prefetch_langs=True)}
         for target_rec in target_records:
-            value = target_rec[target_field]
-            target_rec.update_field_translations(target_field, {
-                lang_code: sources[value].with_context(lang=lang_code)[source_field]
-                for lang_code, __ in self.env['res.lang'].get_installed()
-            })
+            if source_rec := sources.get(target_rec[target_field]):
+                if translations := source_rec._get_stored_translations(source_field):
+                    target_rec.update_field_translations(target_field, dict(translations))
 
     def create_document_from_attachment(self, attachment_ids=None):
         """ When running an action on several documents, this method is called

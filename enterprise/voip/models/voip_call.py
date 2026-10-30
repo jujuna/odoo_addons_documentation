@@ -17,6 +17,7 @@ from odoo.tools.sql import SQL
 from odoo.addons.mail.tools.discuss import Store
 from odoo.addons.voip.models.phone_service_api import PhoneServiceAPI
 from odoo.addons.voip.models.utils import normalize_caller_number, same_number
+from odoo.addons.voip.tools.concurrency import expected_unique_violation
 
 _logger = logging.getLogger(__name__)
 
@@ -385,11 +386,12 @@ class VoipCall(models.Model):
                     leg.voip_call_id = call
             else:
                 try:
-                    Leg.create({
-                        "voip_call_id": call.id,
-                        "conversation_id": call.conversation_id.id,
-                        "sip_call_id": sip_call_id,
-                    })
+                    with expected_unique_violation():
+                        Leg.create({
+                            "voip_call_id": call.id,
+                            "conversation_id": call.conversation_id.id,
+                            "sip_call_id": sip_call_id,
+                        })
                 except UniqueViolation as e:
                     raise ConcurrencyError() from e
 
@@ -726,7 +728,8 @@ class VoipCall(models.Model):
                         "Failed to create call activity for %s/%s",
                         res_model, res_id, exc_info=True,
                     )
-        call = self.sudo().create(values).sudo(False)
+        with expected_unique_violation():
+            call = self.sudo().create(values).sudo(False)
         store = Store().add(call, "_store_voip_fields")
         return {"ids": [call.id], "store_data": store}
 
@@ -900,10 +903,11 @@ class VoipCall(models.Model):
         if success:
             if not self_sudo.start_date or at < self_sudo.start_date:
                 self_sudo.start_date = at
-        elif self_sudo.state == "terminated":
+        elif self_sudo.state == "terminated" and at < self_sudo.start_date:
             # Race condition: end_call ran before start_call.
             # start_date was set by end_call as a placeholder; compute the
-            # duration from the real start before overwriting it.
+            # duration from the real start before overwriting it. An answer at
+            # or after the recorded start is a late copy of the real one.
             diff = (self_sudo.start_date - at).total_seconds()
             self_sudo.duration = max(0, round(diff))
             self_sudo.start_date = at
@@ -1090,7 +1094,16 @@ class VoipCall(models.Model):
         }
 
         scenario = "incoming-call"  # https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/Notifications/notifications_actions_customization.md
-        self._notify_devices_send(data, actions, icon, scenario)
+        # Sent once committed: the push leaves right away, and must not announce
+        # a state a rollback, or a retry after a concurrent update, takes back.
+        call_id = self.id
+
+        # The deferred env drops sudo, and the webhook runs as the public user.
+        def notify(env):
+            if call := env["voip.call"].sudo().browse(call_id).exists():
+                call._notify_devices_send(data, actions, icon, scenario)
+
+        self.env["voip.pbx.service"]._call_after_commit(notify)
 
     def _decline_via_pbx(self):
         """Decline this incoming call in the PBX, for this member alone.

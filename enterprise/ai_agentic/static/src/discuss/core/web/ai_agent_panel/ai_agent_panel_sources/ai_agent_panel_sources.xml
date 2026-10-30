@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
     <t t-name="ai_agentic.AiAgentPanelSourceListRenderer.Header">
-        <div class="d-flex align-items-center gap-2">
+        <div t-if="!isEmpty" class="d-flex align-items-center gap-2">
             <BooleanToggleField name="'restrict_to_sources'" record="this.sourcesFolderTree.record"/>
             <span>Restrict answers to Sources</span>
         </div>

@@ -4,6 +4,7 @@ from unittest.mock import patch
 from freezegun import freeze_time
 
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 from odoo.tools import file_open
 
@@ -152,6 +153,26 @@ class TestEdiXmls(TestPeEdiWithholdingCommon):
         expected = self.get_xml_tree_from_string(self.expected_retention_multi_bill)
         self.assertXmlTreeEqual(current, expected)
 
+    def test_invoice_withholding_node_flagged_tax(self):
+        """Customer invoice with the IGV withholding tax flagged keeps its reason 62 AllowanceCharge."""
+        ChartTemplate = self.env['account.chart.template']
+        withholding_tax = ChartTemplate.ref('sale_tax_withholding_3')
+        withholding_tax.is_withholding_tax = True
+        with freeze_time(self.frozen_today):
+            invoice = self._create_invoice_pe(invoice_line_ids=[Command.create({
+                'product_id': self.product.id,
+                'price_unit': 5300.0,
+                'tax_ids': [Command.set((ChartTemplate.ref('sale_tax_igv_18') | withholding_tax).ids)],
+            })])
+            invoice.action_post()
+            xml_bytes, _errors = invoice._l10n_pe_edi_generate_invoice_bstr()
+
+        current = self.get_xml_tree_from_string(xml_bytes)
+        self.assertEqual(
+            [node.text for node in current.findall('.//{*}AllowanceChargeReasonCode[.="62"]/../*')],
+            ['false', '62', '0.03000', '187.62', '6254.00'],
+        )
+
     # -------------------------------------------------------------------------
     # Non-XML tests
     # -------------------------------------------------------------------------
@@ -161,6 +182,30 @@ class TestEdiXmls(TestPeEdiWithholdingCommon):
         with freeze_time(self.frozen_today):
             payment = self._create_payment_with_retention()
         self.assertTrue(payment.l10n_pe_edi_is_required)
+
+    def test_bill_withholding_on_all_igv_lines(self):
+        """A bill with the withholding tax on some IGV lines only cannot be paid, lines without IGV are ignored."""
+        def create_bill(other_line_taxes):
+            return self._create_vendor_bill(invoice_line_ids=[
+                Command.create({
+                    'product_id': self.product.id,
+                    'price_unit': 5000.0,
+                    'tax_ids': [Command.set((self.purchase_tax_18 | self.withholding_tax).ids)],
+                }),
+                Command.create({
+                    'product_id': self.product.id,
+                    'price_unit': 3000.0,
+                    'tax_ids': [Command.set(other_line_taxes.ids)],
+                }),
+            ])
+
+        with freeze_time(self.frozen_today):
+            bill = create_bill(self.purchase_tax_18)
+            with self.assertRaisesRegex(UserError, r"Withholding tax applies to all taxable items \(with IGV\)\. Ensure retention is applied to all IGV-eligible products on this invoice\."):
+                self._create_payment_with_retention(bills=bill)
+
+            payment = self._create_payment_with_retention(bills=create_bill(self.env['account.chart.template'].ref('purchase_tax_exo')))
+        self.assertEqual(len(payment.withholding_line_ids), 1)
 
     def test_retention_number_mirrors_line(self):
         """Retention number is computed from the (single) withholding line's name."""

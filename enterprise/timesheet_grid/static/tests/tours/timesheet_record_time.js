@@ -1,5 +1,4 @@
 import { registry } from "@web/core/registry";
-import { delay } from "@web/core/utils/concurrency";
 
 registry.category("web_tour.tours").add("timesheet_overtime_hour_encoding", {
     steps: () => [
@@ -13,10 +12,13 @@ registry.category("web_tour.tours").add("timesheet_overtime_hour_encoding", {
             run: "click",
         },
         {
-            trigger: ".o_grid_row",
-            run: async () => {
-                await delay(300);
-            },
+            // Waits for the new period to load: it has 5 cells, the previous one has fewer.
+            trigger: ".o_grid_bar_chart_overtime[title='Daily overtime']:eq(4):not(:visible)",
+        },
+        {
+            trigger:
+                ".o_grid_bar_chart_overtime[title='Total overtime']:contains('+5h'):not(:visible)",
+            run: "hover",
         },
         {
             trigger: ".o_grid_row",
@@ -35,11 +37,6 @@ registry.category("web_tour.tours").add("timesheet_overtime_hour_encoding", {
                     });
             },
         },
-        {
-            trigger:
-                ".o_grid_bar_chart_overtime[title='Total overtime']:contains('+5h'):not(:visible)",
-            run: "hover",
-        },
     ],
 });
 
@@ -55,10 +52,13 @@ registry.category("web_tour.tours").add("timesheet_overtime_day_encoding", {
             run: "click",
         },
         {
-            trigger: ".o_grid_row",
-            run: async () => {
-                await delay(300);
-            },
+            // Waits for the new period to load: it has 4 cells, the previous one has fewer.
+            trigger: ".o_grid_bar_chart_overtime[title='Daily overtime']:eq(3):not(:visible)",
+        },
+        {
+            trigger:
+                ".o_grid_bar_chart_overtime[title='Total overtime']:contains('-0.50'):not(:visible)",
+            run: "hover",
         },
         {
             trigger: ".o_grid_row",
@@ -76,11 +76,6 @@ registry.category("web_tour.tours").add("timesheet_overtime_day_encoding", {
                         }
                     });
             },
-        },
-        {
-            trigger:
-                ".o_grid_bar_chart_overtime[title='Total overtime']:contains('-0.50'):not(:visible)",
-            run: "hover",
         },
     ],
 });

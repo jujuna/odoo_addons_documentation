@@ -152,8 +152,8 @@ class HrPayrollSalaryIncrease(models.TransientModel):
     def _index_future_versions(self, future_versions):
         if not future_versions:
             return
-        wage_field = future_versions._get_contract_wage_field()
         for version in future_versions:
+            wage_field = version._get_contract_wage_field()
             version[wage_field] = self._get_increased_wage(version[wage_field])
 
     def _generate_indexation_message(self, future_affected_versions):

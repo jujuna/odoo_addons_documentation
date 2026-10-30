@@ -396,6 +396,12 @@ class L10nCoEdiDocument(models.Model):
     @api.model
     def _get_xml_by_document_key(self, identifier, move):
         """ Fetch the XML linked to the CUFE using the 'GetXmlByDocumentKey' webservice. """
+        return self._get_xml_by_document_key_for_company(identifier, move.company_id)
+
+    @api.model
+    def _get_xml_by_document_key_for_company(self, identifier, company):
+        """ Fetch the XML linked to the CUFE using the 'GetXmlByDocumentKey' webservice. """
+        # TODO MASTER: merge back into _get_xml_by_document_key(identifier, company).
         # This check is required because the template is added in stable and it's possible
         # that it doesn't exist if the module has not been upgraded
         if self.env.ref('l10n_co_edi.get_xml_by_document_key', raise_if_not_found=False):
@@ -406,7 +412,7 @@ class L10nCoEdiDocument(models.Model):
                     'soap_body_template': "l10n_co_edi.get_xml_by_document_key",
                 },
                 service="GetXmlByDocumentKey",
-                company=move.company_id,
+                company=company,
             )
             if response['status_code'] == 200:
                 root = etree.fromstring(response['response'])

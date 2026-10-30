@@ -40,7 +40,8 @@
                 <t t-if="warnings[level].length">
                     <div t-attf-class="alert alert-{{level}} mb-1" role="alert">
                         <t t-foreach="warnings[level]" t-as="warning" t-key="warning.id">
-                            <div class="d-flex flex-row">
+                            <!-- Keep the line breaks of the message, one line per split part. -->
+                            <div class="d-flex flex-row" style="white-space: pre-wrap;">
                                 <t t-call="hr_payroll.ActionableWarningLine"/>
                             </div>
                         </t>

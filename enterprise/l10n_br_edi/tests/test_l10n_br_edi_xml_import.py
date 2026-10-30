@@ -67,7 +67,7 @@ class TestL10nBrEDIXMLImport(AccountTestInvoicingCommon, ProductVariantsCommon):
                     "invoice_date": fields.Date.to_date("2024-02-07"),
                     "delivery_date": fields.Date.to_date("2024-02-07"),
                     "partner_id": vendor.id,
-                    "l10n_br_access_key": "NFe32240237842696000103550010000381361702937325",
+                    "l10n_br_access_key": "32240237842696000103550010000381361702937325",
                     "l10n_br_edi_payment_method": "17",
                     "l10n_br_edi_freight_model": "Thirdparty",
                     "l10n_br_edi_transporter_id": transporter.id,

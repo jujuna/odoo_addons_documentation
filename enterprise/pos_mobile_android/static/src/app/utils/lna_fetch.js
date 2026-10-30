@@ -1,5 +1,5 @@
-import { hasMobileNative, mobileNative } from "@pos_mobile_android/app/utils/native";
-import { isPrivateIp } from "@point_of_sale/utils";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
+import { isPrivateIp } from "@point_of_sale/app/utils/init_lna";
 
 /**
  * Local Network Access from the app. The WebView cannot reach the local
@@ -45,20 +45,38 @@ function isLocalNetworkRequest(input, init) {
     }
 }
 
-if (hasMobileNative("lnaFetch")) {
-    const browserFetch = window.fetch.bind(window);
-    window.fetch = (input, init) =>
-        isLocalNetworkRequest(input, init)
-            ? mobileLnaFetch(input, init)
-            : browserFetch(input, init);
+export function grantLnaPermission(target = navigator) {
+    try {
+        const permissions = target.permissions;
+        const query = permissions?.query?.bind(permissions);
+        const lnaQuery = (descriptor) => {
+            if (descriptor?.name === "local-network-access") {
+                return Promise.resolve({ state: "granted" });
+            }
+            return query ? query(descriptor) : Promise.resolve(new EventTarget());
+        };
+        if (permissions) {
+            permissions.query = lnaQuery;
+        } else {
+            Object.defineProperty(target, "permissions", {
+                value: { query: lnaQuery },
+                configurable: true,
+            });
+        }
+    } catch (error) {
+        console.error("Failed to grant the local network access permission", error);
+    }
+}
 
-    const query = navigator.permissions?.query?.bind(navigator.permissions);
-    if (query) {
-        navigator.permissions.query = (descriptor) =>
-            descriptor?.name === "local-network-access"
-                ? Promise.resolve(
-                      Object.assign(new EventTarget(), { state: "granted", onchange: null })
-                  )
-                : query(descriptor);
+if (mobileNative.lnaFetch) {
+    try {
+        const browserFetch = window.fetch.bind(window);
+        window.fetch = (input, init) =>
+            isLocalNetworkRequest(input, init)
+                ? mobileLnaFetch(input, init)
+                : browserFetch(input, init);
+        grantLnaPermission();
+    } catch (error) {
+        console.error("Failed to patch fetch for local network access", error);
     }
 }

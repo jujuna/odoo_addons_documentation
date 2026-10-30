@@ -18,11 +18,11 @@ class HrPayslipRun(models.Model):
     @api.depends("slip_ids", "slip_ids.state")
     def _compute_l10n_sa_totals(self):
         sa_payslip_runs = self.filtered(lambda r: r.country_code == "SA")
-        (self - sa_payslip_runs).update({
+        sa_payslips = sa_payslip_runs.slip_ids
+        (self - sa_payslips.payslip_run_id).update({
             'l10n_sa_total_net_cost': 0,
             'l10n_sa_total_gosi_contribution': 0,
         })
-        sa_payslips = sa_payslip_runs.slip_ids
         line_values = sa_payslips._get_line_values(['NETCOST', 'GOSI_EMP', 'GOSI_COMP'])
         for payslip_run, payslips in sa_payslips.grouped('payslip_run_id').items():
             net_cost, gosi = 0, 0

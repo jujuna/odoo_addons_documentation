@@ -107,3 +107,10 @@ class TestSubscriptionPlan(TestSubscriptionCommon):
 
         subscription.action_confirm()
         self.assertEqual(subscription.plan_id.subscription_line_count, 1)
+
+    def test_search_billing_period_display(self):
+        plan = self.env['sale.subscription.plan'].search([
+            ('billing_period_display', 'in', ['1 Month']),
+        ])
+
+        self.assertIn(self.plan_month, plan)

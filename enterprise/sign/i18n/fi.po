@@ -41,11 +41,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-18 02:47+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-15 13:35+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/sign/"
-"fi/>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/sign/fi/"
+">\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -386,13 +386,6 @@ msgid "<small class=\"text-muted\">Signers</small>"
 msgstr ""
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<small>SMS Verification: The signatory has confirmed their control of the "
-"phone number using a unique code sent by SMS</small>"
-msgstr ""
-
-#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
 msgid ""
 "<span class=\"badge rounded-pill text-bg-success ms-2 mb-1\" "
@@ -671,7 +664,7 @@ msgstr "Toimenpidetyyppi"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Toimenpiteen ikoni"
+msgstr "Toimenpidetyypin kuvake"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__sign_log_ids
@@ -1474,7 +1467,7 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 msgid "Created On"
-msgstr ""
+msgstr "Luotu"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_certificate_wizard__create_uid
@@ -2020,18 +2013,6 @@ msgid "Email Subject"
 msgstr "Sähköpostin otsikko"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Email Verification"
-msgstr "Email todentaminen"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"Email Verification: The signatory has confirmed control of their email inbox "
-"by clicking on a unique link"
-msgstr ""
-
-#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
 msgid "Email saved successfully!"
@@ -2420,7 +2401,7 @@ msgstr "Kuvake"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "Kuvake joka kertoo poikkeustoiminnosta."
+msgstr "Poikkeustoimenpiteeseen viittaava kuvake."
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__message_needaction
@@ -2844,7 +2825,7 @@ msgstr ""
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols -kuvake, esim. muistilista"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template__message
@@ -3038,7 +3019,7 @@ msgstr "Seuraavan toimenpiteen eräpäivä"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__activity_summary
 msgid "Next Activity Summary"
-msgstr "Seuraavan toimenpiteen kuvaus"
+msgstr "Seuraavan toimenpiteen yhteenveto"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__activity_type_id
@@ -3727,11 +3708,6 @@ msgid "SMS Token"
 msgstr "Tekstiviestitunniste"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "SMS Verification"
-msgstr ""
-
-#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "Myynti"
@@ -3815,6 +3791,11 @@ msgstr ""
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Etsi ( <span class=\"nolabel\"> asiakirjassa)</span>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Secure Link"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4764,10 +4745,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"Tila aktiviteetin perusteella\n"
-"Myöhässä: Eräpäivä on menneisyydessä\n"
-"Tänään: Eräpäivä on tänään\n"
-"Suunniteltu: Tulevaisuudessa."
+"Tila toimenpiteiden perusteella\n"
+"Myöhässä: Eräpäivä on jo mennyt\n"
+"Tänään: Toimenpiteen päivämäärä on tänään\n"
+"Suunniteltu: Tulevat toimenpiteet."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -4797,6 +4778,11 @@ msgstr "Yliviivaa korostettu alue"
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__subject
 msgid "Subject"
 msgstr "Aihe"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "System Account"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
@@ -5437,7 +5423,7 @@ msgstr ""
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Poikkeusaktiviteetin tyyppi tietueella."
+msgstr "Kirjatun poikkeustoimenpiteen tyyppi."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_tag_view_form
@@ -5468,8 +5454,14 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Ainutlaatuinen koodi tekstiviestillä"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Unique Link via Email"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5627,6 +5619,11 @@ msgstr "Arvo"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "Arvo on jo olemassa!"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Verification method"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6277,6 +6274,9 @@ msgstr "sinä"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{0}} Summary"
 msgstr "{{0}} Yhteenveto"
+
+#~ msgid "Email Verification"
+#~ msgstr "Email todentaminen"
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr "Salli allekirjoittajien suorittaa allekirjoitus itsme®:n avulla"

@@ -7,9 +7,9 @@
                         <div class="card-header bg-100 border-0 pt-2 pb-0 px-3">
                             <div class="position-relative">
                                 <div class="d-flex align-items-center justify-content-center">
-                                    <i class="oi" t-att-class="card.iconClass" t-att-data-icon="card.icon" aria-hidden="true"/>
-                                    <h5><t t-out="card.title"/></h5>
-                                    <span class="ms-1 lh-sm" t-if="card.subTitleValue"><t t-out="card.subTitleValue"/></span>
+                                    <i class="oi fs-4 me-1" t-att-class="card.iconClass" t-att-data-icon="card.icon" aria-hidden="true"/>
+                                    <h5 class="mb-0" t-out="card.title" />
+                                    <span class="ms-1 lh-sm mt-1" t-if="card.subTitleValue" t-out="card.subTitleValue"/>
                                 </div>
                                 <t t-if="card.title === this.orderInfo.title">
                                     <div class="d-flex position-absolute top-0 end-0">

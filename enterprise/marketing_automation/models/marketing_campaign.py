@@ -258,6 +258,41 @@ class MarketingCampaign(models.Model):
     def _ENROLL_ACTION_FIELDS_TO_RESET(self):
         return {'mailing_list_ids'}
 
+    @api.model
+    def _check_restricted_domain(self, model_name, domain_str):
+        """ Raise if the filter domain references a field restricted to system
+        users (base.group_system, base.group_erp_manager) as they makes no
+        sense in a marketing filter. """
+
+        RESTRICTED_DOMAIN_GROUPS = ('base.group_system', 'base.group_erp_manager')
+        domain_str = (domain_str or '').strip()
+        if not domain_str or domain_str == "[]":
+            return
+        domain = literal_eval(domain_str)
+        model = self.env[model_name]
+        for leaf in domain:
+            if not isinstance(leaf, (list, tuple)) or len(leaf) != 3 or not isinstance(leaf[0], str):
+                continue
+            current_model = model
+            for fname in leaf[0].split('.'):
+                field = current_model._fields.get(fname)
+                if field is None:
+                    break
+                field_groups = field.groups.split(',') if field.groups else []
+                if any(group in field_groups for group in RESTRICTED_DOMAIN_GROUPS):
+                    raise ValidationError(
+                        _("The filter domain is using unauthorized fields.")
+                    )
+                if not field.relational:
+                    break
+                current_model = self.env[field.comodel_name]
+
+    @api.constrains('enroll_domain')
+    def _check_domain(self):
+        """ Check that the filter domain is valid for the current user """
+        for campaign in self:
+            self._check_restricted_domain(campaign.model_name, campaign.enroll_domain)
+
     @api.depends('model_id')
     def _compute_enroll_unique_field_id(self):
         for campaign in self:
@@ -312,13 +347,14 @@ class MarketingCampaign(models.Model):
         to_reset.update(reset_values)
         to_update.update(default_values)
 
-    @api.depends('webhook_uuid', 'enroll_type')
+    @api.depends('webhook_uuid', 'enroll_type', 'state')
     def _compute_webhook_url(self):
         webhook_campaigns = self.filtered(lambda r: r.enroll_type == 'webhook')
         for campaign in webhook_campaigns:
             campaign.webhook_url = '%s/mkauto/webhook/%s/%s%s' % (
                 campaign.get_base_url(),
-                campaign.id, campaign.webhook_uuid,
+                campaign._origin.id,
+                campaign.webhook_uuid,
                 '' if campaign.state == 'running' else '/test',
             )
         (self - webhook_campaigns).webhook_url = ''

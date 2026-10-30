@@ -231,8 +231,9 @@ class TestMrpOrder(TestMrpCommon, MailCase):
 
         # test tracking in case of finished date change wo state chage
         self.flush_tracking()
+        new_date_finished = datetime(2022, 6, 28, 18, 0)
         with self.mock_mail_gateway(), self.mock_mail_app():
-            mo.write({'date_finished': datetime(2022, 6, 29, 18, 0)})
+            mo.with_env(self.env).write({'date_finished': new_date_finished})
             self.flush_tracking()
         self.assertMessageFields(self._new_msgs, {
             'body': '',
@@ -240,7 +241,7 @@ class TestMrpOrder(TestMrpCommon, MailCase):
             'subject': False,
             'subtype_id': self.env.ref('mail.mt_note'),
             'tracking_values': [
-                ('date_finished', 'datetime', datetime(2022, 6, 28, 8, 0), datetime(2022, 6, 29, 18, 0)),
+                ('date_finished', 'datetime', datetime(2022, 6, 28, 8, 0), new_date_finished),
             ],
         })
 
@@ -765,10 +766,8 @@ class TestMrpOrder(TestMrpCommon, MailCase):
         mo.button_mark_done()
         self.assertEqual(mo.state, 'done', "Production order should be in done state.")
 
-    def test_product_produce_7(self):
-        """ Plan 2 finished products, reserve and produce 3. Post the current production.
-        Simulate an unlock and edit and, on the opened moves, set the consumed quantity
-        to 5, and to 4. Check the component quantity removed from inventory is correct."""
+    def test_finished_mo_quantity_readonly(self):
+        """The produced quantity cannot be edited through the form of a done MO."""
         mo, _, _, p1, p2 = self.generate_mo(qty_final=1)
         self.assertEqual(len(mo), 1, 'MO should have been created')
 
@@ -786,14 +785,9 @@ class TestMrpOrder(TestMrpCommon, MailCase):
         mo.action_toggle_is_locked()
         self.assertFalse(mo.is_locked)
         mo_form = Form(mo)
-        mo_form.qty_producing = 5
-        mo = mo_form.save()
-        self.assertAlmostEqual(sum(mo.move_finished_ids.move_line_ids.mapped('quantity')), 5)
-
-        mo_form = Form(mo)
-        mo_form.qty_producing = 4
-        mo = mo_form.save()
-        self.assertAlmostEqual(sum(mo.move_finished_ids.move_line_ids.mapped('quantity')), 4)
+        with self.assertRaisesRegex(AssertionError, "can't write on readonly field 'qty_producing'"):
+            mo_form.qty_producing = 5
+        self.assertAlmostEqual(sum(mo.move_finished_ids.move_line_ids.mapped('quantity')), 2)
 
     def test_consumption_warning_1(self):
         """ Checks the constraints of a strict BOM without tracking when playing around
@@ -2282,6 +2276,21 @@ class TestMrpOrder(TestMrpCommon, MailCase):
         self.assertEqual(sibling_mo.state, 'done')
         self.assertEqual(sum(finished_moves.mapped('quantity')), 15.0)
 
+    def test_qty_change_then_overproduction_no_inflated_production(self):
+        """ Test that producing more than a reduced quantity to produce records exactly the
+        produced quantity when the finished move demand is out of sync with product_qty"""
+        mo = self.env['mrp.production'].create({'bom_id': self.bom_1.id, 'product_qty': 10.0})
+        mo.action_confirm()
+        with Form(mo) as mo_form:
+            mo_form.qty_producing = 10.0
+        mo.product_qty = 2.0
+        finished_move = mo.move_finished_ids.filtered(lambda m: m.product_id == self.product_4)
+        self.assertEqual(finished_move.product_uom_qty, 10.0)
+
+        mo.with_context(skip_consumption=True, skip_backorder=True).button_mark_done()
+        self.assertEqual(mo.state, 'done')
+        self.assertEqual(finished_move.quantity, 10.0)
+
     def test_backorder_with_underconsumption(self):
         """ Check that the components of the backorder have the correct quantities
         when there is underconsumption in the initial MO
@@ -3607,10 +3616,8 @@ class TestMrpOrder(TestMrpCommon, MailCase):
             ('state', '=', 'draft'),
         ]))
 
-    def test_component_addition_to_finished_mo(self):
-        """Test that adding a new component move to a finished MO works as intended,
-           where the newly added component move's picked/state/date values are consistent
-           with the other component moves that are already consumed."""
+    def test_component_changes_to_finished_mo(self):
+        """Component lines cannot be added or edited through the form of a done MO."""
         with Form(self.env['mrp.production']) as mo_form:
             mo_form.product_id = self.productA
             with mo_form.move_raw_ids.new() as component:
@@ -3621,30 +3628,11 @@ class TestMrpOrder(TestMrpCommon, MailCase):
         mo.button_mark_done()
         mo.action_toggle_is_locked()
 
-        with freeze_time(mo.date_finished + timedelta(minutes=3)):
-            with Form(mo) as mo_form:
-                with mo_form.move_raw_ids.edit(0) as line:
-                    line.quantity = 1
-                with mo_form.move_raw_ids.new() as component:
-                    component.product_id = self.productC
-                    component.quantity = 1
-                mo = mo_form.save()
-
-            self.assertRecordValues(mo.move_raw_ids, [{
-                'picked': True,
-                'state': 'done',
-                'date': mo.date_finished,
-                'quantity': 1,
-                'raw_material_production_id': mo.id,
-            } for move in mo.move_raw_ids])
-
-            self.assertRecordValues(mo.move_raw_ids.move_line_ids, [{
-                'picked': True,
-                'state': 'done',
-                'date': mo.date_finished,
-                'quantity': 1,
-                'production_id': mo.id,
-            } for move in mo.move_raw_ids])
+        mo_form = Form(mo)
+        with self.assertRaisesRegex(AssertionError, "field 'move_raw_ids' is not editable"):
+            mo_form.move_raw_ids.edit(0)
+        with self.assertRaisesRegex(AssertionError, "field 'move_raw_ids' is not editable"):
+            mo_form.move_raw_ids.new()
 
     def test_compute_picking_type_id(self):
         """
@@ -5638,6 +5626,23 @@ class TestTourMrpOrder(HttpCase):
 
         self.start_tour(url, 'test_mrp_production_product_catalog', login='admin')
         self.assertEqual(len(mo.move_raw_ids), 1)
+
+    def test_mo_overview_no_byproducts(self):
+        """ The MO Overview must render for a production with no byproducts,
+        which is the default case since MoOverviewByproductsBlock is always
+        instantiated regardless of whether the BoM has byproduct lines. """
+        product = self.env['product.product'].create({
+            'name': 'MO Overview Test Product',
+            'is_storable': True,
+        })
+        mo = self.env['mrp.production'].create({
+            'product_id': product.id,
+            'product_uom_qty': 1.0,
+        })
+        mo.action_confirm()
+
+        url = f'/odoo/action-mrp.mrp_production_action/{mo.id}'
+        self.start_tour(url, 'mrp_mo_overview_no_byproducts_tour', login='admin')
 
     def test_manufacturing_and_byproduct_sm_to_sml_synchronization(self):
         """ Test the synchronization between stock moves and stock move lines within

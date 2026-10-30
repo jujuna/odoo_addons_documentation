@@ -134,6 +134,30 @@ class TestAutoPayFile(TestL10NHkHrPayrollAccountCommon):
             'PD004BBAN1234567890                        00000000003310480Z1234567                           SALARY MAY 2025                    Test Employee',
         ])
 
+    def test_mri_autopay_file_proxy_id(self):
+        """ The Second Party Account/Proxy ID must come from the field matching the employee's Autopay Payment Type. """
+        for account_type, field_name, proxy_id in [
+            ('svid', 'l10n_hk_autopay_svid', '0240402'),
+            ('emal', 'l10n_hk_autopay_email', 'test.employee@example.com'),
+            ('mobn', 'l10n_hk_autopay_mobile', '+852-92223333'),
+            ('hkid', 'identification_id', 'Z123456(7)'),
+        ]:
+            with self.subTest(account_type=account_type):
+                self.employee.write({
+                    'l10n_hk_autopay_account_type': account_type,
+                    field_name: proxy_id,
+                })
+                wizard = self.env['hr.payroll.payment.report.wizard'].create({
+                    'payslip_ids': [self.payslip.id],
+                    'payslip_run_id': self.payrun.id,
+                    'effective_date': date(2025, 5, 31),
+                    'export_format': 'l10n_hk_mri',
+                    'l10n_hk_autopay_payment_set_code': 'ABC',
+                    'l10n_hk_autopay_first_party_reference': 'PAY MAY 2025',
+                })
+                wizard.generate_payment_report()
+                self.assertIn(f"PD   {account_type.upper()}{proxy_id}", self.payrun.payment_report.decode())
+
     def test_boc_autopay_file(self):
         wizard = self.env['hr.payroll.payment.report.wizard'].create({
             'payslip_ids': [self.payslip.id],

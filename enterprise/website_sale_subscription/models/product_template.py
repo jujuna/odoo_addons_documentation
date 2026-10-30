@@ -103,13 +103,10 @@ class ProductTemplate(models.Model):
         }
 
         # Find the plan with the shortest billing period to use as base for comparison
-        base_plan = min(pricings.sudo().plan_id, key=lambda x: 1 / to_year[x.billing_period_unit])
+        base_plan = min(
+            pricings.sudo().plan_id, key=lambda x: x.billing_period_value / to_year[x.billing_period_unit],
+        )
         minimum_period = base_plan.billing_period_unit
-
-        # Compute base period price and max price for discount calculation
-        base_plan_pricings = pricings.filtered(lambda pr: pr.plan_id == base_plan)
-        base_period_price = min(base_plan_pricings.mapped('fixed_price'), default=0.0) / base_plan.billing_period_value
-        max_price = max(pricings.mapped('fixed_price'), default=0.0)
 
         currency = website.currency_id
         requested_plan = request and request.params.get('plan_id')
@@ -122,10 +119,7 @@ class ProductTemplate(models.Model):
 
         sales_price = res['price']
 
-        def _get_pricing_data(pricing):
-            if not pricing:
-                return {}
-
+        def _get_pricing_price(pricing):
             price = pricing._compute_price(
                 product=product_or_template,
                 quantity=quantity or 1.0,
@@ -138,7 +132,20 @@ class ProductTemplate(models.Model):
                 price = product_or_template._apply_taxes_to_price(
                     price, currency, product_taxes=res['product_taxes'], taxes=res['taxes'],
                 )
+            return price
 
+        # Compute base period price and max price for discount calculation
+        pricing_prices = {pr: _get_pricing_price(pr) for pr in pricings}
+        base_period_price = min(
+            (price for pr, price in pricing_prices.items() if pr.plan_id == base_plan), default=0.0,
+        ) / base_plan.billing_period_value
+        max_price = max(pricing_prices.values(), default=0.0)
+
+        def _get_pricing_data(pricing):
+            if not pricing:
+                return {}
+
+            price = pricing_prices[pricing]
             price_format = format_amount(self.env, amount=price, currency=currency)
             pricing_plan_sudo = pricing.plan_id.sudo()  # Not accessible to public users
             price_in_minimum_period = (

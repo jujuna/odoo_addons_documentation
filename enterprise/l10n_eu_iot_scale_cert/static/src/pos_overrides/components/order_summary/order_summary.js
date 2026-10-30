@@ -6,7 +6,16 @@ import { _t } from "@web/core/l10n/translation";
 patch(OrderSummary.prototype, {
     _setValue(val) {
         const selectedLine = this.currentOrder.getSelectedOrderline();
+        if (selectedLine?.uiState.isDeleted && !["quantity", "discount", "price"].includes(val)) {
+            this.numberBuffer.reset();
+            this.dialog.add(AlertDialog, {
+                title: _t("Certified Scale error"),
+                body: _t("You cannot modify a product removed from the order."),
+            });
+            return;
+        }
         if (
+            selectedLine &&
             this.pos.isScaleIconVisible &&
             ["quantity", "price"].includes(this.pos.numpadMode) &&
             !["quantity", "discount", "price"].includes(val)
@@ -15,14 +24,10 @@ patch(OrderSummary.prototype, {
 
             if (selectedLine.product_id.to_weight && !isZero) {
                 this.numberBuffer.reset();
-                this.dialog.add(
-                    AlertDialog,
-                    {
-                        title: _t("Certified Scale error"),
-                        body: _t("You cannot change the quantity of a weighed product."),
-                    },
-                    { onClose: this.props.close }
-                );
+                this.dialog.add(AlertDialog, {
+                    title: _t("Certified Scale error"),
+                    body: _t("You cannot change the quantity of a weighed product."),
+                });
                 return;
             }
             if (isZero) {

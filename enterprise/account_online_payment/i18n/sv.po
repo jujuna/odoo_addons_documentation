@@ -10,9 +10,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 04:17+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-09-29 14:34+0000\n"
+"Last-Translator: Hanna Kharraziha <hakha@odoo.com>\n"
+"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-20/"
 "account_online_payment/sv/>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -46,6 +46,27 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>Hej,</p>\n"
+"                    <p>Vi har noterat att du ännu inte har aktiverat "
+"betalningar i Odoo. Genom att aktivera funktionen, kommer du att effektivt "
+"kunna behandla betalningar direkt genom ditt Odoo-konto.</p>\n"
+"                    <p>Om du redan har aktiverat betalningar sedan du tog "
+"emot det här meddelandet, så behöver du inte vidta några åtgärder.</p>\n"
+"                    <p>Är du redo att komma igång? Aktivera dina betalningar "
+"här! Du kan också färdigställa konfigurationen vid ett senare tillfälle "
+"genom dina planerade aktiviteter i Odoo.</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"ctx.get('url')\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            Aktivera betalningar\n"
+"                        </a>\n"
+"                    </div>\n"
+"                </div>\n"
+"            "
 
 #. module: account_online_payment
 #: model:mail.template,body_html:account_online_payment.mail_template_account_payment_activation_success
@@ -69,6 +90,23 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>Hej,</p>\n"
+"                    <p>Vi är glada att meddela att funktionen för "
+"betalningar i Odoo har aktiverats. </p>\n"
+"                    <p>Du kan nu hantera betalningar direkt genom din Odoo-"
+"databas, för snabbare, tryggare och mer effektiva transaktioner.</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"object.get_base_url()\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            Gör betalningar\n"
+"                        </a>\n"
+"                    </div>\n"
+"                </div>\n"
+"            "
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__accepted
@@ -108,7 +146,7 @@ msgstr "Aktivera betalningar"
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "All payments must have the same payment method."
-msgstr ""
+msgstr "Alla betalningar måste ha samma betalningsmetod."
 
 #. module: account_online_payment
 #. odoo-python
@@ -130,7 +168,7 @@ msgstr "Batchbetalning"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_bulk_payment_activated
 msgid "Bulk Payment Activated"
-msgstr ""
+msgstr "Massbetalningar aktiverade"
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__canceled
@@ -146,7 +184,7 @@ msgstr "Kontrollera status"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_method_code
 msgid "Code"
-msgstr ""
+msgstr "Kod"
 
 #. module: account_online_payment
 #. odoo-python
@@ -162,7 +200,7 @@ msgstr ""
 #. module: account_online_payment
 #: model:ir.actions.server,name:account_online_payment.action_account_payment_confirm
 msgid "Confirm"
-msgstr ""
+msgstr "Bekräfta"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
@@ -173,17 +211,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__could_initiate_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__could_initiate_payment
 msgid "Could Initiate Payment"
-msgstr ""
+msgstr "Kunde initiera betalning"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Create Payment"
-msgstr ""
+msgstr "Skapa betalning"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Create Payments"
-msgstr ""
+msgstr "Skapa betalningar"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__display_name
@@ -231,7 +269,7 @@ msgstr "Betalningar är aktiverad"
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__account_online_link_payments_requested
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_activation_requested
 msgid "Is Payment Activation Requested"
-msgstr ""
+msgstr "Förfrågan om aktivering av betalningar"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_blocked
@@ -247,13 +285,13 @@ msgstr "Betalningar är tillåtna"
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_journal
 msgid "Journal"
-msgstr ""
+msgstr "Journal"
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_batch_payment.py:0
 msgid "No online bank connection found for this journal."
-msgstr ""
+msgstr "Ingen bankanslutning hittades för den här journalen."
 
 #. module: account_online_payment
 #. odoo-python
@@ -293,19 +331,19 @@ msgstr "PIS-status"
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_payment_register
 msgid "Pay"
-msgstr ""
+msgstr "Betala"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_list_inherit_account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
 msgid "Pay Now"
-msgstr ""
+msgstr "Betala direkt"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Pay now"
-msgstr ""
+msgstr "Betala direkt"
 
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_payment
@@ -315,7 +353,7 @@ msgstr "Betalning"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_identifier
 msgid "Payment ID"
-msgstr ""
+msgstr "Betalnings-ID"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
@@ -325,7 +363,7 @@ msgstr "Betalningsmetod"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_method_placeholder
 msgid "Payment Method Placeholder"
-msgstr ""
+msgstr "Platshållare för betalningsmetod"
 
 #. module: account_online_payment
 #. odoo-python
@@ -333,12 +371,14 @@ msgstr ""
 msgid ""
 "Payment activation process is already in progress for this bank connection."
 msgstr ""
+"Processen för att aktivera betalningar för den här bankanslutningen är redan "
+"påbörjad."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_online_link.py:0
 msgid "Payment activation process is already in progress."
-msgstr ""
+msgstr "Processen för att aktivera betalningar är redan påbörjad."
 
 #. module: account_online_payment
 #. odoo-python
@@ -350,13 +390,13 @@ msgstr "Betalningen har redan skrivits under"
 #. odoo-python
 #: code:addons/account_online_payment/wizard/account_payment_register.py:0
 msgid "Payment created"
-msgstr ""
+msgstr "Betalning skapad"
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_batch_payment.py:0
 msgid "Payments are already activated for this bank connection."
-msgstr ""
+msgstr "Betalningar är redan aktiverade för den här bankanslutningen."
 
 #. module: account_online_payment
 #. odoo-python
@@ -368,7 +408,7 @@ msgstr "Betalningar är redan aktiverade."
 #. odoo-python
 #: code:addons/account_online_payment/models/account_batch_payment.py:0
 msgid "Payments are not enabled for this bank connection."
-msgstr ""
+msgstr "Betalningar är inte aktiverade för den här bankanslutningen."
 
 #. module: account_online_payment
 #: model:mail.template,name:account_online_payment.mail_template_account_payment_activation_success
@@ -416,7 +456,7 @@ msgstr ""
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
 msgid "Sign Later"
-msgstr ""
+msgstr "Skriv under senare"
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
@@ -427,7 +467,7 @@ msgstr "Skriv under betalning"
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_single_payment_activated
 msgid "Single Payment Activated"
-msgstr ""
+msgstr "Enskilda betalningar aktiverade"
 
 #. module: account_online_payment
 #: model:ir.model.fields,help:account_online_payment.field_account_batch_payment__account_online_link_payments_requested
@@ -436,6 +476,8 @@ msgid ""
 "Technical field indicating whether the customer has started the payment "
 "activation process with the provider."
 msgstr ""
+"Tekniskt fält som anger om en kund har påbörjat processen för att aktivera "
+"betalningar hos leverantören."
 
 #. module: account_online_payment
 #. odoo-python
@@ -451,6 +493,7 @@ msgstr ""
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "The payment initiation service is not activated for this journal."
 msgstr ""
+"Intitieringstjänsten för betalningar är inte aktiverad för den här journalen."
 
 #. module: account_online_payment
 #. odoo-python
@@ -464,6 +507,8 @@ msgstr ""
 msgid ""
 "This journal needs to be connected to a bank to check its payments status."
 msgstr ""
+"Journalen måste vara ansluten till en bank för att kontrollera status för "
+"betalningar."
 
 #. module: account_online_payment
 #: model:ir.module.module,description:base.module_account_online_payment
@@ -516,13 +561,13 @@ msgstr "XML"
 #. odoo-python
 #: code:addons/account_online_payment/wizard/account_payment_register.py:0
 msgid "You can find %s in the payment view."
-msgstr ""
+msgstr "Du kan hitta %s i vyn för betalningar."
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_payment.py:0
 msgid "You can't pay payments from more than one journal."
-msgstr ""
+msgstr "Det är inte möjligt att utfärda betalningar från fler än en journal."
 
 #. module: account_online_payment
 #. odoo-python
@@ -559,7 +604,7 @@ msgstr ""
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
 msgid "Your payment activation is pending, please wait!"
-msgstr ""
+msgstr "Aktivering av betalningar pågår, vänligen avvakta!"
 
 #. module: account_online_payment
 #: model:ir.model,name:account_online_payment.model_account_online_account
@@ -570,7 +615,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_online_payment/wizard/account_payment_register.py:0
 msgid "the payments"
-msgstr ""
+msgstr "betalningarna"
 
 #~ msgid "KYC Link"
 #~ msgstr "Länk till kundkännedom"

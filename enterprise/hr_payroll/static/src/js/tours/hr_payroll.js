@@ -114,13 +114,13 @@ registry.category("web_tour.tours").add('payroll_tours', {
     },
     {
         trigger: `.o_hr_payroll_worked_days`,
-        content: markup(_t('On the first tab is the amount of worked time giving you a <strong>gross amount</strong>.')),
+        content: markup(_t('Here is the amount of worked time giving you a <strong>gross amount</strong>.')),
         tooltipPosition: 'top',
         run: "click",
     },
     {
         trigger: `.o_hr_payroll_salary_computation`,
-        content: markup(_t('On the second tab is the computation of the rules linked to the Structure resulting in a <strong>net amount</strong>.')),
+        content: markup(_t('On the first tab is the computation of the rules linked to the Structure resulting in a <strong>net amount</strong>.')),
         tooltipPosition: 'top',
         run: "click",
     },

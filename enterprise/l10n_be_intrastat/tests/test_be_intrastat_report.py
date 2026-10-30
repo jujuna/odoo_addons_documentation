@@ -218,6 +218,45 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
         options['intrastat_type'][0]['selected'] = arrivals
         options['intrastat_type'][1]['selected'] = dispatches
 
+    def test_dispatch_BE_partner_vat(self):
+        """ Test that for a PARTNERID that is registered in BE, we report the unknown VAT instead. """
+        netherlands = self.env.ref('base.nl')
+        partner_be, partner_nl = self.env['res.partner'].create([
+            {'name': 'BE Customer', 'country_id': self.env.ref('base.be').id, 'vat': 'BE0820243975'},
+            {'name': 'NL Customer', 'country_id': netherlands.id, 'vat': 'NL123456782B90'},
+        ])
+        line_vals = {
+            'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+            'product_id': self.product_aeroplane.id,
+            'intrastat_transaction_id': self.env.ref('account_intrastat.account_intrastat_transaction_11').id,
+            'quantity': 1,
+            'price_unit': 1000,
+        }
+        moves = self.env['account.move'].create([
+            {
+                'move_type': 'out_invoice',
+                'partner_id': partner.id,
+                'partner_shipping_id': partner_nl.id,
+                'invoice_date': '2022-05-15',
+                'date': '2022-05-15',
+                'company_id': self.company_data['company'].id,
+                'invoice_line_ids': [Command.create(line_vals)],
+            }
+            for partner in (partner_be, partner_nl)
+        ])
+        moves.action_post()
+        self.assertEqual(moves.intrastat_country_id, netherlands)
+
+        options = self._generate_options(self.report, '2022-05-01', '2022-05-31')
+        self._set_options(options, dispatches=True)
+
+        tree = etree.fromstring(self.report_goods_handler.be_intrastat_export_to_xml(options)['file_content'])
+        namespaces = {'og': 'http://www.onegate.eu/2010-01-01'}
+        self.assertEqual(
+            sorted(item.find("og:Dim[@prop='PARTNERID']", namespaces).text for item in tree.findall('.//og:Item', namespaces)),
+            ['NL123456782B90', 'QV999999999999'],
+        )
+
     def test_dispatches_only(self):
         """ Test generating an XML export containing only dispatches (when only the dispatches options is checked) """
         self.inwards_vendor_bill.action_post()
@@ -261,7 +300,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
         options = self._generate_options(self.report, '2022-05-01', '2022-05-31')
         self._set_options(options, arrivals=True)
         csv = self.report_goods_handler.be_intrastat_export_to_csv(options)['file_content']
-        expected = '19;IT;11;;25309050;798.0;;23328;;\n'
+        expected = b'19;IT;11;;25309050;798.0;;23328;;\n'
         self.assertEqual(csv, expected)
 
     def test_csv_service_f02cms_export(self):
@@ -273,7 +312,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
         expected = dedent('''\
             B2001;IT;EUR;1400;400
             B2101;IT;EUR;500;0
-            ''')
+            ''').encode()
         self.assertEqual(csv, expected)
 
     def test_csv_service_non_intra_country_f02cms_export(self):
@@ -290,7 +329,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
         expected = dedent('''\
             B2001;US;EUR;1400;400
             B2101;US;EUR;500;0
-            ''')
+            ''').encode()
         self.assertEqual(csv, expected)
 
     def test_csv_service_f01dgs_export(self):
@@ -304,7 +343,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
             B2001;IT;EUR;1400;400
             B2001CN;IT;EUR;400;400
             B2101;IT;EUR;500;0
-            ''')
+            ''').encode()
         self.assertEqual(csv, expected)
 
     def test_full_export(self):

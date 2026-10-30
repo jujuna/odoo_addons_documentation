@@ -75,6 +75,12 @@ patch(PosOrder.prototype, {
     get isReceiptStarted() {
         return this.uiState.receiptState === "started";
     },
+    receiptCancelled() {
+        this.uiState.receiptState = "cancelled";
+    },
+    get isReceiptCancelled() {
+        return this.uiState.receiptState === "cancelled";
+    },
     // When we validate the order, we need to move it to finished; otherwise, syncAllOrders will treat it as a blank order and start a new blank order.
     receiptFinished() {
         this.uiState.receiptState = "finished";

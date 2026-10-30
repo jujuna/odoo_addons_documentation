@@ -1,6 +1,10 @@
+from datetime import UTC
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 import requests
 
+from freezegun import freeze_time
+from lxml import etree
 from markupsafe import Markup
 
 from .common import TestL10nCoEdiPosCommon
@@ -209,6 +213,209 @@ class TestDianPos(TestL10nCoEdiPosCommon):
                 "<ul><li>Regla: 90, Rechazo: Documento procesado anteriormente.</li></ul>"
             ),
         }])
+
+    def _get_dian_signature(self, xml):
+        doc = etree.fromstring(xml) if isinstance(xml, bytes) else xml
+        return (
+            doc.findtext('./{*}ID'),
+            doc.findtext('.//{*}PayableAmount'),
+            doc.findtext('.//{*}AccountingSupplierParty//{*}CompanyID'),
+            doc.findtext('.//{*}AccountingCustomerParty//{*}CompanyID'),
+        )
+
+    def _order_issue_date(self, order):
+        return order.date_order.replace(tzinfo=UTC).astimezone(ZoneInfo('America/Bogota')).date().isoformat()
+
+    def _build_dian_xml(self, doc_id, amount, supplier_id, customer_id, issue_date, uuid='cufe_of_the_previously_accepted_invoice'):
+        return f"""<Invoice>
+            <ID>{doc_id}</ID>
+            <UUID>{uuid}</UUID>
+            <IssueDate>{issue_date}</IssueDate>
+            <SigningTime>2025-02-28T19:00:00+00:00</SigningTime>
+            <AccountingSupplierParty><Party><PartyTaxScheme><CompanyID>{supplier_id}</CompanyID></PartyTaxScheme></Party></AccountingSupplierParty>
+            <AccountingCustomerParty><Party><PartyTaxScheme><CompanyID>{customer_id}</CompanyID></PartyTaxScheme></Party></AccountingCustomerParty>
+            <LegalMonetaryTotal><PayableAmount>{amount}</PayableAmount></LegalMonetaryTotal>
+        </Invoice>""".encode()
+
+    def test_send_bill_sync_duplicated_matches_own_cufe(self):
+        """ SendBillSync returning 'Regla: 90, Rechazo: Documento procesado anteriormente.'
+        The render is anchored on the order's date_order (not wall-clock "now"), so retrying
+        the same order later still recomputes the exact same CUFE. If DIAN's "already
+        processed" identifier matches that CUFE, the order is recovered directly, with no
+        extra lookup.
+        """
+        with freeze_time('2025-03-01 00:00:00'):
+            # 1st attempt: rejected for an unrelated reason, so the order isn't accepted yet.
+            # The CUFE DIAN actually has (as if this first send had been accepted) is captured
+            # here, anchored on this instant.
+            order = self.test_send_bill_sync_errors()
+
+            outgoing_xml, errors = self.env['pos.edi.xml.ubl_dian']._export_pos_order(order)
+            self.assertFalse(errors)
+            own_cufe = etree.fromstring(outgoing_xml).findtext('./{*}UUID')
+
+        duplicated_response = self.file_read('l10n_co_edi/tests/responses/SendBillSync_duplicated.xml').decode().replace(
+            'cufe_of_the_previously_accepted_invoice', own_cufe,
+        )
+
+        # 2nd attempt, several minutes later: DIAN reports the document (referenced by our own
+        # CUFE) as already processed.
+        with (
+            freeze_time('2025-03-01 00:05:00'),
+            self._mock_get_status(),
+            patch(f'{self.utils_path}._build_and_send_request', return_value={'response': duplicated_response, 'status_code': 200}),
+        ):
+            order.l10n_co_edi_pos_action_send_document()
+
+        self.assertRecordValues(order.l10n_co_edi_pos_document_ids, [{
+            'identifier': own_cufe,
+            'state': 'invoice_accepted',
+        }])
+        self.assertEqual(order.l10n_co_edi_pos_dian_state, 'invoice_accepted')
+
+    def test_send_bill_sync_duplicated_fallback_matches(self):
+        """ Same 'already processed' response, but referencing a CUFE that doesn't match our own
+        render (e.g. the order was first sent before the date_order-anchoring fix, under a CUFE
+        computed from a since-unreproducible timestamp). The fetched DIAN document's ID, amount,
+        both parties' CompanyID and issue date (matched against the order's own date_order, not
+        the unreliable render) still match ours, so it must be recovered.
+        """
+        order = self.test_send_bill_sync_errors()  # 1st attempt: rejected for an unrelated reason
+
+        outgoing_xml, errors = self.env['pos.edi.xml.ubl_dian']._export_pos_order(order)
+        self.assertFalse(errors)
+        matching_dian_xml = self._build_dian_xml(*self._get_dian_signature(outgoing_xml), issue_date=self._order_issue_date(order))
+
+        # 2nd attempt: DIAN reports the document as already processed, under a CUFE that
+        # doesn't match ours, but GetXmlByDocumentKey returns a document matching on the
+        # more stable invariants (ID, amount, both parties, issue date)
+        with (
+            self.patched_document('_get_xml_by_document_key_for_company', matching_dian_xml),
+            self._mock_get_status(),
+            patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('SendBillSync_duplicated.xml', 200)),
+        ):
+            order.l10n_co_edi_pos_action_send_document()
+
+        self.assertRecordValues(order.l10n_co_edi_pos_document_ids, [{
+            'identifier': 'cufe_of_the_previously_accepted_invoice',
+            'state': 'invoice_accepted',
+        }])
+        self.assertEqual(order.l10n_co_edi_pos_dian_state, 'invoice_accepted')
+        # the stored attachment must be DIAN's document, not our own (un-accepted) render,
+        # so its own cbc:UUID matches document.identifier instead of contradicting it
+        self.assertEqual(order.l10n_co_edi_pos_attachment_id.raw.content, matching_dian_xml)
+
+    def test_send_bill_sync_duplicated_fallback_no_match(self):
+        """ Same as above, but the fetched DIAN document has a different amount, so it must
+        stay rejected instead of being wrongly recovered.
+        """
+        order = self.test_send_bill_sync_errors()  # 1st attempt: rejected for an unrelated reason
+
+        outgoing_xml, errors = self.env['pos.edi.xml.ubl_dian']._export_pos_order(order)
+        self.assertFalse(errors)
+        doc_id, _amount, supplier_id, customer_id = self._get_dian_signature(outgoing_xml)
+        mismatching_dian_xml = self._build_dian_xml(doc_id, '999999.99', supplier_id, customer_id, issue_date=self._order_issue_date(order))
+
+        with (
+            self.patched_document('_get_xml_by_document_key_for_company', mismatching_dian_xml),
+            self._mock_get_status(),
+            patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('SendBillSync_duplicated.xml', 200)),
+            self.assertRaises(UserError),
+        ):
+            order.l10n_co_edi_pos_action_send_document()
+
+        self.assertEqual(order.l10n_co_edi_pos_dian_state, 'invoice_rejected')
+
+    def test_send_bill_sync_duplicated_fallback_date_no_match(self):
+        """ Same as test_send_bill_sync_duplicated_fallback_matches (ID, amount and both parties'
+        CompanyID all match), but the fetched DIAN document has a different issue date - covers
+        e.g. two different orders from the same anonymous "Consumidor Final" customer, for the
+        same amount, on different days (a coffee/sandwich shop scenario where CompanyID alone
+        doesn't discriminate between orders since walk-in customers share one generic ID).
+        """
+        order = self.test_send_bill_sync_errors()  # 1st attempt: rejected for an unrelated reason
+
+        outgoing_xml, errors = self.env['pos.edi.xml.ubl_dian']._export_pos_order(order)
+        self.assertFalse(errors)
+        mismatching_dian_xml = self._build_dian_xml(*self._get_dian_signature(outgoing_xml), issue_date='2000-01-01')
+
+        with (
+            self.patched_document('_get_xml_by_document_key_for_company', mismatching_dian_xml),
+            self._mock_get_status(),
+            patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('SendBillSync_duplicated.xml', 200)),
+            self.assertRaises(UserError),
+        ):
+            order.l10n_co_edi_pos_action_send_document()
+
+        self.assertEqual(order.l10n_co_edi_pos_dian_state, 'invoice_rejected')
+
+    def test_action_retry_send_document_bulk(self):
+        """ The bulk retry action (Action menu, e.g. on multiple selected orders) recovers
+        eligible orders and leaves orders that no longer need it (e.g. already accepted)
+        untouched.
+        """
+        stuck_order = self.test_send_bill_sync_errors()  # rejected for an unrelated reason
+        accepted_order = self._create_and_send_order(
+            pos_order_ui_data=self.default_pos_order_ui_data, response_file_name='SendBillSync_warnings.xml')
+        self.assertEqual(accepted_order.l10n_co_edi_pos_dian_state, 'invoice_accepted')
+
+        with (
+            self.patched_document('_parse_errors', []),
+            self._mock_get_status(),
+            patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('SendBillSync_warnings.xml', 200)),
+        ):
+            action = (stuck_order | accepted_order).l10n_co_edi_pos_action_retry_send_document()
+
+        self.assertFalse(action)
+        self.assertEqual(stuck_order.l10n_co_edi_pos_dian_state, 'invoice_accepted')
+        self.assertEqual(accepted_order.l10n_co_edi_pos_dian_state, 'invoice_accepted')
+
+    def _create_failed_order(self):
+        # NOTE: unlike test_send_bill_sync_errors(), which returns
+        # self.config.session_ids.order_ids[0] (always the *first* order across all sessions),
+        # this returns the order just created, so callers can create several distinct ones.
+        known_orders = self.config.session_ids.order_ids
+        try:
+            self._create_and_send_order(pos_order_ui_data=self.default_pos_order_ui_data, response_file_name='SendBillSync_errors.xml')
+        except UserError:
+            pass
+        return self.config.session_ids.order_ids - known_orders
+
+    def test_action_retry_send_document_bulk_reports_failures(self):
+        """ An order that still fails on retry doesn't roll back another order that succeeded
+        in the same batch: failures are reported via a notification instead of raising, and
+        logged on the failed order's chatter.
+        """
+        failed_order = self._create_failed_order()
+        recovered_order = self._create_failed_order()
+
+        # keyed by which order is being (re)sent, rather than call order, since the recordset
+        # iteration order of `failed_order | recovered_order` isn't guaranteed
+        def send_bill_sync(data):
+            if data['record'] == recovered_order:
+                return {'state': 'invoice_accepted', 'message_json': {'status': "Procesado Correctamente."}}
+            return {
+                'state': 'invoice_rejected',
+                'message_json': {
+                    'status': "Documento con errores en campos mandatorios.",
+                    'errors': ["Regla: ZB01, Rechazo: Fallo en el esquema XML del archivo"],
+                },
+            }
+
+        with (
+            self._mock_get_status(),
+            patch.object(self.registry['l10n_co_edi.document'], '_l10n_co_edi_pos_send_bill_sync', side_effect=send_bill_sync),
+        ):
+            action = (failed_order | recovered_order).l10n_co_edi_pos_action_retry_send_document()
+
+        self.assertEqual(failed_order.l10n_co_edi_pos_dian_state, 'invoice_rejected')
+        self.assertEqual(recovered_order.l10n_co_edi_pos_dian_state, 'invoice_accepted')
+
+        self.assertEqual(action['type'], 'ir.actions.client')
+        self.assertEqual(action['params']['type'], 'danger')
+        self.assertIn(failed_order.display_name, action['params']['message'])
+        self.assertNotIn(recovered_order.display_name, action['params']['message'])
+        self.assertIn("Regla: ZB01", failed_order.message_ids[0].body)
 
     def test_send_bill_sync_second_attempt(self):
         """ First attempt SendBillSync returns errors, second attempt is successful. """

@@ -257,3 +257,51 @@ class TestSaleCommissionManager(TestSaleCommissionCommon):
             new_plan.target_commission_ids.mapped('amount'),
             self.commission_plan_user.target_commission_ids.mapped('amount'),
         )
+
+    def test_team_plan_achievement_details_multi_teams(self):
+        """Test that achievement details are displayed for a team-based commission
+        plan when the user's primary sale_team_id differs from the plan's team.
+        """
+        self.env['ir.config_parameter'].set_bool('sales_team.membership_multi', True)
+
+        team_commission_2 = self.env['crm.team'].create({
+            'name': 'Team B',
+            'member_ids': [Command.link(self.commission_user_1.id)],
+        })
+        self.team_commission.member_ids = [Command.link(self.commission_user_1.id)]
+        self.commission_user_1.sale_team_id = team_commission_2
+        self.commission_plan_manager.user_ids = [Command.create({'user_id': self.commission_user_1.id})]
+        self.commission_plan_manager.action_approve()
+        self.commission_plan_manager.achievement_ids = [Command.create({
+            'type': 'amount_sold',
+            'rate': 0.1,
+        })]
+
+        order = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'user_id': self.commission_user_1.id,
+            'team_id': self.team_commission.id,
+            'order_line': [Command.create({
+                'product_id': self.commission_product_1.id,
+                'price_unit': 100,
+            })],
+        })
+        order.action_confirm()
+        order.date_order = self.commission_plan_manager.date_from
+        self.env.invalidate_all()
+
+        report_line = self.env['sale.commission.report'].search([
+            ('plan_id', '=', self.commission_plan_manager.id),
+            ('user_id', '=', self.commission_user_1.id),
+        ], limit=1)
+        self.assertTrue(report_line)
+        action = report_line.action_achievement_detail()
+
+        # Context must include the plan's team
+        self.assertIn(self.team_commission.id, action['context']['commission_team_ids'])
+
+        # Achievement Details view must contain the achievement
+        achievements = self.env['sale.commission.achievement.report'].with_context(
+            action['context']
+        ).search(action['domain'])
+        self.assertEqual(len(achievements), 1)

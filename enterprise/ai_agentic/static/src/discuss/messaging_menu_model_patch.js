@@ -50,26 +50,15 @@ patch(MessagingMenu.prototype, {
                 if (!agentId || !user.isInternalUser) {
                     return;
                 }
+                const baseFields = this.aiChatTabFields();
                 return {
                     id: `ai-chat:${agentId}`,
-                    icon: "o_ai_icon",
-                    iconClass: "d-inline-flex justify-content-center",
-                    label: _t("AI"),
-                    sequence: 75,
-                    recordType: "discuss.channel",
                     appWide: false,
+                    ...baseFields,
                     includesChannel: (c) =>
                         this.store.discuss.scopedAiAgentId === agentId &&
-                        this.includesAiChatChannel(c) &&
+                        baseFields.includesChannel(c) &&
                         c.ai_agent_id?.id === agentId,
-                    filters: [
-                        {
-                            id: "ai_chat_unread",
-                            text: _t("Unread"),
-                            includesChannel: (c) => c.isUnread,
-                        },
-                    ],
-                    emptyState: { title: _t("No AI Chats yet.") },
                 };
             },
             eager: true,

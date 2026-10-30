@@ -389,7 +389,7 @@
                             <field name="active" invisible="1"/>
                             <field name="type_id" options="{'no_open': True, 'no_create': True}" readonly="state != 'confirmed'" invisible="not show_eco_type"/>
                             <field name="product_tmpl_id" domain="[('type', '=', 'consu')]" context="{'default_is_storable': True}" readonly="state != 'confirmed'"/>
-                            <field name="bom_id" domain="bom_id_domain" context="{'default_product_tmpl_id': product_tmpl_id}" readonly="state != 'confirmed'" placeholder="No BoM Change"/>
+                            <field name="bom_id" domain="bom_id_domain" context="{'default_product_tmpl_id': product_tmpl_id, 'from_eco': True}" readonly="state != 'confirmed'" placeholder="No BoM Change"/>
                             <field name="new_bom_id" invisible="1"/>
                             <field name="company_id" invisible="1"/>
                             <field name="company_id" groups="base.group_multi_company" placeholder="Visible to all"/>

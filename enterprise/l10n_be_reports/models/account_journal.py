@@ -60,7 +60,7 @@ class AccountJournal(models.Model):
             if not account_id:
                 continue
 
-            self.env['account.reconcile.model']._load_records([{
+            self.with_context(foreign_record_to_create=True).env['account.reconcile.model']._load_records([{
                 'xml_id': xml_id,
                 'values': {
                     'name': name,

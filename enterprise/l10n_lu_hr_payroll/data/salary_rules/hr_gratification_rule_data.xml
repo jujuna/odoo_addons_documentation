@@ -59,7 +59,7 @@
     <field name="amount_python_compute">
 min_social_pay = payslip._rule_parameter('l10n_lu_min_social_pay')
 hours_per_month = payslip._rule_parameter('l10n_lu_hours_per_month')
-worked_hours = payslip._get_worked_days_line_number_of_hours('002.00')
+worked_hours = worked_days['002.00'].number_of_hours if '002.00' in worked_days else 0
 
 prorata = 1 if payslip.l10n_lu_is_monthly else worked_hours / hours_per_month
 result = max(categories['BASIC'] - min_social_pay / 4 * prorata, 0)
@@ -183,7 +183,7 @@ def get_l10n_lu_grat_tax(annual_salary, gratification):
     tax -= tax % 0.1
     return -tax
 
-annual_salary = contract.wage * 12
+annual_salary = version._get_l10n_lu_indexed_wage(payslip.date_to) * 12
 result = get_l10n_lu_grat_tax(annual_salary, result_rules['GROSS']['total'])
         </field>
         <field name="struct_ids" eval="[(6, 0, [

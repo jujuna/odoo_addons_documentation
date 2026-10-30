@@ -122,6 +122,7 @@ class TestL10nBeHoursTracking(TestPayrollCommon):
         fine), but the now-negative hour balance is warned about -- on the allocation and, while
         the leave itself is still pending, on the leave. Approving (or refusing) it clears the
         warning from the leave, since it's no longer pending."""
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         allocation = self._create_allocation(self.employee, self.legal_leave_type, 5, 1)
         monday_leave = self._create_leave(self.employee, self.legal_leave_type, date(2026, 1, 5), date(2026, 1, 5), pending=True)
 
@@ -147,6 +148,7 @@ class TestL10nBeHoursTracking(TestPayrollCommon):
         the same employee (even on dates within the same negative allocation's validity window)
         must not pick it up. Distinct dates per leave: an employee can't have two overlapping
         time off requests regardless of type, so same-day reuse isn't an option here."""
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         self._create_allocation(self.employee, self.legal_leave_type, 5, 1)
         monday_leave = self._create_leave(self.employee, self.legal_leave_type, date(2026, 1, 5), date(2026, 1, 5), pending=True)
         self.assertTrue(monday_leave.issues, "legal_leave_type is negative: this leave should be warned about")

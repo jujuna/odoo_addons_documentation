@@ -125,7 +125,7 @@ class TestUi(TestPreparationDisplayHttpCommon):
 
         self.assertEqual(stats['nb_call'], 2, "sync_from_ui should be called once")
 
-    def test_preparation_display_filters(self):
+    def _create_preset_orders_for_pdis(self):
         self.pdis.write({
             'category_ids': [(5, 0)]
         })
@@ -158,5 +158,28 @@ class TestUi(TestPreparationDisplayHttpCommon):
         self.main_pos_config.with_user(self.pos_user).open_ui()
         # Create various orders from POS
         self.start_pos_tour('PosOrderCreationTourPdis', login="pos_user")
+
+    def test_preparation_display_filters(self):
+        self._create_preset_orders_for_pdis()
         # Check orders visibility on PDIS with filters
         self.start_pdis_tour('PreparationDisplayFilterTour')
+
+    def test_preparation_display_after_preset_deletion(self):
+        # Create a Takeaway order (with preset_time set) among others, sent to the Kitchen Display
+        self._create_preset_orders_for_pdis()
+
+        takeaway_order = self.env['pos.order'].search([('preset_id', '=', self.preset_takeaway.id)], limit=1)
+        self.assertTrue(takeaway_order, "The Takeaway order should have been created")
+        self.assertTrue(takeaway_order.preset_time, "The Takeaway order should keep its preset_time")
+
+        # Customer removes the preset from the POS config, then deletes it (as in the ticket
+        # repro): preset_id is set to False on the order (default ondelete='set null'), but
+        # preset_time remains set.
+        self.main_pos_config.write({'available_preset_ids': [(3, self.preset_takeaway.id)]})
+        self.preset_takeaway.unlink()
+        self.assertFalse(takeaway_order.preset_id, "preset_id should be nullified after the preset is deleted")
+        self.assertTrue(takeaway_order.preset_time, "preset_time should still be set after the preset is deleted")
+
+        # Opening the Kitchen Display must not crash while building the preparation line
+        # for the order whose preset was deleted.
+        self.start_pdis_tour('PreparationDisplayAfterPresetDeletionTour')

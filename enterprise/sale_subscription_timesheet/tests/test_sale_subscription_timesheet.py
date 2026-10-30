@@ -352,3 +352,38 @@ class TestSubscriptionTask(TestSubscriptionCommon, TestCommonSaleTimesheet):
             self.field_service_product,
             "The undelivered timesheet product should not be on this invoice."
         )
+
+    def test_subscription_invoice_overage(self):
+        """
+        Ensures that creating an invoice for a recurring plan
+        over multiple months correctly uses the billing_period_value.
+        """
+        self.product_order_timesheet2.recurring_invoice = True
+        with freeze_time('2026-08-05'):
+            subscription = self.env['sale.order'].create({
+                'name': 'Subscription',
+                'is_subscription': True,
+                'plan_id': self.plan_month.id,
+                'partner_id': self.user_portal.partner_id.id,
+                'order_line': [Command.create({'product_id': self.product_order_timesheet2.id})],
+            })
+            subscription.action_confirm()
+            subscription.write({'next_invoice_date': '2026-09-01'})
+            subscription.order_line.qty_delivered = 5
+
+            context = {
+                "active_model": "sale.order",
+                "active_ids": [subscription.id],
+                "active_id": subscription.id,
+                "default_journal_id": self.company_data["default_journal_sale"].id,
+            }
+            self.env["sale.advance.payment.inv"].with_context(context).create({"invoice_overages": True}).create_invoices()
+            invoice = subscription.invoice_ids
+            self.assertEqual(invoice.invoice_line_ids.quantity, 5.0)
+            invoice.action_post()
+            self.assertFalse(subscription.invoice_overages)
+
+        with freeze_time('2026-09-05'):
+            self.env['sale.order']._cron_recurring_create_invoice()
+            new_invoice = subscription.invoice_ids - invoice
+            self.assertEqual(new_invoice.invoice_line_ids.quantity, 1.0)

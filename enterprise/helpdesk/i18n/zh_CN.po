@@ -12,15 +12,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 03:33+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-22 04:38+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/helpdesk/zh_Hans/>\n"
+"projects/odoo-20/helpdesk/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,6 +55,23 @@ msgid ""
 "    - Install additional features easily using your team form view.\n"
 "\n"
 msgstr ""
+"\n"
+"服务台 - 工单管理应用\n"
+"================================\n"
+"\n"
+"功能：\n"
+"\n"
+"    - 通过不同阶段处理工单，直至解决。\n"
+"    - 为工单添加优先级、类型、描述和标签，以便界定工单。\n"
+"    - 使用聊天记录交流补充信息，并在工单上呼叫同事。\n"
+"    - 享受适配的仪表板，以及易于使用的看板视图来处理工单。\n"
+"    - 通过报告菜单中的数据透视视图对工单进行深入分析。\n"
+"    - 创建团队并定义其成员，如有需要可使用自动指派方式。\n"
+"    - 使用邮件别名自动创建工单并与客户沟通。\n"
+"    - 自动为工单添加服务级别协议截止日期。\n"
+"    - 通过评分获取客户反馈。\n"
+"    - 使用团队表单视图轻松安装附加功能。\n"
+"\n"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__answered_customer_message_count
@@ -126,27 +144,27 @@ msgstr "<b>记录内部备注</b>，使用 @<b>提及</b> 以通知您的同事�
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
 msgid "<b>Tip: Create tickets from incoming emails</b>"
-msgstr ""
+msgstr "<b>提示：从收到的电子邮件创建工单</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_4
 msgid "<b>Tip: Don't let stalled tickets slip under the radar</b>"
-msgstr ""
+msgstr "<b>提示：别让停滞的工单溜出视线</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
 msgid "<b>Tip: Filter your tickets with one click</b>"
-msgstr ""
+msgstr "<b>提示：一键筛选工单</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_1
 msgid "<b>Tip: Identify bottlenecks at a glance</b>"
-msgstr ""
+msgstr "<b>提示：一眼识别瓶颈</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_2
 msgid "<b>Tip: Team-Specific Fields</b>"
-msgstr ""
+msgstr "<b>提示：团队专属字段</b>"
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.auto_close_reminder_email_template
@@ -175,8 +193,8 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"                您好 <t t-out=\"object.sudo().partner_id.name\"/>，<br/><br/>"
-"\n"
+"                您好 <t t-out=\"object.sudo().partner_id.name\"/>，<br/><br/"
+">\n"
 "                我们注意到您的技术支持工单\n"
 "                <t t-if=\"object.team_id.privacy_visibility == 'portal'\">\n"
 "                    <a t-att-href=\"object.get_portal_url()\">#<t t-"
@@ -189,8 +207,8 @@ msgstr ""
 "                已长时间无任何操作。<br/><br/>\n"
 "                若您的问题已解决，无需进行任何操作 —— 该工单将在 <t t-"
 "out=\"object.team_id.auto_close_reminder_delay\"/> 天后自动关闭。<br/><br/>\n"
-"                若您仍需协助，直接回复本邮件即可，我们将保留该工单开启状态"
-"。<br/><br/>\n"
+"                若您仍需协助，直接回复本邮件即可，我们将保留该工单开启状态。"
+"<br/><br/>\n"
 "                <t t-out=\"object.company_id.name\"/> 技术支持团队\n"
 "            </div>\n"
 "        "
@@ -222,8 +240,8 @@ msgstr ""
 "先生</t>,<br/><br/>\n"
 "        谨此通知您，您的工单（编号<t t-out=\"object.ticket_ref or ''\">15</"
 "t> ）已关闭。\n"
-"        我们相信本次服务已达到您的预期，且您的问题已得到妥善解决。<br/><br/>"
-"\n"
+"        我们相信本次服务已达到您的预期，且您的问题已得到妥善解决。<br/><br/"
+">\n"
 "        若您还有其他疑问或意见，可直接回复本邮件重新开启工单。\n"
 "        我们的团队随时为您服务，乐意协助您处理后续相关问题。<br/><br/>\n"
 "        感谢您选择我们的服务以及全程的配合。我们十分珍视与您的合作，也很荣幸"
@@ -314,16 +332,16 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>"
-"\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
 "    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
 "    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            <t t-if=\"partner.name\">\n"
-"                <t t-out=\"partner.name or ''\">Brandon Freeman</t>您好"
-"！<br/><br/>\n"
+"                <t t-out=\"partner.name or ''\">Brandon Freeman</t>您好！<br/"
+"><br/>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
 "                您好！<br/>\n"
@@ -332,8 +350,8 @@ msgstr ""
 "脚不平</strong>”\n"
 "            <t t-if=\"object._rating_get_operator().name\">\n"
 "                问题的服务评分。该项服务要求分派给了<strong t-"
-"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>"
-"。<br/>\n"
+"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>。"
+"<br/>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
 "                .<br/><br/>\n"
@@ -473,14 +491,14 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    亲爱的<t t-out=\"object.sudo().partner_id.name or object.sudo()"
-".partner_name or 'Madam/Sir'\">女士/先生</t>,<br/><br/>\n"
+"    亲爱的<t t-out=\"object.sudo().partner_id.name or "
+"object.sudo().partner_name or 'Madam/Sir'\">女士/先生</t>,<br/><br/>\n"
 "    您的请求\n"
-"   <t t-if=\"hasattr(object.team_id, 'website_id') and object.get_portal_url"
-"()\">\n"
-"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ "
-"object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\"> 桌腿不"
-"平衡</a>\n"
+"   <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.get_portal_url()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
+"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\"> 桌腿"
+"不平衡</a>\n"
 "    </t>\n"
 "    已收到，并正在由我们的<t t-out=\"object.team_id.name or ''\">VIP 支持</"
 "t> 团队审核。<br/><br/>\n"
@@ -489,9 +507,9 @@ msgstr ""
 "\n"
 "    如需提供任何补充信息，请直接回复此邮件。<br/><br/>\n"
 "   <t t-if=\"object.team_id.show_knowledge_base\"> \n"
-"        欢迎访问我们的<a t-attf-href=\"{{ "
-"object.team_id.get_knowledge_base_url() }}\">帮助中心</a> 。您可能会找到问题"
-"的答案。\n"
+"        欢迎访问我们的<a t-attf-"
+"href=\"{{ object.team_id.get_knowledge_base_url() }}\">帮助中心</a> 。您可能"
+"会找到问题的答案。\n"
 "       <br/><br/> \n"
 "   </t>\n"
 "    <t t-if=\"object.team_id.allow_portal_ticket_closing\"> \n"
@@ -503,16 +521,16 @@ msgstr ""
 "object.team_id.use_website_helpdesk_form\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain "
 "or '', object.get_portal_url())\" target=\"_blank\"> 查看工单</a>\n"
 "        </t>\n"
 "       <t t-else=\"\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\"> "
 "查看工单</a>\n"
 "        </t>\n"
@@ -520,8 +538,8 @@ msgstr ""
 "object.team_id.allow_portal_ticket_closing\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
 "(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
 "target=\"_blank\"> 关闭工单</a>\n"
@@ -529,8 +547,8 @@ msgstr ""
 "       <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, "
 "object.access_token)\" target=\"_blank\"> 关闭工单</a>\n"
 "        </t>\n"
@@ -539,8 +557,8 @@ msgstr ""
 "object.team_id.use_website_helpdesk_slides\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"object.team_id.feature_form_url\" "
 "target=\"_blank\"> 访问帮助中心</a>\n"
 "        </t><br/><br/> \n"
@@ -554,7 +572,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi me-2\" data-icon=\"east\"/> Set an Alias Domain"
-msgstr ""
+msgstr "<i class=\"oi me-2\" data-icon=\"east\"/> 设置别名域"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -570,8 +588,8 @@ msgid ""
 "title=\"Unhappy\"/>"
 msgstr ""
 "<i class=\"oi oi-fw o_button_icon text-success\" data-"
-"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"满意\"/>"
-"\n"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"满意\"/"
+">\n"
 "                            <i class=\"oi oi-fw o_button_icon text-warning\" "
 "data-icon=\"sentiment_neutral\">= 3.66\" title=\"中性\"/>\n"
 "                            <i class=\"oi oi-fw o_button_icon text-danger\" "
@@ -591,8 +609,8 @@ msgid ""
 "title=\"Unhappy\"/>"
 msgstr ""
 "<i class=\"oi oi-fw o_button_icon text-success\" data-"
-"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"满意\"/>"
-"\n"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg < 3.66\" title=\"满意\"/"
+">\n"
 "                            <i class=\"oi oi-fw o_button_icon text-warning\" "
 "data-icon=\"sentiment_neutral\">= 3.66\" title=\"中性\"/>\n"
 "                            <i class=\"oi oi-fw o_button_icon text-danger\" "
@@ -627,6 +645,9 @@ msgid ""
 "will be automatically sent to customers by email when their ticket reaches a "
 "stage where ratings are enabled.</span>"
 msgstr ""
+"<i class=\"oi\" data-icon=\"lightbulb\"/>\n"
+"                                    <span class=\"ms-2\">当客户的工单进入已启"
+"用评分的阶段时，系统会自动通过电子邮件向其发送评分请求。</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -649,7 +670,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi\" data-icon=\"lightbulb\"/>&amp;nbsp;"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"lightbulb\"/>&amp;nbsp;"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -663,7 +684,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi\" data-icon=\"warning\"/>&amp;nbsp;"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"warning\"/>&amp;nbsp;"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -724,7 +745,7 @@ msgstr "<span class=\"o_stat_text\">工单</span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
 msgid "<span class=\"o_stat_text\">Rating</span>"
-msgstr "<span class=\"o_stat_text\">额定值</span>"
+msgstr "<span class=\"o_stat_text\">评分</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -765,7 +786,7 @@ msgstr "<span><b>追随 者 </b></span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<span>@</span>"
-msgstr ""
+msgstr "<span>@</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -802,7 +823,7 @@ msgstr "<span>您的支持请求已成功关闭。感谢您的合作</span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<span>days before closure</span>"
-msgstr ""
+msgstr "<span>天关闭前</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -812,7 +833,7 @@ msgstr "<span>不活动的天数</span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "<span>days</span>"
-msgstr ""
+msgstr "<span> 天</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -838,7 +859,7 @@ msgstr "<strong>别名 </strong>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<strong>Send</strong>"
-msgstr ""
+msgstr "<strong>发送</strong>"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_defaults
@@ -896,7 +917,7 @@ msgstr "活动异常标示"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "活动计划"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_state
@@ -941,7 +962,7 @@ msgstr "添加有关此工单的详细信息..."
 msgid ""
 "Add team-specific property fields to tickets to better customize your "
 "helpdesk management process."
-msgstr ""
+msgstr "为工单添加团队专属属性字段，以便更好地定制服务台管理流程。"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -1072,14 +1093,15 @@ msgstr "您确定要删除这些阶段吗？"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_active
 msgid "Ask for Ratings"
-msgstr ""
+msgstr "请求评分"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.action_helpdesk_tag_assignment
 msgid ""
 "Assign tickets to the appropriate team members by defining who can work on "
 "tickets with certain tags."
-msgstr "通过定义谁可以处理带有特定标签的技术支持请求，将工单分配给相应的团队成员。"
+msgstr ""
+"通过定义谁可以处理带有特定标签的技术支持请求，将工单分配给相应的团队成员。"
 
 #. module: helpdesk
 #. odoo-python
@@ -1137,12 +1159,12 @@ msgstr "附件数量"
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_auto_assignment
 msgid "Auto Assignment"
-msgstr ""
+msgstr "自动指派"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_ticket_reminder
 msgid "Auto-Close Reminder"
-msgstr ""
+msgstr "自动关闭提醒"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -1264,12 +1286,12 @@ msgstr "活动"
 msgid ""
 "Can manage helpdesk teams and stages, with access to reporting and "
 "configuration."
-msgstr ""
+msgstr "可以管理服务台团队和阶段，并可访问报告和配置。"
 
 #. module: helpdesk
 #: model:res.groups,comment:helpdesk.group_helpdesk_user
 msgid "Can manage tickets in helpdesk teams they have access to."
-msgstr ""
+msgstr "可以管理其有权访问的服务台团队中的工单。"
 
 #. module: helpdesk
 #: model:helpdesk.stage,name:helpdesk.stage_cancelled
@@ -1300,14 +1322,14 @@ msgstr "频道"
 msgid ""
 "Check the stage tracker on tickets to quickly spot bottlenecks in your "
 "helpdesk workflow."
-msgstr ""
+msgstr "查看工单上的阶段跟踪器，快速发现服务台工作流中的瓶颈。"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
 msgid ""
 "Click the Kanban progress bar to quickly filter tickets by status within the "
 "current stage."
-msgstr ""
+msgstr "点击看板进度条，快速按状态筛选当前阶段内的工单。"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -1626,7 +1648,7 @@ msgstr "第一次达到约定阶段服务的日期时间"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__rotting_days
 msgid "Day count since this resource was last updated"
-msgstr ""
+msgstr "自此资源上次更新以来的天数"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla_report_analysis__sla_exceeded_hours
@@ -1638,12 +1660,12 @@ msgstr "到达 SLA 阶段的日期，不考虑工作日历"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__rotting_days
 msgid "Days Rotting"
-msgstr ""
+msgstr "停滞天数"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rotting_threshold_days
 msgid "Days to rot"
-msgstr ""
+msgstr "停滞天数"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_status__deadline
@@ -1740,17 +1762,17 @@ msgstr "显示名称"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Domain"
-msgstr ""
+msgstr "域"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__criteria_domain
 msgid "Domain to filter the tickets to which this SLA policy will be applied."
-msgstr ""
+msgstr "用于筛选将应用此 SLA 政策的工单的域。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__duration_stage_tracking
 msgid "Duration Stage Tracking"
-msgstr ""
+msgstr "阶段停留时长跟踪"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__assign_method__balanced
@@ -1797,19 +1819,19 @@ msgstr "电子邮件域名，例如 'odoo@example.com' 中的 'example.com'"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__reminder_email_template_id
 msgid "Email template used for the auto-close reminder."
-msgstr ""
+msgstr "用于自动关闭提醒的电子邮件模板。"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__rating_template_id
 msgid "Email template used to send rating requests for helpdesk tickets."
-msgstr ""
+msgstr "用于发送服务台工单评分请求的电子邮件模板。"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
 msgid ""
 "Emails sent to your Helpdesk Team's email address automatically create "
 "tickets in your pipeline."
-msgstr ""
+msgstr "发送到您服务台团队电子邮件地址的邮件会自动在您的管道中创建工单。"
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.rating_ticket_request_email_template
@@ -1823,8 +1845,8 @@ msgid ""
 "Enter the <b>subject</b> of your ticket <br/><i>(e.g. Problem with my "
 "installation, Wrong order, etc.).</i>"
 msgstr ""
-"输入您的工票<b>主题</b> <br/><i> （例如：我的安装有问题，订单错了，等等）</i>"
-"。"
+"输入您的工票<b>主题</b> <br/><i> （例如：我的安装有问题，订单错了，等等）</"
+"i>。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_status__exceeded_hours
@@ -1883,7 +1905,7 @@ msgstr "首次分派日期"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "Fold by Default"
-msgstr ""
+msgstr "默认折叠"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__fold
@@ -2053,7 +2075,7 @@ msgstr "帮助中心概览"
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_sla
 msgid "Helpdesk SLA Policy"
-msgstr ""
+msgstr "服务台 SLA 政策"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_stage
@@ -2068,7 +2090,7 @@ msgstr "支持人员阶段删除向导"
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_tag
 msgid "Helpdesk Tag"
-msgstr ""
+msgstr "服务台标签"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_tag_assignment
@@ -2127,7 +2149,7 @@ msgstr "服务台工单"
 #. module: helpdesk
 #: model:mail.template,name:helpdesk.auto_close_reminder_email_template
 msgid "Helpdesk: Auto-Close Reminder"
-msgstr ""
+msgstr "服务台：自动关闭提醒"
 
 #. module: helpdesk
 #: model:mail.template,name:helpdesk.solved_ticket_request_email_template
@@ -2147,13 +2169,13 @@ msgstr "服务台：技术支持请求已收到"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "High"
-msgstr ""
+msgstr "高"
 
 #. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 msgid "High Priority"
-msgstr ""
+msgstr "高优先级"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__2
@@ -2165,7 +2187,7 @@ msgstr "高优先级"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__rotting_threshold_days
 msgid "Highlight tickets that haven't been updated for this many days."
-msgstr ""
+msgstr "高亮显示已有这么多天未更新的工单。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -2283,7 +2305,7 @@ msgstr "不活跃期（天）"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_reminder_delay
 msgid "Inactive delay period(days)"
-msgstr ""
+msgstr "无活动延迟期（天）"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__privacy_visibility__invited_internal
@@ -2448,7 +2470,7 @@ msgstr "收件时检测本地的别名域"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Low"
-msgstr ""
+msgstr "低"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__0
@@ -2476,7 +2498,7 @@ msgstr "通过使用SLA政策，确保工单得到及时处理。<br>"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols 图标，例如 checklist"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__time
@@ -2642,7 +2664,7 @@ msgstr "下一活动类型"
 #. module: helpdesk
 #: model:res.groups.privilege,placeholder:helpdesk.res_groups_privilege_helpdesk
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
@@ -2679,7 +2701,7 @@ msgstr "还没有数据耶！"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "No email"
-msgstr ""
+msgstr "无电子邮件"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
@@ -2852,8 +2874,8 @@ msgid ""
 "necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"拥有别名的母项模型。拥有别名参考的模型不一定是alias_model_id给出的模型（例如"
-"：project(parent_model) 和任务 (模型)）"
+"拥有别名的母项模型。拥有别名参考的模型不一定是alias_model_id给出的模型（例"
+"如：project(parent_model) 和任务 (模型)）"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__partner_ticket_ids
@@ -2939,7 +2961,7 @@ msgstr "不活动的时期，之后工单将被自动关闭。"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__auto_close_reminder_delay
 msgid "Period of inactivity before the reminder is sent."
-msgstr ""
+msgstr "发送提醒前的无活动时长。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -3028,7 +3050,7 @@ msgstr "权益"
 msgid ""
 "Quickly identify tickets that have been stuck in the same stage for too long "
 "instead of progressing."
-msgstr ""
+msgstr "快速识别在同一阶段停留过久、未能推进的工单。"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_rating_rating
@@ -3055,7 +3077,7 @@ msgstr "评价平均文本"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_template_id
 msgid "Rating Email"
-msgstr ""
+msgstr "评分电邮"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__rating_last_feedback
@@ -3159,13 +3181,13 @@ msgstr "退款"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Reimburse customers with a voucher code for future purchases"
-msgstr ""
+msgstr "使用代金券代码向客户退款，以供未来购买"
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.auto_close_reminder_email_template
 msgid ""
 "Reminder sent to customers before their ticket is closed due to inactivity"
-msgstr ""
+msgstr "在客户工单因无活动而关闭前向其发送的提醒"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_repair
@@ -3185,7 +3207,7 @@ msgstr "维修"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_product_replacements
 msgid "Replacements"
-msgstr ""
+msgstr "替换件"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
@@ -3226,12 +3248,12 @@ msgstr "退货"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__is_rotting
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Rotting"
-msgstr ""
+msgstr "停滞中"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "Rotting in"
-msgstr ""
+msgstr "停滞于"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__sla_id
@@ -3321,7 +3343,7 @@ msgstr "SLA成功"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 msgid "SLA Success Rate"
-msgstr ""
+msgstr "SLA 成功率"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__sla_status__ongoing
@@ -3376,13 +3398,13 @@ msgstr "在“分配给”中搜索"
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
 msgid "Search in Description"
-msgstr ""
+msgstr "在描述中搜索"
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
 msgid "Search in Messages"
-msgstr ""
+msgstr "在消息中搜索"
 
 #. module: helpdesk
 #. odoo-python
@@ -3402,12 +3424,6 @@ msgid "Security Token"
 msgstr "安全令牌"
 
 #. module: helpdesk
-#. odoo-javascript
-#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
-msgid "Select the <b>customer</b> of your ticket."
-msgstr "选择你的工单的<b>客户</b>。"
-
-#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Self-Service"
 msgstr "自助服务"
@@ -3422,7 +3438,7 @@ msgstr "发送电子邮件"
 msgid ""
 "Send an automatic reminder email to customers before their ticket is closed "
 "due to inactivity"
-msgstr ""
+msgstr "在客户工单因无活动而关闭前，自动向其发送提醒电子邮件"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -3444,7 +3460,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Send customers a replacement for a lost, damaged, or returned item"
-msgstr ""
+msgstr "为丢失、损坏或退货的商品向客户寄送替换件"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_service
@@ -3454,7 +3470,7 @@ msgstr "服务"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Set Up Ratings on Stages"
-msgstr ""
+msgstr "在阶段上设置评分"
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.solved_ticket_request_email_template
@@ -3530,7 +3546,7 @@ msgstr "阶段已改变"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__name
 msgid "Stage Name"
-msgstr ""
+msgstr "阶段名称"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
@@ -3594,7 +3610,7 @@ msgstr "主题"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Success"
-msgstr ""
+msgstr "成功"
 
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_ticket_action_7days_success
@@ -3675,13 +3691,13 @@ msgstr "模板"
 msgid ""
 "The auto-close period must be longer than the reminder email delay. Please "
 "set a higher inactivity period or a shorter reminder delay."
-msgstr ""
+msgstr "自动关闭时长必须长于提醒邮件延迟。请设置更长的无活动时长或更短的提醒延迟。"
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "The customer cannot belong to a different company than the ticket."
-msgstr ""
+msgstr "客户所属公司与工单所属公司不能不同。"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_model_id
@@ -3718,7 +3734,7 @@ msgstr "在计算 SLA 时，不会考虑在这些阶段花费的时间。"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
 msgid "There are currently no Tickets for your account."
-msgstr ""
+msgstr "您的账户目前没有工单。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_creation
@@ -3768,7 +3784,8 @@ msgstr "这将存档来自以下团队的阶段及其包含的所有工单："
 msgid ""
 "Those represent the different categories of things you have to do (e.g. "
 "\"Call\" or \"Send email\")."
-msgstr "这些代表了你必须做的不同类别的事情（例如：\"打电话 \"或 \"发送电子邮件\"）"
+msgstr ""
+"这些代表了你必须做的不同类别的事情（例如：\"打电话 \"或 \"发送电子邮件\"）"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -3810,7 +3827,7 @@ msgstr "工单已关闭"
 msgid ""
 "Ticket Closed - Reference {{ object.ticket_ref if object.ticket_ref else "
 "15 }}"
-msgstr ""
+msgstr "工单已关闭 - 参考 {{ object.ticket_ref if object.ticket_ref else 15 }}"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__ticket_count
@@ -3963,22 +3980,22 @@ msgstr "提示：从传入的电子邮件创建工单"
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_4
 msgid "Tip: Don't let stalled tickets slip under the radar"
-msgstr ""
+msgstr "提示：别让停滞的工单溜出视线"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_3
 msgid "Tip: Filter your tickets with one click"
-msgstr ""
+msgstr "提示：一键筛选工单"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_1
 msgid "Tip: Identify bottlenecks at a glance"
-msgstr ""
+msgstr "提示：一眼识别瓶颈"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_2
 msgid "Tip: Team-Specific Fields"
-msgstr ""
+msgstr "提示：团队专属字段"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_my_ticket_action_no_create
@@ -3991,8 +4008,8 @@ msgid ""
 "                Collaborate efficiently by chatting in real-time or via "
 "email."
 msgstr ""
-"要完成工作，请计划活动并使用工单状态。<br>通过实时聊天或通过电子邮件高效协作"
-"。"
+"要完成工作，请计划活动并使用工单状态。<br>通过实时聊天或通过电子邮件高效协"
+"作。"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -4044,7 +4061,7 @@ msgstr "追踪花在工单上的时间"
 #. module: helpdesk
 #: model:ir.module.module,summary:base.module_helpdesk
 msgid "Track, prioritize, and solve customer tickets"
-msgstr ""
+msgstr "跟踪、排定优先级并解决客户工单"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -4060,12 +4077,12 @@ msgstr "记录中异常活动的类型。"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__utm_reference
 msgid "UTM Reference"
-msgstr ""
+msgstr "UTM 参考"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Unanswered"
-msgstr ""
+msgstr "未回答"
 
 #. module: helpdesk
 #. odoo-python
@@ -4129,7 +4146,7 @@ msgstr "使用优惠券"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__use_giftcards
 msgid "Use Gift Cards"
-msgstr ""
+msgstr "使用礼品卡"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -4139,8 +4156,8 @@ msgid ""
 "customers. Add new people to the followers' list to make them aware of the "
 "progress of this ticket."
 msgstr ""
-"利用聊天记录<b>发送电子邮件</b> ，与客户进行高效沟通。将新人添加到关注者列表"
-"，以便了解此工单的进展情况。"
+"利用聊天记录<b>发送电子邮件</b> ，与客户进行高效沟通。将新人添加到关注者列"
+"表，以便了解此工单的进展情况。"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_res_users
@@ -4251,7 +4268,8 @@ msgstr "SLA 期限前尚余工作时数"
 msgid ""
 "Working hours exceeded for reached SLAs compared with deadline. Positive "
 "number means the SLA was reached after the deadline."
-msgstr "与截止日期相比，已达到的 SLA 超过了工作时间。正数表示在截止日期之后达到 SLA。"
+msgstr ""
+"与截止日期相比，已达到的 SLA 超过了工作时间。正数表示在截止日期之后达到 SLA。"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__resource_calendar_id
@@ -4268,7 +4286,7 @@ msgstr "是否也要取消存档这些阶段中包含的所有工单？"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_twitter
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
@@ -4297,7 +4315,7 @@ msgstr "你不能有负数目标"
 msgid ""
 "You cannot update the company of this partner because it would lead to "
 "inconsistency with some of its tickets."
-msgstr ""
+msgstr "您无法更新此合作伙伴的公司，因为这会导致其部分工单不一致。"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_sla
@@ -4312,7 +4330,7 @@ msgstr "您已受邀关注此支持请求文件："
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.auto_close_reminder_email_template
 msgid "Your support ticket will be closed soon"
-msgstr ""
+msgstr "您的支持工单即将关闭"
 
 #. module: helpdesk
 #. odoo-python
@@ -4344,7 +4362,7 @@ msgstr "例如：产品到达时已损坏"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "e.g. Qualification"
-msgstr ""
+msgstr "例如：资格"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -4354,7 +4372,7 @@ msgstr "e.g. mycompany.com"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "e.g. support"
-msgstr ""
+msgstr "例如支持"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_website_helpdesk_slides
@@ -4395,8 +4413,8 @@ msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name or "
 "'Helpdesk' }}: Service Rating Request"
 msgstr ""
-"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' }}"
-": 服务评级请求"
+"{{ object.company_id.name or object.user_id.company_id.name or "
+"'Helpdesk' }}: 服务评级请求"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.new_ticket_request_email_template
@@ -4408,6 +4426,9 @@ msgstr "{{ object.name }}"
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "👤 Unassigned"
 msgstr "👤 未指派"
+
+#~ msgid "Select the <b>customer</b> of your ticket."
+#~ msgstr "选择你的工单的<b>客户</b>。"
 
 #~ msgid "Auto Assigment"
 #~ msgstr "自动分配"

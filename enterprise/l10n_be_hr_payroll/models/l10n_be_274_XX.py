@@ -7,11 +7,12 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from lxml import etree
 
-from odoo import api, fields, models, _
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
-from odoo.tools import BinaryBytes, format_date
+from odoo.tools import BinaryBytes, float_is_zero, format_date
 from odoo.tools.misc import file_path
+from odoo.addons.l10n_be_hr_payroll.models.utils import sum_values_by_group, to_eurocent
 
 
 class L10n_Be274_Xx(models.Model):
@@ -350,29 +351,44 @@ class L10n_Be274_Xx(models.Model):
         sme_rate_param = self.env['hr.rule.parameter']._get_parameter_from_code('sme_withholding_tax_exemption_rate', self.date_start, raise_if_not_found=False)
         sme_exemption_rate = sme_rate_param if sme_rate_param else 0.0012
         exemption_cap_multiplier = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_be_274_witholding_tax_exemption_multiplier', self.date_start, raise_if_not_found=False) or 1.0
-        result_per_employee = defaultdict(lambda: (0.0, 0.0))
-
-        for employee, emp_slips in payslips.grouped('employee_id').items():
-            taxable_amount = emp_slips._sum_category('IPA_REDUCTION_BASE', from_date=self.date_start, include_children=True)
-            exemption_amount = taxable_amount * sme_exemption_rate * exemption_cap_multiplier
-            current_taxable, current_exemption = result_per_employee[employee]
+        # The base is read from the payslips of the declaration, for the amounts attached to its period
+        category_codes = self.env['hr.payslip']._get_child_category_ids('IPA_REDUCTION_BASE')
+        taxable_amount_by_employee = dict(self.env['hr.payslip.line']._read_group(
+            Domain([
+                ('slip_id', 'in', payslips.ids),
+                ('salary_rule_id.category_ids.code', 'in', category_codes),
+            ]) & self.env['hr.payslip']._l10n_be_get_fiscal_line_domain(self.date_start, self.date_end),
+            ['employee_id'], ['total:sum'],
+        ))
+        result_per_employee = {}
+        for employee in payslips.employee_id:
+            taxable_amount = taxable_amount_by_employee.get(employee, 0.0)
             result_per_employee[employee] = (
-                current_taxable + taxable_amount,
-                current_exemption + exemption_amount,
+                taxable_amount,
+                taxable_amount * sme_exemption_rate * exemption_cap_multiplier,
             )
         return result_per_employee
 
     @api.model
+    def _get_exemption_withholding_tax(self, payslips, line_values):
+        # The withholding tax that the exemptions can reduce, as in the salary rule of the 274.81: the one of the
+        # remuneration, without the ones of the replacement incomes, of the double holiday pay and of the presence
+        # tokens. PPTOTAL is the total of all the withholding taxes, the others are negative lines.
+        codes = ('PPTOTAL', 'REPLACEMENT_REVENUE.P.P', 'DH_PP', 'PRESENCE_TOKEN_WITHHOLDING_TAX')
+        return sum(line_values[code][payslip.id]['total'] for payslip in payslips for code in codes)
+
+    @api.model
     def _get_rd_basic_exemption_vals(self, employee_payslips, line_values, taxable_values=None):
+        date_start = self.date_start or (employee_payslips and min(employee_payslips.mapped('date_from')))
         exemption_cap_multiplier = self.env['hr.rule.parameter']._get_parameter_from_code(
-            'l10n_be_274_witholding_tax_exemption_multiplier', self.date_start, raise_if_not_found=False
+            'l10n_be_274_witholding_tax_exemption_multiplier', date_start, raise_if_not_found=False
         ) or 1.0
 
         def sum_line_totals(payslips, code):
             return sum(line_values[code][payslip.id]["total"] for payslip in payslips)
 
         def calculate_exemption(employee, structure_code, withholding_amount):
-            rd_percentage = employee._get_average_rd_percentage(structure_code=structure_code, use_date=self.date_start)
+            rd_percentage = employee._get_average_rd_percentage(structure_code=structure_code, use_date=date_start)
             return rd_percentage * 0.8 * withholding_amount * exemption_cap_multiplier
 
         if taxable_values is not None:
@@ -389,13 +405,7 @@ class L10n_Be274_Xx(models.Model):
         monthly_payslips = payslips_by_structure.get("BEMONTHLY", self.env["hr.payslip"])
         double_pay_payslips = payslips_by_structure.get("BEDOUBLE", self.env["hr.payslip"])
 
-        monthly_withholding = sum(
-            line_values["PPTOTAL"][payslip.id]["total"]
-            + line_values["REPLACEMENT_REVENUE.P.P"][payslip.id]["total"]
-            + line_values['PRESENCE_TOKEN_WITHHOLDING_TAX'][payslip.id]['total']
-            + line_values["DH_PP"][payslip.id]["total"]
-            for payslip in monthly_payslips
-        )
+        monthly_withholding = self._get_exemption_withholding_tax(monthly_payslips, line_values)
 
         double_pay_withholding = (-sum_line_totals(monthly_payslips, "DH_PP") + sum_line_totals(double_pay_payslips, "PPTOTAL"))
 
@@ -427,28 +437,40 @@ class L10n_Be274_Xx(models.Model):
             return capped_bachelor_total / total_bach_exemption
         return 1
 
+    def _get_valid_payslips_filters(self):
+        # The payslips of the forms 274.10, 274.20 and 274.30 are the ones of the 281.10, 281.20 and 281.30
+        return {
+            # the tax on the profit sharing bonus is a withholding tax on movable income, declared on the 273S
+            '274.10': lambda p: bool(p._l10n_be_filter_remuneration_form('281.10')) and p.struct_id.code != 'BEPROFITSHARING',
+            '274.20': lambda p: bool(p._l10n_be_filter_remuneration_form('281.20')),
+            '274.30': lambda p: bool(p._l10n_be_filter_remuneration_form('281.30')),
+        }
+
     def _get_valid_274_32_payslips(self, payslips):
         concerned_payslips_structs = ['BEMONTHLY', 'BEDOUBLE', 'BETERM', 'BETHIRTEEN', 'BEHOLN', 'BEHOLN1']
+        date_from = min(payslips.mapped('date_from'), default=False)
         return payslips.filtered(
             lambda p: p.struct_id.code in concerned_payslips_structs
-            and p.employee_id._get_average_rd_percentage(p.struct_id.code, min(payslips.mapped('date_from'))) > 0
             and p.employee_id.certificate in ['doctor', 'civil_engineer']
+            and p.employee_id._get_average_rd_percentage(p.struct_id.code, date_from) > 0
         )
 
     def _get_valid_274_33_payslips(self, payslips):
         concerned_payslips_structs = ['BEMONTHLY', 'BEDOUBLE', 'BETERM', 'BETHIRTEEN', 'BEHOLN', 'BEHOLN1']
+        date_from = min(payslips.mapped('date_from'), default=False)
         return payslips.filtered(
             lambda p: p.struct_id.code in concerned_payslips_structs
-            and p.employee_id._get_average_rd_percentage(p.struct_id.code, min(payslips.mapped('date_from'))) > 0
             and p.employee_id.certificate in ['master']
+            and p.employee_id._get_average_rd_percentage(p.struct_id.code, date_from) > 0
         )
 
     def _get_valid_274_34_payslips(self, payslips):
         concerned_payslips_structs = ['BEMONTHLY', 'BEDOUBLE', 'BETERM', 'BETHIRTEEN', 'BEHOLN', 'BEHOLN1']
+        date_from = min(payslips.mapped('date_from'), default=False)
         return payslips.filtered(
             lambda p: p.struct_id.code in concerned_payslips_structs
-            and p.employee_id._get_average_rd_percentage(p.struct_id.code, min(payslips.mapped('date_from'))) > 0
             and p.employee_id.certificate in ['bachelor']
+            and p.employee_id._get_average_rd_percentage(p.struct_id.code, date_from) > 0
         )
 
     @api.model
@@ -488,14 +510,15 @@ class L10n_Be274_Xx(models.Model):
         return full_pay_hours and night_hours >= full_pay_hours / 3
 
     @api.model
-    def _get_team_shift_exemption_vals(self, payslip):
+    def _get_team_shift_exemption_vals(self, payslip, taxable=None):
         """
         274.74 (Team / Continuous Team) individual theoretical withholding tax exemption.
 
         To be eligible, the Team (resp. Continuous Team) hourly bonus must be at least the
         legal rate, and the hours tagged with those premiums (summed together) must reach
         at least a third of the hours of the period that are paid at 100%. The exemption
-        rate is then applied on the remuneration amount tied to those hours only.
+        rate then applies to the taxable remuneration of the payslip (`taxable`, its GROSS
+        line by default), the Continuous Team rate in the share of the Continuous Team hours.
 
         :return: (is_eligible, exemption_amount)
         """
@@ -505,17 +528,21 @@ class L10n_Be274_Xx(models.Model):
         if not self._is_team_exemption_eligible(payslip):
             return False, 0.0
 
-        team_amount = payslip._get_l10n_be_category_option_amount('PREMIUM_PAY_TEAM')
-        contteam_amount = payslip._get_l10n_be_category_option_amount('PREMIUM_PAY_CONTTEAM')
+        team_hours = payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_TEAM')
+        contteam_hours = payslip._get_l10n_be_category_option_hours('PREMIUM_PAY_CONTTEAM')
         team_exemption_rate = payslip._rule_parameter('l10n_be_274_74_team_exemption_rate')
         contteam_exemption_rate = payslip._rule_parameter('l10n_be_274_74_contteam_exemption_rate')
-        exemption_amount = team_amount * team_exemption_rate / 100 + contteam_amount * contteam_exemption_rate / 100
-        return True, exemption_amount
+        exemption_rate = (
+            (team_hours * team_exemption_rate + contteam_hours * contteam_exemption_rate) / (team_hours + contteam_hours)
+        )
+        exemption = self._get_shift_exemption_base(payslip, taxable) * exemption_rate / 100
+        return True, self._round_shift_exemption(payslip, exemption)
 
     @api.model
-    def _get_night_shift_exemption_vals(self, payslip):
+    def _get_night_shift_exemption_vals(self, payslip, taxable=None):
         """
-        274.75 (Night) individual theoretical withholding tax exemption.
+        274.75 (Night) individual theoretical withholding tax exemption: its rate on the
+        taxable remuneration of the payslip (`taxable`, its GROSS line by default).
 
         An employee eligible for the Team/Continuous Team exemption (274.74) on this
         payslip can not also claim the Night exemption on it.
@@ -529,8 +556,25 @@ class L10n_Be274_Xx(models.Model):
             return False, 0
 
         exemption_rate = payslip._rule_parameter('l10n_be_274_75_night_exemption_rate')
-        exemption_amount = payslip._get_l10n_be_category_option_amount('PREMIUM_PAY_NIGHT') * exemption_rate / 100
-        return True, exemption_amount
+        exemption = self._get_shift_exemption_base(payslip, taxable) * exemption_rate / 100
+        return True, self._round_shift_exemption(payslip, exemption)
+
+    @api.model
+    def _round_shift_exemption(self, payslip, amount):
+        """The theoretical exemption as its payslip line holds it (in cents): the pool the payslips share and the
+        declaration's pool add the same amounts."""
+        return payslip.company_id.currency_id.round(amount)
+
+    @api.model
+    def _get_shift_exemption_base(self, payslip, taxable=None):
+        """The remuneration the team and night exemptions apply to: the taxable remuneration of the worker, the
+        premiums included (CIR 92, art. 275/5: 22.8%, 25% in continuous teams, of the taxable remuneration, without
+        the double holiday pay, the end-of-year premium and the arrears, which are paid on payslips of their own), i.e.
+        the taxable salary of the payslip. From a salary rule the payslip has no lines yet: the rule gives it, rounded
+        as the line will be, so that the declaration, which reads the line, finds the same amount."""
+        if taxable is not None:
+            return payslip.company_id.currency_id.round(taxable)
+        return payslip._get_line_values(['GROSS'])['GROSS'][payslip.id]['total']
 
     def _get_274_32_33_34_values(self, payslips, line_values, taxable_values):
         """
@@ -592,13 +636,7 @@ class L10n_Be274_Xx(models.Model):
         result_per_employee = defaultdict(lambda: (0.0, 0.0, 0.0))
         for employee, emp_slips in payslips.grouped("employee_id").items():
             taxable_amount = sum(taxable_values[p.id] for p in emp_slips)
-            withholding_tax_amount = sum(
-                line_values["PPTOTAL"][p.id]["total"]
-                + line_values["REPLACEMENT_REVENUE.P.P"][p.id]["total"]
-                + line_values["DH_PP"][p.id]["total"]
-                + line_values["PRESENCE_TOKEN_WITHHOLDING_TAX"][p.id]["total"]
-                for p in emp_slips
-            )
+            withholding_tax_amount = self._get_exemption_withholding_tax(emp_slips, line_values)
             remaining_withholding = withholding_tax_amount - rd_exemption_per_employee.get(employee, 0.0)
             result_per_employee[employee] = (
                 taxable_amount,
@@ -629,12 +667,7 @@ class L10n_Be274_Xx(models.Model):
                 theoretical_exemption += exemption
 
             taxable_amount = sum(taxable_values[p.id] for p in employee_slips)
-            withholding_tax_amount = sum(
-                line_values["PPTOTAL"][p.id]["total"]
-                + line_values["REPLACEMENT_REVENUE.P.P"][p.id]["total"]
-                + line_values["DH_PP"][p.id]["total"]
-                for p in employee_slips
-            )
+            withholding_tax_amount = self._get_exemption_withholding_tax(employee_slips, line_values)
             if withholding_tax_amount > theoretical_exemption:
                 extra_amount = min(withholding_tax_amount - theoretical_exemption, exemption_to_report)
                 exemption_to_report -= extra_amount
@@ -671,12 +704,7 @@ class L10n_Be274_Xx(models.Model):
                 theoretical_exemption += exemption
 
             taxable_amount = sum(taxable_values[p.id] for p in employee_slips)
-            withholding_tax_amount = sum(
-                line_values["PPTOTAL"][p.id]["total"]
-                + line_values["REPLACEMENT_REVENUE.P.P"][p.id]["total"]
-                + line_values["DH_PP"][p.id]["total"]
-                for p in employee_slips
-            )
+            withholding_tax_amount = self._get_exemption_withholding_tax(employee_slips, line_values)
             if withholding_tax_amount > theoretical_exemption:
                 extra_amount = min(withholding_tax_amount - theoretical_exemption, exemption_to_report)
                 exemption_to_report -= extra_amount
@@ -691,60 +719,22 @@ class L10n_Be274_Xx(models.Model):
             )
         return result_per_employee
 
-    def _get_274_81_values(self, payslips, line_values):
+    def _get_274_81_values(self, payslips, line_values, taxable_values=None):
         self.ensure_one()
         result_per_employee = defaultdict(lambda: (0.0, 0.0, 0.0))
-        gross_codes = self.env['hr.payslip']._get_gross_wage_line_codes()
+        if taxable_values is None:
+            gross_codes = self.env['hr.payslip']._get_gross_wage_line_codes()
+            taxable_values = {p.id: sum(line_values[code][p.id]['total'] for code in gross_codes) for p in payslips}
         for employee, emp_slips in payslips.grouped('employee_id').items():
-            taxable_amount = sum(
-                sum(line_values[code][p.id]['total'] for p in emp_slips)
-                for code in gross_codes
-            )
-            withholding_tax_amount = sum(
-                line_values['PPTOTAL'][p.id]['total'] + line_values['REPLACEMENT_REVENUE.P.P'][p.id]['total']
-                    + line_values['DH_PP'][p.id]['total'] + line_values["PRESENCE_TOKEN_WITHHOLDING_TAX"][p.id]["total"]
-                for p in emp_slips
-            )
+            # the taxable salary of the declaration period, as for the 274.10
+            taxable_amount = sum(taxable_values[p.id] for p in emp_slips)
+            withholding_tax_amount = self._get_exemption_withholding_tax(emp_slips, line_values)
             exemption_amount = 0.25 * withholding_tax_amount
             current_taxable, current_withholding, current_exemption = result_per_employee[employee]
             result_per_employee[employee] = (
                 current_taxable + taxable_amount,
                 current_withholding + withholding_tax_amount,
                 current_exemption + exemption_amount,
-            )
-        return result_per_employee
-
-    def _get_274_10_13_18_20_30_values(self, payslips, line_values, taxable_codes, pp_codes, taxable_values=None):
-        """
-        274.10 and 274.20 are reports about withholding tax for Employees and Company Executives
-        274.18 report is about withholding tax for Replacement Revenues
-        274.13 report is about withholding tax for Economic Unemployment
-        Returns:
-        {
-            employee: (
-                taxable_amount,
-                withholding_tax_amount,
-            )
-        }
-        """
-        self.ensure_one()
-        result_per_employee = defaultdict(lambda: (0.0, 0.0))
-        for employee, emp_slips in payslips.grouped('employee_id').items():
-            if taxable_values is not None:
-                taxable_amount = sum(taxable_values[p.id] for p in emp_slips)
-            else:
-                taxable_amount = sum(
-                    sum(line_values[code][p.id]['total'] for p in emp_slips)
-                    for code in taxable_codes
-                )
-            withholding_tax_amount = sum(
-                sum(line_values[code][p.id]['total'] for p in emp_slips)
-                for code in pp_codes
-            )
-            current_taxable, current_withholding = result_per_employee[employee]
-            result_per_employee[employee] = (
-                current_taxable + taxable_amount,
-                current_withholding + withholding_tax_amount,
             )
         return result_per_employee
 
@@ -760,64 +750,72 @@ class L10n_Be274_Xx(models.Model):
         rate = self.env['hr.rule.parameter']._get_parameter_from_code(rate_code, date, raise_if_not_found=False)
         return rate if rate else 0.25
 
-    def _get_extra_hours_lines_ids(self, payslips, line_values):
-        volo150_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_150')
-        volo200_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_voluntary_overtime_200')
-        overtime_type = self.env.ref('hr_work_entry.be_work_entry_type_overtime')
-        relevant_types = (overtime_type + volo150_type + volo200_type)
-        payslips = payslips.filtered(lambda p: p.worked_days_line_ids.work_entry_type_id & relevant_types)
+    @api.model
+    def _get_extra_hours_lines_ids(self, payslips, date_start, line_values):
+        # The overtime giving right to the legal overtime premium, voluntary overtime included, in both joint
+        # committees (the hotel industry's included: SPF Finances, dispense secteur Horeca)
+        overtime_category = self.env['hr.payslip']._l10n_be_get_overtime_category()
+
+        def is_overtime(work_entry_type):
+            return overtime_category in work_entry_type.category_ids
+
+        payslips = payslips.filtered(lambda p: any(map(is_overtime, p.worked_days_line_ids.work_entry_type_id)))
 
         if not payslips:
             return [], False
 
-        jc_302 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302', raise_if_not_found=False)
-        jc_200 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200', raise_if_not_found=False)
         exemption_rate = self.env['hr.rule.parameter']._get_parameter_from_code(
-            'l10n_be_extra_hours_exemption_rate', raise_if_not_found=False) or 0.4125
+            'l10n_be_extra_hours_exemption_rate', date_start, raise_if_not_found=False) or 0.4125
+        # from a payslip's salary rule there is no declaration: the company is the payslips' own
+        company = self.company_id or payslips.company_id[:1]
+
+        cp200 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
+        cp302 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302')
+
+        def get_joint_committee(version):
+            # The joint committee of the payslip, as in the 281.10: the employee may have changed of joint committee
+            jc = version.l10n_be_joint_committee_id
+            if jc and jc.is_descendant_of(cp302):
+                return '302'
+            if jc and jc.is_descendant_of(cp200):
+                return '200'
+            return False
 
         worked_days_groups = self.env['hr.payslip.worked_days']._read_group(
             domain=[
                 ('payslip_id.state', 'in', ['paid', 'validated']),
-                ('payslip_id.company_id', '=', self.company_id.id),
-                ('payslip_id.date_from', '>=', date(self.year, 1, 1)),
-                ('payslip_id.date_to', '<', self.date_start),
+                ('payslip_id.company_id', '=', company.id),
+                ('payslip_id.date_from', '>=', date(date_start.year, 1, 1)),
+                ('payslip_id.date_to', '<', date_start),
                 ('payslip_id.employee_id', 'in', payslips.mapped('employee_id').ids),
-                ('work_entry_type_id', 'in', relevant_types.ids),
+                ('work_entry_type_id.category_ids', 'in', overtime_category.ids),
             ],
-            groupby=['payslip_id.employee_id', 'work_entry_type_id'],
+            groupby=['payslip_id.employee_id', 'payslip_id.version_id'],
             aggregates=['number_of_hours:sum'],
         )
-        consumed_by_employee_type = {
-            (employee, work_entry_type): hours
-            for employee, work_entry_type, hours in worked_days_groups
-        }
+        consumed_by_employee_jc = defaultdict(float)
+        for employee, version, hours in worked_days_groups:
+            consumed_by_employee_jc[employee, get_joint_committee(version)] += hours
 
-        payslips_by_employee = payslips.grouped('employee_id')
+        payslips_by_employee_jc = payslips.grouped(lambda p: (p.employee_id, get_joint_committee(p.version_id)))
 
         line_ids_vals = []
         capped_employees = set()
 
-        for employee, emp_slips in payslips_by_employee.items():
-            jc = employee.l10n_be_joint_committee_id
-            is_cp302 = bool(jc_302 and jc and jc.is_descendant_of(jc_302))
-            is_cp200 = bool(jc_200 and jc and jc.is_descendant_of(jc_200))
-            if not is_cp200 and not is_cp302:
+        for (employee, joint_committee), emp_slips in payslips_by_employee_jc.items():
+            if not joint_committee:
                 continue
+            is_cp200 = joint_committee == '200'
             nature = 44 if is_cp200 else 55
-
-            exempted_types = [overtime_type, volo150_type, volo200_type] if is_cp200 else [overtime_type]
 
             if is_cp200:
                 overtime_threshold_code = 'cp200_overtime_threshold'
             else:
-                overtime_threshold_code = 'cp302_overtime_threshold_white_cash_register' if self.company_id.l10n_be_has_white_cash_register else 'cp302_overtime_threshold_not_white_cash_register'
+                overtime_threshold_code = 'cp302_overtime_threshold_white_cash_register' if company._l10n_be_has_white_cash_register() else 'cp302_overtime_threshold_not_white_cash_register'
 
-            overtime_cap = self.env['hr.rule.parameter']._get_parameter_from_code(overtime_threshold_code, self.date_start)
+            overtime_cap = self.env['hr.rule.parameter']._get_parameter_from_code(overtime_threshold_code, date_start)
 
-            consumed = sum(
-                consumed_by_employee_type.get((employee, wet), 0.0)
-                for wet in exempted_types
-            )
+            consumed = consumed_by_employee_jc[employee, joint_committee]
 
             # Sort so which lines get (partially) capped is deterministic/auditable.
             worked_days_lines = emp_slips.mapped('worked_days_line_ids').sorted(
@@ -826,7 +824,7 @@ class L10n_Be274_Xx(models.Model):
 
             taxable_amount = 0.0
             for wd in worked_days_lines:
-                if wd.work_entry_type_id not in exempted_types:
+                if not is_overtime(wd.work_entry_type_id):
                     continue
 
                 if consumed >= overtime_cap:
@@ -865,6 +863,15 @@ class L10n_Be274_Xx(models.Model):
 
         return line_ids_vals, warning_msg
 
+    def _get_mapping_lines_by_code(self):
+        self.ensure_one()
+        mappings = self.env['l10n.be.281.mapping'].search([
+            ('declaration_code', 'like', '274.%'),
+            ('date_from', '<=', self.date_start),
+            '|', ('date_to', '=', False), ('date_to', '>=', self.date_end),
+        ])
+        return mappings.grouped('declaration_code')
+
     @api.depends('date_start', 'date_end', 'company_id', 'company_id.payroll_config_ids.onss_importance_code', 'training_employee_ids')
     def _compute_line_ids(self):
         for sheet in self:
@@ -887,99 +894,54 @@ class L10n_Be274_Xx(models.Model):
                 for payslip_id, amount in code_values.items():
                     taxable_values[payslip_id] += amount
             gross_values = base_values.get('GROSS', defaultdict(float))
-            line_values = payslips._get_line_values([
-                *gross_codes, 'PPTOTAL', 'DH_PP', 'P.P', 'P.P.NP', 'REPLACEMENT_REVENUE', 'REPLACEMENT_REVENUE.P.P', 'COMPSUPP', 'EUC', 'EUC_CP200', 'EUB', 'ECONOMIC_UNEMPLOYMENT.P.P', 'WARRANT_PP', 'PRESENCE_TOKEN', 'PRESENCE_TOKEN_WITHHOLDING_TAX',
-            ], compute_sum=True, extra_domain=self.env['hr.payslip']._l10n_be_get_fiscal_line_domain(
-                sheet.date_start, sheet.date_end))
 
+            all_codes = list(set(self.env['hr.salary.rule'].with_context(active_test=False).search([]).mapped('code')))
+            line_values = payslips._get_line_values(
+                all_codes,
+                extra_domain=self.env['hr.payslip']._l10n_be_get_fiscal_line_domain(
+                    sheet.date_start, sheet.date_end
+                )
+            )
             sheet.untaxed_employee_ids = (all_payslips - payslips).employee_id
 
-            valid_payslips_10 = payslips.filtered(
-                lambda p: p.version_id.l10n_be_joint_committee_id.egov3_code != '999' and not p.version_id.l10n_be_include_employee_in_281_30
-            )
-            # Will do PPTOTAL - DH_PP - REPLACEMENT_REVENUE.P.P - ECONOMIC_UNEMPLOYMENT.P.P to get the withholding tax amount for 274.10
-            result_274_10_per_employee = sheet._get_274_10_13_18_20_30_values(
-                valid_payslips_10, line_values, gross_codes, ['PPTOTAL', 'DH_PP', 'REPLACEMENT_REVENUE.P.P', 'ECONOMIC_UNEMPLOYMENT.P.P', 'PRESENCE_TOKEN_WITHHOLDING_TAX'],
-                taxable_values=taxable_values,
-            )
-            for employee, res in result_274_10_per_employee.items():
-                taxable, withholding = res
-                line_ids_vals.append({
-                    'sheet_id': sheet.id,
-                    'employee_id': employee.id,
-                    'amount': 0,
-                    'withholding_amount': withholding,
-                    'taxable_amount': taxable,
-                    'nature_code': '274.10'
-                })
-            valid_payslips_13 = payslips.filtered(
-                lambda p: p.worked_days_line_ids.filtered(lambda w: w.work_entry_type_id.l10n_be_economic_unemployment)
-            )
-            result_274_13_per_employee = sheet._get_274_10_13_18_20_30_values(
-                valid_payslips_13, line_values, ['EUC', 'EUC_CP200', 'EUB'], ['ECONOMIC_UNEMPLOYMENT.P.P']
-            )
-            for employee, res in result_274_13_per_employee.items():
-                taxable, withholding = res
-                line_ids_vals.append({
-                    'sheet_id': sheet.id,
-                    'employee_id': employee.id,
-                    'amount': 0,
-                    'withholding_amount': -withholding,
-                    'taxable_amount': taxable,
-                    'nature_code': '274.13'
-                })
+            mapping_by_code = sheet._get_mapping_lines_by_code()
+            valid_payslips_filters = sheet._get_valid_payslips_filters()
+            for declaration_code, mapping_lines in mapping_by_code.items():
+                if declaration_code == '274.13':
+                    declaration_payslips = payslips._l10n_be_filter_economic_unemployment()
+                else:
+                    declaration_payslips = payslips.filtered(valid_payslips_filters.get(declaration_code, lambda p: True))
+                if not declaration_payslips:
+                    continue
 
-            valid_payslips_18 = payslips.filtered(
-                lambda p: p.line_ids.filtered(lambda l: l.code == 'REPLACEMENT_REVENUE' and l.total > 0)
-            )
-            result_274_18_per_employee = sheet._get_274_10_13_18_20_30_values(
-                valid_payslips_18, line_values, ['REPLACEMENT_REVENUE'], ['REPLACEMENT_REVENUE.P.P']
-            )
-            for employee, res in result_274_18_per_employee.items():
-                taxable, withholding = res
-                line_ids_vals.append({
-                    'sheet_id': sheet.id,
-                    'employee_id': employee.id,
-                    'amount': 0,
-                    'withholding_amount': -withholding,
-                    'taxable_amount': taxable,
-                    'nature_code': '274.18'
-                })
+                tag_prefix = declaration_code.replace('.', '_')
+                evaluation_plan = mapping_lines._get_evaluation_plan()
+                employee_payslips = declaration_payslips.grouped('employee_id')
+                line_values_by_employee = sum_values_by_group(employee_payslips, line_values, all_codes)
+                for employee, employee_slips in employee_payslips.items():
+                    employee_line_values = line_values_by_employee[employee]
+                    localdict = self.env['l10n.be.281.mapping']._get_localdict(
+                        line_values=employee_line_values,
+                        payslips=employee_slips,
+                        taxable_values=taxable_values,
+                    )
 
-            valid_payslips_20 = payslips.filtered(
-                lambda p: p.version_id.l10n_be_joint_committee_id.egov3_code == '999' and not p.version_id.l10n_be_include_employee_in_281_30
-            )
-            result_274_20_per_employee = sheet._get_274_10_13_18_20_30_values(
-                valid_payslips_20, line_values, gross_codes, ['P.P', 'P.P.NP', 'WARRANT_PP'],
-                taxable_values=taxable_values,
-            )
-            for employee, res in result_274_20_per_employee.items():
-                taxable, withholding = res
-                line_ids_vals.append({
-                    'sheet_id': sheet.id,
-                    'employee_id': employee.id,
-                    'amount': 0,
-                    'withholding_amount': -withholding,
-                    'taxable_amount': taxable,
-                    'nature_code': '274.20'
-                })
+                    computed_values = mapping_lines._evaluate_batch(localdict, evaluation_plan)
+                    taxable = computed_values.get(f"{tag_prefix}_taxable", 0.0)
+                    withholding = computed_values.get(f"{tag_prefix}_withholding", 0.0)
+                    if declaration_code == '274.18' and float_is_zero(taxable, precision_digits=2) \
+                            and float_is_zero(withholding, precision_digits=2):
+                        # Most payslips have no replacement revenue, and a refunded one cancels its origin
+                        continue
 
-            valid_payslips_30 = payslips.filtered(
-                lambda p: p.version_id.l10n_be_include_employee_in_281_30
-            )
-            result_274_30_per_employee = sheet._get_274_10_13_18_20_30_values(
-                valid_payslips_30, line_values, ['PRESENCE_TOKEN'], ['PRESENCE_TOKEN_WITHHOLDING_TAX']
-            )
-            for employee, res in result_274_30_per_employee.items():
-                taxable, withholding = res
-                line_ids_vals.append({
-                    'sheet_id': sheet.id,
-                    'employee_id': employee.id,
-                    'amount': 0,
-                    'withholding_amount': -withholding,
-                    'taxable_amount': taxable,
-                    'nature_code': '274.30'
-                })
+                    line_ids_vals.append({
+                        'sheet_id': sheet.id,
+                        'employee_id': employee.id,
+                        'amount': computed_values.get(f"{tag_prefix}_exempted", 0.0),
+                        'withholding_amount': withholding,
+                        'taxable_amount': taxable,
+                        'nature_code': declaration_code,
+                    })
 
             valid_payslips_32 = self._get_valid_274_32_payslips(payslips)
             result_274_32_per_employee = sheet._get_274_32_33_34_values(valid_payslips_32, line_values, taxable_values)
@@ -1066,11 +1028,7 @@ class L10n_Be274_Xx(models.Model):
                     'sheet_id': sheet.id,
                     'employee_id': employee.id,
                     'amount': sum(line_values['COMPSUPP'][p.id]['total'] for p in emp_slips),
-                    'withholding_amount': sum(
-                        line_values['PPTOTAL'][p.id]['total'] + line_values['REPLACEMENT_REVENUE.P.P'][p.id]['total']
-                            + line_values['DH_PP'][p.id]['total']
-                        for p in emp_slips
-                    ),
+                    'withholding_amount': sheet._get_exemption_withholding_tax(emp_slips, line_values),
                     'taxable_amount': sum(gross_values[p.id] for p in emp_slips),
                     'nature_code': '274.62'
                 })
@@ -1131,7 +1089,7 @@ class L10n_Be274_Xx(models.Model):
             valid_payslips_81 = payslips.filtered(
                 lambda p: p.struct_id.code == 'BEMONTHLY' and p.version_id.l10n_be_is_aid_zone
             )
-            result_274_81_per_employee = sheet._get_274_81_values(valid_payslips_81, line_values)
+            result_274_81_per_employee = sheet._get_274_81_values(valid_payslips_81, line_values, taxable_values)
             for employee, res in result_274_81_per_employee.items():
                 taxable, withholding, exemption = res
                 line_ids_vals.append({
@@ -1143,7 +1101,7 @@ class L10n_Be274_Xx(models.Model):
                     'nature_code': '274.81'
                 })
             if payslips:
-                extra_hours_vals, warning_msg = sheet._get_extra_hours_lines_ids(payslips, line_values)
+                extra_hours_vals, warning_msg = sheet._get_extra_hours_lines_ids(payslips, sheet.date_start, line_values)
                 line_ids_vals += extra_hours_vals
                 sheet.extra_hours_cap_warning = warning_msg
 
@@ -1180,7 +1138,10 @@ class L10n_Be274_Xx(models.Model):
                 sheet.l10n_be_training_seniority_warning_message = False
                 continue
             new_employees = sheet.training_employee_ids.filtered(
-                lambda e: e.contract_date_start and e.contract_date_start > sheet.date_start - relativedelta(months=6),
+                # Seniority of the chain of contracts at the start of the declaration (not of today's contract)
+                lambda e: e.contract_date_start and (
+                    e._get_first_contract_date(sheet.date_start) or e.contract_date_start
+                ) > sheet.date_start - relativedelta(months=6),
             )
             if new_employees:
                 sheet.l10n_be_training_seniority_warning_message = self.env._(
@@ -1353,12 +1314,9 @@ class L10n_Be274_Xx(models.Model):
         }
 
     def _to_eurocent(self, amount):
-        return '%s' % int(amount * 100)
+        return str(to_eurocent(amount))
 
     def _get_rendering_data(self):
-        def _to_eurocent(amount):
-            return '%s' % int(amount * 100)
-
         # https://finances.belgium.be/sites/default/files/downloads/Sp%C3%A9cification%20XML.doc
         result = {
             'creation_date': fields.Date.context_today(self).strftime("%Y-%m-%d"),
@@ -1625,16 +1583,16 @@ class L10n_Be274_Xx(models.Model):
         result['positive_amount'] = len([d for d in declarations if d['prepayment'] >= 0])
         result['negative_amount'] = len([d for d in declarations if d['prepayment'] < 0])
         result['positive_total'] = str(
-            sum(int(_to_eurocent(d['prepayment']))
+            sum(int(self._to_eurocent(d['prepayment']))
                 for d in declarations if d['prepayment'] >= 0)
         )
         result['negative_total'] = str(
-            sum(int(_to_eurocent(d['prepayment']))
+            sum(int(self._to_eurocent(d['prepayment']))
                 for d in declarations if d['prepayment'] < 0)
         )
         for declaration in declarations:
-            declaration['prepayment'] = _to_eurocent(declaration['prepayment'])
-            declaration['taxable_revenue'] = _to_eurocent(declaration['taxable_revenue'])
+            declaration['prepayment'] = self._to_eurocent(declaration['prepayment'])
+            declaration['taxable_revenue'] = self._to_eurocent(declaration['taxable_revenue'])
 
         result['declarations'] = declarations
         return result

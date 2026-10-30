@@ -161,7 +161,7 @@ test("hr.timesheet (grid)(kpi)(leaderboard): switch view with GroupBy.", async (
     await checkKpiHeader();
     await contains(".o_switch_view.o_grid").click();
     await animationFrame();
-    await checkKpiHeader();
+    await checkKpiHeader(true, { fetched: false });
 });
 
 test("hr.timesheet (grid)(kpi)(leaderboard): Check that confetties are displayed if current employee is first in the leaderboard.", async () => {

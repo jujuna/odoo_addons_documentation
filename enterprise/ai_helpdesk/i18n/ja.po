@@ -3,14 +3,15 @@
 # * ai_helpdesk
 #
 # "Junko Augias (juau)" <juau@odoo.com>, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 03:15+0000\n"
+"PO-Revision-Date: 2026-10-16 03:33+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "ai_helpdesk/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -22,73 +23,73 @@ msgstr ""
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_ticket_view_form
 msgid "<span class=\"o_stat_text order-2\">Closed</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text order-2\">クローズ済</span>"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_ticket_view_form
 msgid "<span class=\"o_stat_text order-2\">Similar</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text order-2\">類似</span>"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_ticket_view_form
 msgid "<span class=\"o_stat_text\">Searching...</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">検索中...</span>"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "AI"
-msgstr ""
+msgstr "AI"
 
 #. module: ai_helpdesk
 #: model:ir.module.module,shortdesc:base.module_ai_helpdesk
 msgid "AI Helpdesk"
-msgstr ""
+msgstr "AIヘルプデスク"
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
-msgstr ""
+msgstr "文章作成用 AIモデル設定(デフォルトプロンプト)"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__ai_agent_id
 msgid "Agent"
-msgstr ""
+msgstr "エージェント"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "Agent that will be used when interacting with tickets of this team."
-msgstr ""
+msgstr "このチームのチケットを処理する際に使用されるエージェント。"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__similar_closed_tickets_count
 msgid "Amount of similar closed tickets"
-msgstr ""
+msgstr "類似するクローズ済チケットの数"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__similar_tickets_count
 msgid "Amount of similar tickets"
-msgstr ""
+msgstr "類似チケットの数"
 
 #. module: ai_helpdesk
 #: model:ir.module.module,summary:base.module_ai_helpdesk
 msgid "Augment Helpdesk with AI Agents."
-msgstr ""
+msgstr "AIエージェントでヘルプデスクを強化。"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "Controls how far in the past should the search for similar tickets go."
-msgstr ""
+msgstr "類似チケットを検索する対象期間(どれくらい過去まで遡るか)を制御します。"
 
 #. module: ai_helpdesk
 #: model:ir.model,website_form_label:ai_helpdesk.model_helpdesk_ticket
 msgid "Create a Ticket"
-msgstr ""
+msgstr "チケット作成"
 
 #. module: ai_helpdesk
 #. odoo-python
 #: code:addons/ai_helpdesk/models/helpdesk_ticket.py:0
 msgid "Default agent not found, cannot find similar records."
-msgstr ""
+msgstr "デフォルトのエージェントが見つかりません。類似のレコードが見つかりません。"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_ai_composer__display_name
@@ -96,23 +97,23 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__display_name
 #: model:ir.model.fields,field_description:ai_helpdesk.field_mail_message__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "表示名"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__embedding_status
 msgid "Embedding Status"
-msgstr ""
+msgstr "埋め込みステータス"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__use_ai
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__use_ai
 msgid "Enable AI features"
-msgstr ""
+msgstr "AI機能を有効化"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__forever
 msgid "Forever"
-msgstr ""
+msgstr "無期限"
 
 #. module: ai_helpdesk
 #: model_terms:ai.prompt.button,prompt:ai_helpdesk.ai_prompt_solution_similar_tickets
@@ -152,21 +153,55 @@ msgid ""
 "contain the email body alone, ready to be sent or edited, with nothing "
 "before or after it."
 msgstr ""
+"コンテキスト内にある類似チケットを使用して、サポート担当者がこのチケットの解"
+"決策を見つけられるよう支援してください。\n"
+"\n"
+"あなたはサポート担当者に対して話しかけています。顧客に対して話しかけているわ"
+"けではありません。絶対に顧客への返答のような言い回しをしないでください。\n"
+"\n"
+"## 解決ルール\n"
+"\n"
+"- コンテキスト内の類似チケットを読み、それらが実際にどのように解決されたかを"
+"確認してください(チャター内の完了メッセージ、担当者が行った対応、顧客が確認し"
+"た内容など)。\n"
+"- 1つ以上のチケットに解決策が含まれている場合は、それをいくつかの具体的な"
+"ステップとして要約し、参照元となるチケットを引用してください。複数の異なる解"
+"決策がある場合は、最も可能性の高いものを筆頭に箇条書きで記載してください。\n"
+"- 類似チケットは存在するものの、どれも解決に至っていない場合は、その旨を伝え"
+"、それらのチケットで既に試された内容を報告してください。\n"
+"- コンテキスト内に類似チケットが存在しない場合は、見つからなかった旨を伝え、"
+"別の場所(データベース内の他のチケット、またはあなた自身の知識)を探すかどうか"
+"を尋ねてください。担当者の返答を待ってください。\n"
+"- 担当者から明示的に要求されない限り、過去のチケットに由来しない解決策を提案"
+"しないでください。提案する場合は、過去のチケットに基づくものではないことを明"
+"確に伝えてください。\n"
+"- あなたの最初のメッセージは、チケットに記載されている内容を提供するものであ"
+"る必要があり、どのように進めるかを担当者に尋ねるメッセージであってはなりませ"
+"ん。\n"
+"## 次のステップ\n"
+"\n"
+"- 明確な解決策が得られたら、それを `ai_tool_ask_user_question` ツールの "
+"`question` 引数に格納し、その文章の最後に顧客への返信の代筆を提案する文言を付"
+"けてください(例: 「顧客宛てのメールの下書きを作成しましょうか?」)。解決策はそ"
+"の引数の中に記載されている必要があります。\n"
+"- 担当者が同意した場合のみ、メールを作成してください。そのメッセージには、前"
+"後に余計なテキストを含めず、すぐに送信または編集できるメール本文のみを含める"
+"必要があります。"
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_helpdesk_team
 msgid "Helpdesk Team"
-msgstr ""
+msgstr "ヘルプデスクチーム"
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_helpdesk_ticket
 msgid "Helpdesk Ticket"
-msgstr ""
+msgstr "ヘルプデスクチケット"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,help:ai_helpdesk.field_helpdesk_team__ticket_similarity_threshold
 msgid "How close tickets should be to be considered similar."
-msgstr ""
+msgstr "チケットが類似しているとみなされるための類似度基準。"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_ai_composer__id
@@ -174,52 +209,52 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__id
 #: model:ir.model.fields,field_description:ai_helpdesk.field_mail_message__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__ticket_similarity_time_range
 msgid "Include Tickets from"
-msgstr ""
+msgstr "以下からのチケットを含める："
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__3m
 msgid "Last 3 Months"
-msgstr ""
+msgstr "直近3か月"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__1y
 msgid "Last 365 days"
-msgstr ""
+msgstr "直近365日"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__6m
 msgid "Last 6 Months"
-msgstr ""
+msgstr "直近6か月"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields.selection,name:ai_helpdesk.selection__helpdesk_team__ticket_similarity_time_range__1w
 msgid "Last Week"
-msgstr ""
+msgstr "先週"
 
 #. module: ai_helpdesk
 #: model_terms:ir.ui.view,arch_db:ai_helpdesk.helpdesk_team_view_form
 msgid "Look for Similar Tickets"
-msgstr ""
+msgstr "類似のチケットを検索"
 
 #. module: ai_helpdesk
 #: model:ir.actions.server,name:ai_helpdesk.action_recompute_ticket_embeddings
 msgid "Look for similar tickets"
-msgstr ""
+msgstr "類似のチケットを検索"
 
 #. module: ai_helpdesk
 #: model:ir.model,name:ai_helpdesk.model_mail_message
 msgid "Message"
-msgstr ""
+msgstr "メッセージ"
 
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_ticket__embedding_ids
 msgid "Record embedding ids"
-msgstr ""
+msgstr "レコードの埋め込みID"
 
 #. module: ai_helpdesk
 #: model_terms:ai.prompt.button,prompt:ai_helpdesk.ai_prompt_top_ticket_cause
@@ -239,9 +274,9 @@ msgstr ""
 #. module: ai_helpdesk
 #: model:ir.model.fields,field_description:ai_helpdesk.field_helpdesk_team__ticket_similarity_threshold
 msgid "Similarity Threshold"
-msgstr ""
+msgstr "類似性しきい値"
 
 #. module: ai_helpdesk
 #: model:ir.model.constraint,message:ai_helpdesk.constraint_helpdesk_team_ticket_similarity_threshold_is_between_0_and_1
 msgid "The ticket similarity threshold must be between 0 and 1.0"
-msgstr ""
+msgstr "チケットの類似度しきい値は 0 から 1.0 の間でなければなりません"

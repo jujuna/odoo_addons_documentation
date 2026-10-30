@@ -25,14 +25,15 @@
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 01:42+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-10-20 12:15+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_reports/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -122,6 +123,8 @@ msgid ""
 "'%(account_name)s' account balance is affected by journal items which don't "
 "originate from a bank statement or payment."
 msgstr ""
+"'%(account_name)s' hesap bakiyesi, banka ekstresi veya ödemeden "
+"kaynaklanmayan yevmiye kalemlerinden etkilenir."
 
 #. module: account_reports
 #. odoo-python
@@ -130,6 +133,8 @@ msgid ""
 "'%s' date scope cannot be evaluated for a report used by multiple return "
 "types using different periodicities."
 msgstr ""
+"'%s' tarih aralığı, farklı periyotlar kullanan birden fazla dönüş türü "
+"tarafından kullanılan bir rapor için değerlendirilemez."
 
 #. module: account_reports
 #. odoo-python
@@ -138,6 +143,8 @@ msgid ""
 "'Open General Ledger' caret option is only available form report lines "
 "targetting accounts or Result Brought Forward."
 msgstr ""
+"'Genel Muhasebe Defterini Aç' imleç seçeneği, yalnızca hesapları veya "
+"Devreden Sonuç'u hedefleyen rapor satırlarında kullanılabilir."
 
 #. module: account_reports
 #. odoo-python
@@ -156,6 +163,9 @@ msgid ""
 "'active' field of account.return.type shouldn't be directly written to in "
 "data files. Use active_fallback. (Detected while loading %(file_path)s)"
 msgstr ""
+"account.return.type'ın 'active' alanı, veri dosyalarında doğrudan "
+"yazılmamalıdır. active_fallback kullanın. ( %(file_path)s yüklenirken tespit "
+"edildi)"
 
 #. module: account_reports
 #. odoo-python
@@ -309,6 +319,23 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <p style=\"margin: 0px; padding: 0px;\">\n"
+"                    Merhaba <span t-out=\"ctx.get('partner') and "
+"ctx['partner'].name\"/>,<br/><br/>\n"
+"                   <strong t-out=\"object.name\"/> adresine gönderim için "
+"son tarih <strong t-out=\"format_date(object.date_deadline)\"/>'dir.<br/>\n"
+"                    Olası para cezasından kaçınmak için lütfen kalan tüm "
+"belgelerin en kısa sürede gönderildiğinden emin olun.<br/>\n"
+"                    Her şeyi zaten göndermiş olmanıza rağmen bu e-postayı "
+"aldıysanız, muhtemelen vergi beyannamesi Odoo'da \"gönderildi\" olarak "
+"işaretlenmemiştir.<br/>\n"
+"                    Herhangi bir sorunuz varsa veya yardıma ihtiyacınız "
+"olursa, lütfen bizimle iletişime geçmekten çekinmeyin.<br/><br/>\n"
+"                    Saygılarımızla,<br/>\n"
+"                </p>\n"
+"           </div> \n"
+"        "
 
 #. module: account_reports
 #: model:mail.template,body_html:account_reports.email_template_generic_tax_instructions
@@ -349,6 +376,41 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <p>\n"
+"                    Sayın <t t-out=\"object.company_id.name\">YourCompany</"
+"t>,\n"
+"               </p>\n"
+"                <p> \n"
+"                    Alınan belgeler ve bilgilere dayanarak, <t t-"
+"out=\"object.company_id.name\">YourCompany</t>\n"
+"                   <t t-"
+"out=\"object.type_id._get_period_name(object.company_id, object.date_from, "
+"object.date_to)\"/> dönemi için vergi beyannamesi sunulmuştur.\n"
+"               </p>\n"
+"                <p> \n"
+"                   <t t-out=\"format_amount(object.total_amount_to_pay, "
+"object.amount_to_pay_currency_id)\"/> tutarında bir meblağın ödenmesi "
+"gerektiği tespit edilmiştir.\n"
+"               </p>\n"
+"                <table style=\"border:1px solid black; padding:20px; text-"
+"align:left; border-spacing: 16px;\"> \n"
+"                   <tr>\n"
+"                        <td> Ödenecek Tutar</td>\n"
+"                        <td><t t-"
+"out=\"format_amount(object.total_amount_to_pay, "
+"object.amount_to_pay_currency_id)\"/></td> \n"
+"                   </tr>\n"
+"                    <tr> \n"
+"                       <td> Son Ödeme Tarihi</td>\n"
+"                        <td><t t-out=\"format_date(object.date_deadline)\"/"
+"></td> \n"
+"                   </tr>\n"
+"                </table> \n"
+"               <p> Saygılarımızla,</p>\n"
+"                <p><t t-out=\"user.name\"> Mitchell Admin</t></p>\n"
+"           </div> \n"
+"        "
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_send_form
@@ -379,6 +441,8 @@ msgid ""
 "<i>Errors marked with <i class=\"oi\" data-icon=\"warning\"/> are critical "
 "and will produce an invalid file.</i>"
 msgstr ""
+"<i> <i class=\"oi\" data-icon=\"warning\"/> ile işaretlenmiş hatalar kritik "
+"öneme sahiptir ve dosyanın geçersiz olmasına neden olur.</i>"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_kanban_view
@@ -395,6 +459,12 @@ msgid ""
 "class=\"oi text-danger pb-2\" data-icon=\"warning\" title=\"Another return "
 "already covers part of this period.\"/>"
 msgstr ""
+"<span invisible=\"not show_warning_existing_return\" class=\"oi text-danger "
+"pb-2\" data-icon=\"warning\" title=\"A return already exists for the "
+"selected period.\"/>\n"
+"                            <span invisible=\"not show_warning_overlap\" "
+"class=\"oi text-danger pb-2\" data-icon=\"warning\" title=\"Another return "
+"already covers part of this period.\"/>"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_type_form_view
@@ -493,7 +563,7 @@ msgstr "Hesap Denetim Durumu"
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_chart_template
 msgid "Account Chart Template"
-msgstr ""
+msgstr "Hesap Planı Şablonu"
 
 #. module: account_reports
 #. odoo-python
@@ -620,7 +690,7 @@ msgstr "Kaydı bulunan hesaplar"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_account_type.xml:0
 msgid "Account:"
-msgstr ""
+msgstr "Hesap:"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_res_company__account_representative_id
@@ -788,7 +858,7 @@ msgstr "Aktivite Türü İmgesi"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/widgets/account_report_x2many/account_report_x2many.xml:0
 msgid "Add a line"
-msgstr ""
+msgstr "Satır Ekle"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_send_form
@@ -831,6 +901,11 @@ msgstr "Düzeltme"
 #: code:addons/account_reports/models/account_multicurrency_revaluation_report.py:0
 msgid "Adjustment Entry"
 msgstr "Düzeltme Kaydı"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment
+msgid "Adjustments to reconcile net profit/(loss) to net cash flows:"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__advance_tax_payment_account_id
@@ -997,6 +1072,8 @@ msgid ""
 "All selected companies or branches do not share the same Tax ID. Please "
 "check the Tax ID of the selected companies."
 msgstr ""
+"Seçilen tüm şirketler veya şubeler aynı Vergi Kimlik Numarası’nı (VKN) "
+"paylaşmıyor. Lütfen seçilen şirketlerin VKN’sini kontrol edin."
 
 #. module: account_reports
 #. odoo-python
@@ -1005,6 +1082,8 @@ msgid ""
 "All the Journal Entries used to record received taxes amounts in the Cash "
 "Basis journal are in sequence."
 msgstr ""
+"Nakit Esaslı yevmiye defterinde alınan vergi tutarlarını kaydetmek için "
+"kullanılan tüm yevmiye kayıtları sırayla yer almaktadır."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_allocation_of_prior_year_result_to_equity
@@ -1080,7 +1159,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_analytic_groupby.xml:0
 msgid "Analytic"
-msgstr ""
+msgstr "Analitik"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_analytic_line__analytic_coverage
@@ -1148,7 +1227,7 @@ msgstr "İçin Açıklamalı"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/mail/message_patch.xml:0
 msgid "Annotated for"
-msgstr ""
+msgstr "İçin açıklamalı"
 
 #. module: account_reports
 #: model:account.return.type,name:account_reports.annual_corporate_tax_return_type
@@ -1232,12 +1311,14 @@ msgid ""
 "Argument 'side' is not valid. Either choose -1 or 1 to indicate respectively "
 "the previous or next period."
 msgstr ""
+"'side' argümanı geçerli değil. Önceki veya sonraki dönemi belirtmek için "
+"sırasıyla -1 veya 1'i seçin."
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/views/accrual_list_view.xml:0
 msgid "As of"
-msgstr ""
+msgstr "İtibarıyla"
 
 #. module: account_reports
 #. odoo-python
@@ -1266,7 +1347,7 @@ msgstr "Bu Tarihte"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/views/accrual_list_view.xml:0
 msgid "At the date of"
-msgstr ""
+msgstr "Tarihinde"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_send_form
@@ -1359,6 +1440,8 @@ msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
 "taxes."
 msgstr ""
+"Vergi kalemlerinin ve hesapların vergilere doğru şekilde atandığından emin "
+"olmak için denetim yapın."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__auto_generate
@@ -1402,6 +1485,7 @@ msgstr "B: %s"
 #: code:addons/account_reports/models/account_trial_balance_report.py:0
 #: model:account.report.column,name:account_reports.balance_sheet_balance
 #: model:account.report.column,name:account_reports.cash_flow_report_balance
+#: model:account.report.column,name:account_reports.cash_flow_report_balance_indirect
 #: model:account.report.column,name:account_reports.executive_summary_column
 #: model:account.report.column,name:account_reports.general_ledger_report_balance
 #: model:account.report.column,name:account_reports.journal_report_balance
@@ -1503,14 +1587,14 @@ msgid "Bank Reconciliation Summary"
 msgstr ""
 
 #. module: account_reports
-#: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Banka Hesap Ekstresi Kalemi"
-
-#. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_statements
 msgid "Bank Statements"
 msgstr "Banka Hesap Ekstreleri"
+
+#. module: account_reports
+#: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_transaction_missing_document
@@ -1548,7 +1632,7 @@ msgstr "Matrah Tutarı"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/aged_partner_balance/filter_aging.xml:0
 msgid "Based on"
-msgstr ""
+msgstr "Buna göre"
 
 #. module: account_reports
 #. odoo-python
@@ -1607,6 +1691,11 @@ msgstr ""
 "Varsayılan olarak, Odoo iadeler için kendi son tarihini uygular (0 olarak "
 "gösterilir). Buraya bir değer girildiğinde bu değer geçersiz kılınacak ve "
 "yeni son tarih olarak kullanılacaktır."
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow
+msgid "CASH FLOW"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -1693,6 +1782,11 @@ msgid "Cash Basis sequences"
 msgstr ""
 
 #. module: account_reports
+#: model:ir.model,name:account_reports.model_account_cash_flow_indirect_report_handler
+msgid "Cash Flow Indirect Report Custom Handler"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model,name:account_reports.model_account_cash_flow_report_handler
 msgid "Cash Flow Report Custom Handler"
 msgstr "Nakit Akış Raporu Özel Yöneticisi"
@@ -1702,6 +1796,36 @@ msgstr "Nakit Akış Raporu Özel Yöneticisi"
 #: model:ir.actions.client,name:account_reports.action_account_report_cs
 msgid "Cash Flow Statement"
 msgstr "Nakit Akış"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_financial_activities
+msgid "Cash Flows from financing activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_investing_activities
+msgid "Cash Flows from investing activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_operational_activities
+msgid "Cash Flows from operating activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_repay_recov_cash_adv
+msgid "Cash advances made to third parties"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_bop
+msgid "Cash and cash equivalents at beginning"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_eop
+msgid "Cash and cash equivalents at end"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -1856,6 +1980,8 @@ msgid ""
 "Check how the prior year's result (N-1) was allocated, especially if "
 "reclassified into share capital or reserves."
 msgstr ""
+"Özellikle sermayeye veya yedeklere yeniden sınıflandırılmışsa, bir önceki "
+"yılın (N-1) sonucunun nasıl tahsis edildiğini kontrol edin."
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_legal_reserve_and_dividend_eligibility
@@ -1947,7 +2073,7 @@ msgstr "Kod"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/sales_report/filters/filter_code.xml:0
 msgid "Codes:"
-msgstr ""
+msgstr "Kodlar:"
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_bank_statements
@@ -2235,7 +2361,7 @@ msgstr "Ülke Kodu"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_budgets.xml:0
 msgid "Create"
-msgstr ""
+msgstr "Oluştur"
 
 #. module: account_reports
 #: model:ir.actions.server,name:account_reports.action_create_composite_report_list
@@ -2344,6 +2470,9 @@ msgid ""
 "another cross-report aggregation with a forced date scope. This is not "
 "allowed."
 msgstr ""
+"\"%(label)s\" satırındaki raporlar arası toplama işlemi, \"%(report_line)s\" "
+"satırındaki, zorunlu tarih aralığına sahip başka bir raporlar arası toplama "
+"işlemine bağlıdır. Bu izin verilmez."
 
 #. module: account_reports
 #. odoo-python
@@ -2353,6 +2482,9 @@ msgid ""
 "(report_line)s' depends on another cross-report aggregation. This is not "
 "allowed."
 msgstr ""
+"%(report_line)s'%(label)s' satırındaki zorlanmış tarih aralığı ' ' ile "
+"raporlar arası toplama işlemi, başka bir raporlar arası toplama işlemine "
+"bağlıdır. Bu izin verilmez."
 
 #. module: account_reports
 #. odoo-python
@@ -2424,7 +2556,7 @@ msgstr "Cari Oran (Dönen Varlıklar / Kısa Vadeli Yabancı Kaynaklar)"
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_date.xml:0
 msgid "Custom Dates"
-msgstr ""
+msgstr "Özel Tarihler"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report__custom_handler_model_id
@@ -2502,12 +2634,17 @@ msgstr "Date To"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filters.js:0
 msgid "Date cannot be empty"
-msgstr ""
+msgstr "Tarih boş olamaz"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_report_annotation__date
 msgid "Date considered as annotated by the annotation."
 msgstr "Açıklamayla işaretlenmiş olarak kabul edilen tarih."
+
+#. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
+msgid "Date:"
+msgstr ""
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_form_view
@@ -2576,13 +2713,13 @@ msgstr "Varsayılan Başlangıç Tarihi"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/deferred_reports/warnings.xml:0
 msgid "Deferrals have not yet been completely generated for this period."
-msgstr ""
+msgstr "Bu dönem için ertelenmiş kayıtlar henüz tamamen oluşturulmadı."
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/deferred_reports/warnings.xml:0
 msgid "Deferrals have not yet been generated for this period."
-msgstr ""
+msgstr "Bu dönem için ertelenmiş kayıtlar henüz oluşturulmadı."
 
 #. module: account_reports
 #. odoo-python
@@ -2638,6 +2775,11 @@ msgid "Deferred Revenues"
 msgstr "Ertelenmiş Gelirler"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_deferred_revenue
+msgid "Deferred revenue"
+msgstr ""
+
+#. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_expression_form
 msgid "Definition"
 msgstr "Tanım"
@@ -2652,6 +2794,11 @@ msgstr "Gecikme birimleri"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_kanban_view
 msgid "Delete"
 msgstr "Sil"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_depreciation
+msgid "Depreciation and amortisation"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -2702,6 +2849,7 @@ msgstr "Posta Oluşturucuyu Görüntüle"
 #: model:ir.model.fields,field_description:account_reports.field_account_audit_account_status__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_balance_sheet_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_bank_reconciliation_report_handler__display_name
+#: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_indirect_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_change_lock_date__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_chart_template__display_name
@@ -3045,7 +3193,7 @@ msgstr "Posta Göndermeyi Etkinleştir"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_variant.xml:0
 msgid "Enable more ..."
-msgstr ""
+msgstr "Daha fazlasını etkinleştir..."
 
 #. module: account_reports
 #. odoo-python
@@ -3115,6 +3263,8 @@ msgid ""
 "Ensure a signed copy of the AGM minutes allocating prior-year profit has "
 "been obtained and archived."
 msgstr ""
+"Bir önceki yılın kârının dağıtımına ilişkin Genel Kurul tutanaklarının "
+"imzalı bir kopyasının alınmış ve arşivlenmiş olduğundan emin olun."
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_equity_account_movements_legal_documents
@@ -3122,6 +3272,8 @@ msgid ""
 "Ensure accounting entries in capital accounts are consistent with supporting "
 "legal documents."
 msgstr ""
+"Sermaye hesaplarındaki muhasebe kayıtlarının, destekleyici yasal belgelerle "
+"tutarlı olduğundan emin olun."
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_clear_internal_transfer_account
@@ -3169,6 +3321,8 @@ msgid ""
 "Ensures that applied taxes and fiscal positions match the customer or vendor "
 "country location."
 msgstr ""
+"Uygulanan vergilerin ve mali pozisyonların müşteri veya tedarikçinin "
+"bulunduğu ülkeyle uyumlu olmasını sağlar."
 
 #. module: account_reports
 #. odoo-python
@@ -3217,7 +3371,7 @@ msgstr "Her 4 ayda bir"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/multicurrency_revaluation_report/filters/filter_exchange_rate.xml:0
 msgid "Exchange Rates"
-msgstr ""
+msgstr "Döviz Kurları"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_move_line__exclude_bank_lines
@@ -3559,6 +3713,26 @@ msgid "Future Activities"
 msgstr "Sonraki Aktiviteler"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_fin_instr
+msgid "Gain (-)/Loss (+) on sale of financial instruments"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_intangible_assets
+msgid "Gain (-)/Loss (+) on sale of intangible assets"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_ppe
+msgid "Gain (-)/Loss (+) on sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_rou
+msgid "Gain (-)/Loss (+) on sale of right-of-use assets"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.actions.server,name:account_reports.ir_cron_garbage_collect_snapshots_ir_actions_server
 msgid "Garbage-collect snapshots of accounting reports"
 msgstr ""
@@ -3710,7 +3884,7 @@ msgstr "Grup Adı"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/deferred_reports/groupby.xml:0
 msgid "Group by"
-msgstr ""
+msgstr "Grupla"
 
 #. module: account_reports
 #. odoo-javascript
@@ -3816,6 +3990,7 @@ msgstr "IBAN"
 #: model:ir.model.fields,field_description:account_reports.field_account_audit_account_status__id
 #: model:ir.model.fields,field_description:account_reports.field_account_balance_sheet_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_bank_reconciliation_report_handler__id
+#: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_indirect_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_change_lock_date__id
 #: model:ir.model.fields,field_description:account_reports.field_account_chart_template__id
@@ -3922,6 +4097,9 @@ msgid ""
 "Identify applicable tax credit schemes, verify eligibility, compute "
 "benefits, validate supporting documentation, and monitor refund claims."
 msgstr ""
+"Uygulanabilir vergi kredisi programlarını belirleyin, uygunluğu doğrulayın, "
+"avantajları hesaplayın, destekleyici belgeleri onaylayın ve geri ödeme "
+"taleplerini izleyin."
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_outstanding_checks
@@ -4029,6 +4207,11 @@ msgid "Income Provision for %s"
 msgstr "%s için Gelir Karşılığı"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_income_tax_paid
+msgid "Income tax paid (-)/received (+)"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Inconsistent Statements"
@@ -4059,6 +4242,11 @@ msgid ""
 "Inconsistent tax on service sale to Northern Ireland. Such services must be "
 "treated strictly as a third country (non-EU) transaction, and should not use "
 "intra-community taxes."
+msgstr ""
+
+#. module: account_reports
+#: model:account.report,name:account_reports.cash_flow_report_indirect
+msgid "Indirect Cash Flow Statement"
 msgstr ""
 
 #. module: account_reports
@@ -4107,6 +4295,21 @@ msgid ""
 msgstr ""
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_interest_paid
+msgid "Interest paid"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_interest_received
+msgid "Interest received"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_int_dev_paid
+msgid "Interests/Dividends paid"
+msgstr ""
+
+#. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/aged_partner_balance/filters.js:0
 msgid "Intervals cannot be smaller than 1"
@@ -4116,7 +4319,7 @@ msgstr "Aralıklar 1'den küçük olamaz"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/sales_report/warnings.xml:0
 msgid "Intra-community taxes are applied on"
-msgstr ""
+msgstr "Topluluk içi vergiler şunlara uygulanır:"
 
 #. module: account_reports
 #. odoo-python
@@ -4158,6 +4361,7 @@ msgstr ""
 "account_codes formülünde geçersiz sembol: '%(token)s' '%(formula)s' içinde"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_inventory
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_inventory
 #: model:ir.ui.menu,name:account_reports.account_audit_inventory_entries_menu
 msgid "Inventory"
@@ -4505,6 +4709,7 @@ msgstr "Kilit Tarihi"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.company_information
+#: model_terms:ir.ui.view,arch_db:account_reports.company_information_customer_report
 msgid "Logo"
 msgstr "Logo"
 
@@ -4530,6 +4735,7 @@ msgstr "Ana Şirket"
 msgid ""
 "Main company must be provided if start_day and start_month are not provided"
 msgstr ""
+"start_day ve start_month belirtilmezse ana şirket bilgisi sağlanmalıdır"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_tax_unit__main_company_id
@@ -4685,6 +4891,9 @@ msgid ""
 "your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
+"Eksik şirket bilgileri ( %(vat_label)s i veya ülke gibi), raporunuzda yanlış "
+"vergi oranının kullanılması veya işlemlerin yanlış bir şekilde muaf "
+"tutulması gibi hatalara neden olabilir."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -4730,7 +4939,7 @@ msgstr "Çoklu Defter:"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_journal.xml:0
 msgid "Multi-ledger"
-msgstr ""
+msgstr "Çoklu-Defter"
 
 #. module: account_reports
 #: model:ir.model,name:account_reports.model_account_multicurrency_revaluation_report_handler
@@ -4814,6 +5023,7 @@ msgstr ""
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profit0
 #: model:account.report.line,name:account_reports.account_financial_report_net_profit0
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_net_income
 msgid "Net Profit"
 msgstr "Net Kar"
 
@@ -4821,6 +5031,11 @@ msgstr "Net Kar"
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_net_assets0
 msgid "Net assets"
 msgstr "Net Varlıklar"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_net_financial_result
+msgid "Net financial result : income (-)/cost (+)"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -4874,7 +5089,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 msgid "No Comparison"
-msgstr ""
+msgstr "Karşılaştırma Yok"
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_no_negative_petty_cash_balances
@@ -5016,6 +5231,13 @@ msgstr "Başlamadı"
 msgid ""
 "Not all aggregation expressions could be computed. This is likely due to "
 "cyclic dependencies in their formulas."
+msgstr ""
+"Tüm toplama ifadeleri hesaplanamadı. Bunun nedeni muhtemelen formüllerdeki "
+"döngüsel bağımlılıklardır."
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow_not_reconciled
+msgid "Not reconciled yet"
 msgstr ""
 
 #. module: account_reports
@@ -5174,7 +5396,7 @@ msgstr "Müşteri Ekstrelerini Aç"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_return/widgets/account_return_check_attachment_viewer.xml:0
 msgid "Open Document"
-msgstr ""
+msgstr "Belge Aç"
 
 #. module: account_reports
 #. odoo-javascript
@@ -5253,6 +5475,16 @@ msgid "Other Income"
 msgstr "Diğer Gelirler"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_payable
+msgid "Other payables"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_receivable
+msgid "Other receivables"
+msgstr ""
+
+#. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_other
 msgid "Others"
 msgstr "Diğerleri"
@@ -5296,6 +5528,8 @@ msgid ""
 "PDF rendering engine used to generate this report when exporting to PDF. "
 "Some engines may ignore headers/footers."
 msgstr ""
+"Bu raporu PDF'ye aktarırken kullanılan PDF oluşturma motoru. Bazı motorlar "
+"üstbilgileri/altbilgileri göz ardı edebilir."
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return__generic_state_only_pay__paid
@@ -5567,7 +5801,7 @@ msgstr "Dönem Toplamı"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 msgid "Period order"
-msgstr ""
+msgstr "Dönem sırası"
 
 #. module: account_reports
 #. odoo-python
@@ -5642,6 +5876,8 @@ msgid ""
 "Please set a deferred account on the related account or in the accounting "
 "settings."
 msgstr ""
+"Lütfen ilgili hesapta veya muhasebe ayarlarında ertelenmiş bir hesap "
+"ayarlayın."
 
 #. module: account_reports
 #. odoo-python
@@ -5672,6 +5908,8 @@ msgid ""
 "Prepare a detailed provision schedule and ensure all risks are identified "
 "and properly provisioned."
 msgstr ""
+"Ayrıntılı bir karşılık planı hazırlayın ve tüm risklerin tespit edilip uygun "
+"şekilde karşılık ayrıldığından emin olun."
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_subsidaries_and_investments_summary
@@ -5747,6 +5985,21 @@ msgstr ""
 "Bu dönem için halihazırda bir düzeltme kaydı olabilir, dikkatli ilerleyin ("
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_borrowings
+msgid "Proceeds from borrowings"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_recov_adv
+msgid "Proceeds from recoverable advances"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_share_issuance
+msgid "Proceeds from share issuance"
+msgstr ""
+
+#. module: account_reports
 #. odoo-javascript
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
@@ -5758,13 +6011,18 @@ msgstr "Ürün"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/deferred_reports/groupby.xml:0
 msgid "Product Category"
-msgstr ""
+msgstr "Ürün Kategorisi"
 
 #. module: account_reports
 #: model:account.report,name:account_reports.profit_and_loss
 #: model:ir.actions.client,name:account_reports.action_account_report_pl
 msgid "Profit and Loss"
 msgstr "Gelir Tablosu"
+
+#. module: account_reports
+#: model:ir.actions.client,name:account_reports.action_account_report_pl_generic
+msgid "Profit and Loss - Generic"
+msgstr ""
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profitability0
@@ -5781,6 +6039,11 @@ msgstr "%(for_cur)s karşılığı ayırma (1 %(comp_cur)s = %(rate)s %(for_cur)
 #: model:account.return.check.template,name:account_reports.account_return_check_template_provision_for_impairment
 msgid "Provision for Impairment"
 msgstr "Değer Düşüklüğü Karşılığı"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_provision
+msgid "Provisions"
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_purchases
@@ -5809,13 +6072,18 @@ msgstr "Üç Aylık"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/multicurrency_revaluation_report/line_name.xml:0
 msgid "Rates"
-msgstr ""
+msgstr "Oranlar"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__rating_ids
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__rating_ids
 msgid "Ratings"
 msgstr "Değerlendirmeler"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_recep_recov_cash_adv
+msgid "Receipt of recoverable cash advances"
+msgstr ""
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.reconciled_receipts
@@ -5873,6 +6141,9 @@ msgid ""
 "Analyze discrepancies, verify post-period payments, and document the status "
 "of any unresolved amounts or ongoing disputes."
 msgstr ""
+"Vergiyle ilgili tüm borçları en son resmi beyannamelerle mutabakatlayın.\n"
+"Uyuşmazlıkları analiz edin, dönem sonu ödemelerini doğrulayın ve çözülmemiş "
+"tutarların veya devam eden ihtilafların durumunu belgelendirin."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_reconcile_payable_with_fillings
@@ -5898,7 +6169,7 @@ msgstr "Kayıt Adı"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_return/views/refresh_returns_cog_menu.xml:0
 msgid "Refresh"
-msgstr ""
+msgstr "Refresh"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__refresh_result
@@ -5923,6 +6194,21 @@ msgstr "Hatırlatma"
 #. module: account_reports
 #: model:mail.template,subject:account_reports.email_template_tax_return_deadline
 msgid "Reminder: Upcoming {{ object.name }} Deadline - Action Required"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_borrowings
+msgid "Repayment of borrowings"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_lease
+msgid "Repayment of lease"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_recov_adv
+msgid "Repayment of recoverable advances"
 msgstr ""
 
 #. module: account_reports
@@ -5970,7 +6256,7 @@ msgstr "Hesap kodunu belirten rapor satırları"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_variant.xml:0
 msgid "Report:"
-msgstr ""
+msgstr "Çıktı:"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_horizontal_group__report_ids
@@ -6159,6 +6445,8 @@ msgid ""
 "Review and reconcile intra-EU and international (export/import) operations "
 "for compliance and completeness."
 msgstr ""
+"AB içi ve uluslararası (ihracat/ithalat) işlemlerini uyumluluk ve "
+"eksiksizlik açısından inceleyin ve uyumlu hale getirin."
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_bank_transaction_missing_document
@@ -6166,6 +6454,8 @@ msgid ""
 "Review bank transactions not associated with any invoices. Ensure the "
 "corresponding documents are created in Odoo."
 msgstr ""
+"Herhangi bir faturayla ilişkili olmayan banka işlemlerini inceleyin. İlgili "
+"belgelerin Odoo'da oluşturulduğundan emin olun."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_for_capitalizable_expenses
@@ -6179,6 +6469,8 @@ msgid ""
 "Review invoices, bills and entries which are either in draft or marked as "
 "Anomaly/To Review."
 msgstr ""
+"Taslak halinde olan veya Anormallik/İncelenecek olarak işaretlenmiş "
+"faturaları, hesap faturalarını ve kayıtları inceleyin."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6308,7 +6600,7 @@ msgstr "Satış"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 msgid "Same Period Last Year"
-msgstr ""
+msgstr "Geçen Yıl Aynı Dönem"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_form_view
@@ -6456,7 +6748,7 @@ msgstr "Hesabı Göster"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_budgets.xml:0
 msgid "Show All Accounts"
-msgstr ""
+msgstr "Tüm Hesapları Göster"
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return__show_amount_to_pay
@@ -6525,7 +6817,7 @@ msgstr "Bir sonraki etkinlik tarihi geçmiş olan tüm kayıtları göster"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/deferred_reports/warnings.xml:0
 msgid "Show already generated deferrals."
-msgstr ""
+msgstr "Zaten oluşturulmuş ertelemeleri göster."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_reports_journal_dashboard_kanban_view
@@ -6550,12 +6842,14 @@ msgstr ""
 #: code:addons/account_reports/models/account_report_snapshot.py:0
 msgid "Snapshots of accounting reports should be made one company at a time."
 msgstr ""
+"Muhasebe raporlarının anlık görüntüleri her seferinde tek bir şirket için "
+"alınmalıdır."
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "Some"
-msgstr ""
+msgstr "Bazı"
 
 #. module: account_reports
 #. odoo-python
@@ -6564,6 +6858,8 @@ msgid ""
 "Some journal items appear to point to obsolete report lines. Check them, and "
 "correct their tax grids if necessary."
 msgstr ""
+"Bazı dergi girişleri, artık kullanılmayan rapor satırlarına işaret ediyor "
+"gibi görünüyor. Bunları kontrol edin ve gerekirse vergi tablolarını düzeltin."
 
 #. module: account_reports
 #. odoo-python
@@ -6572,13 +6868,16 @@ msgid ""
 "Some returns made for return type '%s' keep an inconsistent state after "
 "changing the workflow. This likely comes from a missing upgrade script."
 msgstr ""
+"'%s' iade türü için yapılan bazı iadeler, iş akışının değiştirilmesinden "
+"sonra tutarsız bir durumda kalmaktadır. Bu durum muhtemelen eksik bir "
+"yükseltme komut dosyasından kaynaklanmaktadır."
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_date.xml:0
 msgid "Specific Date"
-msgstr ""
+msgstr "Belirli Tarih"
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_res_company__account_representative_id
@@ -6878,7 +7177,7 @@ msgstr "Vergi Birimi"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_tax_unit.xml:0
 msgid "Tax Unit:"
-msgstr ""
+msgstr "Vergi Birimi:"
 
 #. module: account_reports
 #: model:ir.actions.act_window,name:account_reports.action_view_tax_units
@@ -6888,11 +7187,19 @@ msgid "Tax Units"
 msgstr "Vergi Birimleri"
 
 #. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "Tax and country mismatch"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_payable_account_id
 msgid ""
 "Tax current account used as a counterpart to the Tax Closing Entry when in "
 "favor of the authorities."
 msgstr ""
+"Vergi Kapanış Kaydının karşı kalemi olarak, yetkililer lehine olduğunda "
+"kullanılan vergi cari hesabı."
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_receivable_account_id
@@ -6900,6 +7207,8 @@ msgid ""
 "Tax current account used as a counterpart to the Tax Closing Entry when in "
 "favor of the company."
 msgstr ""
+"Şirket lehine olduğunda, Vergi Kapanış Kaydının karşı kalemi olarak "
+"kullanılan vergi cari hesabı."
 
 #. module: account_reports
 #: model:mail.template,name:account_reports.email_template_generic_tax_instructions
@@ -7077,7 +7386,7 @@ msgstr "Bu ifade için kullanılan operatör desteklenmiyor."
 #: code:addons/account_reports/static/src/components/account_report/warnings.xml:0
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "There are"
-msgstr ""
+msgstr "Var"
 
 #. module: account_reports
 #. odoo-python
@@ -7157,6 +7466,8 @@ msgid ""
 "This company is part of a tax unit. You're currently not viewing the whole "
 "unit."
 msgstr ""
+"Bu şirket bir vergi biriminin parçasıdır. Şu anda tüm birimi "
+"görüntülemiyorsunuz."
 
 #. module: account_reports
 #. odoo-javascript
@@ -7172,7 +7483,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/widgets/account_report_x2many/account_report_x2many.xml:0
 msgid "This line is out of sequence."
-msgstr ""
+msgstr "Bu satır sıralama dışı."
 
 #. module: account_reports
 #. odoo-javascript
@@ -7207,12 +7518,13 @@ msgid ""
 "This report contains inconsistencies. The affected lines are marked with a "
 "warning."
 msgstr ""
+"Bu raporda tutarsızlıklar var. İlgili satırlar uyarı ile işaretlenmiştir."
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/multicurrency_revaluation_report/warnings.xml:0
 msgid "This report only displays the data of the active company."
-msgstr ""
+msgstr "Bu rapor yalnızca aktif şirkete ait verileri gösterir."
 
 #. module: account_reports
 #. odoo-javascript
@@ -7222,6 +7534,9 @@ msgid ""
 "using different currencies,\n"
 "        which can lead the report to be unbalanced."
 msgstr ""
+"Bu rapor, farklı para birimleri kullanan birden fazla şirketi konsolide "
+"etmek için CTA dönüşüm yöntemini kullanır.\n"
+"        Bu durum, raporun dengeli olmamasına neden olabilir."
 
 #. module: account_reports
 #. odoo-python
@@ -7317,6 +7632,11 @@ msgid "Total CTA"
 msgstr ""
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
+msgid "Total Due:"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_general_ledger.py:0
 msgid "Total General Ledger"
@@ -7344,6 +7664,16 @@ msgstr "Ticari Ortaklar"
 #: model:account.return.check.template,name:account_reports.account_return_check_template_trade_payables_analytical_review
 msgid "Trade Payables Analytical Review"
 msgstr "Ticari Borçlar Analitik İnceleme"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_payable
+msgid "Trade payables"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_receivable
+msgid "Trade receivables"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -7514,6 +7844,11 @@ msgid "Unrealized Currency Gains/Losses"
 msgstr "Gerçekleşmemiş Kur Kar/Zararları"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_forex
+msgid "Unrealized FX Gain (-)/Loss (+)"
+msgstr ""
+
+#. module: account_reports
 #. odoo-javascript
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
@@ -7537,7 +7872,7 @@ msgstr "Belgeyi Yükle"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_return/widgets/account_return_check_file_uploader.xml:0
 msgid "Upload File"
-msgstr ""
+msgstr "Dosya Yükleme"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_line_form
@@ -7619,6 +7954,21 @@ msgid "Var N-1"
 msgstr "Var N-1"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var
+msgid "Variation"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_cash
+msgid "Variation of Cash"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_non_cash
+msgid "Variation of NON Cash"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_payment_wizard__vat_balance
 #: model:ir.model.fields,field_description:account_reports.field_qr_code_payment_wizard__vat_balance
 msgid "Vat Balance"
@@ -7641,6 +7991,14 @@ msgid ""
 "exchange for immediate cash.\n"
 "            "
 msgstr ""
+"Dönem sonunda kaydedilen nakit ve kart makbuzlarının bir sonraki dönemde "
+"gerçekten kapatıldığını doğrulayın. Ayrıca, iskonto işlemleri ve faktoring "
+"sözleşmelerinin* muhasebe işlemlerinin doğru yapıldığını da kontrol edin.\n"
+"\n"
+"*Faktoring sözleşmeleri, bir işletmenin ödenmemiş faturalarını (alacak "
+"hesapları) anında nakit karşılığında \"faktör\" olarak bilinen üçüncü taraf "
+"bir şirkete satmasını içerir.\n"
+"            "
 
 #. module: account_reports
 #: model:account.return.check.template,description:account_reports.account_return_check_template_minimum_share_capital_compliance
@@ -7648,6 +8006,8 @@ msgid ""
 "Verify that the company’s share capital meets or exceeds the legal minimum "
 "for its corporate form."
 msgstr ""
+"Şirketin sermayesinin, kurumsal yapısı için yasal asgari tutarı "
+"karşıladığını veya aştığını doğrulayın."
 
 #. module: account_reports
 #. odoo-python
@@ -7680,7 +8040,7 @@ msgstr "Banka Hesap Ekstresini Görüntüle"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell/popover/carryover_popover.xml:0
 msgid "View Carryover Lines"
-msgstr ""
+msgstr "Devreden Satırları Görüntüle"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_kanban_view
@@ -7775,6 +8135,11 @@ msgid "Working Files"
 msgstr "Çalışma Dosyaları"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment
+msgid "Working capital adjustments"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_report_snapshot.py:0
 msgid "Wrong engine result format when merging snapshots."
@@ -7823,7 +8188,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/multicurrency_revaluation_report/warnings.xml:0
 msgid "You are using custom exchange rates."
-msgstr ""
+msgstr "Özel döviz kurları kullanıyorsunuz."
 
 #. module: account_reports
 #: model:ir.model.constraint,message:account_reports.constraint_account_return_check_unique_code_per_return
@@ -7848,6 +8213,8 @@ msgid ""
 "You cannot create duplicate report snapshots for the same company, report "
 "and date with the same engine parameters."
 msgstr ""
+"Aynı şirket, rapor ve tarih için aynı motor parametreleriyle yinelenen rapor "
+"anlık görüntüleri oluşturamazsınız."
 
 #. module: account_reports
 #. odoo-python
@@ -7945,6 +8312,8 @@ msgid ""
 "Your active companies do not match this return's companies. The results "
 "shown for the checks might be incomplete."
 msgstr ""
+"Etkin şirketleriniz bu beyannamedeki şirketlerle eşleşmiyor. Kontroller için "
+"gösterilen sonuçlar eksik olabilir."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.journal_report_pdf_export_main
@@ -7957,7 +8326,7 @@ msgstr "[Taslak]"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/sales_report/warnings.xml:0
 msgid "addressed to"
-msgstr ""
+msgstr "alıcı"
 
 #. module: account_reports
 #. odoo-python
@@ -7990,7 +8359,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/bank_reconciliation_report/warnings.xml:0
 msgid "have a starting balance different from the previous ending balance."
-msgstr ""
+msgstr "önceki dönem kapanış bakiyesinden farklı bir açılış bakiyesine sahip."
 
 #. module: account_reports
 #. odoo-python
@@ -8004,7 +8373,7 @@ msgstr "kimlik"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell/popover/carryover_popover.xml:0
 msgid "in the next period."
-msgstr ""
+msgstr "bir sonraki dönemde"
 
 #. module: account_reports
 #. odoo-javascript
@@ -8052,7 +8421,7 @@ msgstr "partnerler"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/warnings.xml:0
 msgid "prior or included in this period."
-msgstr ""
+msgstr "önceki ya da bu döneme dahil."
 
 #. module: account_reports
 #. odoo-python
@@ -8087,14 +8456,14 @@ msgstr "vergi birimi [%s]"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/sales_report/warnings.xml:0
 msgid "that are not established abroad."
-msgstr ""
+msgstr "yurt dışında yerleşik olmayanlara"
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_comparison.xml:0
 #: code:addons/account_reports/static/src/components/account_report/filters/filter_date.xml:0
 msgid "to"
-msgstr ""
+msgstr "den"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.return_generic_payment_wizard_form
@@ -8117,7 +8486,7 @@ msgstr "Onaylanmamış Yevmiye Kayıtları"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell/popover/carryover_popover.xml:0
 msgid "were carried over to this line from previous period."
-msgstr ""
+msgstr "önceki dönemden bu satıra aktarıldı."
 
 #. module: account_reports
 #. odoo-javascript
@@ -8129,25 +8498,25 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/sales_report/warnings.xml:0
 msgid "who are not established in any of the EC countries."
-msgstr ""
+msgstr "AB ülkelerinden hiçbirinde yerleşik olmayanlar."
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell/popover/carryover_popover.xml:0
 msgid "will be carried over to"
-msgstr ""
+msgstr "şu döneme devredilecek"
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell/popover/carryover_popover.xml:0
 msgid "will be carried over to this line in the next period."
-msgstr ""
+msgstr "bir sonraki dönemde bu satıra devredilecektir."
 
 #. module: account_reports
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/sales_report/warnings.xml:0
 msgid "without a valid intra-community VAT number."
-msgstr ""
+msgstr "geçerli bir topluluk içi KDV numarası olmadan"
 
 #. module: account_reports
 #: model:mail.template,subject:account_reports.email_template_customer_follow_up_report
@@ -8172,13 +8541,16 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/multicurrency_revaluation_report/warnings.xml:0
 msgid "⇒ Reset to Odoo’s Rate"
-msgstr ""
+msgstr "⇒ Odoo oranına sıfırla"
 
 #. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr ""
+
+#~ msgid "Bank Statement Line"
+#~ msgstr "Banka Hesap Ekstresi Kalemi"
 
 #~ msgid "Ensure the taxes on invoices and bills match the customer’s country."
 #~ msgstr ""

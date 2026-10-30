@@ -6,7 +6,7 @@ from odoo import api, models
 class HrPayslipWorkedDays(models.Model):
     _inherit = 'hr.payslip.worked_days'
 
-    @api.depends('is_paid', 'number_of_hours', 'payslip_id', 'version_id.wage', 'payslip_id.sum_worked_hours')
+    @api.depends('is_paid', 'number_of_hours', 'payslip_id', 'version_id.wage')
     def _compute_amount(self):
         mx_worked_days = self.filtered(lambda wd: wd.payslip_id.struct_id.country_id.code == "MX")
         for worked_days in mx_worked_days:

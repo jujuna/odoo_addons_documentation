@@ -1,6 +1,7 @@
 from . import test_voip_access_rights
 from . import test_voip_activity_mixin
 from . import test_voip_call
+from . import test_voip_concurrent_inserts
 from . import test_voip_call_activity_access
 from . import test_voip_call_flow
 from . import test_voip_call_flow_time_condition
@@ -13,6 +14,7 @@ from . import test_voip_multiple_providers
 from . import test_voip_music_on_hold
 from . import test_pbx_service
 from . import test_pbx_tenant_recovery
+from . import test_pbx_tenant_migration_mapping
 from . import test_voip_pbx_routing
 from . import test_voip_queue_agent
 from . import test_voip_requirement
@@ -30,6 +32,7 @@ from . import test_phone_service_access
 from . import test_phone_service_errors
 from . import test_phone_number_utils
 from . import test_phone_service_event
+from . import test_phone_service_event_idempotence
 from . import test_buy_number_wizard
 from . import test_phone_service_notifications
 from . import test_voip_did_number

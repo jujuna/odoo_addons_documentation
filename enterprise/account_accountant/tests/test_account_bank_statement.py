@@ -1755,27 +1755,6 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
         statement_line._try_auto_reconcile_statement_lines()
         self.assertEqual(statement_line.line_ids.reconciled_lines_ids, move_line)
 
-    def test_exchange_diff_single_currency(self):
-        """
-        This test will create a new journal with another currencies as the one from the company with a rounding of 1. Then do a
-        statement line in that currency and adding an invoice in that currency aswell, it should not create an exchange diff move
-        """
-        currency_yen = self.setup_other_currency('JPY', rounding=1.0, rates=[('2016-12-31', 133.62)])
-        new_journal = self.env['account.journal'].create({
-            'name': 'test',
-            'code': 'TBNK',
-            'type': 'bank',
-            'currency_id': currency_yen.id,
-        })
-        st_line = self._create_st_line(50.0, journal_id=new_journal.id, update_create_date=False)
-        inv_line = self._create_invoice_one_line_reco(price_unit=100.0, currency_id=currency_yen.id)
-        st_line.set_line_bank_statement_line(inv_line.id)
-        self.assertRecordValues(st_line.line_ids, [
-            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 50.0, 'currency_id': currency_yen.id, 'balance': 0.37, 'reconciled': False},
-            {'account_id': self.partner_a.property_account_receivable_id.id, 'amount_currency': -50.0, 'currency_id': currency_yen.id, 'balance': -0.37, 'reconciled': True},
-        ])
-        self.assertFalse(st_line.line_ids[1].matched_debit_ids.exchange_move_id)
-
     def test_multi_currency_with_foreign(self):
         currency_yen = self.setup_other_currency('JPY', rounding=1.0, rates=[('2016-12-31', 10.00)])
         new_journal = self.env['account.journal'].create({
@@ -4050,3 +4029,170 @@ class TestAccountBankStatement(TestBankRecWidgetCommon):
             {'account_id': move_line_1.account_id.id, 'amount_currency': -120.0, 'currency_id': self.other_currency.id, 'balance': -60.0, 'reconciled': True},
             {'account_id': move_line_1.account_id.id, 'amount_currency': -60.0, 'currency_id': self.other_currency.id, 'balance': -30.0, 'reconciled': True},
         ])
+
+    def test_create_statement_line_with_reco_model(self):
+        move_line_1 = self._create_invoice_one_line_reco(partner_id=self.partner_a.id, price_unit=400.0)
+        reco_model = self.env['account.reconcile.model'].create({
+            'name': 'test reco model odoobot',
+            'match_journal_ids': [Command.set([self.company_data['default_journal_bank'].id])],
+            'match_label': 'contains',
+            'match_label_param': move_line_1[0].move_name,
+            'line_ids': [Command.create({'account_id': self.company_data['default_account_revenue'].id})],
+        })
+        statement_line = self._create_st_line(
+            amount=400,
+            partner_id=self.partner_a.id,
+            payment_ref=move_line_1[0].move_name,
+            update_create_date=False,
+            reconcile_model_id=reco_model.id,
+        )
+        self.assertRecordValues(statement_line.line_ids, [
+            {'account_id': statement_line.journal_id.default_account_id.id, 'balance': 400.0, 'reconciled': False},
+            {'account_id': self.company_data['default_account_revenue'].id, 'balance': -400.0, 'reconciled': False},
+        ])
+
+    def test_exchange_diff_small_coarse_rounding_currency(self):
+        """A small but real exchange difference must be correctly recorded
+        as an exchange difference move when a line is fully reconciled,
+        even when the transaction currency has a coarse rounding (0
+        decimals), like JPY.
+        """
+        comp_curr = self.env.company.currency_id
+        foreign_curr = self.setup_other_currency('JPY', rounding=1.0, rates=[
+            ('2020-05-31', 270.6),
+            ('2020-06-09', 272.9),
+        ])
+
+        inv_line = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            invoice_date='2020-06-01',
+            currency_id=foreign_curr.id,
+            price_unit=11480.0,
+        )
+        st_line = self._create_st_line(
+            42.07,
+            date='2020-06-10',
+            update_create_date=False,
+        )
+
+        st_line.set_line_bank_statement_line(inv_line.id)
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'amount_currency': 42.07,    'currency_id': comp_curr.id,    'balance': 42.07,  'reconciled': False},
+            {'account_id': inv_line.account_id.id,                   'amount_currency': -11480.0, 'currency_id': foreign_curr.id, 'balance': -42.07, 'reconciled': True},
+        ])
+
+        exchange_move = st_line.line_ids[1].matched_debit_ids.exchange_move_id
+        self.assertTrue(exchange_move, "A real exchange difference of ~0.35 should have been recorded.")
+        self.assertRecordValues(exchange_move.line_ids, [
+            {'account_id': inv_line.account_id.id, 'balance': -0.35},
+            {'account_id': self.env.company.expense_currency_exchange_account_id.id, 'balance': 0.35},
+        ])
+
+    def test_exchange_diff_multiple_coarse_rounding_currency(self):
+        """Ensure multiple invoices in a coarse rounding currency are fully
+        reconciled without leaving a company currency rounding difference.
+        """
+        comp_curr = self.env.company.currency_id
+        foreign_curr = self.setup_other_currency('HUF', rounding=1.0, rates=[
+            ('2026-06-01', 270.6),
+            ('2026-06-10', 272.9),
+        ])
+
+        inv_line_1 = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            invoice_date='2026-06-01',
+            currency_id=foreign_curr.id,
+            price_unit=11480.0,
+        )
+        inv_line_2 = self._create_invoice_one_line_reco(
+            move_type='out_invoice',
+            invoice_date='2026-06-01',
+            currency_id=foreign_curr.id,
+            price_unit=11480.0,
+        )
+
+        # 22,960 HUF at the statement rate (272.9 HUF/USD) = 84.13 USD.
+        st_line = self._create_st_line(
+            84.13,
+            date='2026-06-10',
+            foreign_currency_id=foreign_curr.id,
+            amount_currency=22960.0,
+            update_create_date=False,
+        )
+
+        st_line.set_line_bank_statement_line(
+            (inv_line_1 + inv_line_2).ids,
+        )
+
+        self.assertRecordValues(st_line.line_ids, [
+            {
+                'account_id': st_line.journal_id.default_account_id.id,
+                'amount_currency': 84.13,
+                'currency_id': comp_curr.id,
+                'balance': 84.13,
+                'reconciled': False,
+            },
+            {
+                'account_id': inv_line_1.account_id.id,
+                'amount_currency': -11480.0,
+                'currency_id': foreign_curr.id,
+                'balance': -42.06,
+                'reconciled': True,
+            },
+            {
+                'account_id': inv_line_2.account_id.id,
+                'amount_currency': -11480.0,
+                'currency_id': foreign_curr.id,
+                'balance': -42.07,
+                'reconciled': True,
+            },
+        ])
+
+        self.assertTrue(inv_line_1.reconciled)
+        self.assertTrue(inv_line_2.reconciled)
+
+    def test_auto_reconcile_multiple_refs_in_label_incoming(self):
+        """ A transaction whose label lists several invoice references should reconcile all of them.
+        A third open invoice is created so the partner's total open amount differs from the
+        transaction: the total-amount matching can't apply, and the payment ref matching has to
+        reconcile both references on its own.
+        """
+        invoices = [
+            self._create_invoice_one_line(move_type='out_invoice', price_unit=amount, tax_ids=[], invoice_date='2017-01-01', post=True)
+            for amount in (300.0, 200.0, 100.0)
+        ]
+        move_line_1, move_line_2, move_line_3 = (inv.line_ids.filtered(lambda l: l.display_type == 'payment_term') for inv in invoices)
+
+        statement_line = self._create_st_line(
+            amount=500.0,
+            partner_id=self.partner_a.id,
+            payment_ref=f"{move_line_1.move_name}, {move_line_2.move_name}",
+            update_create_date=False,
+        )
+        statement_line._try_auto_reconcile_statement_lines()
+
+        self.assertTrue(statement_line.is_reconciled)
+        self.assertEqual(statement_line.line_ids.reconciled_lines_ids, move_line_1 + move_line_2)
+        self.assertFalse(move_line_3.reconciled)
+
+    def test_auto_reconcile_multiple_refs_in_label_outgoing(self):
+        """ Same as above, for a vendor payment: the sign of the transaction shouldn't stop the
+        matching after the first bill.
+        """
+        bills = [
+            self._create_invoice_one_line(move_type='in_invoice', price_unit=amount, tax_ids=[], invoice_date='2017-01-01', post=True)
+            for amount in (300.0, 200.0, 100.0)
+        ]
+        move_line_1, move_line_2, move_line_3 = (bill.line_ids.filtered(lambda l: l.display_type == 'payment_term') for bill in bills)
+
+        statement_line = self._create_st_line(
+            amount=-500.0,
+            partner_id=self.partner_a.id,
+            payment_ref=f"{move_line_1.move_name}, {move_line_2.move_name}",
+            update_create_date=False,
+        )
+        statement_line._try_auto_reconcile_statement_lines()
+
+        self.assertTrue(statement_line.is_reconciled)
+        self.assertEqual(statement_line.line_ids.reconciled_lines_ids, move_line_1 + move_line_2)
+        self.assertFalse(move_line_3.reconciled)

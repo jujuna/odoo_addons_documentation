@@ -48,29 +48,9 @@ result = worked_days['SEVENTH_DAY'].amount
 # absences={158.00}
 # disabilities={LEAVE1000 LEAVE1100 LEAVE1200}
 
-disability_codes = {'LEAVE1200', 'LEAVE1100', 'LEAVE1000'}
-disability_days = absence_days = 0.0
-for wd in payslip.worked_days_line_ids:
-    if not wd.is_paid:
-        if wd.code in disability_codes:
-            disability_days += wd.number_of_days
-        else:
-            absence_days += wd.number_of_days
-
-unpaid_days_in_period = disability_days + absence_days
-
-days_in_period = (payslip.date_to - payslip.date_from).days+1
-effective_date_from = max(payslip.date_from, version.date_start)
-effective_date_to = min(payslip.date_to, version.date_end or payslip.date_to)
-effective_days_in_period = (effective_date_to - effective_date_from).days + 1
-days_without_disabilities = effective_days_in_period - disability_days
-
 # Calculate the number of days in the current month
 first_day = payslip.date_from.replace(day=1)
 last_day = payslip.date_from + relativedelta(day=31)
-total_days_in_month = (last_day - first_day).days + 1
-
-accrued_days_in_period = days_in_period - unpaid_days_in_period
 
 hours = version.get_work_hours(first_day, last_day, work_entries)
 unpaid_hours = 0
@@ -85,7 +65,6 @@ accrued_days_in_month = total_days_in_month - unpaid_days_in_month
 
 accrued_ratio_month = accrued_days_in_month / total_days_in_month
 accrued_ratio_in_period = accrued_days_in_period / total_days_in_month
-days_in_month_ratio = days_in_period / total_days_in_month
 
 number_of_days = '016.00' in worked_days and worked_days['016.00'].number_of_days
 result = payslip.l10n_mx_daily_salary * number_of_days
@@ -162,6 +141,7 @@ result = result_rules['BASIC']['total'] - sum(result_rules[code]['total'] for co
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
+number_of_days = '016.00' in worked_days and worked_days['016.00'].number_of_days
 result_qty = number_of_days
 result = payslip.l10n_mx_daily_salary
         </field>
@@ -811,6 +791,7 @@ result = - result_rules['SAVINGS_FUND_EMPLOYER_ALW']['total']
         <field name="sequence">118</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
+gross = categories['GROSS']
 schedule_days = payslip._rule_parameter('l10n_mx_schedule_table')[version.schedule_pay]
 prorated_factor = 30 if schedule_days >= 30 else 30.4
 monthly_subsidy_salary_limit = payslip._rule_parameter('l10n_mx_subsidy_salary_limit', payslip.date_from)
@@ -854,6 +835,7 @@ if not result_rules['ISR']['quantity']:
         <field name="sequence">119</field>
         <field name="condition_select">python</field>
         <field name="condition_python">
+gross = categories['GROSS']
 monthly_subsidy_salary_limit = payslip._rule_parameter('l10n_mx_subsidy_salary_limit')
 # Do not deduct unpaid days; the limit prorates by schedule period, not worked days.
 subsidy_salary_limit = monthly_subsidy_salary_limit * round(schedule_days) / prorated_factor

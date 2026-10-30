@@ -6,7 +6,8 @@
         <field name="inherit_id" ref="l10n_be_reports.vat_return_submission_wizard_form"/>
         <field name="arch" type="xml">
             <group id="instructions" position="before">
-                <field name="comment" placeholder="Comment"/>
+                <label for="comment" string="Comment for the Administration"/>
+                <field name="comment" placeholder="e.g. This declaration replaces the one sent previously for the same period." help="Optional free text transmitted with your declaration to the VAT office."/>
             </group>
         </field>
     </record>

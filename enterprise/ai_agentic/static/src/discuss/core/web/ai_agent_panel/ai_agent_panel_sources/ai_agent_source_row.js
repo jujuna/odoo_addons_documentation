@@ -60,6 +60,7 @@ export class AiAgentSourceRow extends Component {
         const { status, type } = this.record.data;
         return (
             status === "failed" ||
+            status === "skipped" ||
             status === "incomplete" ||
             (status === "indexed" && type !== "binary")
         );
@@ -101,10 +102,9 @@ export class AiAgentSourceRow extends Component {
     }
 
     async onClickRetryOrReprocess() {
-        const method =
-            this.record.data.status === "indexed"
-                ? "action_reprocess_index"
-                : "action_retry_failed_source";
+        const method = ["indexed", "skipped"].includes(this.record.data.status)
+          ? "action_reprocess_index"
+          : "action_retry_failed_source";
         await this.orm.call("ai.agent.source", method, [[this.record.resId]]);
         this.sourcesFolderTree.patchRecord(this.record.resId, { status: "processing" });
     }

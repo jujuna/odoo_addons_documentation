@@ -18,6 +18,8 @@ from odoo.tools.sql import create_index, make_index_name, SQL
 from odoo.tools.translate import LazyTranslate
 from odoo.tools.urls import urljoin as url_join
 
+from .knowledge_article_member import SELF_MEMBER_CREATE_SENTINEL
+
 _lt = LazyTranslate(__name__)
 
 ARTICLE_PERMISSION_LEVEL = {'none': 0, 'read': 1, 'write': 2}
@@ -834,16 +836,12 @@ class KnowledgeArticle(models.Model):
           * automatically organize articles to be the last of their parent
             children, unless a specific sequence is given;
           * allow creation of private articles for him- or her-self. As creation
-            rights on member model are not granted, we detect private article
-            creation and sudo the creation of those. This requires some data
-            manipulation to sudo only those and keep requested ordering based
-            on vals_list;
+            rights on member model are not granted, the creator's membership is
+            created with sudo permissions;
         """
         defaults = self.default_get(['article_member_ids', 'internal_permission', 'parent_id'])
         vals_by_parent_id = {}
-        vals_as_sudo = []
         parent_ids = set()
-
         for vals in vals_list:
             # Set body to match title if any, or prepare a void header to ease
             # article onboarding.
@@ -851,7 +849,6 @@ class KnowledgeArticle(models.Model):
                 vals["body"] = Markup('<h1>%s</h1>') % vals["name"] if vals.get("name") \
                                else Markup('<h1 class="oe-hint"><br></h1>')
 
-            can_sudo = False
             # get values from vals or defaults
             member_ids = vals.get('article_member_ids') or defaults.get('article_member_ids') or False
             internal_permission = vals.get('internal_permission') or defaults.get('internal_permission') or False
@@ -902,34 +899,16 @@ class KnowledgeArticle(models.Model):
                              'parent_id': False,  # just be sure we don't grant privileges
                 })
 
-            # We need to check if the article creation needs to be done with sudo permissions and that
-            # it is authorized.
-            # This is authorized if :
-            #   * The user is not the superuser
-            #   * We do not try to create any favorite records or children articles in the same call
-            #   * We do not try to create a child article
-            #   * We want to create a single member that is the user creating the article
-
-            # The reason why we would want to add the creator as a member for all articles is that
-            # with the new visibility logic, when a user creates a new article in the workspace it is
-            # set to only be visible to members.
-            # This means that in order for him to see the article he just created, we add him to the
-            # members, which needs sudo access.
-
-            check_for_sudo = not self.env.su and \
-                             not self.env.user._is_system() and \
-                             not any(fname in vals for fname in ['favorite_ids', 'child_ids']) and \
-                             not parent_id and member_ids and len(member_ids) == 1
-            if check_for_sudo:
-                self_member = member_ids[0][0] == Command.CREATE and \
-                              member_ids[0][2].get('partner_id') == self.env.user.partner_id.id
-                if self_member:
-                    can_sudo = True
+            # Mark the exact self-membership that the member create override is allowed to create with sudo.
+            if not parent_id and member_ids and member_ids[0][0] == Command.CREATE and member_ids[0][2] == {
+                'partner_id': self.env.user.partner_id.id,
+                'permission': 'write',
+            }:
+                member_ids[0][2]['_knowledge_self_member_create'] = SELF_MEMBER_CREATE_SENTINEL
 
             # if no sequence, parent will have to be checked
             if not vals.get('sequence'):
                 vals_by_parent_id.setdefault(parent_id, []).append(vals)
-            vals_as_sudo.append(can_sudo)
 
         # check access to parents
         if parent_ids:
@@ -955,25 +934,7 @@ class KnowledgeArticle(models.Model):
                     vals['sequence'] = current_sequence
                     current_sequence += 1
 
-        # check access rights only if all records needs sudo
-        if all(vals_as_sudo):
-            self.check_access('create')
-
-        # sort by sudo / not sudo
-        notsudo_articles = iter(super().create([
-            vals for vals, can_sudo in zip(vals_list, vals_as_sudo)
-            if not can_sudo
-        ]))
-        sudo_articles = iter(super(KnowledgeArticle, self.sudo()).create([
-            vals for vals, can_sudo in zip(vals_list, vals_as_sudo)
-            if can_sudo
-        ]).with_env(self.env))
-        articles = self.env['knowledge.article']
-        for is_sudo in vals_as_sudo:
-            if is_sudo:
-                articles += next(sudo_articles)
-            else:
-                articles += next(notsudo_articles)
+        articles = super().create(vals_list)
 
         if any(articles.mapped('is_template')) and not self.env.user.has_group('base.group_system'):
             raise ValidationError(_('You are not allowed to create a new template.'))

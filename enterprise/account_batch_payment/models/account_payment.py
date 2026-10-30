@@ -22,10 +22,7 @@ class AccountPayment(models.Model):
     def _compute_show_download_xml_button(self):
         exportable_method_codes = self.env['account.batch.payment']._get_methods_generating_files()
         for payment in self:
-            payment.show_download_xml_button = (
-                payment.payment_type == 'outbound'
-                and payment.payment_method_line_id.code in exportable_method_codes
-            )
+            payment.show_download_xml_button = payment.payment_method_line_id.code in exportable_method_codes
 
     def _create_and_validate_batch_payment(self, initiate_payment=False):
         batch_payment_action = self.create_batch_payment()
@@ -103,9 +100,6 @@ class AccountPayment(models.Model):
     def action_download_xml(self):
         if not self:
             raise UserError(self.env._("You must select at least one payment to generate a file."))
-
-        if any(payment.payment_type != 'outbound' for payment in self):
-            raise UserError(self.env._("Only outbound payments can be exported."))
 
         if len(self.journal_id) > 1:
             raise UserError(self.env._("You can't generate a file for payments from more than one journal."))

@@ -136,12 +136,18 @@ export class PosOrderline extends PosOrderlineAccounting {
                 )?.custom_value || "";
 
             if (attrValue.attribute_id.display_type === "multi") {
-                if (!acc[attrValue.attribute_id.id]) {
-                    acc[attrValue.attribute_id.id] = { selected: [], custom_value: customValue };
+                if (!acc[attrValue.attribute_line_id.id]) {
+                    acc[attrValue.attribute_line_id.id] = {
+                        selected: [],
+                        custom_value: customValue,
+                    };
                 }
-                acc[attrValue.attribute_id.id].selected.push(attrValue);
+                acc[attrValue.attribute_line_id.id].selected.push(attrValue);
             } else {
-                acc[attrValue.attribute_id.id] = { selected: attrValue, custom_value: customValue };
+                acc[attrValue.attribute_line_id.id] = {
+                    selected: attrValue,
+                    custom_value: customValue,
+                };
             }
             return acc;
         }, {});
@@ -333,6 +339,11 @@ export class PosOrderline extends PosOrderlineAccounting {
     isTipLine() {
         const tipProduct = this.config.tip_product_id;
         return tipProduct && this.product_id.id === tipProduct.id;
+    }
+
+    isGlobalDiscountLine() {
+        const discountProduct = this.config.discount_product_id;
+        return discountProduct && this.product_id.id === discountProduct.id;
     }
 
     getAllLinesInCombo() {

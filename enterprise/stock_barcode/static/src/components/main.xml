@@ -59,9 +59,26 @@
                     >
                         <t t-set-slot="barcode_preview">
                             <div name="barcode_messages">
-                                <span t-if="!info.warning &amp;&amp; info.icon" class="oi oi-lg me-3" t-att-class="info.iconClass" t-att-data-icon="info.icon"/>
-                                <span t-attf-class="o_scan_message o_{{info.class}}" t-out="info.message"/>
+                                <t t-if="this.env.model.trackedQuantityBuffer">
+                                    <t t-set="product" t-value="this.env.model.trackedQuantityBuffer.product.display_name"/>
+                                    <t t-set="quantity" t-value="this.env.model._parseFloat(this.env.model.trackedQuantityBuffer.quantity)"/>
+                                    <t t-set="uom" t-value="this.env.model.trackedQuantityBuffer.uom.name"/>
+                                    <span class="oi oi-lg mx-3" role="img" data-icon="sell"/>
+                                    <span class="o_scan_message o_scan_product_or_lot">
+                                        You scanned <b class="o_scanned_quantity"><t t-out="quantity"/> <t t-out="uom"/></b> of <b><t t-out="product"/></b>.<br/>
+                                        Scan more quantities or scan a lot number to apply the scanned quantity to it.
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span t-if="!info.warning &amp;&amp; info.icon" class="oi oi-lg me-3" t-att-class="info.iconClass" t-att-data-icon="info.icon"/>
+                                    <span t-attf-class="o_scan_message o_{{info.class}}" t-out="info.message"/>
+                                </t>
                             </div>
+                            <button t-if="this.env.model.trackedQuantityBuffer"
+                                class="p-0 ms-3 me-2 btn btn-dark"
+                                t-on-click="() => this.env.model.dropBufferedQuantity()">
+                                <i class="oi oi-lg" role="img" data-icon="delete"/>
+                            </button>
                         </t>
                         <t t-set-slot="barcode_open_button">
                             <button
@@ -123,7 +140,7 @@
         <div t-elif="this.state.view === 'packagePage'"> <!-- Quants (in package) Kanban View -->
             <View type="'kanban'"
                 viewId="this.packageKanbanViewId"
-                display="{ controlPanel: false }"
+                display="{ controlPanel: { layoutActions: false } }"
                 resModel="'stock.quant'"
                 domain="[['package_id', 'in', this._inspectedPackageIds]]"/>
         </div>

@@ -928,6 +928,34 @@ class TestAccountReturn(TestAccountReportsCommon, MailCase):
         second_return.action_reset_tax_return_common()
         first_return.action_reset_tax_return_common()
 
+    @freeze_time('2026-08-01')
+    def test_reset_tax_return_reverses_closing_move_with_restrictive_audit_trail(self):
+        """ When the company enforces the restrictive audit trail, the posted closing move can not
+        be deleted. Resetting the return must instead reverse the closing move, so no entry is ever
+        removed and the audit trail stays intact. """
+        self.company_data['company'].restrictive_audit_trail = True
+
+        tax_return = self.env['account.return'].search([
+            ('type_id', '=', self.basic_return_type.id),
+            ('company_id', '=', self.company_data['company'].id),
+        ], order='date_to ASC', limit=1)
+
+        with self.allow_pdf_render():
+            tax_return.action_validate()
+
+        closing_move = tax_return.closing_move_ids
+        self.assertEqual(len(closing_move), 1)
+        self.assertEqual(closing_move.state, 'posted')
+        self.assertTrue(tax_return.date_lock)
+
+        tax_return.action_reset_tax_return_common()
+
+        # The closing entry must be canceled.
+        self.assertEqual(closing_move.state, 'cancel')
+        self.assertFalse(closing_move.closing_return_id)
+
+        self.assertFalse(tax_return.closing_move_ids)
+
     def test_cannot_submit_if_previous_not_submitted(self):
         first_return, second_return = self.env['account.return'].search([
             ('type_id', '=', self.basic_return_type.id),

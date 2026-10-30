@@ -12,11 +12,11 @@ patch(GeneratePrinterData.prototype, {
         if (data.conditions.code_ke && this.order.l10n_ke_order_json) {
             try {
                 const parsed =
-                    typeof value === "object"
+                    typeof this.order.l10n_ke_order_json === "object"
                         ? this.order.l10n_ke_order_json
                         : JSON.parse(this.order.l10n_ke_order_json);
                 const taxTypes = { B: "16%", E: "8%", C: "0%", D: "Non-VAT", A: "Exempt" };
-                const qrcode = this.generateQrCode(this.order.l10n_ke_edi_oscu_pos_qrurl);
+                const qrcode = this.generateQrCode(this.order.l10n_ke_edi_oscu_pos_qrsrc);
                 const serial = this.order.company.l10n_ke_oscu_serial_number;
                 const sign = this.order.is_refund_or_negative() ? -1 : 1;
                 const taxes = Object.entries(taxTypes).reduce((acc, [type, rate]) => {

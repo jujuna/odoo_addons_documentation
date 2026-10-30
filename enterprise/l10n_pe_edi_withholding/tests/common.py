@@ -58,7 +58,7 @@ class TestPeEdiWithholdingCommon(TestPeEdiCommon):
         self.bill_counter += 1
         vals = {
             'move_type': 'in_invoice',
-            'name': 'F FFI-%05d' % self.bill_counter,
+            'l10n_latam_document_number': 'FFI1-%08d' % self.bill_counter,
             'partner_id': self.partner_a.id,
             'invoice_date': '2017-01-01',
             'date': '2017-01-01',

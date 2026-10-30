@@ -31,6 +31,7 @@ test.tags("desktop");
 test("bank_rec_list_many2one_multi_id widget works in multi-edit", async () => {
     expect.assertions(1);
 
+    onRpc("account.reconcile.model", "get_available_reconcile_model_per_statement_line", () => ({}));
     onRpc("web_save", ({ args }) => {
         expect(args[1].statement_id).toBe(3);
     });

@@ -9,15 +9,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
-"PO-Revision-Date: 2026-09-18 03:36+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-02 17:49+0000\n"
+"PO-Revision-Date: 2026-10-11 12:35+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/hr_payroll_account/zh_Hans/>\n"
+"projects/odoo-20/hr_payroll_account/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,6 +37,13 @@ msgid ""
 "    * Payment Encoding\n"
 "    * Company Contribution Management\n"
 msgstr ""
+"\n"
+"与会计集成的通用工资系统。\n"
+"==============================\n"
+"\n"
+"    * 费用记录\n"
+"    * 付款记录\n"
+"    * 公司分摊管理\n"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_count
@@ -68,12 +76,12 @@ msgid ""
 "                        <span class=\"o_stat_text\" invisible=\"move_state !"
 "= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">日记账记"
-"项<br/>（草稿）</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state "
-"!= 'posted'\">日记账记项<br/>（已过账）</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state "
-"!= 'cancel'\">日记账记项<br/>（已取消）</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">日记账记项"
+"<br/>（草稿）</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">日记账记项<br/>（已过账）</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">日记账记项<br/>（已取消）</span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
@@ -82,6 +90,9 @@ msgid ""
 "                            Journal Entry <br/> (Preview)\n"
 "                        </span>"
 msgstr ""
+"<span class=\"o_stat_text\">\n"
+"                            日记账分录 <br/> （预览）\n"
+"                        </span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -91,12 +102,12 @@ msgstr "<span class=\"o_stat_text\">工资单</span>"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "<span invisible=\"reference\">No payrun id passed in context.</span>"
-msgstr ""
+msgstr "<span invisible=\"reference\">上下文中未传入发薪批次 ID。</span>"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__account
 msgid "Account"
-msgstr ""
+msgstr "科目"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_chart_template
@@ -142,7 +153,7 @@ msgstr "分析精度"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
 msgid "Anonymize Journal Entries"
-msgstr ""
+msgstr "匿名化日记账分录"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
@@ -152,7 +163,7 @@ msgstr "你确定要继续吗？"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__batch_payroll_move_lines
 msgid "Batch Payroll Journal Items"
-msgstr ""
+msgstr "批量工资日记账项目"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__batch_payroll_move_lines
@@ -165,12 +176,12 @@ msgstr "批量工资移动行"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "公司"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__company_currency_id
 msgid "Company Currency"
-msgstr ""
+msgstr "公司币别"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_config_settings
@@ -181,18 +192,18 @@ msgstr "配置设置"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_uid
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "创建人"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "创建日期"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__credit
 msgid "Credit"
-msgstr ""
+msgstr "贷方"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_credit
@@ -209,7 +220,7 @@ msgstr "贷方税务规则"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__debit
 msgid "Debit"
-msgstr ""
+msgstr "借方"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
@@ -260,7 +271,7 @@ msgstr "分析分布账户"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_move_line__employee_bank_account_id
 msgid "Employee Bank Account"
-msgstr ""
+msgstr "员工银行账户"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_version
@@ -279,6 +290,8 @@ msgid ""
 "into a single journal item. This will anonymize the accounting entries but "
 "also disable single payment generations."
 msgstr ""
+"启用此选项可将同一期间的所有会计分录合并为单个日记账项目。这会匿名化会计分录"
+"，但也会禁用单笔付款生成。"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
@@ -287,12 +300,14 @@ msgid ""
 "individual employee amount are not distinguishable in accounting. This also "
 "disables the pay button on individual payslips."
 msgstr ""
+"启用此选项可在处理发薪批次时合并日记账分录，从而在会计中无法区分单个员工的金"
+"额。这还会禁用单张工资单上的付款按钮。"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__employee_move_line
 msgid ""
 "Enable this option to set the employee on the journal items of the payslips."
-msgstr ""
+msgstr "启用此选项可将员工设置到工资单的日记账项目上。"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__split_move_lines
@@ -301,16 +316,18 @@ msgid ""
 "the payslip line name. It could be useful for deduction/reimbursement or "
 "payslip adjustments for instance."
 msgstr ""
+"启用此选项可根据工资单明细行名称拆分该规则的会计分录。例如，对于扣除/报销或工"
+"资单调整可能很有用。"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid "Excluded from Net"
-msgstr ""
+msgstr "不计入净额"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "Generate Draft Journal Entries"
-msgstr ""
+msgstr "生成草稿日记账分录"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
@@ -345,6 +362,8 @@ msgid ""
 "Net salary rule in the journal entries. A specific debit/credit account "
 "should be set to consider it independently."
 msgstr ""
+"若勾选，该规则的结果将不计入日记账分录中的工资净额规则。应设置专门的借方/贷方"
+"科目来单独核算。"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -360,6 +379,8 @@ msgid ""
 "Invalid IBAN for the following Beneficiaries:\n"
 "%s"
 msgstr ""
+"以下收款人的 IBAN 无效：\n"
+"%s"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -388,7 +409,7 @@ msgstr "日记账分录"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "Journal Entry <br/>"
-msgstr ""
+msgstr "日记账分录 <br/>"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_move_line
@@ -398,7 +419,7 @@ msgstr "日记账项目"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Journal Items"
-msgstr ""
+msgstr "日记账项目"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip__date
@@ -408,29 +429,29 @@ msgstr "为空则使用这个期间审核（工资单）日期。"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__label
 msgid "Label"
-msgstr ""
+msgstr "标签"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_uid
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "最后更新人"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "上次更新日期"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__line_ids
 msgid "Line"
-msgstr ""
+msgstr "明细行"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_line
 msgid "Mock version of an account move line used for simulations"
-msgstr ""
+msgstr "用于模拟的会计分录行模拟版本"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_id
@@ -445,13 +466,13 @@ msgstr "分录状态"
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "No Journal"
-msgstr ""
+msgstr "无日记账"
 
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payroll_warning.py:0
 msgid "No Journal on Structure"
-msgstr ""
+msgstr "工资结构上无日记账"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_salary_rule_view_form
@@ -461,7 +482,7 @@ msgstr "无"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__partner
 msgid "Partner"
-msgstr ""
+msgstr "合作伙伴"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -481,7 +502,7 @@ msgstr "工资单"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "付款"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -492,12 +513,12 @@ msgstr "在 %s 处完成付款"
 #. module: hr_payroll_account
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_account
 msgid "Payroll Accounting"
-msgstr ""
+msgstr "工资会计"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payroll_warning
 msgid "Payroll Warning"
-msgstr ""
+msgstr "工资警告"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip_line
@@ -507,7 +528,7 @@ msgstr "工资单明条"
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,description:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "Payslip has no journal defined"
-msgstr ""
+msgstr "工资单未定义日记账"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_ids
@@ -518,17 +539,17 @@ msgstr "工资单"
 #. module: hr_payroll_account
 #: model:ir.actions.act_window,name:hr_payroll_account.action_open_payrun_move_preview
 msgid "Preview of Journal Entry"
-msgstr ""
+msgstr "日记账分录预览"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__reference
 msgid "Reference"
-msgstr ""
+msgstr "参考"
 
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,button_name:hr_payroll_account.hr_payroll_warning_no_journal
 msgid "Review Records"
-msgstr ""
+msgstr "审查记录"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -561,12 +582,12 @@ msgstr "工资结构"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__employee_move_line
 msgid "Set employee on account line"
-msgstr ""
+msgstr "在会计科目行上设置员工"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__split_move_lines
 msgid "Split on names"
-msgstr ""
+msgstr "按名称拆分"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -597,7 +618,7 @@ msgstr "分配给该行的标记在转化为会计分录时将影响财务报表
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__tax_tag_ids
 msgid "Tax Grids"
-msgstr ""
+msgstr "税目明细"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -607,24 +628,35 @@ msgid ""
 msgstr "费用日记账“%s”未正确配置默认科目！"
 
 #. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid ""
+"The following payslips are linked to a posted journal entry, only a user "
+"with accounting rights can cancel them:\n"
+"%s"
+msgstr ""
+"以下工资单已关联到已过账的日记账分录，只有具备会计权限的用户才能取消它们：\n"
+"%s"
+
+#. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Credit"
-msgstr ""
+msgstr "贷方总计"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Debit"
-msgstr ""
+msgstr "借方总计"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid "Validate"
-msgstr ""
+msgstr "验证"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_wizard
 msgid "Wizard to show previews of account moves related to pay runs."
-msgstr ""
+msgstr "用于显示发薪批次相关会计分录预览的向导。"
 
 #. module: hr_payroll_account
 #. odoo-python

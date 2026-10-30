@@ -17,10 +17,6 @@ registry.category("web_tour.tours").add("account_return_flow_tax_return", {
             run: "click",
         },
         {
-            content: "Wait for Checks",
-            trigger: ".kanban_checks_view",
-        },
-        {
             content: "Approve Company Data",
             trigger: "div.o_field_account_review_state_selection_badge > button.btn-outline-danger",
             run: "click",

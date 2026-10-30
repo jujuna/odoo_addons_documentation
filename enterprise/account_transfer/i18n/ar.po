@@ -6,14 +6,15 @@
 # Martin Trigaux, 2022
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:52+0000\n"
-"PO-Revision-Date: 2026-09-17 23:32+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-22 07:42+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "account_transfer/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -31,6 +32,10 @@ msgid ""
 "===========================\n"
 "A helper model for managing transfers between accounts.\n"
 msgstr ""
+"\n"
+"تحويلات الحسابات\n"
+"===========================\n"
+"نموذج مساعد لإدارة التحويلات بين الحسابات.\n"
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -41,14 +46,14 @@ msgstr "<span> إلى </span>"
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model_line.py:0
 msgid "A destination account must be set on each line."
-msgstr ""
+msgstr "يجب تحديد حساب الوجهة في كل بند."
 
 #. module: account_transfer
 #: model:ir.model.fields,help:account_transfer.field_account_transfer_model__conditions
 msgid ""
 "A domain to filter the accounts from which the resulting entry will transfer "
 "amounts."
-msgstr ""
+msgstr "نطاق لتصفية الحسابات التي سيتم تحويل المبالغ منها إلى القيد الناتج."
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -73,12 +78,12 @@ msgstr "بند نموذج تحويل الحساب "
 #. module: account_transfer
 #: model:ir.module.module,shortdesc:base.module_account_transfer
 msgid "Account Transfers"
-msgstr ""
+msgstr "تحويلات الحساب"
 
 #. module: account_transfer
 #: model:ir.actions.server,name:account_transfer.ir_cron_auto_transfer_ir_actions_server
 msgid "Account transfers: Compute transfer entries"
-msgstr ""
+msgstr "تحويلات الحسابات: حساب بنود التحويل"
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -196,7 +201,7 @@ msgstr "الحركات المُنشأة "
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model__has_draft_moves
 msgid "Has Draft Moves"
-msgstr ""
+msgstr "يحتوي على تحويلات بحالة المسودة"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_chart_template__id
@@ -213,13 +218,13 @@ msgstr "المُعرف"
 #: code:addons/account_transfer/demo/account_demo.py:0
 #: model:account.journal.group,name:account_transfer.ifrs_group
 msgid "IFRS"
-msgstr ""
+msgstr "المعايير الدولية لإعداد التقارير المالية"
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/demo/account_demo.py:0
 msgid "IFRS Transfers"
-msgstr ""
+msgstr "التحويلات وفقًا للمعايير الدولية لإعداد التقارير المالية (IFRS)"
 
 #. module: account_transfer
 #. odoo-python
@@ -329,6 +334,8 @@ msgid ""
 "Puts the transfer model in a state in which it will automatically recompute "
 "its draft entries' values every day."
 msgstr ""
+"يضع نموذج التحويل في حالة يتم فيها إعادة حساب قيم مسودات القيود تلقائيًا كل "
+"يوم."
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -336,6 +343,8 @@ msgid ""
 "Puts the transfer model in a state in which it will not automatically "
 "recompute its draft entries' values every day."
 msgstr ""
+"يضع نموذج التحويل في حالة لا يقوم فيها تلقائيًا بإعادة حساب قيم مسودات القيود "
+"كل يوم."
 
 #. module: account_transfer
 #: model:ir.model.fields.selection,name:account_transfer.selection__account_transfer_model__frequency__quarter
@@ -382,13 +391,13 @@ msgstr "النسبة الكلية "
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model.py:0
 msgid "Transfer (%(percent)s%% from %(account)s)"
-msgstr ""
+msgstr "تحويل (%(percent)s%% من %(account)s)"
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model.py:0
 msgid "Transfer (-%(percent)s%% to %(account)s)"
-msgstr ""
+msgstr "تحويل (-%(percent)s%% إلى %(account)s)"
 
 #. module: account_transfer
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__transfer_model_id
@@ -420,19 +429,21 @@ msgid ""
 "You cannot delete a transfer model that has draft moves attached ('%s'). "
 "Please delete them before deleting this transfer."
 msgstr ""
+"لا يمكنك حذف نموذج تحويل يحتوي على مسودات حركة تم إرفاقها (\"%s\"). يرجى "
+"حذفها قبل حذف هذا التحويل."
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/models/transfer_model.py:0
 msgid ""
 "You cannot delete a transfer model that has posted moves attached ('%s')."
-msgstr ""
+msgstr "لا يمكنك حذف نموذج تحويل يحتوي على تحويلات مسجلة مرفقة (’%s‘)."
 
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/models/account_move_line.py:0
 msgid "You cannot set Tax on computed Transfer's entries."
-msgstr ""
+msgstr "لا يمكنك تعيين ضريبة على قيود «التحويل» المحسوبة."
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form

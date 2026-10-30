@@ -10,6 +10,11 @@
                     <field name="is_quarter_month"/>
                     <field name="country_code"/>
                 </xpath>
+
+                <xpath expr="//button[@name='action_submit']/span" position="replace">
+                    <span t-if="record.country_code.raw_value == 'IT' and record.type_external_id.raw_value == 'l10n_it_reports.it_tax_return_type' and !record.is_quarter_month.raw_value">Close</span>
+                    <t t-else="">$0</t>
+                </xpath>
             </field>
         </record>
     </data>

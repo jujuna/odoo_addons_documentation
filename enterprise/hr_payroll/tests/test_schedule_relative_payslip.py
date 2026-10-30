@@ -87,6 +87,7 @@ class TestScheduleRelativePayslip(TransactionCase):
                 self.assertEqual((payslip.date_to - payslip.date_from).days, expected_delta, f"Delta for {pay_schedule} payslip should be {expected_delta} days")
 
     def test_payslip_warnings(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         with freeze_time('2023-04-12'):
             self.billy_contract.write({
                 'schedule_pay': 'quarterly',

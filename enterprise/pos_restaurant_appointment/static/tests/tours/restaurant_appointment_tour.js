@@ -1,3 +1,4 @@
+/* global posmodel */
 import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
 import { registry } from "@web/core/registry";
 import * as RestaurantAppointment from "@pos_restaurant_appointment/../tests/tours/utils/restaurant_appointment_util";
@@ -199,5 +200,28 @@ registry.category("web_tour.tours").add("test_appointment_kanban_view", {
             },
             Dialog.discard(),
             Dialog.isNot(),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add("test_table_without_ressources", {
+    steps: () =>
+        [
+            Chrome.startPoS(),
+            Dialog.confirm("Open Register"),
+            Dialog.is({ title: "Missing Resources" }),
+            Dialog.confirm(),
+            FloorScreen.clickTable("4"),
+            {
+                trigger: "body",
+                run: () => {
+                    if (
+                        !posmodel.models["restaurant.table"]
+                            .getAll()
+                            .every((el) => el.appointment_resource_id)
+                    ) {
+                        throw new Error("All tables should have an appointment ressource set");
+                    }
+                },
+            },
         ].flat(),
 });

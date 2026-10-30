@@ -217,7 +217,7 @@ export class MapModel extends Model {
                     const dateUTC = luxon.DateTime.fromFormat(
                         record[field],
                         "yyyy-MM-dd HH:mm:ss",
-                        { zone: "UTC" }
+                        { zone: "UTC", numberingSystem: "latn" }
                     );
                     record[field] = formatDateTime(dateUTC, { format: "yyyy-MM-dd HH:mm:ss" });
                 }

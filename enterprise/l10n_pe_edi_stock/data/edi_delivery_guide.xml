@@ -129,7 +129,7 @@
                         <cac:DeliveryAddress>
                             <cbc:ID schemeName="Ubigeos"
                                 schemeAgencyName="PE:INEI"><t t-out="delivery_address.l10n_pe_district.code"/></cbc:ID>
-                            <t t-if="partner.l10n_pe_sunat_id_code == '6'">
+                            <t t-if="partner.l10n_pe_sunat_id_code == '6' and record.l10n_pe_edi_reason_for_transfer != '18'">
                                 <cbc:AddressTypeCode
                                     t-att-listID="partner.vat"
                                     listAgencyName="PE:SUNAT"

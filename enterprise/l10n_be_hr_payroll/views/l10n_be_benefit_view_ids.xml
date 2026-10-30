@@ -356,8 +356,11 @@
                 <div class="o_row" invisible="l10n_be_mobility_budget" name="train_div">
                     <field name="train_transport_employee_kilometer" class="o_hr_narrow_field"/> km
                 </div>
-                <field name="train_transport_periodicity" class="o_hr_narrow_field ms-2"
-                    invisible="not train_transport_employee_kilometer or l10n_be_mobility_budget"/>
+                <label for="train_transport_periodicity" string="" invisible="not train_transport_employee_kilometer or l10n_be_mobility_budget"/>
+                <div class="o_row" invisible="not train_transport_employee_kilometer or l10n_be_mobility_budget">
+                    <field name="train_transport_periodicity" class="o_hr_narrow_field"/>
+                    <span>Subscription</span>
+                </div>
             </group>
         </field>
     </record>
@@ -376,7 +379,8 @@
                     <field name="bus_transport_employee_kilometer" class="o_hr_narrow_field"/>
                     km
                 </div>
-                <label for="bus_transport_employee_amount" invisible="l10n_be_mobility_budget or not bus_transport_employee_kilometer"/>
+                <!-- no label: the cost belongs to the ride above (and an empty label would still show the help) -->
+                <div invisible="l10n_be_mobility_budget or not bus_transport_employee_kilometer"/>
                 <div class="o_row" invisible="l10n_be_mobility_budget or not bus_transport_employee_kilometer">
                     <field name="bus_transport_employee_amount" class="o_hr_narrow_field"/>
                     <field name="bus_transport_periodicity" class="o_hr_narrow_field ms-2"/>
@@ -399,7 +403,8 @@
                     <field name="tram_transport_employee_kilometer" class="o_hr_narrow_field"/>
                     km
                 </div>
-                <label for="tram_transport_employee_amount" invisible="l10n_be_mobility_budget or not tram_transport_employee_kilometer"/>
+                <!-- no label: the cost belongs to the ride above (and an empty label would still show the help) -->
+                <div invisible="l10n_be_mobility_budget or not tram_transport_employee_kilometer"/>
                 <div class="o_row" invisible="l10n_be_mobility_budget or not tram_transport_employee_kilometer">
                     <field name="tram_transport_employee_amount" class="o_hr_narrow_field"/>
                     <field name="tram_transport_periodicity" class="o_hr_narrow_field ms-2"/>
@@ -422,7 +427,8 @@
                     <field name="metro_transport_employee_kilometer" class="o_hr_narrow_field"/>
                     km
                 </div>
-                <label for="metro_transport_employee_amount" invisible="l10n_be_mobility_budget or not metro_transport_employee_kilometer"/>
+                <!-- no label: the cost belongs to the ride above (and an empty label would still show the help) -->
+                <div invisible="l10n_be_mobility_budget or not metro_transport_employee_kilometer"/>
                 <div class="o_row" invisible="l10n_be_mobility_budget or not metro_transport_employee_kilometer">
                     <field name="metro_transport_employee_amount" class="o_hr_narrow_field"/>
                     <field name="metro_transport_periodicity" class="o_hr_narrow_field ms-2"/>
@@ -500,6 +506,11 @@
                 <div class="o_row" invisible="l10n_be_mobility_budget or car_id or fuel_card == 0" name="fuel_card_personal_use_div">
                     <field name="fuel_card_personal_use" class="o_hr_narrow_field"/>
                     <span>/ month</span>
+                    <span class="text-warning oi ms-1"
+                        data-icon="warning"
+                        style="cursor: default;"
+                        title="The value of the Fuel Card - Personal Use should be more than 0 and less than the value of Fuel Card. It will be forced between those limits when used."
+                        invisible="0 &lt;= fuel_card_personal_use and fuel_card_personal_use &lt;= fuel_card"/>
                 </div>
                 <field name="mobility_card" invisible="fuel_card == 0"/>
                 <label for="bike_id" string="Company Bike"

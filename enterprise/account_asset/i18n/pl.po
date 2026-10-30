@@ -31,10 +31,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:50+0000\n"
-"PO-Revision-Date: 2026-09-17 23:30+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-10-19 08:28+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-20/"
 "account_asset/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -55,6 +55,12 @@ msgid ""
 "Keeps track of depreciations, and creates corresponding journal entries.\n"
 "\n"
 msgstr ""
+"\n"
+"Zarządzanie zasobami\n"
+"=================\n"
+"Zarządzaj zasobami należącymi do firmy lub osoby.\n"
+"Śledzi amortyzację i tworzy odpowiednie wpisy do dziennika.\n"
+"\n"
 
 #. module: account_asset
 #. odoo-python
@@ -239,8 +245,8 @@ msgid ""
 "(account)s</b>."
 msgstr ""
 "Wpis amortyzacyjny zostanie zaksięgowany w dniu i z dniem %(date)s. <br/> "
-"Zapis o zbyciu zostanie zaksięgowany na koncie %(account_type)s<b>%(account)"
-"s</b>."
+"Zapis o zbyciu zostanie zaksięgowany na koncie %(account_type)s<b>%"
+"(account)s</b>."
 
 #. module: account_asset
 #. odoo-python
@@ -325,24 +331,8 @@ msgstr "Konto"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid ""
-"Account %(account)s should have accumulated depreciation and depreciation "
-"expense accounts set in order to generate an asset"
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
 "Account %(name)s cannot be used to create an asset. The account must be of "
 "the Fixed Asset type."
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Account %(name)s not setup to generate assets. Depreciation model and asset "
-"accounts need to be set on account."
 msgstr ""
 
 #. module: account_asset
@@ -851,7 +841,7 @@ msgstr "Środki"
 #. module: account_asset
 #: model:ir.module.module,shortdesc:base.module_account_asset
 msgid "Assets Management"
-msgstr ""
+msgstr "Zarządzanie środkami trwałymi"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_asset_report_handler
@@ -933,6 +923,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_account__can_create_asset
 msgid "Can Create Asset"
 msgstr "Może utworzyć środek"
+
+#. module: account_asset
+#: model:ir.model.fields,field_description:account_asset.field_account_asset__can_edit_asset_accounts
+msgid "Can Edit Asset Accounts"
+msgstr ""
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -1265,6 +1260,7 @@ msgstr "Amortyzacja"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Depreciation Account"
 msgstr "Konto umorzenia"
 
@@ -1511,8 +1507,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_expense_id
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__expense_account_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Expense Account"
 msgstr "Konto wydatków"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr
+msgid "Financial instruments"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -1574,7 +1576,6 @@ msgstr "Wartość zysku"
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Go to Account"
 msgstr ""
@@ -1696,12 +1697,6 @@ msgstr ""
 "Importuj swoje stałe aktywa, oryginalne dane i ich już naliczoną amortyzację."
 
 #. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid "Important Change"
-msgstr ""
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__already_depreciated_amount_import
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__already_depreciated_amount_import
 msgid ""
@@ -1717,6 +1712,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__informational_text
 msgid "Informational Text"
 msgstr "Tekst informacyjny"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass
+msgid "Intangible assets"
+msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__invoice_line_ids
@@ -1793,16 +1793,6 @@ msgstr "Pozycja zapisu"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__original_move_line_ids
 msgid "Journal Items"
 msgstr "Pozycje zapisów"
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Journal Items of %(account)s should have a label in order to generate an "
-"asset"
-msgstr ""
-"Pozycje dziennika z %(account)s powinny posiadać etykietę, aby mogły "
-"wygenerować zasób"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__journal_id
@@ -2118,9 +2108,12 @@ msgid "No Prorata"
 msgstr "Bez prorata"
 
 #. module: account_asset
+#. odoo-javascript
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
+#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__no_depreciation
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "No depreciation"
 msgstr ""
 
@@ -2301,14 +2294,6 @@ msgstr ""
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid ""
-"Please note that by doing this, you will remove this model from other "
-"companies"
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
 "Please select a different fixed asset account than the one used on the "
@@ -2326,10 +2311,35 @@ msgid "Posted Entries"
 msgstr "Zaksięgowane wpisy"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_sale
+msgid "Proceeds from financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_sale
+msgid "Proceeds from sale of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_sale
+msgid "Proceeds from sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_rou
+msgid "Proceeds from sale of right-of-use assets"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
 msgid "Properties"
 msgstr "Właściwości"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe
+msgid "Property plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -2343,6 +2353,21 @@ msgstr "Data prorata"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__purchase
 msgid "Purchase"
 msgstr "Zakup"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_purch
+msgid "Purchase of financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_purch
+msgid "Purchase of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_purch
+msgid "Purchase of property, plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #: model:account.report.column,name:account_asset.account_grouped_assets_report_duration_rate
@@ -2463,12 +2488,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__select_invoice_line_id
 msgid "Select Invoice Line"
 msgstr "Wybierz linię fakturowania"
-
-#. module: account_asset
-#. odoo-javascript
-#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
-msgid "Select a Depreciation Model"
-msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__company_id
@@ -2701,17 +2720,17 @@ msgid ""
 msgstr ""
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "The fixed asset account differs from the account on the bill. Click"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__new_account_asset_id
 msgid ""
 "The fixed asset account to transfer this asset to. The depreciation "
 "parameters of this account will be applied to the new asset."
 msgstr ""
-
-#. module: account_asset
-#: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_number
-#: model:ir.model.fields,help:account_asset.field_account_depreciation_model__method_number
-msgid "The number of depreciations needed to depreciate your asset"
-msgstr "Liczba amortyzacji potrzebna do amortyzacji twojego środka"
 
 #. module: account_asset
 #. odoo-python
@@ -3160,6 +3179,12 @@ msgid "gain/loss"
 msgstr "zysk/strata"
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "here"
+msgstr ""
+
+#. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "loss"
@@ -3234,6 +3259,16 @@ msgstr ""
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "variant_ids.model_id"
 msgstr ""
+
+#~ msgid ""
+#~ "Journal Items of %(account)s should have a label in order to generate an "
+#~ "asset"
+#~ msgstr ""
+#~ "Pozycje dziennika z %(account)s powinny posiadać etykietę, aby mogły "
+#~ "wygenerować zasób"
+
+#~ msgid "The number of depreciations needed to depreciate your asset"
+#~ msgstr "Liczba amortyzacji potrzebna do amortyzacji twojego środka"
 
 #~ msgid ""
 #~ "Account Type is used for information purpose, to generate country-"

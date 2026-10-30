@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
-from unittest.mock import patch
 
 import odoo.tests
 
@@ -23,17 +22,8 @@ class TestFrontendUrbanPiper(CommonPosUrbanPiperTest, TestPointOfSaleHttpCommon)
             'name': 'Preparation Display',
             'pos_config_ids': [(4, self.urban_piper_config.id)],
         })
-        PosOrder = self.env.registry.models['pos.order']
 
-        def mark_urbanpiper_prep_order_as_printed_patch(self):
-            # Catch the intentionally raised ValueError from the mathod
-            # and return 'False' instead of propagating the exception
-            try:
-                return super(PosOrder, self).mark_urbanpiper_prep_order_as_printed()
-            except ValueError:
-                return False
-        with patch.object(PosOrder, "mark_urbanpiper_prep_order_as_printed", mark_urbanpiper_prep_order_as_printed_patch):
-            self.start_pos_tour('OrderFlowTour', pos_config=self.urban_piper_config, login="pos_admin")
+        self.start_pos_tour('OrderFlowTour', pos_config=self.urban_piper_config, login='pos_admin')
         self.assertEqual(100.0, order_1.amount_total)
         self.assertEqual(100.0, order_1.amount_paid)
         self.assertEqual(0.0, order_1.amount_difference)
@@ -139,7 +129,7 @@ class TestFrontendUrbanPiper(CommonPosUrbanPiperTest, TestPointOfSaleHttpCommon)
         self.urban_piper_config.open_ui()
         order = self.create_urbanpiper_order(qty=2, line_discount=40)
         self.start_pos_tour('test_product_level_discount', pos_config=self.urban_piper_config, login='pos_admin')
-        self.assertEqual(160.0, order.amount_total)
-        self.assertEqual(160.0, order.amount_paid)
+        self.assertEqual(120.0, order.amount_total)
+        self.assertEqual(120.0, order.amount_paid)
         self.assertEqual('paid', order.state)
-        self.assertEqual(20, order.lines[0].discount)
+        self.assertEqual(40, order.lines[0].discount)

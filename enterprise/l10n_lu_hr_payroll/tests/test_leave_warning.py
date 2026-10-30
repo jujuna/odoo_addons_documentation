@@ -10,6 +10,7 @@ class TestLeaveWarning(TestLuPayrollCommon):
 
     def test_no_warning_for_short_sick_leave(self):
         """ A sick leave that stays under the 77 calendar-day paid threshold should not raise any warning. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         leave = self.env['hr.leave'].with_context(leave_fast_create=True).create({
             'employee_id': self.employee_david.id,
             'work_entry_type_id': self.env.ref('hr_work_entry.lu_work_entry_type_sick_leave').id,
@@ -22,6 +23,7 @@ class TestLeaveWarning(TestLuPayrollCommon):
         """ A sick leave crossing the 77 calendar-day threshold should warn that it will be split between
         013.00 (paid by employer) and SL_CNS (paid by CNS) once validated.
         Use leave_fast_create to inspect the warning before the automatic validation splits the leave. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         leave = self.env['hr.leave'].with_context(leave_fast_create=True).create({
             'employee_id': self.employee_david.id,
             'work_entry_type_id': self.env.ref('hr_work_entry.lu_work_entry_type_sick_leave').id,
@@ -41,6 +43,7 @@ class TestLeaveWarning(TestLuPayrollCommon):
 
     def test_no_warning_for_non_sick_leave(self):
         """ The warning only applies to 013.00 (sick leave) work entry types. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         other_work_entry_type = self.env['hr.work.entry.type'].create({
             'name': 'Other Leave',
             'code': 'OTHER',

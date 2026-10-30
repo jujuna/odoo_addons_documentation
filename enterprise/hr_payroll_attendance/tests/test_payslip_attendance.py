@@ -1,10 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.addons.hr_holidays_attendance.tests.common import HrWorkEntryAttendanceCommon
-
-from datetime import datetime, date
+from datetime import date, datetime
 
 from odoo.tests import tagged
+
+from odoo.addons.hr_holidays_attendance.tests.common import HrWorkEntryAttendanceCommon
+
 
 @tagged('-at_install', 'post_install')
 class TestPayslipAttendance(HrWorkEntryAttendanceCommon):
@@ -136,3 +137,58 @@ class TestPayslipAttendance(HrWorkEntryAttendanceCommon):
         self.employee.tz = 'Europe/Brussels'
         attendance.invalidate_recordset(['payslip_id'])
         self.assertFalse(attendance.payslip_id)
+
+    def test_generate_payrun_attendance_with_overtime(self):
+        """A payrun must generate and compute payslips for attendance-based employees with overtime hours."""
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        overtime_type = self.env.ref('hr_work_entry.generic_work_entry_type_overtime')
+        self.env['hr.time.rule'].create({
+            'name': 'Test Overtime Rule',
+            'calendar_source': 'employee',
+            'quantity_period': 'day',
+            'work_entry_type_id': overtime_type.id,
+            'condition_work_entry_type_ids': [self.env.company.attendance_work_entry_type_id.id],
+        })
+
+        self.employee.version_id.write({
+            'structure_type_id': self.struct_type,
+            'hourly_wage': 100,
+        })
+
+        # 20h worked on a scheduled 8h day -> 12h overtime
+        self.env['hr.attendance'].create({
+            'employee_id': self.employee.id,
+            'check_in': datetime(2024, 1, 3, 0, 0, 0),  # Wednesday
+            'check_out': datetime(2024, 1, 3, 20, 0, 0),
+        })
+
+        action = self.env['hr.payslip.run'].action_start_payrun_with_warnings({
+            'date_start': '2024-01-01',
+            'date_end': '2024-01-30',
+            'structure_id': self.struct.id,
+            'company_id': self.env.company.id,
+        })
+        self.assertNotEqual(
+            action.get('tag'), 'hr_payroll.payrun_start_warning',
+            f"Starting the payrun raised unexpected warnings: {action.get('params')}",
+        )
+
+        payrun = self.env['hr.payslip.run'].search([
+            ('date_start', '=', '2024-01-01'),
+            ('date_end', '=', '2024-01-30'),
+            ('structure_id', '=', self.struct.id),
+        ])
+        self.assertEqual(len(payrun), 1, 'The payrun should have been created')
+        self.assertEqual(len(payrun.slip_ids), 1, 'Payrun should have generated one payslip for the attendance-based employee')
+        payslip = payrun.slip_ids
+        self.assertEqual(payslip.state, 'draft')
+        self.assertFalse(payslip.error_count, 'Payslip should not have blocking errors')
+        self.assertEqual(payrun.state, '01_ready', 'Payrun should move past draft once its payslip is generated')
+
+        overtime_line = payslip.worked_days_line_ids.filtered(lambda w: w.code == '040.00')
+        self.assertTrue(overtime_line, 'Payslip should include an overtime worked days line')
+        self.assertEqual(overtime_line.number_of_hours, 12)
+
+        basic_line = payslip.line_ids.filtered_domain([('code', '=', 'BASIC')])
+        self.assertTrue(basic_line, 'Payslip should have computed salary lines')
+        self.assertGreater(basic_line.amount, 0, 'Basic salary should be computed from worked hours')

@@ -237,8 +237,7 @@ class AccountJournal(models.Model):
         last_soda_date = self.env["account.move"].search([
             ("journal_id", "=", soda_journal.id),
         ], order="create_date DESC", limit=1).create_date
-        if not last_soda_date:
-            last_soda_date = fields.Date.today() - relativedelta(years=2)  # API goes back 2 years max
+        last_soda_date = fields.Date.to_date(last_soda_date) if last_soda_date else fields.Date.today() - relativedelta(years=2)  # API goes back 2 years max
 
         lock_date = max(company.user_fiscalyear_lock_date, company.user_hard_lock_date)
         date_from = max(last_soda_date, lock_date)

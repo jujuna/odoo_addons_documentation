@@ -17,6 +17,7 @@ import {
 import {
     contains,
     defineModels,
+    defineParams,
     destroyApp,
     fields,
     findComponent,
@@ -1754,6 +1755,34 @@ test("Content of the marker popup with date time", async () => {
     expect(".o_map_card_grid > div:nth-child(2)").toHaveText("Feb 7, 2022, 11:09 PM", {
         message: 'The time  "2022-02-07 21:09:31" should be in the local timezone',
     });
+});
+
+test("Content of the marker popup with date time in Arabic numbering system", async () => {
+    mockTimeZone(+2); // UTC+2
+    defineParams({ lang: "ar_001" });
+    patchWithCleanup(session, { map_box_token: MAP_BOX_TOKEN });
+
+    Task._records = TEST_RECORDS.task.twoRecordsFieldDateTime;
+    Partner._records = TEST_RECORDS.partner.twoRecordsAddressCoordinates.map((r) => ({ ...r }));
+    Partner._records[0].partner_latitude = 11.0;
+
+    const view = await mountView({
+        config: { views: [[false, "form"]] },
+        type: "map",
+        resModel: "project.task",
+        arch: `<map res_partner="partner_id" routing="true" hide_name="true" hide_address="true">
+                    <field name="scheduled_date" string="Date"/>
+                </map>`,
+    });
+
+    const { records } = getMapController(view).model.data;
+    expect(records.find((r) => r.id === 2).scheduled_date).toBe(
+        "2022-02-07 23:09:31",
+        {
+            message:
+                "The datetime should be parsed correctly and not show as invalid when the numbering system is Arabic",
+        }
+    );
 });
 
 /**
@@ -3916,4 +3945,38 @@ test("Pin list sidebar can be resized", async () => {
     expect(sidebar.offsetWidth).toBeGreaterThan(originalWidth, {
         message: "Dragging the resize handle towards the map should widen the sidebar",
     });
+});
+
+test("Routes are only displayed for unfolded groups", async () => {
+    patchWithCleanup(session, { map_box_token: MAP_BOX_TOKEN });
+
+    Task._records = TEST_RECORDS.task.fourPartners;
+    Partner._records = TEST_RECORDS.partner.fourRecords;
+
+    await mountView({
+        type: "map",
+        resModel: "project.task",
+        arch: `<map res_partner="partner_id" routing="optimized" />`,
+        groupBy: ["name"],
+    });
+
+    expect(".leaflet-overlay-pane path").toHaveCount(2);
+    if (isSmall()) {
+        await contains(".o-sm-map-toggler button:contains(Locations)").click();
+    }
+    await contains(".o-map-renderer--pin-list-container [data-icon='arrow_drop_down']").click(); // Fold first group
+    await contains(".o-map-renderer--pin-list-container [data-icon='arrow_drop_down']").click(); // Fold second group
+    if (isSmall()) {
+        await contains(".o-sm-map-toggler button:contains(Locations)").click();
+    }
+    expect(".leaflet-overlay-pane path").toHaveCount(0);
+
+    if (isSmall()) {
+        await contains(".o-sm-map-toggler button:contains(Locations)").click();
+    }
+    await contains(".o-map-renderer--pin-list-container [data-icon='arrow_right']").click(); // Unfold first group
+    if (isSmall()) {
+        await contains(".o-sm-map-toggler button:contains(Locations)").click();
+    }
+    expect(".leaflet-overlay-pane path").toHaveCount(1);
 });

@@ -1,36 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
     <t t-name="knowledge.KnowledgeTopbar">
-        <div class="o_knowledge_header d-flex align-items-baseline d-print-none py-2 px-md-2 px-1">
+        <div class="o_knowledge_header d-flex d-print-none py-2 px-md-2 px-1">
+            <t t-set="hasBreadcrumbs" t-value="this.env.config?.breadcrumbs?.length > 1"/>
             <div class="d-flex align-self-start">
-                <button class="o_knowledge_toggle_sidebar btn btn-light me-md-2"
+                <button class="o_knowledge_toggle_sidebar btn btn-light"
                     t-on-click="() => this.env.toggleAsideMobile()"
                     data-tooltip="Toggle aside menu" aria-label="Toggle aside menu">
                     <i class="oi" data-icon="left_panel_open" aria-hidden="true"/>
                 </button>
             </div>
-            <div t-if="this.props.record.resId" class="d-none d-md-flex flex-grow-1 flex-wrap min-w-0">
-                <KnowledgeHierarchy record="this.props.record"/>
+            <div class="d-flex flex-column flex-grow-1 min-w-0">
+                <div class="d-flex align-items-baseline min-w-0">
+                    <div t-if="this.props.record.resId and hasBreadcrumbs" class="d-none d-md-block flex-grow-1 min-w-0 ps-1 small">
+                        <KnowledgeBreadcrumbs breadcrumbs="this.env.config.breadcrumbs"/>
+                    </div>
+                    <div t-elif="this.props.record.resId" class="d-none d-md-flex flex-grow-1 flex-wrap min-w-0">
+                        <KnowledgeHierarchy record="this.props.record"/>
+                    </div>
+                    <div class="d-md-none d-flex flex-grow-1 flex-wrap min-w-0 align-items-center gap-2 gap-md-0">
+                        <KnowledgeFormStatusIndicator t-props="this.statusIndicator.props()"/>
+                    </div>
+                    <button t-if="this.props.record.resId and this.props.record.data.active" t-attf-class="btn btn-light #{this.state.shareBtnIsActive ? 'show' : ''}" t-on-click="this.togglePermissionPanel" data-hotkey="shift+s">
+                        <t t-if="this.isInternalUser">
+                            <i class="d-inline-block d-md-none oi" data-icon="share" aria-hidden="true"/>
+                            <span class="d-none d-md-inline">Share</span>
+                        </t>
+                        <t t-else="">Members</t>
+                    </button>
+                    <button class="o_knowledge_toggle_favorite btn btn-light ms-1"
+                        t-if="this.props.record.resId" 
+                        t-on-click="this.env.toggleFavorite"
+                        t-att-aria-label="this.favoriteButtonTitle"
+                        t-att-title="this.favoriteButtonTitle"
+                        data-hotkey="t">
+                        <i t-if="this.props.record.data.is_user_favorite" class="oi oi-filled" data-icon="star" aria-hidden="true"/>
+                        <i t-if="!this.props.record.data.is_user_favorite" class="oi" data-icon="star" aria-hidden="true"/>
+                    </button>
+                    <SidePanelToolbar t-if="!this.panelState.isSidePanelOpen()" t-props="this.props" record="this.reactiveRecord()"/>
+                </div>
+                <!-- With breadcrumbs, the hierarchy moves to its own line -->
+                <div t-if="this.props.record.resId and hasBreadcrumbs" class="d-none d-md-flex flex-wrap min-w-0">
+                    <KnowledgeHierarchy record="this.props.record"/>
+                </div>
             </div>
-            <div class="d-md-none d-flex flex-grow-1 flex-wrap min-w-0 align-items-center gap-2 gap-md-0">
-                <KnowledgeFormStatusIndicator t-props="this.statusIndicator.props()"/>
-            </div>
-            <button t-if="this.props.record.data.active" t-attf-class="btn btn-light #{this.state.shareBtnIsActive ? 'show' : ''}" t-on-click="this.togglePermissionPanel" data-hotkey="shift+s">
-                <t t-if="this.isInternalUser">
-                    <i class="d-inline-block d-md-none oi" data-icon="share" aria-hidden="true"/>
-                    <span class="d-none d-md-inline">Share</span>
-                </t>
-                <t t-else="">Members</t>
-            </button>
-            <button class="o_knowledge_toggle_favorite btn btn-light ms-1"
-                t-on-click="this.env.toggleFavorite"
-                t-att-aria-label="this.favoriteButtonTitle"
-                t-att-title="this.favoriteButtonTitle"
-                data-hotkey="t">
-                <i t-if="this.props.record.data.is_user_favorite" class="oi oi-filled" data-icon="star" aria-hidden="true"/>
-                <i t-if="!this.props.record.data.is_user_favorite" class="oi" data-icon="star" aria-hidden="true"/>
-            </button>
-            <SidePanelToolbar t-if="!this.panelState.isSidePanelOpen()" t-props="this.props" record="this.reactiveRecord()"/>
         </div>
     </t>
 </templates>

@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 18:12+0000\n"
-"PO-Revision-Date: 2026-09-18 05:03+0000\n"
+"POT-Creation-Date: 2026-10-09 18:24+0000\n"
+"PO-Revision-Date: 2026-10-19 23:33+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/l10n_gt_edi/es_419/>\n"
+"odoo-20/l10n_gt_edi/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,6 +27,8 @@ msgid ""
 "\n"
 "E-invoice implementation for Guatemala\n"
 msgstr ""
+"\n"
+"Implementación de la facturación electrónica para Guatemala\n"
 
 #. module: l10n_gt_edi
 #. odoo-python
@@ -503,7 +505,7 @@ msgstr ""
 #. module: l10n_gt_edi
 #: model:ir.module.module,shortdesc:base.module_l10n_gt_edi
 msgid "Guatemala - E-Invoicing"
-msgstr ""
+msgstr "Guatemala - Facturación electrónica"
 
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.res_config_settings_form_inherit_l10n_gt_edi
@@ -751,8 +753,8 @@ msgstr "Motivo de Cancelación"
 
 #. module: l10n_gt_edi
 #: model:ir.model.fields.selection,name:l10n_gt_edi.selection__account_move__l10n_gt_edi_doc_type__nabn
-msgid "NABN - Nota de Pago Electrónica"
-msgstr "NABN - Nota de pago electrónica"
+msgid "NABN - Nota de Abono"
+msgstr "NABN - Nota de Abono"
 
 #. module: l10n_gt_edi
 #: model:ir.model.fields.selection,name:l10n_gt_edi.selection__account_move__l10n_gt_edi_doc_type__ncre
@@ -772,7 +774,7 @@ msgstr "NIT de la Empresa:"
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.l10n_gt_edi_nit_cf_template
 msgid "NIT: CF"
-msgstr ""
+msgstr "NIT: CF"
 
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
@@ -815,6 +817,11 @@ msgid "Otra Referencia:"
 msgstr "Otra Referencia:"
 
 #. module: l10n_gt_edi
+#: model:ir.model.fields.selection,name:l10n_gt_edi.selection__res_company__l10n_gt_edi_vat_affiliation__pecu
+msgid "PECU: Livestock Regime"
+msgstr "PECU: Régimen pecuario"
+
+#. module: l10n_gt_edi
 #: model:ir.model.fields.selection,name:l10n_gt_edi.selection__res_company__l10n_gt_edi_vat_affiliation__pee
 msgid "PEE: Special Electronic Small Taxpayer"
 msgstr "PEE: Pequeño Contribuyente Electrónico Especial"
@@ -828,6 +835,11 @@ msgstr "PEQ: Régimen de Pequeños Contribuyentes"
 #: model:ir.model.fields.selection,name:l10n_gt_edi.selection__account_tax__l10n_gt_edi_short_name__petroleo
 msgid "PETROLEO"
 msgstr "PETROLEO"
+
+#. module: l10n_gt_edi
+#: model:ir.model.fields.selection,name:l10n_gt_edi.selection__res_company__l10n_gt_edi_vat_affiliation__prim
+msgid "PRIM: Primary Regime"
+msgstr "PRIM: Régimen primario"
 
 #. module: l10n_gt_edi
 #. odoo-python
@@ -861,7 +873,7 @@ msgstr "Frases"
 #. odoo-python
 #: code:addons/l10n_gt_edi/models/account_move.py:0
 msgid "Please add the NIT or CUI on partner %s."
-msgstr ""
+msgstr "Agrega el NIT o CUI al contacto %s."
 
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.res_config_settings_form_inherit_l10n_gt_edi
@@ -968,35 +980,41 @@ msgid ""
 "        EXI - Exempt for Specific Income - Explanation: Applies to sectors "
 "or activities exempt from taxes according to special legislation, such as "
 "diplomatic services and certain exports of specific goods or services.\n"
+"        PRIM - Primary Regime.\n"
+"        PECU - Livestock Regime.\n"
 "        "
 msgstr ""
-"Selecciona la afiliación del IVA de su empresa:\n"
-"Gen - Régimen general del IVA: aplicable a los contribuyentes con "
-"actividades comerciales, industriales o de servicio.Deben declarar y pagar "
-"el IVA mensualmente, utilizando el método de débito y crédito fiscal.\n"
-"Exe - IVA exento - se aplica a las entidades gubernamentales, asociaciones "
-"sin fines de lucro y actividades exentas de acuerdo con la ley.No generan ni "
-"pagan el IVA, sino que deben cumplir con los requisitos específicos antes "
-"del SAT.\n"
-"PEQ - Pequeño contribuyente - para individuos o entidades legales con "
-"ingresos anuales hasta un límite establecido por el SAT.Pagan un porcentaje "
-"fijo de sus ventas brutas y sus devoluciones trimestrales.\n"
-"PEE - Pequeño contribuyente electrónico: similar al régimen de los "
-"contribuyentes pequeños, pero adaptado para operaciones electrónicas, "
-"permitiendo declaraciones digitales y facturación.\n"
-"AGR - Régimen agrícola - diseñado para actividades agrícolas con beneficios "
-"fiscales específicos, permitiendo créditos y declaraciones adaptados a la "
-"producción agroindustrial.\n"
-"Edad: régimen agrícola electrónico: igual que el régimen agrícola, pero para "
-"los contribuyentes que operan electrónicamente, facilitando la declaración "
-"fiscal y los procesos de control.\n"
-"ECA - Exportador de bienes y servicios - Explicación: Para las empresas que "
-"exportan.Le permite solicitar reembolsos de crédito fiscal para las "
-"exportaciones y disfrutar de ciertos beneficios fiscales.\n"
-"EXI - Exento de ingresos específicos - Explicación: se aplica a sectores o "
-"actividades exentas de impuestos de acuerdo con la legislación especial, "
-"como los servicios diplomáticos y ciertas exportaciones de bienes o "
-"servicios específicos."
+"Selecciona la afiliación al IVA de tu empresa:\n"
+"         GEN - Régimen general del IVA - Aplica a contribuyentes que "
+"realizan actividades comerciales, industriales o de servicios. Deben "
+"declarar y pagar el IVA cada mes mediante el método de débito y crédito "
+"fiscal.\n"
+"         EXE - Exento del IVA - Aplica a entidades gubernamentales, "
+"asociaciones sin fines de lucro y actividades exentas según la ley. No "
+"generan ni pagan IVA, pero deben cumplir requisitos específicos ante la "
+"SAT.\n"
+"         PEQ - Pequeño contribuyente - Aplica a personas individuales o "
+"jurídicas con ingresos anuales de hasta el límite establecido por la SAT. "
+"Pagan un porcentaje fijo de sus ventas brutas y presentan declaraciones "
+"trimestrales.\n"
+"         PEE - Pequeño contribuyente electrónico - Similar al régimen de "
+"pequeño contribuyente, pero adaptado a operaciones electrónicas, con "
+"declaraciones y facturación digitales.\n"
+"         AGR - Régimen agropecuario - Diseñado para actividades "
+"agropecuarias con beneficios fiscales específicos. Permite aplicar créditos "
+"y presentar declaraciones adaptadas a la producción agroindustrial.\n"
+"         AGE - Régimen agropecuario electrónico - Igual que el régimen "
+"agropecuario, pero para contribuyentes que operan por medios electrónicos. "
+"Facilita los procesos de declaración y control tributario.\n"
+"         ECA - Exportador de bienes y servicios - Aplica a empresas que "
+"exportan. Permite solicitar la devolución del crédito fiscal por "
+"exportaciones y acceder a ciertos beneficios fiscales.\n"
+"         EXI - Exento por ingresos específicos - Aplica a sectores o "
+"actividades exentos de impuestos según leyes especiales, como los servicios "
+"diplomáticos y ciertas exportaciones de bienes o servicios específicos.\n"
+"         PRIM - Régimen primario.\n"
+"         PECU - Régimen pecuario.\n"
+"         "
 
 #. module: l10n_gt_edi
 #. odoo-python
@@ -1239,6 +1257,67 @@ msgstr "Servicios web"
 #: model:ir.model,name:l10n_gt_edi.model_l10n_gt_edi_cancel
 msgid "Wizard to allow the cancellation of Guatemalan documents"
 msgstr "Asistente para permitir la cancelación de documentos guatemaltecos"
+
+#~ msgid "NABN - Nota de Pago Electrónica"
+#~ msgstr "NABN - Nota de pago electrónica"
+
+#~ msgid ""
+#~ "Selects the VAT affiliation of your company:\n"
+#~ "        GEN - General VAT Regime - Applicable to taxpayers with "
+#~ "commercial, industrial or service activities. They must declare and pay "
+#~ "VAT monthly, using the tax debit and credit method.\n"
+#~ "        EXE - VAT Exempt - Applies to government entities, non-profit "
+#~ "associations and exempt activities according to the law. They do not "
+#~ "generate or pay VAT, but must meet specific requirements before the SAT.\n"
+#~ "        PEQ - Small Taxpayer - For individuals or legal entities with "
+#~ "annual income up to a limit established by the SAT. They pay a fixed "
+#~ "percentage of their gross sales and file quarterly returns.\n"
+#~ "        PEE - Small Electronic Taxpayer - Similar to the Small Taxpayer "
+#~ "regime, but adapted for electronic operations, allowing digital "
+#~ "declarations and billing.\n"
+#~ "        AGR - Agricultural Regime - Designed for agricultural activities "
+#~ "with specific tax benefits, allowing credits and declarations adapted to "
+#~ "agroindustrial production.\n"
+#~ "        AGE - Electronic Agricultural Regime - Same as the agricultural "
+#~ "regime, but for taxpayers who operate electronically, facilitating tax "
+#~ "declaration and control processes.\n"
+#~ "        ECA - Exporter of Goods and Services - Explanation: For companies "
+#~ "that export. It allows you to request tax credit refunds for exports and "
+#~ "enjoy certain tax benefits.\n"
+#~ "        EXI - Exempt for Specific Income - Explanation: Applies to "
+#~ "sectors or activities exempt from taxes according to special legislation, "
+#~ "such as diplomatic services and certain exports of specific goods or "
+#~ "services.\n"
+#~ "        "
+#~ msgstr ""
+#~ "Selecciona la afiliación del IVA de su empresa:\n"
+#~ "Gen - Régimen general del IVA: aplicable a los contribuyentes con "
+#~ "actividades comerciales, industriales o de servicio.Deben declarar y "
+#~ "pagar el IVA mensualmente, utilizando el método de débito y crédito "
+#~ "fiscal.\n"
+#~ "Exe - IVA exento - se aplica a las entidades gubernamentales, "
+#~ "asociaciones sin fines de lucro y actividades exentas de acuerdo con la "
+#~ "ley.No generan ni pagan el IVA, sino que deben cumplir con los requisitos "
+#~ "específicos antes del SAT.\n"
+#~ "PEQ - Pequeño contribuyente - para individuos o entidades legales con "
+#~ "ingresos anuales hasta un límite establecido por el SAT.Pagan un "
+#~ "porcentaje fijo de sus ventas brutas y sus devoluciones trimestrales.\n"
+#~ "PEE - Pequeño contribuyente electrónico: similar al régimen de los "
+#~ "contribuyentes pequeños, pero adaptado para operaciones electrónicas, "
+#~ "permitiendo declaraciones digitales y facturación.\n"
+#~ "AGR - Régimen agrícola - diseñado para actividades agrícolas con "
+#~ "beneficios fiscales específicos, permitiendo créditos y declaraciones "
+#~ "adaptados a la producción agroindustrial.\n"
+#~ "Edad: régimen agrícola electrónico: igual que el régimen agrícola, pero "
+#~ "para los contribuyentes que operan electrónicamente, facilitando la "
+#~ "declaración fiscal y los procesos de control.\n"
+#~ "ECA - Exportador de bienes y servicios - Explicación: Para las empresas "
+#~ "que exportan.Le permite solicitar reembolsos de crédito fiscal para las "
+#~ "exportaciones y disfrutar de ciertos beneficios fiscales.\n"
+#~ "EXI - Exento de ingresos específicos - Explicación: se aplica a sectores "
+#~ "o actividades exentas de impuestos de acuerdo con la legislación "
+#~ "especial, como los servicios diplomáticos y ciertas exportaciones de "
+#~ "bienes o servicios específicos."
 
 #~ msgid "CUI"
 #~ msgstr "CUI"

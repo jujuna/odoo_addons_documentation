@@ -92,9 +92,6 @@ export class BankRecButtonList extends Component {
                     "|",
                     ["company_id", "in", [false, this.statementLineData.company_id.id]],
                     ["company_id", "parent_of", this.statementLineData.company_id.id],
-                    "|",
-                    ["parent_id", "=", false],
-                    ["is_company", "=", true],
                 ],
                 onSelected: async (partner) => await this._setPartnerOnReconcileLine(partner[0]),
             },
@@ -303,7 +300,7 @@ export class BankRecButtonList extends Component {
      */
     async deleteTransaction() {
         this.addDialog(ConfirmationDialog, {
-            body: _t("Are you sure you want to delete this statement line?"),
+            body: _t("Are you sure you want to delete this transaction?"),
             confirm: async () => {
                 await this.orm.call("account.bank.statement.line", "delete_statement_line", [
                     this.statementLineData.id,

@@ -200,6 +200,57 @@ class TestExportTours(HttpCase):
         self.assertTrue('My New App' in created_menus)
         self.assertTrue('My App Records' in created_menus)
 
+    def test_export_website(self):
+        public_user = self.env.ref("base.public_user")
+        website = self.env["website"].create(
+            {"name": "test website", "user_id": public_user.id}
+        )
+        website_installed = "website" in self.env["ir.module.module"]._installed()
+
+        attachement = view = None
+        if website_installed:
+            attachement = self.env["ir.attachment"].create(
+                {"name": "test", "website_id": website.id}
+            )
+            view = self.env["ir.ui.view"].create(
+                {
+                    "name": "test",
+                    "website_id": website.id,
+                    "arch": """<t t-name="some_name" />""",
+                    "type": "qweb",
+                    "arch_updated": True,
+                }
+            )
+
+        self.env["studio.export.model"].create(
+            {
+                "model_id": self.env["ir.model"]._get("website").id,
+                "domain": f"[('id', '=', {website.id})]",
+            }
+        )
+        wizard = self.env["studio.export.wizard"].create(
+            {"include_additional_data": True}
+        )
+        data = wizard.get_export_info()
+
+        export_map = {
+            d[0]: {
+                "records": d[1],
+                "fields": d[2],
+            }
+            for d in data[1]
+        }
+
+        if website_installed:
+            self.assertEqual(
+                [v["records"] for v in export_map.values()],
+                [website, view, attachement],
+            )
+            self.assertTrue("website_id" in export_map["ir.attachment"]["fields"])
+            self.assertTrue("website_id" in export_map["ir.ui.view"]["fields"])
+        else:
+            self.assertEqual([v["records"] for v in export_map.values()], [website])
+
 
 @tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCircularDependencies(BaseCase):

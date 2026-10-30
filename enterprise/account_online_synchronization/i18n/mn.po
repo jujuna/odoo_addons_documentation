@@ -4,14 +4,15 @@
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2026.
+# Lodoikhuu <baskhuujacara@gmail.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:35+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-14 13:51+0000\n"
+"Last-Translator: Lodoikhuu <baskhuujacara@gmail.com>\n"
+"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-20/"
 "account_online_synchronization/mn/>\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +30,10 @@ msgid ""
 "If you've already opened a ticket for this issue, don't report it again: a "
 "support agent will contact you shortly."
 msgstr ""
+"\n"
+"\n"
+"Хэрэв та энэ асуудлаар аль хэдийн тасалбар нээсэн бол дахин мэдэгдэх "
+"шаардлагагүй: дэмжлэгийн ажилтан тантай удахгүй холбогдоно."
 
 #. module: account_online_synchronization
 #: model:ir.module.module,description:base.module_account_online_synchronization
@@ -38,18 +43,22 @@ msgid ""
 "online bank accounts (for supported banking institutions), and configure\n"
 "a periodic and automatic synchronization of their bank statements.\n"
 msgstr ""
+"\n"
+"Энэ модулийн тусламжтайгаар хэрэглэгчид банкны журналаа\n"
+"онлайн банкны данстайгаа (дэмжигдсэн банкуудын хувьд) холбож,\n"
+"банкны хуулгаа үечилсэн, автоматаар ижилсүүлэх тохиргоо хийх боломжтой.\n"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_duplicate_transactions.py:0
 msgid "%s duplicate transactions"
-msgstr ""
+msgstr "%s давхардсан гүйлгээ"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "0 transaction fetched"
-msgstr ""
+msgstr "0 гүйлгээ татсан"
 
 #. module: account_online_synchronization
 #: model:mail.template,body_html:account_online_synchronization.email_template_sync_reminder
@@ -87,11 +96,45 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <t t-set=\"base_url\" t-value=\"object.get_base_url()\"/"
+">\n"
+"                    <p>\n"
+"                        Эрхэм хүндэт <t t-"
+"out=\"object.bank_account_id.holder_name or ''\">Marc Demo</t>,<br/><br/>\n"
+"                        <b><a t-att-href=\"base_url\" t-out=\"base_url or "
+"''\">https://yourcompany.odoo.com</a></b>\n"
+"                        болон <t t-out=\"object.account_online_link_id.name "
+"or ''\">Belfius</t>-ийн хоорондох холболтын\n"
+"                        <t t-if=\"not "
+"object.expiring_synchronization_due_day\">хугацаа дууссан.</t>\n"
+"                        <t t-else=\"\">хугацаа <t t-"
+"out=\"object.expiring_synchronization_due_day or ''\">10</t> хоногийн дараа "
+"дуусна.</t>\n"
+"                    </p>\n"
+"                    <p>Odoo-той банкны ижилсүүлэлтийг тасралтгүй ашиглахын "
+"тулд зөвшөөрлөө шинэчилнэ үү.</p>\n"
+"                    <t t-set=\"renew_concent_url\" t-value=\"base_url + '/"
+"renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"/>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"renew_concent_url\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            Зөвшөөрөл шинэчлэх\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    <p>Энэ нь банкны ижилсүүлэлтийн зөвшөөрлийн хугацаа "
+"дуусахаас өмнө сануулах зорилгоор Odoo Санхүүгээс илгээсэн автомат имэйл юм."
+"</p>\n"
+"                </div>\n"
+"            "
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 msgid "<i class=\"oi oi-filled me-1\" data-icon=\"delete\"/> Delete Selected"
-msgstr ""
+msgstr "<i class=\"oi oi-filled me-1\" data-icon=\"delete\"/> Сонгосныг устгах"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__access_token
@@ -101,7 +144,7 @@ msgstr "Хандах Токен"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__account_data
 msgid "Account Data"
-msgstr ""
+msgstr "Дансны өгөгдөл"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__name
@@ -111,7 +154,7 @@ msgstr "Дансны нэр"
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__name
 msgid "Account Name as provided by third party provider"
-msgstr ""
+msgstr "Гуравдагч талын үйлчилгээ үзүүлэгчээс ирүүлсэн дансны нэр"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__account_number
@@ -137,7 +180,7 @@ msgstr "Онлайн дансны холбоос"
 #. module: account_online_synchronization
 #: model:ir.actions.server,name:account_online_synchronization.online_sync_cron_waiting_synchronization_ir_actions_server
 msgid "Account: Journal online Waiting Synchronization"
-msgstr ""
+msgstr "Санхүү: Журналын онлайн ижилсүүлэлт хүлээгдэж буй"
 
 #. module: account_online_synchronization
 #: model:ir.actions.server,name:account_online_synchronization.online_sync_cron_ir_actions_server
@@ -147,12 +190,12 @@ msgstr "Санхүү: Банкны журналын бүртгэл онлайн�
 #. module: account_online_synchronization
 #: model:ir.actions.server,name:account_online_synchronization.online_sync_unused_connection_cron_ir_actions_server
 msgid "Account: Journal online sync cleanup unused connections"
-msgstr ""
+msgstr "Санхүү: Журналын онлайн ижилсүүлэлт - ашиглагдаагүй холболтыг цэвэрлэх"
 
 #. module: account_online_synchronization
 #: model:ir.actions.server,name:account_online_synchronization.online_sync_mail_cron_ir_actions_server
 msgid "Account: Journal online sync reminder"
-msgstr ""
+msgstr "Санхүү: Журналын онлайн ижилсүүлэлтийн сануулга"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__message_needaction
@@ -172,7 +215,7 @@ msgstr "Ажилбарын тайлбар"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Ажилбарын төлөвлөгөө"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_state
@@ -202,12 +245,12 @@ msgstr "Хавсралтын тоо"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__auto_sync
 msgid "Automatic synchronization"
-msgstr ""
+msgstr "Автомат ижилсүүлэлт"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__available_balance
 msgid "Available Balance"
-msgstr ""
+msgstr "Боломжит үлдэгдэл"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__available_balance
@@ -215,12 +258,14 @@ msgid ""
 "Available balance of the account sent by the third party provider. This is "
 "typically the balance plus/minus pending transactions."
 msgstr ""
+"Гуравдагч талын үйлчилгээ үзүүлэгчээс ирүүлсэн дансны боломжит үлдэгдэл. Энэ "
+"нь ихэвчлэн үлдэгдэл дээр хүлээгдэж буй гүйлгээг нэмж/хассан дүн байна."
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_reconciliation/statement_summary/statement_summary.xml:0
 msgid "Available balance with pending"
-msgstr ""
+msgstr "Хүлээгдэж буй гүйлгээ оролцуулсан боломжит үлдэгдэл"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__balance
@@ -230,7 +275,7 @@ msgstr "Үлдэгдэл"
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__balance
 msgid "Balance of the account sent by the third party provider"
-msgstr ""
+msgstr "Гуравдагч талын үйлчилгээ үзүүлэгчээс ирүүлсэн дансны үлдэгдэл"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
@@ -240,39 +285,39 @@ msgstr "Банк"
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_online_link
 msgid "Bank Connection"
-msgstr ""
+msgstr "Банкны холболт"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Bank Synchronization: Update your consent"
-msgstr ""
+msgstr "Банкны ижилсүүлэлт: Зөвшөөрлөө шинэчлэнэ үү"
 
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Банкны гүйлгээ"
 
 #. module: account_online_synchronization
 #: model:mail.template,name:account_online_synchronization.email_template_sync_reminder
 msgid "Bank connection expiration reminder"
-msgstr ""
+msgstr "Банкны холболтын хугацаа дуусах сануулга"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Check the documentation"
-msgstr ""
+msgstr "Баримт бичгийг харах"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_missing_transaction_wizard_view_form
 msgid "Choose a date and a journal from which you want to fetch transactions"
-msgstr ""
+msgstr "Гүйлгээ татах огноо болон журналаа сонгоно уу"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 msgid "Choose a date from which you want to check the transactions."
-msgstr ""
+msgstr "Гүйлгээг шалгаж эхлэх огноог сонгоно уу."
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__client_id
@@ -282,7 +327,7 @@ msgstr "Клиент"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "Client id"
-msgstr ""
+msgstr "Клиент id"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_journal__renewal_contact_email
@@ -291,6 +336,8 @@ msgid ""
 "Comma separated list of email addresses to send consent renewal "
 "notifications 15, 3 and 1 days before expiry"
 msgstr ""
+"Зөвшөөрөл шинэчлэх мэдэгдлийг хугацаа дуусахаас 15, 3, 1 хоногийн өмнө "
+"илгээх имэйл хаягуудын таслалаар тусгаарласан жагсаалт"
 
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_res_company
@@ -308,44 +355,44 @@ msgstr "Холбогдох"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_dashboard_inherit_online_sync
 msgid "Connect bank"
-msgstr ""
+msgstr "Банк холбох"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
 msgid "Connect my Bank"
-msgstr ""
+msgstr "Банкаа холбох"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
 msgid "Connect your bank account to Odoo"
-msgstr ""
+msgstr "Банкны дансаа Odoo-д холбох"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_online_link__state__connected
 msgid "Connected"
-msgstr ""
+msgstr "Холбогдсон"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Connected until"
-msgstr ""
+msgstr "Холбогдсон хугацаа"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__renewal_contact_email
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__renewal_contact_email
 msgid "Connection Requests"
-msgstr ""
+msgstr "Холболтын хүсэлтүүд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__connection_state_details
 msgid "Connection State Details"
-msgstr ""
+msgstr "Холболтын төлөвийн дэлгэрэнгүй"
 
 #. module: account_online_synchronization
 #: model:mail.message.subtype,name:account_online_synchronization.bank_sync_consent_renewal
 msgid "Consent Renewal"
-msgstr ""
+msgstr "Зөвшөөрөл шинэчлэх"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__create_uid
@@ -382,7 +429,7 @@ msgstr "Огноо"
 #: model:ir.model.fields,help:account_online_synchronization.field_account_journal__expiring_synchronization_date
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__expiring_synchronization_date
 msgid "Date when the consent for this connection expires"
-msgstr ""
+msgstr "Энэ холболтын зөвшөөрлийн хугацаа дуусах огноо"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__display_name
@@ -413,60 +460,60 @@ msgstr "Алдаа"
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__expiring_synchronization_date
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__expiring_synchronization_date
 msgid "Expiring Synchronization Date"
-msgstr ""
+msgstr "Ижилсүүлэлт дуусах огноо"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__expiring_synchronization_due_day
 msgid "Expiring Synchronization Due Day"
-msgstr ""
+msgstr "Ижилсүүлэлт дуусах хүртэлх хоног"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Extend Connection"
-msgstr ""
+msgstr "Холболтыг сунгах"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__account_data
 msgid "Extra information needed by third party provider"
-msgstr ""
+msgstr "Гуравдагч талын үйлчилгээ үзүүлэгчид шаардлагатай нэмэлт мэдээлэл"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_missing_transaction_wizard_view_form
 msgid "Fetch"
-msgstr ""
+msgstr "Татах"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_missing_transaction_wizard_view_form
 msgid "Fetch Missing Bank Statements Wizard"
-msgstr ""
+msgstr "Дутуу банкны хуулга татах хөтөч"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "Fetch Transactions"
-msgstr ""
+msgstr "Гүйлгээ татах"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.view_bank_statement_line_search_bank_rec_widget_inherit
 msgid "Fetched Transactions"
-msgstr ""
+msgstr "Татсан гүйлгээнүүд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__online_sync_fetching_status
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__fetching_status
 msgid "Fetching Status"
-msgstr ""
+msgstr "Татах төлөв"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Fetching..."
-msgstr ""
+msgstr "Татаж байна..."
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -474,7 +521,7 @@ msgstr ""
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 #: code:addons/account_online_synchronization/static/src/components/bank_reconciliation/find_duplicate_transactions_cog_menu.xml:0
 msgid "Find Duplicate Transactions"
-msgstr ""
+msgstr "Давхардсан гүйлгээ хайх"
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -482,12 +529,12 @@ msgstr ""
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 #: code:addons/account_online_synchronization/static/src/components/bank_reconciliation/fetch_missing_transactions_cog_menu.xml:0
 msgid "Find Missing Transactions"
-msgstr ""
+msgstr "Дутуу гүйлгээ хайх"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__first_ids_in_group
 msgid "First Ids In Group"
-msgstr ""
+msgstr "Бүлгийн эхний Id-ууд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__message_follower_ids
@@ -512,13 +559,13 @@ msgstr "Мессежтэй"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__has_unlinked_accounts
 msgid "Has Unlinked Accounts"
-msgstr ""
+msgstr "Холбогдоогүй данстай"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Here"
-msgstr ""
+msgstr "Энд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__id
@@ -546,7 +593,7 @@ msgstr "Ажилбар дээр сануулга гарсныг илэрхийл
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__online_identifier
 msgid "Id used to identify account by third party provider"
-msgstr ""
+msgstr "Гуравдагч талын үйлчилгээ үзүүлэгчийн дансыг таних Id"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__message_needaction
@@ -562,12 +609,12 @@ msgstr "Үүнийг сонговол алдаа үүсэх үед зурвас�
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__inverse_balance_sign
 msgid "If checked, the balance sign will be inverted"
-msgstr ""
+msgstr "Сонгосон бол үлдэгдлийн тэмдэг эсрэгээр солигдоно"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__inverse_transaction_sign
 msgid "If checked, the transaction sign will be inverted"
-msgstr ""
+msgstr "Сонгосон бол гүйлгээний тэмдэг эсрэгээр солигдоно"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__auto_sync
@@ -578,45 +625,49 @@ msgid ""
 "If the automatic sync is disabled. that will be due to security policy on "
 "the bank's end. So, they have to launch the sync manually"
 msgstr ""
+"Боломжтой бол энэ бичлэгт шинэ гүйлгээг автоматаар татахыг оролдоно\n"
+"                \n"
+"Хэрэв автомат ижилсүүлэлт идэвхгүй бол энэ нь банкны талын аюулгүй байдлын "
+"бодлоготой холбоотой. Тиймээс ижилсүүлэлтийг гараар эхлүүлэх шаардлагатай"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "Import Transactions"
-msgstr ""
+msgstr "Гүйлгээ импортлох"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__name
 msgid "Institution Name"
-msgstr ""
+msgstr "Байгууллагын нэр"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Internal Error"
-msgstr ""
+msgstr "Дотоод алдаа"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Invalid URL"
-msgstr ""
+msgstr "Буруу URL"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Invalid value for proxy_mode config parameter."
-msgstr ""
+msgstr "proxy_mode тохиргооны параметрийн утга буруу байна."
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__inverse_balance_sign
 msgid "Inverse Balance Sign"
-msgstr ""
+msgstr "Үлдэгдлийн тэмдгийг эсрэгээр солих"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__inverse_transaction_sign
 msgid "Inverse Transaction Sign"
-msgstr ""
+msgstr "Гүйлгээний тэмдгийг эсрэгээр солих"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__message_is_follower
@@ -642,16 +693,18 @@ msgid ""
 "already has existing entries. You can't link selected bank account in %"
 "(currency_name)s to it"
 msgstr ""
+"%(journal_name)s журнал өөр валютаар тохируулагдсан бөгөөд бичилттэй байна. %"
+"(currency_name)s валютаарх сонгосон банкны дансыг үүнтэй холбох боломжгүй"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__last_refresh
 msgid "Last Synchronization"
-msgstr ""
+msgstr "Сүүлийн ижилсүүлэлт"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__last_sync
 msgid "Last Transaction Synchronized on"
-msgstr ""
+msgstr "Сүүлийн гүйлгээ ижилсүүлсэн огноо"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__write_uid
@@ -676,23 +729,23 @@ msgstr "Сүүлд зассан огноо"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
 msgid "Latest Balance"
-msgstr ""
+msgstr "Сүүлийн үлдэгдэл"
 
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_bank_selection
 msgid "Link a bank account to the selected journal"
-msgstr ""
+msgstr "Сонгосон журналд банкны данс холбох"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
-msgid "Manual Bank Statement Lines"
+msgid "Manual Bank Transactions"
 msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols дүрс, жишээ нь checklist"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -714,7 +767,7 @@ msgstr "Зурвасууд"
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
 msgid "Missing and Pending Transactions"
-msgstr ""
+msgstr "Дутуу болон хүлээгдэж буй гүйлгээнүүд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__my_activity_date_deadline
@@ -755,12 +808,12 @@ msgstr "Дараагийн ижилсүүлэлт"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "No Pending Transactions"
-msgstr ""
+msgstr "Хүлээгдэж буй гүйлгээ алга"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_online_link__state__disconnected
 msgid "Not Connected"
-msgstr ""
+msgstr "Холбогдоогүй"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__message_needaction_counter
@@ -795,12 +848,12 @@ msgstr "Онлайн данс"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "Online Accounts"
-msgstr ""
+msgstr "Онлайн дансууд"
 
 #. module: account_online_synchronization
 #: model:ir.module.module,shortdesc:base.module_account_online_synchronization
 msgid "Online Bank Statement Synchronization"
-msgstr ""
+msgstr "Банкны хуулганы онлайн ижилсүүлэлт"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__online_identifier
@@ -810,7 +863,7 @@ msgstr "Онлайн таних дугаар"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__next_link_synchronization
 msgid "Online Link Next synchronization"
-msgstr ""
+msgstr "Онлайн холболтын дараагийн ижилсүүлэлт"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -825,13 +878,13 @@ msgstr "Онлайн ижилсүүлэлт"
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line__online_transaction_identifier
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__online_transaction_identifier
 msgid "Online Transaction Identifier"
-msgstr ""
+msgstr "Онлайн гүйлгээний таних дугаар"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_bank_statement.py:0
 msgid "Opening Statement: First Synchronization"
-msgstr ""
+msgstr "Нээлтийн хуулга: Анхны ижилсүүлэлт"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__partner_name
@@ -847,7 +900,7 @@ msgstr "Төлбөрийн дугаар"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "Payments"
-msgstr ""
+msgstr "Төлбөрүүд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_bank_statement_line_transient__state__pending
@@ -858,7 +911,7 @@ msgstr "Хүлээгдэж буй"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "Pending Transactions"
-msgstr ""
+msgstr "Хүлээгдэж буй гүйлгээнүүд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_online_account__fetching_status__planned
@@ -869,19 +922,19 @@ msgstr "Төлөвлөсөн"
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
 msgid "Please enter a valid Starting Date to continue."
-msgstr ""
+msgstr "Үргэлжлүүлэхийн тулд зөв эхлэх огноо оруулна уу."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Please reconnect your online account."
-msgstr ""
+msgstr "Онлайн дансаа дахин холбоно уу."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_bank_statement_line.py:0
 msgid "Please select first the transactions you wish to import."
-msgstr ""
+msgstr "Эхлээд импортлох гүйлгээгээ сонгоно уу."
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_bank_statement_line_transient__state__posted
@@ -891,27 +944,27 @@ msgstr "Батлагдсан"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.missing_bank_statement_line_search
 msgid "Posted Transactions"
-msgstr ""
+msgstr "Батлагдсан гүйлгээнүүд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_online_account__fetching_status__processing
 msgid "Processing"
-msgstr ""
+msgstr "Боловсруулж байна"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__provider_duplicate_ids
 msgid "Provider Duplicate"
-msgstr ""
+msgstr "Үйлчилгээ үзүүлэгчийн давхардал"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 msgid "Provider Duplicates"
-msgstr ""
+msgstr "Үйлчилгээ үзүүлэгчийн давхардлууд"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__provider_type
 msgid "Provider Type"
-msgstr ""
+msgstr "Үйлчилгээ үзүүлэгчийн төрөл"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__rating_ids
@@ -921,12 +974,12 @@ msgstr "Үнэлгээнүүд"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "Reconnect"
-msgstr ""
+msgstr "Дахин холбох"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_dashboard_inherit_online_sync
 msgid "Reconnect Bank"
-msgstr ""
+msgstr "Банкыг дахин холбох"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -938,7 +991,7 @@ msgstr "Шилжүүлэх"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Refresh"
-msgstr ""
+msgstr "Шинэчлэх"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__refresh_token
@@ -949,18 +1002,18 @@ msgstr "Тасалбарыг сэргээх"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "Report Issue"
-msgstr ""
+msgstr "Асуудал мэдэгдэх"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Report issue"
-msgstr ""
+msgstr "Асуудал мэдэгдэх"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__client_id
 msgid "Represent a link for a given user towards a banking institution"
-msgstr ""
+msgstr "Тухайн хэрэглэгчийн банк руу чиглэсэн холболтыг илэрхийлнэ"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
@@ -981,7 +1034,7 @@ msgstr "SMS илгээлтийн алдаа"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "Search over"
-msgstr ""
+msgstr "Нийт"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
@@ -989,30 +1042,32 @@ msgid ""
 "Security Tip: always check the domain name of this page, before clicking on "
 "the button."
 msgstr ""
+"Аюулгүй байдлын зөвлөгөө: товч дээр дарахаасаа өмнө энэ хуудасны домэйн "
+"нэрийг үргэлж шалгаарай."
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "See error"
-msgstr ""
+msgstr "Алдааг харах"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.view_account_bank_selection_form_wizard
 msgid "Select a Bank Account"
-msgstr ""
+msgstr "Банкны данс сонгох"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Select a Credit Card Account"
-msgstr ""
+msgstr "Кредит картын данс сонгох"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_form
 msgid "Send Now"
-msgstr ""
+msgstr "Одоо илгээх"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__sequence
@@ -1023,23 +1078,24 @@ msgstr "Дугаарлалт"
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__account_number
 msgid "Set if third party provider has the full account number"
 msgstr ""
+"Гуравдагч талын үйлчилгээ үзүүлэгч дансны бүтэн дугаартай бол тохируулна"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "Setup Bank"
-msgstr ""
+msgstr "Банк тохируулах"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__show_sync_actions
 msgid "Show Sync Actions"
-msgstr ""
+msgstr "Ижилсүүлэлтийн үйлдлүүдийг харуулах"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/views/account_online_authorization_kanban_controller.xml:0
 msgid "Some transactions"
-msgstr ""
+msgstr "Зарим гүйлгээ"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__date
@@ -1076,7 +1132,7 @@ msgstr "Баярлалаа!"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "The consent for the selected account has expired."
-msgstr ""
+msgstr "Сонгосон дансны зөвшөөрлийн хугацаа дууссан."
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1085,29 +1141,31 @@ msgid ""
 "The online synchronization service is not available at the moment. Please "
 "try again later."
 msgstr ""
+"Онлайн ижилсүүлэлтийн үйлчилгээ одоогоор ажиллахгүй байна. Дараа дахин "
+"оролдоно уу."
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "There are cancelled"
-msgstr ""
+msgstr "Энэ хугацаанд цуцлагдсан"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "There are no pending transactions for this journal."
-msgstr ""
+msgstr "Энэ журналд хүлээгдэж буй гүйлгээ алга."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "There's already a synchronized journal linked to this IBAN"
-msgstr ""
+msgstr "Энэ IBAN-тай холбогдсон ижилсүүлсэн журнал аль хэдийн байна"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__provider_type
 msgid "Third Party Provider"
-msgstr ""
+msgstr "Гуравдагч талын үйлчилгээ үзүүлэгч"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
@@ -1115,16 +1173,17 @@ msgid ""
 "This action will delete all selected transactions. Are you sure you want to "
 "proceed?"
 msgstr ""
+"Энэ үйлдэл сонгосон бүх гүйлгээг устгана. Үргэлжлүүлэхдээ итгэлтэй байна уу?"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "This button will reset the fetching status"
-msgstr ""
+msgstr "Энэ товч татах төлөвийг дахин тохируулна"
 
 #. module: account_online_synchronization
 #: model:ir.module.module,summary:base.module_account_online_synchronization
 msgid "This module is used for Online bank synchronization."
-msgstr ""
+msgstr "Энэ модулийг банкны онлайн ижилсүүлэлтэд ашиглана."
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1133,6 +1192,9 @@ msgid ""
 "This version of Odoo appears to be outdated and does not support the '%s' "
 "sync mode. Installing the latest update might solve this."
 msgstr ""
+"Odoo-н энэ хувилбар хуучирсан бололтой бөгөөд '%s' ижилсүүлэх горимыг "
+"дэмжихгүй байна. Хамгийн сүүлийн шинэчлэлийг суулгавал асуудал шийдэгдэж "
+"магадгүй."
 
 #. module: account_online_synchronization
 #: model_terms:ir.actions.act_window,help:account_online_synchronization.action_account_online_link_form
@@ -1140,16 +1202,19 @@ msgid ""
 "To create a synchronization with your banking institution,<br>\n"
 "                please click on <b>Add a Bank Account</b>."
 msgstr ""
+"Банктайгаа ижилсүүлэлт үүсгэхийн тулд<br>\n"
+"                <b>Банкны данс нэмэх</b> дээр дарна уу."
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__access_token
 msgid "Token used to access API."
-msgstr ""
+msgstr "API-д хандахад ашиглах токен."
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__refresh_token
 msgid "Token used to sign API request, Never disclose it"
 msgstr ""
+"API хүсэлтэд гарын үсэг зурахад ашиглах токен, хэзээ ч бусдад бүү задруул"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__transaction_ids
@@ -1164,7 +1229,7 @@ msgstr "Гүйлгээний дэлгэрэнгүй"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__transaction_uuid
 msgid "Transaction Uuid"
-msgstr ""
+msgstr "Гүйлгээний Uuid"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
@@ -1174,14 +1239,14 @@ msgstr "Гүйлгээ"
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_bank_statement_line_transient
 msgid "Transient model for bank statement line"
-msgstr ""
+msgstr "Банкны хуулганы мөрийн түр модел"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__has_unlinked_accounts
 msgid ""
 "True if that connection still has accounts that are not linked to an Odoo "
 "journal"
-msgstr ""
+msgstr "Тухайн холболтод Odoo журналтай холбогдоогүй данс байгаа бол үнэн"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__activity_exception_decoration
@@ -1201,12 +1266,12 @@ msgstr "Хүлээгдэж буй"
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_duplicate_transaction_wizard
 msgid "Wizard for duplicate transactions"
-msgstr ""
+msgstr "Давхардсан гүйлгээний хөтөч"
 
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_missing_transaction_wizard
 msgid "Wizard for missing transactions"
-msgstr ""
+msgstr "Дутуу гүйлгээний хөтөч"
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1216,67 +1281,69 @@ msgid ""
 "synchronization\n"
 "                    ("
 msgstr ""
+"Та онлайн ижилсүүлэлт үүссэн огнооноос өмнөх гүйлгээг импортолж байна\n"
+"                    ("
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "You can contact Odoo support"
-msgstr ""
+msgstr "Odoo-ийн дэмжлэгтэй холбогдож болно"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "You can manage your bank synchronization consent for this connection %s"
-msgstr ""
+msgstr "Энэ холболтын банкны ижилсүүлэлтийн зөвшөөрлийг удирдах боломжтой %s"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "You can only execute this action for bank-synchronized journals."
-msgstr ""
+msgstr "Энэ үйлдлийг зөвхөн банктай ижилсүүлсэн журналд гүйцэтгэх боломжтой."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
 msgid "You can't find missing transactions for a journal that isn't connected."
-msgstr ""
+msgstr "Холбогдоогүй журналд дутуу гүйлгээ хайх боломжгүй."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "You cannot have two journals associated with the same Online Account."
-msgstr ""
+msgstr "Нэг онлайн дансанд хоёр журнал холбох боломжгүй."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_bank_statement_line.py:0
 msgid "You cannot import pending transactions."
-msgstr ""
+msgstr "Хүлээгдэж буй гүйлгээг импортлох боломжгүй."
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "You have"
-msgstr ""
+msgstr "Энэ хугацаанд онлайн ижилсүүлэлтээр үүсгээгүй"
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
 msgid "You have to select one journal to continue."
-msgstr ""
+msgstr "Үргэлжлүүлэхийн тулд нэг журнал сонгох шаардлагатай."
 
 #. module: account_online_synchronization
 #: model:mail.template,subject:account_online_synchronization.email_template_sync_reminder
 msgid "Your bank connection is expiring soon"
-msgstr ""
+msgstr "Таны банкны холболтын хугацаа удахгүй дуусна"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "banks"
-msgstr ""
+msgstr "банкнаас хайх"
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1288,25 +1355,25 @@ msgstr "бичилтүүд"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "here."
-msgstr ""
+msgstr "энд."
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "journal_id"
-msgstr ""
+msgstr "journal_id"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "loading..."
-msgstr ""
+msgstr "ачаалж байна..."
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/views/account_online_authorization_kanban_controller.xml:0
 msgid "may be duplicates."
-msgstr ""
+msgstr "давхардсан байж магадгүй."
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
@@ -1316,26 +1383,29 @@ msgstr "дээр"
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_online_account
 msgid "representation of an online bank account"
-msgstr ""
+msgstr "Онлайн банкны дансны төлөөлөл"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "transactions fetched"
-msgstr ""
+msgstr "гүйлгээ татсан"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid ""
 "within this period that were not created using the online synchronization."
-msgstr ""
+msgstr "байна."
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "within this period."
-msgstr ""
+msgstr "байна."
+
+#~ msgid "Manual Bank Statement Lines"
+#~ msgstr "Гараар оруулсан банкны хуулганы мөрүүд"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Касс, харилцахын хуулганы мөр"

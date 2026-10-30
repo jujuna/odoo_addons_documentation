@@ -18,9 +18,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:14+0000\n"
+"PO-Revision-Date: 2026-10-02 08:34+0000\n"
 "Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "account_followup/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -56,11 +56,36 @@ msgid ""
 "reminders\n"
 "        to multiple customers at once using the 'Send Reminders' action.\n"
 msgstr ""
+"\n"
+"Module pour automatiser les lettres relatives aux factures impayées, avec "
+"relances à plusieurs niveaux.\n"
+"=========================================================================\n"
+"\n"
+"Vous pouvez définir vos différents niveaux de relance dans les paramètres de "
+"facturation :\n"
+"-----------------------------------------------------------------------------"
+"\n"
+"    Configuration / Paramètres / Factures clients / Rappels de facture "
+"automatiques\n"
+"\n"
+"Fonctionnalités :\n"
+"---------\n"
+"    - Rappels automatiques à plusieurs niveaux selon la durée du retard.\n"
+"    - Intégration Envoyer & imprimer :\n"
+"        Si Envoyer & imprimer est exécuté à nouveau sur une facture en "
+"retard, le système\n"
+"        passe automatiquement au modèle de relance approprié et joint\n"
+"        le rapport de suivi.\n"
+"    - Relances par lot :\n"
+"        Les utilisateurs peuvent sélectionner plusieurs factures depuis la "
+"vue liste et envoyer des rappels\n"
+"        à plusieurs clients à la fois à l’aide de l’action 'Envoyer des "
+"rappels'.\n"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "\"Automatic Invoice Reminders\" is currently disabled."
-msgstr ""
+msgstr "Les \"Rappels de facture automatiques\" sont actuellement désactivés."
 
 #. module: account_followup
 #. odoo-python
@@ -77,7 +102,7 @@ msgstr "%(display_delay)s jours %(reminder_timing)s"
 #. module: account_followup
 #: model:ir.actions.report,print_report_name:account_followup.action_report_followup
 msgid "'Reminder ' + object.display_name"
-msgstr ""
+msgstr "'Reminder ' + object.display_name"
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_invoice_payment_kind_reminder
@@ -1082,12 +1107,12 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
 msgid "<span class=\"o_stat_text\">Open Items</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Éléments ouverts</span>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "<strong class=\"text-muted\">To: </strong>"
-msgstr ""
+msgstr "<strong class=\"text-muted\">À : </strong>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -1149,7 +1174,7 @@ msgstr "Alertes"
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__automatic
 msgid "Automatic"
-msgstr ""
+msgstr "Automatique"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_company__automatic_invoice_reminder
@@ -1178,7 +1203,7 @@ msgstr "Le corps du texte est identique au modèle"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_mail_compose_message__cached_followup_attachment_id
 msgid "Cached Followup Report"
-msgstr ""
+msgstr "Rapport de suivi mis en cache"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_mail_compose_message__cached_followup_attachment_id
@@ -1186,6 +1211,8 @@ msgid ""
 "Caches the generated followup report to prevent recalculation when switching "
 "templates."
 msgstr ""
+"Met en cache le rapport de suivi généré afin d’éviter un recalcul lors du "
+"changement de modèle."
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__can_edit_body
@@ -1211,6 +1238,9 @@ msgid ""
 "                'Manual' pauses all automatic reminders and level updates "
 "for this partner."
 msgstr ""
+"Choisissez comment les rappels sont traités pour ce partenaire.\n"
+"                  'Manuel' met en pause tous les rappels automatiques et les "
+"mises à jour de niveau pour ce partenaire."
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
@@ -1392,7 +1422,7 @@ msgstr "Modèle d'e-mail"
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_mail_compose_message
 msgid "Email composition wizard"
-msgstr ""
+msgstr "Assistant de composition d’e-mail"
 
 #. module: account_followup
 #. odoo-python
@@ -1455,7 +1485,7 @@ msgstr "Quatrième rappel de relance"
 #. odoo-python
 #: code:addons/account_followup/models/ir_cron.py:0
 msgid "Go to Settings"
-msgstr ""
+msgstr "Aller aux paramètres"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__has_moves
@@ -1493,13 +1523,13 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Invoice Follow-ups"
-msgstr ""
+msgstr "Relances de factures"
 
 #. module: account_followup
 #: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
 #: model:ir.ui.menu,name:account_followup.account_followup_menu
 msgid "Invoice Reminders"
-msgstr ""
+msgstr "Rappels de facture"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -1536,7 +1566,7 @@ msgstr "Langue"
 #: model:ir.model.fields,field_description:account_followup.field_account_bank_statement_line__last_auto_reminder
 #: model:ir.model.fields,field_description:account_followup.field_account_move__last_auto_reminder
 msgid "Last Automatic Reminder"
-msgstr ""
+msgstr "Dernier rappel automatique"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_bank_statement_line__last_reminder
@@ -1580,7 +1610,7 @@ msgstr "Gérez vos rappels automatiques"
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__manual
 msgid "Manual"
-msgstr ""
+msgstr "Manuel"
 
 #. module: account_followup
 #. odoo-python
@@ -1603,13 +1633,13 @@ msgstr "Nom"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_next_action_date
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_next_action_date
 msgid "Next Reminder"
-msgstr ""
+msgstr "Prochain rappel"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_next_action_date
 #: model:ir.model.fields,help:account_followup.field_res_users__followup_next_action_date
 msgid "No Reminder action will be taken before this date."
-msgstr ""
+msgstr "Aucune action de rappel ne sera effectuée avant cette date."
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_note
@@ -1624,7 +1654,7 @@ msgstr "Notifications"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Open settings"
-msgstr ""
+msgstr "Ouvrir les paramètres"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_followup_manual_reminder__lang
@@ -1653,7 +1683,7 @@ msgstr "Les partenaires doivent avoir une adresse e-mail."
 #. module: account_followup
 #: model:ir.module.module,shortdesc:base.module_account_followup
 msgid "Payment Follow-up Management"
-msgstr ""
+msgstr "Gestion du suivi des paiements"
 
 #. module: account_followup
 #: model:mail.template,name:account_followup.mail_template_payment_reminder_before_due
@@ -1663,17 +1693,17 @@ msgstr "Rappel de paiement avant la date d’échéance"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Preview, the content will be adapted per client"
-msgstr ""
+msgstr "Aperçu, le contenu sera adapté par client"
 
 #. module: account_followup
 #: model:ir.actions.report,name:account_followup.action_report_followup
 msgid "Print Reminder Letter"
-msgstr ""
+msgstr "Imprimer la lettre de rappel"
 
 #. module: account_followup
 #: model:ir.actions.server,name:account_followup.action_account_reports_customer_statements_do_followup
 msgid "Process Automatic Reminders"
-msgstr ""
+msgstr "- Traiter les rappels automatiques"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
@@ -1685,12 +1715,12 @@ msgstr "Rappel"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_line_id
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_line_id
 msgid "Reminder Level"
-msgstr ""
+msgstr "Niveau de rappel"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__followup
 msgid "Reminder Responsible"
-msgstr ""
+msgstr "Responsable du rappel"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__reminder_timing
@@ -1700,13 +1730,13 @@ msgstr "Moment du rappel"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.report_followup_print_all
 msgid "Reminder details"
-msgstr ""
+msgstr "Détails du rappel"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_reminder_type
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_reminder_type
 msgid "Reminders"
-msgstr ""
+msgstr "Rappels"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__render_model
@@ -1743,7 +1773,7 @@ msgstr "Planifier une activité"
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_ir_cron
 msgid "Scheduled Action"
-msgstr ""
+msgstr "Action planifiée"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
@@ -1826,7 +1856,7 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_config_settings_view_form
 msgid "Send reminders for invoices and customer statement"
-msgstr ""
+msgstr "Envoyer des rappels pour les factures et le relevé client"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__delay
@@ -1884,11 +1914,15 @@ msgid ""
 "The responsible assigned to manual reminder activities, if defined in the "
 "level."
 msgstr ""
+"Le responsable assigné aux activités de rappel manuel, s’il est défini dans "
+"le niveau."
 
 #. module: account_followup
 #: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_days_uniq
 msgid "There can only be one reminder level with a given delay (per company)"
 msgstr ""
+"Il ne peut y avoir qu’un seul niveau de rappel avec un délai donné (par "
+"société)"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_bank_statement_line__last_auto_reminder
@@ -1897,6 +1931,8 @@ msgid ""
 "This field helps with automatic reminder sending date calculations when the "
 "reminder is belated"
 msgstr ""
+"Ce champ aide à calculer les dates d’envoi automatique des rappels lorsque "
+"le rappel est en retard"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_tree_view
@@ -2015,6 +2051,8 @@ msgid ""
 "You cannot activate this action because 'Automatic Invoice Reminders' are "
 "disabled."
 msgstr ""
+"- Vous ne pouvez pas activer cette action, car les 'Rappels de facture "
+"automatiques' sont désactivés."
 
 #. module: account_followup
 #. odoo-python
@@ -2029,12 +2067,12 @@ msgstr ""
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__after
 msgid "after"
-msgstr ""
+msgstr "après"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__before
 msgid "before"
-msgstr ""
+msgstr "avant"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
@@ -2050,7 +2088,7 @@ msgstr "rappel de paiement"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "to enable them."
-msgstr ""
+msgstr "pour les activer."
 
 #. module: account_followup
 #: model:mail.template,subject:account_followup.mail_template_partner_payment_kind_reminder

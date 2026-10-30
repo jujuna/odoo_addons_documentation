@@ -113,7 +113,7 @@ export class PaymentSix extends PaymentInterfaceIot {
         const data = {
             messageType: "Balance",
             posId: this.pos.session.id,
-            userId: this.pos.session.user_id.id,
+            userId: this.pos.user?.id || 2,
         };
 
         return this.pos.iotHttp.action(

@@ -32,8 +32,9 @@ class AccountAssetVariant(models.Model):
         index=True,
         check_company=True,
         ondelete='restrict',
-        compute='_compute_model_id', store=True, readonly=False, precompute=True,
-        required=True,
+        compute='_compute_model_id',
+        inverse='_inverse_fixed_asset_account',
+        store=True, readonly=False, precompute=True,
     )
     method = fields.Selection(related='model_id.method')
     method_mode = fields.Selection(related='model_id.method_mode')
@@ -96,7 +97,9 @@ class AccountAssetVariant(models.Model):
     account_depreciation_id = fields.Many2one(
         comodel_name='account.account',
         string="Depreciation Account",
-        compute='_compute_depreciation_accounts', store=True, readonly=False,
+        compute='_compute_depreciation_accounts',
+        inverse='_inverse_fixed_asset_account',
+        store=True, readonly=False,
         check_company=True,
         domain=ACCOUNT_DOMAIN,
         help="Account used in the depreciation entries, to decrease the asset value. Value obtained from Fixed Asset Account.",
@@ -104,7 +107,9 @@ class AccountAssetVariant(models.Model):
     account_depreciation_expense_id = fields.Many2one(
         comodel_name='account.account',
         string="Expense Account",
-        compute='_compute_depreciation_accounts', store=True, readonly=False,
+        compute='_compute_depreciation_accounts',
+        inverse='_inverse_fixed_asset_account',
+        store=True, readonly=False,
         check_company=True,
         domain=ACCOUNT_DOMAIN,
         help="Account used in the periodical entries, to record a part of the asset as expense. Value obtained from Fixed Asset Account.",
@@ -195,6 +200,21 @@ class AccountAssetVariant(models.Model):
         for variant in self:
             variant.account_depreciation_id = variant.account_asset_id.asset_depreciation_account_id
             variant.account_depreciation_expense_id = variant.account_asset_id.asset_expense_account_id
+
+    def _inverse_fixed_asset_account(self):
+        # Ledger variants depreciate with their own models and accounts, which are not the account's
+        variants = self.filtered(lambda variant: variant.account_asset_id.can_create_asset and not variant.is_ledger_variant)
+        for account, account_variants in variants.grouped('account_asset_id').items():
+            vals = {}
+            depreciation_models = account_variants.model_id.filtered(lambda model: model.method != 'no_depreciation')
+            if not account.depreciation_model_id and depreciation_models:
+                vals['depreciation_model_id'] = depreciation_models[0].id
+            if not account.asset_depreciation_account_id and account_variants.account_depreciation_id:
+                vals['asset_depreciation_account_id'] = account_variants.account_depreciation_id[0].id
+            if not account.asset_expense_account_id and account_variants.account_depreciation_expense_id:
+                vals['asset_expense_account_id'] = account_variants.account_depreciation_expense_id[0].id
+            if vals:
+                account.sudo().write(vals)
 
     @api.depends('account_asset_id', 'account_asset_id.depreciation_model_id', 'original_move_line_ids')
     def _compute_model_id(self):
@@ -618,7 +638,7 @@ class AccountAssetVariant(models.Model):
             'name': self.env._('Gross Increase'),
             'view_mode': 'list,form',
             'res_model': 'account.asset',
-            'context': {**self.env.context, 'create': False, 'variant_id': self.children_ids.id},
+            'context': {**self.env.context, 'create': False},
             'view_id': False,
             'type': 'ir.actions.act_window',
             'domain': [('id', 'in', self.children_ids.asset_id.ids)],
@@ -627,6 +647,7 @@ class AccountAssetVariant(models.Model):
         if len(self.children_ids) == 1:
             result['views'] = [(False, 'form')]
             result['res_id'] = self.children_ids.asset_id.id
+            result['context'] = {**result['context'], 'variant_id': self.children_ids.id}
         return result
 
     def open_parent_id(self):
@@ -1056,28 +1077,35 @@ class AccountAssetVariant(models.Model):
             :param date: the date at which we want the asset's value
             :return: the value at date of the asset without taking reverse entries into account (as it should be in a "normal" flow of the asset)
         """
-        current_and_previous_depreciation = self.depreciation_move_ids.filtered(
-            lambda mv:
-            mv.asset_depreciation_beginning_date < date
-            and not mv.reversed_entry_id
-        ).sorted('asset_depreciation_beginning_date', reverse=True)
-        if not current_and_previous_depreciation:
+        if not date:
+            return self.value_residual
+
+        if date < self.acquisition_date:
             return 0
 
-        if len(current_and_previous_depreciation) > 1:
-            previous_value_residual = current_and_previous_depreciation[1].asset_remaining_value
+        depreciations = self.depreciation_move_ids.filtered(
+            lambda mv:
+            mv.asset_depreciation_beginning_date <= date
+            and not mv.reversed_entry_id
+        ).sorted('asset_depreciation_beginning_date', reverse=True)[:2]
+        previous_depreciation, current_depreciation = depreciations[1:], depreciations[:1]
+
+        if previous_depreciation:
+            previous_value_residual = previous_depreciation.asset_remaining_value
         else:
-            # If there is only one depreciation, we take the original depreciation value
+            # If there is no previous depreciation, we take the original depreciation value
             previous_value_residual = self.original_value - self.salvage_value - self.already_depreciated_amount_import
 
-        # We compare the amount_residuals of the depreciations before and during the given date.
-        # It applies the ratio of the period (to-given-date / total-days-of-the-period) to the amount of the depreciation.
-        cur_depr_end_date = self._get_end_period_date(date)
-        current_depreciation = current_and_previous_depreciation[0]
-        cur_depr_beg_date = current_depreciation.asset_depreciation_beginning_date
+        if current_depreciation:
+            # We compare the amount_residuals of the depreciations before and during the given date.
+            # It applies the ratio of the period (to-given-date / total-days-of-the-period) to the amount of the depreciation.
+            cur_depr_end_date = self._get_end_period_date(date)
+            cur_depr_beg_date = current_depreciation.asset_depreciation_beginning_date
+            rate = self._get_delta_days(cur_depr_beg_date, date) / self._get_delta_days(cur_depr_beg_date, cur_depr_end_date)
+            lost_value_at_date = (previous_value_residual - current_depreciation.asset_remaining_value) * rate
+        else:
+            lost_value_at_date = 0
 
-        rate = self._get_delta_days(cur_depr_beg_date, date) / self._get_delta_days(cur_depr_beg_date, cur_depr_end_date)
-        lost_value_at_date = (previous_value_residual - current_depreciation.asset_remaining_value) * rate
         residual_value_at_date = self.currency_id.round(previous_value_residual - lost_value_at_date)
         if self.currency_id.compare_amounts(self.original_value, 0) > 0:
             return max(residual_value_at_date, 0)

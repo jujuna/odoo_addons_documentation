@@ -175,6 +175,34 @@ class TestWebsiteSaleSubscription(WebsiteSaleSubscriptionCommon):
         self.assertEqual(monthly['discounted_price'], 0.0)  # 180 > 150 (Buy Once), no discount shown
         self.assertEqual(yearly['discounted_price'], 0.0)   # 1000 > 150 (Buy Once), no discount shown
 
+    def test_subscription_plan_discount_percentage_tax_included(self):
+        """Check that the plan discount badges match the tax-included prices shown on the shop."""
+        self.website.show_line_subtotals_tax_selection = 'tax_included'
+        tax_20 = self.env['account.tax'].create({'name': "20%", 'amount': 20})
+        plan_5_years = self.env['sale.subscription.plan'].create({
+            'name': "5 Years", 'billing_period_value': 5, 'billing_period_unit': 'year', 'sequence': 1,
+        })
+        product = self.env['product.template'].create({
+            'name': "Taxed Subscription",
+            'recurring_invoice': True,
+            'type': 'service',
+            'taxes_id': [Command.set(tax_20.ids)],
+        })
+        self.env['product.pricelist.item'].create([
+            {'plan_id': self.plan_year.id, 'fixed_price': 236.67, 'product_tmpl_id': product.id},
+            {'plan_id': plan_5_years.id, 'fixed_price': 961.67, 'product_tmpl_id': product.id},
+        ])
+
+        product = product.with_context(website_id=self.website.id)
+
+        with self.mock_request(website=self.website):
+            pricings = product._get_combination_info().get('pricings', [])
+
+        yearly = next(p for p in pricings if p['plan_id'] == self.plan_year.id)
+        five_years = next(p for p in pricings if p['plan_id'] == plan_5_years.id)
+        self.assertEqual(yearly['discounted_price'], 0.0)
+        self.assertEqual(five_years['discounted_price'], 18)
+
     def test_cart_add_one_time_then_recurring_not_allowed(self):
         """
         Test that a cart cannot mix one-time and subscription products.
@@ -389,3 +417,17 @@ class TestWebsiteSaleSubscription(WebsiteSaleSubscriptionCommon):
             )
 
         self.assertEqual(prices[product.id]['price_reduce'], 9.0)
+
+    def test_cart_update_keeps_delivery_rate(self):
+        carrier = self._prepare_carrier(
+            self._prepare_carrier_product(list_price=5.0),
+            delivery_type='base_on_rule',
+            price_rule_ids=[Command.create({'variable': 'weight', 'operator': '>=', 'max_value': 0})],
+        )
+        with self.mock_request() as request:
+            cart = request.env.website._create_cart()
+            cart._cart_add(product_id=self.product.id)
+            cart._set_delivery_method(carrier)
+            cart.with_context(skip_cart_verification=True)._cart_add(product_id=self.product.id)
+            cart._verify_cart_after_update()
+            self.assertEqual(cart.order_line.filtered('is_delivery').price_unit, 0)

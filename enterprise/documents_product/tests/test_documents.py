@@ -135,6 +135,18 @@ class TestCaseDocumentsBridgeProduct(TransactionCase):
         gif_doc = self.env['documents.document'].search([('attachment_id', '=', self.attachment_gif_two.id)])
         self.assertEqual(gif_doc.folder_id, self.folder_test, 'the gif two document should have a folder')
 
+    def test_create_attachment_create_document_with_inherited_rights(self):
+        """Test that documents created when creating a product attachment inherits rights from the product folder."""
+        self.company_test.write({'documents_product_settings': True})
+        product_folder = self.company_test.product_folder_id
+        attachment = self.env['ir.attachment'].create(
+            {'name': 'test', 'raw': b'test', 'res_model': self.product_test._name, 'res_id': self.product_test.id})
+        document = self.env['documents.document'].search([('attachment_id', '=', attachment.id)])
+        self.assertEqual(product_folder.access_via_link, 'none')
+        self.assertEqual(document.access_internal, product_folder.access_internal)
+        self.assertEqual(document.access_via_link, product_folder.access_via_link)
+        self.assertEqual(document.is_access_via_link_hidden, product_folder.is_access_via_link_hidden)
+
     def test_create_product_from_workflow(self):
         document_gif = self.env['documents.document'].create({
             'raw': GIF_RAW,

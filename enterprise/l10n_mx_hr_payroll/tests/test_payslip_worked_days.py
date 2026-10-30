@@ -4,6 +4,7 @@ from datetime import date
 from freezegun import freeze_time
 
 from odoo.fields import Command
+from odoo.tests import Form
 from odoo.addons.hr_payroll.tests.common import TestPayrollBase
 from odoo.tests.common import tagged
 
@@ -56,6 +57,40 @@ class TestPayrollWorkedDays(TestPayrollBase):
 
         self._generate_leave(self.employee, date(2030, 1, 1), date(2030, 1, 15), self.work_entry_types['158.00'])
         self.assertEqual(payslip._get_line_values(['BASIC'])['BASIC'][payslip.id]['total'], 19000.0)
+
+    def test_local_dict_injection(self):
+        """ Test that MX specific variables are injected into the safe_eval context """
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Test Slip for Dict Injection',
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_mx_hr_payroll.l10n_mx_regular_pay').id,
+            'date_from': date(2030, 8, 1),
+            'date_to': date(2030, 8, 31),
+        })
+
+        # Fetch the evaluation dictionary
+        local_dict = payslip._get_base_local_dict()
+
+        expected_keys = [
+            'days_in_period',
+            'total_days_in_month',
+            'days_without_disabilities',
+            'accrued_days_in_period',
+            'days_in_month_ratio',
+            'effective_days_in_period',
+        ]
+
+        for key in expected_keys:
+            self.assertIn(
+                key,
+                local_dict,
+                f"The key '{key}' is missing from the payslip computation context.",
+            )
+
+        self.assertEqual(local_dict['days_in_period'], 31)
+        self.assertEqual(local_dict['total_days_in_month'], 31)
+        self.assertEqual(local_dict['days_in_month_ratio'], 1.0)
+        self.assertEqual(local_dict['effective_days_in_period'], 31)
 
     def test_monthly_payslip_with_partial_leave(self):
         self.work_entry_types['158.00'].request_unit = 'hour'
@@ -170,3 +205,18 @@ class TestPayrollWorkedDays(TestPayrollBase):
         payslip_run._generate_payslips()
         # This should no longer raise KeyError
         self.assertTrue(payslip_run.slip_ids.compute_sheet())
+
+    def test_years_worked_without_dates(self):
+        payslip = self._generate_payslip(date(2030, 1, 1), date(2030, 1, 31))
+
+        with self.assertRaises(AssertionError), Form(payslip) as payslip_form:
+            payslip_form.date_from = False
+            payslip_form.date_to = False
+            self.assertEqual(payslip.l10n_mx_years_worked, 0)
+            self.assertEqual(payslip.l10n_mx_integration_factor, 0.0)
+
+        with Form(payslip) as payslip_form:
+            payslip_form.date_from = date(2030, 1, 1)
+            payslip_form.date_to = date(2030, 1, 31)
+        self.assertEqual(payslip.l10n_mx_years_worked, 15)
+        self.assertEqual(payslip.l10n_mx_integration_factor, 1.0410958904109588)

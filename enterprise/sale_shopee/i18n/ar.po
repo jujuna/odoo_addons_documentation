@@ -3,14 +3,15 @@
 # * sale_shopee
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 18:03+0000\n"
-"PO-Revision-Date: 2026-09-18 02:44+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-12 10:36+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "sale_shopee/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -340,8 +341,8 @@ msgstr ""
 "            </style>\n"
 "            <body><div>\n"
 "                <p>The synchronization of the inventory for Shopee Shop\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
-"\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
+"b>\n"
 "                    encountered some errors and was not completed.</p>\n"
 "                <p>Here are the errors sent by Shopee: </p>\n"
 "                <table class=\"shopee_table\">\n"
@@ -354,8 +355,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></th>"
-"\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></"
+"th>\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -844,7 +845,7 @@ msgstr "عدد الطلبات"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Order Discount"
-msgstr ""
+msgstr "خصم على الطلب"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -895,6 +896,8 @@ msgid ""
 "Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
 "Original price: %(price)s"
 msgstr ""
+"العرض الترويجي: %(promotion_type)s - id: %(promotion_id)d\n"
+"السعر الأصلي: %(price)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
@@ -999,7 +1002,7 @@ msgstr "Shipping Label Not Ready"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Shipping: %(carrier)s"
-msgstr ""
+msgstr "الشحن: %(carrier)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -1139,14 +1142,7 @@ msgstr "Shopee Order %(shopee_order_ref)s at %(shop_name)s"
 #. module: sale_shopee
 #: model:product.template,name:sale_shopee.default_discount_product_product_template
 msgid "Shopee Order Discount"
-msgstr ""
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-#: code:addons/sale_shopee/tests/test_shopee.py:0
-msgid "Shopee Pricelist %(currency)s"
-msgstr "Shopee Pricelist %(currency)s"
+msgstr "خصم على طلبات Shopee"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_account__api_endpoint__production_brazil
@@ -1552,3 +1548,6 @@ msgstr "shop_id"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "shopee_shop_id"
 msgstr "shopee_shop_id"
+
+#~ msgid "Shopee Pricelist %(currency)s"
+#~ msgstr "Shopee Pricelist %(currency)s"

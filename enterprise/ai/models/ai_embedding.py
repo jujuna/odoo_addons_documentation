@@ -59,14 +59,12 @@ class AIEmbedding(models.Model):
                     WHERE embedding_vector IS NOT NULL
                     AND embedding_model = %s
                     AND %s
-                    AND (1 - (embedding_vector <=> %s::vector)) >= 0.9
                     ORDER BY similarity DESC
                     LIMIT %s;
                 """,
                     query_embedding,
                     embedding_model,
                     target_filter,
-                    query_embedding,
                     top_n,
                 ),
             )
@@ -209,9 +207,9 @@ class AIEmbedding(models.Model):
                     # Mark all embeddings in failed batch as failed
                     failed_embeddings |= batch
                 except InsufficientCreditError:
-                    for remaining_batch in batch[batch_idx:]:
+                    for remaining_batch in batches[batch_idx:]:
                         iap_credit_error_embeddings |= remaining_batch
-                    continue  # The next requests will also fail with an IAP credit error, so it can be skipped
+                    break  # The next requests will also fail with an IAP credit error, so it can be skipped
 
         all_failed_embeddings = failed_embeddings | iap_credit_error_embeddings
         if all_failed_embeddings:

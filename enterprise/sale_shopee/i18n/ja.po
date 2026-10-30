@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
 "PO-Revision-Date: 2026-09-18 02:44+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
@@ -109,8 +109,8 @@ msgid ""
 "shop in the Shopee Account page."
 msgstr ""
 "<strong>警告:</strong>\n"
-"                    ショップの承認はまもなく使用期限が切れます。Shopee"
-"アカウントページでショップの承認を再度行って下さい。"
+"                    ショップの承認はまもなく使用期限が切れます。Shopeeアカウ"
+"ントページでショップの承認を再度行って下さい。"
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.picking_sync_failure
@@ -229,8 +229,8 @@ msgstr ""
 "out=\"error['message']\"/>\n"
 "                                <t t-else=\"\">Shopeeとの同期中に不明なエラー"
 "が発生しました。\n"
-"                                    お手数ですが、オーダのステートの正誤を"
-"マニュアルで確認する必要があります。\n"
+"                                    お手数ですが、オーダのステートの正誤をマ"
+"ニュアルで確認する必要があります。\n"
 "                                    問題が続くようであれば、以下までご連絡下"
 "さい <a href=\"https://www.odoo.com/help/\">Odooサポート </a>。\n"
 "                                </t>\n"
@@ -337,8 +337,8 @@ msgstr ""
 "            </style>\n"
 "            <body><div>\n"
 "                <p>Shopee店舗\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
-"\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
+"b>\n"
 "                    の在庫の同期中にエラーが発生して完了できませんでした。</"
 "p>\n"
 "                <p>Shopeeから送られたエラー: </p>\n"
@@ -352,8 +352,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></th>"
-"\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></"
+"th>\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -389,7 +389,8 @@ msgstr "アクセストークン使用期限日"
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__access_token
 msgid "Access Token expires in 4 hours and is used to access the Shopee API."
-msgstr "アクセストークンの使用期限は4時間で、Shopee APIへのアクセスに使用されます。"
+msgstr ""
+"アクセストークンの使用期限は4時間で、Shopee APIへのアクセスに使用されます。"
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__access_token_expiration_date
@@ -619,9 +620,9 @@ msgid ""
 "Shopee shop authorization on Shopee Account view. Once expired, the user "
 "must re-authorize the connection on Shopee Account view."
 msgstr ""
-"ショップ承認の有効期限日。Shopeeアカウントのショップ承認中に返されたショップ"
-"。有効期限が切れた場合、ユーザはShopeeアカウントの画面で接続を再度承認する必"
-"要があります。"
+"ショップ承認の有効期限日。Shopeeアカウントのショップ承認中に返されたショッ"
+"プ。有効期限が切れた場合、ユーザはShopeeアカウントの画面で接続を再度承認する"
+"必要があります。"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__fbs_location_id
@@ -748,8 +749,8 @@ msgstr "無効"
 #: model:ir.model.constraint,message:sale_shopee.constraint_shopee_item_unique_shopee_item_and_model_identifiers
 msgid "Item and Model Identifiers must be unique for a given shop."
 msgstr ""
-"アイテムおよびモデル識別子は、特定のショップに対して一意でなければなりません"
-"。"
+"アイテムおよびモデル識別子は、特定のショップに対して一意でなければなりませ"
+"ん。"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__shopee_label_status
@@ -1141,13 +1142,6 @@ msgid "Shopee Order Discount"
 msgstr ""
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-#: code:addons/sale_shopee/tests/test_shopee.py:0
-msgid "Shopee Pricelist %(currency)s"
-msgstr "Shopee価格表 %(currency)s"
-
-#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_account__api_endpoint__production_brazil
 msgid "Shopee Production Endpoint (Brazil)"
 msgstr "Shopee本番エンドポイント (ブラジル)"
@@ -1463,8 +1457,8 @@ msgid ""
 "The stock location managed by Shopee under the Fulfilled by Shopee (FBS) "
 "program."
 msgstr ""
-"Shopeeによるフルフィルメント(FBS)プログラムでShopeeが管理する在庫ロケーション"
-"。"
+"Shopeeによるフルフィルメント(FBS)プログラムでShopeeが管理する在庫ロケーショ"
+"ン。"
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_account__name
@@ -1550,3 +1544,6 @@ msgstr "shop_id"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "shopee_shop_id"
 msgstr "shopee_shop_id"
+
+#~ msgid "Shopee Pricelist %(currency)s"
+#~ msgstr "Shopee価格表 %(currency)s"

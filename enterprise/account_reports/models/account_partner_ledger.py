@@ -54,6 +54,17 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
             },
         }
 
+    def _get_no_partner_line_label(self):
+        return self.env._("Unknown Partner")
+
+    def _should_hide_unknown_partner_line(self, options):
+        # When printing and searching for a specific partner, make it so we only show its lines, not the 'Unknown Partner' one, that would be
+        # shown in case a misc entry with no partner was reconciled with one of the target partner's entries.
+        search_filter = options.get('filter_search_bar', '')
+        if options['export_mode'] != 'print' or not search_filter:
+            return False
+        return search_filter.lower() not in self._get_no_partner_line_label().lower()
+
     def _get_custom_groupby_map(self):
         def partner_line_label_builder(ids):
             valid_ids = [id for id in ids if id]
@@ -61,7 +72,7 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
             partner_names = partners.mapped('name')
             res = dict(zip(partners.ids, partner_names))
             if None in ids:
-                res[None] = self.env._("Unknown Partner")
+                res[None] = self._get_no_partner_line_label()
             return res
 
         def move_line_label_builder(keys):
@@ -175,6 +186,12 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
         return rslt
 
     def _custom_line_postprocessor(self, report, options, lines):
+        if self._should_hide_unknown_partner_line(options):
+            lines = [
+                line for line in lines
+                if not any(model == 'res.partner' and value is None for _markup, model, value in report._parse_line_id(line.id))
+            ]
+
         today = fields.Date.context_today(report)
 
         monetary_columns_indexes = [i for i, col in enumerate(options['columns']) if col.get('figure_type') == 'monetary']
@@ -263,6 +280,22 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
         subformulas = expressions.mapped('subformula')
 
         if not current_groupby:
+            if self._should_hide_unknown_partner_line(options):
+                # Compute the total from the per-partner amounts, excluding the 'Unknown Partner' one.
+                totals = {subformula: None for subformula in subformulas}
+                for partner_totals in self._get_aggregated_lines(subformulas, options, ['partner_id'], date_scope):
+                    if partner_totals['partner_id'] is None:
+                        continue
+                    for subformula in subformulas:
+                        value = partner_totals.get(subformula)
+                        if value is not None:
+                            if subformula.startswith('_currency_'):
+                                totals[subformula] = list(set(totals[subformula] or []) | set(value))
+                            else:
+                                totals[subformula] = (totals[subformula] or 0) + value
+                engine_res = {**totals, 'has_sublines': True}
+                return {next(iter(formulas_dict.values())): engine_res}
+
             totals = self._get_aggregated_lines(subformulas, options, [], date_scope=date_scope)
             engine_res = {**totals[0], 'has_sublines': True} if totals else {subformula: None for subformula in subformulas} | {'has_sublines': False}
             return {next(iter(formulas_dict.values())): engine_res}
@@ -596,6 +629,42 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
             rows = self._get_aggregated_lines([], options, ['partner_id'], 'from_beginning')
             partners = [row['partner_id'] for row in rows]
         return self.env['res.partner'].browse(partner for partner in partners if partner)
+
+    @api.model
+    def _get_documents_to_print_per_partner(self, report, options, lines, total_due_expression_label):
+        """ Splits the lines, computed unfolded for all the partners, into an overview document (the lines folded at
+        the partner level), followed by one document per partner made of the lines of this partner.
+        """
+        lines_by_parent_id = defaultdict(list)
+        for line in lines:
+            lines_by_parent_id[line.parent_id].append(line)
+
+        header_line = [line for line in lines if not report._get_markup(line.id)]
+        partner_documents = []
+        for line in lines:
+            markup = report._get_markup(line.id)
+            if not isinstance(markup, dict) or markup.get('groupby') != 'partner_id':
+                continue
+
+            total_due_column = next(column for column in line.columns if column.expression_label == total_due_expression_label)
+            document_options = {
+                **options,
+                'partner_ids': [report._get_model_info_from_id(line.id)[1]],
+                'partner_total_due': report._format_value(
+                    options,
+                    total_due_column.no_format,
+                    total_due_column.figure_type,
+                    format_params=total_due_column.format_params,
+                ),
+            }
+            partner_documents.append((document_options, [*header_line, *lines_by_parent_id.pop(line.id)]))
+            line.unfolded = False  # Folded in the overview, so that its total is displayed instead of its children
+
+        if len(partner_documents) == 1:
+            return partner_documents  # No need for an overview when there is a single partner
+
+        overview_lines = [line for line in lines if line.parent_id in lines_by_parent_id]
+        return [(options, overview_lines), *partner_documents]
 
     ####################################################
     # ACTIONS

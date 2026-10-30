@@ -12,7 +12,7 @@ from PIL import Image
 
 from odoo.api import SUPERUSER_ID
 from odoo.exceptions import AccessError, ValidationError
-from odoo.tests import tagged
+from odoo.tests import new_test_user, tagged
 from odoo.tools import BinaryBytes, file_open, file_path, mute_logger
 from odoo.tools.image import image_apply_opt
 
@@ -285,6 +285,29 @@ class TestIrAttachment(TransactionCaseWithUserDemo):
             )
             self.assertTrue(a.raw.size, "No bytes written")
 
+    def test_16_create_unique_only_reuses_writable_attachments(self):
+        """ create_unique() must not return an attachment the current user cannot write, as
+        callers link new attachments to it (e.g. the resized variants of an uploaded image).
+        """
+        user_other = new_test_user(self.env, login='other_user', groups='base.group_user')
+        vals = {'name': 'image.webp', 'raw': self.blob1_v, 'mimetype': 'image/webp'}
+        # attachment of another user, not linked to any record (like an image variant)
+        attachment_other = self.Attachment.with_user(user_other).create({**vals, 'public': True})
+
+        Attachment = self.Attachment.with_user(self.user_demo)
+        attachments = Attachment.create_unique([vals])
+        self.assertNotIn(attachment_other, attachments)
+        # a variant can be linked to the returned attachment, as the image field does
+        Attachment.create({
+            'name': 'image.jpg',
+            'raw': self.blob2_v,
+            'mimetype': 'image/jpeg',
+            'res_model': 'ir.attachment',
+            'res_id': attachments[0].id,
+        })
+        # the attachments of the current user are still reused
+        self.assertEqual(Attachment.create_unique([vals]), attachments)
+
     def test_16_from_file_takes_little_memory(self):
         # The biggest file we reliably have is "i18n/base.pot" which is
         # only 1.3MiB. We use tracemalloc to make sure _upload_file uses
@@ -410,6 +433,32 @@ class TestPermissions(TransactionCaseWithUserDemo):
         self.assertNotEqual(SUPERUSER_ID, admin_user.id)
         attachment_admin.with_user(admin_user).raw
 
+    def test_search_without_res_model(self):
+        """A search without res_model returns the attachments the user may read,
+        including the ones granted by an extra access rule."""
+        Admin = self.Attachments.with_user(SUPERUSER_ID)
+        own = self.Attachments.create({'name': 'search_own'})
+        public = Admin.create({'name': 'search_public', 'public': True})
+        Admin.create({'name': 'search_foreign'})
+        token = Admin.create({'name': 'search_token', 'access_token': 'search-token'})
+        linked = Admin.create({'name': 'search_linked', 'res_model': self.attachment._name, 'res_id': self.attachment.id})
+        domain = [('name', '=like', 'search_%')]
+        readable = (own + public + linked).sorted('id')
+
+        self.assertEqual(self.Attachments.search(domain, order='id'), readable)
+        self.assertEqual(self.Attachments.search_count(domain), 3)
+        self.assertEqual(self.Attachments.search(domain, order='id', offset=1), readable[1:])
+        self.assertEqual(self.Attachments.search(domain, order='id', limit=2), readable[:2])
+
+        self.env['ir.access'].sudo().create({
+            'name': 'read attachments with a token',
+            'model_id': self.env['ir.model']._get_id('ir.attachment'),
+            'group_id': self.env.ref('base.group_user').id,
+            'operation': 'r',
+            'domain': "[('access_token', '!=', False)]",
+        })
+        self.assertEqual(self.Attachments.search(domain, order='id'), (readable + token).sorted('id'))
+
     @mute_logger("odoo.addons.base.models.ir_access", "odoo.models")
     def test_field_read_permission(self):
         """If the record field can't be read,
@@ -522,6 +571,15 @@ class TestPermissions(TransactionCaseWithUserDemo):
         # /proc is not writeable, check if we have an error raised
         with patch.object(IrAttachment, '_full_path', lambda self, path: '/proc/dummy_test'), self.assertRaises(OSError):
             self.env['ir.attachment']._file_write('test', io.BytesIO(b'test'))
+
+    def test_write_chmod_permission_error(self):
+        # On filesystems such as CIFS/SMB mounts, fchmod/chmod can raise PermissionError
+        # (operation not permitted) when ownership is fixed at mount time.
+        # Ensure _file_write gracefully continues without failing.
+        with patch('os.fchmod', side_effect=PermissionError(1, 'Operation not permitted')), \
+             patch('os.chmod', side_effect=PermissionError(1, 'Operation not permitted')):
+            attachment = self.env['ir.attachment'].create({'name': 'cifs_test.txt', 'raw': b'test cifs content'})
+            self.assertEqual(attachment.raw.content, b'test cifs content')
 
     def test_write_create_url_binary_attachment(self):
         with self.assertRaisesRegex(ValidationError, r"Sorry, you are not allowed to write on this document"):

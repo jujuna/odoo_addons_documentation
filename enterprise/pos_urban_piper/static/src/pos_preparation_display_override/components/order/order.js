@@ -24,10 +24,12 @@ patch(Order.prototype, {
             const total_order_time = this.order.create_date
                 .setZone("local")
                 .plus({ minutes: this.order.pos_order_id.prep_time || 0 });
-            return Math.max(
+            const timeDiff = Math.max(
                 Math.round((total_order_time.ts - luxon.DateTime.now().ts) / (1000 * 60)),
                 0
             );
+            this.isAlert = timeDiff <= 5;
+            return timeDiff;
         }
         return super._computeDuration();
     },

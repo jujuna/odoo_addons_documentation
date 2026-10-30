@@ -56,7 +56,7 @@ class AppointmentCalendarController(CalendarController):
         event = request.env['calendar.event'].with_context(active_test=False).sudo().search([('access_token', '=', access_token)], limit=1)
         if not event:
             return request.not_found()
-        timezone = request.session.get('timezone') or event.appointment_type_id.appointment_tz
+        timezone = request.session.get('timezone') or event.appointment_type_id.appointment_tz or 'UTC'
         request.session['timezone'] = timezone
         tz_session = ZoneInfo(timezone)
 

@@ -164,6 +164,7 @@ test("Routing popup shows a wrench icon instead of an avatar for material resour
         groupBy: ["resource_ids"],
     });
 
+    await contains(".o-map-renderer--pin-list-container [data-icon='arrow_right']").click();
     expect(
         "div.o-map-renderer--routing-popup .o_planning_resource_avatar i[data-icon='build']"
     ).toHaveCount(1, {

@@ -43,11 +43,11 @@ registry.category("web_tour.tours").add("account_accountant_bank_rec_set_partner
             // The parent company's contact must appear even though the statement line
             // belongs to a branch company — this validates the `parent_of` domain fix.
             content: "Parent company contact is visible in the results",
-            trigger: "tbody > tr > td[name='display_name']:contains('AAAA Parent Partner')",
+            trigger: "tbody > tr > td[name='complete_name']:contains('AAAA Parent Partner')",
         },
         {
             content: "Select the parent company contact",
-            trigger: "tbody > tr > td[name='display_name']:contains('AAAA Parent Partner')",
+            trigger: "tbody > tr > td[name='complete_name']:contains('AAAA Parent Partner')",
             run: "click",
         },
         {

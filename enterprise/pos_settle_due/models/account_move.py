@@ -17,6 +17,20 @@ class AccountMove(models.Model):
 
         for invoice in self:
             remaining_amount = invoice.amount_residual
+            invoice_receivable_lines = invoice.line_ids.filtered(
+                lambda line: line.display_type == 'payment_term' and not line.reconciled
+            )
+            if not remaining_amount:
+                # POS closing invoice, paid at closing: the customer account debt
+                # is the open line of the transfer entry reconciled with it.
+                term_lines = invoice.line_ids.filtered(lambda line: line.display_type == 'payment_term')
+                counterparts = term_lines.matched_debit_ids.debit_move_id | term_lines.matched_credit_ids.credit_move_id
+                invoice_receivable_lines = counterparts.move_id.line_ids.filtered(
+                    lambda line: line.account_id.account_type == 'asset_receivable' and not line.reconciled
+                )
+                remaining_amount = abs(sum(invoice_receivable_lines.mapped('amount_residual')))
+                partner = invoice_receivable_lines.partner_id[:1] or partner
+
             invoice_payment_moves = self.env['account.move.line']
             for pm_id, amount in available_by_pm.items():
                 if amount == 0:
@@ -40,9 +54,6 @@ class AccountMove(models.Model):
             # Reconcile the payment lines against the invoice's receivable line,
             # mirroring pos_session._create_non_reconciled_order_picking() logic.
             # display_type='payment_term' is the receivable line on a posted invoice.
-            invoice_receivable_lines = invoice.line_ids.filtered(
-                lambda line: line.display_type == 'payment_term' and not line.reconciled
-            )
             (invoice_receivable_lines | invoice_payment_moves)\
                 .with_context(skip_invoice_sync=True)\
                 .reconcile()

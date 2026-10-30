@@ -9,14 +9,15 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:30+0000\n"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-14 04:11+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "account_batch_payment/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +41,16 @@ msgid ""
 "When you reconcile, simply select the corresponding batch payment to "
 "reconcile all the payments in the batch.\n"
 msgstr ""
+"\n"
+"一括支払\n"
+"=======================================\n"
+"一括支払ではグループ支払いが可能です。\n"
+"\n"
+"つまり、それだけに限定されませんが小切手については、銀行に一括して預け入れる"
+"前に、複数の小切手をまとめるために使われます。\n"
+"入金された合計金額は、銀行取引明細書に単一の取引として表示されます。\n"
+"消込時には、対応する一括支払いを選択するだけで、バッチ内のすべての支払いが消"
+"込されます。\n"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -134,7 +145,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "All payments must have the same payment method."
-msgstr ""
+msgstr "すべての支払いは、同じ支払い方法を使用することが必須要件です。"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount
@@ -175,7 +186,7 @@ msgstr "銀行仕訳帳"
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "銀行取引"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -457,7 +468,7 @@ msgstr "フォロワー (取引先)"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
 msgid "Generate File"
-msgstr ""
+msgstr "ファイルを生成"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_create_date
@@ -575,7 +586,7 @@ msgstr "自動的に生成するために空欄にしておく"
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols のアイコン (例：checklist)"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -672,12 +683,6 @@ msgstr "Odoo支払LLC"
 #: code:addons/account_batch_payment/wizard/create_batch_error.py:0
 msgid "Only %s payments can be added to a batch. Invalid ones will be ignored."
 msgstr "バッチには %s 件の支払のみ追加できます。無効なものは無視されます。"
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_payment.py:0
-msgid "Only outbound payments can be exported."
-msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
@@ -810,7 +815,7 @@ msgstr "検索: 一括支払"
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "Selected payments include methods that cannot generate a file."
-msgstr ""
+msgstr "選択された支払い方法の中には、ファイルを生成できないものがあります。"
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__sent
@@ -831,7 +836,7 @@ msgstr "表示"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__show_download_xml_button
 msgid "Show Download Xml Button"
-msgstr ""
+msgstr "「XMLをダウンロード」ボタンを表示"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__show_remove_button
@@ -1022,7 +1027,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You can't generate a file for payments from more than one journal."
-msgstr ""
+msgstr "複数の仕訳帳から支払いのファイルを生成することはできません。"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -1054,11 +1059,15 @@ msgstr "支払いが重複するバッチを作成することはできません
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You must select at least one payment to generate a file."
 msgstr ""
+"ファイルを生成するには、少なくとも1つの支払い方法を選択する必要があります。"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 msgid "payments"
 msgstr "支払"
+
+#~ msgid "Only outbound payments can be exported."
+#~ msgstr "エクスポートできるのは出金データのみです。"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "銀行取引明細行"

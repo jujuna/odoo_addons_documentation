@@ -1,5 +1,6 @@
 import base64
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 CONTROL_METHODS = [
     ('co_1', "Company - Cat 1. Capital Ownership or voting rights"),
@@ -32,7 +33,6 @@ class EquityUbo(models.Model):
     _name = 'equity.ubo'
     _inherit = ['mail.thread']
     _description = "Ultimate Beneficial Owner"
-    _check_company_auto = True
 
     company_id = fields.Many2one(
         'res.company',
@@ -52,9 +52,9 @@ class EquityUbo(models.Model):
         'res.partner',
         string="Holder",
         required=True,
-        domain=[('is_company', '=', False)],
+        domain="[('is_company', '=', False)] + ([] if not company_id else "
+            "['|', ('company_id', '=', False), ('company_id', 'parent_of', company_id)])",
         index=True,
-        check_company=True,
     )
 
     start_date = fields.Date(string="Control Start Date", required=True)
@@ -78,6 +78,16 @@ class EquityUbo(models.Model):
         'unique (partner_id, holder_id)',
         "This contact is already a holder of this company",
     )
+
+    @api.constrains('holder_id', 'partner_id')
+    def _check_holder_company(self):
+        for ubo in self:
+            if (holder := ubo.holder_id) and (company := ubo.company_id):
+                if not holder.filtered_domain(holder._check_company_domain(company)):
+                    raise ValidationError(self.env._(
+                        "%(partner)s does not belong to a company compatible with this record.",
+                        partner=holder.display_name,
+                    ))
 
     @api.depends('partner_id.name', 'holder_id.name')
     def _compute_display_name(self):
@@ -116,22 +126,35 @@ class EquityUbo(models.Model):
             :param data: list of new or existing (if has an id) equity.ubo dicts with a holder_id sub-record dict.
                 Each record may have `attachment` which holds a file that should be uploaded to the record chatter.
         """
-        try:
-            for data_record in data:
-                attachment_data = data_record.pop('attachment', None)
-                holder_data = data_record.pop('holder_id')
-                if ubo_id := data_record.pop('id', None):
+        def whitelist(data_dict, allowed_fields):
+            return {k: v for k, v in data_dict.items() if k in allowed_fields}
+
+        partner = self.env['res.partner'].browse(partner_id)
+        if not partner._can_fill_ubo_portal_form():
+            return {'error': self.env._("Partner is not allowed to fill UBO form")}
+
+        try:  # ruff:ignore[too-many-statements-in-try-clause]
+            rep_name = data.pop('rep_name')
+            rep_position = data.pop('rep_position')
+            for ubo_data in data.pop('ubos'):
+                attachment_data = ubo_data.pop('attachment', None)
+                holder_data = whitelist(ubo_data.pop('holder_id'), ['id', 'name', 'country_id', 'birth_date', 'ubo_national_identifier', 'ubo_pep'])
+                ubo_data = whitelist(ubo_data, ['id', 'control_method', 'ownership', 'voting_rights', 'auth_rep_role', 'start_date', 'end_date', 'attachment_expiration_date'])
+                if ubo_id := ubo_data.pop('id', None):
                     ubo = self.browse(ubo_id)
-                    ubo.write(data_record)
-                    assert holder_data.pop('id') == ubo.holder_id.id
+                    assert ubo.partner_id.id == partner_id
+                    assert ubo.holder_id.id == holder_data.pop('id')
+                    ubo.write(ubo_data)
                     ubo.holder_id.write(holder_data)
-                else:
+                elif not holder_data.pop('id', None):
                     holder = self.env['res.partner'].create(holder_data)
                     ubo = self.create({
                         'partner_id': partner_id,
                         'holder_id': holder.id,
-                        **data_record,
+                        **ubo_data,
                     })
+                else:
+                    raise ValidationError(self.env._("Cannot create new UBO for an existing holder"))  # ruff: ignore[raise-within-try]
 
                 if attachment_data:
                     self.env['ir.attachment'].create({
@@ -141,5 +164,7 @@ class EquityUbo(models.Model):
                         'res_model': self._name,
                         'res_id': ubo.id,
                     })
-        except Exception as e:  # noqa: BLE001
+
+            partner._ubo_portal_form_filled(rep_name=rep_name, rep_position=rep_position)
+        except Exception as e:  # ruff:ignore[blind-except]
             return {'error': self.env._("Invalid data: %s", e)}

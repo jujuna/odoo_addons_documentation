@@ -2,7 +2,7 @@
 <odoo>
     <data noupdate="0">
     <record id="l10n_be_transport_company_car" model="hr.contract.salary.benefit">
-        <field name="name">Transportation</field>
+        <field name="name">Company Car</field>
         <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'company_car_total_depreciated_cost')])"/>
         <field name="cost_res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'company_car_total_depreciated_cost')])"/>
         <field name="sequence">5</field>
@@ -27,6 +27,7 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount you spend on public transportation (bus) to go to work. The approximative amount reimbursed by the employer is calculated accordingly.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_bus_transport')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_public_transport')])]"/>
     </record>
 
     <record id="l10n_be_transport_public_tram" model="hr.contract.salary.benefit">
@@ -38,6 +39,7 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount you spend on public transportation (tram) to go to work. The approximative amount reimbursed by the employer is calculated accordingly.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_tram_transport')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_public_transport')])]"/>
     </record>
 
     <record id="l10n_be_transport_public_metro" model="hr.contract.salary.benefit">
@@ -49,6 +51,7 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount you spend on public transportation (metro) to go to work. The approximative amount reimbursed by the employer is calculated accordingly.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_metro_transport')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_public_transport')])]"/>
     </record>
 
     <record id="l10n_be_transport_train" model="hr.contract.salary.benefit">
@@ -60,6 +63,7 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the number of kilometers you ride by train to go to work. The approximative amount reimbursed by the employer is calculated accordingly.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_transport_mode_train')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.employees_salary_train_transport')])]"/>
     </record>
 
     <record id="l10n_be_transport_private_car" model="hr.contract.salary.benefit">
@@ -71,6 +75,7 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the number of kilometers between your home and your work place. The approximative amount reimbursed by the employer is calculated accordingly.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_transport_mode_private_car')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_private_car')])]"/>
     </record>
 
     <record id="l10n_be_transport_private_bike" model="hr.contract.salary.benefit">
@@ -82,6 +87,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the number of kilometers between your home and your work place.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_transport_private_bike')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_cycle_transportation_taxable'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_cycle_transportation')])]"/>
     </record>
 
     <record id="l10n_be_transport_company_bike" model="hr.contract.salary.benefit">
@@ -101,6 +108,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount of your internet subscription invoice. If you have a pack only the internet part of your operator subscription will be paid by the employer.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_internet_subscription')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_internet'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_mobile" model="hr.contract.salary.benefit">
@@ -112,6 +121,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">This BASE subscription include unlimited Internet, calls and SMS in Belgium + Roaming trough Europe (International Communications are excluded).</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_mobile_subscription')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_mobile'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_mobile_amount" model="hr.contract.salary.benefit">
@@ -122,6 +133,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Company phone</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_mobile')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_mobile_phone'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_mobile_laptop" model="hr.contract.salary.benefit">
@@ -132,6 +145,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Laptop</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_laptop')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_laptop'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_tablet" model="hr.contract.salary.benefit">
@@ -142,6 +157,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Company Tablet</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_tablet')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_tablet'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_electricity" model="hr.contract.salary.benefit">
@@ -153,6 +170,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount you spend on electricity for the employee.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_electricity')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_electricity'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_heating" model="hr.contract.salary.benefit">
@@ -164,6 +183,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount you spend on heating for the employee.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_heating')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_heating'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_housing_onss" model="hr.contract.salary.benefit">
@@ -175,6 +196,9 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount you spend on housing for the employee, as valued for the social contributions.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_housing_onss')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_housing_onss'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_atn_housing_onss_deduction'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_housing_fiscal" model="hr.contract.salary.benefit">
@@ -186,6 +210,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount you spend on housing for the employee, as valued for the withholding taxes.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_housing_fiscal')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_atn_housing_fiscal'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_atn_housing_fiscal_deduction')])]"/>
     </record>
 
     <record id="l10n_be_rent" model="hr.contract.salary.benefit">
@@ -197,6 +223,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the part of the rent paid by the company to the Director that exceed the legal amount and has to be reclassified as remuneration.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_rent')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp999_employees_salary_atn_rent'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_pension" model="hr.contract.salary.benefit">
@@ -208,6 +236,8 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Enter the amount of the supplementary pension paid by the company for the company executive.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_pension')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp999_employees_salary_atn_pension'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_advantage_any_kind')])]"/>
     </record>
 
     <record id="l10n_be_canteen" model="hr.contract.salary.benefit">
@@ -218,6 +248,7 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Canteen Cost</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_canteen')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_canteen')])]"/>
     </record>
 
     <record id="l10n_be_extra_time_off" model="hr.contract.salary.benefit">
@@ -237,6 +268,13 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Since Odoo invests massively in developing and writing intellectual property content, legally we are able to pay part of our employees' salaries as intellectual property income. This amount will be paid in cash every month and is taxed less.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_intellectual_property')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_ip_onss_exemption'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_gross_with_ip'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_ip_part'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_ip_subject_to_onss'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_ip_part_onss'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_ip'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_ip_deduction')])]"/>
     </record>
 
     <record id="l10n_be_representation_fees" model="hr.contract.salary.benefit">
@@ -256,9 +294,11 @@
         <field name="name">Fuel Card</field>
         <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'fuel_card')])"/>
         <field name="cost_res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'fuel_card')])"/>
-        <field name="sequence">12</field>
+        <field name="sequence">6</field>
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_fuel_card_personal_use'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_fuel_card_commute')])]"/>
     </record>
 
     <record id="l10n_be_yearly_commission" model="hr.contract.salary.benefit">
@@ -269,6 +309,8 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_yearly_cash"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_commission')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_loss_on_commissions_public_holiday'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_loss_on_commissions_sickness')])]"/>
     </record>
 
     <record id="l10n_be_child_bonus" model="hr.contract.salary.benefit">
@@ -291,6 +333,9 @@
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="description">Each month you'll receive 8€ per day worked on a meal voucher card.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_meal_vouchers')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_termination_fees_ch_year'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_ch_worker'),
+                                                     ref('l10n_be_hr_payroll.hr_salary_rule_meal_voucher_employer')])]"/>
     </record>
 
     <record id="l10n_be_fixed_meal_vouchers" model="hr.contract.salary.benefit">
@@ -340,6 +385,9 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_hospital_insurance')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_hospital_insurance_employee_contribution_input'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_hospital_insurance_employer_contribution'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_hospital_insurance')])]"/>
     </record>
 
     <record id="l10n_be_insured_spouse" model="hr.contract.salary.benefit">
@@ -388,6 +436,7 @@
         <field name="active" eval="False"/>
         <field name="description">The chosen percentage of the salary will be sacrified into a group insurance. Regarding the employer's budget, in addition to the amount invested in group insurance, 8.86% of this amount is paid to the ONSS, and an additional 4.4% is used in the management costs of the insurance product.</field>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_group_insurance')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_group_insurance')])]"/>
     </record>
 
     <record id="l10n_be_ambulatory_insurance" model="hr.contract.salary.benefit">
@@ -398,6 +447,9 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_ambulatory_insurance')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_ambulatory_insurance_employee_contribution_input'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_ambulatory_insurance_employer_contribution'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_termination_fees_ambulatory_insurance')])]"/>
     </record>
 
     <record id="l10n_be_ambulatory_insured_spouse" model="hr.contract.salary.benefit">
@@ -452,6 +504,7 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_fiscal_voluntarism')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_fiscal_voluntarism')])]"/>
     </record>
 
     <record id="l10n_be_onss_restructuring" model="hr.contract.salary.benefit">
@@ -460,6 +513,7 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_onss_reduction')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_onss_restructuring')])]"/>
     </record>
 
     <record id="l10n_be_withholding_tax_benefit" model="hr.contract.salary.benefit">
@@ -468,6 +522,7 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_withholding_tax')])]"/>
+        <field name="l10n_be_joint_committee_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')])]"/>
         <field name="description">For Company Executives that want to have a fixed amount of withholding taxes every month</field>
     </record>
 
@@ -477,6 +532,8 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_impulsion_plan')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_impulsion_25yo'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_impulsion_12mo')])]"/>
     </record>
 
     <record id="l10n_be_time_in_rnd_benefit" model="hr.contract.salary.benefit">
@@ -485,6 +542,9 @@
         <field name="benefit_type_id" ref="hr_payroll.l10n_be_monthly_benefit"/>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
         <field name="view_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.hr_employee_view_form_rnd_time')])]"/>
+        <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_274_32'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_274_33'),
+                                                     ref('l10n_be_hr_payroll.cp200_employees_salary_274_34')])]"/>
     </record>
 
     <record id="l10n_be_posted_employees_benefit" model="hr.contract.salary.benefit">
@@ -853,8 +913,6 @@
                                 ref('l10n_be_hr_payroll.hr_employee_view_form_cafeteria_plan')
                                 ])]"/>
         <field name="salary_rule_ids" eval="[(6, 0, [
-                                ref('l10n_be_hr_payroll.l10n_be_hr_payroll_cafeteria_plan_salary_sacrifice_to_get_shadow_salary'),
-                                ref('l10n_be_hr_payroll.l10n_be_cafeteria_plan_salary_sacrifice_deduction'),
                                 ref('l10n_be_hr_payroll.l10n_be_cafeteria_plan_net_contribution'),
                                 ])]"/>
         <field name="active" eval="False"/>

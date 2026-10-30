@@ -770,7 +770,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
                 : _t("Shift partially scheduled");
         this.closeNotificationFn?.();
         this.closeNotificationFn = this.notificationService.add(
-            markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${notifLabel}</span>`,
+            markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${notifLabel}</span>`,
             {
                 type: "success",
                 className: "planning_notification",
@@ -792,7 +792,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
                                 );
                                 this.model.fetchData();
                                 this.closeNotificationFn = this.notificationService.add(
-                                    markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${
+                                    markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${
                                         ids.length > 1
                                             ? _t("Shifts unscheduled")
                                             : _t("Shift unscheduled")
@@ -804,7 +804,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
                                 );
                             } catch {
                                 this.closeNotificationFn = this.notificationService.add(
-                                    markup`<i class="fa fa-fw fa-times"></i><span class="ms-1">${_t(
+                                    markup`<i class="oi oi-fw" data-icon="close"></i><span class="ms-1">${_t(
                                         "Could not undo scheduling"
                                     )}</span>`,
                                     {

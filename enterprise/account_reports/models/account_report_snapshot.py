@@ -150,19 +150,17 @@ class AccountReportSnapshot(models.Model):
         for company in self.env['res.company'].search([]).with_context(ignore_exceptions=True):
             fy_hard_lock_date = max(company.user_fiscalyear_lock_date, company.user_hard_lock_date)
 
-            if fy_hard_lock_date != date.min:
-                snapshot_deletion_domains.append([
-                    ('date', '>', fy_hard_lock_date),
-                    ('company_id', '=', company.id),
-                    ('report_id.root_report_id', '!=', generic_tax_report.id),
-                ])
+            snapshot_deletion_domains.append([
+                *([('date', '>', fy_hard_lock_date)] if fy_hard_lock_date != date.min else []),
+                ('company_id', '=', company.id),
+                ('report_id.root_report_id', '!=', generic_tax_report.id),
+            ])
 
-            if company.user_tax_lock_date != date.min:
-                snapshot_deletion_domains.append([
-                    ('date', '>', company.user_tax_lock_date),
-                    ('company_id', '=', company.id),
-                    ('report_id.root_report_id', '=', generic_tax_report.id),
-                ])
+            snapshot_deletion_domains.append([
+                *([('date', '>', company.user_tax_lock_date)] if company.user_tax_lock_date != date.min else []),
+                ('company_id', '=', company.id),
+                ('report_id.root_report_id', '=', generic_tax_report.id),
+            ])
 
         self.env['account.lock_exception'].flush_model()
         self.env.cr.execute(SQL("""

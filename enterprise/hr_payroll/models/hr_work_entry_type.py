@@ -40,6 +40,15 @@ class HrWorkEntryType(models.Model):
         for work_entry_type in self:
             work_entry_type.is_extra_hours = extra_hours_category in work_entry_type.category_ids if extra_hours_category else False
 
+    @api.depends('code', 'name')
+    @api.depends_context('is_work_time_report')
+    def _compute_display_name(self):
+        if self.env.context.get('is_work_time_report'):
+            for work_entry_type in self:
+                work_entry_type.display_name = f"{work_entry_type.name} [{work_entry_type.code}]"
+        else:
+            super()._compute_display_name()
+
     def _set_all_external_identifiers_noupdate(self, noupdate):
         self.env['ir.model.data'].sudo().search([
             ('model', '=', "hr.work.entry.type"), ('res_id', 'in', self.ids)

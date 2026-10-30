@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-23 17:52+0000\n"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-09-27 21:41+0000\n"
 "Last-Translator: \"Maitê Dietze (madi)\" <madi@odoo.com>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/"
 "odoo-20/account_reports/pt_BR/>\n"
@@ -887,6 +887,11 @@ msgid "Adjustment Entry"
 msgstr "Lançamento de ajuste"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment
+msgid "Adjustments to reconcile net profit/(loss) to net cash flows:"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__advance_tax_payment_account_id
 msgid "Advance Account"
 msgstr "Conta Avançada"
@@ -1419,6 +1424,8 @@ msgid ""
 "Audit journal items and accounts to ensure they are correctly assigned to "
 "taxes."
 msgstr ""
+"Audite os lançamentos financeiros e as contas para garantir que estejam "
+"corretamente atribuídos aos impostos."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__auto_generate
@@ -1462,6 +1469,7 @@ msgstr "S: %s"
 #: code:addons/account_reports/models/account_trial_balance_report.py:0
 #: model:account.report.column,name:account_reports.balance_sheet_balance
 #: model:account.report.column,name:account_reports.cash_flow_report_balance
+#: model:account.report.column,name:account_reports.cash_flow_report_balance_indirect
 #: model:account.report.column,name:account_reports.executive_summary_column
 #: model:account.report.column,name:account_reports.general_ledger_report_balance
 #: model:account.report.column,name:account_reports.journal_report_balance
@@ -1563,14 +1571,14 @@ msgid "Bank Reconciliation Summary"
 msgstr "Resumo da reconciliação bancária"
 
 #. module: account_reports
-#: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Linha de extrato bancário"
-
-#. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_statements
 msgid "Bank Statements"
 msgstr "Extratos bancários"
+
+#. module: account_reports
+#: model:ir.model.fields.selection,name:account_reports.selection__account_return_check_template__model__account_bank_statement_line
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_bank_transaction_missing_document
@@ -1589,6 +1597,8 @@ msgid ""
 "Bank reconciliation helps identify missing invoices or bills that may affect "
 "taxes."
 msgstr ""
+"A reconciliação bancária ajuda a identificar faturas ou contas em falta que "
+"possam afetar os impostos."
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.bank_information_customer_report
@@ -1667,6 +1677,11 @@ msgid ""
 msgstr ""
 "Por padrão, o Odoo aplica seu próprio prazo para devoluções (mostrado como "
 "0). Insira um valor aqui para substituí-lo e usá-lo como o novo prazo."
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow
+msgid "CASH FLOW"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -1756,6 +1771,11 @@ msgid "Cash Basis sequences"
 msgstr "Sequências com base no regime de caixa"
 
 #. module: account_reports
+#: model:ir.model,name:account_reports.model_account_cash_flow_indirect_report_handler
+msgid "Cash Flow Indirect Report Custom Handler"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.model,name:account_reports.model_account_cash_flow_report_handler
 msgid "Cash Flow Report Custom Handler"
 msgstr "Gerenciador personalizado de relatórios de fluxo de caixa"
@@ -1765,6 +1785,36 @@ msgstr "Gerenciador personalizado de relatórios de fluxo de caixa"
 #: model:ir.actions.client,name:account_reports.action_account_report_cs
 msgid "Cash Flow Statement"
 msgstr "Demonstrativo de fluxo de caixa"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_financial_activities
+msgid "Cash Flows from financing activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_investing_activities
+msgid "Cash Flows from investing activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_operational_activities
+msgid "Cash Flows from operating activities"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_repay_recov_cash_adv
+msgid "Cash advances made to third parties"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_bop
+msgid "Cash and cash equivalents at beginning"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_eop
+msgid "Cash and cash equivalents at end"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -2587,6 +2637,11 @@ msgid "Date considered as annotated by the annotation."
 msgstr "Data considerada como anotada pela anotação."
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
+msgid "Date:"
+msgstr ""
+
+#. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_audit_form_view
 #: model_terms:ir.ui.view,arch_db:account_reports.return_creation_wizard_form
 msgid "Dates"
@@ -2716,6 +2771,11 @@ msgid "Deferred Revenues"
 msgstr "Receitas diferidas"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_deferred_revenue
+msgid "Deferred revenue"
+msgstr ""
+
+#. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_expression_form
 msgid "Definition"
 msgstr "Definição"
@@ -2730,6 +2790,11 @@ msgstr "Unidades de atraso"
 #: model_terms:ir.ui.view,arch_db:account_reports.account_return_kanban_view
 msgid "Delete"
 msgstr "Excluir"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_depreciation
+msgid "Depreciation and amortisation"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -2780,6 +2845,7 @@ msgstr "Exibir compositor de e-mail"
 #: model:ir.model.fields,field_description:account_reports.field_account_audit_account_status__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_balance_sheet_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_bank_reconciliation_report_handler__display_name
+#: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_indirect_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_report_handler__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_change_lock_date__display_name
 #: model:ir.model.fields,field_description:account_reports.field_account_chart_template__display_name
@@ -3261,6 +3327,8 @@ msgid ""
 "Ensures that applied taxes and fiscal positions match the customer or vendor "
 "country location."
 msgstr ""
+"Garante que os impostos aplicados e as posições fiscais correspondam à "
+"localização do país do cliente ou fornecedor."
 
 #. module: account_reports
 #. odoo-python
@@ -3651,6 +3719,26 @@ msgid "Future Activities"
 msgstr "Atividades futuras"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_fin_instr
+msgid "Gain (-)/Loss (+) on sale of financial instruments"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_intangible_assets
+msgid "Gain (-)/Loss (+) on sale of intangible assets"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_ppe
+msgid "Gain (-)/Loss (+) on sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_sale_rou
+msgid "Gain (-)/Loss (+) on sale of right-of-use assets"
+msgstr ""
+
+#. module: account_reports
 #: model:ir.actions.server,name:account_reports.ir_cron_garbage_collect_snapshots_ir_actions_server
 msgid "Garbage-collect snapshots of accounting reports"
 msgstr "Inscrições de coleta de lixo de relatórios financeiros"
@@ -3910,6 +3998,7 @@ msgstr "IBAN"
 #: model:ir.model.fields,field_description:account_reports.field_account_audit_account_status__id
 #: model:ir.model.fields,field_description:account_reports.field_account_balance_sheet_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_bank_reconciliation_report_handler__id
+#: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_indirect_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_cash_flow_report_handler__id
 #: model:ir.model.fields,field_description:account_reports.field_account_change_lock_date__id
 #: model:ir.model.fields,field_description:account_reports.field_account_chart_template__id
@@ -4126,6 +4215,11 @@ msgid "Income Provision for %s"
 msgstr "Provisão de receita para %s"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_income_tax_paid
+msgid "Income tax paid (-)/received (+)"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/bank_reconciliation_report.py:0
 msgid "Inconsistent Statements"
@@ -4163,6 +4257,11 @@ msgstr ""
 "Tais serviços devem ser tratados estritamente como uma transação com um país "
 "terceiro (fora da UE) e não devem estar sujeitos a impostos "
 "intracomunitários."
+
+#. module: account_reports
+#: model:account.report,name:account_reports.cash_flow_report_indirect
+msgid "Indirect Cash Flow Statement"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -4212,6 +4311,21 @@ msgstr ""
 "grupo. Ela garante que os saldos recíprocos entre entidades relacionadas "
 "correspondam com precisão, o que é necessário para eliminar transações "
 "internas durante a consolidação."
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_interest_paid
+msgid "Interest paid"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_interest_received
+msgid "Interest received"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_int_dev_paid
+msgid "Interests/Dividends paid"
+msgstr ""
 
 #. module: account_reports
 #. odoo-javascript
@@ -4264,6 +4378,7 @@ msgid "Invalid token '%(token)s' in account_codes formula '%(formula)s'"
 msgstr "Token inválido '%(token)s' na fórmula account_codes '%(formula)s'"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_inventory
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_inventory
 #: model:ir.ui.menu,name:account_reports.account_audit_inventory_entries_menu
 msgid "Inventory"
@@ -4611,6 +4726,7 @@ msgstr "Data de bloqueio"
 
 #. module: account_reports
 #: model_terms:ir.ui.view,arch_db:account_reports.company_information
+#: model_terms:ir.ui.view,arch_db:account_reports.company_information_customer_report
 msgid "Logo"
 msgstr "Logotipo"
 
@@ -4795,6 +4911,9 @@ msgid ""
 "your report, such as using the wrong tax rate, wrongly exempting "
 "transactions."
 msgstr ""
+"A falta de detalhes da empresa (como %(vat_label)s ou país) pode causar "
+"erros no seu relatório, como a aplicação da alíquota de imposto incorreta ou "
+"a isenção indevida de transações."
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__mode
@@ -4925,6 +5044,7 @@ msgstr "Exibição de valores negativos"
 #. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profit0
 #: model:account.report.line,name:account_reports.account_financial_report_net_profit0
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_net_income
 msgid "Net Profit"
 msgstr "Lucro líquido"
 
@@ -4932,6 +5052,11 @@ msgstr "Lucro líquido"
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_net_assets0
 msgid "Net assets"
 msgstr "Ativos líquidos"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_net_financial_result
+msgid "Net financial result : income (-)/cost (+)"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -5131,6 +5256,11 @@ msgid ""
 msgstr ""
 "Nem todas as expressões de agregação puderam ser calculadas. Isso "
 "provavelmente se deve a dependências cíclicas em suas fórmulas."
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_flow_not_reconciled
+msgid "Not reconciled yet"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_check__notes
@@ -5367,6 +5497,16 @@ msgstr "Outras despesas"
 #: model:account.report.line,name:account_reports.account_financial_report_other_income0
 msgid "Other Income"
 msgstr "Outras Receitas"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_payable
+msgid "Other payables"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_other_receivable
+msgid "Other receivables"
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_other
@@ -5870,6 +6010,21 @@ msgstr ""
 "Prossiga com cautela, pois pode haver um ajuste existente para esse período ("
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_borrowings
+msgid "Proceeds from borrowings"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_proc_recov_adv
+msgid "Proceeds from recoverable advances"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_share_issuance
+msgid "Proceeds from share issuance"
+msgstr ""
+
+#. module: account_reports
 #. odoo-javascript
 #. odoo-python
 #: code:addons/account_reports/models/account_deferred_reports.py:0
@@ -5890,6 +6045,11 @@ msgid "Profit and Loss"
 msgstr "Lucros e perdas"
 
 #. module: account_reports
+#: model:ir.actions.client,name:account_reports.action_account_report_pl_generic
+msgid "Profit and Loss - Generic"
+msgstr ""
+
+#. module: account_reports
 #: model:account.report.line,name:account_reports.account_financial_report_executivesummary_profitability0
 msgid "Profitability"
 msgstr "Rentabilidade"
@@ -5904,6 +6064,11 @@ msgstr "Provisão para %(for_cur)s (1 %(comp_cur)s = %(rate)s %(for_cur)s)"
 #: model:account.return.check.template,name:account_reports.account_return_check_template_provision_for_impairment
 msgid "Provision for Impairment"
 msgstr "Provisão para imparidade"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_provision
+msgid "Provisions"
+msgstr ""
 
 #. module: account_reports
 #: model:account.return.audit.cycle,name:account_reports.audit_cycle_purchases
@@ -5939,6 +6104,11 @@ msgstr "Tarifas"
 #: model:ir.model.fields,field_description:account_reports.field_account_return_type__rating_ids
 msgid "Ratings"
 msgstr "Avaliações"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_inv_recep_recov_cash_adv
+msgid "Receipt of recoverable cash advances"
+msgstr ""
 
 #. module: account_reports
 #: model:account.report.line,name:account_reports.reconciled_receipts
@@ -6053,6 +6223,21 @@ msgstr "Lembrete"
 msgid "Reminder: Upcoming {{ object.name }} Deadline - Action Required"
 msgstr ""
 "Lembrete: Próximo prazo para o \" {{ object.name }} \" - Ação necessária"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_borrowings
+msgid "Repayment of borrowings"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_lease
+msgid "Repayment of lease"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_fin_repay_recov_adv
+msgid "Repayment of recoverable advances"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_report_send__account_report_id
@@ -6312,6 +6497,8 @@ msgid ""
 "Review invoices, bills and entries which are either in draft or marked as "
 "Anomaly/To Review."
 msgstr ""
+"Revise faturas, contas e lançamentos que estejam em rascunho ou marcados "
+"como Anomalia/A revisar."
 
 #. module: account_reports
 #: model:account.return.check.template,name:account_reports.account_return_check_template_review_of_guaranteed
@@ -6474,7 +6661,7 @@ msgstr "Seções"
 #. odoo-javascript
 #: code:addons/account_reports/static/src/components/account_report/line_cell_editable/line_cell_editable_selection.xml:0
 msgid "Select or type a value"
-msgstr ""
+msgstr "Selecione ou digite um valor"
 
 #. module: account_reports
 #: model:ir.model.fields.selection,name:account_reports.selection__account_return_type__deadline_periodicity__semester
@@ -6677,7 +6864,7 @@ msgstr "Um destinatário"
 #: model:ir.model.fields,field_description:account_reports.field_account_report__snapshot_ids
 #: model_terms:ir.ui.view,arch_db:account_reports.account_report_form
 msgid "Snapshots"
-msgstr ""
+msgstr "Instantâneos"
 
 #. module: account_reports
 #. odoo-python
@@ -6941,7 +7128,7 @@ msgstr "Periodicidade fiscal"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Rate & Country Consistency"
-msgstr ""
+msgstr "Alíquotas tributárias e consistência entre países"
 
 #. module: account_reports
 #. odoo-python
@@ -6953,7 +7140,7 @@ msgstr "Ajusto de imposto recebido"
 #. odoo-python
 #: code:addons/account_reports/models/account_return.py:0
 msgid "Tax Reconciliation"
-msgstr ""
+msgstr "Reconciliação fiscal"
 
 #. module: account_reports
 #. odoo-javascript
@@ -7027,6 +7214,12 @@ msgstr "Unidade tributária:"
 #: model:ir.ui.menu,name:account_reports.menu_view_tax_units
 msgid "Tax Units"
 msgstr "Unidades tributárias"
+
+#. module: account_reports
+#. odoo-python
+#: code:addons/account_reports/models/account_return.py:0
+msgid "Tax and country mismatch"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,help:account_reports.field_account_return_type__tax_payable_account_id
@@ -7487,6 +7680,11 @@ msgid "Total CTA"
 msgstr "Total de CTAs"
 
 #. module: account_reports
+#: model_terms:ir.ui.view,arch_db:account_reports.partner_information_customer_report
+msgid "Total Due:"
+msgstr ""
+
+#. module: account_reports
 #. odoo-python
 #: code:addons/account_reports/models/account_general_ledger.py:0
 msgid "Total General Ledger"
@@ -7514,6 +7712,16 @@ msgstr "Parceiros comerciais"
 #: model:account.return.check.template,name:account_reports.account_return_check_template_trade_payables_analytical_review
 msgid "Trade Payables Analytical Review"
 msgstr "Análise analítica das contas a pagar"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_payable
+msgid "Trade payables"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment_trade_receivable
+msgid "Trade receivables"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -7685,6 +7893,11 @@ msgid "Unrealized Currency Gains/Losses"
 msgstr "Ganhos/perdas de moeda não realizados"
 
 #. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_adjustment_forex
+msgid "Unrealized FX Gain (-)/Loss (+)"
+msgstr ""
+
+#. module: account_reports
 #. odoo-javascript
 #. odoo-python
 #: code:addons/account_reports/models/account_report.py:0
@@ -7788,6 +8001,21 @@ msgstr "Var %"
 #: model:ir.model.fields,field_description:account_reports.field_account_account__audit_var_n_1
 msgid "Var N-1"
 msgstr "Var N-1"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var
+msgid "Variation"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_cash
+msgid "Variation of Cash"
+msgstr ""
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_cash_var_non_cash
+msgid "Variation of NON Cash"
+msgstr ""
 
 #. module: account_reports
 #: model:ir.model.fields,field_description:account_reports.field_account_return_payment_wizard__vat_balance
@@ -7955,6 +8183,11 @@ msgstr "Com lançamentos provisórios"
 #: model:ir.ui.menu,name:account_reports.menu_action_working_files
 msgid "Working Files"
 msgstr "Arquivos de Trabalho"
+
+#. module: account_reports
+#: model:account.report.line,name:account_reports.cash_flow_indirect_op_working_cap_adjustment
+msgid "Working capital adjustments"
+msgstr ""
 
 #. module: account_reports
 #. odoo-python
@@ -8382,6 +8615,9 @@ msgstr "⇒ Redefinir para a taxa do Odoo"
 #: code:addons/account_reports/models/account_deferred_reports.py:0
 msgid "≤ 12 Months"
 msgstr "≤ 12 meses"
+
+#~ msgid "Bank Statement Line"
+#~ msgstr "Linha de extrato bancário"
 
 #~ msgid ""
 #~ "Audit journal items and accounts to ensure they are correctly assigned to "

@@ -75,6 +75,9 @@ class AccountExternalTaxMixin(models.AbstractModel):
         if is_service:
             descriptor['hsCode'] = product.l10n_br_nbs_id.code
             descriptor['lc116Code'] = product.l10n_br_ncm_code_id.code or ''
+
+            services = res.setdefault('services', {})
+            services['customsCapitalRegimeIndicator'] = operation_type.l10n_br_customs_regime_id.name
         else:
             legal_uom = product.l10n_br_legal_uom_id
             line_uom = base_line['product_uom_id']

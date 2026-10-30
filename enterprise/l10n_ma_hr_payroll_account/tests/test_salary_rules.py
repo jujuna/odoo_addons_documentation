@@ -48,15 +48,14 @@ class TestPayslipValidation(TestPayslipValidationCommon):
 
     def test_payslip_property_inputs(self):
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_25').code: 1.0,
             self.env.ref('l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_50').code: 1.0,
             self.env.ref('l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_100').code: 1.0,
             self.env.ref('l10n_ma_hr_payroll.l10n_ma_hr_salary_rule_av_sal').code: 1000.0,
             self.env.ref('l10n_ma_hr_payroll.l10n_ma_hr_rule_misc_taxable_indemnity').code: 400.0,
             self.env.ref('l10n_ma_hr_payroll.l10n_ma_hr_rule_misc_non_taxable_indemnity').code: 250.0,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'BASIC': 5000.0, 'EXTRA_HOURS_25': 35.51, 'EXTRA_HOURS_50': 42.61, 'EXTRA_HOURS_100': 56.82, 'SENIORITY': 250.0, 'INDMTD': 400.0, 'INDMNTD': 250.0, 'GROSS': 6034.94, 'E_CNSS': 268.8, 'JOB_LOSS_ALW': 11.47, 'E_AMO': 11.47, 'MEDICAL_ALW': 136.39, 'CIMR': 181.05, 'PRO_CONTRIBUTION': 181.05, 'TOTAL_UT_DED': 790.22, 'GROSS_TAXABLE': 5244.72, 'GROSS_INCOME_TAX': 406.75, 'FAMILY_CHARGE': 0.0, 'NET_INCOME_TAX': 406.75, 'SOCIAL_CONTRIBUTION': 0.0, 'AVS': -1000.0, 'NET': 5431.23}
         self._validate_payslip(payslip, payslip_results)

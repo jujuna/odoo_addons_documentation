@@ -28,6 +28,14 @@ class AccountBatchPayment(models.Model):
             record.l10n_jp_zengin_merge_transactions = record.journal_id.l10n_jp_zengin_merge_transactions
 
     def _validate_bank_account_for_zengin(self, bank_account):
+        if not bank_account:
+            journal = self.journal_id
+            raise RedirectWarning(
+                message=_("The bank account on journal '%(journal_name)s' is not set. Please create a new account or set an existing one.", journal_name=journal.name),
+                action=journal._get_records_action(name=_("Configure Journal"), target="new"),
+                button_text=_("Configure Journal Bank Account"),
+            )
+
         partner = bank_account.partner_id
         missing_fields = []
 

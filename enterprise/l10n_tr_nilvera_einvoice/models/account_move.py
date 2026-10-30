@@ -159,6 +159,7 @@ class AccountMove(models.Model):
     l10n_tr_available_exemption_code_ids = fields.Many2many(
         comodel_name='l10n_tr_nilvera_einvoice.account.tax.code',
         compute='_compute_l10n_tr_available_exemption_code_ids',
+        compute_sudo=True,
         help="Technical field (not for users). The GİB codes available on this invoice, from "
         "the selected GIB Invoice Type and, for a withholding invoice, from the ratio its "
         "lines withhold.",

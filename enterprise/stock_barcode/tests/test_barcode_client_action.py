@@ -119,6 +119,8 @@ class TestBarcodeClientAction(HttpCase):
         super(TestBarcodeClientAction, self).tearDown()
 
     def _get_client_action_url(self, record):
+        if record._name == 'stock.picking.batch':
+            return f'/odoo/{record.id}/action-stock_barcode.stock_barcode_picking_batch_client_action'
         return f'/odoo/{record.id}/action-stock_barcode.stock_barcode_picking_client_action'
 
     def _reset_package_sequence(self, next_number=1):

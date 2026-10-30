@@ -263,8 +263,12 @@ class TestAvalaraBrCommon(AccountTestInvoicingCommon, TestBRMockedRequests):
 
     @classmethod
     @contextmanager
-    def _capture_request_br(cls, return_value=None):
-        with patch(f'{AccountExternalTaxMixin.__module__}.AccountExternalTaxMixin._l10n_br_iap_request', return_value=return_value) as mocked:
+    def _capture_request_br(cls, return_value=None, side_effect=None):
+        with patch(
+            f'{AccountExternalTaxMixin.__module__}.AccountExternalTaxMixin._l10n_br_iap_request',
+            return_value=return_value,
+            side_effect=side_effect,
+        ) as mocked:
             yield mocked
 
     @classmethod
@@ -1155,6 +1159,49 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
 
         self.assertIn('products_missing_fields_danger', self._get_missing_fields_warnings(invoice))
 
+    def test_25_transport_cost_line_between_products(self):
+        """Transport cost lines aren't sent to Avatax, their position shouldn't shift the results of the other lines."""
+        freight = self.env['product.product'].create({
+            'name': 'freight',
+            'list_price': 10.00,
+            'l10n_br_transport_cost_type': 'freight',
+        })
+        products = (
+            self.product_user,
+            freight,
+            self.product_accounting,
+            self.product_expenses,
+            self.product_invoicing,
+        )
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner.id,
+            'fiscal_position_id': self.fp_avatax.id,
+            'invoice_date': '2021-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': product.id,
+                    'tax_ids': None,
+                    'price_unit': product.list_price,
+                }) for product in products
+            ],
+        })
+        invoice.invoice_line_ids[0].discount = 10
+        freight_line = invoice.invoice_line_ids[1]
+        product_lines = invoice.invoice_line_ids - freight_line
+
+        response = generate_response(product_lines)
+        with self._capture_request_br(return_value=response):
+            invoice.action_post()
+
+        self.assertFalse(freight_line.tax_ids, "The freight line isn't sent to Avatax and shouldn't get any taxes.")
+        for line, line_results in zip(product_lines, response['lines']):
+            self.assertEqual(
+                line.price_subtotal,
+                line_results['lineNetFigure'] - line_results['lineTaxedDiscount'],
+                'Line got the results of another line.',
+            )
+
 
 @tagged('post_install_l10n', '-at_install', 'post_install')
 class TestAvalaraBrSettings(TestAvalaraBrInvoiceCommon):
@@ -1229,11 +1276,11 @@ class TestAvalaraBrSettings(TestAvalaraBrInvoiceCommon):
     def test_06_extract_tax_values_multiple_moves(self):
         """Ensure that the tax values are extracted correctly when multiple moves are passed to the function.
         """
-        invoice_1, response = self._create_invoice_01_and_expected_response()
-        invoice_2, _dummy = self._create_invoice_01_and_expected_response()
+        invoice_1, response_1 = self._create_invoice_01_and_expected_response()
+        invoice_2, response_2 = self._create_invoice_01_and_expected_response()
         invoices = invoice_1 | invoice_2
 
-        with self._capture_request_br(return_value=response):
+        with self._capture_request_br(side_effect=[response_1, response_2]):
             invoices.action_post()
         self.assertTrue(all(invoice.state == 'posted' for invoice in invoices))
 

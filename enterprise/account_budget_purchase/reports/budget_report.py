@@ -23,7 +23,7 @@ class BudgetReport(models.Model):
                      THEN ROUND(CAST((%(quantity)s / %(uom_aml_factor)s) * %(uom_pol_factor)s AS NUMERIC), %(precision_digits)s)
                      ELSE COALESCE(%(quantity)s, 0)
                 END
-                * CASE WHEN %(move_type)s = 'in_invoice' THEN 1
+                * CASE WHEN %(move_type)s IN ('in_invoice', 'in_receipt') THEN 1
                        WHEN %(move_type)s = 'in_refund' THEN -1
                        ELSE 0 END
             ) AS qty_invoiced""",

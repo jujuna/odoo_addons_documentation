@@ -85,6 +85,10 @@ class AccountChartTemplate(models.AbstractModel):
         meal_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_ch_worker')
         rules_mapping[meal_rule]['debit'] = meal_vouchers  # Note: this is a credit, but the amount is negative
 
+        # Group insurance personal contributions, owed to the insurer
+        gi_rule = self.env.ref('l10n_be_hr_payroll.cp200_employees_salary_group_insurance_employee_deduction')
+        rules_mapping[gi_rule]['debit'] = other_social_obligations  # Note: this is a credit, but the amount is negative
+
         # Owed Remunerations (NET)
         net_rule = self.env['hr.salary.rule'].search([
             ('struct_ids', 'in', self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id),

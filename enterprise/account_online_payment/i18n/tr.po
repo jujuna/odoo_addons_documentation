@@ -5,14 +5,15 @@
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 04:17+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-20 12:16+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_online_payment/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -69,6 +70,24 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>Merhaba,</p>\n"
+"                    <p>Odoo'daki ödeme özelliğinin başarıyla "
+"etkinleştirildiğini bildirmekten memnuniyet duyarız. </p>\n"
+"                    <p>Artık ödemeleri doğrudan Odoo veritabanınız üzerinden "
+"işleyebilir, böylece daha hızlı, daha güvenli ve daha verimli işlemler "
+"gerçekleştirebilirsiniz.</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                       <a t-att-href=\"object.get_base_url()\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\"> \n"
+"                            Ödeme Yap\n"
+"                       </a>\n"
+"                    </div> \n"
+"               </div> \n"
+"            "
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__accepted
@@ -333,6 +352,8 @@ msgstr ""
 msgid ""
 "Payment activation process is already in progress for this bank connection."
 msgstr ""
+"Bu banka bağlantısı için ödeme etkinleştirme süreci halihazırda devam "
+"etmektedir."
 
 #. module: account_online_payment
 #. odoo-python
@@ -436,6 +457,8 @@ msgid ""
 "Technical field indicating whether the customer has started the payment "
 "activation process with the provider."
 msgstr ""
+"Müşterinin sağlayıcıyla ödeme etkinleştirme sürecini başlatıp başlatmadığını "
+"belirten teknik alan."
 
 #. module: account_online_payment
 #. odoo-python
@@ -464,6 +487,8 @@ msgstr ""
 msgid ""
 "This journal needs to be connected to a bank to check its payments status."
 msgstr ""
+"Bu derginin ödeme durumunu kontrol etmek için bir bankaya bağlanması "
+"gerekiyor."
 
 #. module: account_online_payment
 #: model:ir.module.module,description:base.module_account_online_payment
@@ -553,6 +578,10 @@ msgid ""
 "Your bank allows a maximum of %(limit)s payments per batch.\n"
 "If you want to send your payments through Odoo, please split your batch."
 msgstr ""
+"Bankanız, her toplu işlemde en fazla %(limit)s adet ödemeye izin "
+"vermektedir.\n"
+"Ödemelerinizi Odoo üzerinden göndermek istiyorsanız, lütfen toplu işleminizi "
+"bölün."
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit

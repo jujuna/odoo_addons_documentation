@@ -16,6 +16,7 @@ When sharing documents/folder, the domain of the shared URL can be chosen by sel
     'assets': {
         'web.assets_backend': [
             'website_documents/static/src/views/**/*',
+            'website_documents/static/src/backend/**/*',
         ],
     },
     'auto_install': True,

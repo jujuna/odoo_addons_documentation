@@ -189,3 +189,30 @@ class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
                     self.assertEqual(setting.company_id, expected_company)
                     self.assertEqual(setting.mapped('tag_ids.name'), [expected_tag_name])
                     self.assertEqual(setting.with_context(lang='fr_FR').mapped('tag_ids.name'), [expected_tag_name_fr])
+
+    def test_post_init_sync_translations(self):
+        """Verify that _documents_configure_sync creates tags and settings without KeyError
+        and properly synchronizes stored translations.
+        """
+        self.env['res.users'].with_context(active_test=False).search([('lang', '=', 'en_US')]).lang = 'fr_FR'
+        self.env['res.partner'].search([('lang', '=', 'en_US')]).lang = 'fr_FR'
+        if self.env['website']._fields.get('language_ids'):
+            self.env['website'].search([]).language_ids = self.env.ref('base.lang_fr')
+        self.env.ref('base.lang_en').active = False
+        self.env.ref('base.lang_fr').active = True
+
+        journal = self.env['account.journal'].create({
+            'name': 'Custom Journal',
+            'type': 'general',
+            'company_id': self.env.company.id,
+        })
+        journal.update_field_translations('name', {'en_US': 'Custom Journal', 'fr_FR': 'Journal Personnalisé'})
+
+        self.env['documents.account.folder.setting'].search([('journal_id', '=', journal.id)]).unlink()
+        self.env['documents.tag'].search([('name', '=', journal.name)]).unlink()
+
+        journal.with_context(lang=None)._documents_configure_sync()
+
+        setting = self.env['documents.account.folder.setting'].search([('journal_id', '=', journal.id)])
+        self.assertEqual(setting.tag_ids.with_context(lang=None).name, 'Custom Journal')
+        self.assertEqual(setting.tag_ids.with_context(lang='fr_FR').name, 'Journal Personnalisé')

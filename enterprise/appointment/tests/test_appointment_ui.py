@@ -328,6 +328,36 @@ class AppointmentUITest(AppointmentUICommon):
                 res = self.url_open(f"/appointment/{self.apt_type_bxls_2days.id}/submit", {**event_values, **event_answers_copy})
                 self.assertEqual(res.status_code, 422)
 
+    def test_appointment_booking_with_already_booked_resource(self):
+        """Test that booking an already booked resource displays an unavailable timeslot error."""
+        self.apt_type_resource.is_published = True
+        resource = self.env["appointment.resource"].create({
+            "appointment_type_ids": [(4, self.apt_type_resource.id)],
+            "capacity": 1,
+            "name": "Resource",
+        })
+        start = datetime(2026, 10, 5, 9, 0, 0)
+        phone_question = self.apt_type_resource._get_main_phone_question()
+        data = {
+            "asked_capacity": 1,
+            "available_resource_ids": [resource.id],
+            "datetime_str": str(start),
+            "duration_str": "1.0",
+            "email": "test@test.example.com",
+            "name": "Meeting Test",
+            f"question_{phone_question.id}": "1234567",
+        }
+        url = f"/appointment/{self.apt_type_resource.id}/submit"
+
+        # First user books the resource.
+        self.url_open(url, data=data)
+
+        # Second user tries to book the same resource at the same time.
+        response = self.url_open(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("The selected timeslot is not available anymore.", response.text)
+
     @freeze_time('2022-02-14')
     @users('apt_manager')
     def test_appointment_resource_manual_confirmation(self):
@@ -536,6 +566,20 @@ class AppointmentUITest(AppointmentUICommon):
         url = f"/appointment/{self.apt_type_resource.id}/submit"
         res = self.url_open(url, data=appointment_data)
         self.assertEqual(res.status_code, 200, "Response should = OK")
+
+    def test_appointment_view_without_timezone_and_appointment_type(self):
+        partner = self.portal_user.partner_id
+        self.assertFalse(partner.tz)
+        event = self.env['calendar.event'].create({
+            'name': 'Test-Meeting 1',
+            'user_id': self.staff_user_aust.id,
+            'start': datetime(2026, 1, 1, 8, 0),
+            'stop':  datetime(2026, 1, 1, 9, 0),
+            'partner_ids':  [Command.link(partner.id)],
+        })
+        response = self.url_open(f'/calendar/view/{event.access_token}?partner_id={partner.id}')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'<span> - UTC</span>', response.content)
 
 
 @tagged('appointment_ui', '-at_install', 'post_install')

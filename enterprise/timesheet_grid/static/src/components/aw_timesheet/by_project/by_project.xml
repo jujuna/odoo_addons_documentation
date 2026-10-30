@@ -19,7 +19,7 @@
                 </div>
                 <div class="list-group rounded mb-3">
                     <t t-foreach="Object.keys(this.props.model.data.grouped[groupKey].suggestions)" t-as="title" t-key="title">
-                        <t t-if="this.props.model.data.grouped[groupKey].suggestions[title].type != 'afk'">
+                        <t t-if="this.props.model.data.grouped[groupKey].suggestions[title].type != 'afk' and this.props.model.isVisible(this.props.model.data.grouped[groupKey].suggestions[title])">
                             <button class="o_suggestions_suggestion list-group-item list-group-item-action cursor-pointer bg-view d-flex flex-wrap flex-xl-nowrap align-items-stretch position-relative p-0 mb-2 mb-lg-0"
                                t-att-title="title"
                                t-att-class="this.props.getSelectionClass(groupKey, title, previousWasSelected)"

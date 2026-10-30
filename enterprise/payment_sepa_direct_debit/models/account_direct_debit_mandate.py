@@ -102,12 +102,17 @@ class AccountDirectDebitMandate(models.Model):
     def _get_source_transaction(self):
         """Return the source transaction that initiated the creation of this SDD mandate."""
         self.ensure_one()
-        return self.env["payment.transaction"].search(
-            [
-                ("mandate_id", "=", self.id),
-                ("state", "=", "done"),
-                ("provider_id.custom_mode", "=", "sepa_direct_debit"),
-            ],
-            limit=1,
-            order="id ASC",
+        return (
+            self
+            .env["payment.transaction"]
+            .sudo()  # To read the `custom_mode` field on `payment.provider`
+            .search(
+                [
+                    ("mandate_id", "=", self.id),
+                    ("state", "=", "done"),
+                    ("provider_id.custom_mode", "=", "sepa_direct_debit"),
+                ],
+                limit=1,
+                order="id ASC",
+            )
         )

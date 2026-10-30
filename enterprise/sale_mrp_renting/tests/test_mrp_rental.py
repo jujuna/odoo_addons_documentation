@@ -315,34 +315,32 @@ class TestRentalKits(TestRentalCommon):
         picks = rental.picking_ids.filtered(lambda pick: pick.picking_type_id in (pick_operation_copy, self.warehouse_id.pick_type_id))
         self.assertEqual(len(picks), 2)
 
-    def test_rental_variant_no_bom(self):
-        """Test confirming a rental order for a variant without a BoM,
-        while another variant of the same product has a Kit (phantom) BoM.
-        Ensure the order confirms successfully without raising errors.
+    def test_rental_variant_without_kit_bom(self):
         """
-        attribute = self.env['product.attribute'].create({'name': 'Color'})
-        product_tmpl = self.env['product.template'].create({
-            'name': 'computer kit',
-            'rent_periodicity': 'hours',
-            'attribute_line_ids': [
-                Command.create({
-                    'attribute_id': attribute.id,
-                    'value_ids': [
-                        Command.create({'name': 'A', 'attribute_id': attribute.id}),
-                        Command.create({'name': 'B', 'attribute_id': attribute.id}),
-                    ],
-                })
-            ]
+        Check that a rental of a variant without a kit BoM is delivered and
+        returned normally when another variant of the same product is a kit.
+        """
+        attribute = self.env['product.attribute'].create({
+            'name': 'Rental variant',
+            'value_ids': [Command.create({'name': name}) for name in ('A', 'B')],
         })
-        self.bom.product_id = product_tmpl.product_variant_ids[0].id
-        self.bom.product_tmpl_id = product_tmpl.id
+        template = self.product_id.product_tmpl_id
+        attribute_line = self.env['product.template.attribute.line'].create({
+            'product_tmpl_id': template.id,
+            'attribute_id': attribute.id,
+            'value_ids': [Command.set(attribute.value_ids[:1].ids)],
+        })
+        attribute_line.value_ids = [Command.set(attribute.value_ids.ids)]
+        self.env['stock.quant']._update_available_quantity(template.product_variant_ids[1], self.warehouse_id.lot_stock_id, 2)
         rental_order = self.sale_order_id.copy()
-        rental_order.order_line = [
-            Command.create({
-                'product_id': product_tmpl.product_variant_ids[1].id,
-                'product_uom_qty': 1.0,
-                'is_rental': True
-            })
-        ]
+        rental_order.order_line.write({
+            'product_id': template.product_variant_ids[1].id,
+            'product_uom_qty': 2,
+            'is_rental': True,
+        })
         rental_order.action_confirm()
-        self.assertEqual(rental_order.state, 'sale')
+        rental_order.picking_ids.filtered(lambda p: p.picking_type_code == 'outgoing').button_validate()
+        rental_order.picking_ids.filtered(lambda p: p.picking_type_code == 'incoming').button_validate()
+        self.assertRecordValues(rental_order.order_line, [
+            {'product_id': template.product_variant_ids[1].id, 'qty_delivered': 2.0, 'qty_returned': 2.0},
+        ])

@@ -1,6 +1,6 @@
 from .common import TestSACommon
 from odoo.tests.common import tagged
-from datetime import date, datetime
+from datetime import date
 from dateutil.relativedelta import relativedelta
 
 
@@ -104,15 +104,15 @@ class TestPayslipValidation(TestSACommon):
         | 3rd  | 01/Sep/2025 | 31/Oct/2025 | 45       |     Y1     |    Y1    |
         | 4th  | 01/Nov/2025 | 02/Jan/2026 | 45       |     Y1     |    Y2    |
 
-        - Payslips table (Daily wage is 13700 / 30 ~= 456,666667)
+        - Payslips table (Daily wage varies depending on working days in the month)
         - N/A means that the payslip doesn't lie in two different sick years
-        | Period | Y1 up-to-date sick leaves | Y2 up-to-date sick leaves |   # of sick leaves   |          DEDSICKLEAVE payslip line     |
-        | ------ | ------------------------- | ------------------------- | -------------------- | -------------------------------------- |
-        | Jan 25 |             6             |            N/A            |            6         | 6   * 0             * 456,67 = 0       |
-        | Sep 25 |             28            |            N/A            |            22        | 22  * 0             * 456,67 = 0       |
-        | Oct 25 |             51            |            N/A            |            23        | (2 * 0 + 21 * 0.25) * 456,67 = 2397.5  |
-        | Nov 25 |             71            |            N/A            |            20        | 20  * 0.25          * 456,67 = 2283.33 |
-        | Dec 25 |             94            |            N/A            |            23        | (19 * 0.25 + 4)     * 456,67 = 3995.83 |
+        | Period | Y1 up-to-date sick leaves | Y2 up-to-date sick leaves |   # of sick leaves   |          DEDSICKLEAVE payslip line         |
+        | ------ | ------------------------- | ------------------------- | -------------------- | ------------------------------------------ |
+        | Sep 25 |             28            |            N/A            |            22        | 22  * 0             * 13.7k / 23 = 0       |
+        | Jan 25 |             6             |            N/A            |            6         | 6   * 0             * 13.7k / 22 = 0       |
+        | Oct 25 |             51            |            N/A            |            23        | (2 * 0 + 21 * 0.25) * 13.7k / 23 = 3127.17 |
+        | Nov 25 |             71            |            N/A            |            20        | 20  * 0.25          * 13.7k / 20 = 3425.0  |
+        | Dec 25 |             94            |            N/A            |            23        | 19 * 0.25           * 13.7k / 23 = 2829.35 |
         """
         sick_time_off_type = self.env.ref("hr_work_entry.sa_work_entry_type_sick_leave")
         # take a sick leave in Jan 2023 so that the first counting date is 1 Jan 2023
@@ -246,15 +246,15 @@ class TestPayslipValidation(TestSACommon):
         | 4th  | 01/Sep/2025 | 31/Oct/2025 | 45       |     Y1     |    Y1    |
         | 5th  | 01/Nov/2025 | 02/Jan/2026 | 45       |     Y1     |    Y2    |
 
-        - Payslips table (Daily wage is 13700 / 30 ~= 456,666667)
+        - Payslips table (Daily wage varies depending on working days in the month)
         - N/A means that the payslip doesn't lie in two different sick years
-        | Period | Y1 up-to-date sick leaves | Y2 up-to-date sick leaves |   # of sick leaves   |          DEDSICKLEAVE payslip line      |
-        | ------ | ------------------------- | ------------------------- | -------------------- | --------------------------------------- |
-        | Jan 25 |             10            |            N/A            |            7         | 7   * 0              * 456,67 = 0       |
-        | Sep 25 |             32            |            N/A            |            22        | (20 * 0 + 2 * 0.25)  * 456,67 = 228.33  |
-        | Oct 25 |             55            |            N/A            |            23        | 23  * 0.25           * 456,67 = 2625.85 |
-        | Nov 25 |             65            |            10             |            20        | (10 * 0.25 + 10 * 0) * 456,67 = 1141.67 |
-        | Dec 25 |             33            |            N/A            |            23        | (20 * 0 + 3 * 0.25)  * 456,67 = 342.50  |
+        | Period | Y1 up-to-date sick leaves | Y2 up-to-date sick leaves |   # of sick leaves   |          DEDSICKLEAVE payslip line          |
+        | ------ | ------------------------- | ------------------------- | -------------------- | ------------------------------------------- |
+        | Jan 25 |             10            |            N/A            |            7         | 7   * 0              * 13.7k / 23 = 0       |
+        | Sep 25 |             32            |            N/A            |            22        | (20 * 0 + 2 * 0.25)  * 13.7k / 22 = 311.36  |
+        | Oct 25 |             55            |            N/A            |            23        | 23  * 0.25           * 13.7k / 23 = 3425.0  |
+        | Nov 25 |             65            |            10             |            20        | (10 * 0.25 + 10 * 0) * 13.7k / 20 = 1712.5  |
+        | Dec 25 |             33            |            N/A            |            23        | (20 * 0 + 3 * 0.25)  * 13.7k / 23 = 446.74  |
         """
         sick_time_off_type = self.env.ref("hr_work_entry.sa_work_entry_type_sick_leave")
         self.env["hr.leave"].create(
@@ -383,7 +383,7 @@ class TestPayslipValidation(TestSACommon):
         }
         self._validate_payslip(payslip_dec, payslip_dec_result, skip_lines=True)
 
-    def test_sick_leave_split_with_attendance_payslips(self):  # TODO: fix test in future task handling attendance cases
+    def test_sick_leave_split_with_attendance_payslips(self):
         """
         - Sick leave allowance: 100% for the first 30 days, 75% for days 31-60, and 0% for any days beyond 60.
         - Sick leave counting year 16/Nov -> 15/Nov
@@ -397,15 +397,15 @@ class TestPayslipValidation(TestSACommon):
         | 4th  | 01/Sep/2025 | 31/Oct/2025 | 45       |     Y1     |    Y1    |
         | 5th  | 01/Nov/2025 | 02/Jan/2026 | 45       |     Y1     |    Y2    |
 
-        - Payslips table (Daily wage is 13700 / 30 ~= 456,666667)
+        - Payslips table (allowances don't contribute to BASIC and are prorated in their own rules)
         - N/A means that the payslip doesn't lie in two different sick years
-        | Period | Y1 up-to-date sick leaves | Y2 up-to-date sick leaves |   # of sick leaves   |          DEDSICKLEAVE payslip line      |
-        | ------ | ------------------------- | ------------------------- | -------------------- | --------------------------------------- |
-        | Jan 25 |             10            |            N/A            |            7         | 7   * 0              * 456,67 = 0       |
-        | Sep 25 |             32            |            N/A            |            22        | (20 * 0 + 2 * 0.25)  * 456,67 = 228.33  |
-        | Oct 25 |             55            |            N/A            |            23        | 23  * 0.25           * 456,67 = 2625.85 |
-        | Nov 25 |             65            |            10             |            20        | (10 * 0.25 + 10 * 0) * 456,67 = 1141.67 |
-        | Dec 25 |             33            |            N/A            |            23        | (20 * 0 + 3 * 0.25)  * 456,67 = 342.50  |
+        | Period | Y1 up-to-date sick leaves | Y2 up-to-date sick leaves |   # of sick leaves   |     Amount contributed to the BASIC        |
+        | ------ | ------------------------- | ------------------------- | -------------------- | ------------------------------------------ |
+        | Jan 25 |             10            |            N/A            |            7         | 7                    * 12k / 23 = 3652.17  |
+        | Sep 25 |             32            |            N/A            |            22        | (20 +  2 * 0.75)     * 12k / 22 = 11727.27 |
+        | Oct 25 |             55            |            N/A            |            23        | 23  * 0.75           * 12k / 23 = 9000.0   |
+        | Nov 25 |             65            |            10             |            20        | (10 * 0.75 + 10)     * 12k / 20 = 10500.0  |
+        | Dec 25 |             33            |            N/A            |            23        | (20 + 3 * 0.75)      * 12k / 23 = 11608.69 |
         """
         if (
             self.env["ir.module.module"]._get("hr_payroll_attendance").state
@@ -447,11 +447,6 @@ class TestPayslipValidation(TestSACommon):
             "l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure"
         )
         # January Payslip check
-        self.env['hr.attendance'].create([{  # noqa: OLS03001
-            'employee_id': self.saudi_employee.id,
-            'check_in': datetime(2025, 1, day, 8, 0, 0),
-            'check_out': datetime(2025, 1, day, 16, 0, 0),
-        } for day in range(12, 32) if day % 7 not in (4, 5)])  # exclude weekends
         payslip_jan = self._generate_payslip(
             date_from=date(2025, 1, 1),
             date_to=date(2025, 1, 31),
@@ -464,7 +459,7 @@ class TestPayslipValidation(TestSACommon):
         )
         self.assertEqual(sick_leave_days.number_of_days, 7)
         payslip_jan_results = {
-            "BASIC": 12000 * 15 / 22,
+            "BASIC": 3652.17,
         }
         self._validate_payslip(payslip_jan, payslip_jan_results, skip_lines=True)
         self.env["hr.leave"].create(
@@ -497,7 +492,7 @@ class TestPayslipValidation(TestSACommon):
         self.assertEqual(payslip_sep.worked_days_line_ids.filtered(lambda l: l.code == "013.00").number_of_days, 20)
         self.assertEqual(payslip_sep.worked_days_line_ids.filtered(lambda l: l.code == "SASICKLEAVE75").number_of_days, 2)
         payslip_sep_result = {
-            "BASIC": 0,
+            "BASIC": 11727.27,
         }
         self._validate_payslip(payslip_sep, payslip_sep_result, skip_lines=True)
 
@@ -511,7 +506,7 @@ class TestPayslipValidation(TestSACommon):
         )
         self.assertEqual(payslip_oct.worked_days_line_ids.filtered(lambda l: l.code == "SASICKLEAVE75").number_of_days, 23)
         payslip_oct_result = {
-            "BASIC": 0,
+            "BASIC": 9000.0,
         }
         self._validate_payslip(payslip_oct, payslip_oct_result, skip_lines=True)
 
@@ -526,7 +521,7 @@ class TestPayslipValidation(TestSACommon):
         self.assertEqual(payslip_nov.worked_days_line_ids.filtered(lambda l: l.code == "013.00").number_of_days, 10)
         self.assertEqual(payslip_nov.worked_days_line_ids.filtered(lambda l: l.code == "SASICKLEAVE75").number_of_days, 10)
         payslip_nov_result = {
-            "BASIC": 0,
+            "BASIC": 10500.0,
         }
         self._validate_payslip(payslip_nov, payslip_nov_result, skip_lines=True)
 
@@ -541,7 +536,7 @@ class TestPayslipValidation(TestSACommon):
         self.assertEqual(payslip_dec.worked_days_line_ids.filtered(lambda l: l.code == "013.00").number_of_days, 20)
         self.assertEqual(payslip_dec.worked_days_line_ids.filtered(lambda l: l.code == "SASICKLEAVE75").number_of_days, 3)
         payslip_dec_result = {
-            "BASIC": 0,
+            "BASIC": 11608.69,
         }
         self._validate_payslip(payslip_dec, payslip_dec_result, skip_lines=True)
 

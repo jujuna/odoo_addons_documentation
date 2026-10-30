@@ -16,6 +16,17 @@ patch(HrHolidaysGanttModel.prototype, {
 });
 
 patch(HrHolidaysGanttRenderer.prototype, {
+    onRowHeaderClicked(row) {
+        if (row.groupedByField === "employee_id" && row.resId) {
+            const relation = this.model.metaData.fields?.employee_id?.relation;
+            const resModel = relation === "hr.employee" ? "hr.employee.public" : relation;
+            this.env.bus.trigger("HR_GANTT:OPEN_AVATAR_CARD", {
+                resId: row.resId,
+                resModel,
+            });
+        }
+    },
+
     /**
      * @override
      */
@@ -28,4 +39,8 @@ patch(HrHolidaysGanttRenderer.prototype, {
         }
         return enrichedPill;
     },
+});
+
+patch(HrHolidaysGanttRenderer, {
+    rowHeaderTemplate: "hr_payroll.PayrollHolidaysGanttRenderer.RowHeader",
 });

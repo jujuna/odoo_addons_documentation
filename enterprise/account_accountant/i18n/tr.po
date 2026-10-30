@@ -25,14 +25,15 @@
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-17 22:36+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-20 12:15+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_accountant/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -295,6 +296,9 @@ msgid ""
 "payment: %(link)s.\n"
 "Its amount was deducted from this payment."
 msgstr ""
+"Daha önce bu ödemeyle ilişkilendirilmiş bir fatura için giriş içeren bir "
+"ödeme oluşturuldu: %(link)s.\n"
+"Tutar, bu ödemeden düşüldü."
 
 #. module: account_accountant
 #. odoo-python
@@ -303,6 +307,8 @@ msgid ""
 "A payment with entry was created for the related invoice during its "
 "reconciliation, replacing this one: %(link)s."
 msgstr ""
+"İlgili faturanın mutabakatı sırasında, bu faturayı değiştiren bir giriş "
+"içeren ödeme oluşturuldu: %(link)s."
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
@@ -431,13 +437,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/quick_create/quick_create.xml:0
 msgid "Add & Close"
-msgstr ""
+msgstr "Ekle & Kapat"
 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/quick_create/quick_create.xml:0
 msgid "Add & New"
-msgstr ""
+msgstr "Ekle & Yeni"
 
 #. module: account_accountant
 #: model_terms:ir.actions.act_window,help:account_accountant.account_tag_action
@@ -589,8 +595,8 @@ msgstr ""
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
-msgid "Are you sure you want to delete this statement line?"
-msgstr "Bu ifade satırını silmek istediğinizden emin misiniz?"
+msgid "Are you sure you want to delete this transaction?"
+msgstr ""
 
 #. module: account_accountant
 #. odoo-javascript
@@ -623,7 +629,7 @@ msgstr "Yetkili imza sahibi"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/move_line_list_reconcile/move_line_list_reconcile.xml:0
 msgid "Auto-reconcile"
-msgstr ""
+msgstr "Otomatik-denkleştir"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -653,7 +659,7 @@ msgstr "Otomatik Olarak Denkleştirilen Girişler"
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/search_dialog/search_dialog_kanban.xml:0
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/search_dialog/search_dialog_list.xml:0
 msgid "Balance:"
-msgstr ""
+msgstr "Bakiye:"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -740,7 +746,7 @@ msgstr ""
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.bank_rec_auto_reconcile_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "İptal"
 
 #. module: account_accountant
 #. odoo-python
@@ -795,13 +801,15 @@ msgid ""
 "Check to enable deferred accounting, deferred dates will be required on "
 "invoice / bill"
 msgstr ""
+"Ertelenmiş muhasebeyi etkinleştirip etkinleştirmediğinizi kontrol edin; "
+"fatura/hesapta ertelenmiş tarihler gerekecektir"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.bank_rec_auto_reconcile_wizard_view_form
 msgid ""
 "Choose a journal and a starting date. The system will try to automatically\n"
-"                    reconcile all unreconciled bank statement lines from "
-"that date until today."
+"                    reconcile all unreconciled bank transactions from that "
+"date until today."
 msgstr ""
 
 #. module: account_accountant
@@ -834,6 +842,12 @@ msgstr ""
 #: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
 msgid "Click on the statement to unfold it."
 msgstr "Açmak için ifadenin üzerine tıklayın."
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
+msgid "Click to select"
+msgstr ""
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_select_account_line__code
@@ -1170,7 +1184,7 @@ msgstr "Bir yıldan daha uzun ya da kısa mali yıl tanımlayın"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Delete Transaction"
-msgstr ""
+msgstr "İşlemi Sil"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__expense_depreciation
@@ -1192,7 +1206,7 @@ msgstr "Özet"
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/quick_create/quick_create.xml:0
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_split_journal_item_view
 msgid "Discard"
-msgstr ""
+msgstr "Sil"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
@@ -1515,6 +1529,9 @@ msgid ""
 "revenues is not supported on journal entries involving both expense and "
 "revenue accounts. You can split this entry into two entries instead."
 msgstr ""
+"Masraflar ve gelir hesaplarının her ikisini de içeren yevmiye kayıtlarında, "
+"masraflar ve gelirler için farklı ertelenmiş kayıt oluşturma yöntemlerinin "
+"kullanılması desteklenmez. Bunun yerine bu kaydı iki kayda bölebilirsiniz."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_account__id
@@ -1910,7 +1927,7 @@ msgstr "Ana Ek"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Manage Models"
-msgstr ""
+msgstr "Modelleri Yönet"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__generate_deferred_expense_entries_method__manual
@@ -2368,6 +2385,8 @@ msgid ""
 "Please set a deferred account on the related account or in the accounting "
 "settings."
 msgstr ""
+"Lütfen ilgili hesapta veya muhasebe ayarlarında ertelenmiş bir hesap "
+"ayarlayın."
 
 #. module: account_accountant
 #. odoo-python
@@ -2479,7 +2498,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
 msgid "Reconciled"
-msgstr ""
+msgstr "Denkleştirilmiş"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__reconciled_lines_name
@@ -2557,6 +2576,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "Review"
 msgstr "İnceleme"
+
+#. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/account_bank_statement.py:0
+msgid "Review Statements"
+msgstr ""
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
@@ -2741,6 +2766,8 @@ msgid ""
 "Some lines cannot be processed because they are already reconciled or cannot "
 "be validated."
 msgstr ""
+"Bazı satırlar, halihazırda uzlaştırılmış oldukları veya doğrulanamadıkları "
+"için işlenememektedir."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -2789,19 +2816,9 @@ msgid "Statement"
 msgstr "Hesap Ekstresi"
 
 #. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
-msgid "Statement Line"
-msgstr "Hesap Ekstresi Satırı"
-
-#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__statement_line_attachment_ids
 msgid "Statement Line Attachment"
 msgstr ""
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
-msgid "Statement Lines"
-msgstr "Açıklama Hatları"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
@@ -2816,6 +2833,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
+"Etkinliklere göre durum\n"
+"Gecikmiş: Son tarih çoktan geçti\n"
+"Bugün: Etkinlik tarihi bugün\n"
+"Planlanmış: Gelecekteki etkinlikler."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__stock_journal_id
@@ -2842,7 +2863,7 @@ msgstr "Abonelik 12 ay"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Suggestions"
-msgstr ""
+msgstr "Öneriler"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -2891,6 +2912,9 @@ msgid ""
 "(current_partner_name)s, click here to move it to partner %"
 "(potential_partner_name)s"
 msgstr ""
+"%(account_number)s banka hesabı aslında %(current_partner_name)s ortak "
+"hesabına ayarlanmıştır; burayı tıklayarak ortak hesaba taşıyabilirsiniz %"
+"(potential_partner_name)s"
 
 #. module: account_accountant
 #. odoo-python
@@ -3112,8 +3136,8 @@ msgstr "Transfer %s"
 
 #. module: account_accountant
 #: model:ir.actions.server,name:account_accountant.auto_reconcile_bank_statement_line_ir_actions_server
-msgid "Try to reconcile automatically your statement lines"
-msgstr "Ekstrelerinizin satırlarını otomatik olarak denkleştirmeye çalışın"
+msgid "Try to reconcile automatically your transactions"
+msgstr ""
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_mail_mail__message_type
@@ -3157,7 +3181,7 @@ msgstr "Denkleştirilmiş ekstre satırları"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Upload Bills"
-msgstr ""
+msgstr "Faturaları Yükle"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -3183,6 +3207,14 @@ msgid ""
 "acknowledgment\n"
 "'user_notification': generated for a specific recipient"
 msgstr ""
+"Mesaj üreticisini kategorize etmek için kullanılır\n"
+"'email': gelen bir e-postadan (ör. posta ağ geçidi) üretilmiş\n"
+"'comment': kullanıcı girdisinden (ör. sohbet veya düzenleyici) üretilmiş\n"
+"'email_outgoing': bir toplu e-postadan üretilmiş\n"
+"'notification': sistem tarafından (ör. izleme mesajları) üretilmiş\n"
+"'auto_comment': otomatik bildirim mekanizmasından (ör. alındı onayı) "
+"üretilmiş\n"
+"'user_notification': belirli bir alıcı için üretilmiş"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -3431,6 +3463,29 @@ msgstr "ikincil para birimi"
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_journal_dashboard_kanban_view
 msgid "to reconcile"
 msgstr "denkleştirilecek"
+
+#~ msgid "Are you sure you want to delete this statement line?"
+#~ msgstr "Bu ifade satırını silmek istediğinizden emin misiniz?"
+
+#~ msgid ""
+#~ "Choose a journal and a starting date. The system will try to "
+#~ "automatically\n"
+#~ "                    reconcile all unreconciled bank statement lines from "
+#~ "that date until today."
+#~ msgstr ""
+#~ "Bir hesap defteri ve başlangıç tarihi seçin. Sistem, o tarihten bugüne "
+#~ "kadar\n"
+#~ "                    uyuşmayan tüm banka hesap özeti satırlarını otomatik "
+#~ "olarak uzlaştırmaya çalışacaktır."
+
+#~ msgid "Statement Line"
+#~ msgstr "Hesap Ekstresi Satırı"
+
+#~ msgid "Statement Lines"
+#~ msgstr "Açıklama Hatları"
+
+#~ msgid "Try to reconcile automatically your statement lines"
+#~ msgstr "Ekstrelerinizin satırlarını otomatik olarak denkleştirmeye çalışın"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Banka Hesap Ekstresi Kalemi"

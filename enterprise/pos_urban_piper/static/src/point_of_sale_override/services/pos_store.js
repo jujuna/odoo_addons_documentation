@@ -125,11 +125,11 @@ patch(PosStore.prototype, {
         this.isSoundPlaying = false;
 
         const soundData = this.config.urbanpiper_store_id.order_notification_sound;
-        if (!soundData) {
+        if (!soundData?.content) {
             return;
         }
         try {
-            const blob = base64ToBlob(soundData, "audio/mpeg");
+            const blob = base64ToBlob(soundData.content, "audio/mpeg");
             const storeAudioPath = URL.createObjectURL(blob);
             const storeAudio = new Audio(storeAudioPath);
             this.sound.soundEffects["store-custom-order-receive-tone"] = {
@@ -209,9 +209,11 @@ patch(PosStore.prototype, {
         if (!deliveryOrder) {
             return;
         }
-        if (deliveryOrder.delivery_status === "acknowledged" && deliveryOrder.state != "cancel") {
-            deliveryOrder.uiState.last_general_customer_note = "";
-            deliveryOrder.uiState.last_internal_note = "";
+        if (
+            deliveryOrder.delivery_status === "acknowledged" &&
+            deliveryOrder.state !== "cancel" &&
+            !deliveryOrder.isFutureOrder
+        ) {
             await this._sendDeliveryOrderForPreparation(deliveryOrder);
         } else if (deliveryOrder.delivery_status === "placed") {
             if (!this.isSoundPlaying) {
@@ -227,7 +229,7 @@ patch(PosStore.prototype, {
     },
 
     async _sendDeliveryOrderForPreparation(deliveryOrder) {
-        if (deliveryOrder.urbanpiper_printed || deliveryOrder.isFutureOrder) {
+        if (deliveryOrder.urbanpiper_printed) {
             return;
         }
         let isReadyToPrint = true;
@@ -241,6 +243,8 @@ patch(PosStore.prototype, {
             isReadyToPrint = false;
         }
         if (isReadyToPrint) {
+            deliveryOrder.uiState.last_general_customer_note = "";
+            deliveryOrder.uiState.last_internal_note = "";
             await this.sendOrderInPreparationUpdateLastChange(deliveryOrder);
         }
     },

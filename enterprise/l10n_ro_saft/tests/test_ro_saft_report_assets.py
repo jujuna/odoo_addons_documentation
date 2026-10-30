@@ -168,6 +168,10 @@ class TestRoSaftReportAssets(TestRoSaftReport):
             },
         ])
         cls.bill.action_post()
+        # Posting the bills creates an asset per line: remove them, the test creates its own from the lines
+        bill_assets = (cls.last_year_bill | cls.bill).asset_ids
+        bill_assets.set_to_draft()
+        bill_assets.unlink()
 
         cls.company_data['default_account_assets'].asset_depreciation_account_id = cls.company_data['default_account_assets']
         cls.company_data['default_account_assets'].asset_expense_account_id = cls.company_data['default_account_expense']

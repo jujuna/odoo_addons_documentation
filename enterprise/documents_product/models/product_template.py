@@ -8,10 +8,7 @@ class ProductTemplate(models.Model):
     _inherit = ['product.template', 'documents.mixin']
 
     def _get_document_vals_access_rights(self):
-        return {
-            'access_internal': 'view',
-            'access_via_link': 'view',
-        }
+        return {}  # inherit from product folder
 
     def _get_document_owner(self):
         return self.env.user

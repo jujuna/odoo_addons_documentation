@@ -119,7 +119,7 @@
                         </t>
                     </div>
                     <a t-if="this.originalPost.link_url.value"
-                        class="o_social_stream_post_link p-3 d-flex bg-100"
+                        class="o_social_stream_post_link d-flex p-3 bg-100"
                         t-att-href="this.originalPost.link_url.value"
                         target="_blank">
                         <img t-if="this.originalPost.link_image_url.raw_value"
@@ -273,7 +273,7 @@
                                         t-out="this.formatComment(this.comment.message)"/>
                                     <div t-if="this.comment.attachment" class="o_social_comment_attachment mt-3">
                                         <a t-if="this.comment.attachment.type === 'share'"
-                                            class="o_social_stream_post_link text-reset shadow mb-3 d-block overflow-hidden"
+                                            class="o_social_stream_post_link d-block overflow-hidden mb-3 shadow text-reset"
                                             t-att-href="this.comment.attachment.target.url"
                                             target="_blank">
                                             <img t-att-src="this.comment.attachment.media.image.src" class="img-fluid" alt="Link Image" />
@@ -282,13 +282,13 @@
                                                 <p class="o_social_stream_post_link_description" t-out="this.comment.attachment.description"/>
                                             </div>
                                         </a>
-                                        <img t-if="this.comment.attachment.type === 'photo'" class="o_social_comment_image img-fluid shadow mb-3"
+                                        <img t-if="this.comment.attachment.type === 'photo'" class="o_social_comment_image mb-3 img-fluid rounded shadow"
                                             t-att-src="this.comment.attachment.media.image.src" alt="Comment Image"
                                             target="_blank">
                                         </img>
                                         <a t-elif="comment.attachment.type === 'animated_image_video'"
                                             t-att-href="this.link" target="_blank">
-                                            <img class="o_social_comment_image img-fluid shadow mb-3"
+                                            <img class="o_social_comment_image mb-3 img-fluid rounded shadow"
                                                 t-att-src="comment.attachment.media.image.src" alt="Comment GIF">
                                             </img>
                                         </a>

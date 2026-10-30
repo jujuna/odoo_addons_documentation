@@ -68,7 +68,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
                 month_year = payslip.date_to.strftime('%b %Y').upper()
                 employee = payslip.employee_id
                 payment_data.append({
-                    "account_proxy_id": employee._get_proxy_type(),
+                    "account_proxy_id": employee._l10n_hk_get_autopay_proxy_id(),
                     "autopay_account_type": employee.l10n_hk_autopay_account_type,
                     "amount": payslip.net_wage,
                     "bank_account": employee.primary_bank_account_id,

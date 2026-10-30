@@ -11,12 +11,6 @@
             <button name="action_payment_report" position="before">
                 <button name="action_payment_report" type="object" class="btn btn-primary" string="Pay" invisible="state != '02_close' or payment_report" options="{'is_priority': True}"/>
             </button>
-            <button name="action_paid" position="attributes">
-                <attribute name="invisible" add="not payment_report" separator="or"/>
-            </button>
-            <button name="action_paid" position="before">
-                <button name="action_paid" type="object" class="btn btn-secondary" string="Mark as Paid" invisible="state != '02_close' or payment_report"/>
-            </button>
         </field>
     </record>
 </odoo>

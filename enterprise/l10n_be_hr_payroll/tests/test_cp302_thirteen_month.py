@@ -180,7 +180,8 @@ class TestCP302ThirteenMonth(TestPayrollCommon):
                         if not (date_from <= day <= date_to):
                             # not part of given date range
                             continue
-                        day_name = calendar.day_name[weekday].lower()
+                        # calendar.day_name is locale dependent
+                        day_name = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')[weekday]
                         weekday_counts[day_name] += 1
         return dict(weekday_counts)
 
@@ -2028,7 +2029,7 @@ CP302THIRTEENCONTRIBEMP should always be empty when the employee is a worker
         """)
         contribution = payslip.line_ids.filtered_domain([['code', '=', 'CP302THIRTEENCONTRIBWORK']])
         payslip_wage = payslip.line_ids.filtered_domain([['code', '=', 'SALARY']])
-        self.assertAlmostEqual(contribution.total, round(payslip_wage.total * 1.08 * 0.12, 2), msg="""
+        self.assertAlmostEqual(contribution.total, round(payslip_wage.total * payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.12, 2), msg="""
 The thirteen month contribution of a worker under the cp302 should be 12% of 108%
 of the gross salary submitted to the ONSS.
         """)
@@ -2468,3 +2469,46 @@ worked less than 44 days in the year of payment.
 Temporary workers (dimona == 'ext') should receive their proratized 13th month
 if they worked at least 44 days in the year regardless of the seniority limit
         """)
+
+    def test_cp302_13th_month_planned_schedule_leaver(self):
+        """
+        A schedule planned day by day has no year of its own: a twelfth of the 13th month per weekly hours x 52 / 12
+        hours worked or assimilated. A monthly employee planned 7.6 hours a weekday until the end of the contract on
+        7 March 2025 gets 4,500 x 48 x 7.6 / (38 x 52) = 830.77, not the full 13th month the planning of 48 days alone
+        would give.
+        """
+        start = date(2025, 1, 1)
+        planned = [day for day in (start + timedelta(days=offset) for offset in range(66)) if day.weekday() < 5]
+        planned_calendar = self.env['resource.calendar'].create({
+            'name': 'Planned day by day',
+            'company_id': self.belgian_company.id,
+            'calendar_type': 'variable',
+            'hours_per_week': 38,
+            'days_per_week': 5,
+            'full_time_required_hours': 38,
+            'attendance_ids': [
+                Command.create({'date': day, 'hour_from': hour_from, 'hour_to': hour_to})
+                for day in planned for hour_from, hour_to in ((8, 12), (13, 16.6))
+            ],
+        })
+        employee = self.env['hr.employee'].create({
+            'name': 'Valentino',
+            'contract_date_start': date(2024, 1, 1),
+            'contract_date_end': date(2025, 3, 7),
+            'wage_type': 'monthly',
+            'wage': 4500,
+            'l10n_be_joint_committee_id': self.cp302.id,
+            'resource_calendar_id': planned_calendar.id,
+            'l10n_be_worker_code_id': self.env['l10n.be.worker.code'].search([('dmfa_code', '=', '015')]).id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            "date_from": date(2025, 3, 1),
+            "date_to": date(2025, 3, 31),
+            "struct_id": self.cp200_struct.id,
+        })
+        payslip.compute_sheet()
+        amount = payslip.line_ids.filtered_domain([['code', '=', 'CP302THIRTEEN']]).total
+        self.assertEqual(len(planned), 48)
+        self.assertAlmostEqual(amount, 830.77, places=2)

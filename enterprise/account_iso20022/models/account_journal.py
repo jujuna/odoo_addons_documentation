@@ -197,7 +197,7 @@ class AccountJournal(models.Model):
         if priority:
             InstrPrty = etree.SubElement(PmtTpInf, "InstrPrty")
             InstrPrty.text = priority
-        SvcLvlTxt = self._get_SvcLvlText(payment_method_code)
+        SvcLvlTxt = self.with_context(iso20022_priority=priority)._get_SvcLvlText(payment_method_code)
         if SvcLvlTxt:
             SvcLvl = etree.SubElement(PmtTpInf, "SvcLvl")
             Cd = etree.SubElement(SvcLvl, "Cd")
@@ -464,7 +464,7 @@ class AccountJournal(models.Model):
 
     def _get_SvcLvlText(self, payment_method_code):
         if payment_method_code == 'iso20022':
-            return 'NURG'
+            return 'URGP' if self.env.context.get('iso20022_priority') in ('HIGH', 'URGP') else 'NURG'
         return None
 
     def _get_PstlAdr(self, partner_id, payment_method_line, effective_payment_method_code=None):

@@ -169,13 +169,13 @@ export class ReportEditorWysiwyg extends Component {
         this.scope = useScope();
     }
 
-    instantiateEditor({ editable } = {}) {
-        const onEditorChange = () => {
-            this.undoRedoState.canUndo = this.editor.shared.history.canUndo();
-            this.undoRedoState.canRedo = this.editor.shared.history.canRedo();
-            this.reportEditorModel.isDirty = this.undoRedoState.canUndo;
-        };
+    onEditorChange() {
+        this.undoRedoState.canUndo = this.editor && this.editor.shared.history.canUndo();
+        this.undoRedoState.canRedo = this.editor && this.editor.shared.history.canRedo();
+        this.reportEditorModel.isDirty = this.undoRedoState.canUndo;
+    }
 
+    instantiateEditor({ editable } = {}) {
         editable.querySelectorAll("[ws-view-id]").forEach((el) => {
             el.setAttribute("contenteditable", "true");
         });
@@ -183,7 +183,7 @@ export class ReportEditorWysiwyg extends Component {
             this.scope,
             {
                 Plugins: REPORT_EDITOR_PLUGINS,
-                onChange: onEditorChange,
+                onChange: () => this.onEditorChange(),
                 getRecordInfo: () => {
                     const { anchorNode } = this.editor.shared.selection.getEditableSelection();
                     if (!anchorNode) {
@@ -211,6 +211,7 @@ export class ReportEditorWysiwyg extends Component {
                     this.reportEditorModel.sharedReport.set(shared ? name : null);
                 },
                 cleanEmptyStructuralContainers: false,
+                allowScrollableTables: false,
             },
             this.env.services
         );
@@ -221,21 +222,15 @@ export class ReportEditorWysiwyg extends Component {
         return editor;
     }
 
-    onIframeLoaded({ iframeRef }) {
+    destroyEditor() {
         if (this.editor) {
             this.editor.destroy(true);
             this.editor = null;
         }
-        this.scope.run(() => {
-            useEffect(() => {
-                if (!iframeRef()) {
-                    if (this.editor) {
-                        this.editor.destroy(true);
-                        this.editor = null;
-                    }
-                }
-            });
-        });
+    }
+
+    onIframeLoaded({ iframeRef }) {
+        this.destroyEditor();
         this.iframeRef = iframeRef;
         const doc = iframeRef().contentDocument;
         doc.body.classList.remove("container");
@@ -254,6 +249,8 @@ export class ReportEditorWysiwyg extends Component {
         if (!this.reportEditorModel._errorMessage && this.reportEditorModel.mode === "wysiwyg") {
             this.editor = this.instantiateEditor({ editable: doc.querySelector("#wrapwrap") });
         }
+
+        this.onEditorChange();
     }
 
     get iframeSource() {

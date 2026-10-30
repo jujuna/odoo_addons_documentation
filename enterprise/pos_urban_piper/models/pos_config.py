@@ -25,6 +25,7 @@ class PosConfig(models.Model):
         'pos.urbanpiper.store',
         string='UrbanPiper Store',
         check_company=True,
+        copy=False,
         help="UrbanPiper store linked to this point of sale for handling online delivery orders"
     )
 
@@ -61,8 +62,15 @@ class PosConfig(models.Model):
             ('urbanpiper_store_id', '!=', False),
             ('urbanpiper_store_id.is_webhook_register', '=', False),
         ])
-        for store in configs.urbanpiper_store_id:
+        stores = configs.urbanpiper_store_id
+        self.env['ir.cron']._commit_progress(remaining=len(stores))
+        for store in stores:
+            # Avoid prefetching again after each commit.
+            store = store.with_prefetch()
             UrbanPiperConnector(store).post_webhooks()
+            # Keep the webhooks already registered on UrbanPiper, so a later failure doesn't lead to duplicates.
+            if not self.env['ir.cron']._commit_progress(processed=1):
+                break
 
     def _notify_delivery_order(self, order_id=None):
         """
@@ -71,18 +79,6 @@ class PosConfig(models.Model):
         self.ensure_one()
         if self.current_session_id:
             self._notify('URBANPIPER_DELIVERY_ORDER', order_id)
-
-    @api.model
-    def process_urbanpiper_store_action(self, data, urbanpiper_store):
-        """
-        # UrbanPiper Webhook Handler
-        Send UrbanPiper store status updates (e.g., delivery aggregator enable/disable) to the POS UI.
-        """
-        if not urbanpiper_store.config_id:
-            _logger.warning('UrbanPiper: No PoS config linked to store %s for processing store action', urbanpiper_store.name)
-            return
-        if urbanpiper_store.config_id.current_session_id:
-            urbanpiper_store.config_id._notify('STORE_ACTION', data)
 
     def get_urbanpiper_order_data(self):
         """

@@ -151,7 +151,7 @@ class WhatsappBlocklist(models.Model):
                     'message': _(
                         "Account [%(account)s]: Failed to %(operation)s %(count)d %(number_word)s: %(error)s",
                         account=wa_account_id.name,
-                        operation_label=_("block") if operation == 'block' else _("unblock"),
+                        operation=_("block") if operation == 'block' else _("unblock"),
                         count=len(numbers_to_operate),
                         number_word=_("number") if len(numbers_to_operate) <= 1 else _("numbers"),
                         error=str(err),

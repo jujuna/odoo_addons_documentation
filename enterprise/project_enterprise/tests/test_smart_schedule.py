@@ -566,6 +566,8 @@ class TestSmartSchedule(TestSmartScheduleCommon):
         self.task_project_pigs_no_allocated_hours_user.write({"user_ids": [self.user_projectuser.id, self.user_projectmanager.id]})
 
         tasks_to_schedule = self.task_project_pigs_with_allocated_hours_user + self.task_project_pigs_with_allocated_hours_manager + self.task_project_pigs_with_allocated_hours_no_user + self.task_project_pigs_no_allocated_hours_user
+        for task in tasks_to_schedule:
+            old_vals[task.id]["allocated_hours"] = task.allocated_hours
 
         for new_user in [self.user_projectuser.ids, False]:
             if not new_user:
@@ -586,7 +588,7 @@ class TestSmartSchedule(TestSmartScheduleCommon):
             tasks_to_schedule.action_rollback_auto_scheduling({str(task_id): vals for task_id, vals in result[1].items()})
 
             for task in tasks_to_schedule:
-                for field in ["planned_date_begin", "date_deadline", "user_ids"]:
+                for field in ["planned_date_begin", "date_deadline", "user_ids", "allocated_hours"]:
                     if field in old_vals[task.id]:
                         self.assertEqual(task[field].ids or False if field == "user_ids" else task[field], old_vals[task.id][field])
 

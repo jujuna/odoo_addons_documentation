@@ -7,7 +7,7 @@ from odoo import fields, models, api
 class PosConfig(models.Model):
     _inherit = 'pos.config'
 
-    module_pos_urban_piper = fields.Boolean(string='Use Urbanpiper')
+    module_pos_urban_piper = fields.Boolean(string='Use Urbanpiper', copy=False)
 
     @api.model
     def _load_pos_preparation_data_domain(self, data):

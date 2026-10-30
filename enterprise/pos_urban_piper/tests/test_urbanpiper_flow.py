@@ -194,7 +194,7 @@ class TestUrbanPiperFlow(CommonPosUrbanPiperTest):
             'taxes_id': [(4, tax_5.id)],
         })
 
-        self.urbanpiper_store.tax_type = 'total_included'
+        self.assertEqual(self.urbanpiper_store.tax_type, 'total_included')
         item_data = self.product_1._prepare_urbanpiper_data(self.urbanpiper_store)
         taxes_data = self.product_1._prepare_urbanpiper_taxes_data(self.urbanpiper_store)
         self.assertEqual(len(item_data), 1)
@@ -349,3 +349,59 @@ class TestUrbanPiperFlow(CommonPosUrbanPiperTest):
             },
         })
         self.assertEqual(inventory_payload['items'][0]['price'], 200)
+
+    def test_inventory_update_webhook_posts_summary(self):
+        payload = {
+            'stats': {
+                'items': {
+                    'created': 2,
+                    'updated': 3,
+                    'errors': 0,
+                },
+            },
+        }
+        self.urbanpiper_store._process_urbanpiper_inventory_update(payload)
+        message = self.urbanpiper_store.message_ids[0]
+        self.assertIn('Created: 2', message.body)
+        self.assertIn('Updated: 3', message.body)
+        self.assertNotIn('Errors: 0', message.body)
+
+        # Items rejected by UrbanPiper are reported with their error message.
+        payload['stats']['items']['errors'] = 1
+        payload['items'] = [
+            {'ref_id': str(self.product.id), 'title': 'Test Product', 'upipr_status': {'action': 'A'}},
+            {
+                'ref_id': '404',
+                'title': 'Broken Product',
+                'upipr_status': {'error': True, 'err_msg': "Required attribute(s) missing: ['price']"},
+            },
+        ]
+        self.urbanpiper_store._process_urbanpiper_inventory_update(payload)
+        message = self.urbanpiper_store.message_ids[0]
+        self.assertIn('Errors: 1', message.body)
+        self.assertIn("Broken Product: Required attribute(s) missing: ['price']", message.body)
+        self.assertNotIn('Test Product', message.body)
+
+    def test_store_creation_webhook_message(self):
+        payload = {
+            'stores': [{
+                'upipr_status': {
+                    'error': False,
+                    'action': 'A',
+                },
+            }],
+        }
+        self.urbanpiper_store._process_urbanpiper_store_creation(payload)
+        message = self.urbanpiper_store.message_ids[0]
+        self.assertIn('Store creation completed', message.body)
+        payload['stores'][0]['upipr_status']['action'] = 'U'
+        self.urbanpiper_store._process_urbanpiper_store_creation(payload)
+        self.assertIn('Store update completed', self.urbanpiper_store.message_ids[0].body)
+
+        payload['stores'][0]['upipr_status'] = {
+            'error': True,
+            'err_msg': 'Test Error Msg'
+        }
+        self.urbanpiper_store._process_urbanpiper_store_creation(payload)
+        self.assertIn('Store sync failed', self.urbanpiper_store.message_ids[0].body)
+        self.assertIn('Test Error Msg', self.urbanpiper_store.message_ids[0].body)

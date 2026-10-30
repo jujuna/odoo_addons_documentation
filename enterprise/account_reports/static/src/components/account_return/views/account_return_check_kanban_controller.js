@@ -36,4 +36,11 @@ export class AccountReturnCheckKanbanController extends KanbanController {
         onMounted(restoreScrollPosition);
         onPatched(restoreScrollPosition);
     }
+
+    async beforeExecuteActionButton(clickParams) {
+        // The checks may still be saving (e.g. their review state was just changed): the buttons
+        // (e.g. Validate on the return card) must only be executed once they are saved.
+        await this.model.mutex.getUnlockedDef();
+        return super.beforeExecuteActionButton(clickParams);
+    }
 }

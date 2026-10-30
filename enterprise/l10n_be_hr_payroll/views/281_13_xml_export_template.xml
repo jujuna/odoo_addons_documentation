@@ -77,7 +77,8 @@
                             <f2016_postcodebelgisch t-out="employee_data['f2016_postcodebelgisch']"/>
                         </t>
 
-                        <!-- <f2017_gemeente /> 27 AN commune du bénéficiaire -->
+                        <!-- <f2017_gemeente /> 27 AN commune du bénéficiaire, mandatory for the non-residents -->
+                        <f2017_gemeente t-out="employee_data['employee_city']"/>
 
                         <!-- <f2018_landwoonplaats /> 5 N Code pays du domicile du bénéficiaire
                         des revenus, zéro si Belgique -->
@@ -120,35 +121,7 @@
                         <!-- <f2114_voornamen /> 15 AN Prénom du bénéficiaire des revenus -->
                         <f2114_voornamen t-out="employee_data['f2114_voornamen']"/>
 
-                        <f13_2031_repaymentneo t-out="employee_data['f13_2031_repaymentneo']"/>
-                        <f13_2035_verantwoordingsstukken t-out="employee_data['f13_2035_verantwoordingsstukken']"/>
-                        <f13_2059_totaalcontrole t-out="employee_data['f13_2059_totaalcontrole']"/>
-                        <f13_2060_bedrag t-out="employee_data['f13_2060_bedrag']"/>
-                        <f13_2061_bedrag t-out="employee_data['f13_2061_bedrag']"/>
-                        <f13_2064_bedrag t-out="employee_data['f13_2064_bedrag']"/>
-                        <f13_2065_bedrag t-out="employee_data['f13_2065_bedrag']"/>
-                        <f13_2066_bedrag t-out="employee_data['f13_2066_bedrag']"/>
-                        <f13_2067_bedrag t-out="employee_data['f13_2067_bedrag']"/>
-                        <f13_2070_bedrag t-out="employee_data['f13_2070_bedrag']"/>
-                        <f13_2071_bedrag t-out="employee_data['f13_2071_bedrag']"/>
-                        <f13_2072_werkloosheidzonder t-out="employee_data['f13_2072_werkloosheidzonder']"/>
-                        <f13_2073_decemberallowance t-out="employee_data['f13_2073_decemberallowance']"/>
-                        <f13_2074_werkloosheidmetancienniteit t-out="employee_data['f13_2074_werkloosheidmetancienniteit']"/>
-                        <f13_2075_werkloosheidzonder t-out="employee_data['f13_2075_werkloosheidzonder']"/>
-                        <f13_2077_werkloosheidmetancienniteit t-out="employee_data['f13_2077_werkloosheidmetancienniteit']"/>
-                        <f13_2078_bedrijfsvoorheffing t-out="employee_data['f13_2078_bedrijfsvoorheffing']"/>
-                        <f13_2079_werkloosheidzonder t-out="employee_data['f13_2079_werkloosheidzonder']"/>
-                        <f13_2081_werkloosheidmetancienniteit t-out="employee_data['f13_2081_werkloosheidmetancienniteit']"/>
-                        <f13_2082_bijdragenpremies t-out="employee_data['f13_2082_bijdragenpremies']"/>
-                        <f13_2083_voortzetting t-out="employee_data['f13_2083_voortzetting']"/>
-                        <f13_2084_movingexpenses t-out="employee_data['f13_2084_movingexpenses']"/>
-                        <f13_2089_werkloosheidzonder t-out="employee_data['f13_2089_werkloosheidzonder']"/>
-                        <f13_2091_werkloosheidmetancienniteit t-out="employee_data['f13_2091_werkloosheidmetancienniteit']"/>
-                        <f13_2099_referentienummerui t-out="employee_data['f13_2099_referentienummerui']"/>
-                        <f13_2102_kas t-out="employee_data['f13_2102_kas']"/>
-                        <f13_2103_kasvrijaanvullendpensioen t-out="employee_data['f13_2103_kasvrijaanvullendpensioen']"/>
-                        <f13_2109_fiscaalidentificat t-out="employee_data['f13_2109_fiscaalidentificat']"/>
-                        <f13_2128_vrijaanvullendpensioenwerknemers t-out="employee_data['f13_2128_vrijaanvullendpensioenwerknemers']"/>
+                        <t t-out="employee_data['_xml_declaration_fields']"/>
                     </Fiche28113>
                 </t>
             </Opgave32513>

@@ -40,6 +40,9 @@ class HrPayslip(models.Model):
     @api.depends('date_from', 'date_to')
     def _compute_l10n_mx_years_worked(self):
         for payslip in self:
+            if not payslip.date_from or not payslip.date_to:
+                payslip.l10n_mx_years_worked = 0
+                continue
             start_date = (
                 payslip.employee_id._get_first_contract_date(payslip.date_from)
                 or payslip.employee_id._get_first_contract_date()
@@ -74,7 +77,7 @@ class HrPayslip(models.Model):
     def _get_l10n_mx_integration_factor(self):
         self.ensure_one()
 
-        if not self.version_id or self.country_code != 'MX':
+        if not self.version_id or self.country_code != 'MX' or not self.l10n_mx_years_worked:
             return 0.0
 
         holidays_count = self._rule_parameter('l10n_mx_holiday_tables')[self.l10n_mx_years_worked]
@@ -116,6 +119,52 @@ class HrPayslip(models.Model):
                 }]
                 self._message_log(message_type='tracking', tracking_values=tracking_values)
 
+        return res
+
+    def _get_base_local_dict(self):
+        res = super()._get_base_local_dict()
+        if self.country_code != "MX":
+            return res
+
+        days_in_period = (self.date_to - self.date_from).days + 1
+        first_day = self.date_from.replace(day=1)
+        last_day = self.date_from + relativedelta(day=31)
+        total_days_in_month = (last_day - first_day).days + 1
+
+        disability_codes = {'LEAVE1200', 'LEAVE1100', 'LEAVE1000'}
+        unpaid_days_in_period = 0.0
+        disability_days = 0.0
+        absence_days = 0.0
+        for wd in self.worked_days_line_ids:
+            if not wd.is_paid:
+                days = wd.number_of_days
+                unpaid_days_in_period += days
+                if wd.code in disability_codes:
+                    disability_days += days
+                else:
+                    absence_days += days
+
+        accrued_days_in_period = days_in_period - unpaid_days_in_period
+        days_in_month_ratio = days_in_period / total_days_in_month if total_days_in_month else 0
+
+        v_date_start = self.version_id.date_start if self.version_id and self.version_id.date_start else self.date_from
+        v_date_end = self.version_id.date_end if self.version_id and self.version_id.date_end else self.date_to
+        effective_date_from = max(self.date_from, v_date_start)
+        effective_date_to = min(self.date_to, v_date_end)
+        effective_days_in_period = (effective_date_to - effective_date_from).days + 1
+        days_without_disabilities = effective_days_in_period - disability_days
+
+        res.update({
+            'days_in_period': days_in_period,
+            'total_days_in_month': total_days_in_month,
+            'unpaid_days_in_period': unpaid_days_in_period,
+            'absence_days': absence_days,
+            'disability_days': disability_days,
+            'days_without_disabilities': days_without_disabilities,
+            'accrued_days_in_period': accrued_days_in_period,
+            'effective_days_in_period': effective_days_in_period,
+            'days_in_month_ratio': days_in_month_ratio,
+        })
         return res
 
     def _get_data_files_to_update(self):

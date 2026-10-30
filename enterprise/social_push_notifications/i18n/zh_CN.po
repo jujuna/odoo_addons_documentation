@@ -9,15 +9,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:52+0000\n"
-"PO-Revision-Date: 2026-09-18 00:55+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-23 09:33+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/social_push_notifications/zh_Hans/>\n"
+"projects/odoo-20/social_push_notifications/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,7 +61,7 @@ msgstr "浏览器端点"
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__keys
 msgid "Browser keys"
-msgstr ""
+msgstr "浏览器密钥"
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_res_config_settings
@@ -129,7 +130,7 @@ msgstr "启用推送通知以获得新功能的通知。"
 #. odoo-javascript
 #: code:addons/social_push_notifications/static/src/interactions/push_notification_request_interaction.js:0
 msgid "Failed to enable push notifications"
-msgstr ""
+msgstr "未能启用推送通知"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.push_notifications_preview
@@ -177,7 +178,7 @@ msgstr "图标图像"
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_view_form
 msgid "Immediately"
-msgstr ""
+msgstr "马上"
 
 #. module: social_push_notifications
 #. odoo-javascript
@@ -185,7 +186,7 @@ msgstr ""
 msgid ""
 "It looks like notifications are blocked by your browser. To stay updated, "
 "please enable them in your browser settings!"
-msgstr ""
+msgstr "看起来通知已被您的浏览器阻止。为了及时获取更新，请在浏览器设置中启用通知！"
 
 #. module: social_push_notifications
 #. odoo-javascript
@@ -206,11 +207,15 @@ msgid ""
 "- auth: The auth value should be treated as a secret and not shared outside "
 "of Odoo"
 msgstr ""
+"它指的是通知使用的浏览器密钥：\n"
+"- p256dh：这是浏览器生成的订阅公开密钥。浏览器将\n"
+"          私钥保密，并用于解密有效载荷\n"
+"- auth： 验证值应视为机密，不得在 Odoo 以外共享。"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_live_post__last_push_subscription_id
 msgid "Last Push Subscription"
-msgstr ""
+msgstr "上次推送订阅"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_media__media_type
@@ -232,7 +237,7 @@ msgstr "新消息"
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.utm_campaign_view_form
 msgid "New Push"
-msgstr ""
+msgstr "新建推送"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__notification_request_delay
@@ -290,13 +295,13 @@ msgstr "请指定通知消息。"
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_view_form
 msgid "Post On"
-msgstr ""
+msgstr "发布于"
 
 #. module: social_push_notifications
 #. odoo-javascript
 #: code:addons/social_push_notifications/static/src/views/widgets/push_notification_request_preview/push_notification_request_preview_button.xml:0
 msgid "Preview"
-msgstr ""
+msgstr "预览"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.website_visitor_view_kanban
@@ -367,7 +372,7 @@ msgstr "消息推送预览"
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_post__push_notifications_scheduled_date
 msgid "Push Notifications Scheduled for"
-msgstr ""
+msgstr "推送通知计划发布时间"
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_website_visitor_push_subscription
@@ -401,7 +406,7 @@ msgstr "发送消息推送"
 #: model:ir.module.module,description:base.module_social_push_notifications
 #: model:ir.module.module,summary:base.module_social_push_notifications
 msgid "Send push notifications to your web visitors"
-msgstr ""
+msgstr "向您的网站访客发送推送通知"
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_social_account
@@ -431,7 +436,7 @@ msgstr "社交帖子模板"
 #. module: social_push_notifications
 #: model:ir.module.module,shortdesc:base.module_social_push_notifications
 msgid "Social Push Notifications"
-msgstr ""
+msgstr "社交推送通知"
 
 #. module: social_push_notifications
 #. odoo-python
@@ -442,7 +447,7 @@ msgstr "一些选定的访问者不允许推送通知。"
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_ir_config_parameter
 msgid "System Parameter"
-msgstr ""
+msgstr "系统参数"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_template_view_form
@@ -457,7 +462,7 @@ msgstr "这个网站已经配置完成."
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_account__website_id
 msgid "This configuration will only be used for the specified website"
-msgstr ""
+msgstr "此配置仅用于指定的网站"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_live_post__push_notification_image
@@ -479,7 +484,7 @@ msgstr "UTM营销"
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_utm_mixin
 msgid "UTM Mixin"
-msgstr ""
+msgstr "UTM 混合"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_media__media_type

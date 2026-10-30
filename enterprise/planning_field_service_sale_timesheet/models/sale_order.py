@@ -60,6 +60,30 @@ class SaleOrder(models.Model):
                 )
         return res
 
+    def get_catalog_section_data(self, child_field, **kwargs) -> dict:
+        sale_order = self
+        if intervention_id := kwargs.get('intervention_id'):
+            intervention = self.env['planning.slot'].browse(intervention_id)
+            if not self.has_access('read') and intervention.has_access('write') and intervention.sale_order_id == self:
+                sale_order = self.sudo()
+        return super(SaleOrder, sale_order).get_catalog_section_data(child_field, **kwargs)
+
+    def _get_product_catalog_record_lines(self, product_ids, child_field, **kwargs):
+        sale_order = self
+        if intervention_id := kwargs.get('intervention_id'):
+            intervention = self.env['planning.slot'].browse(intervention_id)
+            if not self.has_access('read') and intervention.has_access('write') and intervention.sale_order_id == self:
+                sale_order = self.sudo()
+        return super(SaleOrder, sale_order)._get_product_catalog_record_lines(product_ids, child_field, **kwargs)
+
+    def _show_prices(self):
+        return super()._show_prices() and (
+            not self.env.context.get('intervention_id')
+            or self.env.user.has_groups(
+                'sales_team.group_sale_salesman,account.group_account_invoice,account.group_account_readonly'
+            )
+        )
+
     def _compute_invoice_status(self):
         super()._compute_invoice_status()
         material_feature_enabled = self.env['res.groups']._is_feature_enabled(

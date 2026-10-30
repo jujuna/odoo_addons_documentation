@@ -40,7 +40,7 @@ class HrPayslip(models.Model):
             if not slip.date_from:
                 slip.name = False
             else:
-                payslip_name = slip.struct_id.payslip_name or _('Salary Slip')
+                payslip_name = slip.title or slip.struct_id.payslip_name or _('Salary Slip')
                 date = format_date(self.env, slip.date_from, date_format="MMMM y")
                 full_name = '%(payslip_name)s - %(dates)s' % {
                     'payslip_name': payslip_name,

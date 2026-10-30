@@ -94,13 +94,12 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 6, 1),
             date(2024, 6, 30),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_transport_allowance').code: 1000000,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_meal_allowance').code: 1000000,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 20000000.0, 'MEAL': 1000000.0, 'TRANSPORT_ALW': 1000000.0, 'BASE': 22000000.0, 'BPJS_JKK': 48000.0, 'BPJS_JKM': 60000.0, 'BPJS_Kesehatan': 480000.0, 'GROSS_TOTAL': 22588000.0, 'GROSS': 22588000.0, 'JHT': -400000.0, 'BPJS_KESEHATAN_DED': -120000.0, 'JP': -100423.0, 'PPH21': -2032920.0, 'NET': 19346657.0}
@@ -127,12 +126,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 6, 1),
             date(2024, 6, 30),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_hr_payroll_structure_id_employee_salary_reimbursement_salary_rule').code: 5e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 5000000.0, 'BASE': 5000000.0, 'BPJS_JKK': 12000.0, 'BPJS_JKM': 15000.0, 'BPJS_Kesehatan': 200000.0, 'GROSS_TOTAL': 5727000.0, 'GROSS': 5227000.0, 'JHT': -100000.0, 'BPJS_KESEHATAN_DED': -50000.0, 'JP': -50000.0, 'PPH21': 0.0, 'REIMBURSEMENT': 500000.0, 'NET': 5300000.0}
@@ -146,12 +144,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 6, 1),
             date(2024, 6, 30),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_meal_allowance').code: 1000000,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 2000000.0, 'MEAL': 1000000.0, 'BASE': 3000000.0, 'BPJS_JKK': 4800.0, 'BPJS_JKM': 6000.0, 'BPJS_Kesehatan': 80000.0, 'GROSS_TOTAL': 3090800.0, 'GROSS': 3090800.0, 'JHT': -40000.0, 'BPJS_KESEHATAN_DED': -20000.0, 'JP': -20000.0, 'PPH21': 0.0, 'NET': 2920000.0}
@@ -166,13 +163,12 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 6, 1),
             date(2024, 6, 30),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_meal_allowance').code: 6e6,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_insurance').code: 5e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 1000000.0, 'INSURANCE': 500000.0, 'MEAL': 6000000.0, 'BASE': 7500000.0, 'BPJS_JKK': 2400.0, 'BPJS_JKM': 3000.0, 'BPJS_Kesehatan': 40000.0, 'GROSS_TOTAL': 7545400.0, 'GROSS': 7545400.0, 'JHT': -20000.0, 'BPJS_KESEHATAN_DED': -10000.0, 'JP': -10000.0, 'PPH21': -113181.0, 'NET': 6846819.0}
@@ -186,12 +182,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 6, 1),
             date(2024, 6, 30),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_laptop').code: 3e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 5000000.0, 'LAPTOP': 300000.0, 'BASE': 5300000.0, 'BPJS_Kesehatan': 200000.0, 'GROSS_TOTAL': 5500000.0, 'GROSS': 5500000.0, 'BPJS_KESEHATAN_DED': -50000.0, 'PPH21': -13750.0, 'NET': 5236250.0}
@@ -206,12 +201,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 6, 30),
         )
 
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_laptop').code: 3e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 5000000.0, 'LAPTOP': 300000.0, 'BASE': 5300000.0, 'BPJS_JKK': 12000.0, 'BPJS_JKM': 15000.0, 'GROSS_TOTAL': 5327000.0, 'GROSS': 5327000.0, 'JHT': -100000.0, 'JP': -50000.0, 'PPH21': 0.0, 'NET': 5150000.0}
@@ -224,12 +218,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 6, 30),
         )
 
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_laptop').code: 3e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'BASIC': 10000000.0, 'LAPTOP': 300000.0, 'BASE': 10300000.0, 'GROSS_TOTAL': 10300000.0, 'GROSS': 10300000.0, 'PPH21': -231750.0, 'NET': 10068250.0}
@@ -243,12 +236,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 4, 1),
             date(2024, 4, 30),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_thr').code: 1e7,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 20000000.0, 'THR': 10000000.0, 'BASE': 30000000.0, 'BPJS_JKK': 48000.0, 'BPJS_JKM': 60000.0, 'BPJS_Kesehatan': 480000.0, 'GROSS_TOTAL': 30588000.0, 'GROSS': 30588000.0, 'JHT': -400000.0, 'BPJS_KESEHATAN_DED': -120000.0, 'JP': -100423.0, 'PPH21': -3976440.0, 'NET': 25403137.0}
@@ -371,12 +363,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
                 date(2024, i, drange[0]),
                 date(2024, i, drange[1]),
             )
-            for code, value in {
+            slip._set_input_values({
                 self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
                 self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
                 self.env.ref('l10n_id_hr_payroll.salary_rule_id_transport_allowance').code: 2e6,
-            }.items():
-                slip._set_input_value(code, value)
+            })
             slip.compute_sheet()
             slip.action_payslip_done()
 
@@ -384,12 +375,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 12, 1),
             date(2024, 12, 31),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_transport_allowance').code: 2e6,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 20000000.0, 'TRANSPORT_ALW': 2000000.0, 'BASE': 22000000.0, 'BPJS_JKK': 48000.0, 'BPJS_JKM': 60000.0, 'BPJS_Kesehatan': 480000.0, 'GROSS_TOTAL': 22588000.0, 'GROSS': 22588000.0, 'JHT': -400000.0, 'BPJS_KESEHATAN_DED': -120000.0, 'JP': -100423.0, 'JABATAN': 1500000.0, 'JHT_JP': -1501269.0, 'PTKP': 54000000.0, 'PKP': 10762000.0, 'PPH21': 3527740.0, 'NET': 24907317.0}
         self._validate_payslip(payslip, payslip_results)
@@ -403,11 +393,10 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2024, 1, 1),
             date(2024, 1, 31),
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: 0,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 11304347.83, 'BASE': 11304347.83, 'BPJS_JKK': 27130.43, 'BPJS_JKM': 33913.04, 'GROSS_TOTAL': 11365391.31, 'GROSS': 11365391.31, 'JHT': -226086.96, 'JP': -100423.0, 'PPH21': -397788.0, 'NET': 10580049.87}
@@ -537,13 +526,12 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 6, 1),
             date(2025, 6, 30)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_transport_allowance').code: 1000000,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_meal_allowance').code: 1000000,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 20000000.0, 'MEAL': 1000000.0, 'TRANSPORT_ALW': 1000000.0, 'BPJS_JKK': 48000.0, 'BPJS_JKM': 60000.0, 'BPJS_Kesehatan': 480000.0, 'JHT_COMP': 740000.0, 'JP_COMP': 210948.0, 'BASE_GROSS_UP': 22588000.0, 'TAXALW': 2509777.0, 'GROSS_TOTAL': 26048725.0, 'GROSS': 25097777.0, 'JHT': -400000.0, 'BPJS_KESEHATAN_DED': -120000.0, 'JP': -105474.0, 'PPH21': -2509777.0, 'NET': 21374526.0}
@@ -572,12 +560,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 6, 1),
             date(2025, 6, 30)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_hr_payroll_structure_id_employee_salary_reimbursement_salary_rule').code: 5e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 5000000.0, 'BPJS_JKK': 12000.0, 'BPJS_JKM': 15000.0, 'BPJS_Kesehatan': 200000.0, 'JHT_COMP': 185000.0, 'JP_COMP': 100000.0, 'BASE_GROSS_UP': 5227000.0, 'TAXALW': 0.0, 'GROSS_TOTAL': 6012000.0, 'GROSS': 5227000.0, 'JHT': -100000.0, 'BPJS_KESEHATAN_DED': -50000.0, 'JP': -50000.0, 'PPH21': 0.0, 'REIMBURSEMENT': 500000.0, 'NET': 5300000.0}
@@ -592,12 +579,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 6, 1),
             date(2025, 6, 30)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_meal_allowance').code: 1000000,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 2000000.0, 'MEAL': 1000000.0, 'BPJS_JKK': 4800.0, 'BPJS_JKM': 6000.0, 'BPJS_Kesehatan': 80000.0, 'JHT_COMP': 74000.0, 'JP_COMP': 40000.0, 'BASE_GROSS_UP': 3090800.0, 'TAXALW': 0.0, 'GROSS_TOTAL': 3204800.0, 'GROSS': 3090800.0, 'JHT': -40000.0, 'BPJS_KESEHATAN_DED': -20000.0, 'JP': -20000.0, 'PPH21': 0.0, 'NET': 2920000.0}
@@ -612,13 +598,12 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 6, 1),
             date(2025, 6, 30)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_meal_allowance').code: 6e6,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_insurance').code: 5e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 1000000.0, 'INSURANCE': 500000.0, 'MEAL': 6000000.0, 'BPJS_JKK': 2400.0, 'BPJS_JKM': 3000.0, 'BPJS_Kesehatan': 40000.0, 'JHT_COMP': 37000.0, 'JP_COMP': 20000.0, 'BASE_GROSS_UP': 7545400.0, 'TAXALW': 114904.0, 'GROSS_TOTAL': 7717304.0, 'GROSS': 7660304.0, 'JHT': -20000.0, 'BPJS_KESEHATAN_DED': -10000.0, 'JP': -10000.0, 'PPH21': -114904.0, 'NET': 6960000.0}
@@ -633,12 +618,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 6, 1),
             date(2025, 6, 30)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_laptop').code: 3e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'BASIC': 5000000.0, 'LAPTOP': 300000.0, 'BPJS_Kesehatan': 200000.0, 'BASE_GROSS_UP': 5500000.0, 'TAXALW': 13784.0, 'GROSS_TOTAL': 5513784.0, 'GROSS': 5513784.0, 'BPJS_KESEHATAN_DED': -50000.0, 'PPH21': -13784.0, 'NET': 5250000.0}
@@ -654,12 +638,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 6, 30)
         )
 
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_laptop').code: 3e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 5000000.0, 'LAPTOP': 300000.0, 'BPJS_JKK': 12000.0, 'BPJS_JKM': 15000.0, 'JHT_COMP': 185000.0, 'JP_COMP': 100000.0, 'BASE_GROSS_UP': 5327000.0, 'TAXALW': 0.0, 'GROSS_TOTAL': 5612000.0, 'GROSS': 5327000.0, 'JHT': -100000.0, 'JP': -50000.0, 'PPH21': 0.0, 'NET': 5150000.0}
@@ -673,12 +656,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 6, 30)
         )
 
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: False,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_laptop').code: 3e5,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'BASIC': 10000000.0, 'LAPTOP': 300000.0, 'BASE_GROSS_UP': 10300000.0, 'TAXALW': 264102.0, 'GROSS_TOTAL': 10564102.0, 'GROSS': 10564102.0, 'PPH21': -264102.0, 'NET': 10300000.0}
@@ -693,12 +675,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 4, 1),
             date(2025, 4, 30)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_thr').code: 1e7,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 20000000.0, 'THR': 10000000.0, 'BPJS_JKK': 48000.0, 'BPJS_JKM': 60000.0, 'BPJS_Kesehatan': 480000.0, 'JHT_COMP': 740000.0, 'JP_COMP': 210948.0, 'BASE_GROSS_UP': 30588000.0, 'TAXALW': 5397882.0, 'GROSS_TOTAL': 36936830.0, 'GROSS': 35985882.0, 'JHT': -400000.0, 'BPJS_KESEHATAN_DED': -120000.0, 'JP': -105474.0, 'PPH21': -5397882.0, 'NET': 29374526.0}
@@ -825,12 +806,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
                 date(2025, i, drange[0]),
                 date(2025, i, drange[1])
             )
-            for code, value in {
+            slip._set_input_values({
                 self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
                 self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
                 self.env.ref('l10n_id_hr_payroll.salary_rule_id_transport_allowance').code: 2e6,
-            }.items():
-                slip._set_input_value(code, value)
+            })
             slip.compute_sheet()
             slip.action_payslip_done()
 
@@ -838,12 +818,11 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 12, 1),
             date(2025, 12, 31)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.salary_rule_id_transport_allowance').code: 2e6,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_BPJS_KES': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 20000000.0, 'TRANSPORT_ALW': 2000000.0, 'BPJS_JKK': 48000.0, 'BPJS_JKM': 60000.0, 'BPJS_Kesehatan': 480000.0, 'JHT_COMP': 740000.0, 'JP_COMP': 210948.0, 'BASE_GROSS_UP': 22588000.0, 'TAXALW': -4453904.0, 'GROSS_TOTAL': 19085044.0, 'GROSS': 18134096.0, 'JHT': -400000.0, 'BPJS_KESEHATAN_DED': -120000.0, 'JP': -105474.0, 'JABATAN': 1500000.0, 'JHT_JP': -1516422.0, 'PTKP': 54000000.0, 'PKP': 11313000.0, 'PPH21': 4453904.0, 'NET': 21374526.0}
         self._validate_payslip(payslip, payslip_results)
@@ -858,11 +837,10 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             date(2025, 1, 1),
             date(2025, 1, 31)
         )
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_jkk_jkm_salary_rule').code: True,
             self.env.ref('l10n_id_hr_payroll.l10n_id_include_bpjs_kesehatan_salary_rule').code: False,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'IN_BPJS_ARREARS': 1.0, 'IN_JKK_JKM': 1.0, 'BASIC': 11304347.83, 'BPJS_JKK': 27130.43, 'BPJS_JKM': 33913.04, 'JHT_COMP': 418260.87, 'JP_COMP': 200846.0, 'BASE_GROSS_UP': 11365391.31, 'TAXALW': 473557.0, 'GROSS_TOTAL': 12458055.18, 'GROSS': 11838948.31, 'JHT': -226086.96, 'JP': -100423.0, 'PPH21': -473557.0, 'NET': 10977837.87}

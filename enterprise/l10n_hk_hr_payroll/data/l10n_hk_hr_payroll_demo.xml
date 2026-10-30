@@ -79,6 +79,13 @@
         <field name="company_id" ref="base.demo_company_hk"/>
     </record>
 
+    <record id="hk_work_location" model="hr.work.location">
+            <field name="name">Hong Kong Office</field>
+            <field name="location_type">office</field>
+            <field name="address_id" ref="res_partner_hk_work_address"/>
+            <field name="company_id" ref="base.demo_company_hk"/>
+    </record>
+
     <record id="base.user_admin" model="res.users">
         <field name="company_ids" eval="[(4, ref('base.demo_company_hk'))]"/>
     </record>
@@ -249,6 +256,7 @@
         <field name="work_phone">9964 6983</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_anthony')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_hk_hr_payroll.res_partner_anthony"/>
+        <field name="work_location_id" ref="hk_work_location"/>
         <field name="company_id" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_anthony')).company_id"/>
         <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
         <field name="tz">Asia/Hong_Kong</field>
@@ -302,6 +310,7 @@
         <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_natalie.webp"/>
         <field name="work_phone">9932 4387</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_natalie')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="work_location_id" ref="hk_work_location"/>
         <field name="parent_id" ref="l10n_hk_hr_payroll.hr_employee_anthony"/>
         <field name="user_id" ref="l10n_hk_hr_payroll.user_natalie"/>
         <field name="company_id" ref="base.demo_company_hk"/>
@@ -351,6 +360,7 @@
         <field name="image_1920" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_david.webp"/>
         <field name="work_phone">9123 4567</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_david_lee')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="work_location_id" ref="hk_work_location"/>
         <field name="parent_id" ref="l10n_hk_hr_payroll.hr_employee_anthony"/>
         <field name="company_id" ref="base.demo_company_hk"/>
         <field name="tz">Asia/Hong_Kong</field>
@@ -400,6 +410,7 @@
         <field name="image_1920" type="bytes" file="base/static/img/res_partner_address_32.webp"/>
         <field name="work_phone">98762345</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_hk_hr_payroll.res_partner_rebecca_wong')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="work_location_id" ref="hk_work_location"/>
         <field name="parent_id" ref="l10n_hk_hr_payroll.hr_employee_anthony"/>
         <field name="company_id" ref="base.demo_company_hk"/>
         <field name="tz">Asia/Hong_Kong</field>
@@ -457,16 +468,6 @@
         <!-- These fields are required in draft, so we fill them with random data to avoid it affecting user testing. -->
         <field name="lease_agreement_file" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.webp"/>
         <field name="stamped_duty_file" type="bytes" file="l10n_hk_hr_payroll/static/img/employee_anthony.webp"/>
-    </record>
-
-    <!-- PUBLIC HOLIDAYS -->
-    <record id="demo_public_holiday" model="resource.calendar.leaves">
-        <field name="name">That public holiday everyone is looking forward to</field>
-        <field name="company_id" ref="base.demo_company_hk" />
-        <field name="calendar_id" ref="calendar_hk"/>
-        <field name="date_from" eval="time.strftime('%Y-%m-01 00:00:00')" />
-        <field name="date_to" eval="time.strftime('%Y-%m-01 09:00:00')" />
-        <field name="work_entry_type_id" ref="hr_work_entry.l10n_hk_work_entry_type_statutory_holiday" />
     </record>
 
     <!-- LEAVE ALLOCATION -->

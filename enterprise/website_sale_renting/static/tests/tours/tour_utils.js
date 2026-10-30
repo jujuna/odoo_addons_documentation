@@ -3,7 +3,7 @@ import { Time } from "@web/core/l10n/time";
 import { session } from "@web/session";
 
 export function getFutureDate(days) {
-    return luxon.DateTime.now().set({ weekday: 1 }).plus({ weeks: 1, days });
+    return luxon.DateTime.now().set({ weekday: 1 }).plus({ weeks: 2, days });
 }
 
 /**

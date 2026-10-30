@@ -192,6 +192,63 @@ class TestPerformance(TestBelgiumCommon, AccountTestInvoicingCommon):
 
     @users('admin')
     @warmup
+    def test_regularised_onss_contributions_query_count(self):
+        structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')
+        payslips = self.env['hr.payslip'].create([{
+            'name': 'Previous quarter payslip',
+            'employee_id': self.employees[0].id,
+            'version_id': self.contracts[0].id,
+            'company_id': self.company.id,
+            'struct_id': structure.id,
+            'date_from': date(2020, 7, 1),
+            'date_to': date(2020, 7, 31),
+        }, {
+            'name': 'Current quarter payslip',
+            'employee_id': self.employees[0].id,
+            'version_id': self.contracts[0].id,
+            'company_id': self.company.id,
+            'struct_id': structure.id,
+            'date_from': self.date_from,
+            'date_to': self.date_to,
+        }])
+        previous_payslip, current_payslip = payslips
+        rules_by_code = {
+            rule.code: rule
+            for rule in structure.rule_ids
+            if rule.code in {'SALARY', 'ONSSEMPLOYER_253', 'ONSSEMPLOYER_255'}
+        }
+        self.env['hr.payslip.line'].create([{
+            'name': rules_by_code[code].name,
+            'code': code,
+            'salary_rule_id': rules_by_code[code].id,
+            'slip_id': previous_payslip.id,
+            'total': total,
+        } for code, total in {'SALARY': 1000, 'ONSSEMPLOYER_253': 2, 'ONSSEMPLOYER_255': 3}.items()])
+
+        result_rules = current_payslip._get_localdict()['result_rules']
+        result_rules['SALARY']['total'] = 2000
+        quarter_totals = {}
+        onss_basis_uplift = current_payslip._l10n_be_get_onss_basis_uplift()
+
+        # Both contributions share one query for the earlier payslip's ONSS lines in the same quarter.
+        with self.assertQueryCount(1):
+            contribution_253 = current_payslip._get_regularised_onss_contribution_amount(
+                'ONSSEMPLOYER_253', 1, result_rules, previous_payslip, quarter_totals, ['SALARY'])
+            contribution_255 = current_payslip._get_regularised_onss_contribution_amount(
+                'ONSSEMPLOYER_255', 2, result_rules, previous_payslip, quarter_totals, ['SALARY'])
+
+        quarter_basis = 3000 * onss_basis_uplift
+        self.assertEqual(contribution_253, round(quarter_basis * 0.01, 2) - 2)
+        self.assertEqual(contribution_255, round(quarter_basis * 0.02, 2) - 3)
+
+        for quarter_base in (1500, 0):
+            contribution = current_payslip._get_regularised_onss_contribution_amount(
+                'ONSSEMPLOYER_253', 1, result_rules, previous_payslip, quarter_totals, ['SALARY'], quarter_base=quarter_base)
+            expected = current_payslip._get_onss_contribution_amount(quarter_base, 1) - 2
+            self.assertEqual(contribution, expected)
+
+    @users('admin')
+    @warmup
     def test_performance_l10n_be_payroll_whole_flow(self):
         # Work entry generation
         with self.assertQueryCount(admin=1800):
@@ -217,7 +274,7 @@ class TestPerformance(TestBelgiumCommon, AccountTestInvoicingCommon):
             _logger.info("Payslips Creation: --- %s seconds ---", time.time() - start_time)
 
         # Payslip Computation
-        with self.assertQueryCount(admin=1215):
+        with self.assertQueryCount(admin=1664):
             start_time = time.time()
             payslips.compute_sheet()
             # --- 9.298089027404785 seconds ---
@@ -271,7 +328,7 @@ class TestPerformance(TestBelgiumCommon, AccountTestInvoicingCommon):
             _logger.info("Declaration 281.xx XML:--- %s seconds ---", time.time() - start_time)
         self.assertEqual(declaration_281_xx.state, 'ready', declaration_281_xx.error_message)
 
-        with self.assertQueryCount(admin=2444):
+        with self.assertQueryCount(admin=2943):
             start_time = time.time()
             declaration_281_10.line_ids.write({
                 'pdf_to_generate': True,
@@ -281,7 +338,7 @@ class TestPerformance(TestBelgiumCommon, AccountTestInvoicingCommon):
             # --- X seconds ---
             _logger.info("Declaration 281.10 PDF:--- %s seconds ---", time.time() - start_time)
 
-        with self.assertQueryCount(admin=2124):
+        with self.assertQueryCount(admin=2627):
             start_time = time.time()
             declaration_281_45.line_ids.write({
                 'pdf_to_generate': True,
@@ -298,7 +355,7 @@ class TestPerformance(TestBelgiumCommon, AccountTestInvoicingCommon):
         })
         individual_accounts.action_generate_declarations()
         self.assertEqual(len(individual_accounts.line_ids), self.EMPLOYEES_COUNT)
-        with self.assertQueryCount(admin=1621):
+        with self.assertQueryCount(admin=2650):
             start_time = time.time()
             individual_accounts.line_ids.write({
                 'pdf_to_generate': True,
@@ -313,7 +370,7 @@ class TestPerformance(TestBelgiumCommon, AccountTestInvoicingCommon):
             'date_from': self.date_from + relativedelta(day=1, month=1),
             'date_to': self.date_from + relativedelta(day=31, month=12),
         })
-        with self.assertQueryCount(admin=167):
+        with self.assertQueryCount(admin=187):
             start_time = time.time()
             social_security_certificate.print_report()
             # --- 0.4724118709564209 seconds ---

@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-17 22:42+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-19 11:33+0000\n"
 "Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-20/"
 "appointment/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -1047,6 +1047,56 @@ msgid ""
 msgstr ""
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"calendar_today\" aria-label=\"Booked\" "
+"title=\"Booked\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Booked</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"check\" aria-label=\"Attended\" "
+"title=\"Attended\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Attended</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"close\" aria-label=\"Cancelled\" "
+"title=\"Cancelled\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Cancelled</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<i class=\"oi oi-fw\" data-icon=\"map\" title=\"Google Reserve\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"schedule\" aria-label=\"Request\" "
+"title=\"Request\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Request</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"visibility_off\" aria-label=\"No Show\" "
+"title=\"No Show\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"No Show</span>"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
 msgid ""
 "<i class=\"oi oi-stack oi-filled flex-shrink-0 rounded-1 text-muted text-"
@@ -1168,6 +1218,11 @@ msgstr "<span>podle návštěvníka</span>"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<span>people</span>"
 msgstr "<span>osoby</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<span>to get restaurant bookings through Google Maps and Search.</span>"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -1647,6 +1702,8 @@ msgid ""
 "Appointment {{ 'Booked' if object.appointment_status == 'booked' else "
 "'Reserved' }}: {{ object.appointment_type_id.name }}"
 msgstr ""
+"Appointment {{ 'Rezervováno' if object.appointment_status == 'booked' else "
+"'Rezervováno' }}: {{ object.appointment_type_id.name }}"
 
 #. module: appointment
 #: model:mail.template,name:appointment.appointment_booking_mail_template
@@ -2662,12 +2719,6 @@ msgid "Does not repeat"
 msgstr ""
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Done"
-msgstr ""
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Drag blocks here to add them on all appointments"
 msgstr "Přetáhněte bloky sem, abyste je přidali ke všem schůzkám"
@@ -2732,6 +2783,11 @@ msgstr "Email*"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Emails & SMS"
 msgstr "E-maily a SMS"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Enable Google Reserve"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -2875,6 +2931,11 @@ msgstr "Vraťte se na úvodní stránku Schůzek."
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Go back to the previous screen."
 msgstr "Vraťte se na předchozí obrazovku."
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Google Bookings"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -4064,6 +4125,12 @@ msgid "Saturday"
 msgstr "Sobota"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Save & copy URL"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Save &amp; Pick Slots"
 msgstr ""
@@ -4440,9 +4507,12 @@ msgid "Starts with"
 msgstr "Začíná s"
 
 #. module: appointment
+#. odoo-python
+#: code:addons/appointment/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_tree_booking
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 msgid "Status"
 msgstr "Stav"
 

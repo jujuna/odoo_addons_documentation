@@ -5,7 +5,7 @@ from odoo import fields, models
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    agent_ids = fields.One2many("ai.agent", inverse_name="partner_id")
+    agent_ids = fields.One2many("ai.agent", inverse_name="partner_id", context={"active_test": False})
 
     def _store_im_status_fields(self, res):
         super()._store_im_status_fields(res)

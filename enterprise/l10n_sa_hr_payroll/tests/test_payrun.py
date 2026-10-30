@@ -26,6 +26,10 @@ class TestSaudiPayrun(TestSACommon):
             'date_start': date(2026, 6, 1),
             'date_end': date(2026, 6, 30),
         })
+
+        self.assertEqual(payrun.l10n_sa_total_gosi_contribution, 0)
+        self.assertEqual(payrun.l10n_sa_total_net_cost, 0)
+
         payslip1 = self.env['hr.payslip'].create({
             'payslip_run_id': payrun.id,
             'employee_id': self.saudi_employee.id,

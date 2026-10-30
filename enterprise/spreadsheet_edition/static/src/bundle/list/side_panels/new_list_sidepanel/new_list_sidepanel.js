@@ -48,15 +48,14 @@ export class NewListSidePanel extends Component {
     }
 
     async _getList() {
-        const { fields, views } = await this.viewService.loadViews({
+        const { views, relatedModels } = await this.viewService.loadViews({
             resModel: this.state.model.technical,
             views: [[false, "list"]],
         });
-
         const archXmlDoc = parseXML(views.list.arch.replace(/&amp;nbsp;/g, nbsp));
         const archInfo = new ListArchParser().parse(
             archXmlDoc,
-            { [this.state.model.technical]: { fields } },
+            relatedModels,
             this.state.model.technical
         );
 

@@ -2,10 +2,12 @@
 
 from collections import defaultdict
 
+from requests.exceptions import RequestException
+
 from odoo import models, _
 
 from ..utils.zeep import Client
-from odoo.tools.zeep.exceptions import Fault
+from odoo.tools.zeep.exceptions import Fault, XMLSyntaxError
 from odoo.tools.zeep.wsse.username import UsernameToken
 
 MONSTER_WSDL_URI = 'https://schemas.monster.com/Current/WSDL/MonsterBusinessGateway.wsdl'
@@ -28,19 +30,19 @@ class HrRecruitmentPlatform(models.Model):
                     'Please set them in the company settings or ask your administrator.'
                 ),
             }
-        monster_soap_client = Client(
-            MONSTER_WSDL_URI,
-            wsse=UsernameToken(
-                username=username,
-                password=password,
-            ),
-        )
-
         for _i in range(3):
             # service can be down for a short time
             try:
+                # instantiating the client downloads and parses the WSDL
+                monster_soap_client = Client(
+                    MONSTER_WSDL_URI,
+                    wsse=UsernameToken(
+                        username=username,
+                        password=password,
+                    ),
+                )
                 monster_response = monster_soap_client.service.UpdateJobs(Job=data)
-            except TimeoutError:
+            except (TimeoutError, RequestException, XMLSyntaxError):
                 continue
             except (KeyError, ValueError):
                 return {

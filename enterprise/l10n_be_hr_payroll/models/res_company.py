@@ -42,9 +42,15 @@ class ResCompany(models.Model):
     l10n_be_cbe_inscription = fields.Date(string="CBE Inscription")
     l10n_be_temporary_car_option = fields.Boolean(string='Temporary Car Option')
     l10n_be_max_unused_cars = fields.Integer(string='Maximum unused cars')
+    # Deprecated: the cash register of the payroll settings (l10n_be_cash_register_active) is the same
     l10n_be_has_white_cash_register = fields.Boolean(
         string="White Cash Register",
         help="If checked, the company has a white cash register, which impacts the extra hours cap for CP302 employees in the 274.XX withholding tax exemption. The cap is raised from 300h to 360h.")
+
+    def _l10n_be_has_white_cash_register(self):
+        # The registered cash system of the hotel industry (white cash register) raises the overtime limits
+        self.ensure_one()
+        return self.l10n_be_cash_register_active or self.l10n_be_has_white_cash_register
 
     def _compute_l10n_be_has_employees(self):
         director_jc_id = self.env['l10n.be.joint.committee'].search([('egov3_code', '=', '999')], limit=1).id

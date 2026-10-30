@@ -1073,7 +1073,6 @@ class HrPayslip(models.Model):
                 'data/hr_rule_parameters_data.xml',
                 'data/hr_salary_rule_category_data.xml',
                 'data/hr_salary_rule_data.xml',
-                'data/hr_salary_rule_stub_data.xml',
                 'data/hr_swiss_work_entry_types.xml',
                 'data/hr_payroll_warning_data.xml',
             ])]

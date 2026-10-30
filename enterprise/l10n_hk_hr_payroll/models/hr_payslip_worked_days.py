@@ -10,7 +10,7 @@ class HrPayslipWorkedDays(models.Model):
 
     l10n_hk_leave_id = fields.Many2one('hr.leave', string='Leave', readonly=True)
 
-    @api.depends('is_paid', 'number_of_hours', 'payslip_id', 'version_id', 'payslip_id.sum_worked_hours', 'payslip_id.l10n_hk_average_daily_wage')
+    @api.depends('is_paid', 'number_of_hours', 'payslip_id', 'version_id', 'payslip_id.l10n_hk_average_daily_wage')
     def _compute_amount(self):
         hk_worked_days = self.filtered(lambda wd: wd.payslip_id.struct_id.country_id.code == "HK")
 

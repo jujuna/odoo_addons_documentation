@@ -17,6 +17,9 @@ from odoo.exceptions import UserError
 from odoo.fields import Domain
 from odoo.tools.misc import frozendict
 from odoo.tools.intervals import Intervals
+from odoo.addons.l10n_be_hr_payroll.models.hr_version import BIK_RULE_PARAMETERS
+
+from odoo.addons.l10n_be_hr_payroll.models.utils import MU_SERVICE_CODES
 
 
 class HrPayslip(models.Model):
@@ -77,18 +80,29 @@ class HrPayslip(models.Model):
         line_values = self._get_line_values(basic_codes, compute_sum=True)
         return sum(line_values[code]['sum']['total'] for code in basic_codes)
 
-    @api.depends('version_id.car_id.future_driver_id')
+    @api.depends('employee_id', 'date_from', 'date_to', 'version_id.car_id.future_driver_id')
     def _compute_vehicle_id(self):
         for slip in self.filtered(lambda s: s.state not in ['validated', 'cancel']):
             contract_sudo = slip.version_id.sudo()
-            if contract_sudo.car_id:
-                future_driver = contract_sudo.car_id.future_driver_id
+            car = contract_sudo.car_id
+            if slip.employee_id and slip.date_from and slip.date_to:
+                # a car changed during the period: the payslip takes the car of the most calendar days (the new
+                # one on a tie), which owes the CO2 contribution of the month
+                days_by_car = defaultdict(float)
+                versions_sudo = contract_sudo.browse(slip._get_period_contracts())
+                for version in versions_sudo.filtered(lambda v: v.transport_mode_car and v.car_id):
+                    days_by_car[version.car_id] += slip._get_be_contract_days_in_payslip_range_prorata(
+                        version.date_start, version.date_end)
+                if days_by_car:
+                    car = max(reversed(days_by_car), key=days_by_car.get)
+            if car:
+                future_driver = car.future_driver_id
                 if future_driver and future_driver == slip.employee_id.work_contact_id:
                     tmp_vehicle = self.env['fleet.vehicle'].search(
-                        [('driver_id', '=', contract_sudo.car_id.future_driver_id.id)], limit=1)
+                        [('driver_id', '=', future_driver.id)], limit=1)
                     slip.vehicle_id = tmp_vehicle
                 else:
-                    slip.vehicle_id = contract_sudo.car_id
+                    slip.vehicle_id = car
 
     @api.depends('employee_id', 'version_id', 'struct_id', 'date_from', 'date_to')
     def _compute_input_line_ids(self):
@@ -244,6 +258,34 @@ class HrPayslip(models.Model):
         ])
         return fiscal_period | pay_period
 
+    def _l10n_be_filter_economic_unemployment(self):
+        # Read from the worked days instead of loading every worked day line of every payslip
+        payslip_ids = {payslip.id for payslip, in self.env['hr.payslip.worked_days']._read_group(
+            [('payslip_id', 'in', self.ids), ('work_entry_type_id.l10n_be_economic_unemployment', '=', True)],
+            ['payslip_id'],
+        )}
+        return self.filtered(lambda payslip: payslip.id in payslip_ids)
+
+    @api.model
+    def _l10n_be_get_overtime_category(self):
+        # The category of the work entry types of the overtime giving right to the legal overtime premium,
+        # voluntary overtime and overtime to recover included, for the 274.44/274.55 exemptions and the box 18 of
+        # the 281.10. Overtime to recover gives right to its premium as well: its pay is the premium, the base hours
+        # are paid when they are recovered. A part-timer's additional hours paid with a premium of 50 % or more
+        # (003.12, 003.08) are overtime too. A copy of these work entry types keeps the category.
+        # Called for each payslip from its salary rules: the id is cached, env.ref would check its existence.
+        return self.env['hr.salary.rule.category'].browse(
+            self.env['ir.model.data']._xmlid_to_res_id('l10n_be_hr_payroll.OVERTIME_TAX_RELIEF'))
+
+    def _l10n_be_filter_remuneration_form(self, form):
+        """Payslips whose remunerations are declared on the 281.10 (employees), 281.20 (company directors) or
+        281.30 (other directors), and their withholding taxes on the 274.10, 274.20 or 274.30."""
+        def get_form(payslip):
+            if payslip.version_id.l10n_be_include_employee_in_281_30:
+                return '281.30'
+            return '281.20' if payslip.version_id.l10n_be_joint_committee_id.egov3_code == '999' else '281.10'
+        return self.filtered(lambda payslip: get_form(payslip) == form)
+
     @api.model
     def _l10n_be_get_fiscal_line_domain(self, date_from, date_to):
         """Payslip lines a fiscal declaration covering [date_from, date_to] must add up.
@@ -360,6 +402,7 @@ class HrPayslip(models.Model):
         ])
         wanted_line_codes = (
             'WITHHOLDING_TAX_EX_274_32', 'WITHHOLDING_TAX_EX_274_33', 'WITHHOLDING_TAX_EX_274_34',
+            "WITHHOLDING_TAX_EX_274_44", "WITHHOLDING_TAX_EX_274_55", "WITHHOLDING_TAX_EX_274_62", "WITHHOLDING_TAX_EX_274_81",
             'T_WITHHOLDING_TAX_EX_274_74', 'WITHHOLDING_TAX_EX_274_74', 'T_WITHHOLDING_TAX_EX_274_75', 'WITHHOLDING_TAX_EX_274_75', 'PPTOTAL',
         )
         common_localdict['l10n_be_exemptions_month_payslips'] = all_month_exemption_payslips
@@ -381,11 +424,12 @@ class HrPayslip(models.Model):
             for payslip, month_payslips in common_localdict['l10n_be_month_payslips_by_payslip'].items()
         }
 
-        # DPV optimization: prefetch previous year work entries once for the whole batch
-        be_dpv_payslips = be_payslips.filtered(lambda p: p.struct_id.code == "CP200DOUBLE")
+        # DPV optimization: prefetch previous year work entries once for the whole batch. Each payslip reads the
+        # entries of its employee: only when the payslips are of the same year, else each one generates its own.
+        be_dpv_payslips = be_payslips.filtered(lambda p: p.struct_id.code == "BEDOUBLE")
         entries_by_employee = defaultdict(list)
-        if be_dpv_payslips:
-            year = min(be_dpv_payslips.mapped("date_from")).year - 1
+        if be_dpv_payslips and len({p.date_from.year for p in be_dpv_payslips}) == 1:
+            year = be_dpv_payslips[0].date_from.year - 1
             date_from = date(year, 1, 1)
             date_to = date(year, 12, 31)
             previous_year_work_entries = be_dpv_payslips.employee_id.version_ids.filtered('resource_calendar_id').generate_work_entries(date_from, date_to)
@@ -437,17 +481,17 @@ class HrPayslip(models.Model):
                 ['total:sum'],
             ):
                 ip_totals_by_employee_year[employee.id, year_start.year] += total
-        common_localdict['l10n_be_ip_year_total_by_payslip'] = {
-            payslip: ip_totals_by_employee_year[payslip.employee_id.id, payslip.date_to.year]
-            for payslip in ip_payslips
+        common_localdict['l10n_be_ip_data_by_payslip'] = {
+            payslip: {
+                'year_total': ip_totals_by_employee_year[payslip.employee_id.id, payslip.date_to.year],
+                'previous_years_average': sum(
+                    ip_totals_by_employee_year[payslip.employee_id.id, payslip.date_to.year - n]
+                    for n in range(1, 5)
+                ) / 4,
+            }
+            for payslip in be_payslips
         }
-        common_localdict['l10n_be_ip_previous_years_average_by_payslip'] = {
-            payslip: sum(
-                ip_totals_by_employee_year[payslip.employee_id.id, payslip.date_to.year - n]
-                for n in range(1, 5)
-            ) / 4
-            for payslip in ip_payslips
-        }
+        common_localdict['l10n_be_quarter_totals_by_payslip'] = {payslip: {} for payslip in be_payslips}
 
         # Compute mobility amounts once for the whole batch to avoid per-payslip queries
         common_localdict['l10n_be_mobility_amounts_by_payslip'] = be_payslips._get_l10n_be_mobility_amounts()
@@ -514,15 +558,6 @@ class HrPayslip(models.Model):
         self.ensure_one()
         return sum(
             line.number_of_hours
-            for line in self.worked_days_line_ids
-            if category_code in line.category_options_ids._get_codes_with_ancestors()
-        )
-
-    def _get_l10n_be_category_option_amount(self, category_code):
-        """Same as ``_get_l10n_be_category_option_hours`` but summing the worked day line amount."""
-        self.ensure_one()
-        return sum(
-            line.amount
             for line in self.worked_days_line_ids
             if category_code in line.category_options_ids._get_codes_with_ancestors()
         )
@@ -731,7 +766,8 @@ class HrPayslip(models.Model):
             # The granted amount depends on the weekly working time, which may change
             # from one version to the next, so each version is prorated on its own
             # (with its own work time rate and its own valid/invalid working days).
-            theoretical_days_by_calendar = {}
+            theoretical_days_by_calendar = {}  # calendar: its theoretical working dates
+            jc_amount = 0
             for version in jc_versions.sorted('date_start'):
                 work_time_rate = version.work_time_rate
                 # skip versions with 0% work time rate such as full parental time off or credit time
@@ -749,9 +785,11 @@ class HrPayslip(models.Model):
                     work_entries_vals_by_version[version.id], unpaid_work_entry_types, neutral_codes)
                 calendar = version.resource_calendar_id
                 if calendar not in theoretical_days_by_calendar:
-                    theoretical_days_by_calendar[calendar] = self._get_eco_vouchers_theoretical_working_days(
+                    theoretical_days_by_calendar[calendar] = self._get_eco_vouchers_theoretical_working_dates(
                         calendar, jc_ref_start, jc_ref_end)
-                theoretical_days = theoretical_days_by_calendar[calendar]
+                # a public holiday registered for the employee alone is no more a working day than one of the calendar
+                theoretical_days = len(theoretical_days_by_calendar[calendar] - self._get_eco_vouchers_public_holiday_dates(
+                    work_entries_vals_by_version[version.id]))
 
                 if 'amount_from_rate' in jc_config:
                     amount = jc_config['amount_from_rate'][-1][1]
@@ -760,8 +798,11 @@ class HrPayslip(models.Model):
                             amount = rate_amount
                             break
                     if theoretical_days:
-                        total_amount += max(0, (valid_days / theoretical_days) * amount)
+                        jc_amount += max(0, (valid_days / theoretical_days) * amount)
                 elif jc_code == '302':
+                    # the Horeca agreement leaves out the students' contracts on the solidarity contribution
+                    if version.is_student():
+                        continue
                     # - Full-time: 250 * complete_months/12 + 250 * partial_working_days/divisor
                     # - Part-time: 250 * working_days/divisor
                     # Divisor: 260 for 5-day week, 312 for 6-day week (company reference).
@@ -819,10 +860,17 @@ class HrPayslip(models.Model):
                         # captures how many distinct days/week the employee works.
                         working_days = max(0, _count_working_days(version_from, version_to) - invalid_days)
                         amount = max_amount * working_days / divisor
-                    total_amount += max(0, min(amount, max_amount))
+                    jc_amount += max(0, min(amount, max_amount))
                 else:
                     if theoretical_days:
-                        total_amount += max(0, (valid_days / theoretical_days) * jc_config['max_amount'] * min(1, work_time_rate))
+                        jc_amount += max(0, (valid_days / theoretical_days) * jc_config['max_amount'] * min(1, work_time_rate))
+            # one reference period never grants more than the joint committee's full amount, whatever the versions and
+            # their calendars (a calendar planned day by day schedules only its own days)
+            if 'amount_from_rate' in jc_config:
+                jc_max_amount = max(rate_amount for dummy, rate_amount in jc_config['amount_from_rate'])
+            else:
+                jc_max_amount = jc_config['max_amount']
+            total_amount += min(jc_amount, jc_max_amount)
 
         explanation_info = {
             'jc_codes': ', '.join(matching_jc_codes),
@@ -836,26 +884,37 @@ class HrPayslip(models.Model):
 
         A date carrying a non neutral work entry is a working day: it is valid
         when actually worked or covered by an assimilated absence (sick time
-        off, paid time off, maternity, ...), invalid when covered by a non
-        assimilated (unpaid) absence. Neutral entries (public holidays,
-        structural reductions such as credit time) are not working days at all,
-        like week-ends.
+        off, paid time off, maternity, ...), even partly (a partial resumption
+        of work), invalid when only covered by non assimilated (unpaid)
+        absences. Neutral entries (public holidays, structural reductions such
+        as credit time) are not working days at all, like week-ends.
 
         :return: (valid working days, invalid working days)
         """
         working_dates = set()
-        unpaid_dates = set()
+        valid_dates = set()
         for vals in work_entries_vals:
             work_entry_type = vals.get('work_entry_type_id')
             if not work_entry_type or work_entry_type.code in neutral_codes:
                 continue
             working_dates.add(vals['date'])
-            if work_entry_type in unpaid_work_entry_types:
-                unpaid_dates.add(vals['date'])
-        return len(working_dates - unpaid_dates), len(unpaid_dates)
+            if work_entry_type not in unpaid_work_entry_types:
+                valid_dates.add(vals['date'])
+        return len(valid_dates), len(working_dates - valid_dates)
+
+    def _get_eco_vouchers_public_holiday_dates(self, work_entries_vals):
+        """ The dates of the public holidays the work entries carry, those of the calendar and those registered for
+        the employee alone (a replacement day): neither worked nor theoretical working days. """
+        return {
+            vals['date'] for vals in work_entries_vals
+            if vals.get('work_entry_type_id') and vals['work_entry_type_id'].code == '006.00'
+        }
 
     def _get_eco_vouchers_theoretical_working_days(self, calendar, date_from, date_to):
-        """ Number of days the calendar theoretically schedules real work over
+        return len(self._get_eco_vouchers_theoretical_working_dates(calendar, date_from, date_to))
+
+    def _get_eco_vouchers_theoretical_working_dates(self, calendar, date_from, date_to):
+        """ The days the calendar theoretically schedules real work over
         ``[date_from, date_to]``: week-ends, public holidays (through the
         calendar global leaves) and structural slots (e.g. credit time) are
         excluded, so that the result is directly comparable with the working
@@ -867,35 +926,29 @@ class HrPayslip(models.Model):
             datetime.combine(date_from, time.min).replace(tzinfo=UTC),
             datetime.combine(date_to, time.max).replace(tzinfo=UTC),
         )[False]
-        return len({
+        return {
             start.date()
             for start, dummy, attendances in work_intervals
             if any(
                 not attendance.work_entry_type_id or attendance.work_entry_type_id.count_as == 'working_time'
                 for attendance in attendances
             )
-        })
+        }
 
-    def _get_l10n_be_max_seizable_amount(self, expected_net, localdict):
+    def _get_l10n_be_max_seizable_amount(self, expected_net):
         # Source: https://emploi.belgique.be/fr/themes/remuneration/protection-de-la-remuneration/saisie-et-cession-sur-salaires
         self.ensure_one()
-        if localdict.get('l10n_be_max_seizable_amount', False):
-            return localdict['l10n_be_max_seizable_amount']
         rates = self.env['hr.rule.parameter']._get_parameter_from_code('seizable_percentages', self.date_to, raise_if_not_found=False)
         child_increase = self.env['hr.rule.parameter']._get_parameter_from_code('seizable_amount_child', self.date_to, raise_if_not_found=False)
         if not rates or not child_increase:
-            localdict['l10n_be_max_seizable_amount'] = expected_net
             return expected_net
         dependent_children = self.employee_id.l10n_be_dependent_children_attachment
         max_seizable_amount = 0
-        for left, right, rate in rates:
-            if dependent_children:
-                left += dependent_children * child_increase
-                right += dependent_children * child_increase
-            if left <= expected_net:
-                max_seizable_amount += (min(expected_net, right) - left) * rate
-        localdict['l10n_be_max_seizable_amount'] = max_seizable_amount
-        return max_seizable_amount
+        lower_bound = 0
+        for _left, right, rate in rates:
+            max_seizable_amount += max(0, min(expected_net, right) - lower_bound) * rate
+            lower_bound = right
+        return max(0, max_seizable_amount - dependent_children * child_increase)
 
     @api.depends("date_from", "employee_id.marital")
     def _compute_effective_marital(self):
@@ -927,6 +980,16 @@ class HrPayslip(models.Model):
             return version._get_reference_calendar()
         return super()._get_out_of_contract_calendar(version)
 
+    def _get_out_of_period_duration(self, start, stop, reference_calendar):
+        if reference_calendar.calendar_type == 'variable' and reference_calendar.hours_per_week \
+                and not reference_calendar.attendance_ids.filtered('recurrency'):
+            # a schedule planned day by day plans nothing outside the contract: the days of its regime (Monday to
+            # Friday or Saturday) at the hours of its week
+            weekdays = 6 if reference_calendar.days_per_week > 5 else 5
+            days = sum(1 for day in rrule.rrule(rrule.DAILY, dtstart=start.date(), until=stop.date()) if day.weekday() < weekdays)
+            return {'days': days, 'hours': reference_calendar.hours_per_week / weekdays * days}
+        return super()._get_out_of_period_duration(start, stop, reference_calendar)
+
     def _get_worked_day_lines_values(self, version, work_entries_vals):
         self.ensure_one()
         res = []
@@ -951,7 +1014,7 @@ class HrPayslip(models.Model):
             res.append(attendance_line)
         return res
 
-    def _l10n_be_get_loss_on_commission_amount_public_holiday(self, localdict):
+    def _l10n_be_get_loss_on_commission_amount_public_holiday(self, result_rules):
         self.ensure_one()
         first_contract_date = self.employee_id._get_first_contract_date()
         if not self.version_id.commission_on_target or not first_contract_date:
@@ -964,7 +1027,7 @@ class HrPayslip(models.Model):
 
         if first_contract_date.year == self.date_from.year and first_contract_date.month == self.date_from.month:
             # If employee joined during current month, average variable salary = commissions / # worked days
-            commissions = localdict['result_rules']['COMMISSION']['total'] + localdict['result_rules']['COMMISSION_ADV']['total']
+            commissions = result_rules['COMMISSION']['total'] + result_rules['COMMISSION_ADV']['total']
             worked_days = worked_day_line_values['002.00']['sum']['number_of_days']
             return (commissions / worked_days) * public_holiday_number_of_days if worked_days else 0
         elif first_contract_date.year == self.date_from.year:
@@ -1016,7 +1079,9 @@ class HrPayslip(models.Model):
         if force_avg_variable_revenues:
             return force_avg_variable_revenues
 
-        versions = self.employee_id.version_ids.filtered(lambda v: v.structure_type_id == self.struct_id.type_id)
+        versions = self.employee_id.version_ids.filtered(lambda v:
+            v.contract_date_start and v.structure_type_id == self.struct_id.type_id
+        )
         if not versions:
             return 0.0
 
@@ -1195,7 +1260,8 @@ class HrPayslip(models.Model):
                 worked_days_data[code][payslip.id]['number_of_hours'] for code in additional_hours_codes)
             if not has_additional_hours:
                 continue
-            payslip.l10n_be_sum_additional_hours = worked_days_data['003.00'][payslip.id]['number_of_hours']
+            payslip.l10n_be_sum_additional_hours = float_round(
+                worked_days_data['003.00'][payslip.id]['number_of_hours'], precision_digits=2)
 
             public_leaves = payslip.version_id.resource_calendar_id.global_leave_ids.filtered(
                 lambda leave: leave.work_entry_type_id.code == '006.00')
@@ -1212,6 +1278,9 @@ class HrPayslip(models.Model):
 
             work_entries_vals_by_date = defaultdict(float)
             work_entries_vals_by_week = defaultdict(float)
+            # The maxima concern the additional hours: they are only checked on the days and weeks that carry some.
+            additional_hours_dates = set()
+            additional_hours_weeks = set()
 
             for entry in work_entries_vals:
                 if entry['work_entry_type_id'].count_as == 'absence' or entry['work_entry_type_id'].code in overtime_codes:
@@ -1219,12 +1288,15 @@ class HrPayslip(models.Model):
 
                 _, week_number, _ = entry['date'].isocalendar()
                 work_entries_vals_by_week[week_number] += entry['duration']
+                if entry['work_entry_type_id'].code in additional_hours_codes:
+                    additional_hours_weeks.add(week_number)
 
                 if entry['date'] < payslip.date_from:
                     continue
 
                 work_entries_vals_by_date[entry['date']] += entry['duration']
                 if entry['work_entry_type_id'].code in additional_hours_codes:
+                    additional_hours_dates.add(entry['date'])
                     entry_version = entry.get('version_id')
 
                     effective_version = entry_version if entry_version else payslip.version_id
@@ -1239,7 +1311,8 @@ class HrPayslip(models.Model):
                     )
 
                     if standard_work_duration_on_date > 0:
-                        for leave in entry['leave_ids']:
+                        # only the entries of a time off carry it, not those of a calendar leave
+                        for leave in entry.get('leave_ids', ()):
                             leave_start = fields.Datetime.to_datetime(leave.date_from).replace(tzinfo=UTC)
                             leave_end = fields.Datetime.to_datetime(leave.date_to).replace(tzinfo=UTC)
 
@@ -1249,15 +1322,20 @@ class HrPayslip(models.Model):
                                 payslip.l10n_be_additional_hours_during_working_time = True
                                 break
 
+                    # Within the monthly credit, additional hours carry no supplement, whatever the day. Beyond it,
+                    # they carry the overtime one, raised from +50% to +100% on a Sunday or a public holiday (royal
+                    # decree of 25 June 1990, art. 3; labour law, art. 29 § 1). Plain hours beyond the credit are
+                    # the monthly check's.
                     is_sunday_or_public_holiday = entry['date'].weekday() == 6 or entry['date'] in public_holidays_dates
-                    if is_sunday_or_public_holiday and entry['work_entry_type_id'].code != '003.08':
+                    if is_sunday_or_public_holiday and entry['work_entry_type_id'].code == '003.12':
                         payslip.l10n_be_wrong_additional_hours_on_sundays_or_public_holidays = True
 
             day_limit = 9
             week_limit = payslip.version_id.reference_calendar_id.full_time_required_hours if payslip.version_id.reference_calendar_id else 40
-            if any(d > day_limit for d in work_entries_vals_by_date.values()):
+            # the durations of the entries are floats: 4 h + 4 h 40 + 20 min add up to 9.000000000000002
+            if any(float_compare(work_entries_vals_by_date[d], day_limit, precision_digits=2) > 0 for d in additional_hours_dates):
                 payslip.l10n_be_working_hours_limit_per_day_exceeded = True
-            if any(w > week_limit for w in work_entries_vals_by_week.values()):
+            if any(float_compare(work_entries_vals_by_week[w], week_limit, precision_digits=2) > 0 for w in additional_hours_weeks):
                 payslip.l10n_be_working_hours_limit_per_week_exceeded = True
 
     def _l10n_be_get_work_entry_vals_by_date(self, date_from, date_to, work_entries=None):
@@ -1268,11 +1346,35 @@ class HrPayslip(models.Model):
             work_entries_vals_by_date[vals['date']].append(vals)
         return work_entries_vals_by_date
 
-    def _l10n_be_get_version_by_date(self, date_from, date_to, versions):
+    def _l10n_be_get_public_holiday_dates(self, date_from, date_to, versions):
+        """ Days of the public holidays from the month of date_from to date_to, in the time zone of each version.
+        They are not worked days: e.g. starting on Monday 4 May 2026, after the 1st of May (Friday) and the weekend,
+        covers the whole month.
 
-        def is_less_or_first_work_day_of_month(calendar, d):
+        :return: {version: set of dates}
+        """
+        self.ensure_one()
+        public_holidays = self.employee_id._get_public_holidays(
+            date_from + relativedelta(day=1, days=-1), date_to + relativedelta(days=1))
+        dates_by_tz = defaultdict(set)
+        for tz_name in set(versions.mapped(lambda v: v._get_tz())):
+            tz = ZoneInfo(tz_name)
+            for leave in public_holidays:
+                start = leave.date_from.replace(tzinfo=UTC).astimezone(tz).date()
+                stop = leave.date_to.replace(tzinfo=UTC).astimezone(tz).date()
+                dates_by_tz[tz_name].update(day.date() for day in rrule.rrule(rrule.DAILY, dtstart=start, until=stop))
+        return {version: dates_by_tz[version._get_tz()] for version in versions}
+
+    def _l10n_be_get_version_by_date(self, date_from, date_to, versions):
+        self.ensure_one()
+        public_holiday_dates_by_version = self._l10n_be_get_public_holiday_dates(date_from, date_to, versions)
+
+        def works_on_date(calendar, public_holiday_dates, d):
+            return d not in public_holiday_dates and calendar._works_on_date(d)
+
+        def is_less_or_first_work_day_of_month(calendar, public_holiday_dates, d):
             current_date = date(d.year, d.month, 1)
-            while not calendar._works_on_date(current_date):
+            while not works_on_date(calendar, public_holiday_dates, current_date):
                 current_date += timedelta(days=1)
                 if current_date.month != d.month:
                     return False
@@ -1292,14 +1394,15 @@ class HrPayslip(models.Model):
                 date_to,
                 next_version_start - relativedelta(days=1),
             )
-            if is_less_or_first_work_day_of_month(calendar, date_start):
+            public_holiday_dates = public_holiday_dates_by_version[version]
+            if is_less_or_first_work_day_of_month(calendar, public_holiday_dates, date_start):
                 new_date_start = date_start - relativedelta(days=1)
-                while new_date_start.month == date_start.month and not calendar._works_on_date(new_date_start) and date_from <= new_date_start:
+                while new_date_start.month == date_start.month and not works_on_date(calendar, public_holiday_dates, new_date_start) and date_from <= new_date_start:
                     date_start = new_date_start
                     new_date_start -= relativedelta(days=1)
 
             new_date_end = date_end + relativedelta(days=1)
-            while not calendar._works_on_date(new_date_end) and new_date_end <= date_to and new_date_end < next_version_start:
+            while not works_on_date(calendar, public_holiday_dates, new_date_end) and new_date_end <= date_to and new_date_end < next_version_start:
                 date_end = new_date_end
                 new_date_end += relativedelta(days=1)
 
@@ -1330,6 +1433,7 @@ class HrPayslip(models.Model):
         company_avg_hours_per_day = self.version_id._get_reference_calendar().hours_per_day
 
         payslip_amount = 0
+        n_months = 0
 
         sick_work_entry_types = [
             self.env.ref('hr_work_entry.be_work_entry_type_sick_leave'),  # Sick Time Off
@@ -1373,7 +1477,7 @@ class HrPayslip(models.Model):
                         consecutive_work_days_counter = 0
                         leave_ids = self.env['hr.leave']
                         for vals in work_entries_vals_date:
-                            if vals['leave_ids']:
+                            if vals.get('leave_ids'):
                                 leave_ids |= vals['leave_ids']
                         if leave_ids:
                             current_date = max(leave_ids.mapped('date_to')).date() + relativedelta(days=1)
@@ -1408,6 +1512,7 @@ class HrPayslip(models.Model):
                     pfa_calendar_sick_days_remaining = max(0, pfa_calendar_sick_days_remaining - last_year_sick_calendar_days)
 
         version_by_date = self._l10n_be_get_version_by_date(date_from, date_to, versions)
+        public_holiday_dates_by_version = self._l10n_be_get_public_holiday_dates(date_from, date_to, versions)
         for year, versions_by_month in version_by_date.items():
             for month, version_by_day in versions_by_month.items():
 
@@ -1416,7 +1521,10 @@ class HrPayslip(models.Model):
                     if not version:
                         is_month_dropped = True
                         break
-                    is_calendar_day = version.resource_calendar_id._works_on_date(day)
+                    if day in public_holiday_dates_by_version[version]:
+                        is_calendar_day = False
+                    else:
+                        is_calendar_day = version.resource_calendar_id._works_on_date(day)
                     work_entries_vals_date = work_entries_vals_by_date.get(day)
                     if is_calendar_day and (not work_entries_vals_date or all(vals['work_entry_type_id'] in unpaid_work_entry_types for vals in work_entries_vals_date)):
                         is_month_dropped = True
@@ -1486,16 +1594,17 @@ class HrPayslip(models.Model):
                         work_time_rate = version.resource_calendar_id._l10n_be_get_work_time_rate_med_included(date_from, date_to, version._get_reference_calendar())
 
                     payslip_amount += ((n_days / days_in_month) / 12) * (fte_basic * work_time_rate)
+                    n_months += (n_days / days_in_month)
 
         first_version_date = self.employee_id._get_first_contract_date()
         if first_version_date.year == self.date_from.year and first_version_date.month >= 7:
-            return 0
-        return payslip_amount
+            return 0, 0
+        return payslip_amount, n_months
 
     def _l10n_be_get_sick_leave_twelve_months_cutoff_date(self, employee, reference_date):
         return employee._l10n_be_get_sick_leave_twelve_months_cutoff_date(reference_date)
 
-    def _compute_double_holiday_assimilated_months(self, date_from, date_to, versions, base_version=False, work_entries=None):
+    def _compute_double_holiday_assimilated_months(self, date_from, date_to, versions, base_version=False, work_entries=None, current_time_credit_rate=1.0):
         self.ensure_one()
 
         work_entries_vals_by_date = self._l10n_be_get_work_entry_vals_by_date(date_from, date_to, work_entries=work_entries)
@@ -1506,7 +1615,8 @@ class HrPayslip(models.Model):
 
         version_by_date = self._l10n_be_get_version_by_date(date_from, date_to, versions)
         number_of_months = 0
-        current_work_time_rate = (base_version or self.version_id).work_time_rate
+        # the months are weighed against the current occupation, the current time credit included: its pay is the base
+        current_work_time_rate = (base_version or self.version_id).work_time_rate * current_time_credit_rate
         twelve_months_sick_cutoff = self._l10n_be_get_sick_leave_twelve_months_cutoff_date(self.employee_id, date_to)
 
         for year, versions_by_month in version_by_date.items():
@@ -1547,6 +1657,8 @@ class HrPayslip(models.Model):
                     # Note: Should consider the real days to reflect on correct version
                     # instead of a arbitrary count for the month
                     month_deduction = max(month_deduction - actual_deduction, 0)
+                    if not n_days:
+                        continue  # the version's days of the month are all unassimilated
 
                     work_time_rate = min(1, version.work_time_rate / current_work_time_rate) if current_work_time_rate else 0
                     # Compute the real work time rate if partial incapacity. Partial incapacity should count in the work time rate in the PFA
@@ -1582,7 +1694,7 @@ class HrPayslip(models.Model):
                 return 0.0
             fixed_salary = self.version_id._get_contract_wage() * n_months / 12
         else:
-            fixed_salary = self._compute_13th_month_presence_prorated_fixed_wage(date_from, date_to, versions)
+            fixed_salary, n_months = self._compute_13th_month_presence_prorated_fixed_wage(date_from, date_to, versions)
 
         force_avg_variable_revenues = self._get_input_line_amount('VARIABLE')
         if force_avg_variable_revenues:
@@ -1592,7 +1704,8 @@ class HrPayslip(models.Model):
                 variable_revenue_date_from=self.date_from
             )._get_last_year_average_variable_revenues()
 
-        paid_amount = fixed_salary + avg_variable_revenues
+        # Fixed salary is already prorated according to n_months, no need to do it again
+        paid_amount = fixed_salary + (avg_variable_revenues * n_months / 12)
 
         # For sales representatives (CP200), there is a limit for the PFA
         if self.version_id.l10n_be_egov3_code == '200' and self.version_id.l10n_be_is_sale_representative:
@@ -2103,7 +2216,7 @@ class HrPayslip(models.Model):
             departure_reason_code == departures['fired']
             and not (
                 seniority_in_year >= timedelta(**fired_min_y_seniority)
-                or last_work_day >= self.employee_id.contract_date_start + relativedelta(**fired_min_contract_duration) - relativedelta(days=1)
+                or last_work_day >= self.version_id.contract_date_start + relativedelta(**fired_min_contract_duration) - relativedelta(days=1)
             )
         ):
             return False
@@ -2114,7 +2227,7 @@ class HrPayslip(models.Model):
             departure_reason_code == departures['resigned_serious_employer_misconduct']
             and not (
                 seniority_in_year >= timedelta(**emp_mis_min_y_seniority)
-                or last_work_day >= self.employee_id.contract_date_start + relativedelta(**emp_mis_min_contract_duration) - relativedelta(days=1)
+                or last_work_day >= self.version_id.contract_date_start + relativedelta(**emp_mis_min_contract_duration) - relativedelta(days=1)
             )
         ):
             return False
@@ -2131,10 +2244,10 @@ class HrPayslip(models.Model):
         # employees with determined contract duration (CDD) don't get their 13th
         # month if they end their contract sooner than expected
         if (
-            self.employee_id.fixed_term
+            self.version_id.fixed_term
             and departure_reason_code is not False
             and self.employee_id.departure_date
-            and self.employee_id.departure_date < self.employee_id.contract_date_end
+            and self.employee_id.departure_date < self.version_id.contract_date_end
         ):
             return False
 
@@ -2218,7 +2331,7 @@ class HrPayslip(models.Model):
 
         return 0
 
-    def _cp302_get_paid_amount_13th_month(self, localdict):
+    def _cp302_get_paid_amount_13th_month(self, year_payslips):
         """
         Computes and returns the value of the 13th month the worker should receive
         from the Horeca Social Fund, following the rules defined for the Joint Committee 302.
@@ -2259,18 +2372,23 @@ class HrPayslip(models.Model):
             # 13th month equal to their last monthly pay
             full_13th_month = self.version_id._get_contract_wage()
 
-        max_workable_hours_in_year = self.version_id.resource_calendar_id.get_work_hours_count(
-            date(self.date_to.year, 1, 1),
-            date(self.date_to.year, 12, 31),
-            compute_leaves=False,
-        )
+        calendar = self.version_id.resource_calendar_id
+        if calendar.calendar_type == 'variable':
+            # a planned schedule has no year of its own: a twelfth per weekly hours x 52 / 12 worked or assimilated
+            max_workable_hours_in_year = calendar.hours_per_week * 52
+        else:
+            max_workable_hours_in_year = calendar.get_work_hours_count(
+                date(self.date_to.year, 1, 1),
+                date(self.date_to.year, 12, 31),
+                compute_leaves=False,
+            )
 
         # proratise the result and get the 13th month for the whole year up to self.date_to
         worked_hours_ratio = (accounted_hours / max_workable_hours_in_year) if max_workable_hours_in_year else 0
         thirteen_month = min(full_13th_month, full_13th_month * worked_hours_ratio)
 
         # we need to deduct what has already been paid during the year if needed
-        previous_payslips_of_year = localdict['l10n_be_year_payslips_by_payslip'][self].filtered_domain(
+        previous_payslips_of_year = year_payslips.filtered_domain(
             [('date_to', '<', self.date_to)],
         )
         already_paid_13th_month = sum(previous_payslips_of_year.line_ids.filtered_domain([['code', '=', 'CP302THIRTEEN']]).mapped('total'))
@@ -2289,7 +2407,21 @@ class HrPayslip(models.Model):
         else:
             base_version = self.employee_id._get_version(base_month)
 
-        basic = base_version._get_contract_wage()
+        # 92% of the gross pay of the month the holidays start (art. 38, 2° AR 30.03.1967): under time credit, the pay
+        # of the hours still worked (a partial resumption after an incapacity, 122.04, keeps the contract's pay); with
+        # the benefits in kind bearing ONSS (art. 38bis only leaves out what bears none)
+        holiday_month = base_month if base_month and base_month <= self.date_from else self.date_from
+        time_credit_rate = 1.0
+        if base_version.l10n_be_time_credit:
+            calendar, reference_calendar = base_version.resource_calendar_id, base_version._get_reference_calendar()
+            month_start, month_end = holiday_month.replace(day=1), holiday_month + relativedelta(day=31)
+            occupied = calendar._l10n_be_get_work_time_rate_time_credit_included(month_start, month_end, reference_calendar)
+            if occupied:
+                time_credit_rate = min(1.0, calendar._l10n_be_get_work_time_rate_med_included(
+                    month_start, month_end, reference_calendar) / occupied)
+        basic = base_version._get_contract_wage() * time_credit_rate + sum(
+            self.env['hr.rule.parameter']._get_parameter_from_code(parameter_code, holiday_month, raise_if_not_found=False) or 0.0
+            for field_name, parameter_code in BIK_RULE_PARAMETERS.items() if base_version[field_name])
         force_months = self._get_input_line_amount('MONTH')
 
         year = self.date_from.year - 1
@@ -2301,7 +2433,8 @@ class HrPayslip(models.Model):
             number_of_months = force_months
             fixed_salary = basic * number_of_months / 12
         else:
-            number_of_months = self._compute_double_holiday_assimilated_months(date_from, date_to, versions, base_version, work_entries)
+            number_of_months = self._compute_double_holiday_assimilated_months(
+                date_from, date_to, versions, base_version, work_entries, current_time_credit_rate=time_credit_rate)
             fixed_salary = (number_of_months / 12) * basic
             attests = self.employee_id.l10n_be_holiday_attest_ids.filtered(lambda a: a.year == year and a.prev_double_holiday_pay_paid > 0)
             for attest in attests:
@@ -2394,6 +2527,11 @@ class HrPayslip(models.Model):
         belgian_slips._l10n_be_defer_fiscal_date()
         belgian_slips._l10n_be_apply_correction_fiscal_period()
         belgian_slips._l10n_be_flag_274_corrections()
+        belgian_slips._check_create_wech006()
+        belgian_slips._check_create_wech007()
+        belgian_slips._check_create_wech008()
+        belgian_slips._check_create_zima002()
+        belgian_slips._check_create_zima003()
         for slip in arrear_slips:
             quarter = (slip.date_from.month - 1) // 3 + 1
             slip.activity_schedule(
@@ -2412,6 +2550,7 @@ class HrPayslip(models.Model):
         existing_dmfa_reports = self.env['l10n_be.dmfa'].sudo().search([
             ('state', 'in', ['done', 'paid']),
             ('declaration_type', '=', 'original'),
+            ('company_id', 'in', self.company_id.root_id.ids),
         ])
 
         report_date_boundaries = []
@@ -2420,7 +2559,8 @@ class HrPayslip(models.Model):
 
         for ps in self:
             for report, start_date, end_date in report_date_boundaries:
-                if ps.date_from <= end_date and ps.date_to >= start_date:
+                # only the declarations of the company of the payslip
+                if ps.company_id in report.branch_ids and ps.date_from <= end_date and ps.date_to >= start_date:
                     ps.l10n_be_is_dmfa_reported = False
                     report.is_correction_needed = True
 
@@ -2452,7 +2592,11 @@ class HrPayslip(models.Model):
         return res
 
     def action_payslip_cancel(self):
+        # a declared payslip cancelled has to be removed from its DMFA with a modification
+        declared_dmfas = self.sudo().l10n_be_dmfa_id.filtered(
+            lambda d: d.state in ['done', 'paid'] and d.declaration_type == 'original')
         res = super().action_payslip_cancel()
+        declared_dmfas.is_correction_needed = True
         self.filtered(lambda p: p.country_code == 'BE')._l10n_be_flag_274_corrections()
         latest_273_xx_report = self.l10n_be_273_line_ids.sheet_id.filtered(
             lambda r: r.state in ['ready', 'done']
@@ -2528,7 +2672,8 @@ class HrPayslip(models.Model):
         return pdf.merge_pdf(pdf_parts)
 
     def _generate_payslip_pdf(self, lang, report, is_translated=False):
-        pdf_content, _ = self.env['ir.actions.report'].sudo().with_context(
+        # in the document layout of the company of the payslip, not the one of the current company
+        pdf_content, _ = self.env['ir.actions.report'].sudo().with_company(self.company_id).with_context(
             lang=lang,
             is_translated=is_translated
         )._render_qweb_pdf(report, self.id)
@@ -2550,6 +2695,8 @@ class HrPayslip(models.Model):
         return super()._get_data_files_to_update() + [(
             'l10n_be_hr_payroll', [
                 'data/hr_rule_parameters_data.xml',
+                'data/hr_payroll_structure_data.xml',
+                'data/hr_salary_rule_category_data.xml',
                 'data/hr_salary_rule_data.xml',
             ])]
 
@@ -2612,7 +2759,10 @@ class HrPayslip(models.Model):
             return [], 0.0
 
         rule_param = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code
-        hire_date = employee.first_contract_date
+        hire_date = employee._get_first_contract_date(date_limit=date_ref)
+        # the Walloon reduction is removed for the engagements from 1 July 2026
+        if competence == 'wa' and hire_date and hire_date >= date(2026, 7, 1):
+            return [], 0.0
         # transition date from the old code 8320 (transition state) to 8321/8322 (permanant codes)
         # if an employee was already under code 8320 he should stay in it , if he only became eligibile after the cutoff date , then he moves to the new codes 8321/8322
         cutoff = date(2023, 7, 1)
@@ -2645,6 +2795,13 @@ class HrPayslip(models.Model):
             (code, amin, amax, g_amounts[g.lower()])
             for (code, amin, amax, g) in brackets
         ]
+        # 8321 (under 60) is for the workers engaged at that age (at the end of the quarter of the engagement), not for
+        # the ones getting older in service
+        brackets_8321 = [b for b in brackets if b[0] == 8321]
+        if competence == 'wa' and hire_date and brackets_8321:
+            hire_age = employee._l10n_be_age_at_quarter_end(employee, hire_date)
+            if not min(b[1] for b in brackets_8321) <= hire_age <= max(b[2] for b in brackets_8321):
+                brackets = [b for b in brackets if b[0] != 8321]
         age = employee._l10n_be_age_at_quarter_end(employee, date_ref)
         brackets = [b for b in brackets if b[1] <= age <= b[2]]
         if competence == 'wa':
@@ -2699,8 +2856,18 @@ class HrPayslip(models.Model):
             return []
         if not aggregates['ss_quarter'] or aggregates['ss_quarter'] > cap:
             return []
-        # TODO : When service_exemption_notion are implemented, in case of wallonia reduction , it should only apply when 0, 7 or 8 are mentionned in service_exemption_notion
-        return [{'code': int(code), 'g': G} for (code, _amin, _amax, G) in brackets]
+        if competence == 'wa' and self.version_id.l10n_be_work_exemption in ('2', '3', '4', '5'):
+            # No Walloon reduction for a worker fully exempted from work during the quarter
+            return []
+        specs = []
+        hire_date = employee._get_first_contract_date(date_limit=quarter_start + relativedelta(months=3, days=-1))
+        for (code, _amin, _amax, G) in brackets:
+            spec = {'code': int(code), 'g': G}
+            # The date of the start of the right, the hire date, is mandatory for 8321, and for 8322 from 2026/2
+            if hire_date and (int(code) == 8321 or (int(code) == 8322 and quarter_start >= date(2026, 4, 1))):
+                spec['starting_date'] = hire_date.isoformat()
+            specs.append(spec)
+        return specs
 
     def _l10n_be_target_group_reduction_unexperienced_flander(self, employee, quarter_start, aggregates):
         def _quarter_start(d):
@@ -2768,6 +2935,17 @@ class HrPayslip(models.Model):
         if active_before_current >= 4:
             return []
 
+        # The quarterly reference wage must be below the ceiling: a condition, not a maximum of the reduction
+        salary_ceiling = (
+            self.env["hr.rule.parameter"]
+            .sudo()
+            ._get_parameter_from_code(
+                "l10n_be_unexperienced_salary_ceiling", date=quarter_start, raise_if_not_found=False
+            )
+        )
+        if salary_ceiling and aggregates['ss_quarter'] >= salary_ceiling:
+            return []
+
         g_amount = (
             self.env["hr.rule.parameter"]
             .sudo()
@@ -2775,14 +2953,13 @@ class HrPayslip(models.Model):
                 "g1"
             ]
         )
-        p_max = (
-            self.env["hr.rule.parameter"]
-            .sudo()
-            ._get_parameter_from_code(
-                "l10n_be_unexperienced_salary_ceiling", date=quarter_start, raise_if_not_found=False
-            )
+        # The right starts at the engagement opening the current cycle
+        cycle_start = sorted_active[cycle_start_idx]
+        starting_date = min(
+            (start for start in contract_end_by_start if _quarter_diff(_quarter_start(start), cycle_start) >= 0),
+            default=first_contract_date,
         )
-        return [{'code': 6340, 'g': g_amount, 'p_max': p_max, 'starting_date': first_contract_date.isoformat()}]
+        return [{'code': 6340, 'g': g_amount, 'starting_date': starting_date.isoformat()}]
 
     def _is_l10n_be_onss_elderly_eligible(self):
         """Eligibility gate for the elderly-worker NSSO target-group reduction G1.
@@ -2795,10 +2972,12 @@ class HrPayslip(models.Model):
         competence = version.l10n_be_working_region
         if not competence:
             return False
+        if competence == 'wa' and version.l10n_be_work_exemption in ('2', '3', '4', '5'):
+            return False
         brackets, _cap = self._l10n_be_elderly_reduction_params(employee, self.date_to, competence)
         return bool(brackets)
 
-    def _get_l10n_be_onss_elderly_reduction(self, localdict):
+    def _get_l10n_be_onss_elderly_reduction(self, result_rules):
         """Estimate the monthly share of the quarterly NSSO target-group
         reduction G1 for elderly workers.
 
@@ -2813,14 +2992,18 @@ class HrPayslip(models.Model):
         if not brackets:
             return 0.0
 
-        result_rules = localdict['result_rules']
-        version = localdict['version']
+        version = self.version_id
         if result_rules['ONSS_BASE_TOTAL']['total'] * 3 > cap_quarterly:
             return 0.0
 
         ref_calendar = version._get_reference_calendar()
         U_weekly = ref_calendar.full_time_required_hours
-        Z_month = sum(wd.number_of_hours for wd in self.worked_days_line_ids)
+        # worked and assimilated hours, as the work fraction of the structural reduction; time credit keeps its share
+        Z_month = sum(
+            wd.number_of_hours for wd in self.worked_days_line_ids
+            if wd.work_entry_type_id.l10n_be_is_time_credit or (
+                wd.work_entry_type_id.dmfa_code and int(wd.work_entry_type_id.dmfa_code) in MU_SERVICE_CODES)
+        )
         # Quarterly-equivalent prestation fraction estimated from monthly hours:
         # mu_quarter = (3 x Z_month) / (13 x U) = Z_month / ((13/3) x U)
         denom = (13.0 / 3.0) * U_weekly
@@ -2844,14 +3027,13 @@ class HrPayslip(models.Model):
             return [{'code': 4300, 'g': g_amount, 'p_max': reduction_max_cap}]
         return []
 
-    def _get_l10n_be_onss_artist_reduction(self, localdict):
+    def _get_l10n_be_onss_artist_reduction(self, result_rules):
         self.ensure_one()
         threshold = (self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(code='l10n_be_average_guaranteed_minimum_monthly_income', date=self.date_to, raise_if_not_found=False) or 0.0)
-        if localdict['result_rules']['ONSS_BASE_TOTAL']['total'] >= threshold and self.version_id.l10n_be_worker_code_id.dmfa_code in ['046', '047'] and self.version_id.l10n_be_working_region != 'fl':
+        if result_rules['ONSS_BASE_TOTAL']['total'] >= threshold and self.version_id.l10n_be_worker_code_id.dmfa_code in ['046', '047'] and self.version_id.l10n_be_working_region != 'fl':
             g_amount = self._rule_parameter('l10n_be_target_group_g_amounts')['g12']
             reduction_max_cap = self._rule_parameter('l10n_be_onss_employer_reduction_artist_cap')
-            version = localdict['version']
-            ref_calendar = version._get_reference_calendar()
+            ref_calendar = self.version_id._get_reference_calendar()
             U_weekly = ref_calendar.full_time_required_hours
             Z_month = sum(wd.number_of_hours for wd in self.worked_days_line_ids)
             # Quarterly-equivalent prestation fraction estimated from monthly hours:
@@ -2860,15 +3042,14 @@ class HrPayslip(models.Model):
             mu = (Z_month / denom) if denom else 0.0
             mu = math.floor(mu * 100 + 0.5) / 100
 
-            hours_per_week = version.resource_calendar_id.hours_per_week or 0.0
-            at_least_half_time = hours_per_week >= (U_weekly / 2.0)
-            beta_g = self._l10n_be_reduction_beta_g(mu, at_least_half_time)
+            # no minimum for the artists
+            beta_g = self._l10n_be_reduction_beta_g(mu, at_least_half_time=True)
 
             pg_quarter = min(round(g_amount * mu * beta_g, 2), reduction_max_cap)
             return round(pg_quarter / 3.0, 2)
         return 0.0
 
-    def _l10n_be_get_quarterly_structural_deduction(self, localdict):
+    def _l10n_be_get_quarterly_structural_deduction(self, result_rules, quarter_payslips):
         """
         To accurately compute the quarterly structural deduction, we use:
         1. All finalized (validated or paid) payslips for the quarter.
@@ -2882,7 +3063,6 @@ class HrPayslip(models.Model):
         """
         self.ensure_one()
         quarter_start, quarter_end = date_utils.get_quarter(self.date_to)
-        quarter_payslips = localdict['l10n_be_quarter_payslips_by_payslip'].get(self, self.env['hr.payslip'])
         payslips = quarter_payslips.filtered(
             lambda p: p.version_id.structure_type_id == self.version_id.structure_type_id
             and p.company_id == self.company_id
@@ -2911,12 +3091,12 @@ class HrPayslip(models.Model):
         # mu global and total structural deduction is computed as the sum of all mu's and deductions for each occupation
         mu_global = sum(self.env['l10n_be.dmfa']._get_l10n_be_mu(slips[:1].version_id, payslips=slips) for _, slips in occupation_groups)
         quarterly_deduction = sum(
-            self.env['l10n_be.dmfa']._get_l10n_be_structural_deduction_3000(slips, mu_global, localdict['result_rules'])
+            self.env['l10n_be.dmfa']._get_l10n_be_structural_deduction_3000(slips.with_context(current_payslip_id=self.id), mu_global, result_rules)
             for _, slips in occupation_groups
         )
         return quarterly_deduction, payslips
 
-    def _l10n_be_get_monthly_regularized_structural_deduction(self, localdict):
+    def _l10n_be_get_monthly_regularized_structural_deduction(self, result_rules, quarter_payslips):
         """
         Compute the monthly structural deduction based on the target quarterly deduction, and regularize it
         based on the deductions already applied in the current quarter.
@@ -2924,8 +3104,8 @@ class HrPayslip(models.Model):
         self.ensure_one()
         # Compute the deductions that were applied in the previous payslips and subtract from the total deduction to find the
         # deduction (or correction) to apply for the current payslip
-        target_quarterly_deduction, payslips = self._l10n_be_get_quarterly_structural_deduction(localdict)
-        already_deducted = sum(line.total for line in payslips.line_ids.filtered(lambda line: line.code == "ONSS_STRUCTURAL"))
+        target_quarterly_deduction, payslips = self._l10n_be_get_quarterly_structural_deduction(result_rules, quarter_payslips)
+        already_deducted = sum(line.total for line in (payslips - self).line_ids.filtered(lambda line: line.code == "ONSS_STRUCTURAL"))
         return -target_quarterly_deduction - already_deducted
 
     def _l10n_be_target_group_reduction_acs(self, employee, quarter_start, aggregates):
@@ -2957,19 +3137,18 @@ class HrPayslip(models.Model):
                 g_amount -= self.env['l10n_be.dmfa']._get_l10n_be_structural_deduction_3000(payslips, aggregates['mu_global'])
         return [{'code': code, 'g': g_amount}]
 
-    def _get_l10n_be_onss_acs_reduction(self, localdict):
+    def _get_l10n_be_onss_acs_reduction(self, result_rules, quarter_payslips):
         self.ensure_one()
-        result_rules = localdict['result_rules']
 
         if self.version_id._l10n_be_is_eligible_for_acs_deduction():
             result = -result_rules['ONSSEMPLOYERBASIC']['total'] if result_rules['ONSSEMPLOYERBASIC'] else 0.0
             if self.date_to.month in (3, 6, 9, 12):  # compute and substract ded3000 amount based on niss
-                total_quarter_structural_deduction, _ = self._l10n_be_get_quarterly_structural_deduction(localdict)
+                total_quarter_structural_deduction, _ = self._l10n_be_get_quarterly_structural_deduction(result_rules, quarter_payslips)
                 result += total_quarter_structural_deduction
             return round(result, 2)
         return 0.0
 
-    def _get_l10n_be_atn_car_regularization_amount(self, localdict):
+    def _get_l10n_be_atn_car_regularization_amount(self, result_rules):
         """
         Compute the ATN car regularization for the current payslip.
 
@@ -3021,16 +3200,16 @@ class HrPayslip(models.Model):
         # the final ATN that should have been paid, after applying the legal minimum on the covered period
         atn_to_pay = max(theoretical_atn, min_legal_car_atn * covered_days / days_in_year)
         atn_paid = previous_payslips._get_line_values(['ATN.CAR'], compute_sum=True)['ATN.CAR']['sum']['total']
-        atn_paid += localdict['result_rules']['ATN.CAR']['total'] if 'ATN.CAR' in localdict['result_rules'] else 0.0
+        atn_paid += result_rules['ATN.CAR']['total'] if 'ATN.CAR' in result_rules else 0.0
 
         # negative: the employee paid too much and is refunded, positive: he has to pay the difference
         regularization = atn_to_pay - atn_paid
         return regularization if abs(regularization) >= 1.0 else 0.0
 
-    def _get_be_private_car_reimursement_amount(self, localdict):
+    def _get_be_private_car_reimursement_amount(self, work_entries):
         self.ensure_one()
         code = self.version_id.l10n_be_joint_committee_id.egov3_code
-        result_qty = self._get_be_benefit_count('PRIVATE_CAR', localdict)
+        result_qty = self._get_be_benefit_count('PRIVATE_CAR', work_entries)
         result_rate = 100
 
         if code in ['200', '302'] and self.date_from >= date(2026, 2, 1):
@@ -3047,13 +3226,12 @@ class HrPayslip(models.Model):
         else:
             return (result * 3 / 13 / 5, result_qty, result_rate)
 
-    def _get_be_bike_reimbursement_amounts(self, localdict):
+    def _get_be_bike_reimbursement_amounts(self, result_rules, work_entries):
         # Returns the daily bike reimbursement split into its exempt and taxable parts, both
         # capped together on the yearly maximum: only what is actually paid may be taxed.
         self.ensure_one()
         version = self.version_id
-        result_rules = localdict['result_rules']
-        quantity = self._get_be_benefit_count('PRIVATE_CAR', localdict)
+        quantity = self._get_be_benefit_count('PRIVATE_CAR', work_entries)
         if not result_rules['BASIC']['total'] or not quantity:
             return (0, 0)
         joint_committee_code = self.l10n_be_joint_committee_id.egov3_code or '200'
@@ -3063,7 +3241,7 @@ class HrPayslip(models.Model):
         # by both rules: substracting the running total gives the previous payslips in both cases.
         already_reimbursed = sum(
             result_rules[code]['ytd'] - result_rules[code]['total'] for code in ('CYCLE', 'CYCLE.TAX'))
-        amount = version._get_bike_reimbursed_amount()
+        amount = version._get_bike_reimbursed_amount(reference_date=self._get_ytd_reference_date())
         amount = min(yearly_maximum - already_reimbursed, amount * quantity) / quantity
         exempt_rate = self._rule_parameter('bike_exempt_reimbursement_per_km', raise_if_not_found=False)
         taxable_amount = 0
@@ -3071,15 +3249,13 @@ class HrPayslip(models.Model):
             taxable_amount = max(0, amount - exempt_rate * version.bike_transport_employee_kilometer * 2)
         return (amount - taxable_amount, taxable_amount)
 
-    def _get_be_cp999_flat_rate_social_contributions(self, localdict):
+    def _get_be_cp999_flat_rate_social_contributions(self, result_rules):
 
-        payslip = localdict['payslip']
+        monthly_revenues = result_rules['GROSS.M']['total']
 
-        monthly_revenues = localdict['result_rules']['GROSS.M']['total']
-
-        min_amount = payslip._rule_parameter('l10n_be_dir_flat_rate_deduction_min', raise_if_not_found=False)
-        max_amount = payslip._rule_parameter('l10n_be_dir_flat_rate_deduction_max', raise_if_not_found=False)
-        rate_by_threshold = payslip._rule_parameter('l10n_be_dir_flat_rate_deduction', raise_if_not_found=False)
+        min_amount = self._rule_parameter('l10n_be_dir_flat_rate_deduction_min', raise_if_not_found=False)
+        max_amount = self._rule_parameter('l10n_be_dir_flat_rate_deduction_max', raise_if_not_found=False)
+        rate_by_threshold = self._rule_parameter('l10n_be_dir_flat_rate_deduction', raise_if_not_found=False)
 
         if not min_amount or not max_amount or not rate_by_threshold:
             return 0
@@ -3101,12 +3277,13 @@ class HrPayslip(models.Model):
         """
         Check if a work entry type qualifies as an extra hour line.
         - Must be marked as extra hours (`is_extra_hours = True`)
-        - AND either `amount_rate >= 1.0` OR (amount_rate + child premium percentage > 1.0)
+        - AND either `amount_rate >= 1.0`, OR a premium only (0 < amount_rate < 1.0: recovered overtime, the line
+          pays the premium), OR (amount_rate + child premium percentage > 1.0)
         """
         if not work_entry_type.is_extra_hours:
             return False
 
-        if work_entry_type.amount_rate >= 1.0:
+        if work_entry_type.amount_rate >= 1.0 or 0.0 < work_entry_type.amount_rate < 1.0:
             return True
 
         assigned_categories = work_entry_type.category_ids | work_entry_type.optional_category_ids
@@ -3124,7 +3301,7 @@ class HrPayslip(models.Model):
     def _get_withholding_extra_hours_reduction(self):
         self.ensure_one()
 
-        overtime_threshold_code = 'overtime_withholding_tax_reduction_threshold_white_cash_register' if self.company_id.l10n_be_has_white_cash_register else 'overtime_withholding_tax_reduction_threshold_not_white_cash_register'
+        overtime_threshold_code = 'overtime_withholding_tax_reduction_threshold_white_cash_register' if self.company_id._l10n_be_has_white_cash_register() else 'overtime_withholding_tax_reduction_threshold_not_white_cash_register'
         annual_cap = self.env['hr.rule.parameter']._get_parameter_from_code(overtime_threshold_code, self.date_to, raise_if_not_found=False)
 
         tier1_rate = self.env['hr.rule.parameter']._get_parameter_from_code(
@@ -3154,15 +3331,19 @@ class HrPayslip(models.Model):
         if self.version_id.hourly_wage:
             basic_hourly_wage = self.version_id.hourly_wage
         else:
-            monthly_hours = sum(self.worked_days_line_ids.mapped('number_of_hours'))
-            basic_hourly_wage = self.version_id._get_contract_wage() / monthly_hours if monthly_hours else 0.0
+            # the normal hourly wage: 3 months of pay over 13 weeks of the employee's schedule
+            hours_per_week = self.version_id.resource_calendar_id.hours_per_week
+            basic_hourly_wage = self.version_id._get_contract_wage() * 3 / (13 * hours_per_week) if hours_per_week else 0.0
 
         total_deduction = 0.0
         for line in self.worked_days_line_ids:
             if not self._is_extra_hours_qualifying(line.work_entry_type_id):
                 continue
 
-            line_rate = line.work_entry_type_id.amount_rate - 1.0
+            # the overtime premium picks the reduction rate: 1.5 pays the hour and a 50% premium, 0.5 (026.00, hours
+            # recovered later) pays the 50% premium alone, so both are a 50% premium
+            amount_rate = line.work_entry_type_id.amount_rate
+            line_rate = amount_rate - 1.0 if amount_rate >= 1.0 else amount_rate
             assigned_categories = line.work_entry_type_id.category_ids | line.work_entry_type_id.optional_category_ids
             for category in assigned_categories:
                 for child in category.children_ids:
@@ -3187,7 +3368,7 @@ class HrPayslip(models.Model):
 
         return total_deduction
 
-    def _get_be_withholding_taxes_transport_deduction(self, localdict):
+    def _get_be_withholding_taxes_transport_deduction(self, work_entries):
         self.ensure_one()
 
         version = self.version_id
@@ -3197,11 +3378,11 @@ class HrPayslip(models.Model):
             if version.transport_mode_car:
                 yearly_transport_amount += version.car_atn
             if version.private_car_employee_kilometer:
-                result, result_qty, result_rate = self._get_be_private_car_reimursement_amount(localdict)
+                result, result_qty, result_rate = self._get_be_private_car_reimursement_amount(work_entries)
                 private_car_amount = result * result_qty * result_rate / 100
                 yearly_transport_amount += private_car_amount * 12
 
-            yearly_exemption_amount = self._rule_parameter('pricate_car_taxable_threshold')
+            yearly_exemption_amount = self._rule_parameter('private_car_withholding_monthly_exemption') * 12
             return min(yearly_transport_amount, yearly_exemption_amount)
 
         return 0
@@ -3267,7 +3448,7 @@ class HrPayslip(models.Model):
 
         if self._is_eligible_for_bareme_I() or self._is_eligible_for_bareme_II():
             if version.disabled:
-                total_reduction += self._rule_parameter('disabled_dependent_deduction')
+                total_reduction += self._rule_parameter('disabled_worker_deduction')
             if version.other_senior_dependent:
                 total_reduction += self._rule_parameter('dependent_senior_deduction') * version.other_senior_dependent
             if version.dependent_juniors:
@@ -3314,23 +3495,34 @@ class HrPayslip(models.Model):
         version = self.version_id
         if not version.is_non_resident and self._is_eligible_for_bareme_II():
             # Scale II allocates up to 30 percent of income to the non-working spouse, reducing the total tax.
-            max_spouse_income = self._rule_parameter('max_spouse_income')
-            amount_for_spouse = min(yearly_net_taxable_amount * 0.3, max_spouse_income)
+            amount_for_spouse = min(yearly_net_taxable_amount * 0.3, self._get_be_max_spouse_income())
             return apply_brackets(amount_for_spouse) + apply_brackets(yearly_net_taxable_amount - amount_for_spouse)
         return apply_brackets(yearly_net_taxable_amount)
 
-    def _get_be_withholding_taxes_basic_bareme(self, localdict):
+    def _get_be_max_spouse_income(self):
+        """ Scale II: the maximum income allotted to the spouse without income. From November 2026, a higher maximum
+        applies to the whole year when both spouses reach the age by January 1st of the tax year (the next year). """
+        self.ensure_one()
+        seniors = self._rule_parameter('max_spouse_income_seniors', raise_if_not_found=False)
+        if seniors:
+            tax_year_start = date(self.date_to.year + 1, 1, 1)
+            birthdates = (self.employee_id.birthday, self.version_id.spouse_birthdate)
+            if all(birthdates) and all(birthdate + relativedelta(years=seniors['age']) <= tax_year_start for birthdate in birthdates):
+                return seniors['amount']
+        return self._rule_parameter('max_spouse_income')
+
+    def _get_be_withholding_taxes_basic_bareme(self, result_rules, work_entries):
         self.ensure_one()
 
         version = self.version_id
 
         gross_code = 'GROSS.NET.Y' if self.struct_id.code == 'BEMONTHLY' else 'TERM_GROSS_NET_Y'
-        yearly_net_taxable_revenue = localdict['result_rules'][gross_code]['total']  # Base imposable nette
+        yearly_net_taxable_revenue = result_rules[gross_code]['total']  # Base imposable nette
 
         # Only the termination structure lacks a CAR.PRIV line, so it still needs the private-car reimbursement fictively added to the taxable base.
         termination_struct = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees')
         if self.struct_id == termination_struct and version.private_car_employee_kilometer:
-            result, result_qty, result_rate = self._get_be_private_car_reimursement_amount(localdict)
+            result, result_qty, result_rate = self._get_be_private_car_reimursement_amount(work_entries)
             private_car_amount = result * result_qty * result_rate / 100
             yearly_net_taxable_revenue += private_car_amount * 12
 
@@ -3340,7 +3532,7 @@ class HrPayslip(models.Model):
         """ Check if this payslip is the last one of the employee (leaving the company). """
         self.ensure_one()
         employee = self.employee_id
-        contract_end = employee.contract_date_end
+        contract_end = self.version_id.contract_date_end
         # The employee leaves through an explicit departure date falling in this slip.
         leaves_on_departure_date = bool(employee.departure_date and self.date_from <= employee.departure_date <= self.date_to)
         # Or a fixed term contract ends in this slip with no later version starting after it.
@@ -3350,7 +3542,7 @@ class HrPayslip(models.Model):
         ends_fixed_term_contract = contract_ends_in_slip and not has_later_version
         return leaves_on_departure_date or ends_fixed_term_contract
 
-    def _l10n_be_is_last_payslip_of_quarter(self, localdict):
+    def _l10n_be_is_last_payslip_of_quarter(self, quarter_payslips, month_payslips):
         """
         If a validated/paid payslip (or self) is at the end of the current
         quarter, then self is the last payslip of the quarter
@@ -3362,8 +3554,6 @@ class HrPayslip(models.Model):
             be generated afterwards)
         """
         self.ensure_one()
-        # all validated/paid payslips of self's quarter
-        quarter_payslips = localdict['l10n_be_quarter_payslips_by_payslip'][self]
 
         # if the employee stops working before the end of quarter, then we
         # consider his last work day as the end of the quarter
@@ -3378,11 +3568,10 @@ class HrPayslip(models.Model):
         # 13th month payslips are considered the last payslip of the quarter only
         # if there is already a monthly payslip in the same month
         is_thirteen = self.struct_id.code == 'BETHIRTEEN'
-        return not is_thirteen or self._l10n_be_has_monthly_payslip_in_same_month(localdict)
+        return not is_thirteen or self._l10n_be_has_monthly_payslip_in_same_month(month_payslips)
 
-    def _l10n_be_has_monthly_payslip_in_same_month(self, localdict):
+    def _l10n_be_has_monthly_payslip_in_same_month(self, month_payslips):
         self.ensure_one()
-        month_payslips = localdict['l10n_be_month_payslips_by_payslip'][self]
         return any(p.struct_id.code == 'BEMONTHLY' for p in month_payslips - self)
 
     def _l10n_be_csss_get_total_contribution(self, frequency: str, taxable_amount: float) -> float:
@@ -3420,7 +3609,7 @@ class HrPayslip(models.Model):
             break
         return special_social_contrib
 
-    def _l10n_be_csss_get_gross_onss_wage(self, localdict, validated_payslips_in_period):
+    def _l10n_be_csss_get_gross_onss_wage(self, result_rules, validated_payslips_in_period):
         """
         Any gross salary received during the month (or quarter) must be subject
         to the Special Social Contribution (CSSS). The wage is increased by 8%
@@ -3433,12 +3622,12 @@ class HrPayslip(models.Model):
         line_values = validated_payslips_in_period._get_line_values(relevant_codes, compute_sum=True)
         gross_onss_salary = sum(line_values[code]['sum']['total'] for code in relevant_codes)
         if self not in validated_payslips_in_period:
-            gross_onss_salary += sum(localdict.get(code, 0) for code in relevant_codes)
+            gross_onss_salary += sum(result_rules[code]['total'] for code in relevant_codes)
         if self.version_id.is_worker():
-            gross_onss_salary *= 1.08
+            gross_onss_salary *= self._rule_parameter('worker_onss_calculation_basis_uplift')
         return gross_onss_salary
 
-    def _l10n_be_csss_get_simple_holiday_pay(self, localdict, validated_payslips_in_period):
+    def _l10n_be_csss_get_simple_holiday_pay(self, result_rules, validated_payslips_in_period):
         """
         Any simple holiday pay (simple pécule de vacances) received during the
         month (or quarter) must be subject to the Special Social Contribution (CSSS).
@@ -3446,10 +3635,10 @@ class HrPayslip(models.Model):
         self.ensure_one()
         simple_holiday_pay = validated_payslips_in_period._get_line_values(['PAY_SIMPLE'], compute_sum=True)['PAY_SIMPLE']['sum']['total']
         if self not in validated_payslips_in_period:
-            simple_holiday_pay += localdict.get('PAY_SIMPLE', 0)
+            simple_holiday_pay += result_rules['PAY_SIMPLE']['total']
         return simple_holiday_pay
 
-    def _l10n_be_csss_get_irc_per_quarter(self, localdict, validated_payslips_in_period) -> dict[tuple, float]:
+    def _l10n_be_csss_get_irc_per_quarter(self, result_rules, validated_payslips_in_period) -> dict[tuple, float]:
         """
         When an employee does not do all of his notice period, and instead
         receives all of it in the termination fees (indemnité de rupture de
@@ -3466,7 +3655,7 @@ class HrPayslip(models.Model):
 
         irc = validated_payslips_in_period._get_line_values(['TERM_SALARY'], compute_sum=True)['TERM_SALARY']['sum']['total']
         if self not in validated_payslips_in_period:
-            irc += localdict.get('TERM_SALARY', 0)
+            irc += result_rules['TERM_SALARY']['total']
 
         unprestated_notice_start = self.employee_id.departure_date + relativedelta(days=1)
         unprestated_notice_end = self.employee_id.l10n_be_notice_period_theoretical_end
@@ -3491,7 +3680,7 @@ class HrPayslip(models.Model):
 
         return quarters_in_notice
 
-    def _l10n_be_get_special_social_contribution(self, localdict, frequency: str):
+    def _l10n_be_get_special_social_contribution(self, result_rules, quarter_payslips, month_payslips, frequency: str):
         """
         The Special Social Contribution (CSSS) is a quarterly tax on the gross
         wage of the employee.
@@ -3510,16 +3699,13 @@ class HrPayslip(models.Model):
                 invalid_freq=frequency,
             ))
 
-        if frequency == 'quarterly':
-            validated_payslips_in_period = localdict['l10n_be_quarter_payslips_by_payslip'][self]
-        else:
-            validated_payslips_in_period = localdict['l10n_be_month_payslips_by_payslip'][self]
+        validated_payslips_in_period = quarter_payslips if frequency == 'quarterly' else month_payslips
 
-        gross_onss_salary = self._l10n_be_csss_get_gross_onss_wage(localdict, validated_payslips_in_period)
-        simple_holiday_pay = self._l10n_be_csss_get_simple_holiday_pay(localdict, validated_payslips_in_period)
+        gross_onss_salary = self._l10n_be_csss_get_gross_onss_wage(result_rules, validated_payslips_in_period)
+        simple_holiday_pay = self._l10n_be_csss_get_simple_holiday_pay(result_rules, validated_payslips_in_period)
 
         # get notice period paid sum (IRC), split per quarter
-        irc_per_quarter = self._l10n_be_csss_get_irc_per_quarter(localdict, validated_payslips_in_period)
+        irc_per_quarter = self._l10n_be_csss_get_irc_per_quarter(result_rules, validated_payslips_in_period)
 
         # if we have an IRC for this payslip's quarter, we have to use it for
         # the main CSSS computation
@@ -3528,7 +3714,7 @@ class HrPayslip(models.Model):
         if (quarter_start, quarter_end) in irc_per_quarter:
             additional_irc = irc_per_quarter[quarter_start, quarter_end]
             if self.version_id.is_worker():
-                additional_irc *= 1.08  # worker uplift on ONSS wages
+                additional_irc *= self._rule_parameter('worker_onss_calculation_basis_uplift')  # worker uplift on ONSS wages
             # we will remove this quarter's irc to avoid counting it again later
             irc_per_quarter.pop((quarter_start, quarter_end))
 
@@ -3541,7 +3727,7 @@ class HrPayslip(models.Model):
         # now and add it to this payslip's CSSS
         for quarter_irc in irc_per_quarter.values():
             if self.version_id.is_worker():
-                quarter_irc *= 1.08  # worker uplift on ONSS wages
+                quarter_irc *= self._rule_parameter('worker_onss_calculation_basis_uplift')  # worker uplift on ONSS wages
             special_social_contribution += self._l10n_be_csss_get_total_contribution('quarterly', quarter_irc)
 
         # we should deduct what has already been paid during the period
@@ -3550,7 +3736,7 @@ class HrPayslip(models.Model):
 
         return special_social_contribution - advances
 
-    def _get_be_benefit_count(self, benefit, localdict):
+    def _get_be_benefit_count(self, benefit, work_entries):
         # Note:
         # meal_voucher / private car returns the number of days granting the advantage
         self.ensure_one()
@@ -3561,21 +3747,21 @@ class HrPayslip(models.Model):
         benefit_category = self.env.ref(f'l10n_be_hr_payroll.{benefit}', raise_if_not_found=False)
         if not benefit_category:
             return 0
-        granting_days = list({vals['date'] for vals in localdict['work_entries'] if benefit_category.id in (vals['work_entry_type_id'].category_ids | vals.get('category_options_ids', self.env['hr.salary.rule.category'])).ids})
+        granting_days = list({vals['date'] for vals in work_entries if benefit_category.id in (vals['work_entry_type_id'].category_ids | vals.get('category_options_ids', self.env['hr.salary.rule.category'])).ids})
         if benefit in ['MEAL_VOUCHER', 'PRIVATE_CAR']:
             return len(granting_days)
         return 0
 
-    def _get_be_ip(self, localdict):
+    def _get_be_ip(self, result_rules):
         self.ensure_one()
         if self.version_id.ip_wage_rate <= 0:
             return 0.0
-        return localdict['result_rules']['BASIC']['total'] * self.version_id.ip_wage_rate
+        return result_rules['BASIC']['total'] * self.version_id.ip_wage_rate
 
-    def _get_be_ip_values(self, localdict):
+    def _get_be_ip_values(self, result_rules, categories, ip_data):
         """ Split the intellectual property (IP) of the payslip.
 
-        The values are computed once per payslip (memoized in the localdict) so that every IP rule
+        The values are computed once per payslip (memoized in ip_data) so that every IP rule
         relies on the same figures. The first call comes from the `IP.EXEMPT` rule (sequence 535),
         i.e. once the ONSS base is complete but still contains the whole IP.
 
@@ -3593,15 +3779,13 @@ class HrPayslip(models.Model):
         related conditions don't apply and the whole IP is subject to ONSS.
         """
         self.ensure_one()
-        cache = localdict.setdefault('l10n_be_ip_values', {})
-        if self.id in cache:
-            return cache[self.id]
-        ip = self._get_be_ip(localdict)
+        if 'values' in ip_data:
+            return ip_data['values']
+        ip = self._get_be_ip(result_rules)
         yearly_limit = self._rule_parameter('ip_limit', raise_if_not_found=False)
         if ip > 0 and yearly_limit:
             # yearly cap: only the room left under the limit is paid as IP
-            year_ip = localdict.get('l10n_be_ip_year_total_by_payslip', {}).get(self, 0.0)
-            ip = max(0.0, min(ip, float_round(yearly_limit - year_ip, precision_digits=2)))
+            ip = max(0.0, min(ip, float_round(yearly_limit - ip_data['year_total'], precision_digits=2)))
         values = {
             'ip': ip,
             'total_remuneration': 0.0,
@@ -3611,12 +3795,11 @@ class HrPayslip(models.Model):
         }
         if ip > 0:
             # the ONSS base still contains the IP, unless the exemption line was already computed
-            total = localdict['categories']['ONSS_BASE'] - localdict['result_rules']['IP.EXEMPT']['total']
+            total = categories['ONSS_BASE'] - result_rules['IP.EXEMPT']['total']
             max_share = self._rule_parameter('ip_max_remuneration_share', raise_if_not_found=False)
             max_ip = float_round(max_share * total, precision_digits=2) if max_share else 0.0
             share_ok = not max_share or float_compare(ip, max_ip, precision_digits=2) <= 0
-            previous_years_average = localdict.get('l10n_be_ip_previous_years_average_by_payslip', {}).get(self, 0.0)
-            average_ok = not yearly_limit or float_compare(previous_years_average, yearly_limit, precision_digits=2) <= 0
+            average_ok = not yearly_limit or float_compare(ip_data['previous_years_average'], yearly_limit, precision_digits=2) <= 0
             onss_exempt = 0.0 if not max_share or self.version_id.ip_onss else min(ip, max_ip)
             values.update({
                 'total_remuneration': total,
@@ -3624,22 +3807,22 @@ class HrPayslip(models.Model):
                 'onss_part': ip - onss_exempt,
                 'within_limits': share_ok and average_ok,
             })
-        cache[self.id] = values
+        ip_data['values'] = values
         return values
 
-    def _get_be_ip_flat_rate_costs(self, localdict):
+    def _get_be_ip_flat_rate_costs(self, result_rules, categories, ip_data):
         """ Lump-sum professional costs on the IP, only granted to the owners of a certificate of
         artistic work: 50 % of the yearly IP up to the first bracket, 25 % between the first and
         the second bracket, nothing above. The brackets are yearly amounts: the costs are assessed
         on the IP of this payslip on top of the IP of the validated payslips of the year.
         """
         self.ensure_one()
-        ip = self._get_be_ip_values(localdict)['ip']
+        ip = self._get_be_ip_values(result_rules, categories, ip_data)['ip']
         if ip <= 0:
             return 0.0
         bracket_1 = self._rule_parameter('ip_deduction_bracket_1')
         bracket_2 = self._rule_parameter('ip_deduction_bracket_2')
-        year_ip = localdict.get('l10n_be_ip_year_total_by_payslip', {}).get(self, 0.0)
+        year_ip = ip_data['year_total']
 
         def tranche(lower, upper):
             # part of the IP of this payslip falling between both yearly amounts
@@ -3647,23 +3830,23 @@ class HrPayslip(models.Model):
 
         return 0.5 * tranche(0.0, bracket_1) + 0.25 * tranche(bracket_1, bracket_2)
 
-    def _get_be_ip_deduction(self, localdict):
+    def _get_be_ip_deduction(self, result_rules, categories, ip_data):
         self.ensure_one()
         # the IP subject to the IP withholding tax (IP_WT category) is the whole IP of the payslip
-        ip_values = self._get_be_ip_values(localdict)
+        ip_values = self._get_be_ip_values(result_rules, categories, ip_data)
         ip = ip_values['ip']
-        if ip <= 0 or not localdict['categories']['IP_WT']:
+        if ip <= 0 or not categories['IP_WT']:
             return 0.0
         # the withholding tax applies on the IP net of its ONSS part
         onss_rate = self._get_onss_global_rates()['personal_rate']
         taxable_amount = ip - ip_values['onss_part'] * onss_rate / 100
         if self.version_id.ip_artist:
-            taxable_amount -= self._get_be_ip_flat_rate_costs(localdict)
+            taxable_amount -= self._get_be_ip_flat_rate_costs(result_rules, categories, ip_data)
         return - max(taxable_amount, 0.0) * self._rule_parameter('ip_tax_rate')
 
-    def _l10n_be_init_work_bonus_explanation(self, localdict):
+    def _l10n_be_init_work_bonus_explanation(self, explanation_info):
         no_worked_days = self.env._("No worked days")
-        localdict['explanation_info'].update({
+        explanation_info.update({
             'salary_formula': no_worked_days,
             'reference_salary': 0,
             'base_bonus_formula': no_worked_days,
@@ -3675,7 +3858,7 @@ class HrPayslip(models.Model):
             'carry_over': 0,
         })
 
-    def _l10n_be_update_work_bonus_explanation(self, localdict, gross, salary, base_bonus, base_bonus_formula,
+    def _l10n_be_update_work_bonus_explanation(self, explanation_info, gross, salary, base_bonus, base_bonus_formula,
                                                is_full_time, paid_days, total_days, paid_hours, total_hours):
         """
         Details how the work bonus reference salary (S) and the granted amount (P) are obtained.
@@ -3691,7 +3874,7 @@ class HrPayslip(models.Model):
             proration_formula = self.env._(
                 "Basic bonus (%(base_bonus)s) * (Paid hours (%(paid)s) / Total hours (%(total)s), rounded (2-digits))",
                 base_bonus=base_bonus, paid=paid, total=total)
-        elif paid_days < total_days:
+        elif float_compare(paid_days, total_days, precision_digits=2):
             paid, total = float_round(paid_days, precision_digits=4), float_round(total_days, precision_digits=4)
             salary_formula = self.env._(
                 "(Gross (%(gross)s) / Paid days (%(paid)s), rounded (2-digits)) * Total days (%(total)s)",
@@ -3703,7 +3886,7 @@ class HrPayslip(models.Model):
             salary_formula = self.env._("Gross (%(gross)s), complete month", gross=gross)
             proration_formula = self.env._(
                 "Basic bonus (%(base_bonus)s), complete month", base_bonus=base_bonus)
-        localdict['explanation_info'].update({
+        explanation_info.update({
             'salary_formula': salary_formula,
             'reference_salary': float_round(salary, precision_digits=4),
             'base_bonus_formula': base_bonus_formula,
@@ -3713,15 +3896,101 @@ class HrPayslip(models.Model):
 
     @api.model
     def _get_employment_bonus_excluded_codes(self):
-        return ['147.00', '147.05', '147.07', '040.27', '040.28', '039.23', '147.04', '147.08', '147.13']
+        # 026.00 pays the premium of overtime recovered later: its hours are declared when the rest is taken
+        return ['147.00', '147.05', '147.07', '040.27', '040.28', '039.23', '147.04', '147.08', '147.13', '026.00']
 
-    def _get_employment_bonus_employees_volet_A(self, localdict):
-        self._l10n_be_init_work_bonus_explanation(localdict)
-        result_rules = localdict['result_rules']
-        prev_monthly_payslips = localdict['l10n_be_month_payslips_by_payslip'][self]
-        worked_days_payslip = (self | prev_monthly_payslips).filtered('worked_days_line_ids')
+    def _l10n_be_get_employment_bonus_fractions(self, worked_days_payslip):
+        """Whether the days formula applies (full time, without time credit, out of Horeca), the hours (H) and days
+        (J) with a performance in the month, and the hours (U) and days (D) of the month in the full-time regime: the
+        reference wage of the employment bonus is the pay of a full month at full time, and part-time or incomplete
+        months get a share of the bonus."""
+        self.ensure_one()
+        excluded_codes = self._get_employment_bonus_excluded_codes()
+        onss_base = self.env.ref('l10n_be_hr_payroll.ONSS_BASE')
+        # paid time in the ONSS pay; extra hours add hours but no days
+        performances = worked_days_payslip.worked_days_line_ids.filtered(
+            lambda wd: wd.code not in excluded_codes and wd.amount and onss_base in wd.work_entry_type_id.category_ids
+        )
+        paid_hours = round(sum(performances.mapped('number_of_hours')), 2)  # H
+        paid_days = sum(performances.filtered(lambda wd: not wd.work_entry_type_id.is_extra_hours).mapped('number_of_days'))  # J
+        version = self.version_id
+        reference_calendar = version._get_reference_calendar()
+        calendar = version.resource_calendar_id
+        tz = ZoneInfo(version._get_tz())
+        if calendar.calendar_type == 'variable' and reference_calendar.hours_per_week:
+            if version.work_time_rate >= 1.0 and calendar.attendance_ids.filtered('recurrency'):
+                # a full-time cycle (days repeated every week or every few weeks) sets the regime's hours of each
+                # month: those of a full-time worker on the same cycle
+                month = calendar.get_work_duration_data(
+                    datetime.combine(self.date_from, time.min, tz), datetime.combine(self.date_to, time.max, tz),
+                    compute_leaves=False,
+                )
+                return False, paid_hours, round(month['hours'], 2), paid_days, month['days']
+            if reference_calendar.calendar_type == 'fixed':
+                # planned day by day: the month of the ONSS reference person, the hours its week plans over the days of
+                # the month (U, the hours corresponding to D, the days of its regime)
+                month = reference_calendar.get_work_duration_data(
+                    datetime.combine(self.date_from, time.min, tz), datetime.combine(self.date_to, time.max, tz),
+                    compute_leaves=False,
+                )
+            if reference_calendar.calendar_type != 'fixed' or not month['hours']:
+                # without a theoretical week of the reference person, its full-time week spread over the working days
+                # of the regime (Monday to Friday or Saturday)
+                weekdays = 6 if calendar.days_per_week > 5 else 5
+                days = sum(
+                    1 for day in rrule.rrule(rrule.DAILY, dtstart=self.date_from, until=self.date_to)
+                    if day.weekday() < weekdays
+                )
+                month = {'hours': reference_calendar.hours_per_week / weekdays * days, 'days': days}
+            if (version.work_time_rate >= 1.0 and not version.l10n_be_time_credit
+                    and version.l10n_be_joint_committee_id.egov3_code != '302'):
+                # a full-time worker out of Horeca declares days: the days formula, complete (S = W) when paid for all
+                # the days its planning holds in a month of contract, else against the days of the regime (D)
+                if (version.contract_date_start <= self.date_from
+                        and (not version.contract_date_end or version.contract_date_end >= self.date_to)):
+                    planned = calendar.get_work_duration_data(
+                        datetime.combine(self.date_from, time.min, tz), datetime.combine(self.date_to, time.max, tz),
+                        compute_leaves=False,
+                    )
+                    if planned['days'] and float_compare(paid_days, planned['days'], precision_digits=2) >= 0:
+                        return True, paid_hours, round(planned['hours'], 2), paid_days, paid_days
+                return True, paid_hours, round(month['hours'], 2), paid_days, month['days']
+            # the hours formula
+            return False, paid_hours, round(month['hours'], 2), paid_days, month['days']
+        month = reference_calendar.get_work_duration_data(
+            datetime.combine(self.date_from, time.min, tz), datetime.combine(self.date_to, time.max, tz),
+            compute_leaves=False,
+        )
+        if not month['hours']:
+            # no reference schedule to measure the month: the employee's own worked days
+            own = worked_days_payslip[0].worked_days_line_ids.filtered(lambda wd: wd.code not in excluded_codes)
+            month = {'hours': sum(own.mapped('number_of_hours')), 'days': sum(own.mapped('number_of_days'))}
+        # a time credit or a partial resumption reduces the week of a full-time contract, and Horeca declares the hours
+        # of its full-time workers: hours, as for a part time
+        is_full_time = (version.work_time_rate >= 1.0 and not version.l10n_be_time_credit
+                        and version.l10n_be_joint_committee_id.egov3_code != '302')
+        return is_full_time, paid_hours, round(month['hours'], 2), paid_days, month['days']
+
+    def _l10n_be_get_work_bonus_reference_salary(self, result_rules, month_payslips):
+        """The reference wage (S) of the employment bonus, as its volets measure it. The bounds of the bonus apply to
+        S, below the pay of the month when more hours (or days) are paid than the full-time month has."""
+        self.ensure_one()
+        basic = result_rules['ONSS_BASE_TOTAL']['total'] - result_rules['HolPayRec']['total']
+        worked_days_payslip = (self | month_payslips).filtered('worked_days_line_ids')
+        if self.env.context.get('salary_simulation') or not worked_days_payslip:
+            return basic
+        is_full_time, paid_hours, total_hours, paid_days, total_days = self._l10n_be_get_employment_bonus_fractions(worked_days_payslip)
+        if is_full_time and paid_days and float_compare(paid_days, total_days, precision_digits=2):
+            return float_round(basic / paid_days, precision_digits=2) * total_days  # S = (W/J) x D
+        if not is_full_time and paid_hours and float_compare(paid_hours, total_hours, precision_digits=2):
+            return float_round(basic / paid_hours, precision_digits=2) * total_hours  # S = (W/H) x U
+        return basic  # S = W
+
+    def _get_employment_bonus_employees_volet_A(self, result_rules, explanation_info, month_payslips, month_line_values, prev_month_line_values):
+        self._l10n_be_init_work_bonus_explanation(explanation_info)
+        worked_days_payslip = (self | month_payslips).filtered('worked_days_line_ids')
         if not worked_days_payslip and not self.env.context.get('salary_simulation') and result_rules['SECTORIAL.BONUS']['total'] == 0:  # in case we want a payslip with only the sectorial bonus
-            return {'result': 0, 'remaining_bonus': 0, 'explanation_info': localdict['explanation_info']}
+            return {'result': 0, 'remaining_bonus': 0, 'explanation_info': explanation_info}
 
         # S = (W / H) * U
         # W = salaire brut
@@ -3733,23 +4002,19 @@ class HrPayslip(models.Model):
         if self.env.context.get('salary_simulation') or not worked_days_payslip:
             paid_hours = total_hours = paid_days = total_days = 1
         else:
-            excluded_codes = self._get_employment_bonus_excluded_codes()
-            all_worked_days = worked_days_payslip.worked_days_line_ids.filtered(lambda wd: wd.code not in excluded_codes)
-            ref_worked_days = worked_days_payslip[0].worked_days_line_ids.filtered(lambda wd: wd.code not in excluded_codes)
-            paid_hours = round(sum(all_worked_days.filtered(lambda wd: wd.amount).mapped('number_of_hours')), 2)  # H
-            total_hours = round(sum(ref_worked_days.mapped('number_of_hours')), 2)  # U
-            paid_days = sum(all_worked_days.filtered(lambda wd: wd.amount).mapped('number_of_days'))  # J
-            total_days = sum(ref_worked_days.mapped('number_of_days'))  # D
+            is_full_time, paid_hours, total_hours, paid_days, total_days = self._l10n_be_get_employment_bonus_fractions(worked_days_payslip)
             if (not is_full_time and not paid_hours) or (is_full_time and not paid_days):
-                return {'result': 0, 'remaining_bonus': 0, 'explanation_info': localdict['explanation_info']}
+                return {'result': 0, 'remaining_bonus': 0, 'explanation_info': explanation_info}
 
         # 1. - Détermination du salaire mensuel de référence (S)
         basic = result_rules['ONSS_BASE_TOTAL']['total'] - result_rules['HolPayRec']['total']
         if is_full_time:
-            if paid_days < total_days:
+            if float_compare(paid_days, total_days, precision_digits=2):
                 salary = float_round(basic / paid_days, precision_digits=2) * total_days  # S = (W/J) x D
             else:
                 salary = basic  # S = W
+        elif not float_compare(paid_hours, total_hours, precision_digits=2):
+            salary = basic  # S = W
         else:
             salary = float_round(basic / paid_hours, precision_digits=2) * total_hours  # S = (W/H) x U
 
@@ -3789,31 +4054,31 @@ class HrPayslip(models.Model):
                 salary=float_round(salary, precision_digits=4),
                 bound=float_round(wage_higher_bound, precision_digits=4))
 
+        # R is rounded to the cent before the fraction of the month applies
+        result = float_round(result, precision_digits=2)
         self._l10n_be_update_work_bonus_explanation(
-            localdict, basic, salary, result, base_bonus_formula,
+            explanation_info, basic, salary, result, base_bonus_formula,
             is_full_time, paid_days, total_days, paid_hours, total_hours)
         # 3. - Détermination du montant de la réduction (P)
         if is_full_time:
             if paid_days < total_days:  # If J=D result will remain same
                 result = float_round(paid_days / total_days, precision_digits=2) * result  # P = (J/D) x R
         else:
-            result = float_round(paid_hours / total_hours, precision_digits=2) * result  # P = (H/U) x R
+            result = min(1.0, float_round(paid_hours / total_hours, precision_digits=2)) * result  # P = (H/U) x R, at most R
 
-        already_paid = localdict['l10n_be_month_line_values_by_payslip'][self]['EmpBonus.A']['sum']['total']
-        carry_over = localdict['l10n_be_prev_month_line_values_by_payslip'][self]['EmpBonus.A.CO']['sum']['total']
+        already_paid = month_line_values['EmpBonus.A']['sum']['total']
+        carry_over = prev_month_line_values['EmpBonus.A.CO']['sum']['total']
         onss = result_rules['ONSS']['total'] + result_rules['ONSS_BONUS']['total'] + result_rules['ONSSRESTRUCTURING']['total']
-        localdict['explanation_info'].update({'onss': -float_round(onss, precision_digits=4), 'calculated_bonus': float_round(result, precision_digits=4), 'already_paid': float_round(already_paid, precision_digits=4), 'carry_over': float_round(carry_over, precision_digits=4)})
+        explanation_info.update({'onss': -float_round(onss, precision_digits=4), 'calculated_bonus': float_round(result, precision_digits=4), 'already_paid': float_round(already_paid, precision_digits=4), 'carry_over': float_round(carry_over, precision_digits=4)})
         result = result - already_paid + carry_over
         remaining_bonus = max(0, result + onss)
-        return {'result': min(-onss, result), 'remaining_bonus': remaining_bonus, 'explanation_info': localdict['explanation_info']}
+        return {'result': min(-onss, result), 'remaining_bonus': remaining_bonus, 'explanation_info': explanation_info}
 
-    def _get_employment_bonus_employees_volet_B(self, localdict):
-        self._l10n_be_init_work_bonus_explanation(localdict)
-        result_rules = localdict['result_rules']
-        prev_monthly_payslips = localdict['l10n_be_month_payslips_by_payslip'][self]
-        worked_days_payslip = (self | prev_monthly_payslips).filtered('worked_days_line_ids')
+    def _get_employment_bonus_employees_volet_B(self, result_rules, explanation_info, month_payslips, month_line_values, prev_month_line_values):
+        self._l10n_be_init_work_bonus_explanation(explanation_info)
+        worked_days_payslip = (self | month_payslips).filtered('worked_days_line_ids')
         if not worked_days_payslip and not self.env.context.get('salary_simulation') and result_rules['SECTORIAL.BONUS']['total'] == 0:
-            return {'result': 0, 'remaining_bonus': 0, 'explanation_info': localdict['explanation_info']}
+            return {'result': 0, 'remaining_bonus': 0, 'explanation_info': explanation_info}
 
         # S = (W / H) * U
         # W = salaire brut
@@ -3825,23 +4090,19 @@ class HrPayslip(models.Model):
         if self.env.context.get('salary_simulation') or not worked_days_payslip:
             paid_hours = total_hours = paid_days = total_days = 1
         else:
-            excluded_codes = self._get_employment_bonus_excluded_codes()
-            all_worked_days = worked_days_payslip.worked_days_line_ids.filtered(lambda wd: wd.code not in excluded_codes)
-            ref_worked_days = worked_days_payslip[0].worked_days_line_ids.filtered(lambda wd: wd.code not in excluded_codes)
-            paid_hours = round(sum(all_worked_days.filtered(lambda wd: wd.amount).mapped('number_of_hours')), 2)  # H
-            total_hours = round(sum(ref_worked_days.mapped('number_of_hours')), 2)  # U
-            paid_days = sum(all_worked_days.filtered(lambda wd: wd.amount).mapped('number_of_days'))  # J
-            total_days = sum(ref_worked_days.mapped('number_of_days'))  # D
+            is_full_time, paid_hours, total_hours, paid_days, total_days = self._l10n_be_get_employment_bonus_fractions(worked_days_payslip)
             if (not is_full_time and not paid_hours) or (is_full_time and not paid_days):
-                return {'result': 0, 'remaining_bonus': 0, 'explanation_info': localdict['explanation_info']}
+                return {'result': 0, 'remaining_bonus': 0, 'explanation_info': explanation_info}
 
         # 1. - Détermination du salaire mensuel de référence (S)
         basic = result_rules['ONSS_BASE_TOTAL']['total'] - result_rules['HolPayRec']['total']
         if is_full_time:
-            if paid_days < total_days:
+            if float_compare(paid_days, total_days, precision_digits=2):
                 salary = float_round(basic / paid_days, precision_digits=2) * total_days  # S = (W/J) x D
             else:
                 salary = basic  # S = W
+        elif not float_compare(paid_hours, total_hours, precision_digits=2):
+            salary = basic  # S = W
         else:
             salary = float_round(basic / paid_hours, precision_digits=2) * total_hours  # S = (W/H) x U
 
@@ -3880,35 +4141,35 @@ class HrPayslip(models.Model):
                 salary=float_round(salary, precision_digits=4),
                 bound=float_round(wage_higher_bound, precision_digits=4))
 
+        # R is rounded to the cent before the fraction of the month applies
+        result = float_round(result, precision_digits=2)
         self._l10n_be_update_work_bonus_explanation(
-            localdict, basic, salary, result, base_bonus_formula,
+            explanation_info, basic, salary, result, base_bonus_formula,
             is_full_time, paid_days, total_days, paid_hours, total_hours)
         # 3. - Détermination du montant de la réduction (P)
         if is_full_time:
             if paid_days < total_days:  # If J=D result will remain same
                 result = float_round(paid_days / total_days, precision_digits=2) * result  # P = (J/D) x R
         else:
-            result = float_round(paid_hours / total_hours, precision_digits=2) * result  # P = (H/U) x R
+            result = min(1.0, float_round(paid_hours / total_hours, precision_digits=2)) * result  # P = (H/U) x R, at most R
 
-        already_paid = localdict['l10n_be_month_line_values_by_payslip'][self]['EmpBonus.B']['sum']['total']
-        carry_over = localdict['l10n_be_prev_month_line_values_by_payslip'][self]['EmpBonus.B.CO']['sum']['total']
+        already_paid = month_line_values['EmpBonus.B']['sum']['total']
+        carry_over = prev_month_line_values['EmpBonus.B.CO']['sum']['total']
         onss = result_rules['ONSS']['total'] + result_rules['ONSS_BONUS']['total'] + result_rules['ONSSRESTRUCTURING']['total'] + result_rules['EmpBonus.A']['total']
-        localdict['explanation_info'].update({'onss': -float_round(onss, precision_digits=4), 'calculated_bonus': float_round(result, precision_digits=4), 'already_paid': float_round(already_paid, precision_digits=4), 'carry_over': float_round(carry_over, precision_digits=4)})
+        explanation_info.update({'onss': -float_round(onss, precision_digits=4), 'calculated_bonus': float_round(result, precision_digits=4), 'already_paid': float_round(already_paid, precision_digits=4), 'carry_over': float_round(carry_over, precision_digits=4)})
         result = result - already_paid + carry_over
         remaining_bonus = max(0, result + onss)
-        return {'result':  min(-onss, result), 'remaining_bonus': remaining_bonus, 'explanation_info': localdict['explanation_info']}
+        return {'result':  min(-onss, result), 'remaining_bonus': remaining_bonus, 'explanation_info': explanation_info}
 
     # ref: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/deductions/workers_reductions/workbonus.html
-    def _get_employment_bonus_employees(self, localdict):
+    def _get_employment_bonus_employees(self, result_rules, month_payslips, month_line_values, prev_month_line_values):
         self.ensure_one()
-        result_rules = localdict['result_rules']
         if self.date_from >= date(2024, 4, 1):
             bonus_volet_A = result_rules['EmpBonus.A']['total']
             bonus_volet_B = result_rules['EmpBonus.B']['total']
             return {'result': bonus_volet_A + bonus_volet_B, 'remaining_bonus': 0}
 
-        prev_monthly_payslips = localdict['l10n_be_month_payslips_by_payslip'][self]
-        worked_days_payslip = (self | prev_monthly_payslips).filtered('worked_days_line_ids')
+        worked_days_payslip = (self | month_payslips).filtered('worked_days_line_ids')
         if not worked_days_payslip and not self.env.context.get('salary_simulation') and result_rules['SECTORIAL.BONUS']['total'] == 0:
             return {'result': 0, 'remaining_bonus': 0}
 
@@ -3925,23 +4186,19 @@ class HrPayslip(models.Model):
             paid_days = 1
             total_days = 1
         else:
-            excluded_codes = self._get_employment_bonus_excluded_codes()
-            all_worked_days = worked_days_payslip.worked_days_line_ids.filtered(lambda wd: wd.code not in excluded_codes)
-            ref_worked_days = worked_days_payslip[0].worked_days_line_ids.filtered(lambda wd: wd.code not in excluded_codes)
-            paid_hours = round(sum(all_worked_days.filtered(lambda wd: wd.amount).mapped('number_of_hours')), 2)  # H
-            total_hours = round(sum(ref_worked_days.mapped('number_of_hours')), 2)  # U
-            paid_days = sum(all_worked_days.filtered(lambda wd: wd.amount).mapped('number_of_days'))  # J
-            total_days = sum(ref_worked_days.mapped('number_of_days'))  # D
+            is_full_time, paid_hours, total_hours, paid_days, total_days = self._l10n_be_get_employment_bonus_fractions(worked_days_payslip)
             if (not is_full_time and not paid_hours) or (is_full_time and not paid_days):
                 return {'result': 0, 'remaining_bonus': 0}
 
         # 1. - Détermination du salaire mensuel de référence (S)
         basic = result_rules['ONSS_BASE_TOTAL']['total'] - result_rules['HolPayRec']['total']
         if is_full_time:
-            if paid_days < total_days:
+            if float_compare(paid_days, total_days, precision_digits=2):
                 salary = float_round(basic / paid_days, precision_digits=2) * total_days  # S = (W/J) x D
             else:
                 salary = basic  # S = W
+        elif not float_compare(paid_hours, total_hours, precision_digits=2):
+            salary = basic  # S = W
         else:
             salary = float_round(basic / paid_hours, precision_digits=2) * total_hours  # S = (W/H) x U
 
@@ -3977,12 +4234,12 @@ class HrPayslip(models.Model):
             if paid_days < total_days:  # If J=D result will remain same
                 result = float_round(paid_days / total_days, precision_digits=2) * result  # P = (J/D) x R
         else:
-            result = float_round(paid_hours / total_hours, precision_digits=2) * result  # P = (H/U) x R
+            result = min(1.0, float_round(paid_hours / total_hours, precision_digits=2)) * result  # P = (H/U) x R, at most R
 
-        carry_over = localdict['l10n_be_prev_month_line_values_by_payslip'][self]['EmpBonus.Total.CO']['sum']['total']
+        carry_over = prev_month_line_values['EmpBonus.Total.CO']['sum']['total']
         result += carry_over
         if self.date_from < date(2024, 4, 1):
-            already_paid = localdict['l10n_be_month_line_values_by_payslip'][self]['EmpBonus.1']['sum']['total']
+            already_paid = month_line_values['EmpBonus.1']['sum']['total']
             result -= already_paid
         onss = result_rules['ONSS']['total'] + result_rules['ONSS_BONUS']['total'] + result_rules['ONSSRESTRUCTURING']['total']
         remaining_bonus = max(0, result + onss)
@@ -4000,7 +4257,8 @@ class HrPayslip(models.Model):
         if self.date_to.year >= 2024 and rates == self._rule_parameter('termination_fees_pp_rates'):
             yearly_revenue = gross
         else:
-            monthly_revenue = version._get_contract_wage()
+            # Annex III n° 53: the yearly normal pay, that of the weekly hours for a worker paid by the hour
+            monthly_revenue = version._l10n_be_get_monthly_wage(self.date_to.year)
             deduct_rate = self._get_starterjob_deduction_rate()
             if deduct_rate != 0:
                 monthly_revenue *= (100 - deduct_rate) / 100
@@ -4043,10 +4301,11 @@ class HrPayslip(models.Model):
 
         return - withholding_tax_amount
 
-    def _get_theoretical_exceptional_monthly_withholding_tax(self, localdict, exceptional_gross):
+    def _get_theoretical_exceptional_monthly_withholding_tax(self, work_entries, exceptional_gross):
         """ Estimate what the monthly professional withholding tax would be on regular contract income topped up by one twelfth of the exceptional gross. """
         version = self.version_id
-        monthly_contract_wage = version._get_contract_wage()
+        # The normal monthly pay, that of the weekly hours for a worker paid by the hour
+        monthly_contract_wage = version._l10n_be_get_monthly_wage(self.date_to.year)
 
         # Add each recurring taxable benefit in kind to the monthly contract wage.
         if version.internet:
@@ -4074,7 +4333,7 @@ class HrPayslip(models.Model):
 
         # The taxable share of private car kilometre reimbursements is annualised and included here.
         if version.private_car_employee_kilometer:
-            car_result, car_result_qty, car_result_rate = self._get_be_private_car_reimursement_amount(localdict)
+            car_result, car_result_qty, car_result_rate = self._get_be_private_car_reimursement_amount(work_entries)
             yearly_taxable_gross += car_result * car_result_qty * car_result_rate / 100 * 12
 
         # Flat-rate professional fees, same lookup as the F_PROFESSIONAL_FEES rule, are deducted before the bareme
@@ -4090,10 +4349,11 @@ class HrPayslip(models.Model):
             or self._rule_parameter('flat_rate_professional_fees_rate_cp200', raise_if_not_found=False)
             or 0
         )
-        yearly_net_taxable = yearly_taxable_gross - min(yearly_taxable_gross * fees_rate, fees_max)
         # The transport withholding tax exemption offsets car ATN and private car reimbursements, capped at the
-        # gross taxable base, same as the TRANSPORT_TAX_DED rule.
-        yearly_net_taxable -= min(yearly_taxable_gross, self._get_be_withholding_taxes_transport_deduction(localdict))
+        # gross taxable base, same as the TRANSPORT_TAX_DED rule; the fees apply to what remains taxable.
+        transport_exemption = min(yearly_taxable_gross, self._get_be_withholding_taxes_transport_deduction(work_entries))
+        yearly_net_taxable = yearly_taxable_gross - transport_exemption
+        yearly_net_taxable -= min(yearly_net_taxable * fees_rate, fees_max)
 
         # Run the bareme on the full yearly base, then remove the marital and family charge deductions.
         yearly_theoretical_tax = self._compute_basic_bareme(yearly_net_taxable)
@@ -4103,7 +4363,7 @@ class HrPayslip(models.Model):
         # Floor at zero and divide by twelve, as a negative monthly tax makes no sense.
         return max(0.0, yearly_theoretical_tax) / 12.0
 
-    def _is_exceptional_withholding_tax_exempted(self, localdict, exceptional_gross):
+    def _is_exceptional_withholding_tax_exempted(self, year_payslips, work_entries, exceptional_gross):
         """
         Return True when the flat-rate professional withholding tax on double holiday or 13th month pay can be skipped.
         SSCUM for the year and the theoretical monthly tax on regular income must both be zero for the exemption to fire.
@@ -4124,7 +4384,7 @@ class HrPayslip(models.Model):
 
         # Check that no cumulated professional withholding tax (SSCUM) was paid on BEMONTHLY payslips this year.
         # The year key holds every validated payslip of the year, so the monthly structure is filtered here.
-        year_payslips = localdict['l10n_be_year_payslips_by_payslip'][self].filtered(
+        year_payslips = year_payslips.filtered(
             lambda p: p.struct_id.code == 'BEMONTHLY',
         )
         if year_payslips:
@@ -4136,47 +4396,47 @@ class HrPayslip(models.Model):
                 return False
 
         # Simulate what the monthly tax would be on regular income topped up by one twelfth of the exceptional gross.
-        theoretical_monthly_tax = self._get_theoretical_exceptional_monthly_withholding_tax(localdict, exceptional_gross)
+        theoretical_monthly_tax = self._get_theoretical_exceptional_monthly_withholding_tax(work_entries, exceptional_gross)
         # A zero theoretical tax means the employee genuinely owes nothing on this exceptional payment.
         return theoretical_monthly_tax <= 0
 
-    def _get_be_double_holiday_withholding_taxes(self, localdict):
+    def _get_be_double_holiday_withholding_taxes(self, categories, year_payslips, work_entries):
         self.ensure_one()
         # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
 
-        gross = localdict['categories']['DH_WITHHOLDING_BASE']
+        gross = categories['DH_WITHHOLDING_BASE']
         if gross <= 0:
             return 0
         # Skip the flat-rate tax entirely if the exemption conditions are met.
-        if self._is_exceptional_withholding_tax_exempted(localdict, gross):
+        if self._is_exceptional_withholding_tax_exempted(year_payslips, work_entries, gross):
             return 0
         rates = self._rule_parameter('holiday_pay_pp_rates')
 
         return self._get_withholding_taxes_after_child_allowances(rates, gross)
 
-    def _get_thirteen_month_withholding_taxes(self, localdict):
+    def _get_thirteen_month_withholding_taxes(self, categories, year_payslips, work_entries):
         self.ensure_one()
         # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
 
-        gross = localdict['categories']['BONUS_WITHHOLDING_BASE']
+        gross = categories['BONUS_WITHHOLDING_BASE']
         if gross <= 0:
             return 0
         # Skip the flat-rate tax entirely if the exemption conditions are met.
-        if self._is_exceptional_withholding_tax_exempted(localdict, gross):
+        if self._is_exceptional_withholding_tax_exempted(year_payslips, work_entries, gross):
             return 0
         rates = self._rule_parameter('exceptional_allowances_pp_rates')
 
         return self._get_withholding_taxes_after_child_allowances(rates, gross)
 
-    def _is_cp200_annual_sectorial_bonus_eligible(self, localdict=None):
+    def _is_cp200_annual_sectorial_bonus_eligible(self, month_line_values=None):
         self.ensure_one()
-        if localdict:
-            line_values = localdict['l10n_be_month_line_values_by_payslip'][self]
-            if line_values['SECTORIAL.BONUS']['sum']['total'] > 0:
-                return False
+        if month_line_values and month_line_values['SECTORIAL.BONUS']['sum']['total'] > 0:
+            return False
         EXCLUDED_EMPLOYER_DMFA_CODES = {'024', '026', '044', '054', '114'}
         if (
             self.version_id.l10n_be_reason_code == 355
+            or self.version_id.is_flexi()
+            or self.version_id.is_student()
             or self.date_to < date(2023, 1, 1)
             or self.payroll_config_id.l10n_be_employer_category_id.dmfa_code in EXCLUDED_EMPLOYER_DMFA_CODES
         ):
@@ -4260,54 +4520,56 @@ class HrPayslip(models.Model):
 
         return prorata
 
-    def _get_termination_fees_withholding_taxes(self, localdict):
+    def _get_termination_fees_withholding_taxes(self, result_rules, categories, work_entries):
         # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
         if self.date_from.year >= 2024:
             self.ensure_one()
 
             rates = self._rule_parameter('termination_fees_pp_rates')
-            gross = localdict['categories']['TERMINATION_WITHHOLDING_BASE']
+            gross = categories['TERMINATION_WITHHOLDING_BASE']
 
             return self._get_withholding_taxes_after_child_allowances(rates, gross, apply_reduction=False)
 
         else:
-            yearly_tax_amount = self._get_be_withholding_taxes_basic_bareme(localdict)
+            yearly_tax_amount = self._get_be_withholding_taxes_basic_bareme(result_rules, work_entries)
             yearly_tax_amount -= self._get_be_withholding_taxes_marital_deduction()
             yearly_tax_amount -= self._get_be_withholding_taxes_family_charges_deduction()
             return -max(0, float_round(yearly_tax_amount / 12.0, precision_rounding=0.01, rounding_method='DOWN'))
 
-    def _get_replacement_revenue_withholding_taxes(self, localdict):
+    def _get_replacement_revenue_withholding_taxes(self, categories):
         self.ensure_one()
 
         rates = self._rule_parameter('exceptional_allowances_pp_rates')
-        gross = localdict['categories']['REPLACEMENT_REVENUE_BASE']
+        gross = categories['REPLACEMENT_REVENUE_BASE']
         return self._get_withholding_taxes_after_child_allowances(rates, gross)
 
-    def _l10n_be_get_warrant_atn_rate(self, localdict):
+    def _l10n_be_get_warrant_atn_rate(self, inputs):
         # The optional payslip input overrides the legal percentage (18%)
-        atn_percent_input = localdict['inputs'].get('WARRANT_ATN_PERCENT')
+        atn_percent_input = inputs.get('WARRANT_ATN_PERCENT')
         if atn_percent_input and atn_percent_input.amount:
             return atn_percent_input.amount
         return self._rule_parameter('warrant_atn_percentage')
 
-    def _get_warrant_withholding_taxes(self, localdict):
+    def _get_warrant_withholding_taxes(self, categories):
         self.ensure_one()
 
         rates = self._rule_parameter('exceptional_allowances_pp_rates')
-        gross = localdict['categories']['WARRANT_WITHHOLDING_BASE']
+        gross = categories['WARRANT_WITHHOLDING_BASE']
         return self._get_withholding_taxes_after_child_allowances(rates, gross)
 
-    def _get_withholding_reduction(self, localdict):
+    def _get_withholding_reduction(self, result_rules, previous_payslips_line_values):
         self.ensure_one()
-        result_rules = localdict['result_rules']
-        categories = localdict['categories']
-        previous_payslips_line_values = localdict['l10n_be_month_line_values_by_payslip'][self]
         reduction_explanation = ''
+        # The reductions of the scale reduce the tax of the scale, after its reduction for overtime, and never the
+        # exceptional rates of the same payslip: the flat rate on the temporary unemployment supplements (Annex III
+        # to the royal decree implementing the ITC 1992, n° 79.2.2: 26.75 % without reduction), the replacement
+        # revenue, the premiums or the double holiday pay
+        withholding_tax = max(0.0, -(result_rules['P.P']['total'] + result_rules['P.P.DEDEH']['total']))
         if result_rules['EmpBonus.1']:
             bonus_volet_A_rate = self.env['hr.rule.parameter']._get_parameter_from_code('work_bonus_volet_A_rate', date=self.date_to, raise_if_not_found=False) or 0.3314
             if self.date_from >= date(2024, 4, 1):
-                bonus_volet_A = localdict['result_rules']['EmpBonus.A']['total']
-                bonus_volet_B = localdict['result_rules']['EmpBonus.B']['total']
+                bonus_volet_A = result_rules['EmpBonus.A']['total']
+                bonus_volet_B = result_rules['EmpBonus.B']['total']
                 bonus_volet_B_rate = self.env['hr.rule.parameter']._get_parameter_from_code('work_bonus_volet_B_rate', date=self.date_to, raise_if_not_found=False) or 0.5254
                 if previous_payslips_line_values:
                     bonus_volet_A += previous_payslips_line_values['EmpBonus.A']['sum']['total']
@@ -4333,11 +4595,11 @@ class HrPayslip(models.Model):
                     bonus_volet_A_rate=float_round(bonus_volet_A_rate, precision_digits=2),
                 )
 
-            explanation_info = {'reduction_explanation': reduction_explanation, 'reduction': float_round(reduction, precision_digits=2), 'ded_pp': float_round(abs(categories['PP']), precision_digits=2)}
-            return min(abs(categories['PP']), reduction), explanation_info
-        return 0.0, {'reduction_explanation': reduction_explanation, 'reduction': 0.0, 'ded_pp': float_round(abs(categories['PP']), precision_digits=2)}
+            explanation_info = {'reduction_explanation': reduction_explanation, 'reduction': float_round(reduction, precision_digits=2), 'ded_pp': float_round(withholding_tax, precision_digits=2)}
+            return min(withholding_tax, reduction), explanation_info
+        return 0.0, {'reduction_explanation': reduction_explanation, 'reduction': 0.0, 'ded_pp': float_round(withholding_tax, precision_digits=2)}
 
-    def _get_impulsion_plan_amount(self, localdict):
+    def _get_impulsion_plan_amount(self):
 
         def _get_working_coefficient(payslips, date_from, date_to):
             full_time_calendar = (
@@ -4375,7 +4637,7 @@ class HrPayslip(models.Model):
             return theoretical_amount, min(coefficient, 1.0) * 100
         return 0, 0
 
-    def _get_onss_restructuring(self, localdict):
+    def _get_onss_restructuring(self, result_rules):
         self.ensure_one()
         # Source: https://www.onem.be/fr/documentation/feuille-info/t115
 
@@ -4433,19 +4695,19 @@ class HrPayslip(models.Model):
             return 0, {'restruct_amount': 0.0, 'restruct_ratio': 0.0}
 
         employee = self.version_id.employee_id
-        if employee._get_age(employee.contract_date_start) < 30:
+        if employee._get_age(self.version_id.contract_date_start) < 30:
             threshold = self._rule_parameter('onss_restructuring_before_30')
         else:
             threshold = self._rule_parameter('onss_restructuring_after_30')
 
-        salary = localdict['result_rules']['BASIC']['total']
+        salary = result_rules['BASIC']['total']
         if salary > threshold:
             return 0, {'restruct_amount': 0.0, 'restruct_ratio': 0.0}
 
         amount = self._rule_parameter('onss_restructuring_amount')
 
         if self.version_id.is_worker():
-            amount = amount * 1.08
+            amount = amount * self._rule_parameter('worker_onss_calculation_basis_uplift')
 
         paid_hours = sum(self.worked_days_line_ids.filtered(lambda wd: wd.amount).mapped('number_of_hours'))
         total_hours = sum(self.worked_days_line_ids.mapped('number_of_hours'))
@@ -4504,6 +4766,36 @@ class HrPayslip(models.Model):
             case _:
                 return False
 
+    def _l10n_be_get_activation_contribution_type(self):
+        """ The type of the activation contribution (260/261), its quarterly minimum and whether it is increased (due
+        for at least 10% of the workers). The type depends on the age at the start of the exemption from work.
+        Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/special_contributions/other_specialcontributions/activationcontribution.html
+        """
+        self.ensure_one()
+        version = self.version_id
+        quarter_start = date_utils.get_quarter(self.date_to)[0]
+        # Only the workers in contract during the quarter
+        all_versions = self.env['hr.version'].browse([
+            versions.sorted('date_version', reverse=True)[0].id
+            for _, versions in self.env['hr.version']._read_group(
+                domain=[
+                    ('company_id', '=', self.company_id.id),
+                    ('date_version', '<', self.date_to),
+                    ('contract_date_start', '!=', False),
+                    '|', ('contract_date_end', '=', False), ('contract_date_end', '>=', quarter_start),
+                ],
+                groupby=['employee_id'],
+                aggregates=['id:recordset'],
+            )
+        ])
+        increased = len(all_versions.filtered(lambda v: v._should_apply_onss_activation())) / len(all_versions) >= 0.1 if all_versions else False
+        age = self.employee_id._get_age(version.l10n_be_work_exemption_date or version.date_version)
+        if age < 60:
+            return ('5' if increased else '0'), 300, increased
+        if age < 62:
+            return ('6' if increased else '3'), 225.60, increased
+        return ('7' if increased else '4'), 225.60, increased
+
     def _should_apply_onss_contribution(self, contribution_worker_code):
         self.ensure_one()
         owedness_codes = self._get_owedness_codes(contribution_worker_code)
@@ -4512,11 +4804,17 @@ class HrPayslip(models.Model):
 
     def _must_contribute_retirement_fund(self):
         self.ensure_one()
+        if self.payroll_config_id.l10n_be_employer_category_id.dmfa_code in ('017', '417') and (
+            self.version_id.l10n_be_dimona_category in ('alt', 'ext')
+            or self.version_id.l10n_be_apprenticeship_contract_number
+        ):
+            # The Horeca pension excludes apprentices and occasional workers.
+            return False
         retirement_date = self.version_id.l10n_be_retirement_date
         quarter_start = date_utils.get_quarter(self.date_from)[0]
         return not retirement_date or retirement_date >= quarter_start or self.version_id.l10n_be_contribute_to_fse
 
-    def _get_number_repr_fees_units(self, unit, localdict):
+    def _get_number_repr_fees_units(self, unit, result_rules, worked_days):
         """
         This function is aimed at returning the effective amount of units
         that allow representation fees.
@@ -4535,21 +4833,21 @@ class HrPayslip(models.Model):
         benefit_category = self.env.ref('l10n_be_hr_payroll.REPRESENTATION_FEES')
         result = 0
         # Representation fees aren't paid if there's no basic pay or every day is an absence
-        if localdict['result_rules']['BASIC']['total'] and (not all((days.mapped('work_entry_type_id.count_as') == ['absence']) for days in localdict['worked_days'].values())):
+        if result_rules['BASIC']['total'] and (not all((days.mapped('work_entry_type_id.count_as') == ['absence']) for days in worked_days.values())):
             def filter(wdl): return benefit_category.id in wdl.work_entry_type_id.category_ids.mapped('id')
             result = sum(self.worked_days_line_ids.filtered(filter).mapped(field))
         return result
 
-    def _get_repr_fees_proration_rate(self, localdict):
+    def _get_repr_fees_proration_rate(self, result_rules, worked_days, work_hours_by_calendar_and_period):
         if self.env.context.get('salary_simulation_full_time'):
             return 100
 
         # The rate is the percentage of the expected work time according to the full-time calendar for the company that is actually being worked
-        number_of_hours_worked = self._get_number_repr_fees_units('hours', localdict)
-        expected_number_of_hours = localdict['work_hours_by_calendar_and_period'][self.version_id._get_reference_calendar(), self.date_from, self.date_to]
+        number_of_hours_worked = self._get_number_repr_fees_units('hours', result_rules, worked_days)
+        expected_number_of_hours = work_hours_by_calendar_and_period[self.version_id._get_reference_calendar(), self.date_from, self.date_to]
         return min(((number_of_hours_worked / expected_number_of_hours) * 100), 100)
 
-    def _get_holiday_pay_recovery(self, localdict):
+    def _get_holiday_pay_recovery(self, worked_days):
         """
             See: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/intermediates#intermediate_row_196b32c7-9d98-4233-805d-ca9bf123ff48
 
@@ -4589,7 +4887,6 @@ class HrPayslip(models.Model):
         """
         self.ensure_one()
         explanation_info = {'remaining_day_amount': 0.0, 'holiday_amount': 0.0}
-        worked_days = localdict['worked_days']
         if '016.00' not in worked_days or not sum(worked_days['016.00'].mapped('amount')):
             return 0, explanation_info
 
@@ -4626,11 +4923,11 @@ class HrPayslip(models.Model):
         explanation_info.update({'remaining_day_amount': float_round(remaining_day_amount, precision_digits=2), 'holiday_amount': float_round(holiday_amount, precision_digits=2)})
         return - min(remaining_day_amount, holiday_amount) * 0.9, explanation_info
 
-    def _get_termination_n_basic_double(self, localdict):
+    def _get_termination_n_basic_double(self):
         self.ensure_one()
         result_qty = 1
         result_rate = 6.8
-        result = localdict['payslip']._get_input_line_amount('GROSS_REF')
+        result = self._get_input_line_amount('GROSS_REF')
         date_from = self.date_from
         if self.struct_id.code == "BEHOLN1":
             existing_double_pay = self.env['hr.payslip'].search([
@@ -4673,7 +4970,7 @@ class HrPayslip(models.Model):
 
         return sum(attest._get_double_holiday_pay_cap(self.date_from) for attest in attests)
 
-    def _get_holiday_pay_regularization(self, localdict):
+    def _get_holiday_pay_regularization(self, result_rules, year_payslips):
         """Compute the annual holiday pay regularization for previous year's holiday attestations (N-1).
 
         Throughout the year, taking legal leave (`016.00`) deducts 90% of the hourly wage via the
@@ -4705,8 +5002,8 @@ class HrPayslip(models.Model):
               deductions exceeded `max_recoverable`.
 
         Args:
-            localdict (dict): Payroll evaluation context containing 'l10n_be_year_payslips_by_payslip'
-                              and 'result_rules'.
+            result_rules (dict): Rule results of the current payslip.
+            year_payslips (hr.payslip): Validated/paid payslips of the current year.
 
         Returns:
             tuple:
@@ -4728,13 +5025,11 @@ class HrPayslip(models.Model):
         if not hours_to_recover:
             return 0.0, {}
 
-        year_payslips = localdict['l10n_be_year_payslips_by_payslip'][self]
         all_payslips = (year_payslips | self).sorted('date_from')
 
         line_values = year_payslips._get_line_values(['HolPayRec'], compute_sum=True)
         actual_recovered_amount = -line_values['HolPayRec']['sum']['total']
 
-        result_rules = localdict['result_rules']
         if 'HolPayRec' in result_rules:
             actual_recovered_amount += -result_rules['HolPayRec']['total']
 
@@ -4789,7 +5084,11 @@ class HrPayslip(models.Model):
             ], limit=1)
         days_per_week = self.version_id.resource_calendar_id.days_per_week
         hours_per_day = self.version_id.resource_calendar_id.hours_per_day
-        result = self.version_id._get_contract_wage() * 3 / 13 / days_per_week
+        if self.version_id.wage_type == 'hourly':
+            # paid by the hour: the hours of a normal day at the hourly wage
+            result = self.version_id._get_contract_wage() * hours_per_day
+        else:
+            result = self.version_id._get_contract_wage() * 3 / 13 / days_per_week
         unlink_records = self.worked_days_line_ids.filtered_domain([('work_entry_type_id', '=', upcomming_public_holiday_type.id)])
         if unlink_records:
             unlink_records.unlink()
@@ -4803,33 +5102,51 @@ class HrPayslip(models.Model):
         })
         self.compute_sheet()
 
-    def _get_current_quarter_sum(self, rule_codes, localdict, include_current_payslip=True):
+    def _get_current_quarter_sum(
+        self, rule_codes, result_rules, quarter_payslips, quarter_totals, include_current_payslip=True, prefetch_rule_codes=(),
+    ):
         self.ensure_one()
-        quarter_prev_payslips = localdict['l10n_be_quarter_payslips_by_payslip'][self]
-        # TODO: to keep old behavior, the following line was added but we need make sure this is intended
-        #  (for example the termination payslip was not regulating the ONSS with regular payslips,
-        #  ~800€ difference in the 'test test_06_declaration_employee_no_notice_period')
-        quarter_prev_payslips = quarter_prev_payslips.filtered(lambda p: p.struct_id == self.struct_id)
-        line_values = quarter_prev_payslips._get_line_values(rule_codes, compute_sum=True)
-        total_prev_payslips = sum(line_values[rule_code]['sum']['total'] for rule_code in rule_codes)
-        total_current_payslip = sum(localdict['result_rules'].get(rule_code, {'total': 0})['total'] for rule_code in rule_codes)
+        missing_rule_codes = {*rule_codes, *prefetch_rule_codes} - quarter_totals.keys()
+        if missing_rule_codes:
+            # TODO: to keep old behavior, the following line was added but we need make sure this is intended
+            #  (for example the termination payslip was not regulating the ONSS with regular payslips,
+            #  ~800€ difference in the 'test test_06_declaration_employee_no_notice_period')
+            quarter_prev_payslips = quarter_payslips.filtered(lambda p: p.struct_id == self.struct_id)
+            line_values = quarter_prev_payslips._get_line_values(missing_rule_codes, compute_sum=True)
+            quarter_totals.update({
+                rule_code: line_values[rule_code]['sum']['total']
+                for rule_code in missing_rule_codes
+            })
+        total_prev_payslips = sum(quarter_totals[rule_code] for rule_code in rule_codes)
+        total_current_payslip = sum(result_rules.get(rule_code, {'total': 0})['total'] for rule_code in rule_codes)
         return total_prev_payslips + (total_current_payslip if include_current_payslip else 0)
+
+    def _l10n_be_get_onss_basis_uplift(self):
+        """ The factor of the ONSS contributions basis: 108% for the blue collars, whose holiday pay is paid
+        by the holiday fund (a flexi-job's holiday pay is the flexi holiday pay, already in the basis) """
+        self.ensure_one()
+        employer_category = self.payroll_config_id.l10n_be_employer_category_id.dmfa_code
+        if self.version_id.is_worker() and not self.version_id.is_flexi() and employer_category not in ['036', '320']:
+            return self._rule_parameter('worker_onss_calculation_basis_uplift')
+        return 1
 
     def _get_onss_contribution_amount(self, base_amount, rate):
         self.ensure_one()
-        employer_category = self.payroll_config_id.l10n_be_employer_category_id.dmfa_code
-        if self.version_id.is_worker() and employer_category not in ['036', '320']:
-            base_amount *= 1.08
-        return float_round(base_amount * rate / 100, 2)
+        return float_round(base_amount * self._l10n_be_get_onss_basis_uplift() * rate / 100, 2)
 
-    def _get_regularised_onss_contribution_amount(self, contribution_code, rate, localdict, base_codes=None, quarter_base=None):
+    def _get_regularised_onss_contribution_amount(self, contribution_code, rate, result_rules, quarter_payslips, quarter_totals, base_codes=None, quarter_base=None):
         self.ensure_one()
         if base_codes is None:
             base_codes = self._get_salary_wage_line_codes() - {'DH_SALARY'}
         if quarter_base is None:
-            quarter_base = self._get_current_quarter_sum(base_codes, localdict)
+            employer_rule_codes = {
+                code for code in self.struct_id.rule_ids.mapped('code') if code.startswith('ONSSEMPLOYER')
+            }
+            quarter_base = self._get_current_quarter_sum(
+                base_codes, result_rules, quarter_payslips, quarter_totals, prefetch_rule_codes=employer_rule_codes,
+            )
         quarter_contribution = self._get_onss_contribution_amount(quarter_base, rate)
-        already_paid_contribution = self._get_current_quarter_sum([contribution_code], localdict)
+        already_paid_contribution = self._get_current_quarter_sum([contribution_code], result_rules, quarter_payslips, quarter_totals)
         return quarter_contribution - already_paid_contribution
 
     def _calculate_dmfa_occupation_fraction(self, quarter_payslips):
@@ -5009,6 +5326,11 @@ class HrPayslip(models.Model):
         self.ensure_one()
         remuneration_n1 = self._l10n_be_get_remuneration_n1()
         simple_holiday_due = remuneration_n1 * 0.0767
+        gross_reference_n1 = self._get_input_line_amount('GROSS_REF') if self.struct_id.code == 'BEHOLN1' else 0
+        if gross_reference_n1:
+            # The departure passes the gross reference remuneration of the previous year, which can be encoded when
+            # that year's payroll is not in Odoo: the simple holiday pay due follows it.
+            simple_holiday_due = gross_reference_n1 * 0.0767
         current_year = self.date_from.replace(month=1, day=1)
         dp_date = current_year.replace(month=self._l10n_be_get_theoretical_double_holiday_pay_month())
         double_holiday_due_based_on_main_holiday_month = self._l10n_be_get_paid_double_holiday(
@@ -5132,7 +5454,7 @@ class HrPayslip(models.Model):
             loop_guard += 1
         return 0
 
-    def _l10n_be_get_economic_unemployment_compensation(self, localdict):
+    def _l10n_be_get_economic_unemployment_compensation(self, year_payslips, work_entries):
         """Compute the economic unemployment compensation for the employee/worker.
 
         Joint Committee Rules:
@@ -5145,21 +5467,24 @@ class HrPayslip(models.Model):
                     - Total temporary unemployment days > 110: 2€ per day.
             Default (Other Joint Committees):
                 2€ per day.
+        Neither is due on a collective closure (annual holidays, compulsory leave, compensatory rest): it is no
+        lack of work for economic reasons (law of 3 July 1978, art. 51).
         """
         self.ensure_one()
 
         payslip_input = self._get_input_line_amount('EUC_CP200')
         employee = self.employee_id
         worked_days = self.worked_days_line_ids
-        company_seniority = relativedelta(self.date_from, employee.first_contract_date)
+        company_seniority = relativedelta(self.date_from, employee._get_first_contract_date(date_limit=self.date_to))
         company_seniority = company_seniority.years * 12 + company_seniority.months
         joint_committee_code = self.l10n_be_joint_committee_id.egov3_code or "200"
         daily_compensation = self._rule_parameter("economic_unemployment_daily_compensation")
         special_codes = ["152.00", "156.50", "151.00"]
+        collective_closure_codes = ["157.00", "157.05", "157.10"]
         days = 0
         days_special = 0
 
-        for line in worked_days.filtered(lambda l: l.work_entry_type_id.l10n_be_economic_unemployment):
+        for line in worked_days.filtered(lambda l: l.work_entry_type_id.l10n_be_economic_unemployment and l.work_entry_type_id.code not in collective_closure_codes):
             if line.work_entry_type_id.code in special_codes:
                 days_special += line.number_of_days
             else:
@@ -5169,12 +5494,12 @@ class HrPayslip(models.Model):
         result = daily_compensation
         if joint_committee_code == "302" and company_seniority >= 6:
             previous_unemployment_days = 0
-            previous_payslips_of_year = localdict['l10n_be_year_payslips_by_payslip'][self].filtered_domain([
+            previous_payslips_of_year = year_payslips.filtered_domain([
                 ('date_to', '<=', self.date_from),
                 ('state', 'in', ['paid', 'validated']),
             ])
 
-            for previous_worked_days in previous_payslips_of_year.worked_days_line_ids.filtered(lambda l: l.work_entry_type_id.l10n_be_economic_unemployment):
+            for previous_worked_days in previous_payslips_of_year.worked_days_line_ids.filtered(lambda l: l.work_entry_type_id.l10n_be_economic_unemployment and l.work_entry_type_id.code not in collective_closure_codes):
                 previous_unemployment_days += previous_worked_days.number_of_days
 
             if previous_unemployment_days <= 110:
@@ -5184,27 +5509,33 @@ class HrPayslip(models.Model):
                 cap_remaining_days = 110 - previous_unemployment_days
 
                 unemployment_entries = [
-                    we for we in localdict['work_entries']
+                    we for we in work_entries
                     if we["work_entry_type_id"].l10n_be_economic_unemployment
+                    and we["work_entry_type_id"].code not in collective_closure_codes
                 ]
 
                 entries_by_date = defaultdict(list)
                 for entry in unemployment_entries:
                     entries_by_date[entry["date"]].append(entry)
 
+                # The complement is due per day of unemployment, whatever its length: a partial day
+                # (a fraction of a worked day) is a day, so the days beyond the 110 are counted per date too.
                 for daily_entries in entries_by_date.values():
-                    if cap_remaining_days <= 0:
-                        break
+                    beyond_cap = cap_remaining_days <= 0
                     cap_remaining_days -= 1
 
                     if any(we["work_entry_type_id"].code in special_codes for we in daily_entries):
                         continue
 
-                    daily_hours = sum(we["duration"] for we in daily_entries)
-                    result += max(daily_compensation, daily_hours * hourly_compensation)
-                    days -= 1
+                    if beyond_cap:
+                        result += daily_compensation
+                        continue
 
-                result += (days_special + days) * daily_compensation
+                    # an amount per day: each day is paid to the cent
+                    daily_hours = sum(we["duration"] for we in daily_entries)
+                    result += max(daily_compensation, float_round(daily_hours * hourly_compensation, precision_digits=2))
+
+                result += days_special * daily_compensation
         elif joint_committee_code == "200":
             result = payslip_input
 
@@ -5216,7 +5547,7 @@ class HrPayslip(models.Model):
         days_after_2014 = (self.employee_id.l10n_be_notice_period_start - max(date(2014, 1, 1), self.employee_id.l10n_be_first_contract_date)).days
         total_days = (self.employee_id.l10n_be_notice_period_start - self.employee_id.l10n_be_first_contract_date).days
         if self.version_id.is_worker():
-            base_amount *= 1.08
+            base_amount *= self._rule_parameter('worker_onss_calculation_basis_uplift')
         return base_amount * days_after_2014 / total_days
 
     def _get_termination_fees_minimum_yearly_salary(self):
@@ -5415,7 +5746,7 @@ class HrPayslip(models.Model):
                 action['params']['next'] = {
                     'type': 'ir.actions.act_window',
                     'res_model': 'l10n.be.flexi.at.work',
-                    'view_mode': 'tree,form',
+                    'view_mode': 'list,form',
                     'domain': [('payslip_id', 'in', self.ids)],
                 }
         return action
@@ -5450,16 +5781,15 @@ class HrPayslip(models.Model):
         if paid_time_off_to_postpone_n2 > 0:
             self._set_input_value('PPTO2', existing_amounts['PPTO2'] + paid_time_off_to_postpone_n2)
 
-    def _get_net_to_recover_amount(self, localdict):
+    def _get_net_to_recover_amount(self, categories, year_payslips):
         self.ensure_one()
 
-        categories = localdict['categories']
         current_net = categories['REMUNERATION_BASE']
 
         if current_net < 0:
             return abs(current_net)
 
-        past_payslips = localdict['l10n_be_year_payslips_by_payslip'][self].filtered_domain([
+        past_payslips = year_payslips.filtered_domain([
             ('date_to', '<', self.date_to),
             ('state', 'in', ['paid', 'validated']),
         ])
@@ -5482,7 +5812,7 @@ class HrPayslip(models.Model):
     def _get_starterjob_deduction_rate(self):
         self.ensure_one()
         if self.version_id.l10n_be_is_starterjob and not self.env.context.get('without_starterjob'):
-            last_day_of_the_month = date.today() + relativedelta(day=31)
+            last_day_of_the_month = self.date_to + relativedelta(day=31)
             age = self.employee_id._get_age(last_day_of_the_month)
             if age >= 18 and age <= 20:
                 return self._rule_parameter('starterjob_gross_reduction').get(age)
@@ -5602,30 +5932,43 @@ class HrPayslip(models.Model):
     def _get_special_wage_moderation_contribution(self):
         """
         Formule: (Partie_A + Partie_B) / 2
-            - Partie A = (Salaire de ref. indexé modéré - [4000 * (1 + chiffre d'index) * fraction de prestation]) * chiffre d'index limité à 2%
+            - Partie A = (Salaire de ref. indexé - [4000 * (1 + chiffre d'index)]) * fraction de prestation * chiffre d'index limité à 2%
             - Partie B = Partie A * taux ONSS global (employeur + modération salariale)
+        The reference wage is a full-time one: a part-time wage is converted with the work time rate (Q/S).
         Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/special_contributions/pennyindex_wagemoderationcontribution.html
         """
         self.ensure_one()
+        # the contribution is due from the first indexation of the period of the measure, that starts on 1 June 2026:
+        # an earlier indexation (as the one of January 2026) isn't moderated
+        indexation_date = date(self.date_from.year, 1, 1)
+        legal_index = self.env['hr.rule.parameter.value'].sudo().search([
+            ('rule_parameter_id.code', '=', 'l10n_be_legal_index'),
+            ('date_from', '<=', indexation_date),
+        ], order='date_from desc', limit=1)
+        if not legal_index or legal_index.date_from < date(2026, 6, 1):
+            return 0
         version = self.version_id
         rates = self._get_onss_global_rates()
         onss_pat_global_rate = rates['employer_rate'] + rates['salary_moderation_rate']
         reference_salary = version._l10n_be_get_monthly_wage(int(self.date_from.year))
         rule_parameter = self.env["hr.rule.parameter"]._get_parameter_from_code(
-                    "l10n_be_legal_index", date=date(self.date_from.year, 1, 1), raise_if_not_found=False,
+                    "l10n_be_legal_index", date=indexation_date, raise_if_not_found=False,
                 ).get(version.l10n_be_egov3_code, False)
         if not rule_parameter:
             return 0
         rate, cap = rule_parameter
-        attendance_rate = self._get_attendance_rate()
-        part_A = (reference_salary - (cap * (1 + rate) * attendance_rate)) * min(rate, 0.02)
+        # only the part of the full-time wage above the capped reference wage is concerned, nothing is due at or below
+        # it; the fraction of performance (against a full-time worker) prorates that part, so nothing is due without
+        # any performance either. With the work time rate Q/S: (wage x S/Q - cap) x (attendance x Q/S)
+        work_time_rate = version.work_time_rate or 1.0
+        part_A = max(0.0, reference_salary - cap * (1 + rate) * work_time_rate) * self._get_attendance_rate() * min(rate, 0.02)
         part_B = part_A * onss_pat_global_rate / 100
         return (part_A + part_B) / 2
 
     def _get_attendance_rate(self):
         self.ensure_one()
-        # DMFA prestation codes 1, 3, 4, 5, 20
-        PRESTATION_DMFA_CODES = {'1', '3', '4', '5', '20'}
+        # DMFA prestation codes 1, 3, 4, 5, 20, 38
+        PRESTATION_DMFA_CODES = {'1', '3', '4', '5', '20', '38'}
         wd_lines = self.worked_days_line_ids.filtered(lambda wd: wd.code != 'OUT')
         prestation_lines = wd_lines.filtered(lambda wd: wd.work_entry_type_id.dmfa_code in PRESTATION_DMFA_CODES)
         is_part_time = self.version_id.work_time_rate < 1.0
@@ -5640,6 +5983,51 @@ class HrPayslip(models.Model):
             D = sum(wd_lines.mapped('number_of_days'))
             attendance_rate = J / D if D else 0
         return attendance_rate
+
+    def _l10n_be_is_horeca_occasional(self):
+        """A Horeca occasional worker (an extra): DIMONA category EXT, declared under the employer category 317."""
+        self.ensure_one()
+        return (self.version_id.l10n_be_dimona_category == 'ext'
+                and self.payroll_config_id.l10n_be_employer_category_id.dmfa_code == '317')
+
+    def _l10n_be_get_horeca_occasional_days(self, work_entries):
+        """The flat-rate regime of Horeca occasional workers: their contributions are computed on a flat wage per
+        started hour, 6 hours a day at most, and a flat withholding tax applies, for the first days of work of the
+        calendar year (the worker's contingent).
+
+        :param work_entries: the work entries of the payslip (the rules' localdict)
+        :return: ({date: flat hours} of the payslip's days under the regime, {date: worked hours} of all its days)
+        Source: https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/socialsecuritycontributions/calculationbase/occasionals_horeca.html
+        """
+        self.ensure_one()
+
+        def worked_hours(entries):
+            hours = defaultdict(float)
+            for vals in entries:
+                if vals['work_entry_type_id'].count_as == 'working_time' and vals.get('duration'):
+                    hours[vals['date']] += vals['duration']
+            return hours
+
+        worked = worked_hours(work_entries)
+        # the days of work as an occasional worker earlier in the year use the contingent up
+        year_start = self.date_from.replace(month=1, day=1)
+        used = 0
+        if self.date_from > year_start:
+            before = self.date_from - timedelta(days=1)
+            versions = self.employee_id._get_versions_with_contract_overlap_with_period(year_start, before).filtered(
+                lambda v: v.l10n_be_dimona_category == 'ext')
+            used = len(worked_hours(versions.generate_work_entries(year_start, before)))
+        left = max(0, self._rule_parameter('horeca_occasional_days') - used)
+        flat = {day: min(math.ceil(round(worked[day], 4)), 6) for day in sorted(worked)[:left]}
+        return flat, worked
+
+    def _l10n_be_get_horeca_occasional_share(self, work_entries):
+        """The share of the pay of the payslip earned on the days of the flat-rate regime of Horeca occasional
+        workers (their worked hours over all the worked hours)."""
+        self.ensure_one()
+        flat, worked = self._l10n_be_get_horeca_occasional_days(work_entries)
+        total = sum(worked.values())
+        return sum(worked[day] for day in flat) / total if total else 0.0
 
     def action_open_employee_calendar(self):
         """Encoding worked time needs the wider list of time types, absences only is not enough.
@@ -5675,6 +6063,109 @@ class HrPayslip(models.Model):
     def _l10n_be_find_withholding_tax_rates(self, x, rates):
         low_bound, high_bound = rates[0][0], rates[-1][1]
         x = min(max(low_bound, x), high_bound)
+        rounded_x = float_round(x, precision_digits=2)
         for low, high, rate in rates:
-            if low <= x <= high:
+            if low <= rounded_x <= high:
                 return rate / 100.0
+
+    def _check_create_wech006(self):
+        """ The part-time work of the workers with a declaration of the start of their part-time occupation
+        (WECH003) is declared monthly to compute their income guarantee allowance """
+        wech003_risk = self.env.ref('l10n_be_hr_payroll.drs_risk_wech003_001', raise_if_not_found=False)
+        wech006_risk = self.env.ref('l10n_be_hr_payroll.drs_risk_wech006_001', raise_if_not_found=False)
+        payslips_to_declare = self.filtered(
+            lambda payslip: payslip.country_code == 'BE'
+            and payslip.struct_id.code == 'BEMONTHLY'
+            and payslip.version_id.resource_calendar_id.hours_per_week < payslip.version_id._get_reference_calendar().hours_per_week)
+        if not payslips_to_declare or not wech003_risk or not wech006_risk:
+            return
+        employees_with_wech003 = self.env['l10n.be.drs'].search([
+            ('risk_id', '=', wech003_risk.id),
+            ('employee_id', 'in', payslips_to_declare.employee_id.ids),
+        ]).employee_id
+        self.env['l10n.be.drs']._create_missing_declarations([{
+            'employee_id': payslip.employee_id.id,
+            'sector': 'unemployment',
+            'risk_id': wech006_risk.id,
+            'month': payslip.date_from.month,
+            'year': payslip.date_from.year,
+        } for payslip in payslips_to_declare if payslip.employee_id in employees_with_wech003])
+
+    def _check_create_wech007(self):
+        """ The work in a sheltered workshop is declared monthly, once declared for the employee (the ONEM still
+        compensates the workers of the sheltered workshops employed before July 2004) """
+        risk = self.env.ref('l10n_be_hr_payroll.drs_risk_wech007_001', raise_if_not_found=False)
+        payslips_to_declare = self.filtered(lambda payslip: payslip.country_code == 'BE' and payslip.struct_id.code == 'BEMONTHLY')
+        if not payslips_to_declare or not risk:
+            return
+        declared_employees = self.env['l10n.be.drs'].search([
+            ('risk_id', '=', risk.id),
+            ('employee_id', 'in', payslips_to_declare.employee_id.ids),
+        ]).employee_id
+        self.env['l10n.be.drs']._create_missing_declarations([{
+            'employee_id': payslip.employee_id.id,
+            'sector': 'unemployment',
+            'risk_id': risk.id,
+            'month': payslip.date_from.month,
+            'year': payslip.date_from.year,
+        } for payslip in payslips_to_declare if payslip.employee_id in declared_employees])
+
+    def _check_create_wech008(self):
+        """ The Walloon Impulsion plans are declared monthly to compute the work allowance """
+        risk_010 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_010', raise_if_not_found=False)
+        risk_011 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_011', raise_if_not_found=False)
+        payslips_to_declare = self.filtered(
+            lambda payslip: payslip.country_code == 'BE'
+            and payslip.struct_id.code == 'BEMONTHLY'
+            and payslip.version_id.l10n_be_impulsion_plan
+            and payslip.version_id.l10n_be_working_region == 'wa')
+        if not payslips_to_declare or not risk_010 or not risk_011:
+            return
+        self.env['l10n.be.drs']._create_missing_declarations([{
+            'employee_id': payslip.employee_id.id,
+            'sector': 'unemployment',
+            'risk_id': risk_010.id if payslip.version_id.l10n_be_impulsion_plan == '12mo' else risk_011.id,
+            'month': payslip.date_from.month,
+            'year': payslip.date_from.year,
+        } for payslip in payslips_to_declare])
+
+    def _check_create_zima002(self):
+        """ The adapted work during an incapacity (medical part-time) or as a maternity protection measure is
+        declared monthly to the health insurance """
+        risk_001 = self.env.ref('l10n_be_hr_payroll.drs_risk_zima002_001', raise_if_not_found=False)
+        risk_002 = self.env.ref('l10n_be_hr_payroll.drs_risk_zima002_002', raise_if_not_found=False)
+        if not risk_001 or not risk_002:
+            return
+        vals_list = []
+        for payslip in self.filtered(lambda payslip: payslip.country_code == 'BE' and payslip.struct_id.code == 'BEMONTHLY'):
+            worked_days = payslip.worked_days_line_ids.filtered(lambda line: line.number_of_hours > 0)
+            risks = worked_days.work_entry_type_id.l10n_be_drs_risk_ids
+            if risk_001 in risks:
+                risk = risk_001
+            # A partial removal from work, with worked hours
+            elif risk_002 in risks and any(line.work_entry_type_id.count_as == 'working_time' for line in worked_days):
+                risk = risk_002
+            else:
+                continue
+            vals_list.append({
+                'employee_id': payslip.employee_id.id,
+                'sector': 'compensation',
+                'risk_id': risk.id,
+                'month': payslip.date_from.month,
+                'year': payslip.date_from.year,
+            })
+        self.env['l10n.be.drs']._create_missing_declarations(vals_list)
+
+    def _check_create_zima003(self):
+        """ The breastfeeding pauses are declared monthly to the health insurance """
+        risk = self.env.ref('l10n_be_hr_payroll.drs_risk_zima003_001', raise_if_not_found=False)
+        if not risk:
+            return
+        self.env['l10n.be.drs']._create_missing_declarations([{
+            'employee_id': payslip.employee_id.id,
+            'sector': 'compensation',
+            'risk_id': risk.id,
+            'month': payslip.date_from.month,
+            'year': payslip.date_from.year,
+        } for payslip in self.filtered(lambda payslip: payslip.country_code == 'BE' and payslip.struct_id.code == 'BEMONTHLY' and any(
+            risk in line.work_entry_type_id.l10n_be_drs_risk_ids for line in payslip.worked_days_line_ids if line.number_of_hours > 0))])

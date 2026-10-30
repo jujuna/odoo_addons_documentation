@@ -2,6 +2,7 @@
 
 import io
 from datetime import date
+import logging
 
 import requests
 from dateutil.relativedelta import relativedelta
@@ -12,6 +13,8 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools import BinaryBytes, config, frozendict
 
 from odoo.addons.l10n_be_hr_payroll.models.l10n_be_onss_file import ENVIRONMENTS
+
+_logger = logging.getLogger(__name__)
 
 
 class L10nBeONSSBatchDeclaration(models.AbstractModel):
@@ -40,6 +43,8 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
     onss_declaration_ids = fields.One2many('l10n.be.onss.declaration', string="ONSS Declarations", compute='_compute_onss_declaration_ids', search='_search_onss_declaration_ids')
 
     error_message = fields.Char(store=True, compute='_compute_error_message', string="Error Message")
+    issues = fields.Json(compute='_compute_issues', readonly=True)
+    has_blocking_issues = fields.Boolean(compute='_compute_has_blocking_issues', export_string_translation=False)
 
     xml_file = fields.Binary(string="XML file")
     xml_raw_content = fields.Text(readonly=True)
@@ -65,15 +70,17 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
         compute='_compute_state',
     )
 
-    def _fetch_validation_schema(self):
-        self.ensure_one()
-        # We fetch the schema labeled with the previous quarter. I.E -> in May 2026 we use Q1 2026's schema.
-        base_schema_filename = self._get_base_schema_filename()
-
+    @api.model
+    def _get_schema_year_quarter(self):
+        # The schemas are labeled with the previous quarter. I.E -> in May 2026 we use Q1 2026's schema.
         target_date = date.today() - relativedelta(months=3)
         target_quarter = (target_date.month - 1) // 3 + 1
-        current_year_quarter = '%s%s' % (target_date.year, target_quarter)
-        schema_filename = base_schema_filename + current_year_quarter
+        return '%s%s' % (target_date.year, target_quarter)
+
+    def _fetch_validation_schema(self):
+        self.ensure_one()
+        base_schema_filename = self._get_base_schema_filename()
+        schema_filename = base_schema_filename + self._get_schema_year_quarter()
 
         attachment = self.env['ir.attachment'].search([
             ('name', '=', schema_filename),
@@ -85,21 +92,16 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
 
         base_url = self._get_base_schema_url()
         schema_url = base_url + schema_filename + '.xsd'
-        try:
-            response = requests.get(schema_url, timeout=30)
-            response.raise_for_status()
-            schema_xsd_root = etree.parse(io.BytesIO(response.content))
-            self.env['ir.attachment'].create({
-                'name': schema_filename,
-                'type': 'binary',
-                'raw': response.content,
-                'res_model': self._name,
-                'description': f'Cached {self._name} {self._get_declaration_type()} XSD schema',
-            })
-        except Exception as e:  # noqa: BLE001
-            raise UserError(_(
-                'Failed to fetch validation schema of %(type)s report for quarter %(year_quarter)s: \n%(error)s', type=self._get_declaration_type(), year_quarter=current_year_quarter, error=e))
-
+        response = requests.get(schema_url, timeout=30)
+        response.raise_for_status()
+        schema_xsd_root = etree.parse(io.BytesIO(response.content))
+        self.env['ir.attachment'].create({
+            'name': schema_filename,
+            'type': 'binary',
+            'raw': response.content,
+            'res_model': self._name,
+            'description': f'Cached {self._name} {self._get_declaration_type()} XSD schema',
+        })
         return schema_xsd_root
 
     @api.depends('xml_file')
@@ -108,7 +110,15 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
             declaration.error_message = False
             if not declaration.xml_file or config['test_enable'] or modules.module.current_test:
                 continue
-            xsd_root = declaration._fetch_validation_schema()
+            try:
+                xsd_root = declaration._fetch_validation_schema()
+            except requests.exceptions.ConnectionError:
+                current_year_quarter = declaration._get_schema_year_quarter()
+                error_message = f'Failed to fetch validation schema of {declaration._get_declaration_type()} report for quarter {current_year_quarter}. This was caused by a connection error to the social security page, please check your internet connection.'
+
+                declaration.error_message = error_message
+
+                return
             schema = etree.XMLSchema(xsd_root)
             try:
                 xml_root = etree.fromstring(declaration.xml_file.content)
@@ -177,6 +187,8 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
 
     def generate_declaration_xml_report(self):
         self.ensure_one()
+        if self.has_blocking_issues and not self._skip_blocking_issues_check():
+            raise UserError(self.env._("Fix the validation errors before creating the report."))
         filename_common = self._get_common_filename()
         certificate_sudo = self.company_id.sudo().onss_certificate_id
         if not certificate_sudo and self.environment != 'S' and not self.env.context.get('onss_skip_signature'):
@@ -251,6 +263,53 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
     def _get_rendering_data(self):
         raise NotImplementedError
 
+    def _skip_blocking_issues_check(self):
+        return False
+
+    @api.model
+    def _issues_dependencies(self):
+        return ['state']
+
+    @api.depends(lambda self: self._issues_dependencies())
+    def _compute_issues(self):
+        self.issues = {}
+        if (
+            not self.env.registry.ready
+            and not (config["test_enable"] or modules.module.current_test)
+            # This context key acts as an escape hatch for upgrade scripts that need to
+            # explicitly recompute payroll issues while the registry is still initializing.
+            and not (self.env.context.get("hr_payroll_force_compute_issue"))
+        ):
+            return
+
+        warnings = self.env["hr.payroll.warning"].search([
+            ("display_on_model", "=", True),
+            ("model_name", "=", self._name),
+            ("active", "=", True),
+        ])
+
+        warning_result = {}
+        for warning in warnings:
+            if warning.warning_type == 'domain':
+                warning_result[warning] = (warning._get_warning_domain_records(self.company_id, records_to_check=self), {})
+            else:
+                records, details, _, _ = warning._get_warning_python_records(localdict={'records': self})
+                if records == self.env['base']:
+                    continue
+                warning_result[warning] = (records, details or {})
+
+        for record in self:
+            record_issues = []
+            for warning, (related_records, details) in warning_result.items():
+                if record in related_records:
+                    record_issues.append(details.get(record.id, warning._get_warning_issue()))
+            record.issues = dict(enumerate(record_issues)) if record_issues else {}
+
+    @api.depends('issues')
+    def _compute_has_blocking_issues(self):
+        for record in self:
+            record.has_blocking_issues = any(issue.get('level') == 'danger' for issue in (record.issues or {}).values())
+
     def action_open_onss_declaration(self):
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id('l10n_be_hr_payroll.action_l10n_be_onss_declaration')
@@ -308,12 +367,17 @@ class L10nBeONSSBatchDeclaration(models.AbstractModel):
         errors = []
         if not self.xml_file or not self.xml_filename:
             errors.append(self.env._("The XML file is missing. Please generate the declaration first."))
+        if self.state == 'error' and self.error_message:
+            # The ONSS refuses a file which doesn't match its schema
+            errors.append(self.error_message)
         if self.environment != 'S' and not self.env.context.get('onss_skip_signature') and (not self.signature_file or not self.signature_filename):
             errors.append(self.env._("The signature file is missing. Please generate the declaration first."))
         if not self.go_file or not self.go_filename:
             errors.append(self.env._("The GO file is missing. Please generate the declaration first."))
         if not self.company_id.onss_expeditor_number:
             errors.append(self.env._("There is no defined expeditor number for the company."))
+        if self.has_blocking_issues and not self._skip_blocking_issues_check():
+            errors.append(self.env._("There are validation errors to fix."))
         return errors
 
     def action_submit_declaration(self):

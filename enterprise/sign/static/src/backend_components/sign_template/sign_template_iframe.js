@@ -413,6 +413,10 @@ export class SignTemplateIframe extends EditablePDFIframeMixin(PDFIframe) {
             for (const id in this.closePopoverFns) {
                 this.closePopoverFns[id].close();
                 const signItem = this.getSignItemById(id);
+                // the item may have been removed (e.g. radio options reduced from the popover)
+                if (!signItem) {
+                    continue;
+                }
                 if (signItem.data.type === "selection" && !signItem.data.option_ids.length) {
                     signItem.el.classList.add("o_sign_field_error");
                     this.notification.add(

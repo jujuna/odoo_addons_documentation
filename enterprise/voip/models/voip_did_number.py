@@ -19,9 +19,9 @@ from odoo.addons.voip.models.utils import digits, normalize_caller_number
 _logger = logging.getLogger(__name__)
 
 DID_NUMBER_TYPES = [
-    ("mobile", "Mobile"),
     ("local", "Local"),
     ("national", "National"),
+    ("mobile", "Mobile"),
     ("toll_free", "Toll-free"),
 ]
 
@@ -413,6 +413,65 @@ class VoipDidNumber(models.Model):
             if partners:
                 did.sudo().message_subscribe(partner_ids=partners.ids)
 
+    def message_post(self, **kwargs):
+        if (
+            kwargs.get("message_type") == "tracking"
+            and not kwargs.get("subject")
+            and kwargs.get("subtype_id") == self.env.ref("voip.mt_did_number_state").id
+            and (state_notification := self._get_state_notification())
+        ):
+            kwargs["subject"] = state_notification[0]
+        return super().message_post(**kwargs)
+
+    def _get_state_notification(self):
+        """Return the (subject, body) announcing the current state, or None."""
+        self.ensure_one()
+        number = self.did_number
+        if self.state == "pending":
+            subject = self.env._("Your number order is under review (%(number)s)", number=number)
+            text = self.env._(
+                "The order for your phone number %(number)s has been received and is under review. "
+                "The documents you have submitted are being evaluated. "
+                "You will be notified if we need more information to complete the order.",
+                number=number,
+            )
+        elif self.state == "active":
+            subject = self.env._("Your number is active! (%(number)s)", number=number)
+            text = self.env._(
+                "The order for your phone number %(number)s is complete. "
+                "Your number is now active and you can assign it.",
+                number=number,
+            )
+        elif self.state == "failure":
+            subject = self.env._("Your number order has failed (%(number)s)", number=number)
+            text = self.env._(
+                "The order for your phone number %(number)s could not be completed. "
+                "You can find more details on the phone number.",
+                number=number,
+            )
+        elif self.state == "suspended":
+            subject = self.env._("Your number is suspended (%(number)s)", number=number)
+            text = self.env._(
+                "Your phone number %(number)s has been suspended because your credit balance "
+                "could not cover its monthly fee. Buy credits to reactivate it, otherwise it will be released.",
+                number=number,
+            )
+        elif self.state == "released":
+            subject = self.env._("Your number has been released (%(number)s)", number=number)
+            text = self.env._(
+                "Your phone number %(number)s has been released. "
+                "It is no longer yours and can no longer be used to make or receive calls.",
+                number=number,
+            )
+        else:
+            return None
+        body = Markup("<p>%s</p><p>%s</p><p>--<br/>%s</p>") % (
+            self.env._("Dear %(name)s,", name=(self.user_id or self.create_uid).name),
+            text,
+            self.env._("Odoo Phone Team"),
+        )
+        return subject, body
+
     def _track_log_get_default_subtype(self, track_init_values):
         if "state" in track_init_values:
             return self.env.ref("voip.mt_did_number_state")
@@ -425,18 +484,11 @@ class VoipDidNumber(models.Model):
         )
         if not state_change:
             return super()._message_compute_body_with_trackings(body, tracking_values)
-        new_state = state_change.get("new_value")
-        if self.state == "active":
-            custom_html = Markup("<p>%s</p>") % self.env._(
-                "Your phone number is now active and can be assigned.",
-            )
-        elif self.state == "failure":
-            custom_html = Markup("<p>%s</p>") % self.env._(
-                "Your phone number activation has failed.",
-            )
+        if state_notification := self._get_state_notification():
+            custom_html = state_notification[1]
         else:
             custom_html = Markup("<p>%s</p>") % self.env._(
-                'Your phone number is in "%(state)s" state.', state=new_state,
+                'Your phone number is in "%(state)s" state.', state=state_change.get("new_value"),
             )
         other_trackings = [val for val in tracking_values if val is not state_change]
         if other_trackings:

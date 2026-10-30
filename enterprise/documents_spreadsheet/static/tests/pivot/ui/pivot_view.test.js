@@ -1323,7 +1323,7 @@ test("Can collapse pivot header group", async function () {
     ]);
 });
 
-test("when inserting a pivot in spreadsheet with a monetary measure, the aggregator is sum_currency", async () => {
+test("when inserting a sorted pivot in spreadsheet with a monetary measure, the aggregator is sum_currency", async () => {
     const { model } = await createSpreadsheetFromPivotView({
         serverData: {
             models: getBasicData(),
@@ -1336,6 +1336,9 @@ test("when inserting a pivot in spreadsheet with a monetary measure, the aggrega
                 "partner,false,search": /* xml */ `<search/>`,
             },
         },
+        actions: async () => {
+            await contains("thead .o_pivot_measure_row").click();
+        },
     });
 
     const [pivotId] = model.getters.getPivotIds();
@@ -1345,4 +1348,5 @@ test("when inserting a pivot in spreadsheet with a monetary measure, the aggrega
         fieldName: "pognon",
         aggregator: "sum_currency",
     });
+    expect(definition.sortedColumn.measure).toBe("pognon:sum_currency");
 });

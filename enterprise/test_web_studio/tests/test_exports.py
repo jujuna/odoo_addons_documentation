@@ -60,8 +60,8 @@ class TestStudioExports(StudioExportCase):
             data=[
                 "data/ir_model.xml",
                 "data/ir_model_fields.xml",
-                "data/ir_ui_view.xml",
                 "data/ir_actions_act_window.xml",
+                "data/ir_ui_view.xml",
                 "data/ir_ui_menu.xml",
             ],
             depends=["web_studio"],
@@ -158,6 +158,95 @@ class TestStudioExports(StudioExportCase):
         # Without export model, the custom model data are not exported
         self.studio_export()
         self.assertFileList("data/ir_model.xml", "data/ir_model_fields.xml")
+
+    def test_export_action_before_view_server(self):
+        action = self.create_customization(
+            "ir.actions.server",
+            name="Studio Server Action",
+            model_id=self.env["ir.model"]._get("res.partner").id,
+            state="code",
+            code="pass",
+        )
+        action_data = self.env["ir.model.data"].search([
+            ("studio", "=", True),
+            ("model", "=", "ir.actions.server"),
+            ("res_id", "=", action.id),
+        ])
+        self.create_customization(
+            "ir.ui.view",
+            name="Studio View",
+            model="res.partner",
+            type="form",
+            arch=f'<form><button string="Run" type="action" name="{action_data.complete_name}"/></form>',
+        )
+
+        self.studio_export()
+        self.assertFileList("data/ir_actions_server.xml", "data/ir_ui_view.xml")
+
+    def test_export_action_before_view_act_window(self):
+        action = self.create_customization(
+            "ir.actions.act_window",
+            name="Studio Window Action",
+            res_model="res.partner",
+            view_mode="list,form",
+        )
+        action_data = self.env["ir.model.data"].search([
+            ("studio", "=", True),
+            ("model", "=", "ir.actions.act_window"),
+            ("res_id", "=", action.id),
+        ])
+        self.create_customization(
+            "ir.ui.view",
+            name="Studio View",
+            model="res.partner",
+            type="form",
+            arch=f'<form><button string="Run" type="action" name="{action_data.complete_name}"/></form>',
+        )
+
+        self.studio_export()
+        self.assertFileList("data/ir_actions_act_window.xml", "data/ir_ui_view.xml")
+
+    def test_export_action_before_view_report(self):
+        report = self.create_customization(
+            "ir.actions.report",
+            name="Studio Report",
+            report_name="web_studio.test_studio_report",
+            model="res.partner",
+        )
+        report_data = self.env["ir.model.data"].search([
+            ("studio", "=", True),
+            ("model", "=", "ir.actions.report"),
+            ("res_id", "=", report.id),
+        ])
+        self.create_customization(
+            "ir.ui.view",
+            name="Studio View",
+            model="res.partner",
+            type="form",
+            arch=f'<form><button string="Print" type="action" name="{report_data.complete_name}"/></form>',
+        )
+
+        self.studio_export()
+        self.assertFileList("data/ir_actions_report.xml", "data/ir_ui_view.xml")
+
+    def test_export_view_before_act_window_with_real_view_id(self):
+        custom_view = self.create_customization(
+            "ir.ui.view",
+            name="Studio Form View",
+            model="res.partner",
+            type="form",
+            arch="<form><field name='name'/></form>",
+        )
+        self.create_customization(
+            "ir.actions.act_window",
+            name="Studio Action",
+            res_model="res.partner",
+            view_mode="form",
+            view_id=custom_view.id,
+        )
+
+        self.studio_export()
+        self.assertFileList("data/ir_ui_view.xml", "data/ir_actions_act_window.xml")
 
     def test_export_customizations_with_export_model(self):
         custom_model = self.create_customization(

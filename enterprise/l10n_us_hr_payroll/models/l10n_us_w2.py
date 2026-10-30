@@ -11,6 +11,43 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import BinaryBytes
 
+STATE_INCOME_TAX_CODES = [
+    'CAINCOMETAX', 'NYINCOMETAX', 'COINCOMETAX', 'ALINCOMETAX', 'VTINCOMETAX',
+    'ILINCOMETAX', 'AZINCOMETAX', 'NCINCOMETAX', 'VAINCOMETAX', 'DCINCOMETAX',
+    'ORINCOMETAX', 'IDINCOMETAX', 'IAINCOMETAX', 'GAINCOMETAX', 'MSINCOMETAX',
+    'NJINCOMETAX', 'MIINCOMETAX', 'MOINCOMETAX', 'KYINCOMETAX', 'UTINCOMETAX',
+    'SCINCOMETAX', 'KSINCOMETAX',
+]
+OTHER_TAX_CODES = {
+    'CA': {'CA SDI Tax': 'CASDITAX'},
+    'NY': {'NY SDI Tax': 'NYSDITAX'},
+    'VT': {'VT Childcare Tax': 'VTCHILDCARE'},
+    'OR': {'OR Transit Tax': 'ORTRANSITTAX', 'OR FMLI': 'ORFMLI'},
+    'NJ': {'NJ SDI Tax': 'NJSDITAX', 'NJ FLI Tax': 'NJFLITAX', 'NJ SUI Tax': 'NJSUITAX'},
+}
+LOCAL_INCOME_TAX_CODES = {
+    'CO': {
+        'Aurora': 'COOPTAURORA',
+        'Denver': 'COOPTDENVER',
+        'Glendale': 'COOPTGLENDALE',
+        'Greenwood Village': 'COOPTGREENWOODVILLAGE',
+        'Sheridan': 'COOPTSHERIDAN',
+    },
+    'NY': {
+        'New York': 'NYNYCINCOMETAX',
+        'Yonkers': 'NYYONKERSINCOMETAX',
+    },
+    'MO': {
+        'Kansas City': 'MOKCTAX',
+        'St. Louis': 'MOSTLOUISTAX',
+    },
+}
+# One rule covers all the localities of the state, so the locality name comes from the address
+ADDRESS_LOCAL_INCOME_TAX_CODES = {
+    'KY': 'KYCOUNTYTAX',
+    'MI': 'MICITYTAX',
+}
+
 
 class L10nUsW2(models.Model):
     _name = 'l10n.us.w2'
@@ -59,8 +96,8 @@ class L10nUsW2(models.Model):
         self.ensure_one()
         return [
             ('state', 'in', ['validated', 'paid']),
-            ('date_from', '<=', self.date_end),
-            ('date_to', '>=', self.date_start),
+            ('paid_date', '>=', self.date_start),
+            ('paid_date', '<=', self.date_end),
             ('company_id', '=', self.company_id.id),
         ]
 
@@ -73,9 +110,14 @@ class L10nUsW2(models.Model):
                 allowed_payslips = self.env['hr.payslip'].search(w2._get_allowed_payslips_domain())
                 w2.allowed_payslip_ids = allowed_payslips
 
+    def _get_box14_other_taxes(self, state, line_values):
+        box14 = []
+        for label, code in OTHER_TAX_CODES.get(state, {}).items():
+            box14 += [label, abs(line_values[code]['sum']['total'])]
+        return (box14 + [""] * 6)[:6]
+
     def _get_box17_state_income_tax(self, line_values):
-        state_income_tax_codes = ['CAINCOMETAX', 'NYINCOMETAX', 'COINCOMETAX', 'ALINCOMETAX']
-        return abs(sum(line_values[code]['sum']['total'] for code in state_income_tax_codes))
+        return abs(sum(line_values[code]['sum']['total'] for code in STATE_INCOME_TAX_CODES))
 
     def _get_box18_local_wage(self, state, line_values):
         if state == 'CO':
@@ -83,13 +125,32 @@ class L10nUsW2(models.Model):
         return ""
 
     def _get_box19_local_income_tax(self, state, line_values):
-        if state == 'CO':
-            colorado_local_income_tax_codes = ['COOPTAURORA', 'COOPTDENVER', 'COOPTGLENDALE', 'COOPTGREENWOODVILLAGE', 'COOPTSHERIDAN']
-            return abs(sum(line_values[code]['sum']['total'] for code in colorado_local_income_tax_codes))
+        local_income_tax_codes = list(LOCAL_INCOME_TAX_CODES.get(state, {}).values())
+        if state in ADDRESS_LOCAL_INCOME_TAX_CODES:
+            local_income_tax_codes.append(ADDRESS_LOCAL_INCOME_TAX_CODES[state])
+        if local_income_tax_codes:
+            return abs(sum(line_values[code]['sum']['total'] for code in local_income_tax_codes))
         return ""
 
     def _get_box20_locality_name(self, version):
-        if (version.address_id.state_id.code == 'CO' and version.address_id.city in ('Aurora', 'Denver', 'Glendale', 'Greenwood Village', 'Sheridan')):
+        state = version.address_id.state_id.code
+        if version.address_id.city in LOCAL_INCOME_TAX_CODES.get(state, {}):
+            return version.address_id.city
+        # MO also taxes the residents of its cities
+        if state == 'MO' and version.private_state_id.code == 'MO' and version.private_city in LOCAL_INCOME_TAX_CODES['MO']:
+            return version.private_city
+        if state in ADDRESS_LOCAL_INCOME_TAX_CODES:
+            return self._get_address_locality_name(version)
+        return ""
+
+    def _get_address_locality_name(self, version):
+        if version.address_id.state_id.code == 'KY':
+            return version.address_id.city_id.l10n_us_county_id.name or ""
+        mi_city_rates = self.env['hr.rule.parameter']._get_parameter_from_code(
+            'l10n_us_mi_city_tax_rates', self.date_end, raise_if_not_found=False) or {}
+        if version.private_state_id.code == 'MI' and version.private_city in mi_city_rates:
+            return version.private_city
+        if version.address_id.city in mi_city_rates:
             return version.address_id.city
         return ""
 
@@ -140,12 +201,13 @@ class L10nUsW2(models.Model):
             "13 Statutory employee",
             "13 Retirement plan",
             "13 Third-party sick pay",
-            "14 Other A",
-            "14 Other amount A",
-            "14 Other B",
-            "14 Other amount B",
-            "14 Other C",
-            "14 Other amount C",
+            "14a Other A",
+            "14a Other amount A",
+            "14a Other B",
+            "14a Other amount B",
+            "14a Other C",
+            "14a Other amount C",
+            "14b Treasury Tipped Occupation Code(s)",
             "File directly with state",
             "15 State",
             "15 Employer’s state ID number",
@@ -171,11 +233,13 @@ class L10nUsW2(models.Model):
         for employee, payslips in payslips_by_employee.items():
             line_values = payslips._get_line_values([
                 'TAXABLE', 'FIT', '401K', 'TIPS', 'SST', 'MEDICARE', 'MEDICAREADD', 'ALLOCATEDTIPS',
-                'MEDICALFSADC', 'MEDICALHSA', 'ROTH401K',
-                'CAINCOMETAX', 'NYINCOMETAX', 'COINCOMETAX', 'ALINCOMETAX',
-                'CASDITAX', 'NYSDITAX',
-                'COOPTAURORA', 'COOPTDENVER', 'COOPTGLENDALE', 'COOPTGREENWOODVILLAGE', 'COOPTSHERIDAN',
+                'MEDICALFSADC', 'MEDICALHSA', 'ROTH401K', 'QAOT',
+                *STATE_INCOME_TAX_CODES,
+                *(code for taxes in OTHER_TAX_CODES.values() for code in taxes.values()),
+                *(code for localities in LOCAL_INCOME_TAX_CODES.values() for code in localities.values()),
+                *ADDRESS_LOCAL_INCOME_TAX_CODES.values(),
             ], compute_sum=True)
+            qualified_overtime = abs(line_values['QAOT']['sum']['total'])
 
             version = employee._get_version(self.date_start)
 
@@ -219,16 +283,12 @@ class L10nUsW2(models.Model):
                 abs(line_values['MEDICALHSA']['sum']['total']),
                 "AA",
                 abs(line_values['ROTH401K']['sum']['total']),
-                "",
-                "",
+                "TT" if qualified_overtime else "",
+                qualified_overtime or "",
                 "TRUE" if version.l10n_us_statutory_employee else "FALSE",
                 "TRUE" if version.l10n_us_retirement_plan else "FALSE",
                 "TRUE" if version.l10n_us_third_party_sick_pay else "FALSE",
-                _("%s SDI Tax", version.address_id.state_id.code) if version.address_id.state_id.code in ['NY', 'CA'] else "",
-                abs(line_values['CASDITAX']['sum']['total'] + line_values['NYSDITAX']['sum']['total']),
-                "",
-                "",
-                "",
+                *self._get_box14_other_taxes(version.address_id.state_id.code, line_values),
                 "",
                 "",
                 version.address_id.state_id.code or "",

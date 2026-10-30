@@ -611,14 +611,6 @@ export class Session {
             // session out of Initial, so any later accept is a no-op.
             return;
         }
-        // The setTimeout is required to avoid a flickering when accepting the
-        // call when the microphone is already enabled. The async operation
-        // afterwards waits for the microphone being enabled + the call to be
-        // initialized: so the delay used here is a best guess.
-        const resolveMicError = this.voip.triggerError({
-            message: _t("Please accept use of the microphone."),
-            delay: 500,
-        });
         try {
             await this.__sipJsSession.accept({
                 sessionDescriptionHandlerOptions: {
@@ -628,10 +620,7 @@ export class Session {
             if (promote) {
                 this.voip.userAgent.promoteToFront(this.key);
             }
-            resolveMicError();
         } catch (error) {
-            resolveMicError();
-
             console.error(error);
             let technicalExtra = "";
             if (!this._hasSrtpDtlsMediaType()) {

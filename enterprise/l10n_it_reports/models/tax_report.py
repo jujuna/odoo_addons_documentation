@@ -1,4 +1,3 @@
-from dateutil.relativedelta import relativedelta
 from lxml import etree
 from markupsafe import Markup
 
@@ -132,7 +131,6 @@ class ItalianReportCustomHandler(models.AbstractModel):
             "tax_year": options_date_to.year,
             "vat_number": "".join([char for char in report.get_vat_for_export(options) if char.isdigit()]),
             "parent_company_vat_number": options["parent_company_vat_number"],
-            "last_month": (options_date_to - relativedelta(months=1)).month,
             "company_code": options["company_code"],
             "intermediary_code": options["intermediary_code"],
             "submission_commitment": options["intermediary_code"] and int(options["submission_commitment"]),

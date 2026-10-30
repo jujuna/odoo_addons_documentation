@@ -27,7 +27,8 @@
                 <thead>
                     <tr>
                         <th>Appointment Name</th>
-                        <th class="text-end">Date</th>
+                        <th>Date</th>
+                        <th class="text-end">Status</th>
                     </tr>
                 </thead>
                 <t t-foreach="appointments" t-as="appts">
@@ -37,8 +38,10 @@
                         <tr class="table-light">
                             <th>
                                 <em class="fw-normal text-muted">Appointments by <t t-out="searchbar_groupby[groupby]['label']"/>:</em>
-                                <span t-field="groupby_record.name"/>
+                                <span t-if="groupby == 'responsible'" t-field="groupby_record.name"/>
+                                <span t-if="groupby == 'status'" t-field="groupby_record.appointment_status"/>
                             </th>
+                            <th/>
                             <th class="text-end">
                                 Total: <span class="text-muted" t-out="len(appts)"/>
                             </th>
@@ -55,7 +58,34 @@
                                         </t>
                                     </a>
                                 </td>
-                                <td class="text-end"><span t-field="appointment.start"/></td>
+                                <td><span t-field="appointment.start"/></td>
+                                <td class="text-end">
+                                    <span t-if="appointment.appointment_status == 'booked'"
+                                        class="badge rounded-pill text-bg-success">
+                                        <i class="oi oi-fw" data-icon="calendar_today" aria-label="Booked" title="Booked" role="img"/>
+                                        <span class="d-none d-md-inline"> Booked</span>
+                                    </span>
+                                    <span t-elif="appointment.appointment_status == 'attended'"
+                                        class="badge rounded-pill text-bg-success">
+                                        <i class="oi oi-fw" data-icon="check" aria-label="Attended" title="Attended" role="img"/>
+                                        <span class="d-none d-md-inline"> Attended</span>
+                                    </span>
+                                    <span t-elif="appointment.appointment_status == 'no_show'"
+                                        class="badge rounded-pill text-bg-danger">
+                                        <i class="oi oi-fw" data-icon="visibility_off" aria-label="No Show" title="No Show" role="img"/>
+                                        <span class="d-none d-md-inline"> No Show</span>
+                                    </span>
+                                    <span t-elif="appointment.appointment_status == 'cancelled'"
+                                        class="badge rounded-pill text-bg-danger">
+                                        <i class="oi oi-fw" data-icon="close" aria-label="Cancelled" title="Cancelled" role="img"/>
+                                        <span class="d-none d-md-inline"> Cancelled</span>
+                                    </span>
+                                    <span t-else=""
+                                        class="badge rounded-pill text-bg-info">
+                                        <i class="oi oi-fw" data-icon="schedule" aria-label="Request" title="Request" role="img"/>
+                                        <span class="d-none d-md-inline"> Request</span>
+                                    </span>
+                                </td>
                             </tr>
                         </t>
                     </tbody>

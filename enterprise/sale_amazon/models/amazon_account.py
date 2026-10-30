@@ -461,15 +461,17 @@ class AmazonAccount(models.Model):
             amazon_utils.ensure_account_is_set_up(account)
 
             # The last synchronization date of the account is used as the lower limit on the orders'
-            # last status update date. The upper limit is determined by the API and returned with
-            # the request response, then saved on the account if the synchronization goes through.
-            sync_start = fields.Datetime.now()
-            last_updated_after = account.last_orders_sync  # Lower limit for pulling orders.
-            status_update_upper_limit = None  # Upper limit of synchronized orders.
+            # last status update date. The upper limit must be at least 2 minutes before the request
+            # time, and is saved on the account if the synchronization goes through.
+            sync_lower_limit = account.last_orders_sync
+            sync_upper_limit = fields.Datetime.now() - timedelta(minutes=2)
+            if sync_lower_limit > sync_upper_limit:
+                continue
 
             # Pull all recently updated orders and save the progress during synchronization.
             payload = {
-                "lastUpdatedAfter": last_updated_after.isoformat(sep="T") + "Z",
+                "lastUpdatedAfter": sync_lower_limit.isoformat(sep="T") + "Z",
+                "lastUpdatedBefore": sync_upper_limit.isoformat(sep="T") + "Z",
                 "marketplaceIds": ",".join(account.active_marketplace_ids.mapped("api_ref")),
                 "includedData": ("BUYER,RECIPIENT,FULFILLMENT,PROCEEDS,PROMOTION"),
             }
@@ -483,8 +485,6 @@ class AmazonAccount(models.Model):
                         account, "searchOrders", payload
                     )
                     orders_data = orders_batch_data["orders"]
-                    if last_updated_before := orders_batch_data.get("lastUpdatedBefore"):
-                        status_update_upper_limit = dateutil.parser.parse(last_updated_before)
 
                     # Process the batch one order data at a time.
                     for order_data in orders_data:
@@ -545,12 +545,9 @@ class AmazonAccount(models.Model):
                 )
                 continue  # The remaining orders will be pulled later when the cron runs again.
 
-            # There are no more orders to pull and the synchronization went through. Set the API
-            # upper limit on order status update to be the last synchronization date of the account.
-            if status_update_upper_limit:
-                account.last_orders_sync = status_update_upper_limit.replace(tzinfo=None)
-            else:
-                account.last_orders_sync = sync_start
+            # There are no more orders to pull and the synchronization went through. Set the upper
+            # limit as the last synchronization date of the account.
+            account.last_orders_sync = sync_upper_limit
 
     def _sync_order_by_reference(self, amazon_order_ref):
         """Synchronize an order based on its Amazon order reference.
@@ -983,7 +980,7 @@ class AmazonAccount(models.Model):
                 )
 
             # Discount tax computation
-            breakdowns = item_data["proceeds"].get("breakdowns", [])
+            breakdowns = item_data.get("proceeds", {}).get("breakdowns", [])
             promo_discount = get_financial_amount("DISCOUNT", "ITEM")
             ship_discount = get_financial_amount("DISCOUNT", "SHIPPING")
             total_discount = get_financial_amount("DISCOUNT")
@@ -1302,10 +1299,8 @@ class AmazonAccount(models.Model):
         def to_sync(offer_):
             return offer_.sync_stock or offer_.amazon_sync_status == "reset"
 
-        # Cache `free_qty` of all products to avoid recomputing it for each offer.
-        accounts.offer_ids.filtered(to_sync).product_id._compute_quantities()
-
         for account in accounts:
+            account = account.with_context(allowed_company_ids=account.company_id.ids)
             amazon_utils.ensure_account_is_set_up(account)
             offers = account.offer_ids.filtered(to_sync)
             offers._update_inventory_availability(account)

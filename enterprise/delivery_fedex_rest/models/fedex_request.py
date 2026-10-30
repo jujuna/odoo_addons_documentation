@@ -7,6 +7,8 @@ import re
 import requests
 from requests import RequestException
 
+import textwrap
+
 from odoo import _
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_repr, remove_accents
@@ -246,9 +248,9 @@ class FedexRequest:
 
     def _get_address_from_partner(self, partner, check_residential=False):
         res = self._get_location_from_partner(partner, check_residential)
-        res['streetLines'] = [remove_accents(partner.street)]
+        res['streetLines'] = textwrap.wrap(remove_accents(partner.street), width=35)
         if partner.street2:
-            res['streetLines'].append(remove_accents(partner.street2))
+            res['streetLines'] += textwrap.wrap(remove_accents(partner.street2), width=35)
         return res
 
     def _get_contact_from_partner(self, partner, company_partner=False):
@@ -260,17 +262,17 @@ class FedexRequest:
             res['phoneNumber'] = company_partner.phone
         if company_partner:
             # Always put the name of the company, if the partner is a WH
-            res['companyName'] = partner.name[:35]
-            res['personName'] = partner.name[:70]
+            res['companyName'] = remove_accents(partner.name[:35])
+            res['personName'] = remove_accents(partner.name[:70])
         elif partner.is_company:
-            res['companyName'] = partner.name[:35]
-            res['personName'] = partner.name[:70]
+            res['companyName'] = remove_accents(partner.name[:35])
+            res['personName'] = remove_accents(partner.name[:70])
         else:
-            res['personName'] = partner.name[:70]
+            res['personName'] = remove_accents(partner.name[:70])
             if partner.parent_id:
-                res['companyName'] = partner.parent_id.name[:35]
+                res['companyName'] = remove_accents(partner.parent_id.name[:35])
             elif partner.parent_name:
-                res['companyName'] = partner.parent_name[:35]
+                res['companyName'] = remove_accents(partner.parent_name[:35])
         if partner.email:
             res['emailAddress'] = partner.email
         elif company_partner and company_partner.email:

@@ -745,8 +745,12 @@ export class GridModel extends Model {
         };
         const groupBys = [];
         let notificationDisplayed = false;
+
         for (const groupBy of searchParams.groupBy) {
-            if (groupBy.startsWith(this.columnFieldName)) {
+            const fieldName = groupBy.split(":")[0];
+            const fieldInfo = this.fieldsInfo[fieldName];
+
+            if (fieldName === this.columnFieldName) {
                 if (!notificationDisplayed) {
                     this.notificationService.add(
                         _t(
@@ -756,11 +760,22 @@ export class GridModel extends Model {
                     );
                     notificationDisplayed = true;
                 }
+            } else if (fieldInfo && ["date", "datetime"].includes(fieldInfo.type)) {
+                if (!notificationDisplayed) {
+                    this.notificationService.add(
+                        _t(
+                            "Grouping by date is not supported."
+                        ),
+                        { type: "warning" }
+                    );
+                    notificationDisplayed = true;
+                }
             } else {
                 groupBys.push(groupBy);
             }
         }
-        if (searchParams.length !== groupBys.length) {
+
+        if (searchParams.groupBy.length !== groupBys.length) {
             searchParams.groupBy = groupBys;
         }
         let rowFields = [];

@@ -313,3 +313,86 @@ class TestCisReport(TestAccountReportsCommon):
             ],
             options,
         )
+
+    def pay_invoice(self, invoice, payment_date, payment_amount=None):
+        payment_register = self.env['account.payment.register']\
+            .with_context(active_model='account.move', active_ids=invoice.ids)\
+            .create({'payment_date': payment_date})
+        if payment_amount:
+            payment_register.amount = payment_amount
+        payment_register._create_payments()
+
+    def test_cash_basis_reported_on_the_payment_periods(self):
+        """
+        Test that once the cash basis is enabled, the bills are reported on the periods
+        they are paid in.
+        """
+        if 'account_reports_cash_basis' not in self.env['ir.module.module']._installed():
+            self.skipTest("Account Reports Cash Basis module is not installed")
+        partner = self.env['res.partner'].create({
+            'name': 'Adam George',
+            'is_company': False,
+            'l10n_uk_cis_enabled': True,
+            'l10n_uk_reports_cis_verification_number': 'V6499876214',
+            'l10n_uk_reports_cis_deduction_rate': 'net',
+            'l10n_uk_reports_cis_forename': 'Adam',
+            'l10n_uk_reports_cis_surname': 'George',
+        })
+        # Labour 1500 + materials 500 + 20% VAT - 20% CIS deduction gives 2100 to pay, half of it in June.
+        invoice = self.create_invoice_and_post(partner, '2009-04-18', [(1500, True), (500, False)])
+        self.pay_invoice(invoice, '2009-06-10', payment_amount=1050)
+        self.pay_invoice(invoice, '2009-07-10')
+
+        options = self._generate_options(self.report, '2009-04-06', '2009-05-05')
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            # Name                              Payment     Materials   Deduction
+            [0,                                 1,          2,          3],
+            [
+                ('CIS Deduction Purchase',      2000,       500,        300),
+                ('Adam George',                 2000,       500,        300),
+            ],
+            options,
+        )
+
+        self.env['ir.config_parameter'].set_bool('l10n_uk_reports_cis.cash_basis', True)
+
+        options = self._generate_options(self.report, '2009-04-06', '2009-05-05')
+        self.assertLinesValues(self.report._get_lines(options), [1, 2, 3], [], options)
+
+        for date_from, date_to in (('2009-06-06', '2009-07-05'), ('2009-07-06', '2009-08-05')):
+            options = self._generate_options(self.report, date_from, date_to)
+            self.assertLinesValues(
+                self.report._get_lines(options),
+                # Name                              Payment     Materials   Deduction
+                [0,                                 1,          2,          3],
+                [
+                    ('CIS Deduction Purchase',      1000,       250,        150),
+                    ('Adam George',                 1000,       250,        150),
+                ],
+                options,
+            )
+
+    def test_cash_basis_warning_unregistered_partner(self):
+        """
+        Test that on the cash basis, the warning about a partner not registered to the CIS is raised on
+        the period the bill is reported in.
+        """
+        if 'account_reports_cash_basis' not in self.env['ir.module.module']._installed():
+            self.skipTest("Account Reports Cash Basis module is not installed")
+        partner = self.env['res.partner'].create({
+            'name': 'Lumber Inc',
+            'is_company': True,
+        })
+        invoice = self.create_invoice_and_post(partner, '2009-04-18', [(3000, True)])
+        self.pay_invoice(invoice, '2009-06-10')
+        self.env['ir.config_parameter'].set_bool('l10n_uk_reports_cis.cash_basis', True)
+
+        for date_from, date_to, expect_warning in (
+            ('2009-04-06', '2009-05-05', False),
+            ('2009-06-06', '2009-07-05', True),
+        ):
+            warnings = {}
+            options = self._generate_options(self.report, date_from, date_to)
+            self.report._get_lines(options, None, warnings)
+            self.assertEqual('l10n_uk_reports_cis.warning_cis_unregistered_partner' in warnings, expect_warning)

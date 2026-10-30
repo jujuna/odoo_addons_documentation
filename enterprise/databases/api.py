@@ -6,6 +6,7 @@ import requests
 import xmlrpc.client
 
 from odoo.tools import LazyTranslate
+from odoo.tools.urls import urljoin
 
 
 _logger = logging.getLogger(__name__)
@@ -102,7 +103,7 @@ class BaseApi:
                 headers['X-Odoo-Database'] = self.database
 
             response = requests.post(
-                f'{self.host}/json/2/{model}/{method}',
+                urljoin(f'{self.host}/', f'json/2/{model}/{method}'),
                 headers=headers,
                 allow_redirects=False,
                 json=kwargs,
@@ -137,14 +138,14 @@ class OdooDatabaseApi(BaseApi):
     def fetch_version(cls, database_url):
         try:
             _logger.info('Call json2 fetch version on %s/json/version', database_url)
-            response = requests.get(f'{database_url}/json/version', allow_redirects=False, timeout=TIMEOUT)
+            response = requests.get(urljoin(f'{database_url}/', 'json/version'), allow_redirects=False, timeout=TIMEOUT)
             if response.status_code == 200:
                 if version := response.json().get('version'):
                     return _humanize_version(version)
 
             # Fallback to XML RPC call to common.version
             _logger.info('Call xmlrpc fetch version on %s', database_url)
-            version = xmlrpc.client.ServerProxy(f'{database_url}/xmlrpc/2/common').version().get('server_serie')
+            version = xmlrpc.client.ServerProxy(urljoin(f'{database_url}/', 'xmlrpc/2/common')).version().get('server_serie')
             return _humanize_version(version)
         except (requests.exceptions.RequestException, xmlrpc.client.Error):
             return None

@@ -72,8 +72,8 @@ class TestSubscription(TestSubscriptionCommon, HttpCase):
         self.assertEqual(self.url_open(url).status_code, 200, "Preview URL's response status should be 200")
 
     def test_sales_portal_redirects_to_subscription(self):
-        """Accessing a record from the sales portal should render:
-            - the subscription portal when the order is a subscription
+        """Accessing a record from the subscription portal should render:
+            - the subscription portal when current_history is my_subscriptions_history
             - the sales order portal when it is not
         """
 
@@ -85,21 +85,33 @@ class TestSubscription(TestSubscriptionCommon, HttpCase):
             subscription.access_token,
         )
 
-        # Case 1: order is a subscription → subscription portal template
-        response = self.url_open(url)
+        self.authenticate(self.user_portal.login, self.user_portal.login)
 
+        # Case 1: order is accessed with my_subscriptions_history session -> subscription view (Subscriptions breadcrumb)
+        self.url_open('/my/subscriptions')
+        response = self.url_open(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'o_sale_subscription_subscription_portal_template',
             response.content,
-            "Subscription portal template should be rendered for subscription orders"
+            "Subscription portal template should be rendered when accessed from subscription context"
         )
+        self.assertIn(b'/my/subscriptions', response.content)
 
-        # Case 2: order is no longer a subscription → sales order portal template
-        subscription.is_subscription = False
-
+        # Case 2: order accessed via sales order history -> sales order view (Sales Orders breadcrumb)
+        self.url_open('/my/orders')
         response = self.url_open(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'o_sale_sale_order_portal_template',
+            response.content,
+            "Sales order portal template should be rendered when accessed from sales context"
+        )
+        self.assertIn(b'/my/orders', response.content)
 
+        # Case 3: order is no longer a subscription -> sales order portal template
+        subscription.is_subscription = False
+        response = self.url_open(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'o_sale_sale_order_portal_template',

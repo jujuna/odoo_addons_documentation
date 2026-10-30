@@ -10,6 +10,7 @@
     <t t-name="project_enterprise.TaskGanttView.Buttons" t-inherit="web_gantt.GanttView.Buttons" t-inherit-mode="primary">
         <button class="o_gantt_button_add btn btn-primary" position="replace">
             <ProjectTaskTemplateDropdown
+                t-if="this.model.metaData.canCreate and !this.env.inDialog"
                 projectId="this.props.context.default_project_id"
                 onCreate="() => this.onNewClicked()"
                 newButtonClasses="'o_gantt_button_add btn btn-primary'"

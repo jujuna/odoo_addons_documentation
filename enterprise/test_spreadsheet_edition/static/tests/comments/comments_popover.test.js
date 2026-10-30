@@ -2,6 +2,7 @@ import { describe, expect, test, getFixture } from "@odoo/hoot";
 import { click, hover, press, waitFor, waitForNone, queryOne } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { helpers, registries, stores } from "@odoo/o-spreadsheet";
+import { listenStoreFetch, waitStoreFetch } from "@mail/../tests/mail_test_helpers";
 import { selectCell } from "@spreadsheet/../tests/helpers/commands";
 import { getActionMenu } from "@spreadsheet/../tests/helpers/ui";
 import { defineTestSpreadsheetEditionModels } from "@test_spreadsheet_edition/../tests/helpers/data";
@@ -154,4 +155,19 @@ test("Spreadsheet cell thread composer shows only one send button", async () => 
     // There should only be one send button (from chat window composer)
     await waitFor(".o-mail-Composer button[name='send-message']:count(1)");
     await waitForNone(".o-mail-Composer .o-mail-Composer-send");
+});
+
+test("Comment popover does not repeatedly fetch messages while open", async () => {
+    listenStoreFetch("/mail/thread/messages");
+    const { model, pyEnv } = await setupWithThreads();
+    const sheetId = model.getters.getActiveSheetId();
+    await createThread(model, pyEnv, { sheetId, ...toCartesian("A2") }, ["wave"]);
+
+    selectCell(model, "A2");
+    await waitFor(".o-thread-popover .o-mail-Thread");
+    await waitStoreFetch(["/mail/thread/messages"]);
+
+    // No further fetch should fire on its own.
+    await animationFrame();
+    expect.verifySteps([]);
 });

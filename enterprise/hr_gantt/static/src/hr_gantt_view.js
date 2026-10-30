@@ -9,7 +9,7 @@ export const hrGanttView = {
     ...ganttView,
     Model: HrGanttModel,
     Renderer: HrGanttRenderer,
-    searchMenuTypes: ["filter", "favorite"],
+    searchMenuTypes: ["filter", "groupBy", "favorite"],
 };
 
 viewRegistry.add("hr_gantt", hrGanttView);

@@ -2,7 +2,10 @@
     .o_helpdesk_team_kanban_view_view .o_kanban_renderer {
         --KanbanGroup-width: #{map-get($grid-breakpoints, 'xl') * 0.35};
         --KanbanRecord-width: #{map-get($grid-breakpoints, 'xl') * 0.35};
-        --Kanban-padding: #{map-get($spacers, 3)};
+
+        &, &.o_kanban_ungrouped {
+            --Kanban-padding: #{map-get($spacers, 3)};
+        }
     }
 }
 

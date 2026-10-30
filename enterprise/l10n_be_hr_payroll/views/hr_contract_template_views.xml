@@ -171,13 +171,24 @@
                 <attribute name="invisible">country_code == 'BE'</attribute>
             </field>
             <field name='structure_type_id' position="after">
-                <field name='l10n_be_salary_scale_id' string="Salary Scale" invisible="not display_l10n_be_scale"/>
+                <field name='l10n_be_salary_scale_id' string="Salary Scale" invisible="not display_l10n_be_scale" required="display_l10n_be_scale"/>
                 <field name="l10n_be_is_sale_representative" invisible="l10n_be_egov3_code != '200'"/>
             </field>
             <xpath expr="//sheet" position="before">
                 <div role="alert" class="alert alert-danger text-center" groups="hr_payroll.group_hr_payroll_user" invisible="not issues or country_code != 'BE'">
                       <field name="issues" class="w-100" widget="actionable_warnings" groups="hr_payroll.group_hr_payroll_user"/>
                 </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_version_list_view" model="ir.ui.view">
+        <field name="name">hr.version.list.view.inherit.l10n_be_hr_payroll</field>
+        <field name="model">hr.version</field>
+        <field name="inherit_id" ref="hr.hr_version_list_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='resource_calendar_id']" position="after">
+                <field name="car_id" widget="many2one" optional="hidden"/>
             </xpath>
         </field>
     </record>

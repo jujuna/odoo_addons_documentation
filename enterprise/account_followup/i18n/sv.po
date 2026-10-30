@@ -24,9 +24,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:15+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-21 12:34+0000\n"
+"Last-Translator: Hanna Kharraziha <hakha@odoo.com>\n"
+"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-20/"
 "account_followup/sv/>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -77,7 +77,7 @@ msgstr "%(company)s Betalningspåminnelse - %(partner)s"
 #. odoo-python
 #: code:addons/account_followup/models/account_followup.py:0
 msgid "%(display_delay)s days %(reminder_timing)s"
-msgstr ""
+msgstr "%(display_delay)s dagar %(reminder_timing)s"
 
 #. module: account_followup
 #: model:ir.actions.report,print_report_name:account_followup.action_report_followup
@@ -158,6 +158,75 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Hej\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>),\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t>,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or ''\">"
+"Brandon Freeman</t>,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        Det här är en påminnelse om att fakturan\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (med referensnummer: <t t-"
+"out=\"object.invoice_origin or ''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        och med beloppet <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount_residual, object.currency_id) or ''\">$143 "
+"750,00</span>\n"
+"                        från <t t-out=\"object.company_id.name or ''\">"
+"YourCompany</t> nu har förfallit.\n"
+"                        <br/><br/>\n"
+"                        Vänligen genomför betalningen så snart som möjligt\n"
+"                        <t t-if=\"object.payment_reference\">\n"
+"                            med följande betalningsreferens: <strong t-"
+"out=\"object.payment_reference or ''\">INV/2021/05/0005</strong>\n"
+"                            <t t-if=\"object.partner_bank_id\">\n"
+"                                till kontot <strong t-"
+"out=\"object.partner_bank_id.account_number\"/>\n"
+"                            </t>.\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object.partner_id._show_pay_now_button"
+"()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Betala nu</a>\n"
+"                        </p>\n"
+"                        En kopia av den ursprungliga fakturan finns bifogad "
+"till det här meddelandet.\n"
+"                        <br/>\n"
+"                        Om du redan har skickat betalningen kan du ignorera "
+"den här påminnelsen. Vid eventuella frågor eller funderingar, går det bra "
+"att helt enkelt svara på detta meddelande.\n"
+"                        <br/><br/>\n"
+"                        Med vänliga hälsningar,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_invoice_payment_last_reminder
@@ -233,6 +302,76 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Hej\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>),\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t>,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or ''\">"
+"Brandon Freeman</t>,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        Det här är vår tredje och sista påminnelse angående "
+"det obetalda beloppet för fakturan\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (med referensnummer: <t t-"
+"out=\"object.invoice_origin or ''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        vars betalning nu är\n"
+"                        <t t-if=\"object.invoice_date_due and "
+"object.invoice_date_due &lt; datetime.date.today()\">\n"
+"                            <t t-out=\"(datetime.date.today() - "
+"object.invoice_date_due).days\"/> dagar\n"
+"                        </t>\n"
+"                        försenad.\n"
+"                        Det totala kvarvarande beloppet är <span "
+"style=\"font-weight:bold;\" t-out=\"format_amount(object.amount_residual, "
+"object.currency_id) or ''\">$143 750,00</span>.\n"
+"                        Vi har skickat flera påminnelser men har varken fått "
+"in någon betalning eller ett svar.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object.partner_id._show_pay_now_button"
+"()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Betala nu</a>\n"
+"                        </p>\n"
+"                        Observera att ditt konto härmed anses vara "
+"försumligt. Vi uppmanar dig att genomföra betalningen så snart som möjligt. "
+"Vänligen se den ursprungliga fakturan bifogad.\n"
+"                        <br/><br/>\n"
+"                        Vänligen kontakta oss för att antingen bekräfta "
+"betalningen eller diskutera ärendet vidare. Vid utebliven betalning eller "
+"svar inom de närmsta 10 dagarna blir vi tvungna att granska kontots status.\n"
+"                        <br/><br/>\n"
+"                        Tack på förhand!\n"
+"                        <br/><br/>\n"
+"                        Med vänliga hälsningar,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_invoice_payment_second_reminder
@@ -315,6 +454,82 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Hej\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>),\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t>,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or ''\">"
+"Brandon Freeman</t>,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        Vi vill följa upp om vårt tidigare meddelande "
+"angående faktura\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (med referensnummer: <t t-"
+"out=\"object.invoice_origin or ''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        med beloppet <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount_residual, object.currency_id) or ''\">$143 "
+"750,00</span>\n"
+"                        från <t t-out=\"object.company_id.name or ''\">"
+"YourCompany</t>. Våra uppgifter indikerar att fakturan fortfarande inte är "
+"betald. Vänligen se den\n"
+"                        bifogade fakturan för mer information.\n"
+"                        <br/><br/>\n"
+"                        Vänligen ange\n"
+"                        <t t-if=\"object.payment_reference\">\n"
+"                            följande betalningsreferens: <strong t-"
+"out=\"object.payment_reference or ''\">INV/2021/05/0005</strong>\n"
+"                            <t t-if=\"object.partner_bank_id\">\n"
+"                                vid betalning till kontot <strong t-"
+"out=\"object.partner_bank_id.account_number\"/>\n"
+"                            </t>.\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object.partner_id._show_pay_now_button"
+"()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Betala nu</a>\n"
+"                        </p>\n"
+"                        Vi skulle uppskatta om du meddelade oss betalningens "
+"status. Om betalningen redan har utfärdats,\n"
+"                        vänligen meddela oss datum och betalningsmetod så "
+"att vi kan spåra betalningen och bekräfta detta.\n"
+"                        <br/>\n"
+"                        Vid eventuella problem med att genomföra "
+"betalningen, vänligen kontakta oss så snart som möjligt för vidare hjälp och "
+"rådgivning.\n"
+"                        <br/><br/>\n"
+"                        Tack på förhand!\n"
+"                        <br/><br/>\n"
+"                        Med vänliga hälsningar,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_partner_payment_kind_reminder
@@ -379,6 +594,63 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Hej\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        Det här är en vänlig påminnelse om att vissa av dina "
+"fakturor har uteblivna betalningar.\n"
+"                        <br/>\n"
+"                        För närvarande har ditt konto hos <t t-"
+"out=\"object.company_id.name or ''\">YourCompany</t> ett obetalt belopp på "
+"totalt\n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-out=\"format_amount(ctx.get"
+"('amount_due'), object.currency_id) or ''\">$143 750,00</t>\n"
+"                            </t>\n"
+"                            <t t-elif=\"object.followup_single_currency_id\">"
+"\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_currency_followup, object.followup_single_currency_id) "
+"or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Betala nu</a>\n"
+"                        </p>\n"
+"                        En rapport med relaterade fakturor finns bifogad "
+"till det här meddelandet.\n"
+"                        <br/>\n"
+"                        Om du redan har genomfört betalningen, kan du "
+"ignorera den här påminnelsen. Vid eventuella frågor eller funderingar, "
+"vänligen kontakta oss genom att svara på det här meddelandet.\n"
+"                        <br/><br/>\n"
+"                        Med vänliga hälsningar,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_payment_reminder_before_due
@@ -431,6 +703,52 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Hej\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        Det här är en vänlig påminnelse om att du har "
+"obetalda fakturor med det totala beloppet\n"
+"                        <b>\n"
+"                            <t t-if=\"object.followup_single_currency_id\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_due_currency_followup, object.followup_single_currency_id) or "
+"''\">$143 750,00</t>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_due_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>\n"
+"                        från <t t-out=\"object.company_id.name or ''\">"
+"YourCompany</t> som förfaller inom kort.\n"
+"                        <br/><br/>\n"
+"                        Syftet med påminnelsen är att hjälpa till att "
+"undvika försenade betalningar.\n"
+"                        <br/>\n"
+"                        Om du redan har genomfört betalningen, kan du "
+"ignorera det här meddelandet!\n"
+"                        <br/>\n"
+"                        Se en kopia av de ursprungliga fakturorna bifogad "
+"till det här meddelandet.\n"
+"                        <br/><br/>\n"
+"                        Med vänliga hälsningar,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_partner_payment_last_reminder
@@ -495,6 +813,64 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Hej\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        Det här är vår tredje och sista påminnelse angående "
+"de obetalda beloppen för de förfallna fakturorna med det totala beloppet \n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-out=\"format_amount(ctx.get"
+"('amount_due'), object.currency_id) or ''\">$143 750,00</t>\n"
+"                            </t>\n"
+"                            <t t-elif=\"object.followup_single_currency_id\">"
+"\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_currency_followup, object.followup_single_currency_id) "
+"or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>. Vi har skickat flera påminnelser utan inkommen "
+"betalning eller några svar.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Betala nu</a>\n"
+"                        </p>\n"
+"                        Vänligen observera att ditt konto nu anses vara "
+"försumligt. Vi uppmanar dig att genomföra betalningen omedelbart för att "
+"åtgärda detta..\n"
+"                        <br/><br/>\n"
+"                        <b>Vänligen kontakta oss</b> för att antingen "
+"bekräfta genomförd betalning eller diskutera ärendet vidare. Vid utebliven "
+"betalning eller utan något svar inom de närmsta 10 dagarna blir vi tvungna "
+"att granska kontots status.\n"
+"                        <br/><br/>\n"
+"                        Vi hoppas på fortsatt samarbete.\n"
+"                        <br/><br/>\n"
+"                        Med vänliga hälsningar,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_partner_payment_second_reminder
@@ -560,6 +936,66 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        Hej\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        Det här är en andra påminnelse om de fakturor som "
+"förfallit, med totalbeloppet\n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-out=\"format_amount(ctx.get"
+"('amount_due'), object.currency_id) or ''\">$143 750,00</t>\n"
+"                            </t>\n"
+"                            <t t-elif=\"object.followup_single_currency_id\">"
+"\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_currency_followup, object.followup_single_currency_id) "
+"or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>. Våra uppgifter visar att fakturorna "
+"fortfarande är obetalda. Vänligen se den bifogade rapporten för ytterligare "
+"information.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Betala nu</a>\n"
+"                        </p>\n"
+"                        Vi skulle uppskatta om du kan meddela oss status för "
+"betalningarna. Om betalningarna redan har genomförts, vänligen meddela oss "
+"datum och betalningsmetod så att vi kan spåra betalningarna.\n"
+"                        <br/>\n"
+"                        Vid eventuella problem med att genomföra "
+"betalningen, vänligen kontakta oss omedelbart för vidare hjälp och "
+"rådgivning.\n"
+"                        Tack på förhand!\n"
+"                        <br/><br/>\n"
+"                        Vi uppskattar ert fortsatta samarbete i det här "
+"ärendet.\n"
+"                        <br/><br/>\n"
+"                        Med vänliga hälsningar,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.demo_followup_email_template_4
@@ -606,8 +1042,8 @@ msgstr ""
 "                        <t t-if=\"object.id != "
 "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
 "t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                        <t t-else=\"\">Hej <t t-out=\"object.name or ''\"/>,"
-"</t>\n"
+"                        <t t-else=\"\">Hej <t t-out=\"object.name or ''\"/>"
+",</t>\n"
 "                        <br/>\n"
 "                        Trots flera påminnelser finns det fortfarande "
 "obetalda fakturor på ditt konto.\n"
@@ -620,18 +1056,18 @@ msgstr ""
 "                        <br/>\n"
 "                        Med vänliga hälsningar,\n"
 "                        <br/>\n"
-"                        <t t-if=\"not "
-"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
 "                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().signature\"/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
 "                            <br/>\n"
 "                            --\n"
 "                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().name\"/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -682,7 +1118,7 @@ msgstr "Aktivitet"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Activity Notes"
-msgstr "Aktivitetsanteckningar"
+msgstr "Anteckningar"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_type_id
@@ -702,7 +1138,7 @@ msgstr "Adress"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__alerts
 msgid "Alerts"
-msgstr ""
+msgstr "Varningar"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__automatic
@@ -715,18 +1151,18 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__automatic_invoice_reminder
 #: model:ir.model.fields,field_description:account_followup.field_res_users__automatic_invoice_reminder
 msgid "Automatic Invoice Reminders"
-msgstr ""
+msgstr "Automatiska fakturapåminnelser"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/res_config_settings.py:0
 msgid "Automatic invoices reminders"
-msgstr ""
+msgstr "Automatiska fakturapåminnelser"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__preview_body
 msgid "Body Preview"
-msgstr ""
+msgstr "Förhandsvisning av brödtext"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__body_has_template_value
@@ -759,7 +1195,7 @@ msgstr "Avbryt"
 #. odoo-python
 #: code:addons/account_followup/wizard/followup_manual_reminder.py:0
 msgid "Check Partner(s) Email(s)"
-msgstr ""
+msgstr "Kontrollera partners e-post"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_reminder_type
@@ -881,7 +1317,7 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.actions.act_window,help:account_followup.action_account_followup_line_definition_form
 msgid "Define reminders and their related actions"
-msgstr ""
+msgstr "Konfigurera påminnelser och dess relaterade åtgärder"
 
 #. module: account_followup
 #. odoo-python
@@ -890,6 +1326,9 @@ msgid ""
 "Delay must be a positive value. To send a reminder before the invoice due "
 "date, set the Reminder Timing to \"Before\" and enter a positive delay."
 msgstr ""
+"Fördröjningen måste vara ett positivt värde. För att skicka en påminnelse "
+"före fakturans förfallodatum, ställ in påminnelsetiden till ”Före” och ange "
+"en positiv fördröjning."
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
@@ -974,13 +1413,13 @@ msgstr "Uppföljningssteg"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__followup_overdue
 msgid "Followup Overdue"
-msgstr ""
+msgstr "Uppföljning om försening"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_single_currency_id
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_single_currency_id
 msgid "Followup Single Currency"
-msgstr ""
+msgstr "Uppföljning om enskilda valutor"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_missing_information_wizard
@@ -1042,6 +1481,7 @@ msgid ""
 "Indicates whether the reminder should be sent before or after the invoice "
 "due date."
 msgstr ""
+"Anger om påminnelser bör skickas före eller efter fakturans förfallodatum."
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
@@ -1052,7 +1492,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
 #: model:ir.ui.menu,name:account_followup.account_followup_menu
 msgid "Invoice Reminders"
-msgstr ""
+msgstr "Fakturapåminnelser"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -1067,7 +1507,7 @@ msgstr "Kan redigera"
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_move
 msgid "Journal Entry"
-msgstr ""
+msgstr "Verifikation"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_move_line
@@ -1078,7 +1518,7 @@ msgstr "Verifikationsrad"
 #: model:mail.template,name:account_followup.mail_template_invoice_payment_kind_reminder
 #: model:mail.template,name:account_followup.mail_template_partner_payment_kind_reminder
 msgid "Kind Reminder"
-msgstr ""
+msgstr "Påminnelse"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__lang
@@ -1097,13 +1537,13 @@ msgstr ""
 #: model:mail.template,name:account_followup.mail_template_invoice_payment_last_reminder
 #: model:mail.template,name:account_followup.mail_template_partner_payment_last_reminder
 msgid "Last Reminder"
-msgstr "Senaste påminnelse"
+msgstr "Sista påminnelse"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__last_reminder
 #: model:ir.model.fields,field_description:account_followup.field_res_users__last_reminder
 msgid "Last Reminder Date"
-msgstr "Datum för senaste påminnelse"
+msgstr "Datum för sista påminnelse"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__write_uid
@@ -1128,7 +1568,7 @@ msgstr "E-postmall"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_config_settings_view_form
 msgid "Manage your automatic reminders"
-msgstr ""
+msgstr "Hantera dina automatiska påminnelser"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__manual
@@ -1145,7 +1585,7 @@ msgstr "Saknade uppgifter"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__move_ids
 msgid "Move"
-msgstr ""
+msgstr "Verifikation"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.line_template
@@ -1172,7 +1612,7 @@ msgstr "Anteckning"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Notification"
-msgstr "Avisering"
+msgstr "Notis"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
@@ -1190,8 +1630,8 @@ msgstr ""
 "Valfritt översättningsspråk (ISO-kod) att välja när ett e-postmeddelande "
 "skickas ut. Om det inte har angetts så kommer den huvudsakliga partnerns "
 "förvalda språk att användas. Detta bör vanligtvis vara ett "
-"platshållaruttryck som anger lämpligt språk, t.ex. "
-"{{ object.partner_id.lang }}."
+"platshållaruttryck som anger lämpligt språk, t.ex. {{ "
+"object.partner_id.lang }}."
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__invoice_origin
@@ -1202,7 +1642,7 @@ msgstr "Ursprung"
 #. odoo-python
 #: code:addons/account_followup/wizard/followup_manual_reminder.py:0
 msgid "Partner(s) should have an email address."
-msgstr ""
+msgstr "Partner bör ha en angiven e-post."
 
 #. module: account_followup
 #: model:ir.module.module,shortdesc:base.module_account_followup
@@ -1212,7 +1652,7 @@ msgstr ""
 #. module: account_followup
 #: model:mail.template,name:account_followup.mail_template_payment_reminder_before_due
 msgid "Payment Reminder before due date"
-msgstr ""
+msgstr "Betalningspåminnelse innan förfallodatum"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
@@ -1232,7 +1672,7 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Remind"
-msgstr "Påminn"
+msgstr "Skicka påminnelse"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__followup_line_id
@@ -1249,7 +1689,7 @@ msgstr ""
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__reminder_timing
 msgid "Reminder Timing"
-msgstr ""
+msgstr "Påminnelsens tidpunkt"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.report_followup_print_all
@@ -1282,7 +1722,7 @@ msgstr "Ansvarig"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__send_sms
 msgid "SMS"
-msgstr "SMS"
+msgstr "Sms"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__salesperson
@@ -1308,7 +1748,7 @@ msgstr "Sök efter påminnelser"
 #: model:mail.template,name:account_followup.mail_template_invoice_payment_second_reminder
 #: model:mail.template,name:account_followup.mail_template_partner_payment_second_reminder
 msgid "Second Reminder"
-msgstr ""
+msgstr "Andra påminnelse"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
@@ -1318,56 +1758,56 @@ msgstr "Skicka"
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_move_send_wizard
 msgid "Send Invoice Wizard"
-msgstr ""
+msgstr "Verktygsguide för att skicka fakturor"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_out_invoice_tree_reminder_inherit
 msgid "Send Reminder"
-msgstr ""
+msgstr "Skicka påminnelse"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_move.py:0
 msgid "Send Reminders"
-msgstr ""
+msgstr "Skicka påminnelser"
 
 #. module: account_followup
 #: model:mail.template,description:account_followup.mail_template_partner_payment_kind_reminder
 msgid ""
 "Send a kind payment reminder to customers with their invoices in attachment"
-msgstr ""
+msgstr "Skicka en vänlig påminnelse till kunder med deras fakturor bifogade"
 
 #. module: account_followup
 #: model:mail.template,description:account_followup.mail_template_invoice_payment_kind_reminder
 msgid "Send a kind reminder to customers with their invoices in attachment"
-msgstr ""
+msgstr "Skicka en vänlig påminnelse till kunder med deras fakturor bifogade"
 
 #. module: account_followup
 #: model:mail.template,description:account_followup.mail_template_partner_payment_last_reminder
 msgid ""
 "Send a last payment reminder to customers with their invoices in attachment"
-msgstr ""
+msgstr "Skicka en sista påminnelse till kunder med deras fakturor bifogade"
 
 #. module: account_followup
 #: model:mail.template,description:account_followup.mail_template_invoice_payment_last_reminder
 msgid "Send a last reminder to customers with their invoices in attachment"
-msgstr ""
+msgstr "Skicka en sista påminnelse till kunder med deras fakturor bifogade"
 
 #. module: account_followup
 #: model:mail.template,description:account_followup.mail_template_payment_reminder_before_due
 msgid "Send a payment reminder before the due date to customer"
-msgstr ""
+msgstr "Skicka en påminnelse till kunden innan förfallodatum"
 
 #. module: account_followup
 #: model:mail.template,description:account_followup.mail_template_partner_payment_second_reminder
 msgid ""
 "Send a second payment reminder to customers with their invoices in attachment"
-msgstr ""
+msgstr "Skicka en andra påminnelse till kunder med deras fakturor bifogade"
 
 #. module: account_followup
 #: model:mail.template,description:account_followup.mail_template_invoice_payment_second_reminder
 msgid "Send a second reminder to customers with their invoices in attachment"
-msgstr ""
+msgstr "Skicka en andra påminnelse till kunder med deras fakturor bifogade"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_config_settings_view_form
@@ -1377,7 +1817,7 @@ msgstr ""
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__delay
 msgid "Signed Delay"
-msgstr ""
+msgstr "Fast fördröjning"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__sms_template_id
@@ -1392,7 +1832,7 @@ msgstr "Ämne"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__preview_subject
 msgid "Subject Preview"
-msgstr ""
+msgstr "Förhandsvisning"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_summary
@@ -1420,6 +1860,8 @@ msgid ""
 "The number of days after or before the due date of the invoice to wait "
 "before sending the reminder."
 msgstr ""
+"Antal dagar före eller efter fakturans förfallodatum som påminnelsen bör "
+"skickas."
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_responsible_id
@@ -1457,7 +1899,7 @@ msgstr "Totalt förfallet belopp"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_due_abs
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_due_abs
 msgid "Total All Due Abs"
-msgstr ""
+msgstr "Totalbelopp för alla förfallna fakturor (absolut värde)"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_overdue
@@ -1475,13 +1917,13 @@ msgstr "Totalt att betala"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due_currency_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_due_currency_followup
 msgid "Total Due Currency Followup"
-msgstr ""
+msgstr "Totalbelopp för förfallna fakturor i en viss valuta"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_due_followup
 msgid "Total Due Followup"
-msgstr ""
+msgstr "Totalbelopp för förfallna fakturor"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue
@@ -1493,7 +1935,7 @@ msgstr "Totalt förfallet"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue_currency_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_overdue_currency_followup
 msgid "Total Overdue Currency Followup"
-msgstr ""
+msgstr "Totalbelopp för försenade fakturor i en viss valuta"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue_followup
@@ -1511,7 +1953,7 @@ msgstr "Oavstämd AML"
 #. odoo-python
 #: code:addons/account_followup/wizard/followup_manual_reminder.py:0
 msgid "View Partner(s)"
-msgstr ""
+msgstr "Visa partners"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
@@ -1567,21 +2009,23 @@ msgid ""
 "You cannot delete this mail template, it is used in the invoice reminder "
 "sending flow."
 msgstr ""
+"Det är inte möjligt att radera den här e-postmallen, då den för närvarande "
+"används i flödet för påminnelser om fakturor."
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__after
 msgid "after"
-msgstr ""
+msgstr "efter"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__before
 msgid "before"
-msgstr ""
+msgstr "före"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "days"
-msgstr ""
+msgstr "dagar"
 
 #. module: account_followup
 #. odoo-python
@@ -1603,6 +2047,8 @@ msgid ""
 "{{ (object.company_id or "
 "object._get_followup_responsible().company_id).name }} Payment Reminder"
 msgstr ""
+"{{ (object.company_id or object._get_followup_responsible().company_id)"
+".name }} Betalningspåminnelse"
 
 #. module: account_followup
 #: model:mail.template,subject:account_followup.demo_followup_email_template_4
@@ -1611,24 +2057,31 @@ msgid ""
 "object._get_followup_responsible().company_id).name }} Payment Reminder - "
 "{{ object.parent_name }}"
 msgstr ""
+"{{ (object.company_id or object._get_followup_responsible().company_id)"
+".name }} Betalningspåminnelse - {{ object.parent_name }}"
 
 #. module: account_followup
 #: model:mail.template,subject:account_followup.mail_template_invoice_payment_kind_reminder
 msgid ""
 "{{ object.company_id.name }} Kind Reminder (Ref {{ object.name or 'n/a' }})"
 msgstr ""
+"{{ object.company_id.name }} Påminnelse (Referens {{ object.name or 'n/a' }})"
 
 #. module: account_followup
 #: model:mail.template,subject:account_followup.mail_template_invoice_payment_last_reminder
 msgid ""
 "{{ object.company_id.name }} Last Reminder (Ref {{ object.name or 'n/a' }})"
 msgstr ""
+"{{ object.company_id.name }} Sista påminnelse (Referens {{ object.name or 'n/"
+"a' }})"
 
 #. module: account_followup
 #: model:mail.template,subject:account_followup.mail_template_invoice_payment_second_reminder
 msgid ""
 "{{ object.company_id.name }} Second Reminder (Ref {{ object.name or 'n/a' }})"
 msgstr ""
+"{{ object.company_id.name }} Andra påminnelse (Referens {{ object.name or 'n/"
+"a' }})"
 
 #~ msgid "Days of the follow-up lines must be different per company"
 #~ msgstr ""

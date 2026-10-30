@@ -2,16 +2,16 @@
 # This file contains the translation of the following modules:
 # * sign_emsigner
 #
-# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:52+0000\n"
-"PO-Revision-Date: 2026-09-18 02:43+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:56+0000\n"
+"PO-Revision-Date: 2026-10-12 10:37+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "sign_emsigner/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -36,12 +36,8 @@ msgid ""
 "<br/>\n"
 "                        Transaction Number:"
 msgstr ""
-
-#. module: sign_emsigner
-#: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
-msgid ""
-"<small>The signatory has provided this identity through emSigner</small>"
-msgstr ""
+"<br/>\n"
+"                        رقم المعاملة:"
 
 #. module: sign_emsigner
 #. odoo-python
@@ -58,6 +54,8 @@ msgid ""
 "Aadhaar Sign works only with a single signer and document. Adding more will "
 "switch to the standard eSignature."
 msgstr ""
+"يعمل Aadhaar Sign مع طرف موقّع واحد ومستند واحد فقط. سيؤدي إضافة المزيد إلى "
+"التبديل إلى التوقيع الإلكتروني القياسي."
 
 #. module: sign_emsigner
 #. odoo-python
@@ -80,11 +78,11 @@ msgid ""
 "their identity through the emSigner platform using aadhaar card number. "
 "Available in India."
 msgstr ""
-
-#. module: sign_emsigner
-#: model_terms:ir.ui.view,arch_db:sign_emsigner.sign_request_logs_user
-msgid "Authenticated with emSigner"
-msgstr ""
+"اطلب من الموقعين على المستندات باستخدام تطبيق التوقيع الإلكتروني لدى أودو "
+"تقديم هويتهم باستخدام emSigner aadhaar esign. من خلال الجمع بين تطبيق "
+"التوقيع الإلكتروني لدى أودو وemSigner، يمكنك إضافة خطوة تحديد الهوية في "
+"عمليات التوقيع الخاصة بك ومطالبة الموقعين بتقديم هويتهم من خلال منصة "
+"emSigner باستخدام رقم بطاقة aadhaar. متوفر في الهند."
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_item_role__auth_method
@@ -95,7 +93,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Continue"
-msgstr ""
+msgstr "استمرار"
 
 #. module: sign_emsigner
 #: model:iap.service,unit_name:sign_emsigner.iap_service_emsigner_proxy
@@ -115,13 +113,13 @@ msgstr "اسم العرض"
 #. odoo-python
 #: code:addons/sign_emsigner/controllers/main.py:0
 msgid "ERROR: Invalid PDF file! %s"
-msgstr ""
+msgstr "خطأ: ملف PDF غير صالح! %s"
 
 #. module: sign_emsigner
 #. odoo-python
 #: code:addons/sign_emsigner/controllers/main.py:0
 msgid "Emsigner only supports signing a single document at a time."
-msgstr ""
+msgstr "يدعم Emsigner توقيع مستند واحد فقط في كل مرة."
 
 #. module: sign_emsigner
 #. odoo-python
@@ -129,6 +127,8 @@ msgstr ""
 msgid ""
 "Emsigner role cannot be signed first. Please keep emsigner as last signer."
 msgstr ""
+"لا يمكن التوقيع على دور \"Emsigner\" أولاً. يرجى جعل \"Emsigner\" هو الموقّع "
+"الأخير."
 
 #. module: sign_emsigner
 #. odoo-python
@@ -137,6 +137,8 @@ msgid ""
 "Emsigner role cannot be used for signing directly. Please send the request "
 "instead."
 msgstr ""
+"لا يمكن استخدام دور \"Emsigner\" للتوقيع مباشرةً. يرجى إرسال الطلب بدلاً من "
+"ذلك."
 
 #. module: sign_emsigner
 #. odoo-javascript
@@ -168,13 +170,13 @@ msgstr "موافق"
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Proceed to eSign"
-msgstr ""
+msgstr "المتابعة إلى التوقيع الإلكتروني"
 
 #. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Redirecting to complete the Aadhaar eSign process."
-msgstr ""
+msgstr "إعادة التوجيه لإكمال عملية التوقيع الإلكتروني في Aadhaar."
 
 #. module: sign_emsigner
 #: model:ir.module.module,summary:base.module_sign_emsigner
@@ -239,7 +241,7 @@ msgstr ""
 #. module: sign_emsigner
 #: model:ir.model.fields.selection,name:sign_emsigner.selection__sign_item_role__auth_method__emsigner
 msgid "Via Aadhar eSign"
-msgstr ""
+msgstr "عبر Aadhar eSign"
 
 #. module: sign_emsigner
 #. odoo-javascript
@@ -251,7 +253,7 @@ msgstr "تحذير"
 #. odoo-python
 #: code:addons/sign_emsigner/controllers/main.py:0
 msgid "emSigner IAP service could not be found."
-msgstr ""
+msgstr "تعذر العثور على خدمة emSigner IAP."
 
 #. module: sign_emsigner
 #: model:iap.service,name:sign_emsigner.iap_service_emsigner_proxy
@@ -261,22 +263,29 @@ msgstr ""
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_reference_number
 msgid "emSigner Reference Number"
-msgstr ""
+msgstr "رقم مرجع emSigner"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_status
 msgid "emSigner Status"
-msgstr ""
+msgstr "حالة emSigner"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_transaction_number
 msgid "emSigner Transaction Number"
-msgstr ""
+msgstr "رقم معاملة emSigner"
 
 #. module: sign_emsigner
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__emsigner_return_value
 msgid "emSigner Values"
-msgstr ""
+msgstr "قيم emSigner"
+
+#~ msgid ""
+#~ "<small>The signatory has provided this identity through emSigner</small>"
+#~ msgstr "<small>قدم الطرف الموقّع هذه الهوية عبر emSigner</small>"
+
+#~ msgid "Authenticated with emSigner"
+#~ msgstr "تم التوثيق باستخدام emSigner"
 
 #~ msgid "Extra Authentication Step"
 #~ msgstr "خطوة المصادقة الإضافية"

@@ -385,6 +385,59 @@ class TestIntrastatReport(TestAccountReportsCommon):
             options,
         )
 
+    def test_partner_vat_of_company_country(self):
+        """ Test that a dispatch under a VAT issued by our own fiscal country is reported as unknown,
+            its holder not being identified in the country the goods are shipped to, while
+            arrivals and the numbers issued by any other country are reported as they are.
+        """
+        netherlands, belgium = self.env.ref('base.nl'), self.env.ref('base.be')
+        fictional_country = self.env['res.country'].search([('code', '=', 'SQ')])
+        self.env.company.account_fiscal_country_id = belgium
+        self.assertEqual(self.env.company.country_id, fictional_country)
+        partner_be, partner_nl = self.env['res.partner'].create([
+            {'name': 'BE Partner', 'country_id': belgium.id, 'vat': 'BE0477472701'},
+            {'name': 'NL Partner', 'country_id': netherlands.id, 'vat': 'NL000099998B57'},
+        ])
+
+        def move_vals(**kwargs):
+            return {
+                'invoice_date': '2022-01-01',
+                'date': '2022-01-01',
+                'invoice_line_ids': [Command.create({
+                    'product_id': self.product_1.id,
+                    'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'quantity': 1.0,
+                    'price_unit': 100.0,
+                    'tax_ids': [],
+                })],
+                **kwargs,
+            }
+
+        self.env['account.move'].create([
+            move_vals(move_type='out_invoice', partner_id=partner_be.id, partner_shipping_id=partner_nl.id),
+            move_vals(move_type='out_invoice', partner_id=partner_nl.id, partner_shipping_id=partner_nl.id),
+            move_vals(move_type='in_invoice', partner_id=partner_be.id, intrastat_country_id=netherlands.id),
+        ]).action_post()
+
+        options = self._generate_options(self.report, '2022-01-01', '2022-01-31', default_options={'unfold_all': True})
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            # 0/name,                                 12/value
+            [0,                                            12],
+            [
+                ('Intrastat',                               300.0),
+                ('Arrival - BE0477472701 - 100 - NL',       100.0),
+                ('BILL/2022/01/0001',                       100.0),
+                ('Dispatch - NL000099998B57 - 100 - NL',    100.0),
+                ('INV/2022/00002',                          100.0),
+                ('Dispatch - QV999999999999 - 100 - NL',    100.0),
+                ('INV/2022/00001',                          100.0),
+            ],
+            options,
+        )
+
     def test_intrastat_report_lines_with_unique_id(self):
         """ This test checks that even if we have similar lines,
             each discriminant line value is used to generate

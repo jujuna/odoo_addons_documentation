@@ -264,8 +264,8 @@ class SignEmsigner(SignController):
         if sign_user_sudo:
             # sign as a known user
             context = {}
-            if request.env.user != sign_user_sudo and not request.env.user._is_public():
-                context.update(logged_user_id=request.env.user.id)
+            if request.env.user != sign_user_sudo:
+                context.update(logged_user_id=None if request.env.user._is_public() else request.env.user.id)
             request_item = request_item.with_context(context).with_user(sign_user_sudo).sudo()
 
         sign_request = request_item.sign_request_id

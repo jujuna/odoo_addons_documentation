@@ -27,8 +27,18 @@ class HrPayslip(models.Model):
         return super()._issues_dependencies() + ['struct_id.journal_id']
 
     def action_payslip_cancel(self):
-        moves = self.mapped('move_id')
-        moves.sudo()._unlink_or_reverse()
+        # Payroll creates its draft entries itself (see _create_account_move), so it can drop them without
+        # accounting rights. An entry that has been posted belongs to accounting: never escalate rights for it.
+        moves_sudo = self.move_id.sudo()
+        posted_moves = moves_sudo.filtered('posted_before').with_env(self.env)
+        if posted_moves and not self.env.su and not self.env.user.has_group('account.group_account_invoice'):
+            raise UserError(_(
+                "The following payslips are linked to a posted journal entry, "
+                "only a user with accounting rights can cancel them:\n%s",
+                '\n'.join(self.filtered(lambda slip: slip.move_id in posted_moves).mapped('name')),
+            ))
+        (moves_sudo - posted_moves)._unlink_or_reverse()
+        posted_moves._unlink_or_reverse()
         return super().action_payslip_cancel()
 
     def action_payslip_done(self):
@@ -39,7 +49,8 @@ class HrPayslip(models.Model):
         if any(slip.state == 'paid' for slip in self):
             raise ValidationError(_("You can't create a journal entry for a paid payslip."))
         res = super().action_payslip_done()
-        self.filtered('journal_id')._action_create_account_move()
+        for company, slips in self.grouped('company_id').items():
+            slips.with_company(company).filtered('journal_id')._action_create_account_move()
         return res
 
     def _get_account_move_vals(self):
@@ -112,6 +123,11 @@ class HrPayslip(models.Model):
         return account_move_vals, slips_date_tuples
 
     def _action_create_account_move(self):
+        """ Create accounting entries for payslips belonging to the company in the current context.
+
+        This method must be called separately for each company, with the
+        corresponding company set in the context.
+        """
         account_move_vals, slips_date_tuples = self._get_account_move_vals()
         moves = self._create_account_move(account_move_vals)
         for move, (slips, date) in zip(moves, slips_date_tuples):

@@ -238,6 +238,19 @@ class PayrollConfigSettings(models.Model):
         for config in self:
             for field_to_copy in fields_to_copy:
                 config[field_to_copy] = config.parent_id[field_to_copy] if config.parent_id else config[field_to_copy]
+            if not config.parent_id and config.company_id.country_code == 'BE':
+                config.l10n_be_sector = config.l10n_be_sector or 'private'
+                config.onss_importance_code = config.onss_importance_code or config._get_onss_importance_code_from_employees()
+
+    def _get_onss_importance_code_from_employees(self):
+        self.ensure_one()
+        employee_count = self.env['hr.employee'].search_count([('company_id', '=', self.company_id.id)])
+        if not employee_count:
+            return False
+        for code, min_employees in (('9', 1000), ('8', 500), ('7', 200), ('6', 100), ('5', 50), ('4', 20), ('3', 10), ('2', 5)):
+            if employee_count >= min_employees:
+                return code
+        return '1'
 
     @api.depends('l10n_be_employer_category_id')
     def _compute_allowed_joint_committee_ids(self):
@@ -269,6 +282,9 @@ class PayrollConfigSettings(models.Model):
         return res
 
     def action_open_hr_payroll_localization_form(self):
+        # the employees are usually created after the payroll, default the size when configuring
+        if not self.parent_id and not self.onss_importance_code and self.company_id.country_code == 'BE':
+            self.onss_importance_code = self._get_onss_importance_code_from_employees()
         return {
             'name': self.env._('Payroll Localization'),
             'type': 'ir.actions.act_window',

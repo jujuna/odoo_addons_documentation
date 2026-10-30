@@ -73,9 +73,14 @@ class TestMobilityBudget(TransactionCase):
             (6, 0, [cls.mobility_product.id])
         ]
 
+        # A valid Belgian payslip language is required to validate payslips when
+        # a Belgian language is active (otherwise the language wizard is returned)
+        cls.env['res.lang']._activate_lang('fr_BE')
+
         cls.employee = cls.env["hr.employee"].create(
             {
                 "name": "Test Employee",
+                "lang": "fr_BE",
                 "company_id": cls.company.id,
                 "resource_calendar_id": cls.resource_calendar.id,
                 "structure_type_id": cls.env.ref("hr.structure_type_employee_cp200").id,
@@ -595,6 +600,7 @@ class TestMobilityBudget(TransactionCase):
         payslip._set_input_value("MOBILITY_TO_PAY", 50.0)
         payslip.compute_sheet()
         payslip.action_payslip_done()
+        self.assertEqual(payslip.state, "validated")
 
         # Second expense, after validation of the payslip (to check if "MOBILITY_TO_PAY" from payslip will affect the remaining amounts)
         expense_2 = self._create_expense(self.mobility_product, 100.0, date(2025, 5, 28), state="posted")

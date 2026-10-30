@@ -31,8 +31,8 @@ class PosConfig(models.Model):
         self.company_id._verify_required_fields()
 
         # For each company there should be only single SCU with initialized state
-        if not self.company_id.l10n_at_pos_company_scuid:
-            scuid = fiskaly_client.setup_scu({"legal_entity_id": {"vat_id": self.company_id.vat}}, self.company_id.sudo().l10n_at_fiskaly_access_token)
+        scuid = fiskaly_client.setup_scu({"legal_entity_id": {"vat_id": self.company_id.vat}}, self.company_id.sudo().l10n_at_fiskaly_access_token)
+        if scuid != self.company_id.l10n_at_pos_company_scuid:
             self.company_id.l10n_at_pos_company_scuid = scuid
             self.env.cr.commit()
 

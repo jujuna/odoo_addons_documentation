@@ -91,10 +91,9 @@ class IrActionsReport(models.Model):
 
     @api.onchange('name')
     def _onchange_name(self):
-        for action in self:
-            if action.name:
-                name = re.sub(r'[^a-z0-9_]', '', action.name.replace(' ', '_').lower())
-                action.report_name = "report_name." + name
+        for action in self.filtered(lambda a: not a._origin and a.name):
+            name = re.sub(r'[^a-z0-9_]', '', action.name.replace(' ', '_').lower())
+            action.report_name = "report_name." + name
 
     def _search_model_id(self, operator, value):
         if operator in Domain.NEGATIVE_OPERATORS:
@@ -267,14 +266,14 @@ class IrActionsReport(models.Model):
             'base_url': base_url,
             'report_xml_id': self.xml_id,
             'debug': self.env.context.get("debug"),
-        })
+        }) if len(header_node) else None
         footer = self.env['ir.qweb']._render(layout.id, {
             'subst': True,
             'body': Markup(lxml.html.tostring(footer_node, encoding='unicode')),
             'base_url': base_url,
             'report_xml_id': self.xml_id,
             'debug': self.env.context.get("debug"),
-        })
+        }) if len(footer_node) else None
 
         return bodies, res_ids, header, footer, specific_paperformat_args
 

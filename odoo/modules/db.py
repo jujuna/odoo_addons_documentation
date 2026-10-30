@@ -10,6 +10,7 @@ import logging
 import os
 import pathlib
 import re
+import secrets
 import shutil
 import subprocess
 import tempfile
@@ -221,6 +222,17 @@ def has_unaccent(cr: BaseCursor) -> FunctionStatus:
     # can be used to create index (it should be 'i' - means immutable), see
     # https://www.postgresql.org/docs/current/catalog-pg-proc.html.
     return FunctionStatus.INDEXABLE if result[0] == 'i' else FunctionStatus.PRESENT
+
+
+def has_bytewise_collation(cr: BaseCursor) -> bool:
+    """ Test if the default collation of the database compares strings
+    character by character, like the "C" collation does.
+
+    Collations like glibc's en_US.UTF-8 ignore punctuation at first and sort
+    '12/14/' after '120', so a range on ``parent_path`` misses descendants.
+    """
+    cr.execute("SELECT '12/14/'::varchar < '120'::varchar")
+    return cr.fetchone()[0]
 
 
 def has_trigram(cr: BaseCursor) -> bool:
@@ -641,6 +653,7 @@ def restore(
             [
                 find_pg_tool('psql'),
                 '--dbname', db_name,
+                '--command', f'\\restrict {secrets.token_hex()}',
                 '--file', os.path.join(dump_dir, 'dump.sql'),
                 '--quiet',
             ],

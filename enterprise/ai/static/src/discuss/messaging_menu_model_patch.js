@@ -20,28 +20,7 @@ patch(MessagingMenu.prototype, {
                 }
                 return {
                     id: MENU_TABS.AI_CHAT,
-                    icon: "o_ai_icon",
-                    iconClass: "d-inline-flex justify-content-center",
-                    label: _t("AI"),
-                    sequence: 75,
-                    recordType: "discuss.channel",
-                    includesChannel: (c) => this.includesAiChatChannel(c),
-                    filters: [
-                        {
-                            id: "ai_chat_unread",
-                            text: _t("Unread"),
-                            includesChannel: (c) => c.isUnread,
-                        },
-                    ],
-                    actions: [
-                        {
-                            id: "new-ai-chat",
-                            icon: "add",
-                            text: _t("Chat"),
-                            onClick: () => this.launchAiChat(),
-                        },
-                    ],
-                    emptyState: { title: _t("No AI Chats yet.") },
+                    ...this.aiChatTabFields(),
                 };
             },
             eager: true,
@@ -54,5 +33,32 @@ patch(MessagingMenu.prototype, {
         return this.store.env.services.aiChatLauncher.launchAIChat({
             interfaceKey: "systray_ai_button",
         });
+    },
+    /** Fields shared by the global AI tab and the agent-scoped one defined in `ai_agentic`. */
+    aiChatTabFields() {
+        return {
+            icon: "o_ai_icon",
+            iconClass: "d-inline-flex justify-content-center",
+            label: _t("AI"),
+            sequence: 75,
+            recordType: "discuss.channel",
+            includesChannel: (c) => this.includesAiChatChannel(c),
+            filters: [
+                {
+                    id: "ai_chat_unread",
+                    text: _t("Unread"),
+                    includesChannel: (c) => c.isUnread,
+                },
+            ],
+            actions: [
+                {
+                    id: "new-ai-chat",
+                    icon: "add",
+                    text: _t("Chat"),
+                    onClick: () => this.launchAiChat(),
+                },
+            ],
+            emptyState: { title: _t("No AI Chats yet.") },
+        };
     },
 });

@@ -258,31 +258,40 @@ class StockMove(models.Model):
         return moves
 
     def _create_account_move(self):
-        """ Create account move for specific location or analytic."""
-        aml_vals_list = []
-        move_to_link = set()
+        """ Create account move for specific location or analytic.
+
+        One account move is created per company and accounting partner, as moves
+        validated together may belong to pickings of different partners or companies.
+        """
+        moves_by_company_partner = defaultdict(lambda: self.env['stock.move'])
         for move in self:
             if move._should_create_account_move():
+                moves_by_company_partner[move.company_id, move._get_partner_id_for_valuation_lines()] |= move
+
+        account_moves = self.env['account.move']
+        for (company, partner_id), moves in moves_by_company_partner.items():
+            aml_vals_list = []
+            for move in moves:
                 aml_vals_list += move._get_account_move_line_vals()
-                move_to_link.add(move.id)
-        if not aml_vals_list:
-            return self.env['account.move']
+            if not aml_vals_list:
+                continue
 
-        move_refs = list(set(self.mapped('reference')))
-        joined_refs = ", ".join(move_refs)
-        if len(joined_refs) > 43:
-            joined_refs = joined_refs[:40] + "..."
+            move_refs = list(set(moves.mapped('reference')))
+            joined_refs = ", ".join(move_refs)
+            if len(joined_refs) > 43:
+                joined_refs = joined_refs[:40] + "..."
 
-        account_move = self.env['account.move'].sudo().create({
-            'ref': joined_refs,
-            'partner_id': self._get_partner_id_for_valuation_lines(),
-            'journal_id': self.company_id.account_stock_journal_id.id,
-            'line_ids': [Command.create(aml_vals) for aml_vals in aml_vals_list],
-            'date': self.env.context.get('force_period_date') or fields.Date.context_today(self),
-        })
-        self.env['stock.move'].browse(move_to_link).account_move_id = account_move.id
-        account_move._post()
-        return account_move
+            account_move = self.env['account.move'].sudo().create({
+                'ref': joined_refs,
+                'partner_id': partner_id,
+                'journal_id': company.account_stock_journal_id.id,
+                'line_ids': [Command.create(aml_vals) for aml_vals in aml_vals_list],
+                'date': self.env.context.get('force_period_date') or fields.Date.context_today(self),
+            })
+            moves.account_move_id = account_move.id
+            account_move._post()
+            account_moves |= account_move
+        return account_moves
 
     def _get_partner_id_for_valuation_lines(self):
         return (self.picking_id.partner_id and self.env['res.partner']._find_accounting_partner(self.picking_id.partner_id).id) or False
@@ -352,7 +361,9 @@ class StockMove(models.Model):
             from ``recompute_date`` (the earliest impacted date among the moves) through
         :param skip_check: internal flag set while replaying, to only refresh in-move
             values without re-triggering the replay detection below (which would loop).
+        :return: the outgoing moves whose value changed during a valuation replay.
         """
+        changed_moves = self.env['stock.move']
         moves_already_sold = self.filtered(lambda m: m.is_in and m.remaining_qty != m._get_valued_qty())
         if not recompute_date and not skip_check and moves_already_sold:
             recompute_date = min(self.mapped('date'))
@@ -365,12 +376,11 @@ class StockMove(models.Model):
                 if oversold_moves:
                     recompute_date = min(recompute_date, *oversold_moves.mapped('date'))
             self._set_value(recompute_date=recompute_date)
-            return
+            return changed_moves
 
         if recompute_date and any(m.remaining_qty != m._get_valued_qty() or m.is_out for m in self):
             self.filtered(lambda m: m.is_in)._set_value(skip_check=True)
-            self.product_id._correct_inventory_valuation(recompute_date)
-            return
+            return self.product_id._correct_inventory_valuation(recompute_date)
 
         self = self.sorted(key=lambda m: (m.date, m.id))  # noqa: PLW0642
         products_to_recompute = set()
@@ -434,6 +444,7 @@ class StockMove(models.Model):
         # Recompute the standard price
         self.env['product.product'].browse(products_to_recompute)._update_standard_price()
         self.env['stock.lot'].browse(lots_to_recompute)._update_standard_price()
+        return changed_moves
 
     def _get_value(self, forced_std_price=False, ignore_manual_update=False):
         return self._get_value_data(forced_std_price, ignore_manual_update)['value']
@@ -536,9 +547,9 @@ class StockMove(models.Model):
         stays consistent with `value` (also negative for out moves) and value/qty
         ratios stay positive without needing abs(). """
         self.ensure_one()
-        if self._is_in():
+        if (self.state == 'done' and self.is_in) or (self.state != 'done' and self._is_in()):
             return sum(self._get_in_move_lines(lot).mapped('quantity_product_uom'))
-        if self._is_out():
+        if (self.state == 'done' and self.is_out) or (self.state != 'done' and self._is_out()):
             qty = sum(self._get_out_move_lines(lot).mapped('quantity_product_uom'))
             return -qty if signed else qty
         if self.is_dropship:

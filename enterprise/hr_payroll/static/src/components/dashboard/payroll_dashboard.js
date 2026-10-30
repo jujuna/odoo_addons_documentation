@@ -162,7 +162,7 @@ class PayrollDashboardComponent extends Component {
             const raw = browser.localStorage.getItem(this.storageKey);
             const parsed = raw ? JSON.parse(raw) : [];
             return Array.isArray(parsed)
-                ? parsed.filter((card) => card && typeof card.id === "number" && typeof card.warning_date === "string")
+                ? parsed.filter((card) => card && typeof card.id === "number" && typeof card.warning_date === "string" && typeof card.sequence === "number")
                 : [];
         } catch {
             return [];
@@ -175,6 +175,7 @@ class PayrollDashboardComponent extends Component {
                 id: warning.id,
                 key: warning.key,
                 name: warning.name,
+                sequence: warning.sequence,
                 description: warning.description,
                 color_class: warning.color_class,
                 button_name: warning.button_name,
@@ -199,8 +200,10 @@ class PayrollDashboardComponent extends Component {
 
     /**
      * Syncs the cards currently displayed for `warningId` with `recomputedCards`,
-     * matching them by warning_date: a card still present is updated in place
-     * (e.g. its loading spinner resolves into real data), a displayed card missing
+     * matching them by key (schedule, warning id and warning_date), since a single
+     * warning can yield cards for several schedules on the same date: a card still
+     * present is updated in place (e.g. its loading spinner resolves into real
+     * data), a displayed card missing
      * from `recomputedCards` is faded out, and a card in `recomputedCards` with no
      * displayed match is faded in.
      */
@@ -209,10 +212,10 @@ class PayrollDashboardComponent extends Component {
         const unmatchedCards = [...recomputedCards];
 
         for (const warning of oldWarnings) {
-            const matchIndex = unmatchedCards.findIndex(c => c.warning_date === warning.warning_date);
+            const matchIndex = unmatchedCards.findIndex(c => c.key === warning.key);
             if (matchIndex !== -1) {
                 const [recomputed] = unmatchedCards.splice(matchIndex, 1);
-                Object.assign(warning, recomputed, { key: warning.key });
+                Object.assign(warning, recomputed);
             } else {
                 await this.fadeOutWarning(warning);
             }
@@ -294,6 +297,9 @@ class PayrollDashboardComponent extends Component {
         const groups = Object.values(grouped);
         for (const group of groups) {
             group.warningDates.sort((a, b) => a - b);
+            for (const warnings of Object.values(group.warningsByDate)) {
+                warnings.sort((a, b) => a.sequence - b.sequence || a.name.localeCompare(b.name));
+            }
         }
         return groups.sort((a, b) => a.date - b.date);
     }

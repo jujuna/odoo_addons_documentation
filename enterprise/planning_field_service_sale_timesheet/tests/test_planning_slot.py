@@ -216,3 +216,45 @@ class TestPlanningSlot(TestPlanningFieldServiceSaleTimesheetCommon):
             intervention_timesheet,
             self.env['account.analytic.line'].search(action['domain']),
         )
+
+    def test_sale_warning_text(self):
+        group_user = self.env.ref('base.group_user')
+        group_warning_sale = self.env.ref('sale.group_warning_sale')
+        group_user._apply_group(group_warning_sale)
+        partner_with_warning = self.env['res.partner'].create({
+            'name': 'Partner With Warning',
+            'sale_warn_msg': 'Highly infectious disease',
+        })
+        child_partner_with_warning = self.env['res.partner'].create({
+            'type': 'invoice',
+            'parent_id': partner_with_warning.id,
+            'sale_warn_msg': 'Slightly infectious disease',
+        })
+
+        self.intervention.partner_id = partner_with_warning
+        self.assertEqual(
+            self.intervention.sale_warning_text,
+            "Partner With Warning - Highly infectious disease",
+            "The shift should display the sale warning of its customer.",
+        )
+
+        self.intervention.partner_id = child_partner_with_warning
+        self.assertEqual(
+            self.intervention.sale_warning_text,
+            "Partner With Warning, Invoice - Slightly infectious disease\n"
+            "Partner With Warning - Highly infectious disease",
+            "The warning of the parent partner should be displayed after the one of its contact.",
+        )
+
+        self.intervention.partner_id = self.partner_1
+        self.assertFalse(
+            self.intervention.sale_warning_text,
+            "No warning should be displayed for a customer without sale warning.",
+        )
+
+        group_user._remove_group(group_warning_sale)
+        self.intervention.partner_id = child_partner_with_warning
+        self.assertFalse(
+            self.intervention.sale_warning_text,
+            "No warning should be displayed without the sale warning group.",
+        )

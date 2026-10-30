@@ -67,6 +67,9 @@ class SaleOrderLine(models.Model):
         sol_from_task_without_anglo.qty_to_invoice = 0.0
         super(SaleOrderLine, self - sol_from_task_without_anglo)._compute_qty_to_invoice()
 
+    def _should_reset_under_warranty(self):
+        return True
+
     def _planning_slot_values(self):
         slot_vals = super()._planning_slot_values()
         slot_vals['partner_id'] = self.order_id.partner_shipping_id.id if self.env.user.has_group('account.group_delivery_invoice_address') else self.order_partner_id.id

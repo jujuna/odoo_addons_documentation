@@ -47,7 +47,15 @@ evaluationCommandTypes.add("ADD_COMMENT_THREAD");
 evaluationCommandTypes.add("DELETE_COMMENT_THREAD");
 evaluationCommandTypes.add("EDIT_COMMENT_THREAD");
 
-inverseCommandRegistry.add("ADD_COMMENT_THREAD", identity);
+inverseCommandRegistry.add("ADD_COMMENT_THREAD", (cmd) => [
+    {
+        type: "DELETE_COMMENT_THREAD",
+        threadId: cmd.threadId,
+        sheetId: cmd.sheetId,
+        col: cmd.col,
+        row: cmd.row,
+    },
+]);
 inverseCommandRegistry.add("DELETE_COMMENT_THREAD", identity);
 inverseCommandRegistry.add("EDIT_COMMENT_THREAD", identity);
 

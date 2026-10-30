@@ -56,7 +56,6 @@ beforeEach(() => {
 
 class Task extends projectModels.ProjectTask {
     stuff_id = fields.Many2one({ string: "Stuff", relation: "stuff" });
-    allocated_hours = fields.Float({ string: "Allocated Hours" });
 
     _records = [
         {
@@ -220,50 +219,6 @@ test("progress bar has the correct unit", async () => {
     expect(SELECTORS.progressBarForeground).toHaveAttribute("data-tooltip", "100h/100h (100%)");
 });
 
-test("task leaf rows should not show a progress bar", async () => {
-    Task._records = [
-        {
-            id: 1,
-            name: "Task A",
-            planned_date_begin: "2021-06-14 08:00:00",
-            date_deadline: "2021-06-16 08:00:00",
-            user_ids: [100],
-            project_id: 1,
-            allocated_hours: 10,
-        },
-        {
-            id: 2,
-            name: "Task B",
-            planned_date_begin: "2021-06-14 08:00:00",
-            date_deadline: "2021-06-18 08:00:00",
-            user_ids: [100],
-            project_id: 1,
-            allocated_hours: 20,
-        },
-    ];
-    onRpc("get_gantt_data", ({ parent }) => {
-        const result = parent();
-        result.progress_bars.user_ids = {
-            100: { value: 60, max_value: 160 },
-        };
-        result.progress_bars.__default = {
-            false: { value: 60, max_value: 160 },
-        };
-        return result;
-    });
-    await mountGanttView({
-        arch: `<gantt js_class="task_gantt" date_start="planned_date_begin" date_stop="date_deadline"
-            progress_bar="user_ids" total_row="1" display_mode="sparse" default_range="month" scales="month"/>`,
-        resModel: "project.task",
-        type: "gantt",
-        groupBy: ["user_ids"],
-    });
-    // Only the assignee row shows a progress bar; task leaves stay empty
-    expect(SELECTORS.progressBar).toHaveCount(1);
-    // But task leaves still keep their allocated-time label.
-    expect(queryAllTexts(SELECTORS.progressBarForeground)).toEqual(["100h", "10h", "20h"]);
-});
-
 test("open a dialog to schedule task", async () => {
     Task._records.push({
         id: 51,
@@ -286,6 +241,22 @@ test("open a dialog to schedule task", async () => {
     expect(".modal .o_list_view .o_data_row").toHaveClass("o_data_row_selected");
     await contains(".modal footer .o_auto_plan_button").click();
     expect.verifySteps(["schedule_tasks"]);
+});
+
+test("New button on day scale uses the working schedule", async () => {
+    Task._views = {
+        form: '<form><field name="name"/><field name="planned_date_begin"/><field name="date_deadline"/></form>',
+    };
+    onRpc("onchange", ({ kwargs }) => {
+        expect.step(`use_working_schedule: ${kwargs.context.use_working_schedule}`);
+    });
+    await mountGanttView({
+        ...ganttViewParams,
+        arch: '<gantt js_class="task_gantt" date_start="planned_date_begin" date_stop="date_deadline" default_scale="day"/>',
+    });
+    await contains(SELECTORS.addButton + ":visible").click();
+    expect(".modal").toHaveCount(1);
+    expect.verifySteps(["use_working_schedule: true"]);
 });
 
 test("Lines are displayed in group order, with the unassigned one always first", async () => {

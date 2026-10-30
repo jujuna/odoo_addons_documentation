@@ -5,15 +5,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-11 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 03:29+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"PO-Revision-Date: 2026-10-11 06:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/frontdesk/zh_Hans/>\n"
+"projects/odoo-20/frontdesk/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -76,6 +77,16 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p>您好 <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: frontdesk
 #: model_terms:web_tour.tour,rainbow_man_message:frontdesk.frontdesk_tour
@@ -97,7 +108,7 @@ msgid ""
 "A comprehensive front desk management system that enables guests to "
 "effortlessly check in and out while ensuring seamless notifications for "
 "hosts."
-msgstr ""
+msgstr "一套完善的前台管理系统，让访客轻松完成签到和签退，同时确保及时通知接待人。"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction
@@ -120,7 +131,7 @@ msgstr "管理员"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 msgid "All"
-msgstr ""
+msgstr "全部"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -150,31 +161,31 @@ msgstr "附件数量"
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__auto_checkout_hours
 msgid "Auto-Checkout"
-msgstr ""
+msgstr "自动签退"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__auto_checkout_time
 msgid "Auto-Checkout Time"
-msgstr ""
+msgstr "自动签退时间"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 #: code:addons/frontdesk/static/src/navbar/navbar.xml:0
 msgid "Back"
-msgstr ""
+msgstr "返回"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Browse All Hosts"
-msgstr ""
+msgstr "浏览所有接待人"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Browse Hosts"
-msgstr ""
+msgstr "浏览接待人"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
@@ -185,7 +196,7 @@ msgstr "按负责人"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Change Host"
-msgstr ""
+msgstr "更改接待人"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -240,13 +251,13 @@ msgstr "签退"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Choose how hosts are notified when a guest arrives."
-msgstr ""
+msgstr "选择访客到达时如何通知接待人。"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Choose who you would like to visit"
-msgstr ""
+msgstr "选择您想拜访的人"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -275,7 +286,7 @@ msgstr "公司Logo"
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid ""
 "Concise summary displayed immediately to the user for quick transparency."
-msgstr ""
+msgstr "立即向用户显示的简要说明，便于快速了解。"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
@@ -286,7 +297,7 @@ msgstr "配置"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Continue"
-msgstr ""
+msgstr "继续"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__create_uid
@@ -350,7 +361,7 @@ msgstr "邮箱"
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__mail_template_id
 msgid "Email Template"
-msgstr ""
+msgstr "电子邮件模板"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -388,7 +399,7 @@ msgstr "前台"
 #. module: frontdesk
 #: model:mail.template,name:frontdesk.frontdesk_visitor_mail_template
 msgid "Frontdesk Email Template"
-msgstr ""
+msgstr "前台邮件模板"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__name
@@ -398,19 +409,19 @@ msgstr "前台名称"
 #. module: frontdesk
 #: model:ir.model,name:frontdesk.model_frontdesk_visitor
 msgid "Frontdesk Visitor"
-msgstr ""
+msgstr "前台访客"
 
 #. module: frontdesk
 #: model:ir.actions.server,name:frontdesk.cron_auto_checkout_visitors_ir_actions_server
 msgid "Frontdesk: Auto-Checkout Visitors"
-msgstr ""
+msgstr "前台：自动签退访客"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid ""
 "Full legal disclosure covering storage, rights, and contact info (accessible "
 "via click)."
-msgstr ""
+msgstr "完整的法律声明，涵盖数据存储、权利和联系方式（点击可查看）。"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -421,7 +432,7 @@ msgstr "返回"
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__authenticate_guest
 msgid "Guest Details"
-msgstr ""
+msgstr "访客详情"
 
 #. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_open_guest_on_site_visitor
@@ -461,7 +472,7 @@ msgstr "接待人"
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Host Avatar"
-msgstr ""
+msgstr "接待人头像"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__host_id
@@ -471,7 +482,7 @@ msgstr "接待人姓名"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Host Notifications"
-msgstr ""
+msgstr "接待人通知"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_selection
@@ -482,7 +493,7 @@ msgstr "接待人选择"
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__station_host_ids
 msgid "Hosts"
-msgstr ""
+msgstr "接待人"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__id
@@ -521,6 +532,8 @@ msgid ""
 "Invalid domain. Allowed filters are: department_id with '=' and display_name "
 "with 'ilike'."
 msgstr ""
+"无效的筛选条件。允许的筛选器为：department_id 使用 '='，display_name 使用 "
+"'ilike'。"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
@@ -625,7 +638,7 @@ msgstr "名称"
 #. module: frontdesk
 #: model:res.groups.privilege,placeholder:frontdesk.res_groups_privilege_frontdesk
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #. module: frontdesk
 #: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_frontdesk
@@ -642,7 +655,7 @@ msgstr "还没有访客。让我们新增一个！"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Notify by Email"
-msgstr ""
+msgstr "通过邮件通知"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_discuss
@@ -726,12 +739,12 @@ msgstr "打印访客徽标"
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice
 msgid "Privacy Notice"
-msgstr ""
+msgstr "隐私声明"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice_details
 msgid "Privacy Notice Details"
-msgstr ""
+msgstr "隐私声明详情"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -754,13 +767,13 @@ msgstr "点评"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Read More"
-msgstr ""
+msgstr "阅读更多"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Read more"
-msgstr ""
+msgstr "阅读更多"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
@@ -780,12 +793,12 @@ msgstr "负责人"
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__responsible_ids
 msgid "Responsibles are notified if no host is selected."
-msgstr ""
+msgstr "若未选择接待人，则会通知负责人。"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__host_selection
 msgid "Restrict the hosts available from the client to choose from."
-msgstr ""
+msgstr "限制客户端可供选择的接待人范围。"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_sms_error
@@ -814,12 +827,12 @@ msgstr "安全Token"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Select Host"
-msgstr ""
+msgstr "选择接待人"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Select Hosts"
-msgstr ""
+msgstr "选择接待人"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -835,12 +848,12 @@ msgstr "自助签到"
 #. module: frontdesk
 #: model:mail.template,description:frontdesk.frontdesk_visitor_mail_template
 msgid "Sent to hosts on guest arrival"
-msgstr ""
+msgstr "访客到达时发送给接待人"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
@@ -891,7 +904,7 @@ msgstr "状态"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "Thank you for registering!"
-msgstr ""
+msgstr "感谢您的登记！"
 
 #. module: frontdesk
 #. odoo-python
@@ -902,7 +915,7 @@ msgstr "感谢您的理解。"
 #. module: frontdesk
 #: model:ir.model.constraint,message:frontdesk.constraint_frontdesk_frontdesk_check_auto_checkout_positive
 msgid "The Auto-Checkout value should be positive."
-msgstr ""
+msgstr "自动签退的值应为正数。"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__theme
@@ -912,7 +925,7 @@ msgstr "主题"
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__image
 msgid "This image will be used as the kiosk background."
-msgstr ""
+msgstr "该图片将用作自助终端的背景。"
 
 #. module: frontdesk
 #: model:res.groups,name:frontdesk.frontdesk_group_user
@@ -933,14 +946,14 @@ msgstr "参观公司"
 #. module: frontdesk
 #: model:ir.module.module,summary:base.module_frontdesk
 msgid "Visitor management system"
-msgstr ""
+msgstr "访客管理系统"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid ""
 "Visitor sessions expire automatically after the predefined duration. Leave "
 "to 0 to disable."
-msgstr ""
+msgstr "访客会话会在预定时长后自动过期。设为 0 可禁用。"
 
 #. module: frontdesk
 #. odoo-python
@@ -968,7 +981,7 @@ msgstr "很遗憾通知您，以下%(host_status)s当前不可用："
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Welcome to"
-msgstr ""
+msgstr "欢迎光临"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1005,12 +1018,12 @@ msgstr "您已注册！"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Your Information"
-msgstr ""
+msgstr "您的信息"
 
 #. module: frontdesk
 #: model:mail.template,subject:frontdesk.frontdesk_visitor_mail_template
 msgid "Your Visitor {{ object.name }} Requested To Meet You"
-msgstr ""
+msgstr "您的访客 {{ object.name }} 请求与您会面"
 
 #. module: frontdesk
 #. odoo-python
@@ -1041,25 +1054,25 @@ msgstr "例如：john@company.com"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
-msgstr ""
+msgstr "已被通知。"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "host is"
-msgstr ""
+msgstr "接待人为"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "hosts are"
-msgstr ""
+msgstr "接待人为"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "will get back to you."
-msgstr ""
+msgstr "会尽快回复您。"
 
 #~ msgid ""
 #~ "%(host_names)s must have a valid Phone to be informed about visitor "

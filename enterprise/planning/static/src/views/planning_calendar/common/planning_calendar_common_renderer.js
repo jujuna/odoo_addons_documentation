@@ -56,7 +56,7 @@ export class PlanningCalendarCommonRenderer extends CalendarCommonRenderer {
 
         this.closeNotificationFn?.();
         this.closeNotificationFn = this.notificationService.add(
-            markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${notifLabel}</span>`,
+            markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${notifLabel}</span>`,
             {
                 type: "success",
                 className: "planning_notification",
@@ -78,7 +78,7 @@ export class PlanningCalendarCommonRenderer extends CalendarCommonRenderer {
                                 );
                                 this.props.model.load();
                                 this.closeNotificationFn = this.notificationService.add(
-                                    markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${_t(
+                                    markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${_t(
                                         "Shift unscheduled"
                                     )}</span>`,
                                     {
@@ -88,7 +88,7 @@ export class PlanningCalendarCommonRenderer extends CalendarCommonRenderer {
                                 );
                             } catch {
                                 this.closeNotificationFn = this.notificationService.add(
-                                    markup`<i class="fa fa-fw fa-times"></i><span class="ms-1">${_t(
+                                    markup`<i class="oi oi-fw" data-icon="close"></i><span class="ms-1">${_t(
                                         "Could not undo scheduling"
                                     )}</span>`,
                                     {

@@ -11,7 +11,7 @@ class PlanningSlotTemplate(models.Model):
         check_company=True,
     )
 
-    @api.depends('worksheet_template_id')
+    @api.depends('worksheet_template_id.company_id')
     def _compute_company_id(self):
         super()._compute_company_id()
 

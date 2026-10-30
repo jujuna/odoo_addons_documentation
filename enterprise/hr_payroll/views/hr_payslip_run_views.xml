@@ -28,14 +28,14 @@
         <field name="name">hr.payrun.blank.kanban.card</field>
         <field name="model">hr.payslip.run</field>
         <field name="arch" type="xml">
-          <kanban js_class="payslip_run_kanban" default_order="state, date_start DESC, id" quick_create="0">
+          <kanban js_class="payslip_run_kanban" default_order="state, date_start DESC, id" quick_create="0" highlight_color="color">
 
                 <field name="currency_id"/>
                 <field name="payment_report_format"/>
                 <field name="payment_report_filename"/>
 
                 <templates>
-                    <t t-name="payrun_menu" class="d-flex flex-column">
+                    <t t-name="menu" class="d-flex flex-column">
 
                 <button name="action_validate" type="object" class="btn oe_highlight" string="Validate"
                         invisible="state != '01_ready' or empty_payslips > 0 or payslip_count == 0" context="{'payslip_generate_pdf': payslip_generate_and_send_trigger != 'never'}"
@@ -44,7 +44,6 @@
                         string="Test Print" invisible="state != '01_ready'"
                         confirm="Draft PDFs will be generated for all payslips and attached in their chatter.&#10;Are you sure you want to proceed?"/>
                 <button name="action_confirm" type="object" class="btn oe_highlight" string="Compute" invisible="state != '01_ready' or empty_payslips == 0"/>
-                <button name="action_paid" type="object" class="btn btn-primary" string="Mark as Paid" invisible="state != '02_close'" options="{'is_priority': True}"/>
                 <field name="payment_report" filename="payment_report_filename" format="payment_report_format"
                        widget="payrun_binary" class="btn btn-secondary btn-addr align-content-center text-center"  invisible="not payment_report"/>
                 <button name="action_unpaid" type="object" class="btn btn-secondary" string="Mark as Unpaid" invisible="state != '03_paid'"/>
@@ -64,45 +63,42 @@
                         <button name="unlink" type="delete" class="btn text-danger">Delete</button>
                     </t>
 
-                    <t t-name="payrun_name">
+
+                    <t t-name="card">
+                      <!-- payrun name -->
+                      <div class="o_payrun_name d-flex flex-column justify-content-center gap-1">
                         <div class="fs-4 fw-bold text-truncate">
-                            <input t-if="context.payrun_kanban_card_view_id"
-                                type="text"
-                                t-att-value="record.name.value"
-                                data-payrun-name="1"
-                                placeholder="Pay Run Name"
-                                class="o_field_widget o_input w-100"/>
-                            <field name="name" t-else="" class="text-truncate"/>
+                          <field name="name" class="text-truncate"/>
                         </div>
                         <div class="fw-medium text-truncate" style="font-size: 0.75rem;">
-                            <field name="date_start"/>
-                            <i class="oi px-2" data-icon="east" title="Arrow"/>
-                            <field name="date_end"/>
-                            <span class="mx-2 text-muted">|</span>
-                            <span class="text-black"><field name="employee_count"/> Employees</span>
-                                <span class="o_payrun_chatter_icon ms-1 opacity-0 opacity-100-hover lh-1 fade text-muted" role="button"
-                                      t-if="!context.payrun_kanban_card_view_id">
-                                    <i class="oi oi-fw" t-att-data-icon="{'forum': !(this.isChatterOpen and this.isSelected), 'close': this.isChatterOpen and this.isSelected}" title="Chatter"/>
-                                </span>
+                          <field name="date_start"/>
+                          <i class="oi px-2" data-icon="east" title="Arrow"/>
+                          <field name="date_end"/>
+                          <span class="mx-2 text-muted">|</span>
+                          <span class="text-black"><field name="employee_count"/> Employees</span>
+                          <span class="o_payrun_chatter_icon ms-1 opacity-0 opacity-100-hover lh-1 fade text-muted" role="button"
+                                t-if="!context.payrun_kanban_card_view_id">
+                            <i class="oi oi-fw" t-att-data-icon="this.isChatterOpen and this.isSelected ? 'close' : 'forum'" title="Chatter"/>
+                          </span>
                         </div>
-                    </t>
-                    <t t-name="payrun_state">
-                      <field name="state" widget="badge"
-                            decoration-info="state in ('00_draft', '01_ready')"
-                            decoration-success="state == '02_close'"
-                            decoration-primary="state == '03_paid'" />
-                    </t>
-                    <t t-name="payrun_kpis">
-                      <div class="o_payrun_metrics d-flex justify-content-center align-items-start gap-4">
+                      </div>
+
+                      <div class="o_payrun_kpis d-flex justify-content-center align-items-center">
+                        <div class="o_payrun_metrics d-flex justify-content-center align-items-start gap-4">
                           <div class="d-flex flex-column align-items-start">
-                              <div class="o_payrun_metric_label small text-muted"><span>Total Cost</span></div>
-                              <div class="o_payrun_metric_value"><field name="total_employer_cost" widget="payrun_kpi"/></div>
+                            <div class="o_payrun_metric_label small text-muted"><span>Total Cost</span></div>
+                            <div class="o_payrun_metric_value"><field name="total_employer_cost" widget="payrun_kpi"/></div>
                           </div>
 
                           <div class="d-flex flex-column align-items-start">
-                              <div class="o_payrun_metric_label small text-muted"><span>Net</span></div>
-                              <div class="o_payrun_metric_value"><field name="net_sum" widget="payrun_kpi"/></div>
+                            <div class="o_payrun_metric_label small text-muted"><span>Net</span></div>
+                            <div class="o_payrun_metric_value"><field name="net_sum" widget="payrun_kpi"/></div>
                           </div>
+                        </div>
+                      </div>
+
+                      <div class="o_payrun_state fs-3">
+                        <field name="state" widget="badge" options="{'color_field': 'color'}"/>
                       </div>
                     </t>
                 </templates>
@@ -121,10 +117,7 @@
                 <field name="name"/>
                 <field name="total_employer_cost" string="Total Cost" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" sum="Total Cost"/>
                 <field name="net_sum" string="Net" widget="monetary" options="{'currency_field': 'currency_id'}" decoration-bf="1" optional="show" sum="Total Net"/>
-                <field name="state" widget="badge"
-                       decoration-info="state in ('00_draft', '01_ready')"
-                       decoration-success="state == '02_close'"
-                       decoration-primary="state == '03_paid'" />
+                <field name="state" widget="badge" options="{'color_field': 'color'}"/>
                 <button string="Journal" name="action_payroll_line_report" type="object" title="Payroll Journal"/>
             </list>
         </field>

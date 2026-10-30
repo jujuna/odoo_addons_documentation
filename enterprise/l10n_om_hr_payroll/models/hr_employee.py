@@ -23,13 +23,20 @@ class HrEmployee(models.Model):
         for employee in (self - om_employees):
             employee.l10n_om_remaining_annual_leave_balance = 0
 
-        emp_per_company = om_employees.grouped('company_id')
-        annual_work_entry_type_allocation_data = ({
-            company.id: company.l10n_om_annual_work_entry_type_id.get_allocation_data(emp_per_company[company], target_date=emp_per_company[company].departure_date)
-                for company in om_employees.company_id
-                if company.l10n_om_annual_work_entry_type_id
-        })
+        emp_per_company_and_date = om_employees.grouped(
+            lambda e: (e.company_id, e.departure_date)
+        )
+        allocation_data_per_employee = {}
+        for (company, departure_date), employees in emp_per_company_and_date.items():
+            work_entry_type = company.l10n_om_annual_work_entry_type_id
+            if not work_entry_type:
+                continue
+            allocation_data_per_employee.update(
+                work_entry_type.get_allocation_data(employees, target_date=departure_date)
+            )
+
         for employee in om_employees:
-            company_data = annual_work_entry_type_allocation_data.get(employee.company_id.id, {})
-            employee_allocation_data = company_data.get(employee, False)
-            employee.l10n_om_remaining_annual_leave_balance = employee_allocation_data[0][1]['remaining_leaves'] if employee_allocation_data else 0
+            employee_allocation_data = allocation_data_per_employee.get(employee, False)
+            employee.l10n_om_remaining_annual_leave_balance = (
+                employee_allocation_data[0][1]['remaining_leaves'] if employee_allocation_data else 0
+        )

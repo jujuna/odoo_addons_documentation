@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, UTC
 from lxml import etree
 from zoneinfo import ZoneInfo
 import re
@@ -81,7 +81,7 @@ class PosEdiXmlUBLDian(models.AbstractModel):
 
         pos_order = vals['pos_order']
 
-        post_datetime = pos_order.date_order.now().astimezone(ZoneInfo('America/Bogota'))
+        post_datetime = pos_order.date_order.replace(tzinfo=UTC).astimezone(ZoneInfo('America/Bogota'))
 
         document_node.update({
             'cbc:CustomizationID': {'_text': vals['l10n_co_edi_operation_type']},

@@ -382,3 +382,33 @@ test("sparse gantt with a group expand and unavailabilities", async () => {
         "--Gantt__DayOff-background-color",
     ]);
 });
+
+test("sparse gantt does not show the progress bar for individual rows", async () => {
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
+        result.progress_bars.user_id = {
+            1: { value: 50, max_value: 100 },
+            2: { value: 25, max_value: 200 },
+        };
+        result.progress_bars.__default = {
+            false: { value: 75, max_value: 300 },
+        };
+        return result;
+    });
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                display_mode="sparse"
+                progress_bar="user_id"
+                total_row="1"
+            />
+        `,
+        groupBy: ["user_id"],
+    });
+    expect(`${SELECTORS.rowHeader}.o_group_open .o_gantt_progress_bar`).toHaveCount(2);
+    expect(`${SELECTORS.rowHeader}:not(.o_group_open) .o_gantt_progress_bar`).toHaveCount(0);
+    expect(SELECTORS.rowTotalProgressBar).toHaveCount(1);
+});

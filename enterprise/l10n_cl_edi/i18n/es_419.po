@@ -4,15 +4,16 @@
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
+# Marco Antonio Iribe Sepulveda <masi@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.3alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 18:16+0000\n"
-"PO-Revision-Date: 2026-09-18 05:01+0000\n"
+"POT-Creation-Date: 2026-10-23 18:22+0000\n"
+"PO-Revision-Date: 2026-10-19 21:41+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/l10n_cl_edi/es_419/>\n"
+"odoo-20/l10n_cl_edi/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -532,12 +533,6 @@ msgstr "<span>Razón</span>"
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.template_references_table
 msgid "<span>Reference Doc Type</span>"
 msgstr "<span>Tipo de Doc. Ref</span>"
-
-#. module: l10n_cl_edi
-#. odoo-python
-#: code:addons/l10n_cl_edi/models/account_move.py:0
-msgid "<strong>WARNING: Simulating %s in Demo Mode</strong>"
-msgstr "<strong>WARNING: Simulando %s en modo Demo</strong>"
 
 #. module: l10n_cl_edi
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.res_config_settings_view_cl_form
@@ -1276,14 +1271,15 @@ msgstr "Nombre mostrado"
 #. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
-msgid "Document %s failed with the following response:"
-msgstr "Documento %s falló con la siguiente respuesta:"
+msgid ""
+"Document %(document)s was accepted with the following response: %(response)s"
+msgstr ""
 
 #. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
-msgid "Document %s was accepted with the following response:"
-msgstr "Documento %s fue aceptado con la siguiente respuesta:"
+msgid "Document %s failed with the following response:"
+msgstr "Documento %s falló con la siguiente respuesta:"
 
 #. module: l10n_cl_edi
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_l10n_cl_edi_reference__date
@@ -1537,21 +1533,8 @@ msgstr "Servidor de correo entrante"
 #. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/fetchmail_server.py:0
-msgid ""
-"Incoming SII DTE result:<br/> <li><b>ESTADO</b>: %(status)s</"
-"li><li><b>REVISIONDTE/ESTADO</b>: %(error_status)s</li><li><b>REVISIONDTE/"
-"DETALLE</b>: %(details)s</li>"
+msgid "Incoming SII DTE result: %s"
 msgstr ""
-"Resultado del DTE entrante del SII:<br/> <li><b>ESTADO</b>: %(status)s</"
-"li><li><b>REVISIONDTE/ESTADO</b>: %(error_status)s</li><li><b>REVISIONDTE/"
-"DETALLE</b>: %(details)s</li>"
-
-#. module: l10n_cl_edi
-#. odoo-python
-#: code:addons/l10n_cl_edi/models/fetchmail_server.py:0
-msgid "Incoming SII DTE result:<br/><li><b>ESTADO</b>: %s</li>"
-msgstr ""
-"DTE entrante, con el siguiente resultado:<br/><li><b>ESTADO</b>: %s</li>"
 
 #. module: l10n_cl_edi
 #. odoo-python
@@ -2450,7 +2433,7 @@ msgstr "Categoría impuestos"
 #. module: l10n_cl_edi
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
 msgid "TRANSFERABLE"
-msgstr "TRANSFERIBLE"
+msgstr "CEDIBLE"
 
 #. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__res_company__l10n_cl_sii_regional_office__ur_tat
@@ -2807,6 +2790,13 @@ msgid ""
 "                        for a branch trading under the RUT of its parent "
 "company."
 msgstr ""
+"Esta empresa declara su propio RUT, por lo que el SII la considera un "
+"contribuyente independiente de su empresa matriz: emite\n"
+"                        sus documentos con ese RUT y necesita sus propios "
+"archivos CAF y certificado digital. Deja vacío el número de identificación "
+"fiscal\n"
+"                        si se trata de una sucursal que opera con el RUT de "
+"su empresa matriz."
 
 #. module: l10n_cl_edi
 #. odoo-python
@@ -3001,6 +2991,12 @@ msgstr "Viña del Mar"
 #. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
+msgid "WARNING: Simulating %s in Demo Mode"
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid "Warning:"
 msgstr "Advertencia:"
 
@@ -3145,6 +3141,25 @@ msgstr "⇒ Reprocesar Acuse de Recibo"
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.invoice_status_form_cl
 msgid "⇒ Verify on SII"
 msgstr "⇒ Verificar en SII"
+
+#~ msgid "<strong>WARNING: Simulating %s in Demo Mode</strong>"
+#~ msgstr "<strong>WARNING: Simulando %s en modo Demo</strong>"
+
+#~ msgid "Document %s was accepted with the following response:"
+#~ msgstr "Documento %s fue aceptado con la siguiente respuesta:"
+
+#~ msgid ""
+#~ "Incoming SII DTE result:<br/> <li><b>ESTADO</b>: %(status)s</"
+#~ "li><li><b>REVISIONDTE/ESTADO</b>: %(error_status)s</li><li><b>REVISIONDTE/"
+#~ "DETALLE</b>: %(details)s</li>"
+#~ msgstr ""
+#~ "Resultado del DTE entrante del SII:<br/> <li><b>ESTADO</b>: %(status)s</"
+#~ "li><li><b>REVISIONDTE/ESTADO</b>: %(error_status)s</li><li><b>REVISIONDTE/"
+#~ "DETALLE</b>: %(details)s</li>"
+
+#~ msgid "Incoming SII DTE result:<br/><li><b>ESTADO</b>: %s</li>"
+#~ msgstr ""
+#~ "DTE entrante, con el siguiente resultado:<br/><li><b>ESTADO</b>: %s</li>"
 
 #~ msgid ""
 #~ "There are no CAFs available for folio %(folio)s in the sequence of %"

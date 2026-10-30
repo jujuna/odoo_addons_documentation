@@ -1,10 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models
+from odoo import models, fields
 
 
 class L10nBeOnssDeclaration(models.Model):
     _inherit = 'l10n.be.onss.declaration'
+
+    batch_declaration_name = fields.Char(compute='_compute_batch_declaration_name')
+
+    def _compute_batch_declaration_name(self):
+        for record in self:
+            record.batch_declaration_name = record.batch_declaration_id._name if record.batch_declaration_id else False
 
     def action_post(self):
         """ Sandbox mode: Test Declarations (S) are never uploaded to the ONSS

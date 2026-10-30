@@ -685,7 +685,12 @@ class SalePortal(sale_portal.CustomerPortal):
             except (AccessError, MissingError):
                 order_sudo = False
 
-            if order_sudo and order_sudo.is_subscription and order_sudo.state == 'sale':
+            if (
+                order_sudo
+                and order_sudo.is_subscription
+                and order_sudo.state == 'sale'
+                and request.session.get("current_history") == "my_subscriptions_history"
+            ):
                 return self.subscription(*args, **kw)
 
         # Fallback to the default Sales portal behavior

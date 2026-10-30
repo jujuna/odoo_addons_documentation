@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:50+0000\n"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
 "PO-Revision-Date: 2026-09-17 23:30+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
@@ -142,8 +142,7 @@ msgstr ""
 msgid ""
 "%s Future entries will be recomputed to depreciate the asset following the "
 "changes."
-msgstr ""
-"%s รายการในอนาคตจะถูกคำนวณใหม่ เพื่อคิดค่าเสื่อมราคาสินทรัพย์หลังได้มีการเปลี่ยนแปลง"
+msgstr "%s รายการในอนาคตจะถูกคำนวณใหม่ เพื่อคิดค่าเสื่อมราคาสินทรัพย์หลังได้มีการเปลี่ยนแปลง"
 
 #. module: account_asset
 #. odoo-python
@@ -207,8 +206,8 @@ msgid ""
 "> %(extra_text)s Future entries will be recomputed to depreciate the asset "
 "following the changes."
 msgstr ""
-"รายการค่าเสื่อมราคาจะถูกโพสต์ในวันที่และรวมถึงวันที่ %(date)s <br/>%(extra_text)s รายการใ"
-"นอนาคตจะถูกคำนวณใหม่เพื่อคิดค่าเสื่อมราคาสินทรัพย์หลังการเปลี่ยนแปลง"
+"รายการค่าเสื่อมราคาจะถูกโพสต์ในวันที่และรวมถึงวันที่ %(date)s <br/>%(extra_text)s "
+"รายการในอนาคตจะถูกคำนวณใหม่เพื่อคิดค่าเสื่อมราคาสินทรัพย์หลังการเปลี่ยนแปลง"
 
 #. module: account_asset
 #. odoo-python
@@ -218,8 +217,8 @@ msgid ""
 "A disposal entry will be posted on the %(account_type)s account <b>%"
 "(account)s</b>."
 msgstr ""
-"รายการค่าเสื่อมราคาจะถูกผ่านรายการและมีวันที่ %(date)s<br/> รายการตัดทิ้งจะถูกโพสต์ในบัญชีประ"
-"เภท %(account_type)s <b>%(account)s</b>"
+"รายการค่าเสื่อมราคาจะถูกผ่านรายการและมีวันที่ %(date)s<br/> "
+"รายการตัดทิ้งจะถูกโพสต์ในบัญชีประเภท %(account_type)s <b>%(account)s</b>"
 
 #. module: account_asset
 #. odoo-python
@@ -229,8 +228,9 @@ msgid ""
 "A second entry will neutralize the original income and post the  outcome of "
 "this sale on account <b>%(account)s</b>."
 msgstr ""
-"รายการค่าเสื่อมราคาจะถูกโพสต์ในวันที่และรวมถึงวันที่ %(date)s <br/>รายการที่สองจะทำให้รายได้เ"
-"ดิมเป็นกลางและโพสต์ผลลัพธ์ของการขายนี้ในบัญชี <b>%(account)s</b>"
+"รายการค่าเสื่อมราคาจะถูกโพสต์ในวันที่และรวมถึงวันที่ %(date)s <br/"
+">รายการที่สองจะทำให้รายได้เดิมเป็นกลางและโพสต์ผลลัพธ์ของการขายนี้ในบัญชี <b>%(account)s</"
+"b>"
 
 #. module: account_asset
 #. odoo-python
@@ -303,24 +303,8 @@ msgstr "บัญชี"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid ""
-"Account %(account)s should have accumulated depreciation and depreciation "
-"expense accounts set in order to generate an asset"
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
 "Account %(name)s cannot be used to create an asset. The account must be of "
 "the Fixed Asset type."
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Account %(name)s not setup to generate assets. Depreciation model and asset "
-"accounts need to be set on account."
 msgstr ""
 
 #. module: account_asset
@@ -347,8 +331,7 @@ msgstr ""
 msgid ""
 "Account used in the periodical entries, to record a part of the asset as "
 "expense."
-msgstr ""
-"บัญชีที่ใช้ในการลงรายการตามงวด เพื่อบันทึกส่วนหนึ่งของสินทรัพย์เป็นค่าใช้จ่าย"
+msgstr "บัญชีที่ใช้ในการลงรายการตามงวด เพื่อบันทึกส่วนหนึ่งของสินทรัพย์เป็นค่าใช้จ่าย"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__account_depreciation_expense_id
@@ -903,6 +886,11 @@ msgid "Can Create Asset"
 msgstr "สามารถสร้างสินทรัพย์ได้"
 
 #. module: account_asset
+#: model:ir.model.fields,field_description:account_asset.field_account_asset__can_edit_asset_accounts
+msgid "Can Edit Asset Accounts"
+msgstr ""
+
+#. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Cancel Asset"
 msgstr "ยกเลิกสินทรัพย์"
@@ -1230,6 +1218,7 @@ msgstr "ค่าเสื่อมสภาพ"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Depreciation Account"
 msgstr "บัญชีค่าเสื่อมราคา"
 
@@ -1471,8 +1460,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_expense_id
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__expense_account_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Expense Account"
 msgstr "บัญชีค่าใช้จ่าย"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr
+msgid "Financial instruments"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -1534,7 +1529,6 @@ msgstr "มูลค่ากำไร"
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Go to Account"
 msgstr ""
@@ -1652,12 +1646,6 @@ msgid ""
 msgstr ""
 
 #. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid "Important Change"
-msgstr ""
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__already_depreciated_amount_import
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__already_depreciated_amount_import
 msgid ""
@@ -1672,6 +1660,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__informational_text
 msgid "Informational Text"
 msgstr "ข้อความที่ให้ข้อมูล"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass
+msgid "Intangible assets"
+msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__invoice_line_ids
@@ -1748,14 +1741,6 @@ msgstr "รายการสมุดรายวัน"
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__original_move_line_ids
 msgid "Journal Items"
 msgstr "รายการสมุดรายวัน"
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Journal Items of %(account)s should have a label in order to generate an "
-"asset"
-msgstr "รายการสมุดรายวันของ %(account)s ควรมีป้ายกำกับเพื่อสร้างสินทรัพย์"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__journal_id
@@ -2069,9 +2054,12 @@ msgid "No Prorata"
 msgstr "ไม่มี Pro rata"
 
 #. module: account_asset
+#. odoo-javascript
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
+#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__no_depreciation
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "No depreciation"
 msgstr ""
 
@@ -2174,8 +2162,8 @@ msgid ""
 "recorded for this period. Ensure assets are properly registered for "
 "automatic depreciation calculation."
 msgstr ""
-"Odoo จัดการค่าเสื่อมราคาสำหรับสินทรัพย์ถาวรของคุณ ไม่มีการบันทึกค่าเสื่อมราคาในงวดนี้ โปรดตรวจส"
-"อบให้แน่ใจว่าสินทรัพย์ถูกลงทะเบียนอย่างถูกต้องเพื่อให้ระบบคำนวณค่าเสื่อมราคาโดยอัตโนมัติ"
+"Odoo จัดการค่าเสื่อมราคาสำหรับสินทรัพย์ถาวรของคุณ ไม่มีการบันทึกค่าเสื่อมราคาในงวดนี้ "
+"โปรดตรวจสอบให้แน่ใจว่าสินทรัพย์ถูกลงทะเบียนอย่างถูกต้องเพื่อให้ระบบคำนวณค่าเสื่อมราคาโดยอัตโนมัติ"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__paused
@@ -2247,14 +2235,6 @@ msgstr ""
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid ""
-"Please note that by doing this, you will remove this model from other "
-"companies"
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
 "Please select a different fixed asset account than the one used on the "
@@ -2272,10 +2252,35 @@ msgid "Posted Entries"
 msgstr "รายการที่ผ่านรายการแล้ว"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_sale
+msgid "Proceeds from financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_sale
+msgid "Proceeds from sale of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_sale
+msgid "Proceeds from sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_rou
+msgid "Proceeds from sale of right-of-use assets"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
 msgid "Properties"
 msgstr "คุณสมบัติ"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe
+msgid "Property plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -2289,6 +2294,21 @@ msgstr "วันที่ Pro rata"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_move__asset_move_type__purchase
 msgid "Purchase"
 msgstr "การจัดซื้อ"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_purch
+msgid "Purchase of financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_purch
+msgid "Purchase of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_purch
+msgid "Purchase of property, plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #: model:account.report.column,name:account_asset.account_grouped_assets_report_duration_rate
@@ -2409,12 +2429,6 @@ msgid "Select Invoice Line"
 msgstr "เลือกรายการใบแจ้งหนี้"
 
 #. module: account_asset
-#. odoo-javascript
-#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
-msgid "Select a Depreciation Model"
-msgstr ""
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__company_id
 msgid ""
 "Select a specific company to limit this model's use, or leave it empty to "
@@ -2486,8 +2500,7 @@ msgstr ""
 msgid ""
 "Starting date of the period used in the prorata calculation of the first "
 "depreciation"
-msgstr ""
-"วันที่เริ่มต้นของรอบระยะเวลาที่ใช้ในการคำนวณตามสัดส่วนของค่าเสื่อมราคาครั้งแรก"
+msgstr "วันที่เริ่มต้นของรอบระยะเวลาที่ใช้ในการคำนวณตามสัดส่วนของค่าเสื่อมราคาครั้งแรก"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__main_variant_state
@@ -2525,8 +2538,7 @@ msgstr ""
 msgid ""
 "Sum of the depreciable value, the salvage value and the book value of all "
 "value increase items"
-msgstr ""
-"ผลรวมของมูลค่าเสื่อมราคา มูลค่าซาก และมูลค่าตามบัญชีของรายการมูลค่าที่เพิ่มขึ้นทั้งหมด"
+msgstr "ผลรวมของมูลค่าเสื่อมราคา มูลค่าซาก และมูลค่าตามบัญชีของรายการมูลค่าที่เพิ่มขึ้นทั้งหมด"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__country_code
@@ -2616,8 +2628,7 @@ msgstr ""
 msgid ""
 "The disposal invoice is needed in order to generate the closing journal "
 "entry."
-msgstr ""
-"จำเป็นต้องมีใบแจ้งหนี้การตัดจำหน่าย เพื่อสร้างรายการสมุดรายวันการปิดบัญชี"
+msgstr "จำเป็นต้องมีใบแจ้งหนี้การตัดจำหน่าย เพื่อสร้างรายการสมุดรายวันการปิดบัญชี"
 
 #. module: account_asset
 #. odoo-python
@@ -2637,17 +2648,17 @@ msgid ""
 msgstr ""
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "The fixed asset account differs from the account on the bill. Click"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__new_account_asset_id
 msgid ""
 "The fixed asset account to transfer this asset to. The depreciation "
 "parameters of this account will be applied to the new asset."
 msgstr ""
-
-#. module: account_asset
-#: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_number
-#: model:ir.model.fields,help:account_asset.field_account_depreciation_model__method_number
-msgid "The number of depreciations needed to depreciate your asset"
-msgstr "จำนวนค่าเสื่อมราคาที่จำเป็นในการคิดค่าเสื่อมราคาสินทรัพย์ของคุณ"
 
 #. module: account_asset
 #. odoo-python
@@ -2680,8 +2691,7 @@ msgstr "มีหลายบรรทัดที่อาจเกี่ยว
 msgid ""
 "There are unposted depreciations prior to the selected operation date, "
 "please deal with them first."
-msgstr ""
-"มีค่าเสื่อมราคาที่ยังไม่ได้ผ่านรายการก่อนวันดำเนินการที่เลือก โปรดทำการผ่านรายการก่อน"
+msgstr "มีค่าเสื่อมราคาที่ยังไม่ได้ผ่านรายการก่อนวันดำเนินการที่เลือก โปรดทำการผ่านรายการก่อน"
 
 #. module: account_asset
 #. odoo-javascript
@@ -2848,8 +2858,7 @@ msgstr ""
 msgid ""
 "You can't post an entry related to a draft asset. Please post the asset "
 "before."
-msgstr ""
-"คุณไม่สามารถผ่านรายการที่เกี่ยวข้องกับสินทรัพย์ฉบับร่างได้ กรุณาผ่านรายการสินทรัพย์ก่อน"
+msgstr "คุณไม่สามารถผ่านรายการที่เกี่ยวข้องกับสินทรัพย์ฉบับร่างได้ กรุณาผ่านรายการสินทรัพย์ก่อน"
 
 #. module: account_asset
 #. odoo-python
@@ -2886,8 +2895,8 @@ msgid ""
 "You cannot automate the journal entry for an asset that has a running gross "
 "increase. Please use 'Dispose' on the increase(s)."
 msgstr ""
-"คุณไม่สามารถทำให้รายการสมุดรายวันสำหรับสินทรัพย์ที่มีการเพิ่มขึ้นขั้นต้นได้โดยอัตโนมัติ กรุณาใช้ 'ตัดจำ"
-"หน่าย' ในการเพิ่ม"
+"คุณไม่สามารถทำให้รายการสมุดรายวันสำหรับสินทรัพย์ที่มีการเพิ่มขึ้นขั้นต้นได้โดยอัตโนมัติ กรุณาใช้ "
+"'ตัดจำหน่าย' ในการเพิ่ม"
 
 #. module: account_asset
 #. odoo-python
@@ -2901,8 +2910,7 @@ msgstr ""
 msgid ""
 "You cannot create an asset from lines containing credit and debit on the "
 "account or with a null amount"
-msgstr ""
-"คุณไม่สามารถสร้างสินทรัพย์จากบรรทัดที่มีเครดิตและเดบิตในบัญชีหรือมีจำนวนเงินเป็นศูนย์ได้"
+msgstr "คุณไม่สามารถสร้างสินทรัพย์จากบรรทัดที่มีเครดิตและเดบิตในบัญชีหรือมีจำนวนเงินเป็นศูนย์ได้"
 
 #. module: account_asset
 #. odoo-python
@@ -3083,6 +3091,12 @@ msgid "gain/loss"
 msgstr "กำไร/ขาดทุน"
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "here"
+msgstr ""
+
+#. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "loss"
@@ -3157,6 +3171,14 @@ msgstr ""
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "variant_ids.model_id"
 msgstr ""
+
+#~ msgid ""
+#~ "Journal Items of %(account)s should have a label in order to generate an "
+#~ "asset"
+#~ msgstr "รายการสมุดรายวันของ %(account)s ควรมีป้ายกำกับเพื่อสร้างสินทรัพย์"
+
+#~ msgid "The number of depreciations needed to depreciate your asset"
+#~ msgstr "จำนวนค่าเสื่อมราคาที่จำเป็นในการคิดค่าเสื่อมราคาสินทรัพย์ของคุณ"
 
 #~ msgid "# Original Move Lines"
 #~ msgstr "# เส้นทางการเคลื่อนที่เดิม"

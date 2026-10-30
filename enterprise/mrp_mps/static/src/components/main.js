@@ -1,10 +1,12 @@
 import { render, useSubEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
-import { MrpMpsControlPanel, MrpMpsSearchBar } from "../search/mrp_mps_control_panel";
+import { MrpMpsControlPanel } from "../search/mrp_mps_control_panel";
+import { GroupMenu } from "../search/group_menu";
 import MpsLineComponent from '@mrp_mps/components/line';
 import { MasterProductionScheduleModel } from '@mrp_mps/models/master_production_schedule_model';
 import { useService, useBus } from "@web/core/utils/hooks";
 import { CheckBox } from "@web/core/checkbox/checkbox";
+import { SearchBar } from "@web/search/search_bar/search_bar";
 import { usePager } from "@web/search/pager_hook";
 import { useSetupAction } from "@web/search/action_hook";
 import { ActionMenus } from "@web/search/action_menus/action_menus";
@@ -29,7 +31,8 @@ export class MainComponent extends Component {
         MrpMpsControlPanel,
         MpsLineComponent,
         CheckBox,
-        MrpMpsSearchBar,
+        SearchBar,
+        GroupMenu,
         ActionMenus,
         ViewScaleSelector,
     };

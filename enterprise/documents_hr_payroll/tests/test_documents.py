@@ -74,6 +74,12 @@ class TestCaseDocumentsBridgeHR(TestPayslipBase, TransactionCaseDocumentsHr):
         self.assertTrue(document, "There should be a new document created from the attachment")
         self.assertFalse(document.owner_id)
         self.assertEqual(document.folder_id, self.richard_emp.hr_employee_payroll_folder_id, "The document should have been created in the employee's Payroll folder")
+        self.assertEqual(document.partner_id, self.richard_emp.user_id.partner_id, "The document contact must be the user partner of the employee")
+        self.assertEqual(
+            self.payslip.document_access_url,
+            f"{document.access_url}?documents_init_open_preview=",
+            "The payslip link should open the documents view without opening a document preview",
+        )
         self.assertEqual(document.access_via_link, "view")
         self.assertEqual(document.access_internal, "none")
         self.assertTrue(document.is_access_via_link_hidden)

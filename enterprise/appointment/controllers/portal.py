@@ -25,6 +25,10 @@ class AppointmentPortal(portal.CustomerPortal):
             ('user_id', '!=', my_user.id),
             ('partner_ids', 'in', my_user.partner_id.ids),
             ('appointment_type_id', '!=', False),
+            # Active events or inactive cancelled ones
+            '|',
+                ('active', '=', True),
+                '&', ('active', '=', False), ('appointment_status', '=', 'cancelled')
         ]
 
     def _get_appointment_search_domain(self, search_in, search):
@@ -40,6 +44,7 @@ class AppointmentPortal(portal.CustomerPortal):
     def _appointment_get_groupby_mapping(self):
         return {
             'responsible': 'user_id',
+            'status': 'appointment_status',
         }
 
     @http.route(['/my/appointments',
@@ -67,6 +72,7 @@ class AppointmentPortal(portal.CustomerPortal):
         searchbar_groupby = {
             'none': {'label': _('None'), 'input': 'none'},
             'responsible': {'label': _('Responsible'), 'input': 'responsible'},
+            'status': {'label': _('Status'), 'input': 'status'},
         }
 
         searchbar_filters = {
@@ -105,7 +111,12 @@ class AppointmentPortal(portal.CustomerPortal):
         # If not False, this will contain a list of tuples (record of groupby, recordset of events):
         # [(res.users(2), calendar.event(1, 2)), (...), ...]
         if groupby_field:
-            grouped_appointments = [(g, Event.concat(events)) for g, events in groupbyelem(appointments, itemgetter(groupby_field))]
+            is_selection = Event._fields[groupby_field].type == 'selection'
+            # for selection fields, use the first event of the group instead
+            grouped_appointments = [
+                (events[0] if is_selection else g, Event.concat(events))
+                for g, events in groupbyelem(appointments, itemgetter(groupby_field))
+            ]
 
         values.update({
             'appointments': appointments,

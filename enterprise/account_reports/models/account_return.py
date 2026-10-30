@@ -233,7 +233,7 @@ class AccountReturnType(models.Model):
                     file_path=install_filename,
                 ))
 
-    @api.depends_context('company_id')
+    @api.depends_context('company')
     @api.depends('active_selection', 'active_fallback')
     def _compute_active(self):
         for record in self:
@@ -1802,8 +1802,8 @@ class AccountReturn(models.Model):
         self.date_submission = False
 
         if self.closing_move_ids:
-            self.closing_move_ids.button_draft()
-            self.closing_move_ids.unlink()
+            self.closing_move_ids._unlink_or_reverse()
+            self.closing_move_ids.closing_return_id = False
 
     ####################################################################################################
     ####  Other Actions
@@ -1938,7 +1938,7 @@ class AccountReturn(models.Model):
             'tax_unit': 'company_only' if not self.tax_unit_id else self.tax_unit_id.id,
             'selected_return_type_id': self.type_id.id,
         }
-        current_company = self.env.company
+        current_company = self.company_id
         company_ids = self.company_ids.ids
         return report.sudo().with_context(allowed_company_ids=company_ids).with_company(current_company).get_options(previous_options=options)
 
@@ -2643,6 +2643,7 @@ class AccountReturn(models.Model):
 
             review_action = {
                 'type': 'ir.actions.act_window',
+                'name': self.env._("Tax and country mismatch"),
                 'view_mode': 'list',
                 'res_model': 'account.move',
                 'domain': [('id', 'in', country_error_move_ids)],
@@ -3613,7 +3614,7 @@ class AccountReturnCheckTemplate(models.Model):
         selection=[
             ('account.move.line', "Journal Item"),
             ('account.move', "Journal Entry"),
-            ('account.bank.statement.line', "Bank Statement Line"),
+            ('account.bank.statement.line', "Bank Transaction"),
             ('account.payment', "Payments"),
             ('account.account', "Accounts"),
         ],

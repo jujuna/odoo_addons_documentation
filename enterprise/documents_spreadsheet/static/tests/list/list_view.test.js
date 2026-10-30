@@ -240,6 +240,31 @@ test("An error is displayed in the side panel if the list has invalid model", as
     expect(".o-validation-error").toHaveCount(1);
 });
 
+test("Can delete a list with an invalid model from the side panel", async function () {
+    const { model, env } = await createSpreadsheetFromListView({
+        mockRPC: async function (route, { model, method }) {
+            if (model === "unknown" && method === "fields_get") {
+                throw makeServerError({ code: 404 });
+            }
+        },
+    });
+    await contains(".o-sidePanelClose").click();
+    const listId = model.getters.getListIds()[0];
+    const listDefinition = model.getters.getListDefinition(listId);
+    model.dispatch("UPDATE_ODOO_LIST", {
+        listId,
+        list: {
+            ...listDefinition,
+            model: "unknown",
+        },
+    });
+    env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
+
+    await contains("button:contains(Delete List)").click();
+    await contains(".modal-footer .btn-primary").click();
+    expect(model.getters.getListIds()).toEqual([]);
+});
+
 test("Open list properties", async function () {
     const { env } = await createSpreadsheetFromListView();
 

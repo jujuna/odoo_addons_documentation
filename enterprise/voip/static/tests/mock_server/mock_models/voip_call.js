@@ -288,7 +288,7 @@ export class VoipCall extends models.ServerModel {
             ["state", "=", "missed"],
         ];
         if (this.env.user.last_seen_phone_call) {
-            domain.push([("id", ">", this.env.user.last_seen_phone_call)]);
+            domain.push([["id", ">", this.env.user.last_seen_phone_call]]);
         }
         return this.search_count(domain);
     }

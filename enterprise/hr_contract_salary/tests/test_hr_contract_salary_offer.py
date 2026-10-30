@@ -1,8 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.addons.hr_contract_salary.utils.hr_version import HR_VERSION_CTX_KEY
-from odoo.tests import TransactionCase, tagged, Form
+from odoo.tests import TransactionCase, tagged, Form, new_test_user
 from datetime import date
 
 
@@ -77,6 +77,31 @@ class TestHrContractSalaryOffer(TransactionCase):
         version = offer._get_version()
         self.assertAlmostEqual(offer.gross_wage, 2000.0, places=2)
         self.assertEqual(version.resource_calendar_id, self.version_calendar)
+
+    def test_employee_job_id_recompute_on_version_job_change(self):
+        job_a = self.env['hr.job'].create({'name': 'Developer'})
+        job_b = self.env['hr.job'].create({'name': 'Team Lead'})
+        department_a = self.env['hr.department'].create({'name': 'R&D'})
+        department_b = self.env['hr.department'].create({'name': 'Management'})
+        self.version.write({'job_id': job_a.id, 'department_id': department_a.id})
+
+        offer = self.env['hr.contract.salary.offer'].create({
+            'employee_id': self.employee.id,
+            'structure_id': self.structure.id,
+            'salary_amount': 2000,
+            'budget_type': 'monthly_gross',
+            'resource_calendar_id': self.offer_calendar.id,
+        })
+        self.assertEqual(offer.contract_template_id, self.version)
+        self.assertEqual(offer.employee_job_id, job_a)
+        self.assertEqual(offer.department_id, department_a)
+
+        self.version.write({'job_id': job_b.id, 'department_id': department_b.id})
+
+        self.assertEqual(offer.employee_job_id, job_b, "Offer job should refresh when the linked version's job changes")
+        self.assertEqual(offer.department_id, department_b)
+        self.assertEqual(offer.resource_calendar_id, self.offer_calendar)
+        self.assertEqual(offer.salary_amount, 2000)
 
     def test_gross_guess_based_on_net_calculation(self):
         offer = self.env['hr.contract.salary.offer'].create({
@@ -164,3 +189,82 @@ class TestHrContractSalaryOffer(TransactionCase):
             "Existing draft payslip should not be recomputed by a salary simulation")
         self.assertEqual(payslip.worked_days_line_ids.ids, worked_days_before,
             "Existing draft payslip should not be recomputed by a salary simulation")
+
+    def test_future_contract_offer_creation(self):
+        """
+        Ensure that creating a salary offer for a contract starting in the future
+        does not raise a validation error when the employee has a running contract
+        ending today.
+        """
+        today = fields.Date.today()
+        start_of_year = today.replace(month=1, day=1)
+        future_date = fields.Date.add(today, days=1)
+
+        self.version.write({
+            'contract_date_start': start_of_year,
+            'contract_date_end': today,
+            'date_start': start_of_year,
+            'date_version': start_of_year,
+        })
+
+        future_version = self.env['hr.version'].create({
+            'employee_id': self.employee.id,
+            'contract_date_start': future_date,
+            'date_start': future_date,
+            'date_version': future_date,
+            'wage': 2500,
+            'structure_type_id': self.struct_type.id,
+        })
+
+        action = future_version.action_generate_offer()
+        offer = self.env['hr.contract.salary.offer'].browse(action['res_id'])
+
+        offer.with_context(**self.version_ctx)._compute_salary()
+
+        self.assertEqual(self.version.contract_date_end, today)
+        self.assertTrue(offer.exists())
+
+    def test_generate_offer_form_with_recomputed_draft_payslip_inputs(self):
+        """
+        Generating a new offer from the employee should prefill the form, even when
+        the employee has a draft payslip whose inputs are computed from payslip
+        adjustments. Choosing another contract template should keep the form filled.
+        """
+        attachment_rule = self.env['hr.salary.rule'].create({
+            'name': 'Attachment of Salary',
+            'code': 'ATTACH_OFFER',
+            'struct_ids': [Command.link(self.structure.id)],
+            'category_ids': [Command.link(self.env.ref('hr_payroll.DED').id)],
+            'input_usage_payslip': True,
+        })
+        self.env['hr.salary.attachment'].create({
+            'employee_id': self.employee.id,
+            'description': 'Attachment',
+            'salary_rule_id': attachment_rule.id,
+            'date_start': date.today().replace(day=1),
+            'amount': 100,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Draft payslip',
+            'employee_id': self.employee.id,
+            'date_from': date.today().replace(day=1),
+            'date_to': date.today(),
+        })
+        self.assertEqual(payslip.input_line_ids.code, 'ATTACH_OFFER')
+
+        payroll_user = new_test_user(self.env, login='payroll_user', groups='hr_payroll.group_hr_payroll_user,sign.group_sign_user')
+        action = self.employee.with_user(payroll_user).action_generate_offer()
+        offer_form = Form(self.env['hr.contract.salary.offer'].with_user(payroll_user).with_context(action['context']))
+        self.assertEqual(offer_form.employee_id, self.employee)
+        self.assertEqual(offer_form.contract_template_id, self.employee.version_id)
+        self.assertEqual(offer_form.display_name, f"Offer for {self.employee.name}")
+
+        contract_template = self.env['hr.version'].create({
+            'name': 'Contract Template',
+            'structure_type_id': self.struct_type.id,
+            'wage': 3000,
+        })
+        offer_form.contract_template_id = contract_template
+        self.assertEqual(offer_form.employee_id, self.employee)
+        self.assertEqual(offer_form.contract_template_id, contract_template)
+        self.assertEqual(offer_form.display_name, f"Offer for {self.employee.name}")

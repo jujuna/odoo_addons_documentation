@@ -10,6 +10,10 @@
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'assets': {
+        'web.assets_backend': [
+            'hr_gantt/static/src/hr_gantt_employee_avatar.js',
+            'hr_gantt/static/src/hr_gantt_employee_avatar.xml',
+        ],
         'web.assets_backend_lazy': [
             'hr_gantt/static/src/**/*',
         ],

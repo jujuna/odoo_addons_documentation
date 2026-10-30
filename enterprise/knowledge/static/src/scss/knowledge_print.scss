@@ -1,5 +1,17 @@
 @media print {
     .o_web_client:has(.o_knowledge_form_view) {
+        // The portal also loads the screen layout when printing. Let the article
+        // span multiple pages without clipping or scrollbars.
+        background-color: unset;
+        height: auto;
+
+        .o_action_manager,
+        .o_action,
+        .o_content,
+        .o_form_view_container {
+            overflow: visible !important;
+        }
+
         .o-we-toolbar {
             display: none !important;
         }

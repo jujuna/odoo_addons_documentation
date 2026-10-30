@@ -493,13 +493,12 @@ class L10n_EsVATBooksReportHandler(models.AbstractModel):
         elif tax.l10n_es_type == 'ignore':
             return
         else:
-            if line_vals.get('operation_qualification') == 'S2':
-                return
             line_vals.update({
-                'total_amount': line_vals['total_amount'] + tax_amount,
                 'tax_rate': tax.amount,
                 'taxed_amount': line_vals['taxed_amount'] + tax_amount,
             })
+            if line_vals.get('operation_qualification') != 'S2' and line_vals.get('isp_taxable') != 'S' and line_vals.get('operation_code') != '09':
+                line_vals['total_amount'] += tax_amount
             # add amount to tax_deductible only if the line have mod303 in the tax grid (supports pro rata tax type)
             if not self._l10n_es_libros_is_income_line(line) and any('mod303' in tag for tag in line.tax_tag_ids.mapped('name')):
                 line_vals['tax_deductible'] += tax_amount

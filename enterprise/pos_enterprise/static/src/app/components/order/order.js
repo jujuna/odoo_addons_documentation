@@ -23,9 +23,12 @@ export class Order extends Component {
 
     orderlinesContainerRef = signal.ref();
 
+    get orderKey() {
+        return this.prepDisplay.getOrderKey(this.props.order);
+    }
     // Drives the card animation while the order is moving to another stage.
     isStageChanging = computed(() =>
-        this.prepDisplay.stageChangedOrderIds?.includes(this.order?.id)
+        this.prepDisplay.stageChangedOrderIds?.includes(this.orderKey)
     );
 
     setup() {
@@ -42,8 +45,10 @@ export class Order extends Component {
                 clearInterval(this.interval);
             }
         }, 1000);
+        this.currentOrderKey = this.orderKey;
         onWillUnmount(() => {
             clearInterval(this.interval);
+            this.prepDisplay.clearChangeTimeout(this.currentOrderKey);
         });
 
         this.internalNoteState = useDelayedValueChange(() => this.order.pos_order_id.internal_note);

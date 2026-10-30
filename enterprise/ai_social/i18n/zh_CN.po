@@ -3,15 +3,16 @@
 # * ai_social
 #
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:55+0000\n"
-"PO-Revision-Date: 2026-09-18 05:11+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-11 12:35+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/ai_social/zh_Hans/>\n"
+"projects/odoo-20/ai_social/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,6 +32,13 @@ msgid ""
 "conversation.\n"
 "        "
 msgstr ""
+"\n"
+"            向当前对话添加一名可用的人工客服，\n"
+"            并停止 AI 代理处理新的用户消息。\n"
+"            当用户要求人工服务，\n"
+"            或对话必须转接给真人时，使用此工具。\n"
+"            如果没有可用的客服人员，AI 代理将继续留在对话中。\n"
+"        "
 
 #. module: ai_social
 #. odoo-python
@@ -38,23 +46,23 @@ msgstr ""
 msgid ""
 "A human operator has been added to the conversation. Let the user know that "
 "a human will take over."
-msgstr ""
+msgstr "已向对话添加一名人工客服。请告知用户将有真人接管。"
 
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_ai_agent
 #: model:ir.model.fields,field_description:ai_social.field_im_livechat_channel__ai_social_livechat_agent_id
 msgid "AI Agent"
-msgstr ""
+msgstr "AI 代理"
 
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
-msgstr ""
+msgstr "用于文本起草的 AI 模型配置（默认提示词）。"
 
 #. module: ai_social
 #: model:ir.actions.server,name:ai_social.ir_actions_server_add_human
 msgid "AI: Social Live Chat Add Human Operator"
-msgstr ""
+msgstr "AI：社交在线客服添加人工客服"
 
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_ai_composer__interface_key
@@ -64,27 +72,27 @@ msgstr "操作"
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_ai_agent__ai_social_livechat_channel_ids
 msgid "Ai Social Livechat Channel"
-msgstr ""
+msgstr "AI 社交即时聊天频道"
 
 #. module: ai_social
 #: model:ir.model.fields.selection,name:ai_social.selection__im_livechat_channel__ai_social_livechat_enabled_condition__always
 msgid "Always"
-msgstr ""
+msgstr "总是"
 
 #. module: ai_social
 #: model_terms:ir.ui.view,arch_db:ai_social.im_livechat_channel_view_form
 msgid "Connect an AI Agent..."
-msgstr ""
+msgstr "连接 AI 代理..."
 
 #. module: ai_social
 #: model:ir.actions.server,ai_tool_thinking_text:ai_social.ir_actions_server_add_human
 msgid "Contacting an operator"
-msgstr ""
+msgstr "正在联系客服人员"
 
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "讨论群组"
 
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_ai_agent__display_name
@@ -97,19 +105,19 @@ msgstr "‎显示名称‎"
 #. module: ai_social
 #: model:ir.model.fields,field_description:ai_social.field_im_livechat_channel__ai_social_livechat_enabled_condition
 msgid "Enable ChatBot"
-msgstr ""
+msgstr "启用 ChatBot"
 
 #. module: ai_social
 #. odoo-python
 #: code:addons/ai_social/models/ai_agent.py:0
 msgid "Error: Cannot use this tool in this conversation"
-msgstr ""
+msgstr "错误：无法在此对话中使用此工具"
 
 #. module: ai_social
 #. odoo-python
 #: code:addons/ai_social/models/ai_agent.py:0
 msgid "Error: Failed to add a human, no human operator online."
-msgstr ""
+msgstr "错误：无法添加人工客服，当前没有在线的人工客服。"
 
 #. module: ai_social
 #: model_terms:ai.prompt.button,prompt:ai_social.ai_prompt_button_social_post_idea
@@ -148,22 +156,22 @@ msgstr ""
 #. module: ai_social
 #: model:ir.model,name:ai_social.model_im_livechat_channel
 msgid "Livechat Channel"
-msgstr ""
+msgstr "即时聊天"
 
 #. module: ai_social
 #: model:ir.model.fields.selection,name:ai_social.selection__im_livechat_channel__ai_social_livechat_enabled_condition__only_if_operator
 msgid "Only when an operator is available"
-msgstr ""
+msgstr "仅当操作员可用时"
 
 #. module: ai_social
 #: model:ir.model.fields.selection,name:ai_social.selection__im_livechat_channel__ai_social_livechat_enabled_condition__only_if_no_operator
 msgid "Only when no operator is available"
-msgstr ""
+msgstr "仅当没有操作员时"
 
 #. module: ai_social
 #: model:ir.module.module,shortdesc:base.module_ai_social
 msgid "Social AI"
-msgstr ""
+msgstr "社交 AI"
 
 #. module: ai_social
 #. odoo-javascript
@@ -180,7 +188,7 @@ msgstr "撰写社交媒体帖子"
 #: model:ir.module.module,description:base.module_ai_social
 #: model:ir.module.module,summary:base.module_ai_social
 msgid "Write social post using AI."
-msgstr ""
+msgstr "使用 AI 撰写社交媒体帖子。"
 
 #~ msgid "AI model configurations (system prompts) for text drafting."
 #~ msgstr "用于文本起草的人工智能模型配置（系统提示）。"

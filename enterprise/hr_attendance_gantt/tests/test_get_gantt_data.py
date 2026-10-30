@@ -318,7 +318,7 @@ class TestGetGanttData(TransactionCase):
         slightly over the number of attended employees
         """
         limit = len(self.attended_employees) + 2
-        returned_ids = self._get_paginated_gantt_data_ids(limit, user_domain=[])
+        returned_ids = self._get_paginated_gantt_data_ids(limit, user_domain=[('employee_id.company_id.id', '=', self.company.id)])
         self._assert_paginated_returned_ids_equals_employee_list(
             returned_ids,
             self.all_employees,

@@ -139,3 +139,16 @@ class TestUi(HttpCase, WebsiteSaleRentingCommon):
         self.start_tour(
             "/shop?search=Computer", "shop_buy_rental_product_comparison", login="admin"
         )
+
+    def test_snippet_shows_compare_list_price(self):
+        self.env["res.config.settings"].create({"group_product_price_comparison": True}).execute()
+        main_product, sale_product, rental_product = (
+            self._create_product(name=name, is_published=True, **values)
+            for name, values in (
+                ("Main Product", {}),
+                ("Sale Product", {"rent_periodicity": False, "compare_list_price": 150.0}),
+                ("Rental Product", {"compare_list_price": 150.0}),
+            )
+        )
+        main_product.alternative_product_ids = (sale_product + rental_product).product_tmpl_id
+        self.start_tour(main_product.website_url, "website_sale_renting_snippet_compare_price")

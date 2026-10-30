@@ -12,7 +12,7 @@ patch(PayrollAvatarCard.prototype, {
         if (emp.company_id?.country_code !== "BE") {
             return info;
         }
-        const category = emp.l10n_be_salary_scale_id?.name || null;
+        const scale = emp.l10n_be_salary_scale_id?.name || null;
         const hasBelgianScale = ["200", "302"].includes(emp.l10n_be_egov3_code);
         let years, months;
         if (hasBelgianScale) {
@@ -30,6 +30,6 @@ patch(PayrollAvatarCard.prototype, {
             parts.push(months === 1 ? _t("1 month") : _t("%s months", months));
         }
         const seniority = parts.join(" ") || info.seniority;
-        return { ...info, category, seniority };
+        return { ...info, scale, seniority };
     },
 });

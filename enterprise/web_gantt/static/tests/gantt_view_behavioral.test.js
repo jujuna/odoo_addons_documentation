@@ -10,6 +10,7 @@ import {
     queryAllTexts,
     queryOne,
     queryRect,
+    queryAll,
     scroll,
     waitFor,
     waitForNone,
@@ -27,7 +28,7 @@ import {
     toggleSearchBarMenu,
     validateSearch,
 } from "@web/../tests/web_test_helpers";
-import { ResUsers, Tasks, defineGanttModels } from "./gantt_mock_models";
+import { ResUsers, Stage, Tasks, defineGanttModels } from "./gantt_mock_models";
 import {
     CLASSES,
     SELECTORS,
@@ -3620,4 +3621,66 @@ test("selecting cells to create a task keeps the cells highlighted as long as th
     expect(".o_gantt_pill_wrapper").toHaveCount(6);
     expect(".o_drag_hover").toHaveCount(0);
     expect(".modal").toHaveCount(0);
+});
+
+test("dragging a pill at the edge renders newly visible rows and columns", async () => {
+    for (let id = 5; id <= 30; id++) {
+        Stage._records.push({
+            id,
+            name: `Stage ${id}`,
+            sequence: id,
+        });
+        Tasks._records.push({
+            id: 100 + id,
+            name: `Task ${id}`,
+            start: "2018-12-20 00:00:00",
+            stop: "2018-12-20 23:00:00",
+            stage_id: id,
+        });
+    }
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                precision="{'day':'hour:full', 'week':'day:full', 'month':'day:full'}"
+            >
+                <field name="progress"/>
+            </gantt>
+        `,
+        groupBy: ["stage_id"],
+        context: {
+            default_range: "custom",
+            default_start_date: "2018-12-17",
+            default_stop_date: "2019-02-18",
+        },
+    });
+    const getVisibleColumns = () =>
+        new Set(
+            queryAll(".o_gantt_cell")
+                .map((cell) => cell.dataset.col)
+                .filter((col) => col !== undefined && col !== "")
+                .map(Number)
+                .filter(Number.isFinite)
+        );
+    const getVisibleRows = () =>
+        new Set(
+            queryAll(".o_gantt_row_header")
+                .map((row) => row.dataset.rowId)
+                .filter(Boolean)
+        );
+    const visibleColumnsBefore = getVisibleColumns();
+    const visibleRowsBefore = getVisibleRows();
+    const { drop } = await dragPill("Task 2");
+    await scroll(".o_gantt_scroll_container", {
+        left: window.innerWidth * 2,
+        top: window.innerHeight,
+    });
+    await advanceFrame(50);
+    const visibleColumnsAfter = getVisibleColumns();
+    const visibleRowsAfter = getVisibleRows();
+    expect(Math.max(...visibleColumnsAfter)).toBeGreaterThan(Math.max(...visibleColumnsBefore));
+    expect([...visibleRowsAfter].some((rowId) => !visibleRowsBefore.has(rowId))).toBe(true);
+    await drop({ row: "Stage 26", columnHeader: "04", groupHeader: "February 2019" });
 });

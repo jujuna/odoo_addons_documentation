@@ -134,16 +134,28 @@ class SpreadsheetMixinControllerTest(SpreadsheetTestCase, HttpCase):
         data = response.json()
         self.assertEqual(data['revisions'][0]['serverRevisionId'], snapshot_uuid)
 
-    def test_download_spreadsheet_with_image(self):
-        image = self.env["ir.attachment"].create({
+    def test_download_spreadsheet_with_images(self):
+        image1 = self.env["ir.attachment"].create({
             "name": "image.png",
             "raw": b"test",
         })
-        image.generate_access_token()
+
+        image1.generate_access_token()
         self.authenticate(self.raoul.login, self.raoul.password)
+        spreadsheet = self.env['spreadsheet.test'].create({})
+        # mimics an image coming from an xlsx import or spreadsheet created before saas-19.1
+        image2 = self.env["ir.attachment"].create({
+            "name": "image.png",
+            "raw": b"test",
+            "res_model": "spreadsheet.test",
+            "res_id": spreadsheet.id
+        })
         files = EXCEL_FILES + [{
             'path': "xl/media/image1.png",
-            'imageSrc': f"/web/image/{image.id}?access_token={image.access_token}",
+            'imageSrc': f"/web/image/{image1.id}?access_token={image1.access_token}",
+        }, {
+            'path': "xl/media/image2.png",
+            'imageSrc': f"/web/image/{image2.id}",
         }]
 
         response = self.url_open(
@@ -160,6 +172,7 @@ class SpreadsheetMixinControllerTest(SpreadsheetTestCase, HttpCase):
         self.assertEqual(response.headers['Content-Type'], 'application/vnd.ms-excel')
 
         with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
-            self.assertEqual(archive.namelist(), ['[Content_Types].xml', 'xl/media/image1.png'])
+            self.assertEqual(archive.namelist(), ['[Content_Types].xml', 'xl/media/image1.png', 'xl/media/image2.png'])
             self.assertEqual(archive.read('[Content_Types].xml').decode(), EXCEL_FILES[0]['content'])
-            self.assertEqual(archive.read('xl/media/image1.png'), image.raw.content)
+            self.assertEqual(archive.read('xl/media/image1.png'), image1.raw.content)
+            self.assertEqual(archive.read('xl/media/image2.png'), image2.raw.content)

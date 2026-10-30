@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 01:49+0000\n"
+"POT-Creation-Date: 2026-10-23 17:52+0000\n"
+"PO-Revision-Date: 2026-10-19 11:33+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "ai_website/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -77,6 +77,59 @@ msgid ""
 "child position matches the other components of the selector.\n"
 "        "
 msgstr ""
+"\n"
+"Soveltaa HTML-muutoksia sivulle määritetyn toiminnon ja CSS-valitsimen "
+"perusteella.\n"
+"Koko sivun muokkaaminen päättää vuoron.\n"
+"Käytä tätä työkalua sivun muokkaamiseen, mukaan lukien pääsisältö ja "
+"alatunniste.\n"
+"\n"
+"Jätä valitsin tyhjäksi, jos toiminto on ”korvaa” ja haluat korvata koko "
+"alueen.\n"
+"Osittaisia muokkauksia varten, anna CSS-valitsin kohdistaaksesi tiettyihin "
+"muokattaviin elementteihin\n"
+"sekä varmistaaksesi, että muu HTML-rakenne säilyy ennallaan.\n"
+"\n"
+"Muokataksesi ominaisuuksien arvoja, korvaa koko elementti uudella HTML:llä, "
+"joka sisältää\n"
+"päivitetyt ominaisuudet.\n"
+"\n"
+"Jos haluat lisätä JavaScript-koodia, kirjoita <script data-ai-script-id=\"..."
+"\"> raa'an JS-koodin sisältävä tunniste toiminnon HTML-”sisältöön.”\n"
+"Sen voi upottaa samaan toimintoon kuin\n"
+"sen ohjaama merkintä, tai lähettää omassa toiminnossaan, jonka sisältö on "
+"pelkkä <script> tägi, kun\n"
+"merkintä on jo olemassa sivulla eikä sitä tarvitse kirjoittaa uudelleen.\n"
+"Jokaisessa <script> tägissä TÄYTYY olla `data-ai-script-id`-ominaisuus, joka "
+"sisältää lyhyen ja sivukohtaisen snake-case -muotoisen\n"
+"tunnisteen (vain kirjaimia, numeroita ja alaviivoja);\n"
+"editori ei hallinnoi skriptejä, joissa tätä ei ole. Ne hylätään.\n"
+"Sijoita <script> tägi sen osion tai katkelman viimeiseksi alielementiksi, "
+"johon se kuuluu. Näin ne\n"
+"kopioidaan, siirretään ja poistetaan yhdessä. Pelkästään skriptiä koskevassa "
+"toiminnossa käytä mode=\"after\"\n"
+"valitsimen kanssa, joka osoittaa kyseisen osion SISÄLLÄ olevaan viimeiseen "
+"alielementtiin. Näin skripti sijoittuu\n"
+"sen sisälle eikä osion sisarelementiksi.\n"
+"Skriptit suoritetaan perinteisinä inline-skripteinä, kun ympäröivä merkintä "
+"on DOM:ssa. Kaikki\n"
+"toiminnon elementit ovat siis käytettävissä skriptin suorituksen aikana.\n"
+"Päivitä skripti lähettämällä sen sisältävä elementti uudelleen "
+"mode=\"replace\" -asetuksella sekä päivitetyllä\n"
+"<script> tägillä; poista skripti lähettämällä kyseinen elementti uudelleen "
+"ilman <script> tägiä.\n"
+"Molemmissa tapauksissa poistetun skriptin siivous suoritetaan ja sivun muut "
+"skriptit säilytetään ennallaan.\n"
+"Vältä `:nth-of-type`-selektoria, sillä sen käyttäytyminen voi olla "
+"hämmentävää. Jos haluat kohdistaa\n"
+"elementin tiettyyn esiintymään, käytä mieluummin `:nth-child`.\n"
+"Huomio: element:nth-child() -syntaksissa aliementtien lukumäärään "
+"sisältyvät\n"
+"kaikentyyppiset sisarelementit; vastaavuus katsotaan kuitenkin toteutuneeksi "
+"vain, jos kyseisessä \n"
+"alielementin sijainnissa oleva elementti vastaa selektorin muita "
+"komponentteja.\n"
+"        "
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_description:ai_website.ir_actions_server_edit_website_menus
@@ -619,7 +672,7 @@ msgstr ""
 #. module: ai_website
 #: model:ir.module.module,shortdesc:base.module_ai_website
 msgid "AI Website Integration"
-msgstr ""
+msgstr "Tekoäly-verkkosivuintegraatio"
 
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_ai_website_service
@@ -634,7 +687,7 @@ msgstr ""
 #. module: ai_website
 #: model:ir.module.module,summary:base.module_ai_website
 msgid "AI website integration"
-msgstr ""
+msgstr "Tekoäly-verkkosivuintegraatio"
 
 #. module: ai_website
 #. odoo-javascript
@@ -762,7 +815,7 @@ msgstr "Kuvaile sivua avainsanoilla..."
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "Keskustelukanava"
 
 #. module: ai_website
 #: model:ir.model.fields,field_description:ai_website.field_ai_composer__display_name
@@ -1069,6 +1122,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/ai_website/static/src/discuss/composer_patch.js:0
 msgid "Remove %(element)s"
+msgstr ""
+
+#. module: ai_website
+#. odoo-javascript
+#: code:addons/ai_website/static/src/builder/ai_generated_scripts_panel.js:0
+msgid "Removing a script requires 'Editor and Designer' access"
 msgstr ""
 
 #. module: ai_website

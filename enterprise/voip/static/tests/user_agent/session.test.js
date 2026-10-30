@@ -1,7 +1,9 @@
 import { describe, expect, test } from "@odoo/hoot";
+import { advanceTime } from "@odoo/hoot-mock";
 import { patch } from "@web/core/utils/patch";
 import { AudioManager } from "@voip/core/web/audio_manager";
 import { Session } from "@voip/core/web/session";
+import { Voip } from "@voip/core/web/voip_service";
 
 describe.current.tags("headless");
 
@@ -157,6 +159,25 @@ function makeSession({ callProm = Promise.resolve({ start() {}, end() {}, id: 1 
         sipSession,
     };
 }
+
+test("slow incoming call setup does not display a microphone warning", async () => {
+    const { session, sipSession } = makeSession();
+    Object.assign(session.voip, {
+        error: null,
+        triggerError: Voip.prototype.triggerError,
+        resolveError: Voip.prototype.resolveError,
+    });
+    const { promise, resolve } = Promise.withResolvers();
+    sipSession.accept = () => promise;
+
+    const acceptance = session.accept({ promote: false });
+    await advanceTime(1000);
+    expect(session.voip.error).toBe(null);
+
+    resolve();
+    await acceptance;
+    expect(session.voip.error).toBe(null);
+});
 
 test("a hold requested before establishment is signaled once established", async () => {
     const { session, setState, sipSession } = makeSession();

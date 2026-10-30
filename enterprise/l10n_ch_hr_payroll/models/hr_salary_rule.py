@@ -30,30 +30,7 @@ class HrSalaryRule(models.Model):
         string="LPP Factor", default=0)
     l10n_ch_lpp_retroactive = fields.Boolean(
         string="LPP Retroactive", default=False)
-    l10n_ch_salary_certificate = fields.Selection(string="Salary Certificate", selection=[
-        ('1', '1. Salary'),
-        ('2.1', '2.1 Room and board'),
-        ('2.2', '2.2 Personal use of the company car'),
-        ('2.3', '2.3 Personal use of the company car'),
-        ('3', '3. Irregular Benefits'),
-        ('4', '4. Capital Benefits'),
-        ('5', '5. Ownership right in accordance with supplement'),
-        ('6', '6. Board of directors’ compensation'),
-        ('7', '7. Other benefits'),
-        ('8', '8. Gross Salary Total / Pension'),
-        ('9', '9. Contributions OASI/DI/IC/UI/NBUV'),
-        ('10.1', '10.1 Regular contributions'),
-        ('10.2', '10.2 Purchasing contribution'),
-        ('11', '11. Net salary / Pension'),
-        ('12', '12. Withholding tax deduction'),
-        ('13.1.1', '13.1.1. Actual expenses - Trip, room and board'),
-        ('13.1.2', '13.1.2. Actual expenses - Others'),
-        ('13.2.1', '13.2.1. Overall expenses - Representation'),
-        ('13.2.2', '13.2.2. Overall expenses - Car'),
-        ('13.2.3', '13.2.3. Overall expenses - Other'),
-        ('13.3', '13.3. Contributions to further education'),
-        ('14', '14. Further fringe benefits'),
-    ])
+    l10n_ch_salary_certificate = fields.Selection(string="Salary Certificate", selection='_get_l10n_ch_salary_certificate_selection')
     l10n_ch_caf_statement = fields.Char(string="CAF Statement")
     l10n_ch_wage_statement = fields.Selection(string="Monthly Statistic", help="""Code meaning:
     - I: Gross base salary and regular allowances
@@ -134,3 +111,31 @@ class HrSalaryRule(models.Model):
         # Do not flag in noupdate for swissdec
         if 'CHMONTHLYELM' not in self.struct_ids.mapped('code'):
             super()._set_all_external_identifiers_noupdate(noupdate)
+
+    def _get_l10n_ch_salary_certificate_selection(self):
+        # dynamic: unlike a static selection, its values are not stored in the database, so sections can be added in stable
+        return [
+            ('1', self.env._('1. Salary')),
+            ('2.1', self.env._('2.1 Room and board')),
+            ('2.2', self.env._('2.2 Personal use of the company car')),
+            ('2.3', self.env._('2.3 Additional salary benefits - Other')),
+            ('3', self.env._('3. Irregular Benefits')),
+            ('4', self.env._('4. Capital Benefits')),
+            ('5', self.env._('5. Ownership right in accordance with supplement')),
+            ('6', self.env._('6. Board of directors’ compensation')),
+            ('7', self.env._('7. Other benefits')),
+            ('8', self.env._('8. Gross Salary Total / Pension')),
+            ('9', self.env._('9. Contributions OASI/DI/IC/UI/NBUV')),
+            ('10.1', self.env._('10.1 Regular contributions')),
+            ('10.2', self.env._('10.2 Purchasing contribution')),
+            ('11', self.env._('11. Net salary / Pension')),
+            ('12', self.env._('12. Withholding tax deduction')),
+            ('13.1.1', self.env._('13.1.1. Actual expenses - Trip, room and board')),
+            ('13.1.2', self.env._('13.1.2. Actual expenses - Others')),
+            ('13.2.1', self.env._('13.2.1. Overall expenses - Representation')),
+            ('13.2.2', self.env._('13.2.2. Overall expenses - Car')),
+            ('13.2.3', self.env._('13.2.3. Overall expenses - Other')),
+            ('13.3', self.env._('13.3. Contributions to further education')),
+            ('14', self.env._('14. Further fringe benefits')),
+            ('15', self.env._('15. Remarks')),
+        ]

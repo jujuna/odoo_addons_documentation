@@ -2,7 +2,7 @@
 <templates>
     <t t-name="account_accountant.BankRecControlPanel" t-inherit="web.ControlPanel" t-inherit-mode="primary">
         <xpath expr="//div[hasclass('o_control_panel_actions')]" position="inside">
-            <div t-if="this.selectedStatementLines.length and !this.ui.isSmall and (this.extraButtonToDisplay.length or this.buttonsToDisplay.length)" class="d-flex w-100 gap-1">
+            <div t-if="this.selectedStatementLines.length and !this.ui.isSmall and (this.extraButtonToDisplay.length or this.buttonsToDisplay.length)" class="d-flex gap-1">
                 <t t-foreach="this.buttonsToDisplay" t-as="button" t-key="button_index">
                     <BankRecButton t-props="button"/>
                 </t>
@@ -24,6 +24,9 @@
                     </t>
                 </Dropdown>
             </div>
+        </xpath>
+        <xpath expr="//div[hasclass('o_control_panel_actions')]" position="attributes">
+            <attribute name="class" add="justify-content-lg-center" remove="justify-content-lg-around" separator=" "/>
         </xpath>
     </t>
 </templates>

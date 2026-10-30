@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.fields import Domain
 
 
 class HrEmployeeDeparture(models.Model):
@@ -102,9 +103,11 @@ class HrEmployeeDeparture(models.Model):
     ], compute='_compute_professional_reclassification', store=True, readonly=False,
         help="Outplacement is defined as a set of services and guidance advice provided individually or in groups by a service provider, on behalf of an employer, to enable a worker to find employment with a new employer as quickly as possible or to develop a professional activity as a self-employed person. Contact your social secretariat for more information.")
 
+    l10n_be_special_outplacement_warning = fields.Boolean(compute='_compute_special_outplacement_warning')
+    l10n_be_work_time_rate = fields.Float(compute='_compute_version_data')
     l10n_be_company_sector = fields.Selection(related="employee_id.version_id.payroll_config_id.l10n_be_sector")
 
-    @api.depends('l10n_be_notice_duration_week_after_2014', 'employee_id.birthday', 'departure_date', 'l10n_be_first_contract_date')
+    @api.depends('l10n_be_notice_duration_week_after_2014', 'employee_id.birthday', 'departure_date', 'l10n_be_first_contract_date', 'l10n_be_work_time_rate', 'l10n_be_company_sector')
     def _compute_professional_reclassification(self):
         for departure in self:
             if departure.country_code != 'BE' or not departure.employee_id:
@@ -114,12 +117,35 @@ class HrEmployeeDeparture(models.Model):
                 departure.l10n_be_professional_reclassification = 'general'
             elif departure.departure_date and departure.l10n_be_first_contract_date\
                 and departure.employee_id._get_age(departure.departure_date) >= 45\
-                and (relativedelta(departure.departure_date, departure.l10n_be_first_contract_date).years):
+                and departure.l10n_be_company_sector == 'private'\
+                and relativedelta(departure.departure_date, departure.l10n_be_first_contract_date).years >= 1\
+                and departure.l10n_be_work_time_rate >= 0.5:
                 departure.l10n_be_professional_reclassification = 'special'
             else:
                 departure.l10n_be_professional_reclassification = False
 
-    @api.constrains('l10n_be_professional_reclassification', 'l10n_be_notice_duration_week_after_2014', 'employee_id', 'departure_date')
+    @api.depends('country_code', 'employee_id', 'departure_date', 'l10n_be_first_contract_date', 'l10n_be_work_time_rate')
+    def _compute_special_outplacement_warning(self):
+        for departure in self:
+            departure.l10n_be_special_outplacement_warning = bool(
+                departure.country_code == 'BE'
+                and departure.employee_id
+                and departure.l10n_be_work_time_rate < 0.5
+                and departure.departure_date
+                and departure.l10n_be_first_contract_date
+                and departure.employee_id._get_age(departure.departure_date) >= 45
+                and relativedelta(departure.departure_date, departure.l10n_be_first_contract_date).years >= 1
+            )
+
+    @api.depends('employee_id', 'departure_date')
+    def _compute_version_data(self):
+        for departure in self:
+            if departure.employee_id and departure.departure_date:
+                departure.l10n_be_work_time_rate = departure.employee_id._get_version(departure.departure_date).work_time_rate
+            else:
+                departure.l10n_be_work_time_rate = 0.0
+
+    @api.constrains('l10n_be_professional_reclassification', 'l10n_be_notice_duration_week_after_2014', 'employee_id', 'departure_date', 'l10n_be_first_contract_date')
     def _check_professional_reclassification(self):
         for departure in self:
             if departure.l10n_be_professional_reclassification == 'general' and departure.l10n_be_notice_duration_week_after_2014 and departure.l10n_be_notice_duration_week_after_2014 < 30:
@@ -131,22 +157,35 @@ class HrEmployeeDeparture(models.Model):
                     raise ValidationError(_("You cannot select the Specific Scheme if the employee is less than 45 years old."))
                 if departure.l10n_be_company_sector and departure.l10n_be_company_sector.startswith('public'):
                     raise ValidationError(_("You cannot select the Specific Scheme if the company sector is public."))
-                if departure.employee_id.l10n_be_scale_seniority < 1:
+                if relativedelta(departure.departure_date, departure.l10n_be_first_contract_date).years < 1:
                     raise ValidationError(_("You cannot select the Specific Scheme if the employee has less than 1 year of seniority."))
 
-    @api.depends('employee_id')
+    @api.depends('employee_id', 'employee_id.l10n_be_fictive_hire_date', 'dismissal_date')
     def _compute_first_contract(self):
         self.l10n_be_first_contract_id = False
         self.l10n_be_first_contract_date = False
+
         for departure in self.filtered(lambda dep: dep.country_code == 'BE'):
+            # Walk back the chain of contracts from the one at the dismissal date
             in_contract_versions = departure.employee_id.version_ids.filtered(
-                lambda v: v.contract_date_start and not v.is_PFI())
+                lambda v: v.contract_date_start and not v.is_PFI()
+                and (not departure.dismissal_date or v.date_start <= departure.dismissal_date))
             if not in_contract_versions:
                 continue
-            departure.l10n_be_first_contract_id = in_contract_versions[0]
-            departure.l10n_be_first_contract_date = departure.employee_id.l10n_be_fictive_hire_date or in_contract_versions[0].contract_date_start
+            start_version = in_contract_versions[-1]
+            for prev_version in reversed(in_contract_versions[:-1]):
+                if not prev_version._is_continuous_with(start_version):
+                    break
+                start_version = prev_version
+            departure.l10n_be_first_contract_id = start_version
+            fictive_hire_date = departure.employee_id.l10n_be_fictive_hire_date
+            if fictive_hire_date and departure.dismissal_date and fictive_hire_date <= departure.dismissal_date:
+                departure.l10n_be_first_contract_date = fictive_hire_date
+            else:
+                departure.l10n_be_first_contract_date = start_version.contract_date_start
 
-    @api.depends('l10n_be_first_contract_date', 'dismissal_date')
+    @api.depends('l10n_be_first_contract_date', 'departure_date',
+        'employee_id.l10n_be_scale_seniority', 'employee_id.l10n_be_scale_seniority_months')
     def _compute_seniority_description(self):
         for notice in self:
             difference = relativedelta(notice.departure_date, notice.l10n_be_first_contract_date)
@@ -181,13 +220,15 @@ class HrEmployeeDeparture(models.Model):
                 'cp200_thirteen_month_three_years_required_seniority', self.departure_date)
         return self.departure_date >= self.l10n_be_first_contract_date + relativedelta(**required_seniority)
 
-    @api.depends('l10n_be_first_contract_id', 'departure_reason_id', 'l10n_be_salary_december_2013',
+    @api.depends('l10n_be_first_contract_id', 'departure_reason_id', 'l10n_be_salary_december_2013', 'dismissal_date',
         'l10n_be_notice_period_start', 'employee_id.l10n_be_scale_seniority', 'employee_id.l10n_be_scale_seniority_months')
     def _compute_notice_duration(self):
         self.l10n_be_salary_visibility = False
         self.l10n_be_notice_duration_month_before_2014 = 0
         self.l10n_be_notice_duration_week_after_2014 = 0
-        for departure in self.filtered('l10n_be_first_contract_id'):
+        for departure in self:
+            if not departure.l10n_be_first_contract_id or not departure.dismissal_date:
+                continue
             departure_code = departure.l10n_be_reason_code
             first_contract_date = departure.l10n_be_first_contract_date
             first_contract_date += relativedelta(
@@ -209,13 +250,14 @@ class HrEmployeeDeparture(models.Model):
                 period_since_2014 = relativedelta(departure.l10n_be_notice_period_start, first_day_since_2014)
                 period_in_month = period_since_2014.months + period_since_2014.years * 12
 
-                on_economic_unemployment = bool(departure.employee_id.current_version_id.resource_calendar_id.attendance_ids.filtered(lambda a: a.work_entry_type_id.l10n_be_economic_unemployment))
+                dismissal_version = departure.employee_id._get_version(departure.dismissal_date)
+                on_economic_unemployment = bool(dismissal_version.resource_calendar_id.attendance_ids.filtered(lambda a: a.work_entry_type_id.l10n_be_economic_unemployment))
                 if on_economic_unemployment and departure_code == 343:
                     departure.l10n_be_notice_duration_week_after_2014 = 0
                     continue
                 duration_parameter = 'l10n_be_duration_notice_resigned' if departure_code in [343, 340] else 'l10n_be_duration_notice_fired'
-                current_version_start = departure.employee_id.current_version_id.date_start
-                rule_param_date = date(2026, 7, 31) if current_version_start < date(2026, 8, 1) and departure.dismissal_date >= date(2026, 8, 1) else departure.dismissal_date
+                in_company_since = departure.l10n_be_first_contract_date
+                rule_param_date = date(2026, 7, 31) if in_company_since < date(2026, 8, 1) and departure.dismissal_date >= date(2026, 8, 1) else departure.dismissal_date
                 duration_notice = self.env['hr.rule.parameter']._get_parameter_from_code(duration_parameter, rule_param_date)
                 if departure_code != 343:
                     # Once you reach 24 years (288 months) of seniority,
@@ -251,8 +293,9 @@ class HrEmployeeDeparture(models.Model):
             if not departure.dismissal_date:
                 continue
             remaining_economic_unemployment_days = 0
-            on_economic_unemployment = bool(departure.employee_id.current_version_id.resource_calendar_id.attendance_ids.filtered(lambda a: a.work_entry_type_id.l10n_be_economic_unemployment))
-            contract_end_date = departure.employee_id.current_version_id.contract_date_end
+            dismissal_version = departure.employee_id._get_version(departure.dismissal_date) if departure.employee_id else self.env['hr.version']
+            on_economic_unemployment = bool(dismissal_version.resource_calendar_id.attendance_ids.filtered(lambda a: a.work_entry_type_id.l10n_be_economic_unemployment))
+            contract_end_date = dismissal_version.contract_date_end
             if not contract_end_date or contract_end_date < departure.dismissal_date:
                 contract_end_date = departure.dismissal_date
             if on_economic_unemployment:
@@ -263,7 +306,7 @@ class HrEmployeeDeparture(models.Model):
             elif departure.l10n_be_reason_code in (342, 358, 359):
                 # We can only take the next monday that has at least 3 calendar days (Monday to Saturday except public
                 # holidays) between the departure date and the start of the notice period
-                public_leaves = self.employee_id.version_id.resource_calendar_id.global_leave_ids.filtered(
+                public_leaves = dismissal_version.resource_calendar_id.global_leave_ids.filtered(
                     lambda leave: leave.work_entry_type_id == public_holiday_type)
                 public_holidays_dates = (d.date() for d in public_leaves.mapped('date_from'))
                 calendar_days = 0
@@ -518,19 +561,21 @@ class HrEmployeeDeparture(models.Model):
             total_days = (self.departure_date - self.l10n_be_notice_period_start).days
             remaining_days = total_days % 7
 
-        termination_payslip._set_input_value('ND_MONTH', 0 if is_worker else self.l10n_be_notice_duration_month_before_2014)
-        termination_payslip._set_input_value('ND_WEEK', weeks)
-        termination_payslip._set_input_value('ND_DAY', remaining_days)
-        termination_payslip._set_input_value('UNREASONABLE_DISMISSAL', 0)
-        termination_payslip._set_input_value('NON_RESPECT_MOTIVATION', 0)
-        termination_payslip._set_input_value('YEAREND_BONUS', self._get_termination_year_end_bonus(version, is_worker))
-        termination_payslip._set_input_value('RESIDENCE', 0)
-        termination_payslip._set_input_value('EXPATRIATE', 0)
-        termination_payslip._set_input_value('VARIABLE_SALARY', termination_payslip._get_last_year_average_variable_revenues() * 12)
-        termination_payslip._set_input_value('BENEFIT_IN_KIND', 0)
-        termination_payslip._set_input_value('STOCK_OPTION', termination_payslip._get_last_year_average_warrant_revenues())
-        termination_payslip._set_input_value('SPECIFIC_RULES', 0)
-        termination_payslip._set_input_value('OTHER', 0)
+        termination_payslip._set_input_values({
+            'ND_MONTH': 0 if is_worker else self.l10n_be_notice_duration_month_before_2014,
+            'ND_WEEK': weeks,
+            'ND_DAY': remaining_days,
+            'UNREASONABLE_DISMISSAL': 0,
+            'NON_RESPECT_MOTIVATION': 0,
+            'YEAREND_BONUS': self._get_termination_year_end_bonus(version, is_worker),
+            'RESIDENCE': 0,
+            'EXPATRIATE': 0,
+            'VARIABLE_SALARY': termination_payslip._get_last_year_average_variable_revenues() * 12,
+            'BENEFIT_IN_KIND': 0,
+            'STOCK_OPTION': termination_payslip._get_last_year_average_warrant_revenues(),
+            'SPECIFIC_RULES': 0,
+            'OTHER': 0,
+        })
 
         termination_payslip.compute_sheet()
         return termination_payslip
@@ -592,28 +637,51 @@ class HrEmployeeDeparture(models.Model):
             'views': [[False, 'list'], [False, 'form']],
         }
 
-    def _generate_termination_holidays(self):
-        self.ensure_one()
+    def _generate_termination_holidays(self, payrun_id=False):
         struct_n_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays')
         struct_n1_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays')
+        double_structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday')
 
         payslips = self.env['hr.payslip']
-        target_date_from = self.departure_date + relativedelta(day=1)
-        termination_payslip_n = self.env['hr.payslip'].search([
-            ('employee_id', '=', self.employee_id.id),
-            ('struct_id', '=', struct_n_id.id),
-            ('date_from', '=', target_date_from),
-            ('state', '!=', 'cancel')
-        ], limit=1)
 
-        if not termination_payslip_n:
-            termination_payslip_n = self.env['hr.payslip'].create({
-                'employee_id': self.employee_id.id,
-                'struct_id': struct_n_id.id,
-                'date_from': target_date_from,
-            })
-            termination_payslip_n.worked_days_line_ids = [(5, 0, 0)]
+        search_n_domains = []
+        for departure in self:
+            target_date_from = departure.departure_date + relativedelta(day=1)
+            search_n_domains.append([
+                ('employee_id', '=', departure.employee_id.id),
+                ('date_from', '=', target_date_from),
+            ])
 
+        existing_n_payslips = self.env['hr.payslip']
+        if search_n_domains:
+            existing_n_payslips = self.env['hr.payslip'].search(Domain.AND([
+                [('struct_id', '=', struct_n_id.id), ('state', '!=', 'cancel')],
+                Domain.OR(search_n_domains)
+            ]))
+
+        existing_n_payslips_by_employee_date_from = {(p.employee_id.id, p.date_from): p for p in existing_n_payslips}
+
+        termination_payslip_n_vals = []
+        departures_to_create_n = []
+        for departure in self:
+            target_date_from = departure.departure_date + relativedelta(day=1)
+            if (departure.employee_id.id, target_date_from) not in existing_n_payslips_by_employee_date_from:
+                termination_payslip_n_vals.append({
+                    'employee_id': departure.employee_id.id,
+                    'struct_id': struct_n_id.id,
+                    'date_from': target_date_from,
+                    'company_id': departure.employee_id.company_id.id,
+                    'payslip_run_id': payrun_id,
+                })
+                departures_to_create_n.append(departure)
+                payslips += existing_n_payslips_by_employee_date_from.get((departure.employee_id.id, target_date_from), self.env['hr.payslip'])
+            else:
+                payslips += existing_n_payslips_by_employee_date_from[departure.employee_id.id, target_date_from]
+
+        if termination_payslip_n_vals:
+            created_n_payslips = self.env['hr.payslip'].create(termination_payslip_n_vals)
+            created_n_payslips.worked_days_line_ids = [(5, 0, 0)]
+            payslips_n_by_departure = {departure.id: created_n for departure, created_n in zip(departures_to_create_n, created_n_payslips)}
             # As regards the recovery of amounts for European holidays (“additional holidays”), the
             # amount paid in advance is
             # - or recovered from the double vacation pay (part 85%) for the following year;
@@ -623,49 +691,86 @@ class HrEmployeeDeparture(models.Model):
             # (85% of 7.67 %).
             # In addition, when "additional" vacation has been taken, the vacation certificate must
             # mention: the number of days already granted + the related gross allowance.
-            current_year_start = self.departure_date.replace(month=1, day=1)
-            current_year_end = self.departure_date.replace(month=12, day=31)
-            payslips_n = self.env['hr.payslip'].search([
-                ('employee_id', '=', self.employee_id.id),
-                ('date_from', '>=', current_year_start),
-                ('date_to', '<=', current_year_end),
-                ('state', 'in', ['draft', 'validated', 'paid'])])
-            european_wds = payslips_n.worked_days_line_ids.filtered(lambda wd: wd.code == '142.20')
-            european_leaves_amount = sum(european_wds.mapped('amount'))
-            european_leaves_days = sum(european_wds.mapped('number_of_days'))
-            european_amount_to_deduct = max(european_leaves_amount, 0)
+            payslips_n_domains = []
+            for departure in departures_to_create_n:
+                year_start = departure.departure_date.replace(month=1, day=1)
+                year_end = departure.departure_date.replace(month=12, day=31)
+                payslips_n_domains.append([
+                    ('employee_id', '=', departure.employee_id.id),
+                    ('date_from', '>=', year_start),
+                    ('date_to', '<=', year_end),
+                ])
 
-            termination_payslip_n._set_input_value('EU_LEAVE_DEDUC', european_amount_to_deduct)
-            termination_payslip_n._set_input_value('EUROPEAN_DAYS', european_leaves_days)
-            termination_payslip_n._set_input_value('PPTO1', 0)
-            termination_payslip_n._set_input_value('PPTO2', 0)
-            termination_payslip_n._set_input_value('TIME_OFF_TAKEN', 0)
-            termination_payslip_n._set_input_value('ALLOCATION', 0)
-            termination_payslip_n._set_input_value('GROSS_REF', self.l10n_be_gross_reference_remuneration_n)
+            historical_payslips_n = self.env['hr.payslip'].search(Domain.AND([
+                [('state', 'in', ['draft', 'validated', 'paid'])],
+                Domain.OR(payslips_n_domains),
+            ])) if payslips_n_domains else self.env['hr.payslip']
 
-            termination_payslip_n.compute_sheet()
-            termination_payslip_n.name = '%s - %s' % (struct_n_id.payslip_name, self.employee_id.legal_name)
-        payslips += termination_payslip_n
+            for departure in departures_to_create_n:
+                termination_payslip = payslips_n_by_departure[departure.id]
+                related_payslips = historical_payslips_n.filtered(lambda p: p.employee_id == departure.employee_id)
+                european_wds = related_payslips.worked_days_line_ids.filtered(lambda wd: wd.code == '142.20')
+                european_leaves_amount = sum(european_wds.mapped('amount'))
+                european_leaves_days = sum(european_wds.mapped('number_of_days'))
+                european_amount_to_deduct = max(european_leaves_amount, 0)
 
-        departure_year = self.departure_date.year if self.departure_date else fields.Date.today().year
-        worked_in_n1 = (self.l10n_be_first_contract_date and self.l10n_be_first_contract_date.year < departure_year)
-
-        if worked_in_n1:
-            termination_payslip_n1 = self.env['hr.payslip'].search([
-                ('employee_id', '=', self.employee_id.id),
-                ('struct_id', '=', struct_n1_id.id),
-                ('date_from', '=', target_date_from),
-                ('state', '!=', 'cancel')
-            ], limit=1)
-
-            if not termination_payslip_n1:
-                termination_payslip_n1 = self.env['hr.payslip'].create({
-                    'employee_id': self.employee_id.id,
-                    'struct_id': struct_n1_id.id,
-                    'date_from': target_date_from,
+                termination_payslip._set_input_values({
+                    'EU_LEAVE_DEDUC': european_amount_to_deduct,
+                    'EUROPEAN_DAYS': european_leaves_days,
+                    'PPTO1': 0,
+                    'PPTO2': 0,
+                    'TIME_OFF_TAKEN': 0,
+                    'ALLOCATION': 0,
+                    'GROSS_REF': departure.l10n_be_gross_reference_remuneration_n,
                 })
-                termination_payslip_n1.worked_days_line_ids = [(5, 0, 0)]
 
+            created_n_payslips.compute_sheet()
+            for departure in departures_to_create_n:
+                termination_payslip = payslips_n_by_departure[departure.id]
+                termination_payslip.name = '%s - %s' % (struct_n_id.payslip_name, departure.employee_id.legal_name)
+
+            payslips += created_n_payslips
+        departures_worked_n1 = self.filtered(
+            lambda d: d.l10n_be_first_contract_date
+            and d.l10n_be_first_contract_date.year < (d.departure_date.year if d.departure_date else fields.Date.today().year)
+        )
+
+        if departures_worked_n1:
+            search_n1_domains = []
+            for departure in departures_worked_n1:
+                target_date_from = departure.departure_date + relativedelta(day=1)
+                search_n1_domains.append([
+                    ('employee_id', '=', departure.employee_id.id),
+                    ('date_from', '=', target_date_from),
+                ])
+
+            existing_n1_payslips = self.env['hr.payslip'].search(Domain.AND([
+                [('struct_id', '=', struct_n1_id.id), ('state', '!=', 'cancel')],
+                Domain.OR(search_n1_domains),
+            ]))
+
+            existing_n1_map = {(p.employee_id.id, p.date_from): p for p in existing_n1_payslips}
+
+            termination_payslip_n1_vals = []
+            departures_to_create_n1 = []
+            for departure in departures_worked_n1:
+                target_date_from = departure.departure_date + relativedelta(day=1)
+                if (departure.employee_id.id, target_date_from) not in existing_n1_map:
+                    termination_payslip_n1_vals.append({
+                        'employee_id': departure.employee_id.id,
+                        'struct_id': struct_n1_id.id,
+                        'date_from': target_date_from,
+                        'company_id': departure.employee_id.company_id.id,
+                        'payslip_run_id': payrun_id,
+                    })
+                    departures_to_create_n1.append(departure)
+                else:
+                    payslips += existing_n1_map[departure.employee_id.id, target_date_from]
+
+            if termination_payslip_n1_vals:
+                created_n1_payslips = self.env['hr.payslip'].create(termination_payslip_n1_vals)
+                created_n1_payslips.worked_days_line_ids = [(5, 0, 0)]
+                payslips_n1_by_dep = {dep.id: created_n1 for dep, created_n1 in zip(departures_to_create_n1, created_n1_payslips)}
                 # As regards the recovery of amounts for European holidays (“additional holidays”), the
                 # amount paid in advance is
                 # - or recovered from the double vacation pay (part 85%) for the following year;
@@ -675,57 +780,83 @@ class HrEmployeeDeparture(models.Model):
                 # (85% of 7.67 %).
                 # In addition, when "additional" vacation has been taken, the vacation certificate must
                 # mention: the number of days already granted + the related gross allowance.
-                double_structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday')
-                double_holiday_n = self.env['hr.payslip'].search([
-                    ('employee_id', '=', self.employee_id.id),
-                    ('date_to', '>=', current_year_start),
-                    ('state', 'in', ['validated', 'paid', 'draft']),
-                    ('struct_id', '=', double_structure.id)])
-                # Part already deducted on the double holiday for year N
-                double_amount_n = - double_holiday_n._get_line_values(['EU_LEAVE_DEDUC'], compute_sum=True)['EU_LEAVE_DEDUC']['sum']['total']
-                # Original Amount to deduct
-                payslips_n1 = self.env['hr.payslip'].search([
-                    ('employee_id', '=', self.employee_id.id),
-                    ('date_to', '>=', current_year_start + relativedelta(years=-1)),
-                    ('date_from', '<', current_year_start),
-                    ('state', 'in', ['validated', 'paid'])])
-                postponed_time_off_n1_remaining = 0
-                postponed_time_off_n2_remaining = 0
-                postponed_time_off_n1_total = 0
-                postponed_time_off_n2_total = 0
-                time_off_allocated = 0
-                time_off_taken = 0
-                for line in self.l10n_be_time_off_line_ids:
-                    if line.year == current_year_start.year:
-                        if line.work_entry_type_id.code == '016.00':
-                            time_off_allocated += line.leave_allocation_count
-                            time_off_taken += line.leave_count
-                        elif line.work_entry_type_id.code == '142.24':
-                            postponed_time_off_n1_remaining += line.leave_allocation_count - line.leave_count
-                            postponed_time_off_n1_total += line.leave_allocation_count
-                        elif line.work_entry_type_id.code == '142.26':
-                            postponed_time_off_n2_remaining += line.leave_allocation_count - line.leave_count
-                            postponed_time_off_n2_total += line.leave_allocation_count
 
-                european_wds = payslips_n1.worked_days_line_ids.filtered(lambda wd: wd.code == '142.20')
-                european_leaves_amount = sum(european_wds.mapped('amount'))
-                european_leaves_days = sum(european_wds.mapped('number_of_days'))
-                european_amount_to_deduct = max(european_leaves_amount - double_amount_n, 0)
+                double_holiday_domains = []
+                payslips_n1_domains = []
+                for departure in departures_to_create_n1:
+                    year_start = departure.departure_date.replace(month=1, day=1)
+                    double_holiday_domains.append([
+                        ('employee_id', '=', departure.employee_id.id),
+                        ('date_to', '>=', year_start),
+                    ])
+                    payslips_n1_domains.append([
+                        ('employee_id', '=', departure.employee_id.id),
+                        ('date_to', '>=', year_start + relativedelta(years=-1)),
+                        ('date_from', '<', year_start),
+                    ])
 
-                termination_payslip_n1._set_input_value('EU_LEAVE_DEDUC', european_amount_to_deduct)
-                termination_payslip_n1._set_input_value('EUROPEAN_DAYS', european_leaves_days)
-                termination_payslip_n1._set_input_value('PPTO1', postponed_time_off_n1_remaining)
-                termination_payslip_n1._set_input_value('PPTO2', postponed_time_off_n2_remaining)
-                termination_payslip_n1._set_input_value('TPPTO1', postponed_time_off_n1_total)
-                termination_payslip_n1._set_input_value('TPPTO2', postponed_time_off_n2_total)
-                termination_payslip_n1._set_input_value('TIME_OFF_TAKEN', time_off_taken)
-                termination_payslip_n1._set_input_value('ALLOCATION', time_off_allocated)
-                termination_payslip_n1._set_input_value('GROSS_REF', self.l10n_be_gross_reference_remuneration_n1)
+                double_holiday_n = self.env['hr.payslip'].search(Domain.AND([
+                    [('state', 'in', ['validated', 'paid', 'draft']), ('struct_id', '=', double_structure.id)],
+                    Domain.OR(double_holiday_domains),
+                ])) if double_holiday_domains else self.env['hr.payslip']
 
-                termination_payslip_n1.compute_sheet()
-                termination_payslip_n1.name = '%s - %s' % (struct_n1_id.payslip_name, self.employee_id.legal_name)
+                payslips_n1 = self.env['hr.payslip'].search(Domain.AND([
+                    [('state', 'in', ['validated', 'paid'])],
+                    Domain.OR(payslips_n1_domains),
+                ])) if payslips_n1_domains else self.env['hr.payslip']
 
-            payslips += termination_payslip_n1
+                for departure in departures_to_create_n1:
+                    termination_payslip = payslips_n1_by_dep[departure.id]
+                    year_start = departure.departure_date.replace(month=1, day=1)
+
+                    related_double_holiday_n = double_holiday_n.filtered(lambda p: p.employee_id == departure.employee_id)
+                    # Part already deducted on the double holiday for year N
+                    double_amount_n = - related_double_holiday_n._get_line_values(['EU_LEAVE_DEDUC'], compute_sum=True)['EU_LEAVE_DEDUC']['sum']['total']
+
+                    related_payslips_n1 = payslips_n1.filtered(lambda p: p.employee_id == departure.employee_id)
+
+                    postponed_time_off_n1_remaining = 0
+                    postponed_time_off_n2_remaining = 0
+                    postponed_time_off_n1_total = 0
+                    postponed_time_off_n2_total = 0
+                    time_off_allocated = 0
+                    time_off_taken = 0
+                    for line in departure.l10n_be_time_off_line_ids:
+                        if line.year == year_start.year:
+                            if line.work_entry_type_id.code == '016.00':
+                                time_off_allocated += line.leave_allocation_count
+                                time_off_taken += line.leave_count
+                            elif line.work_entry_type_id.code == '142.24':
+                                postponed_time_off_n1_remaining += line.leave_allocation_count - line.leave_count
+                                postponed_time_off_n1_total += line.leave_allocation_count
+                            elif line.work_entry_type_id.code == '142.26':
+                                postponed_time_off_n2_remaining += line.leave_allocation_count - line.leave_count
+                                postponed_time_off_n2_total += line.leave_allocation_count
+
+                    european_wds = related_payslips_n1.worked_days_line_ids.filtered(lambda wd: wd.code == '142.20')
+                    european_leaves_amount = sum(european_wds.mapped('amount'))
+                    european_leaves_days = sum(european_wds.mapped('number_of_days'))
+                    european_amount_to_deduct = max(european_leaves_amount - double_amount_n, 0)
+
+                    termination_payslip._set_input_values({
+                        'EU_LEAVE_DEDUC': european_amount_to_deduct,
+                        'EUROPEAN_DAYS': european_leaves_days,
+                        'PPTO1': postponed_time_off_n1_remaining,
+                        'PPTO2': postponed_time_off_n2_remaining,
+                        'TPPTO1': postponed_time_off_n1_total,
+                        'TPPTO2': postponed_time_off_n2_total,
+                        'TIME_OFF_TAKEN': time_off_taken,
+                        'ALLOCATION': time_off_allocated,
+                        'GROSS_REF': departure.l10n_be_gross_reference_remuneration_n1,
+                    })
+
+                created_n1_payslips.compute_sheet()
+                for departure in departures_to_create_n1:
+                    termination_payslip = payslips_n1_by_dep[departure.id]
+                    termination_payslip.name = '%s - %s' % (struct_n1_id.payslip_name, departure.employee_id.legal_name)
+
+                payslips += created_n1_payslips
+
         return payslips
 
     def _get_termination_version(self):
@@ -738,6 +869,7 @@ class HrEmployeeDeparture(models.Model):
         res = super().create(vals_list)
 
         res._process_fixed_term_departure()
+        res._check_create_wech001()
 
         for departure in res:
             if departure.country_code != 'BE' or not departure.employee_id or not departure.l10n_be_professional_reclassification:
@@ -751,6 +883,60 @@ class HrEmployeeDeparture(models.Model):
                 summary=self.env._('Outplacement'),
             )
         return res
+
+    def write(self, vals):
+        declarations = self._get_l10n_be_wech001_declarations() if 'departure_date' in vals or 'dismissal_date' in vals else False
+        res = super().write(vals)
+        if declarations is not False:
+            self._check_create_wech001()
+            declarations.filtered(lambda drs: not drs._is_necessary()).unlink()
+        return res
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_l10n_be_wech001_declarations(self):
+        """ The end of the contract is not declared anymore, unless the contract still ends during that month """
+        declarations = self._get_l10n_be_wech001_declarations()
+        declarations.filtered(lambda drs: drs.departure_id in self and drs.code != '004' and not drs._get_wech001_contract_end_date()).unlink()
+
+    def _get_l10n_be_wech001_declarations(self):
+        """ Declarations of the end of the contract automatically created for the departures, not generated yet """
+        # sudo: l10n.be.drs - the HR officers register the departures without payroll access
+        declarations = self.env['l10n.be.drs'].sudo()
+        for departure in self.filtered('departure_date'):
+            declarations |= declarations.search([
+                ('employee_id', '=', departure.employee_id.id),
+                ('risk_id.identification', '=', 'WECH001'),
+                ('is_automatically_created', '=', True),
+                ('state', '=', 'draft'),
+                ('year', '=', departure.departure_date.year),
+                ('month', '=', str(departure.departure_date.month)),
+            ])
+        return declarations
+
+    def _check_create_wech001(self):
+        """ The end of the employment contract is declared to the unemployment sector (C4) """
+        risk_001 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech001_001', raise_if_not_found=False)
+        risk_002 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech001_002', raise_if_not_found=False)
+        departure_dead = self.env.ref('hr.departure_dead', raise_if_not_found=False)
+        if not risk_001 or not risk_002:
+            return
+        vals_list = []
+        for departure in self:
+            if departure.country_code != 'BE' or not departure.employee_id or not departure.departure_date \
+                    or departure.departure_reason_id == departure_dead:
+                continue
+            version = departure.employee_id._get_version(departure.departure_date)
+            if version.is_student() or version.is_flexi():
+                continue
+            vals_list.append({
+                'employee_id': departure.employee_id.id,
+                'sector': 'unemployment',
+                'risk_id': (risk_002 if departure.l10n_be_reason_code == 353 else risk_001).id,
+                'month': departure.departure_date.month,
+                'year': departure.departure_date.year,
+            })
+        # sudo: l10n.be.drs - the HR officers register the departures without payroll access
+        self.env['l10n.be.drs'].sudo()._create_missing_declarations(vals_list)
 
     def _check_refuse_future_leaves_condition(self):
         """ Refuse future leaves for Belgian employees instead of deleting them. """

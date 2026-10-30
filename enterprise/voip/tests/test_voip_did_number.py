@@ -25,11 +25,11 @@ def _patch_phone_service():
 @tagged("voip")
 class TestVoipDidNumberEmail(common.TransactionCase):
     STATE_MESSAGES = [
-        ("active", "Your phone number is now active and can be assigned."),
-        ("failure", "Your phone number activation has failed."),
-        ("pending", 'Your phone number is in "Under Review" state.'),
-        ("suspended", 'Your phone number is in "Suspended" state.'),
-        ("released", 'Your phone number is in "Released" state.'),
+        ("active", "Your number is active! (%s)", "Your number is now active and you can assign it."),
+        ("failure", "Your number order has failed (%s)", "could not be completed."),
+        ("pending", "Your number order is under review (%s)", "has been received and is under review."),
+        ("suspended", "Your number is suspended (%s)", "Buy credits to reactivate it"),
+        ("released", "Your number has been released (%s)", "It is no longer yours"),
     ]
 
     @classmethod
@@ -106,11 +106,30 @@ class TestVoipDidNumberEmail(common.TransactionCase):
         self._assert_email_body(did, "View Phone Number")
 
     def test_voip_did_state_changes_generate_correct_email_messages(self):
-        for index, (state, expected) in enumerate(self.STATE_MESSAGES):
+        for index, (state, expected_subject, expected_body) in enumerate(self.STATE_MESSAGES):
             with self.subTest(state=state):
                 did = self._new_did(did_number="+32870001%02d" % index)
                 self._subscribe_email_follower(
                     did, login="voip_email_follower_%d" % index,
                 )
                 self._set_did_state(did, state)
-                self._assert_email_body(did, expected)
+                self.assertEqual(self._notification_mails(did)[0].subject, expected_subject % did.did_number)
+                self._assert_email_body(did, expected_body)
+                self._assert_email_body(did, "Dear %s," % did.create_uid.name)
+
+    def test_voip_did_state_email_greets_assigned_user(self):
+        did = self._new_did()
+        user = self._subscribe_email_follower(did)
+        did.sudo().destination_ref = user
+        self._set_did_state(did, "active")
+        self._assert_email_body(did, "Dear %s," % user.name)
+
+    def test_voip_did_state_message_keeps_explicit_subject(self):
+        did = self._new_did()
+        did.sudo().state = "active"
+        message = did.message_post(
+            subject="Custom subject",
+            message_type="tracking",
+            subtype_id=self.env.ref("voip.mt_did_number_state").id,
+        )
+        self.assertEqual(message.subject, "Custom subject")

@@ -995,12 +995,18 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
         self.assertFalse(move_id.asset_ids, "No asset should be created when the account is not a fixed asset account.")
 
         # Change the account of first line to a fixed asset account
+        # A change to the bill when it's posted doesn't affect the asset
         move_id.line_ids[0].write({
             'account_id': self.company_data['default_account_assets'].id,
             'depreciation_model_id': self.account_asset_model_3_years.id,
         })
-        self.assertEqual(len(move_id.asset_ids), 1)
+        self.assertFalse(move_id.asset_ids)
+        # Changing the bill to draft then posting it again, creates the asset
+        move_id.button_draft()
+        self.assertFalse(move_id.asset_ids)
+        move_id.action_post()
         asset = move_id.asset_ids
+        self.assertEqual(len(asset), 1)
         self.assertEqual(asset.state, 'open')
         self.assertEqual(asset.model_id, self.account_asset_model_3_years)
 
@@ -1009,11 +1015,10 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
             asset.original_move_line_ids |= move_id.invoice_line_ids[1]
 
         # change account of second line to be able to add to asset
-        # will create a new asset for second line (irrelevant to test)
         move_id.invoice_line_ids[1].account_id = self.company_data['default_account_assets']
         # Add second line to original asset
         asset.original_move_line_ids |= move_id.invoice_line_ids[1]
-        self.assertEqual(len(move_id.invoice_line_ids[1].asset_ids), 2)
+        self.assertEqual(len(move_id.invoice_line_ids[1].asset_ids), 1)
         self.assertEqual(len(asset.original_move_line_ids), 2)
 
         # Making sure addition of second line to running asset didn't change asset values
@@ -1023,15 +1028,13 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
         self.assertEqual(asset.model_id, self.account_asset_model_3_years)
 
         # Now asset has 2 move lines. Try to change account of first line
-        with self.assertRaisesRegex(UserError, "cannot update the account for asset.*because it is linked to journal items from multiple different accounts"):
-            move_id.invoice_line_ids[0].write({
-                'account_id': account.id
-            })
-        # Try to change account of second line.
-        with self.assertRaisesRegex(UserError, "cannot update the account for asset.*because it is linked to journal items from multiple different accounts"):
-            move_id.invoice_line_ids[1].write({
-                'account_id': account.id
-            })
+        # Nothing prevents changing the accounts used on the asset after being added to the asset
+        move_id.invoice_line_ids[0].write({
+            'account_id': account.id
+        })
+        move_id.invoice_line_ids[1].write({
+            'account_id': account.id
+        })
         self.assertEqual(asset.state, 'open')
 
     def test_asset_from_bill_move_line_to_non_fixed_asset_account(self):
@@ -1061,8 +1064,13 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
         self.assertEqual(move_id.asset_ids.state, 'open')
 
         # Change the account to a non fixed asset account
+        # A change to the bill when it's posted doesn't affect the asset
         move_id.line_ids[0].account_id = account
-        self.assertEqual(len(move_id.asset_ids), 1)
+        self.assertEqual(move_id.asset_ids.state, 'open')
+        # Changing the bill to draft then posting it again, updates the asset
+        move_id.button_draft()
+        self.assertEqual(move_id.asset_ids.state, 'cancelled')
+        move_id.action_post()
         self.assertEqual(move_id.asset_ids.state, 'cancelled')
 
     def test_asset_from_bill_move_line_cancelled(self):
@@ -1219,7 +1227,7 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
         self.assertEqual(new_assets.non_deductible_tax_value, 78.75)
 
     def test_asset_from_bill_move_line_no_depreciation_account(self):
-        """Test that the asset is not created if account has no asset depreciation or expense account"""
+        """Test that the asset stays in draft if account has no asset depreciation or expense account"""
         asset_depreciation_account_id = self.company_data['default_account_assets'].asset_depreciation_account_id
         asset_expense_account_id = self.company_data['default_account_assets'].asset_expense_account_id
         for depreciation_account_id, expense_account_id in [(asset_depreciation_account_id.id, False), (False, asset_expense_account_id.id)]:
@@ -1240,9 +1248,14 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
                     }),
                 ]
             })
-            # When posting the bill, the asset should not be created raising an error that account is not properly configured
-            with self.assertRaisesRegex(UserError, "Account.*should have accumulated depreciation and depreciation expense accounts set in order to generate an asset"):
-                move_ids.action_post()
+            # The asset cannot be confirmed as the account is not properly configured
+            move_ids.action_post()
+            self.assertEqual(move_ids.asset_ids.state, 'draft')
+
+            # Posting the bill again keeps it in draft
+            move_ids.button_draft()
+            move_ids.action_post()
+            self.assertEqual(move_ids.asset_ids.state, 'draft')
 
     def test_asset_modify_value_00(self):
         """Test the values of the asset and value increase 'assets' after a
@@ -2930,6 +2943,324 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
         self.assertEqual(invoice.asset_ids.main_variant_id.account_depreciation_id, other_account_on_bill.asset_depreciation_account_id)
         self.assertEqual(invoice.asset_ids.main_variant_id.account_depreciation_expense_id, other_account_on_bill.asset_expense_account_id)
 
+    def test_asset_from_bill_without_depreciation_model_on_line(self):
+        """A bill line whose depreciation model has been cleared still generates an
+        asset, falling back on the 'no depreciation' model instead of no model."""
+        no_depreciation_model = self.env.ref('account_asset.asset_no_depreciation')
+        asset_account = self.company_data['default_account_assets']
+        asset_account.depreciation_model_id = self.account_asset_model_3_years
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'invoice_date': '2020-12-31',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'land',
+                    'account_id': asset_account.id,
+                    'depreciation_model_id': False,
+                    'price_unit': 1000.0,
+                    'quantity': 1,
+                    'tax_ids': [],
+                }),
+            ],
+        })
+        invoice.action_post()
+        self.assertFalse(invoice.invoice_line_ids.depreciation_model_id)
+        self.assertEqual(invoice.asset_ids.model_id, no_depreciation_model)
+
+    def test_asset_from_bill_on_unconfigured_account(self):
+        """Bills on a fixed asset account without depreciation settings create assets, and keep them."""
+        no_depreciation_model = self.env.ref('account_asset.asset_no_depreciation')
+        unconfigured_account = self.company_data['default_account_assets'].copy({
+            'depreciation_model_id': False,
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'invoice_date': '2020-12-31',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [
+                Command.create({'name': 'Land', 'account_id': unconfigured_account.id, 'price_unit': 1000.0, 'tax_ids': []}),
+                Command.create({'name': 'Office', 'account_id': self.company_data['default_account_expense'].id, 'price_unit': 500.0, 'tax_ids': []}),
+            ],
+        })
+        self.assertFalse(invoice.invoice_line_ids.depreciation_model_id)
+        invoice.action_post()
+        asset = invoice.asset_ids
+        self.assertRecordValues(asset, [{'state': 'open', 'model_id': no_depreciation_model.id}])
+
+        # Posting the bill again keeps its asset
+        invoice.button_draft()
+        invoice.action_post()
+        self.assertEqual(invoice.asset_ids, asset)
+        self.assertEqual(asset.state, 'open')
+
+        # Moving a posted line to such an account doesn't create an asset
+        invoice.invoice_line_ids[1].account_id = unconfigured_account
+        self.assertFalse(invoice.invoice_line_ids[1].asset_ids)
+
+    def test_asset_from_bill_stays_draft_in_manual_validation_country(self):
+        """In some countries (e.g. Germany), assets created or updated from bills are kept
+        in draft so that the accountant reviews and confirms them."""
+        no_depreciation_account = self.company_data['default_account_assets'].copy({'depreciation_model_id': False})
+        invoice = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'invoice_date': '2021-07-01',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [
+                Command.create({'name': 'Laptop', 'account_id': self.company_data['default_account_assets'].id, 'price_unit': 1000.0, 'tax_ids': []}),
+                Command.create({'name': 'Land', 'account_id': no_depreciation_account.id, 'price_unit': 500.0, 'tax_ids': []}),
+            ],
+        })
+        self.env.company.account_fiscal_country_id = self.env.ref('base.de')
+        invoice.action_post()
+        assets = invoice.asset_ids.sorted('original_value', reverse=True)
+        self.assertRecordValues(assets, [
+            {'state': 'draft', 'model_id': self.account_asset_model_5_years.id, 'original_value': 1000.0},
+            {'state': 'draft', 'model_id': self.env.ref('account_asset.asset_no_depreciation').id, 'original_value': 500.0},
+        ])
+
+        # Once confirmed, the assets go back to draft when the bill is posted again
+        assets.validate()
+        self.assertEqual(assets.mapped('state'), ['open', 'open'])
+        invoice.button_draft()
+        self.assertEqual(assets.mapped('state'), ['cancelled', 'cancelled'])
+        invoice.action_post()
+        self.assertEqual(invoice.asset_ids, assets)
+        self.assertRecordValues(assets, [
+            {'state': 'draft', 'model_id': self.account_asset_model_5_years.id, 'original_value': 1000.0},
+            {'state': 'draft', 'model_id': self.env.ref('account_asset.asset_no_depreciation').id, 'original_value': 500.0},
+        ])
+
+        # Other countries confirm the assets when the bill is posted (draft assets are deleted on reset)
+        self.env.company.account_fiscal_country_id = self.env.ref('base.be')
+        invoice.button_draft()
+        self.assertFalse(assets.exists())
+        invoice.action_post()
+        self.assertEqual(invoice.asset_ids.mapped('state'), ['open', 'open'])
+
+    def test_asset_created_from_journal_items(self):
+        """An asset can be created from the journal items of such an account"""
+        no_depreciation_model = self.env.ref('account_asset.asset_no_depreciation')
+        unconfigured_account = self.company_data['default_account_assets'].copy({
+            'depreciation_model_id': False,
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        })
+        entry = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2020-12-31',
+            'line_ids': [
+                Command.create({'name': 'Land', 'account_id': unconfigured_account.id, 'debit': 1000.0}),
+                Command.create({'name': 'Land', 'account_id': self.company_data['default_account_payable'].id, 'credit': 1000.0}),
+            ],
+        })
+        entry.action_post()
+        asset_line = entry.line_ids.filtered(lambda line: line.account_id == unconfigured_account)
+        action = asset_line.with_context(active_ids=asset_line.ids).turn_as_asset()
+        asset = Form(self.env['account.asset'].with_context(action['context'])).save()
+        self.assertRecordValues(asset, [{
+            'account_asset_id': unconfigured_account.id,
+            'original_value': 1000.0,
+            'model_id': no_depreciation_model.id,
+        }])
+
+    def test_asset_from_bill_line_without_label(self):
+        """A bill line without label nor product still posts, its asset being named after the bill."""
+        invoice = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'invoice_date': '2020-12-31',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [
+                Command.create({'account_id': self.company_data['default_account_assets'].id, 'price_unit': 1000.0, 'tax_ids': []}),
+            ],
+        })
+        invoice.action_post()
+        self.assertFalse(invoice.invoice_line_ids.name)
+        self.assertEqual(invoice.asset_ids.name, invoice.name)
+
+    def test_asset_form_set_accounts_on_unconfigured_account(self):
+        """A fixed asset account without depreciation settings can be used on an asset: the
+        depreciation model and accounts entered on the asset are saved on the fixed asset account."""
+        no_depreciation_model = self.env.ref('account_asset.asset_no_depreciation')
+        fixed_asset_account = self.company_data['default_account_assets'].copy({
+            'depreciation_model_id': False,
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        })
+        depreciation_account = self.env['account.account'].create({
+            'name': 'Accumulated Depreciation',
+            'code': '999901',
+            'account_type': 'asset_non_current',
+        })
+        expense_account = self.company_data['default_account_expense']
+        not_depreciated_asset = self.env['account.asset'].create({
+            'name': "Land",
+            'original_value': 1000,
+            'account_asset_id': fixed_asset_account.id,
+        })
+        not_depreciated_asset.validate()
+        self.assertEqual(not_depreciated_asset.model_id, no_depreciation_model)
+        self.assertFalse(fixed_asset_account.depreciation_model_id, "'No depreciation' is not saved on the account")
+
+        # Only fixed asset accounts are completed from their assets
+        non_fixed_asset_account = self.env['account.account'].create({
+            'name': 'Non-current Asset',
+            'code': '999902',
+            'account_type': 'asset_non_current',
+        })
+        self.env['account.asset'].create({
+            'name': "Patent",
+            'original_value': 1000,
+            'account_asset_id': non_fixed_asset_account.id,
+            'model_id': self.account_asset_model_5_years.id,
+            'account_depreciation_id': depreciation_account.id,
+            'account_depreciation_expense_id': expense_account.id,
+        })
+        self.assertRecordValues(non_fixed_asset_account, [{
+            'depreciation_model_id': False,
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        }])
+
+        asset_form = Form(self.env['account.asset'])
+        asset_form.name = "Test Asset"
+        asset_form.original_value = 10000
+        asset_form.acquisition_date = '2020-01-01'
+        asset_form.account_asset_id = fixed_asset_account
+        self.assertFalse(asset_form.model_id)
+        asset_form.model_id = self.account_asset_model_5_years
+        self.assertTrue(asset_form.can_edit_asset_accounts)
+        asset_form.import_account_depreciation_id = depreciation_account
+        asset_form.import_account_depreciation_expense_id = expense_account
+        asset = asset_form.save()
+
+        self.assertRecordValues(fixed_asset_account, [{
+            'depreciation_model_id': self.account_asset_model_5_years.id,
+            'asset_depreciation_account_id': depreciation_account.id,
+            'asset_expense_account_id': expense_account.id,
+        }])
+        self.assertFalse(asset.can_edit_asset_accounts)
+        self.assertRecordValues(asset.main_variant_id, [{
+            'account_depreciation_id': depreciation_account.id,
+            'account_depreciation_expense_id': expense_account.id,
+        }])
+        # Other assets of the account keep their model
+        self.assertEqual(not_depreciated_asset.model_id, no_depreciation_model)
+
+        asset.validate()
+        self.assertEqual(asset.state, 'open')
+        self.assertEqual(len(asset.depreciation_move_ids), 5)
+        self.assertEqual(asset.depreciation_move_ids.line_ids.account_id, depreciation_account | expense_account)
+
+        # Account configuration doesn't get overriden (only empty fields)
+        fixed_asset_account.write({'asset_expense_account_id': False})
+        other_depreciation_account = fixed_asset_account.copy()
+        other_expense_account = fixed_asset_account.copy()
+        asset = self.env['account.asset'].create({
+            'name': "Land",
+            'original_value': 1000,
+            'account_asset_id': fixed_asset_account.id,
+            'account_depreciation_id': other_depreciation_account.id,
+            'account_depreciation_expense_id': other_expense_account.id,
+        })
+        self.assertRecordValues(asset.main_variant_id, [{
+            'model_id': self.account_asset_model_5_years.id,
+            'account_depreciation_id': other_depreciation_account.id,
+            'account_depreciation_expense_id': other_expense_account.id,
+        }])
+        self.assertRecordValues(fixed_asset_account, [{
+            'depreciation_model_id': self.account_asset_model_5_years.id,
+            'asset_depreciation_account_id': depreciation_account.id,
+            'asset_expense_account_id': other_expense_account.id,
+        }])
+
+    def test_asset_from_bill_set_accounts_on_draft_asset(self):
+        """An asset left in draft by a bill, as its account lacks the depreciation accounts, can be
+        completed from the asset form: the accounts are saved on the asset and on the account."""
+        fixed_asset_account = self.company_data['default_account_assets'].copy({
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        })
+        depreciation_account = self.env['account.account'].create({
+            'name': 'Accumulated Depreciation',
+            'code': '999903',
+            'account_type': 'asset_non_current',
+        })
+        expense_account = self.company_data['default_account_expense']
+        invoice = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'invoice_date': '2020-12-31',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [
+                Command.create({'name': 'Laptop', 'account_id': fixed_asset_account.id, 'price_unit': 1000.0, 'tax_ids': []}),
+            ],
+        })
+        invoice.action_post()
+        asset = invoice.asset_ids
+        self.assertEqual(asset.state, 'draft')
+        self.assertTrue(asset.can_edit_asset_accounts)
+
+        with Form(asset) as asset_form:
+            asset_form.import_account_depreciation_id = depreciation_account
+            asset_form.import_account_depreciation_expense_id = expense_account
+
+        self.assertRecordValues(asset.main_variant_id, [{
+            'account_depreciation_id': depreciation_account.id,
+            'account_depreciation_expense_id': expense_account.id,
+        }])
+        self.assertRecordValues(fixed_asset_account, [{
+            'asset_depreciation_account_id': depreciation_account.id,
+            'asset_expense_account_id': expense_account.id,
+        }])
+        asset.validate()
+        self.assertEqual(asset.depreciation_move_ids.line_ids.account_id, depreciation_account | expense_account)
+
+    def test_asset_without_model_saved_as_no_depreciation(self):
+        """Without a model from the bill or the account, the asset form starts without depreciation
+        model, and the asset gets the 'no depreciation' model once saved."""
+        no_depreciation_model = self.env.ref('account_asset.asset_no_depreciation')
+        unconfigured_account = self.company_data['default_account_assets'].copy({
+            'depreciation_model_id': False,
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        })
+
+        # Account without any depreciation settings
+        asset_form = Form(self.env['account.asset'])
+        asset_form.name = "Land"
+        asset_form.original_value = 1000
+        asset_form.account_asset_id = unconfigured_account
+        self.assertFalse(asset_form.model_id)
+        asset = asset_form.save()
+        self.assertEqual(asset.model_id, no_depreciation_model)
+        asset.validate()
+        self.assertEqual(asset.state, 'open')
+        self.assertFalse(asset.depreciation_move_ids)
+
+        # The model proposed by the account is cleared by the user
+        asset_form = Form(self.env['account.asset'])
+        asset_form.name = "Building"
+        asset_form.original_value = 1000
+        asset_form.account_asset_id = self.company_data['default_account_assets']
+        self.assertEqual(asset_form.model_id, self.account_asset_model_5_years)
+        asset_form.model_id = self.env['account.depreciation.model']
+        asset = asset_form.save()
+        self.assertEqual(asset.model_id, no_depreciation_model)
+
+        # Through the ORM
+        asset = self.env['account.asset'].create({
+            'name': "Warehouse",
+            'original_value': 1000,
+            'account_asset_id': unconfigured_account.id,
+        })
+        self.assertEqual(asset.model_id, no_depreciation_model)
+        asset.model_id = self.account_asset_model_5_years
+        asset.write({'model_id': False})
+        self.assertEqual(asset.model_id, no_depreciation_model)
+
     def test_asset_reevaluation_degressive_linear(self):
         """ Tests the reevaluation of an asset in degressive_then_linear with a gross increase"""
         asset = self.env['account.asset'].create({
@@ -3535,3 +3866,98 @@ class TestAccountAsset(TestAccountAssetCommon, TestAccountReportsCommon):
             1210.0,
             "The original_value must not double-count explicitly linked non-deductible tax lines."
         )
+
+    def test_open_increase_with_multiple_children(self):
+        """Test opening gross increases with multiple child variants."""
+        for value_residual in (100, 200):
+            self.env['asset.modify'].create({
+                'name': 'Test Increase',
+                'asset_variant_id': self.truck.main_variant_id.id,
+                'value_residual': self.truck.book_value + value_residual,
+                'account_asset_counterpart_id': self.assert_counterpart_account_id,
+            }).modify()
+
+        self.assertEqual(len(self.truck.main_variant_id.children_ids), 2)
+
+        action = self.truck.open_increase()
+        self.assertNotIn('variant_id', action['context'])
+
+    def test_depreciation_model_from_product_expense_account(self):
+        """ The depreciation model of the product's expense account is proposed on the bill line. """
+        asset_account = self.company_data['default_account_assets']
+        asset_account.depreciation_model_id = self.account_asset_model_3_years
+        asset_product = self.env['product.product'].create({
+            'name': 'Laptop',
+            'standard_price': 1000.0,
+            'property_account_expense_id': asset_account.id,
+        })
+
+        with Form(self.env['account.move'].with_context(default_move_type='in_invoice')) as bill_form:
+            bill_form.partner_id = self.partner_a
+            bill_form.invoice_date = fields.Date.from_string('2020-12-31')
+            with bill_form.invoice_line_ids.new() as line_form:
+                line_form.product_id = self.product_a
+                self.assertEqual(line_form.account_id, self.company_data['default_account_expense'])
+                self.assertFalse(line_form.depreciation_model_id)
+                self.assertFalse(line_form.display_depreciation_model)
+
+                line_form.product_id = asset_product
+                self.assertEqual(line_form.account_id, asset_account)
+                self.assertEqual(line_form.depreciation_model_id, self.account_asset_model_3_years)
+                self.assertTrue(line_form.display_depreciation_model)
+        bill = bill_form.record
+        self.assertEqual(bill.invoice_line_ids.depreciation_model_id, self.account_asset_model_3_years)
+
+        bill.action_post()
+        self.assertEqual(bill.asset_ids.state, 'open')
+        self.assertEqual(bill.asset_ids.model_id, self.account_asset_model_3_years)
+
+        bill.button_draft()
+        with Form(bill) as bill_form, bill_form.invoice_line_ids.edit(0) as line_form:
+            line_form.product_id = self.product_a
+            self.assertFalse(line_form.depreciation_model_id)
+            self.assertFalse(line_form.display_depreciation_model)
+        self.assertFalse(bill.invoice_line_ids.depreciation_model_id)
+
+    def test_asset_account_mismatch(self):
+        """
+        Test if the Depreciation Schedule report catches the mismatch between the
+        Fixed Asset Account of the asset and the Account of the associated move_line
+        """
+        self.company_data['default_account_assets'].depreciation_model_id = self.account_asset_model_3_years
+
+        invoices = self.env['account.move'].create([
+            {
+                'move_type': 'in_invoice',
+                'invoice_date': '2026-07-31',
+                'partner_id': self.partner_a.id,
+                'invoice_line_ids': [
+                    Command.create({
+                        'name': f"Truck {idx}",
+                        'account_id': self.default_account_assets.id,
+                        'price_unit': price_unit,
+                        'quantity': 1,
+                    })
+                ],
+            }
+            for idx, price_unit in enumerate([450, 500, 550])
+        ])
+        invoices.action_post()
+
+        report = self.env.ref('account_asset.assets_report')
+        options = self._generate_options(report, '2026-01-01', '2026-12-31')
+        warnings = {}
+        report._get_lines(options, warnings=warnings)
+
+        self.assertNotIn('account_asset.common_warning_discrepancy_detected', warnings)
+
+        modified_move_line = invoices[1].invoice_line_ids[0]
+        modified_move_line.account_id = self.company_data['default_account_expense'].id
+        corresponding_asset = self.env['account.asset'].search([('original_move_line_ids', 'in', [modified_move_line.id])])
+
+        self.env.invalidate_all()
+        warnings = {}
+        report._get_lines(options, warnings=warnings)
+
+        self.assertIn('account_asset.common_warning_discrepancy_detected', warnings)
+        self.assertEqual(warnings['account_asset.common_warning_discrepancy_detected']['asset_ids'], corresponding_asset.ids)

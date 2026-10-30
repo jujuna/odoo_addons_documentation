@@ -73,6 +73,7 @@ export class AiScriptPlugin extends Plugin {
         this.aiGeneratedScriptsPanelProps.scripts = scriptEls.map((el) => ({
             el,
             isStopped: el.dataset.aiScriptStopped,
+            isRemovable: this.services.website.isDesigner,
         }));
     }
 

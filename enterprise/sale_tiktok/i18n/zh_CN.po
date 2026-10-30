@@ -1,16 +1,18 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sale_tiktok
+# * sale_tiktok
 #
+# 张飞虎 <feihu.zhang@live.com>, 2026.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:50+0000\n"
-"PO-Revision-Date: 2026-09-18 05:19+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-23 09:33+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/sale_tiktok/zh_Hans/>\n"
+"projects/odoo-20/sale_tiktok/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,12 +34,21 @@ msgid ""
 "  (SKU in TikTok Shop)\n"
 "* Support for Fulfillment by Seller (FBS)\n"
 msgstr ""
+"\n"
+"在 Odoo 中导入您的 TikTok Shop 订单并同步送货\n"
+"=================================================================\n"
+"\n"
+"主要功能\n"
+"------------\n"
+"* 从多个商店导入订单\n"
+"* 根据 Odoo 产品的内部参考（TikTok Shop 中的 SKU）匹配订单\n"
+"* 支持卖家履约（FBS）\n"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_shop_create_wizard.py:0
 msgid "(Pending Authorization)"
-msgstr ""
+msgstr "（待授权）"
 
 #. module: sale_tiktok
 #: model:mail.template,body_html:sale_tiktok.order_sync_failure
@@ -77,6 +88,37 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
+"<div>\n"
+"                <p>\n"
+"                    参考编号为\n"
+"                    <t t-out=\"ctx.get('tiktok_order_ref') or ''\">REF</t>\n"
+"                    的 TikTok Shop 订单同步处理时出错，尚未完成。\n"
+"                </p>\n"
+"                <p>\n"
+"                    除非订单在 TikTok Shop 中取消，否则不会尝试其他同步操作"
+"。\n"
+"                </p>\n"
+"                <p>\n"
+"                    安排新的同步尝试的步骤如下：\n"
+"                    </p><ol>\n"
+"                        <li>进入开发者工具。</li>\n"
+"                        <li>打开下订单的 TikTok Shop 表单。</li>\n"
+"                        <li>导航至“订单跟进”选项卡。</li>\n"
+"                        <li>\n"
+"                            为 <em>最后订单同步日期</em> 设置一个早于订单最后"
+"状态更新的日期。\n"
+"                        </li>\n"
+"                        <li>保存更改，然后点击 <em>同步订单</em> 按钮。</li>"
+"\n"
+"                    </ol>\n"
+"                \n"
+"                <p>\n"
+"                    若问题仍然存在，请联系\n"
+"                    <a href=\"https://www.odoo.com/help/\">Odoo 技术支持</a>"
+"。\n"
+"                </p>\n"
+"            </div>\n"
+"        "
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
@@ -85,6 +127,8 @@ msgid ""
 "                    An unexpected error occurred during authorization. "
 "Please try again."
 msgstr ""
+"<strong>授权失败：</strong>                    授权过程中发生意外错误。请重试"
+"。"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
@@ -97,6 +141,12 @@ msgid ""
 ">\n"
 "                    4. Get your Service ID, App key and App secret<br/>"
 msgstr ""
+"<strong>在哪里找到您的 API 凭据：</strong><br/>\n"
+"                    1. 前往 TikTok Shop 合作伙伴中心<br/>\n"
+"                    2. 导航至 应用 &amp; 服务 → 创建新应用或使用现有应用<br/>"
+"\n"
+"                    3. 授予应用访问您商店数据的权限<br/>\n"
+"                    4. 获取您的服务 ID、应用密钥和应用密钥<br/>"
 
 #. module: sale_tiktok
 #: model:mail.template,body_html:sale_tiktok.inventory_sync_failure
@@ -170,114 +220,181 @@ msgid ""
 "            </div>\n"
 "        </body>"
 msgstr ""
+"<style>\n"
+"                .tiktok_table {\n"
+"                    width: 100%;\n"
+"                    max-width: 900px;\n"
+"                    border-collapse: collapse;\n"
+"                }\n"
+"\n"
+"                .tiktok_table th,\n"
+"                .tiktok_table td {\n"
+"                    border: 1px solid #888;\n"
+"                }\n"
+"\n"
+"                .tiktok_table th {\n"
+"                    white-space: nowrap;\n"
+"                }\n"
+"\n"
+"                .tiktok_table thead th {\n"
+"                    padding: 0.5em 0.5em;\n"
+"                    text-align: center;\n"
+"                    border-bottom: 1px solid #888;\n"
+"                }\n"
+"\n"
+"                .tiktok_table tbody th,\n"
+"                .tiktok_table tbody td {\n"
+"                    padding: 0.5em 0.5em 1em;\n"
+"                    vertical-align: top;\n"
+"                }\n"
+"            </style>\n"
+"            <body><div>\n"
+"                <p>\n"
+"                    TikTok Shop\n"
+"                    <b><t t-out=\"ctx.get('tiktok_shop') or ''\">REF</t></b>"
+"\n"
+"                    的库存同步遇到一些错误，未能完成。\n"
+"                </p>\n"
+"                <p>以下是 TikTok Shop 发送的错误信息：</p>\n"
+"                <table class=\"tiktok_table\">\n"
+"                    <thead>\n"
+"                        <tr>\n"
+"                            <th>产品内部参考</th>\n"
+"                            <th>消息</th>\n"
+"                        </tr>\n"
+"                    </thead>\n"
+"                    <tbody>\n"
+"                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
+"as=\"error\">\n"
+"                            <th>\n"
+"                                <t t-out=\"', '.join(error['default_codes'])"
+"\"/>\n"
+"                            </th>\n"
+"                            <td>\n"
+"                                <t t-if=\"error['message']\" t-"
+"out=\"error['message']\"/>\n"
+"                                <t t-else=\"\">\n"
+"                                    与 TikTok Shop 同步过程中出现未知错误。\n"
+"                                    很遗憾，您需要手动检查产品的可用数量是否"
+"正确。\n"
+"                                    如果问题仍然存在，请联系\n"
+"                                    <a href=\"https://www.odoo.com/help/\">"
+"Odoo 技术支持</a>。\n"
+"                                </t>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"            </div>\n"
+"        </body>"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__access_token
 msgid "Access Token"
-msgstr ""
+msgstr "访问令牌"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__access_token_expire_datetime
 msgid "Access Token Expiration"
-msgstr ""
+msgstr "访问令牌有效期"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__active
 msgid "Active"
-msgstr ""
+msgstr "有效"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "An unexpected error occurred during authorization."
-msgstr ""
+msgstr "授权过程中发生意外错误。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__tiktok_cipher
 msgid "An unique identifier as an input parameter in shop related APIs."
-msgstr ""
+msgstr "商店相关 API 中作为输入参数的唯一标识符。"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "App Credentials"
-msgstr ""
+msgstr "应用凭据"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__app_key
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__app_key
 msgid "App key"
-msgstr ""
+msgstr "应用密钥"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__app_secret
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__app_secret
 msgid "App secret"
-msgstr ""
+msgstr "应用密钥"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_search
 msgid "Archived"
-msgstr ""
+msgstr "已归档"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__confirmed
 msgid "Awaiting Collection on TikTok Shop"
-msgstr ""
+msgstr "等待 TikTok Shop 揽收"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__draft
 msgid "Awaiting Shipment on TikTok Shop"
-msgstr ""
+msgstr "等待 TikTok Shop 发货"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__canceled
 msgid "Canceled on TikTok Shop"
-msgstr ""
+msgstr "已在 TikTok Shop 取消"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 msgid "Collection Period"
-msgstr ""
+msgstr "揽收时段"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__company_id
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__company_id
 msgid "Company"
-msgstr ""
+msgstr "公司"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_list
 msgid "Connect New Shop"
-msgstr ""
+msgstr "连接新商店"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 msgid "Connect Shop & Authorize"
-msgstr ""
+msgstr "连接商店并授权"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "联系人"
 
 #. module: sale_tiktok
 #: model:ir.actions.act_window,name:sale_tiktok.action_tiktok_shop_create_wizard
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_create_wizard_view_form
 msgid "Create TikTok Shop"
-msgstr ""
+msgstr "创建 TikTok 商店"
 
 #. module: sale_tiktok
 #: model:ir.model,website_form_label:sale_tiktok.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "创建客户"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__create_uid
@@ -285,7 +402,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__create_uid
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "创建人"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__create_date
@@ -293,27 +410,27 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__create_date
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "创建日期"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Credentials"
-msgstr ""
+msgstr "授权认证"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__team_id
 msgid "Default Sales Team"
-msgstr ""
+msgstr "默认销售团队"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__user_id
 msgid "Default Salesperson"
-msgstr ""
+msgstr "默认销售人员"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__done
 msgid "Delivered on TikTok Shop"
-msgstr ""
+msgstr "已在 TikTok Shop 送达"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_product_product__display_name
@@ -325,36 +442,36 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__display_name
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "显示名称"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.stock_picking_form
 msgid "Download TikTok Label"
-msgstr ""
+msgstr "下载 TikTok 标签"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__synchronize_inventory
 msgid "Enable Inventory Synchronization"
-msgstr ""
+msgstr "启用库存同步"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__sync_to_tiktok
 msgid ""
 "Enable this to allow pushing the product inventory quantities from Odoo to "
 "TikTok."
-msgstr ""
+msgstr "启用后，可将产品的库存数量从 Odoo 推送到 TikTok。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__synchronize_inventory
 msgid ""
 "Enable this to keep this shop's product quantities synchronized with TikTok "
 "Shop."
-msgstr ""
+msgstr "启用后，可使此商店的产品数量与 TikTok Shop 保持同步。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__fbs_warehouse_id
 msgid "FBS Warehouse"
-msgstr ""
+msgstr "FBS 仓库"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -363,18 +480,20 @@ msgid ""
 "Failed to download the shipping label. Use the provided link:\n"
 "%(link)s"
 msgstr ""
+"下载运输标签失败。请使用提供的链接：\n"
+"%(link)s"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "Failed to fetch label. Please wait and try again later. %s"
-msgstr ""
+msgstr "获取标签失败。请稍后重试。%s"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "Failed to ship order: %s"
-msgstr ""
+msgstr "发货失败：%s"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_product_product__id
@@ -386,19 +505,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__id
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.sale_order_form
 msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
-msgstr ""
+msgstr "无法修改已锁定的销售，但仍可以开票或交付。"
 
 #. module: sale_tiktok
 #: model:ir.module.module,summary:base.module_sale_tiktok
 msgid "Import TikTok Shop orders and sync deliveries"
-msgstr ""
+msgstr "导入 TikTok Shop 订单并同步送货"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -408,71 +527,74 @@ msgid ""
 "TikTok API operation '%(operation)s' with request ID '%(request_id)s':\n"
 "%(error_message)s"
 msgstr ""
+"在 TikTok Shop“%(shop_name)s”中，执行 TikTok API 操作“%(operation)s”时发生错"
+"误 %(error_code)s（请求 ID：'%(request_id)s'）：\n"
+"%(error_message)s"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/utils.py:0
 msgid "Invalid JSON response received from TikTok."
-msgstr ""
+msgstr "从 TikTok 收到无效的 JSON 响应。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Invalid OAuth state."
-msgstr ""
+msgstr "无效的 OAuth 状态。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "Invalid TikTok document URL"
-msgstr ""
+msgstr "无效的 TikTok 文档 URL"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Invalid authorization signature"
-msgstr ""
+msgstr "无效的授权签名"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Inventory Synchronization"
-msgstr ""
+msgstr "库存同步"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_item_count
 msgid "Item Count"
-msgstr ""
+msgstr "商品数"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__tiktok_item_extern_id
 msgid "Item ID"
-msgstr ""
+msgstr "商品 ID"
 
 #. module: sale_tiktok
 #: model:ir.model.constraint,message:sale_tiktok.constraint_tiktok_item_unique_tiktok_item_and_sku_external_ids
 msgid "Item and SKU external IDs must be unique for a given shop."
-msgstr ""
+msgstr "同一商店内，商品和 SKU 的外部 ID 必须唯一。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_item_ids
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Items"
-msgstr ""
+msgstr "商品"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__last_product_catalog_sync_date
 msgid "Last Catalog Synchronization"
-msgstr ""
+msgstr "上次产品目录同步"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__last_orders_sync_date
 msgid "Last Order Synchronization"
-msgstr ""
+msgstr "上次订单同步"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__last_inventory_sync_date
 msgid "Last Sync Date"
-msgstr ""
+msgstr "上次同步日期"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__write_uid
@@ -480,7 +602,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__write_uid
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "最后更新人"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__write_date
@@ -488,241 +610,241 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__write_date
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "上次更新日期"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.sale_order_form
 msgid "Lock"
-msgstr ""
+msgstr "锁定"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Malformed OAuth state."
-msgstr ""
+msgstr "OAuth 状态格式错误。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields.selection,name:sale_tiktok.selection__sale_order__tiktok_delivery_status__manual
 msgid "Manual handling required"
-msgstr ""
+msgstr "需人工处理"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Missing OAuth state."
-msgstr ""
+msgstr "缺少 OAuth 状态。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__name
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "No TikTok shop found for this order."
-msgstr ""
+msgstr "未找到此订单对应的 TikTok 商店。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/utils.py:0
 msgid "No authorization code or refresh token found for shop %(shop_name)s."
-msgstr ""
+msgstr "未找到商店%(shop_name)s 的授权码或刷新令牌。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__order_count
 msgid "Order Count"
-msgstr ""
+msgstr "订单数"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Order Synchronization"
-msgstr ""
+msgstr "订单同步"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__order_ids
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Orders"
-msgstr ""
+msgstr "订单"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "Original price: %(price)s"
-msgstr ""
+msgstr "原价：%(price)s"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_picking_ship_wizard__picking_id
 msgid "Picking"
-msgstr ""
+msgstr "拣货"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_picking_ship_wizard__pickup_end
 msgid "Pickup End Time"
-msgstr ""
+msgstr "取件结束时间"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Pickup End Time must be after Pickup Start Time."
-msgstr ""
+msgstr "取件结束时间必须晚于取件开始时间。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_picking_ship_wizard__pickup_start
 msgid "Pickup Start Time"
-msgstr ""
+msgstr "取件开始时间"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Please provide both Pickup Start and Pickup End times."
-msgstr ""
+msgstr "请同时提供取件开始时间和取件结束时间。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__product_id
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_item_search
 msgid "Product"
-msgstr ""
+msgstr "产品"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__product_tmpl_id
 msgid "Product Template"
-msgstr ""
+msgstr "产品模板"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "产品变体"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Rate limit reached. Please try again later."
-msgstr ""
+msgstr "已达到速率限制，请稍后重试。"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Re-authorize Shop"
-msgstr ""
+msgstr "重新授权商店"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__refresh_token
 msgid "Refresh Token"
-msgstr ""
+msgstr "刷新令牌"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__refresh_token_expire_datetime
 msgid "Refresh Token Expiration"
-msgstr ""
+msgstr "刷新令牌有效期"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/utils.py:0
 msgid "Request exception during TikTok Shop API operation"
-msgstr ""
+msgstr "TikTok Shop API 操作期间发生请求异常"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__tiktok_sku_extern_id
 msgid "SKU ID"
-msgstr ""
+msgstr "SKU ID"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "Sale Orders"
-msgstr ""
+msgstr "销售订单"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_sale_order
 msgid "Sales Order"
-msgstr ""
+msgstr "销售订单"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__tiktok_seller_sku
 msgid "Seller SKU"
-msgstr ""
+msgstr "卖家 SKU"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__service_extern_id
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop_create_wizard__service_extern_id
 msgid "Service ID"
-msgstr ""
+msgstr "服务 ID"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 msgid "Ship Order"
-msgstr ""
+msgstr "发货订单"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Ship Orders Result"
-msgstr ""
+msgstr "发货订单结果"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 msgid "Ship TikTok Orders"
-msgstr ""
+msgstr "发货 TikTok 订单"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.stock_picking_form
 msgid "Ship on TikTok"
-msgstr ""
+msgstr "在 TikTok 上发货"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "Shipping: %(carrier)s"
-msgstr ""
+msgstr "运输：%(carrier)s"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__shop_id
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_search
 msgid "Shop"
-msgstr ""
+msgstr "商店"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_shop_ref
 msgid "Shop ID"
-msgstr ""
+msgstr "商店 ID"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Information"
-msgstr ""
+msgstr "商店信息"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Name"
-msgstr ""
+msgstr "商店名称"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__country_id
 msgid "Shop Region"
-msgstr ""
+msgstr "商店地区"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Settings"
-msgstr ""
+msgstr "商店设置"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Shop Tokens"
-msgstr ""
+msgstr "商店令牌"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "Shop not found."
-msgstr ""
+msgstr "未找到商店。"
 
 #. module: sale_tiktok
 #: model:ir.ui.menu,name:sale_tiktok.shops_menu
 msgid "Shops"
-msgstr ""
+msgstr "商店"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_delivery_status
@@ -737,66 +859,72 @@ msgid ""
 "- Manual handling required: Shipment must be rearranged and checked again in "
 "TikTok Shop."
 msgstr ""
+"TikTok Shop 系统内的送货订单状态：\n"
+"- 等待发货：订单已准备好发货，但尚未发货。\n"
+"- 等待揽收：已安排发货，等待承运商揽收。\n"
+"- 已送达：包裹已被承运商揽收并发出。\n"
+"- 已取消：包裹已取消。\n"
+"- 需人工处理：必须在 TikTok Shop 中重新安排并检查发货。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/wizard/tiktok_picking_ship_wizard.py:0
 msgid "Successfully shipped orders."
-msgstr ""
+msgstr "订单发货成功。"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Sync Catalog"
-msgstr ""
+msgstr "同步产品目录"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Sync Inventory"
-msgstr ""
+msgstr "同步库存"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_item__sync_to_tiktok
 msgid "Sync Inventory to TikTok"
-msgstr ""
+msgstr "将库存同步到 TikTok"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Sync Orders"
-msgstr ""
+msgstr "同步订单"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "Synchronization Information"
-msgstr ""
+msgstr "同步信息"
 
 #. module: sale_tiktok
 #: model:mail.template,subject:sale_tiktok.inventory_sync_failure
 msgid "Synchronization of TikTok Shop inventory has failed"
-msgstr ""
+msgstr "TikTok 商店库存同步失败"
 
 #. module: sale_tiktok
 #: model:mail.template,subject:sale_tiktok.order_sync_failure
 msgid ""
 "Synchronization of TikTok Shop order {{ ctx.get('tiktok_order_ref') }} has "
 "failed"
-msgstr ""
+msgstr "TikTok Shop 订单 {{ ctx.get('tiktok_order_ref') }} 同步失败"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_order_ref
 #: model:ir.model.fields,help:sale_tiktok.field_stock_picking__tiktok_order_ref
 msgid "The TikTok Shop-defined order reference."
-msgstr ""
+msgstr "由 TikTok Shop 定义的订单参考。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_packing_ref
 #: model:ir.model.fields,help:sale_tiktok.field_stock_picking__tiktok_packing_ref
 msgid "The TikTok Shop-defined packing reference."
-msgstr ""
+msgstr "由 TikTok Shop 定义的包裹参考。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_sale_order__tiktok_shop_id
 msgid "The TikTok shop from which the order was placed."
-msgstr ""
+msgstr "下此订单的 TikTok 商店。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__access_token
@@ -805,48 +933,50 @@ msgid ""
 "needs to be refreshed with the refresh token. You don't have to manage this "
 "field manually."
 msgstr ""
+"TikTok Shop API 的访问令牌。该令牌 7 天后过期，需要使用刷新令牌进行刷新。无需"
+"手动管理此字段。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_stock_picking__tiktok_label_attachment_id
 msgid "The attachment related to the TikTok shipping label."
-msgstr ""
+msgstr "与 TikTok 运输标签相关的附件。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "The collection of this order was already scheduled."
-msgstr ""
+msgstr "此订单的揽收已安排。"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_picking_ship_wizard_form
 msgid ""
 "The collection period is optional. Leave empty to follow courier pickup "
 "schedule."
-msgstr ""
+msgstr "揽收时段为可选。留空则遵循承运商的取件安排。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__access_token_expire_datetime
 msgid ""
 "The date when the access token expires. Odoo will automatically refresh the "
 "token before it expires."
-msgstr ""
+msgstr "访问令牌的过期日期。Odoo 将在令牌过期前自动刷新。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__refresh_token_expire_datetime
 msgid ""
 "The date when the refresh token expires. Odoo will automatically refresh the "
 "token before it expires."
-msgstr ""
+msgstr "刷新令牌的过期日期。Odoo 将在令牌过期前自动刷新。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__team_id
 msgid "The default Sales Team assigned to TikTok Shop orders for reporting"
-msgstr ""
+msgstr "分配给 TikTok Shop 订单用于报表的默认销售团队"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__user_id
 msgid "The default salesperson assigned to TikTok Shop orders"
-msgstr ""
+msgstr "分配给 TikTok Shop 订单的默认销售人员"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__last_orders_sync_date
@@ -854,11 +984,13 @@ msgid ""
 "The last time orders were synchronized with TikTok Shop. Orders whose status "
 "has not changed since this date are not created nor updated in Odoo."
 msgstr ""
+"与 TikTok Shop 同步订单的上次时间。自该日期以来状态未发生变化的订单不会在 "
+"Odoo 中创建或更新。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__last_product_catalog_sync_date
 msgid "The last time the TikTok Shop catalog was synchronized with Odoo."
-msgstr ""
+msgstr "TikTok Shop 产品目录与 Odoo 同步的上次时间。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__refresh_token
@@ -867,13 +999,15 @@ msgid ""
 "needs to be refreshed with the access token. You don't have to manage this "
 "field manually."
 msgstr ""
+"TikTok Shop API 的刷新令牌。该令牌 30 天后过期，需要使用访问令牌进行刷新。无"
+"需手动管理此字段。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__tiktok_seller_sku
 msgid ""
 "The seller SKU in TikTok. A Seller SKU in TikTok is equivalent to the "
 "product default code in Odoo."
-msgstr ""
+msgstr "TikTok 中的卖家 SKU。TikTok 中的卖家 SKU 相当于 Odoo 中的产品默认编码。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__service_extern_id
@@ -882,27 +1016,29 @@ msgid ""
 "in the TikTok Shop API. You can find this in your TikTok Partner Center "
 "after creating an application."
 msgstr ""
+"TikTok Shop API 的服务 ID。此 ID 用于在 TikTok Shop API 中标识商店。创建应用"
+"后，您可在 TikTok 合作伙伴中心中找到。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__tiktok_sku_extern_id
 msgid ""
 "The unique identifier for a SKU in TikTok. A SKU in TikTok is equivalent to "
 "a product variant in Odoo."
-msgstr ""
+msgstr "TikTok 中 SKU 的唯一标识符。TikTok 中的 SKU 相当于 Odoo 中的产品变体。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_item__tiktok_item_extern_id
 msgid ""
 "The unique identifier for an item in TikTok. An item in TikTok is equivalent "
 "to a product in Odoo."
-msgstr ""
+msgstr "TikTok 中商品的唯一标识符。TikTok 中的商品相当于 Odoo 中的产品。"
 
 #. module: sale_tiktok
 #: model:ir.model.constraint,message:sale_tiktok.constraint_sale_order_unique_tiktok_order_ref_tiktok_shop_id
 msgid ""
 "There can only exist one sale order for a given TikTok Shop Order Reference "
 "per Shop."
-msgstr ""
+msgstr "每个商店的同一 TikTok Shop 订单参考只能存在一个销售订单。"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.sale_order_form
@@ -911,48 +1047,50 @@ msgid ""
 "This order contains unsupported TikTok Shop delivery status.\n"
 "                    Please process the order manually on TikTok Shop."
 msgstr ""
+"此订单包含 TikTok Shop 不支持的送货状态。\n"
+"                    请在 TikTok Shop 上手动处理该订单。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "This picking is not linked to a TikTok order."
-msgstr ""
+msgstr "此拣货未关联 TikTok 订单。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "TikTok API rate limit reached. Please try again later."
-msgstr ""
+msgstr "已达到 TikTok API 速率限制，请稍后重试。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 #: model:product.template,name:sale_tiktok.default_adjustment_product_product_template
 msgid "TikTok Amount Adjustment"
-msgstr ""
+msgstr "TikTok 金额调整"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_res_partner__tiktok_buyer_extern_id
 #: model:ir.model.fields,field_description:sale_tiktok.field_res_users__tiktok_buyer_extern_id
 msgid "TikTok Buyer ID"
-msgstr ""
+msgstr "TikTok 买家 ID"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_sale_order__tiktok_packing_ref
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_packing_ref
 msgid "TikTok Packing Reference"
-msgstr ""
+msgstr "TikTok 包裹参考"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_picking_ship_wizard
 msgid "TikTok Picking Ship Wizard"
-msgstr ""
+msgstr "TikTok 拣货发货向导"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_sale_order__tiktok_order_ref
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_order_ref
 msgid "TikTok Reference"
-msgstr ""
+msgstr "TikTok 参考"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_shop
@@ -962,109 +1100,109 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_item_search
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "TikTok Shop"
-msgstr ""
+msgstr "TikTok 商店"
 
 #. module: sale_tiktok
 #: model:ir.actions.act_window,name:sale_tiktok.action_tiktok_shop_authorization_error
 msgid "TikTok Shop Authorization Error"
-msgstr ""
+msgstr "TikTok Shop 授权错误"
 
 #. module: sale_tiktok
 #: model:ir.module.module,shortdesc:base.module_sale_tiktok
 msgid "TikTok Shop Connector"
-msgstr ""
+msgstr "TikTok Shop 连接器"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_shop_create_wizard
 msgid "TikTok Shop Creation Wizard"
-msgstr ""
+msgstr "TikTok Shop 创建向导"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_tiktok_item
 msgid "TikTok Shop Item"
-msgstr ""
+msgstr "TikTok Shop 商品"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_item_list
 msgid "TikTok Shop Items"
-msgstr ""
+msgstr "TikTok Shop 商品"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/stock_picking.py:0
 msgid "TikTok Shop Label"
-msgstr ""
+msgstr "TikTok Shop 标签"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/tests/test_tiktok.py:0
 msgid "TikTok Shop Order %(order)s"
-msgstr ""
+msgstr "TikTok Shop 订单 %(order)s"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "TikTok Shop Order %(tiktok_order_ref)s"
-msgstr ""
+msgstr "TikTok Shop 订单 %(tiktok_order_ref)s"
 
 #. module: sale_tiktok
 #: model:product.template,name:sale_tiktok.default_sale_product_product_template
 msgid "TikTok Shop Sale"
-msgstr ""
+msgstr "TikTok Shop 销售"
 
 #. module: sale_tiktok
 #: model:product.template,name:sale_tiktok.default_shipping_product_product_template
 msgid "TikTok Shop Shipping"
-msgstr ""
+msgstr "TikTok Shop 运输"
 
 #. module: sale_tiktok
 #: model:ir.actions.server,name:sale_tiktok.ir_cron_sync_tiktok_inventory_ir_actions_server
 msgid "TikTok Shop: sync inventory"
-msgstr ""
+msgstr "TikTok Shop：同步库存"
 
 #. module: sale_tiktok
 #: model:ir.actions.server,name:sale_tiktok.ir_cron_sync_tiktok_orders_ir_actions_server
 msgid "TikTok Shop: sync orders"
-msgstr ""
+msgstr "TikTok Shop：同步订单"
 
 #. module: sale_tiktok
 #: model:ir.actions.act_window,name:sale_tiktok.action_tiktok_shop_list
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_list
 msgid "TikTok Shops"
-msgstr ""
+msgstr "TikTok 商店"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_sale_order__tiktok_delivery_status
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_delivery_status
 msgid "TikTok Status"
-msgstr ""
+msgstr "TikTok 状态"
 
 #. module: sale_tiktok
 #: model:mail.template,name:sale_tiktok.inventory_sync_failure
 msgid "TikTok: Inventory Synchronization Failure"
-msgstr ""
+msgstr "TikTok：库存同步失败"
 
 #. module: sale_tiktok
 #: model:mail.template,name:sale_tiktok.order_sync_failure
 msgid "TikTok: Order Synchronization Failure"
-msgstr ""
+msgstr "TikTok：订单同步失败"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_tiktok_shop__tiktok_cipher
 msgid "Tiktok Cipher"
-msgstr ""
+msgstr "Tiktok 加密标识"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,field_description:sale_tiktok.field_stock_picking__tiktok_label_attachment_id
 msgid "Tiktok Label Attachment"
-msgstr ""
+msgstr "Tiktok 标签附件"
 
 #. module: sale_tiktok
 #: model:ir.model,name:sale_tiktok.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "调拨"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__fbs_warehouse_id
@@ -1074,6 +1212,8 @@ msgid ""
 "directly to customers. If not set, your company's default warehouse will be "
 "used."
 msgstr ""
+"在卖家履约（FBS）计划下与 TikTok Shop 同步的仓库。请选择存放您直接发货给客户"
+"的产品仓库。若未设置，将使用您公司的默认仓库。"
 
 #. module: sale_tiktok
 #. odoo-python
@@ -1081,20 +1221,20 @@ msgstr ""
 msgid ""
 "We do not support syncing services or combo products to TikTok Shop. Only "
 "storable products are supported."
-msgstr ""
+msgstr "我们不支持将服务或组合产品同步到 TikTok Shop。仅支持可库存产品。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/controllers/onboarding.py:0
 msgid "You are not allowed to access this page."
-msgstr ""
+msgstr "您无权访问此页面。"
 
 #. module: sale_tiktok
 #: model:ir.model.constraint,message:sale_tiktok.constraint_tiktok_shop_unique_active_shop
 msgid ""
 "You cannot connect the same shop twice. Consider archiving the existing shop "
 "first."
-msgstr ""
+msgstr "无法重复连接同一商店。请先考虑归档现有商店。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__app_key
@@ -1103,6 +1243,8 @@ msgid ""
 "Center after creating an application. Enter this before authorizing the "
 "connection."
 msgstr ""
+"您的 TikTok 商店应用程序密钥。创建应用程序后，您可在 TikTok 合作伙伴中心中找"
+"到此密钥。在授权连接前请输入此密钥。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop__app_secret
@@ -1111,6 +1253,8 @@ msgid ""
 "Partner Center after creating an application. Enter this before authorizing "
 "the connection."
 msgstr ""
+"您的 TikTok 商店应用程序密钥。创建应用程序后，您可在 TikTok 合作伙伴中心中找"
+"到此密钥。在授权连接前请输入此密钥。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop_create_wizard__app_key
@@ -1119,6 +1263,8 @@ msgid ""
 "Center → Apps/Service after creating an application. Enter this before "
 "authorizing the connection."
 msgstr ""
+"您的 TikTok 应用程序密钥。创建应用程序后，您可在 TikTok Shop 合作伙伴中心 → "
+"应用/服务中找到此密钥。在授权连接前请输入此密钥。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop_create_wizard__app_secret
@@ -1127,6 +1273,8 @@ msgid ""
 "the TikTok Shop Partner Center → Apps/Service. Keep this confidential and "
 "enter it before authorizing the connection."
 msgstr ""
+"您的 TikTok 应用程序密钥。该密钥与应用密钥一同在 TikTok Shop 合作伙伴中心 → "
+"应用/服务中提供。请妥善保密，并在授权连接前完成填写。"
 
 #. module: sale_tiktok
 #: model:ir.model.fields,help:sale_tiktok.field_tiktok_shop_create_wizard__service_extern_id
@@ -1135,26 +1283,28 @@ msgid ""
 "→ Apps/Service at the top of the page called ID. Enter this before "
 "authorizing the connection."
 msgstr ""
+"您的 TikTok 服务 ID。您可在 TikTok Shop 合作伙伴中心 → 应用/服务页面顶部名称"
+"为 ID 的位置找到。请在授权连接前输入。"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "[%(sku)s] %(product_name)s"
-msgstr ""
+msgstr "[%(sku)s] %(product_name)s"
 
 #. module: sale_tiktok
 #: model_terms:ir.ui.view,arch_db:sale_tiktok.tiktok_shop_form
 msgid "e.g. Indonesian Shop"
-msgstr ""
+msgstr "例：印尼商店"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "shop_id"
-msgstr ""
+msgstr "shop_id"
 
 #. module: sale_tiktok
 #. odoo-python
 #: code:addons/sale_tiktok/models/tiktok_shop.py:0
 msgid "tiktok_shop_id"
-msgstr ""
+msgstr "tiktok_shop_id"

@@ -3,12 +3,13 @@ import { fields, models } from "@web/../tests/web_test_helpers";
 export class ProductProduct extends models.Model {
     tracking = fields.Selection({
         selection: [
-            ("serial", "By Unique Serial Number"),
-            ("lot", "By Lots"),
+            ["serial", "By Unique Serial Number"],
+            ["lot", "By Lots"],
         ],
     });
     use_expiration_date = fields.Boolean();
     is_storable = fields.Boolean();
+
     _records = [
         {
             id: 3,

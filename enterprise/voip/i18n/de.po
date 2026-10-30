@@ -15,11 +15,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:34+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/voip/"
-"de/>\n"
+"POT-Creation-Date: 2026-10-16 17:50+0000\n"
+"PO-Revision-Date: 2026-10-23 08:20+0000\n"
+"Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/voip/de/>"
+"\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -231,6 +231,11 @@ msgid ""
 "Linphone holds a single account, so scanning replaces the one already "
 "configured on that smartphone."
 msgstr ""
+"1) Installieren Sie Linphone auf Ihrem Smartphone\n"
+"2) Scannen Sie den QR-Code\n"
+"\n"
+"Linphone verfügt über ein einziges Konto, daher wird durch das Scannen das "
+"bereits auf diesem Smartphone konfigurierte Konto ersetzt."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
@@ -278,6 +283,32 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"                    Sehr geehrte(r) <t t-out=\"ctx.get('recipient_name')\"/"
+">,\n"
+"                   <br/><br/> \n"
+"                   <strong t-out=\"user.name\"/> hat eine Telefonnummer "
+"angefordert.\n"
+"                   <br/><br/> \n"
+"                   <t t-if=\"not is_html_empty(object.body_html)\">\n"
+"                        <span> Sie haben folgenden Kommentar hinzugefügt:</"
+"span>\n"
+"                        <div style=\"border-left: 4px solid #dee2e6; "
+"padding: 8px 0 8px 16px; margin: 1rem 0 2rem 0;\">\n"
+"                           <t t-out=\"object.body_html\"/>\n"
+"                        </div> \n"
+"                   </t>\n"
+"                    <a t-attf-style=\"background-color: "
+"{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px; "
+"text-decoration: none; color: {{user.company_id.email_primary_color or "
+"'#FFFFFF'}}; border-radius: 5px;\" href=\"/odoo/action-"
+"voip.action_voip_did_number\"> \n"
+"                        Nummer kaufen\n"
+"                   </a>\n"
+"                </p> \n"
+"           </div> \n"
+"        "
 
 #. module: voip
 #: model:mail.template,body_html:voip.mail_template_voicemail_message
@@ -479,6 +510,8 @@ msgid ""
 "<span class=\"text-nowrap\" invisible=\"voip_no_answer_destination_type != "
 "'forward'\">seconds to</span>"
 msgstr ""
+"<span class=\"text-nowrap\" invisible=\"voip_no_answer_destination_type != "
+"'forward'\">Sekunden an</span>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
@@ -494,6 +527,7 @@ msgstr "<span invisible=\"voip_busy_destination_type != 'forward'\">an</span>"
 msgid ""
 "<span invisible=\"voip_disconnected_destination_type != 'forward'\">to</span>"
 msgstr ""
+"<span invisible=\"voip_disconnected_destination_type != 'forward'\">an</span>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
@@ -541,13 +575,13 @@ msgstr "<span>Im Anrufablauf bearbeiten</span>"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "<span>invalid inputs or timeouts, play</span>"
-msgstr ""
+msgstr "<span>ungültige Eingaben oder Zeitlimits, Abspielen von</span>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "<span>seconds</span>"
-msgstr ""
+msgstr "<span> Sekunden</span>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_form
@@ -556,11 +590,14 @@ msgid ""
 "                                <span invisible=\"timeout != 0\">(no "
 "timeout)</span>"
 msgstr ""
+"<span>Sekunden</span>\n"
+"                                <span invisible=\"timeout != 0\">(kein "
+"Zeitlimit)</span>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "<strong>Example: </strong>"
-msgstr ""
+msgstr "<strong>Beispiel: </strong>"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -570,6 +607,13 @@ msgid ""
 "                    <strong>Update Requirements</strong> above and complete\n"
 "                    the identity verification step to activate this number."
 msgstr ""
+"<strong>Identitätsprüfung erforderlich.</strong>\n"
+"                    Diese Nummer wartet auf behördliche Genehmigung. Klicken "
+"Sie auf\n"
+"                   <strong>Anforderungen aktualisieren</strong> oben und "
+"schließen Sie\n"
+"                    den Schritt zur Identitätsprüfung ab, um diese Nummer zu "
+"aktivieren."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
@@ -578,6 +622,9 @@ msgid ""
 "                        Review and reply below within five business days to "
 "avoid automatic cancellation."
 msgstr ""
+"<strong>Weitere Informationen erforderlich.</strong>\n"
+"                        Bitte prüfen Sie die Angaben und antworten Sie "
+"innerhalb von fünf Werktagen, um eine automatische Stornierung zu vermeiden."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
@@ -586,6 +633,9 @@ msgid ""
 "                        You will not be charged until you approve a proposal "
 "and the request is fulfilled."
 msgstr ""
+"<strong>Odoo ermittelt Ihre Nummer.</strong>\n"
+"                        Es entstehen keine Kosten für Sie, bis Sie ein "
+"Angebot genehmigen und die Anfrage abgeschlossen ist."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -594,6 +644,9 @@ msgid ""
 "                    Review the latest chatter message, then return to Phone "
 "Numbers and search again."
 msgstr ""
+"<strong>Diese Anfrage ist fehlgeschlagen.</strong>\n"
+"                    Überprüfen Sie die letzte Chatter-Nachricht, kehren Sie "
+"dann zu „Telefonnummern“ zurück und suchen Sie erneut."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
@@ -601,6 +654,9 @@ msgid ""
 "<strong>This request could not be fulfilled.</strong>\n"
 "                        Review the latest message below for details."
 msgstr ""
+"<strong>Diese Anfrage konnte nicht erfüllt werden.</strong>\n"
+"                        Weitere Informationen finden Sie in der neuesten "
+"Nachricht unten."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
@@ -609,6 +665,9 @@ msgid ""
 "                        Phone numbers appear below as their individual "
 "orders complete."
 msgstr ""
+"<strong>Diese Anfrage wurde bearbeitet.</strong>\n"
+"                        Die Telefonnummern werden unten angezeigt, sobald "
+"die jeweiligen Anfragen abgeschlossen sind."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
@@ -622,6 +681,9 @@ msgid ""
 "                        Review any proposed numbers and reply below within "
 "five business days."
 msgstr ""
+"<strong>Ihre Entscheidung ist gefragt.</strong>\n"
+"                        Prüfen Sie alle vorgeschlagenen Nummern und "
+"antworten Sie innerhalb von fünf Werktagen unten."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -629,6 +691,9 @@ msgid ""
 "<strong>Your order is Under Review.</strong>\n"
 "                    You will be notified of any change via this chatter."
 msgstr ""
+"<strong>Ihre Anfrage wird derzeit geprüft.</strong>\n"
+"                    Über etwaige Änderungen werden Sie über diesen Chatter "
+"informiert."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -638,6 +703,11 @@ msgid ""
 "required document gets rejected.\n"
 "                    Update requirements until all documents are approved."
 msgstr ""
+"<strong>Ihre Anfrage wird derzeit geprüft.</strong>\n"
+"                    Sie erhalten über diesen Chatter eine Benachrichtigung, "
+"falls ein erforderliches Dokument abgelehnt wird.\n"
+"                    Passen Sie die Anforderungen an, bis alle Dokumente "
+"genehmigt sind."
 
 #. module: voip
 #. odoo-python
@@ -674,8 +744,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_call_leg_pbx_call_id_unique_per_conversation
 msgid "A PBX call id is unique within its conversation."
-msgstr ""
-"Eine Anruf-ID der TK-Anlage ist innerhalb einer Unterhaltung eindeutig."
+msgstr "Eine Anruf-ID der TK-Anlage ist innerhalb eines Gesprächs eindeutig."
 
 #. module: voip
 #. odoo-python
@@ -737,11 +806,12 @@ msgstr ""
 #: code:addons/voip/models/voip_voicemail.py:0
 msgid "A mailbox cannot be changed between personal and shared."
 msgstr ""
+"Eine Mailbox kann nicht zwischen „privat“ und „geteilt“ umgestellt werden."
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_voicemail_message_unique_event_id
 msgid "A mailbox message event is processed only once."
-msgstr ""
+msgstr "Eine Mailbox-Nachricht wird nur einmal verarbeitet."
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_ivr_menu_sound_unique
@@ -752,28 +822,39 @@ msgstr "Ein Menü-Sound kann nur zu einem Menü gehören."
 #. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "A node output can only be connected to one node."
-msgstr ""
+msgstr "Die Knotenausgabe kann nur mit einem Knoten verbunden werden."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "A node output is connected to an invalid node."
-msgstr ""
+msgstr "Eine Knotenausgabe ist mit einem ungültigen Knoten verbunden."
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_phone_service_event_unique_event_id
 msgid "A phone service event is processed only once."
+msgstr "Ein Telefondienst-Ereignis wird nur einmal verarbeitet."
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/pbx_service.py:0
+msgid "A tenant migration cannot reuse an identifier with a different mapping."
 msgstr ""
+"Bei der Migration einer VoIP-Instanz darf eine Kennung nicht einer anderen "
+"Zuordnung zugewiesen werden."
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_call_check_unique_control_handle_per_user
 msgid "A user can only have one live call per control handle and direction."
 msgstr ""
+"Ein Benutzer kann pro Steuerungskennung und -richtung nur einen aktiven "
+"Anruf haben."
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_call_unique_live_per_user_conversation
 msgid "A user can only have one live call per conversation and direction."
 msgstr ""
+"Ein Benutzer kann pro Gespräch und Richtung nur einen aktiven Anruf haben."
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_voicemail_unique_user_id
@@ -792,22 +873,22 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "Abort"
-msgstr ""
+msgstr "Abbrechen"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__abort_destination_ref
 msgid "Abort Destination"
-msgstr ""
+msgstr "Ziel abbrechen"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__abort_sound_id
 msgid "Abort Sound"
-msgstr ""
+msgstr "Ton abbrechen"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Abort after"
-msgstr ""
+msgstr "Abbrechen nach"
 
 #. module: voip
 #. odoo-javascript
@@ -996,23 +1077,25 @@ msgstr "Zusätzliche Adressangaben"
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__field_type__address
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_is_filled
 msgid "Address Filled"
-msgstr ""
+msgstr "Adresse ausgefüllt"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "Address Information"
-msgstr ""
+msgstr "Adressangaben"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_requirement.py:0
 msgid "Address should include either First and Last Name or Business Name."
 msgstr ""
+"Die Adresse sollte entweder Vor- und Nachnamen oder den Geschäftsnamen "
+"enthalten."
 
 #. module: voip
 #: model:ir.module.module,description:base.module_voip
@@ -1032,65 +1115,65 @@ msgstr "Administrator"
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "After"
-msgstr ""
+msgstr "Nach"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__resolved_agent_count
 msgid "Agent Count"
-msgstr ""
+msgstr "Anzahl Agenten"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue_agent__agent_number
 msgid "Agent Number"
-msgstr ""
+msgstr "Agentennummer"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__agent_timeout
 msgid "Agent Timeout"
-msgstr ""
+msgstr "Zeitlimit des Agenten"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__resolved_agent_user_ids
 msgid "Agent Users"
-msgstr ""
+msgstr "Agent-Benutzer"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__agent_ids
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_list
 msgid "Agents"
-msgstr ""
+msgstr "Agenten"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__all_day
 msgid "All Day"
-msgstr ""
+msgstr "Ganztägig"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_time_condition.py:0
 msgid "All day"
-msgstr ""
+msgstr "Ganztägig"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Allowed Agents"
-msgstr ""
+msgstr "Zulässige Agenten"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__allowed_call_group_ids
 msgid "Allowed Groups"
-msgstr ""
+msgstr "Zulässige Gruppen"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__allowed_user_ids
 msgid "Allowed Users"
-msgstr ""
+msgstr "Zulässige Benutzer"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/flow_node_palette.js:0
 msgid "Already added"
-msgstr ""
+msgstr "Bereits hinzugefügt"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__res_users_settings__how_to_call_on_mobile__ask
@@ -1107,6 +1190,7 @@ msgstr "Immer vor Anruf fragen"
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "An Outcall node must contain a valid extension."
 msgstr ""
+"Ein Knoten für ausgehende Anrufe muss eine gültige Nebenstelle enthalten."
 
 #. module: voip
 #. odoo-javascript
@@ -1138,32 +1222,40 @@ msgstr ""
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/pbx_service.py:0
+msgid "An older tenant migration mapping cannot replace the current mapping."
+msgstr ""
+"Eine ältere Zuordnung zur Instanz-Migration kann die aktuelle Zuordnung "
+"nicht ersetzen."
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/voip_call.py:0
 msgid "Answer"
-msgstr ""
+msgstr "Annehmen"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__answered_at
 msgid "Answered At"
-msgstr ""
+msgstr "Angenommen:"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Any day"
-msgstr ""
+msgstr "Beliebiger Tag"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Any month"
-msgstr ""
+msgstr "Beliebiger Monat"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/flow_node_configuration_dialog.js:0
 msgid "Apply"
-msgstr ""
+msgstr "Anwenden"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number__requirement_review_state__approved
@@ -1202,7 +1294,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__area_code
 msgid "Area Code"
-msgstr ""
+msgstr "Vorwahl"
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_mail_call_artifact_artifact_has_possessor
@@ -1255,7 +1347,7 @@ msgstr "Audiodatei"
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/audio_list_play/audio_list_play_field.js:0
 msgid "Audio Play"
-msgstr ""
+msgstr "Audio abspielen"
 
 #. module: voip
 #. odoo-javascript
@@ -1268,24 +1360,25 @@ msgstr "Audiodatei erfolgreich generiert."
 #: model:ir.model.fields,help:voip.field_voip_sound__data
 msgid "Audio file to play. Upload an uncompressed PCM WAV file."
 msgstr ""
+"Audiodatei zum Abspielen. Laden Sie eine unkomprimierte PCM-WAV-Datei hoch."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_sound.py:0
 msgid "Audio message file must be stored as bytes."
-msgstr ""
+msgstr "Die Audiodatei muss als Byte-Datei gespeichert werden."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/audio_binary/audio_binary_field.js:0
 msgid "Audio record field"
-msgstr ""
+msgstr "Feld für Audioaufnahme"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/audio_binary/audio_binary_field.js:0
 msgid "Audio recording is not supported in this browser."
-msgstr ""
+msgstr "Audioaufnahmen werden in diesem Browser nicht unterstützt."
 
 #. module: voip
 #. odoo-javascript
@@ -1297,13 +1390,13 @@ msgstr "Audioeinstellungen"
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "August"
-msgstr ""
+msgstr "August"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "Auto-select"
-msgstr ""
+msgstr "Automatisch auswählen"
 
 #. module: voip
 #. odoo-javascript
@@ -1356,38 +1449,40 @@ msgid ""
 "Bumped every time a Linphone bootstrap document is served, which invalidates "
 "every QR code issued before."
 msgstr ""
+"Wird bei jedem Aufruf eines Linphone-Bootstrap-Dokuments aktualisiert, "
+"wodurch alle zuvor ausgegebenen QR-Codes ungültig werden."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_business_name
 msgid "Business Name"
-msgstr ""
+msgstr "Geschäftsname"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/queue.js:0
 msgid "Busy"
-msgstr ""
+msgstr "Besetzt"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_busy_destination_type
 #: model:ir.model.fields,field_description:voip.field_voip_queue__busy_destination_ref
 msgid "Busy Destination"
-msgstr ""
+msgstr "Ziel besetzt"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_busy_destination_kind
 msgid "Busy Destination Kind"
-msgstr ""
+msgstr "Art des besetzten Ziels"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_busy_outcall_number
 msgid "Busy External Number"
-msgstr ""
+msgstr "Externe Nummer besetzt"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_busy_destination_ref
 msgid "Busy Internal Destination"
-msgstr ""
+msgstr "Interes Ziel besetzt"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_list_view
@@ -1407,6 +1502,7 @@ msgstr "Guthaben kaufen"
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/no_phone_number_card.xml:0
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
 msgid "Buy a Number"
 msgstr "Nummer kaufen"
 
@@ -1449,7 +1545,7 @@ msgstr "Anrufsartefakt"
 #. odoo-python
 #: code:addons/voip/models/voip_call.py:0
 msgid "Call Back"
-msgstr ""
+msgstr "Zurückrufen"
 
 #. module: voip
 #. odoo-javascript
@@ -1630,13 +1726,13 @@ msgstr "Anruf verweigert."
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/flow_node_categories.js:0
 msgid "Call routing"
-msgstr ""
+msgstr "Anrufsrouting"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "Call speakers"
-msgstr ""
+msgstr "Anrufslautsprecher"
 
 #. module: voip
 #. odoo-python
@@ -1795,7 +1891,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Cannot order more than %(max)s numbers at once."
-msgstr ""
+msgstr "Es können nicht mehr als %(max)s Nummern auf einmal bestellt werden."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__how_to_call_on_mobile
@@ -1809,25 +1905,25 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_city
 msgid "City"
-msgstr ""
+msgstr "Stadt"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/voip_document_dropzone_field.xml:0
 msgid "Clear"
-msgstr ""
+msgstr "Löschen"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.xml:0
 msgid "Clear all"
-msgstr ""
+msgstr "Alle löschen"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Click to Enable"
-msgstr ""
+msgstr "Hier aktivieren"
 
 #. module: voip
 #. odoo-javascript
@@ -1889,7 +1985,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request_wizard__body_html
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_provider__company_id
@@ -1901,14 +1997,14 @@ msgstr "Unternehmen"
 #: code:addons/voip/static/src/core/common/call_model.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_call__state__terminated
 msgid "Completed"
-msgstr ""
+msgstr "Beendet"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/common/call_model.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_call__state__completed_elsewhere
 msgid "Completed Elsewhere"
-msgstr ""
+msgstr "Anderswo beendet"
 
 #. module: voip
 #: model:ir.ui.menu,name:voip.menu_voip_call_configuration
@@ -1928,7 +2024,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/flow_node_configuration_dialog.js:0
 msgid "Configure node"
-msgstr ""
+msgstr "Knoten konfigurieren"
 
 #. module: voip
 #. odoo-javascript
@@ -1945,12 +2041,12 @@ msgstr "Weiterleitung bestätigen"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Connect"
-msgstr ""
+msgstr "Verbinden"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__agent_connect_code
 msgid "Connect Code"
-msgstr ""
+msgstr "Verbindungscode"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_provider_view
@@ -2025,12 +2121,12 @@ msgstr "Kontaktdaten"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
 msgid "Contact Odoo's Phone Carrier"
-msgstr ""
+msgstr "Telefonanbieter von Odoo kontaktieren"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_requirement__address_phone
 msgid "Contact phone for this address"
-msgstr ""
+msgstr "Kontakttelefonnummer für diese Adresse"
 
 #. module: voip
 #. odoo-javascript
@@ -2053,45 +2149,45 @@ msgstr "Fortfahren"
 #: model:ir.model.fields,field_description:voip.field_voip_call__conversation_id
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__conversation_id
 msgid "Conversation"
-msgstr ""
+msgstr "Gespräch"
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_conversation_check_conversation_identifier
 msgid "Conversation ID must be unique if set."
-msgstr ""
+msgstr "Die ID des Gesprächs muss eindeutig sein, falls festgelegt."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_conversation__conversation_identifier
 msgid "Conversation Identifier"
-msgstr ""
+msgstr "Gesprächs-ID"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call_leg__conversation_id
 msgid "Conversation this leg belongs to (grouped by PBX conversation_id)."
 msgstr ""
-"Unterhaltung, zu der diese Etappe gehört (gruppiert nach der Unterhaltungs-"
-"ID der TK-Anlage)."
+"Gespräch, zu dem diese Etappe gehört (gruppiert nach der Unterhaltungs-ID "
+"der TK-Anlage)."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "Copied!"
-msgstr ""
+msgstr "Kopiert!"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__cost
 msgid "Cost (Credits)"
-msgstr ""
+msgstr "Kosten (Guthaben)"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__cost_line_ids
 msgid "Cost Line"
-msgstr ""
+msgstr "Kostenzeile"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call__cost
 msgid "Cost of the call in Credits"
-msgstr ""
+msgstr "Kosten des Anrufs in Guthaben"
 
 #. module: voip
 #. odoo-python
@@ -2099,36 +2195,42 @@ msgstr ""
 msgid ""
 "Could not authenticate with the Odoo Phone Service. Please try again later."
 msgstr ""
+"Die Authentifizierung beim Odoo-Telefon-Dienst war nicht möglich. Bitte "
+"versuchen Sie es später erneut."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_requirement.py:0
 msgid "Could not find requirement id for URL generation."
 msgstr ""
+"Die Anforderungs-ID für die URL-Generierung konnte nicht gefunden werden."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "Could not place the order for %(count)d number(s): %(error)s"
 msgstr ""
+"Die Anfrage für %(count)d Nummer(n) konnte nicht aufgegeben werden: %(error)s"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/phone_service_api.py:0
 msgid "Could not reach the Odoo Phone Service. Please try again later."
 msgstr ""
+"Der Odoo-Telefon-Dienst konnte nicht erreicht werden. Bitte versuchen Sie es "
+"später erneut."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Could not refresh your queue memberships."
-msgstr ""
+msgstr "Ihre Warteschlangenzugehörigkeit konnten nicht aktualisiert werden"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Could not update your queue membership."
-msgstr ""
+msgstr "Ihre Warteschlangenzugehörigkeit konnte nicht aktualisiert werden."
 
 #. module: voip
 #. odoo-javascript
@@ -2166,13 +2268,13 @@ msgstr "Länderflagge"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__country_id_domain
 msgid "Country Id Domain"
-msgstr ""
+msgstr "Ländercode-Domain"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_result_line__country_id
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_wizard__country_id
 msgid "Country prefix of the phone number"
-msgstr ""
+msgstr "Ländervorwahl des Telefons"
 
 #. module: voip
 #. odoo-javascript
@@ -2212,6 +2314,10 @@ msgid ""
 "                A good practice is at least to create an extension for all "
 "users who will make or receive calls."
 msgstr ""
+"Erstellen Sie eine Nebenstelle, um einen Benutzer, eine Gruppe oder eine "
+"Warteschlange intern anrufen zu können.\n"
+"                Es empfiehlt sich, zumindest für alle Benutzer, die Anrufe "
+"tätigen oder entgegennehmen, eine Nebenstelle anzulegen."
 
 #. module: voip
 #. odoo-javascript
@@ -2222,7 +2328,7 @@ msgstr "Geöffneten Zeitraum erstellen"
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_music_on_hold
 msgid "Create your first music on hold playlist"
-msgstr ""
+msgstr "Erstellen Sie Ihre erste Warteschleifen-Playlist"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__create_uid
@@ -2296,12 +2402,13 @@ msgstr "Anmeldedaten"
 #: model:iap.service,unit_name:voip.iap_service_phone_service
 #: model:ir.model.fields,field_description:voip.field_voip_call_cost_line__credits
 msgid "Credits"
-msgstr ""
+msgstr "Guthaben"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_requirement_group__status
 msgid "Current phone_service approval status of the requirement group."
 msgstr ""
+"Aktueller Status der Genehmigungen für phone_service der Anforderungsgruppe."
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_did_number_search_result_line
@@ -2317,7 +2424,7 @@ msgstr "Assistent zur Durchwahlnummernsuche"
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__data_version
 #: model:ir.model.fields,field_description:voip.field_voip_sound__data_version
 msgid "Data Version"
-msgstr ""
+msgstr "Datenversion"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_tree_view
@@ -2331,13 +2438,19 @@ msgstr "Datum"
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Date:"
-msgstr ""
+msgstr "Datum:"
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Dear %(name)s,"
+msgstr "Guten Tag %(name)s,"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "December"
-msgstr ""
+msgstr "Dezember"
 
 #. module: voip
 #. odoo-python
@@ -2426,22 +2539,26 @@ msgstr "Ziel"
 #: model:ir.model.fields,field_description:voip.field_voip_extension__destination_type
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_search
 msgid "Destination Type"
-msgstr ""
+msgstr "Zieltyp"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Destinations"
-msgstr ""
+msgstr "Ziele"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_queue__agent_connect_code
 msgid "Dial this code in Odoo Phone to connect to this queue."
 msgstr ""
+"Wählen Sie diesen Code in Odoo Telefon, um sich mit dieser Warteschlange zu "
+"verbinden."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_queue__agent_disconnect_code
 msgid "Dial this code in Odoo Phone to disconnect from this queue."
 msgstr ""
+"Wählen Sie diesen Code in Odoo Telefon, um die Verbindung zu dieser "
+"Warteschlange zu trennen."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__did_number_id
@@ -2458,7 +2575,7 @@ msgstr "Art der Durchwahlnummer"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr_option__digit
 msgid "Digit"
-msgstr ""
+msgstr "Ziffer"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__direction
@@ -2480,12 +2597,12 @@ msgstr "Verwerfen"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Disconnect"
-msgstr ""
+msgstr "Trennen"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__agent_disconnect_code
 msgid "Disconnect Code"
-msgstr ""
+msgstr "Trennungscode"
 
 #. module: voip
 #. odoo-javascript
@@ -2493,27 +2610,27 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_queue_status__disconnected
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue_agent__status__logged_out
 msgid "Disconnected"
-msgstr ""
+msgstr "Getrennt"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_disconnected_destination_type
 msgid "Disconnected Destination"
-msgstr ""
+msgstr "Getrenntes Ziel"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_disconnected_destination_kind
 msgid "Disconnected Destination Kind"
-msgstr ""
+msgstr "Art des getrennten Ziels"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_disconnected_outcall_number
 msgid "Disconnected External Number"
-msgstr ""
+msgstr "Getrennte externe Nummer"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_disconnected_destination_ref
 msgid "Disconnected Internal Destination"
-msgstr ""
+msgstr "Getrenntes internes Ziel"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__display_name
@@ -2584,7 +2701,7 @@ msgstr "Bitte nicht stören bis %(time)s"
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Do Not Disturb until I turn it off"
-msgstr ""
+msgstr "Bitte nicht stören, bis ich die Funktion deaktiviere"
 
 #. module: voip
 #. odoo-javascript
@@ -2595,22 +2712,22 @@ msgstr "Möchten Sie, dass man Sie im Anruf hört?"
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__field_type__document
 msgid "Document"
-msgstr ""
+msgstr "Dokument"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__document_file
 msgid "Document File"
-msgstr ""
+msgstr "Dokumentdatei"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "Document Requirement"
-msgstr ""
+msgstr "Dokumentanforderung"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "Doe"
-msgstr ""
+msgstr "Doe"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_busy_destination_type__none
@@ -2620,7 +2737,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__res_users_settings__voip_disconnected_destination_type__none
 #: model:ir.model.fields.selection,name:voip.selection__res_users_settings__voip_no_answer_destination_type__none
 msgid "Don't Forward"
-msgstr ""
+msgstr "Nicht weiterleiten"
 
 #. module: voip
 #. odoo-javascript
@@ -2639,13 +2756,13 @@ msgstr "Herunterladen"
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/voip_document_dropzone_field.xml:0
 msgid "Drag and drop a document"
-msgstr ""
+msgstr "Dokument per Drag & Drop hochladen"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/voip_document_dropzone_field.xml:0
 msgid "Drag and drop to replace"
-msgstr ""
+msgstr "Zum Ersetzen per Drag & Drop ziehen"
 
 #. module: voip
 #. odoo-javascript
@@ -2695,11 +2812,13 @@ msgid ""
 "Each Phone user has one personal mailbox, accessible by long-pressing 1 in "
 "Odoo Phone."
 msgstr ""
+"Jeder Telefon-Benutzer verfügt über eine persönliche Mailbox, auf die durch "
+"langes Drücken der 1 in Odoo Telefon zugegriffen werden kann."
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_ivr_option_ivr_digit_unique
 msgid "Each digit can only be configured once per IVR."
-msgstr ""
+msgstr "Jede Ziffer kann pro Sprachmenü nur einmal konfiguriert werden."
 
 #. module: voip
 #. odoo-javascript
@@ -2715,18 +2834,18 @@ msgstr "Tatsächliches Startdatum"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__email_queued_at
 msgid "Email Queued At"
-msgstr ""
+msgstr "E-Mail in der Warteschlange bei"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_search
 msgid "Empty Groups"
-msgstr ""
+msgstr "Leere Gruppen"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "Enable Audio"
-msgstr ""
+msgstr "Audio aktivieren"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__end_date
@@ -2737,12 +2856,12 @@ msgstr "Enddatum"
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/hangup.js:0
 msgid "End the current call."
-msgstr ""
+msgstr "Beenden Sie den aktuellen Anruf."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__ended_at
 msgid "Ended At"
-msgstr ""
+msgstr "Beendet um"
 
 #. module: voip
 #. odoo-javascript
@@ -2765,25 +2884,26 @@ msgstr "Vom Administrator erzwungen"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "England"
-msgstr ""
+msgstr "England"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/outcall.js:0
 msgid "Enter a valid extension before applying."
-msgstr ""
+msgstr "Geben Sie vor der Anwendung eine gültige Nebenstelle ein."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/res_users_settings.py:0
 msgid "Enter an extension number from 100 to 9999."
-msgstr ""
+msgstr "Geben Sie eine Nebenstellennummer zwischen 100 und 9999 ein."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/res_users_settings.py:0
 msgid "Enter an external number in E.164 format, for example +32471234567."
 msgstr ""
+"Geben Sie eine externe Nummer im E.164-Format ein, zum Beispiel +32471234567."
 
 #. module: voip
 #. odoo-python
@@ -2791,6 +2911,8 @@ msgstr ""
 #: model:ir.model.fields,help:voip.field_res_users_settings__voip_no_answer_immediate_destination
 msgid "Enter an internal extension or an external number in E.164 format."
 msgstr ""
+"Geben Sie eine interne Nebenstelle oder eine externe Nummer im E.164-Format "
+"ein."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users__external_device_number
@@ -2809,24 +2931,24 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/start.js:0
 msgid "Entry point of the flow."
-msgstr ""
+msgstr "Einstiegspunkt des Ablaufs."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_cost_line__event_id
 #: model:ir.model.fields,field_description:voip.field_voip_phone_service_event__event_id
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__event_id
 msgid "Event"
-msgstr ""
+msgstr "Ereignis"
 
 #. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_call_cost_line_check_unique_event_id
 msgid "Event ID must be unique"
-msgstr ""
+msgstr "Die Ereignis-ID muss eindeutig sein"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_phone_service_event__event_type
 msgid "Event Type"
-msgstr ""
+msgstr "Ereignistyp"
 
 #. module: voip
 #. odoo-python
@@ -2843,7 +2965,7 @@ msgstr "Jeder Anrufablaufsknoten muss eine gültige ID haben."
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__example
 msgid "Example"
-msgstr ""
+msgstr "Beispiel"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_call_flow_window
@@ -2853,7 +2975,7 @@ msgstr "Beispiel eines konfigurierten Anrufablaufs."
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement_group__status__expired
 msgid "Expired"
-msgstr ""
+msgstr "Abgelaufen"
 
 #. module: voip
 #. odoo-javascript
@@ -2891,13 +3013,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_list
 msgid "Extension"
-msgstr ""
+msgstr "Nebenstelle"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/extension_destination_field.js:0
 msgid "Extension Destination"
-msgstr ""
+msgstr "Ziel der Nebenstelle"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__routing_extension_id
@@ -2905,14 +3027,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_extension_destination_mixin__routing_extension_id
 #: model:ir.model.fields,field_description:voip.field_voip_queue__routing_extension_id
 msgid "Extension Record"
-msgstr ""
+msgstr "Nebenstellen-Datensatz"
 
 #. module: voip
 #: model:ir.actions.act_window,name:voip.action_voip_extension
 #: model:ir.ui.menu,name:voip.voip_extension_menu
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_list
 msgid "Extensions"
-msgstr ""
+msgstr "Nebenstellen"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_busy_destination_kind__external
@@ -2932,13 +3054,15 @@ msgid ""
 "External calls are unavailable because no active company phone number is "
 "configured."
 msgstr ""
+"Externe Anrufe sind nicht möglich, da keine aktive Telefonnummer "
+"konfiguriert ist."
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_request__state__failed
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_search_view
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_view
 msgid "Failed"
-msgstr ""
+msgstr "Fehlgeschlagen"
 
 #. module: voip
 #. odoo-python
@@ -2988,54 +3112,54 @@ msgstr "Aufnahme konnte nicht hochgeladen werden"
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number__state__failure
 msgid "Failure"
-msgstr ""
+msgstr "Fehler"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Fallback Destinations"
-msgstr ""
+msgstr "Ausweichsziele"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "February"
-msgstr ""
+msgstr "Februar"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__fewestcalls
 msgid "Fewest Calls"
-msgstr ""
+msgstr "Wenigste Anrufe"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__data
 #: model:ir.model.fields,field_description:voip.field_voip_sound__data
 #: model_terms:ir.ui.view,arch_db:voip.voip_sound_view_list
 msgid "File"
-msgstr ""
+msgstr "Datei"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/voip_document_dropzone_field.xml:0
 msgid "File Uploaded:"
-msgstr ""
+msgstr "Datei hochgeladen:"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__data_filename
 #: model:ir.model.fields,field_description:voip.field_voip_music_on_hold_track__filename
 #: model:ir.model.fields,field_description:voip.field_voip_sound__data_filename
 msgid "Filename"
-msgstr ""
+msgstr "Dateiname"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__requirement_ids
 msgid "Fill in the required information"
-msgstr ""
+msgstr "Geben Sie die erforderlichen Informationen ein"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_list
 msgid "Fill requirement"
-msgstr ""
+msgstr "Anforderung erfüllen"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_wizard__consecutive
@@ -3047,41 +3171,41 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__selected_prorated_total
 msgid "First Month (prorated)"
-msgstr ""
+msgstr "Erster Monat (anteilig)"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_first_name
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "First Name"
-msgstr ""
+msgstr "Vorname"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/flow_editor/flow_editor.js:0
 msgid "Fit to content"
-msgstr ""
+msgstr "An Inhalt anpassen"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/flow_node_categories.js:0
 msgid "Flow control"
-msgstr ""
+msgstr "Ablaufskontrolle"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/flow_editor/flow_editor.js:0
 msgid "Flow editor"
-msgstr ""
+msgstr "Ablauf-Editor"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__folder_name
 msgid "Folder Name"
-msgstr ""
+msgstr "Ordnername"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__folder_type
 msgid "Folder Type"
-msgstr ""
+msgstr "Ordnertyp"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__message_follower_ids
@@ -3102,18 +3226,23 @@ msgstr "Follower (Partner)"
 msgid ""
 "For action requirements, the specific DID number this verification is for"
 msgstr ""
+"Für die erforderlichen Maßnahmen: die spezifische Durchwahlummer, für die "
+"diese Verifizierung gilt"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_sound.py:0
 msgid "For text-to-speech sounds, both Text and Voice must be set."
 msgstr ""
+"Für die Text-in-Sprache-Wiedergabe müssen sowohl „Text“ als auch „Sprache“ "
+"eingestellt sein."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_sound.py:0
 msgid "For uploaded sounds, an audio file must be provided."
 msgstr ""
+"Für hochgeladene Tonaufnahmen muss eine Audiodatei bereitgestellt werden."
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_provider__recording_policy__always
@@ -3130,12 +3259,12 @@ msgstr ""
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "Form Filling"
-msgstr ""
+msgstr "Formularausfüllung"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_result_line__price_display
 msgid "Formatted price display"
-msgstr ""
+msgstr "Formatierte Preisangabe"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_busy_destination_type__forward
@@ -3147,53 +3276,54 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 msgid "Forward"
-msgstr ""
+msgstr "Weiterleiten"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/views/fields/time_condition_period_autocomplete/time_condition_period_autocomplete.js:0
 msgid "Friday"
-msgstr ""
+msgstr "Freitag"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
 msgid "From"
-msgstr ""
+msgstr "Von"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__is_fulfilled
 msgid "Fulfilled"
-msgstr ""
+msgstr "Erfüllt"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/tts_generate/tts_generate_field.js:0
 msgid "Generate"
-msgstr ""
+msgstr "Generieren"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_sound.py:0
 msgid "Generate the audio before saving the text-to-speech sound."
 msgstr ""
+"Generieren Sie die Audiodatei, bevor Sie die Text-in-Sprache-Datei speichern."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__generated_tts_text
 #: model:ir.model.fields,field_description:voip.field_voip_sound__generated_tts_text
 msgid "Generated Tts Text"
-msgstr ""
+msgstr "Generierter Text-in-Sprache-Text"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__generated_tts_voice
 #: model:ir.model.fields,field_description:voip.field_voip_sound__generated_tts_voice
 msgid "Generated Tts Voice"
-msgstr ""
+msgstr "Generierter Text-in-Sprache-Stimme"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/tts_generate/tts_generate_field.js:0
 msgid "Generating..."
-msgstr ""
+msgstr "Generieren …"
 
 #. module: voip
 #. odoo-javascript
@@ -3210,17 +3340,17 @@ msgstr "Zu den allgemeinen Einstellungen"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_flow__graph_data
 msgid "Graph Data"
-msgstr ""
+msgstr "Diagrammdaten"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Greeting"
-msgstr ""
+msgstr "Begrüßung"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__greeting_sound_id
 msgid "Greeting Sound"
-msgstr ""
+msgstr "Begrüßungston"
 
 #. module: voip
 #. odoo-javascript
@@ -3252,7 +3382,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_call_group
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_form
 msgid "Group"
-msgstr ""
+msgstr "Gruppe"
 
 #. module: voip
 #: model:ir.actions.act_window,name:voip.action_voip_call_group
@@ -3260,7 +3390,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_list
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_search
 msgid "Groups"
-msgstr ""
+msgstr "Gruppen"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_call_group
@@ -3289,7 +3419,7 @@ msgstr "Bearbeitet"
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/hangup.js:0
 msgid "Hang Up"
-msgstr ""
+msgstr "Auflegen"
 
 #. module: voip
 #. odoo-javascript
@@ -3313,7 +3443,7 @@ msgstr "Hat zugewiesene Durchwahlnummer"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__has_available_types
 msgid "Has Available Types"
-msgstr ""
+msgstr "Hat verfügbare Typen"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__has_message
@@ -3349,7 +3479,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_extension_destination_mixin__has_routing_extension
 #: model:ir.model.fields,field_description:voip.field_voip_queue__has_routing_extension
 msgid "Has Routing Extension"
-msgstr ""
+msgstr "Hat Routing-Nebenstelle"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__has_searched
@@ -3419,6 +3549,7 @@ msgstr "Wie Anrufe auf Handy tätigen"
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
 msgid "I have updated the proof of address with a more recent bill..."
 msgstr ""
+"Ich habe den Adressnachweis mit einer aktuelleren Rechnung aktualisiert …"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_ir_config_parameter__id
@@ -3548,7 +3679,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__res_users__voip_queue_status__in_call
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue_agent__status__in_call
 msgid "In Call"
-msgstr ""
+msgstr "In Anruf"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_music_on_hold__sort__alphabetical
@@ -3588,14 +3719,15 @@ msgstr "Eingehender Anruf …"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__input_count
 msgid "Input Count"
-msgstr ""
+msgstr "Anzahl Eingaben"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__option_ids
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_list
+#, fuzzy
 msgid "Inputs"
-msgstr ""
+msgstr "Eingaben"
 
 #. module: voip
 #. odoo-python
@@ -3616,6 +3748,8 @@ msgid ""
 "Internal and external calls are unavailable until Odoo Phone is activated "
 "and the user is configured."
 msgstr ""
+"Interne und externe Anrufe sind erst verfügbar, wenn Odoo Telefon aktiviert "
+"und der Benutzer konfiguriert ist."
 
 #. module: voip
 #. odoo-javascript
@@ -3642,6 +3776,8 @@ msgid ""
 "Internal calls are available through extension %(extension)s. An active "
 "company number is required for external calls."
 msgstr ""
+"Interne Anrufe sind über die Nebenstelle %(extension)s möglich. Für externe "
+"Anrufe ist eine aktive Unternehmensnummer erforderlich."
 
 #. module: voip
 #. odoo-javascript
@@ -3650,6 +3786,8 @@ msgid ""
 "Internal calls are available through your extension. Get a company number to "
 "make and receive external calls."
 msgstr ""
+"Interne Anrufe sind über Ihre Nebenstelle möglich. Beantragen Sie eine "
+"Unternehmensnummer, um externe Anrufe zu tätigen und entgegenzunehmen."
 
 #. module: voip
 #. odoo-javascript
@@ -3658,6 +3796,8 @@ msgid ""
 "Internal calls are available. An active company number is required for "
 "external calls."
 msgstr ""
+"Interne Anrufe sind möglich. Für externe Anrufe ist eine aktive "
+"Unternehmensnummer erforderlich."
 
 #. module: voip
 #. odoo-javascript
@@ -3665,6 +3805,8 @@ msgstr ""
 msgid ""
 "Internal calls are available. External calls require an active phone number."
 msgstr ""
+"Interne Anrufe sind möglich. Für externe Anrufe ist eine aktive "
+"Telefonnummer erforderlich."
 
 #. module: voip
 #. odoo-javascript
@@ -3673,6 +3815,8 @@ msgid ""
 "Internal calls are available. External calls will be available once your "
 "number is approved."
 msgstr ""
+"Interne Anrufe sind möglich. Externe Anrufe sind möglich, sobald die "
+"Genehmigungen für Ihre Nummer erteilt sind."
 
 #. module: voip
 #. odoo-javascript
@@ -3681,33 +3825,35 @@ msgid ""
 "Internal calls are available. External calls will resume once your number is "
 "reactivated."
 msgstr ""
+"Interne Anrufe sind möglich. Externe Anrufe sind wieder möglich, sobald Ihre "
+"Nummer reaktiviert wurde."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Internal calls only"
-msgstr ""
+msgstr "Nur interne Anrufe"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "Invalid"
-msgstr ""
+msgstr "Ungültig"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__invalid_destination_ref
 msgid "Invalid Destination"
-msgstr ""
+msgstr "Ungültiges Ziel"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Invalid Input"
-msgstr ""
+msgstr "Ungültige Eingabe"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__invalid_sound_id
 msgid "Invalid Sound"
-msgstr ""
+msgstr "Ungültiger Ton"
 
 #. module: voip
 #. odoo-python
@@ -3719,12 +3865,12 @@ msgstr "Ungültiger VOIP-Nachrichtentyp: %(type)s"
 #. odoo-python
 #: code:addons/voip/models/voip_time_condition.py:0
 msgid "Invalid hours"
-msgstr ""
+msgstr "Ungültige Uhrzeiten"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__is_audio_message
 msgid "Is Audio Message"
-msgstr ""
+msgstr "Ist Audio-Nachricht"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_partner__is_call_flow_node_configuration
@@ -3743,7 +3889,7 @@ msgstr "Ist Konfiguration des Anrufablaufsknotens"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__is_current_user_agent
 msgid "Is Current User Agent"
-msgstr ""
+msgstr "Ist aktueller Benutzer-Agent"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__is_current_user_logged
@@ -3753,7 +3899,7 @@ msgstr "Ist der aktuelle Benutzer angemeldet?"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail_message__is_empty
 msgid "Is Empty"
-msgstr ""
+msgstr "Ist leer"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__message_is_follower
@@ -3766,7 +3912,7 @@ msgstr "Ist Follower"
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__uses_odoo_provider
 #: model:ir.model.fields,field_description:voip.field_voip_provider__is_odoo_provider
 msgid "Is Odoo Provider"
-msgstr ""
+msgstr "Ist Odoo-Anbieter"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__is_within_same_company
@@ -3786,7 +3932,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr_option__ivr_id
 msgid "Ivr"
-msgstr ""
+msgstr "Sprachmenü"
 
 #. module: voip
 #. odoo-javascript
@@ -3933,7 +4079,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__leastrecent
 msgid "Least Recent"
-msgstr ""
+msgstr "Am längsten ohne Anruf"
 
 #. module: voip
 #. odoo-javascript
@@ -3966,7 +4112,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__linear
 msgid "Linear"
-msgstr ""
+msgstr "Linear"
 
 #. module: voip
 #. odoo-javascript
@@ -4158,7 +4304,7 @@ msgstr "Als erledigt markieren"
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material-Symbols-Icon, z. B. Checkliste"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__max_tries
@@ -4174,6 +4320,8 @@ msgstr ""
 #: model:ir.model.fields,help:voip.field_voip_queue__max_waiting_calls
 msgid "Maximum number of calls waiting in the queue. Set to 0 for no limit."
 msgstr ""
+"Maximale Anzahl an Anrufen, die in der Warteschlange stehen dürfen. Setzen "
+"Sie den Wert auf 0, um kein Limit festzulegen."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_queue__queue_timeout
@@ -4181,6 +4329,8 @@ msgid ""
 "Maximum number of seconds a call may remain in the queue. Set to 0 for no "
 "timeout."
 msgstr ""
+"Maximale Anzahl Sekunden, die ein Anruf in der Warteschlange verbleiben "
+"darf. Setzen Sie den Wert auf 0, um kein Zeitlimit festzulegen."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call_group__timeout
@@ -4188,6 +4338,8 @@ msgid ""
 "Maximum number of seconds the call may remain in this group. Set to 0 for no "
 "timeout."
 msgstr ""
+"Maximale Anzahl Sekunden, die der Anruf in dieser Gruppe verbleiben darf. "
+"Setzen Sie den Wert auf 0, um kein Zeitlimit festzulegen."
 
 #. module: voip
 #. odoo-javascript
@@ -4228,7 +4380,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__menu_sound_id
 msgid "Menu Sound"
-msgstr ""
+msgstr "Menü-Ton"
 
 #. module: voip
 #: model:ir.actions.act_window,name:voip.action_voip_ivr
@@ -4243,13 +4395,13 @@ msgid ""
 "Menus (also called IVRs) ask callers to press certain digits to progress in "
 "the call flow."
 msgstr ""
-"Menüs (auch IVRs genannt) fordern Anrufer auf, bestimmte Ziffern zu drücken, "
-"um im Anrufablauf voranzukommen."
+"Sprachmenüs (auch IVRs genannt) fordern Anrufer auf, bestimmte Ziffern zu "
+"drücken, um im Anrufablauf voranzukommen."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__new_comment
 msgid "Message"
-msgstr ""
+msgstr "Nachricht"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_voicemail__message_count
@@ -4342,7 +4494,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__month_days
 msgid "Month Days"
-msgstr ""
+msgstr "Monatstage"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_result_line__monthly_cost
@@ -4361,6 +4513,9 @@ msgid ""
 "More information is required for this number request. Review and reply "
 "within five business days to avoid automatic cancellation."
 msgstr ""
+"Für diese Nummernanfrage sind weitere Informationen erforderlich. Bitte "
+"prüfen Sie die Anfrage und antworten Sie innerhalb von fünf Werktagen, um "
+"eine automatische Stornierung zu vermeiden."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
@@ -4454,7 +4609,7 @@ msgstr ""
 #. module: voip
 #: model:mail.template,subject:voip.mail_template_voicemail_message
 msgid "New mailbox message in {{ object.voicemail_id.name }}"
-msgstr ""
+msgstr "Neue Mailbox-Nachricht in {{ object.voicemail_id.name }}"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_voicemail__email
@@ -4493,29 +4648,29 @@ msgstr ""
 #: code:addons/voip/static/src/flow_editor/node_types/call_group.js:0
 #: code:addons/voip/static/src/flow_editor/node_types/queue.js:0
 msgid "No Answer"
-msgstr ""
+msgstr "Nichtannahme"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_no_answer_destination_type
 #: model:ir.model.fields,field_description:voip.field_voip_call_group__no_answer_destination_ref
 #: model:ir.model.fields,field_description:voip.field_voip_queue__no_answer_destination_ref
 msgid "No Answer Destination"
-msgstr ""
+msgstr "Nichtannahme bei Ziel"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_no_answer_destination_kind
 msgid "No Answer Destination Kind"
-msgstr ""
+msgstr "Art des Ziels der Nichtannahme"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_no_answer_outcall_number
 msgid "No Answer External Number"
-msgstr ""
+msgstr "Nichtannahme bei externer Nummer"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_no_answer_destination_ref
 msgid "No Answer Internal Destination"
-msgstr ""
+msgstr "Nichtannahme bei internem Ziel"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.voip_call_view
@@ -4527,7 +4682,7 @@ msgstr ""
 #: code:addons/voip/static/src/flow_editor/node_types/terminal_record_flow_node.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue_agent__status__unavailable
 msgid "No Device Detected"
-msgstr ""
+msgstr "Kein Gerät entdeckt"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement_group__status__no_longer_eligible
@@ -4543,7 +4698,7 @@ msgstr "Noch keine Telefonnummern"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "No Sound"
-msgstr ""
+msgstr "Kein Ton"
 
 #. module: voip
 #. odoo-javascript
@@ -4554,7 +4709,7 @@ msgstr "Keine aktive Telefonnummer"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_no_answer_timeout
 msgid "No answer after"
-msgstr "Keine Antwort nach"
+msgstr "Nicht angenommen nach"
 
 #. module: voip
 #. odoo-javascript
@@ -4636,6 +4791,11 @@ msgstr "Keine Knoten"
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "No number"
 msgstr "Keine Nummer"
+
+#. module: voip
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
+msgid "No number requests found"
+msgstr "Es wurden keine Nummernanfragen gefunden"
 
 #. module: voip
 #. odoo-python
@@ -4783,19 +4943,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__number_request
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
 msgid "Number Request"
-msgstr ""
+msgstr "Nummeranfrage"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__number_request_uuid
 msgid "Number Request Uuid"
-msgstr ""
+msgstr "UUID der Nummernanfrage"
 
 #. module: voip
 #: model:ir.actions.act_window,name:voip.action_voip_did_number_request
 #: model:ir.ui.menu,name:voip.voip_did_number_request_menu
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_list_view
 msgid "Number Requests"
-msgstr ""
+msgstr "Nummeranfragen"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__did_number_type
@@ -4859,6 +5019,10 @@ msgid ""
 "replaying the menu, redirecting the call to the timeout destination (if set) "
 "or aborting the call (if the maximum number of tries has been reached)."
 msgstr ""
+"Anzahl Sekunden, die nach dem Abspielen des Menü-Signaltons gewartet werden "
+"soll, bevor entweder das Menü erneut abgespielt wird, der Anruf an das Ziel "
+"des Zeitlimits weitergeleitet (sofern festgelegt) oder der Anruf abgebrochen "
+"wird (sofern die maximale Anzahl an Versuchen erreicht wurde)."
 
 #. module: voip
 #. odoo-python
@@ -4875,13 +5039,14 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_search_wizard__step__number_request
 msgid "Number request"
-msgstr ""
+msgstr "Nummeranfrage"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "Number requests are available only when a search finds no numbers."
 msgstr ""
+"Nummernanfragen sind nur verfügbar, wenn eine Suche keine Nummern findet."
 
 #. module: voip
 #. odoo-python
@@ -4890,12 +5055,15 @@ msgid ""
 "Number requests are not available for toll-free numbers in Canada or the "
 "United States."
 msgstr ""
+"Nummernanfragen sind für gebührenfreie Nummern in Kanada oder den "
+"Vereinigten Staaten nicht möglich."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "Number requests support a numeric prefix of at most 3 digits."
 msgstr ""
+"Nummernanfragen unterstützen ein numerisches Präfix von maximal 3 Ziffern."
 
 #. module: voip
 #. odoo-javascript
@@ -4952,6 +5120,12 @@ msgid "Odoo Phone Service"
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Odoo Phone Team"
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_service.js:0
 msgid "Odoo Phone is unavailable until your user is fully configured."
@@ -4974,14 +5148,14 @@ msgstr "Beauftragter"
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 #: model_terms:ir.ui.view,arch_db:voip.voip_res_users_settings_view_form
 msgid "On Busy"
-msgstr "Bei „Beschäftigt“"
+msgstr "Bei „Besetzt“"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 #: model_terms:ir.ui.view,arch_db:voip.voip_res_users_settings_view_form
 msgid "On Disconnected"
-msgstr ""
+msgstr "Bei „"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_request__state__hold
@@ -4999,14 +5173,14 @@ msgstr "Mobil"
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 #: model_terms:ir.ui.view,arch_db:voip.voip_res_users_settings_view_form
 msgid "On No Answer"
-msgstr "Bei „Keine Antwort“"
+msgstr "Bei „Nichtannahme“"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/terminal_record_flow_node.js:0
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue_agent__status__paused
 msgid "On Pause"
-msgstr ""
+msgstr "Pausiert"
 
 #. module: voip
 #. odoo-javascript
@@ -5022,6 +5196,9 @@ msgid ""
 "a fallback outgoing number for users who have an extension and no phone "
 "number."
 msgstr ""
+"Eine (und nur eine) Nummer muss als Standard-Ausgangsnummer festgelegt "
+"werden. Sie dient als Ausweichnummer für Benutzer, die über eine Durchwahl, "
+"aber keine Telefonnummer verfügen."
 
 #. module: voip
 #. odoo-javascript
@@ -5053,6 +5230,8 @@ msgstr ""
 #: code:addons/voip/models/voip_queue.py:0
 msgid "Only agents assigned to this queue can join or leave it."
 msgstr ""
+"Nur Agenten, die dieser Warteschlange zugewiesen sind, können ihr beitreten "
+"oder sie verlassen."
 
 #. module: voip
 #. odoo-python
@@ -5107,7 +5286,7 @@ msgstr ""
 #: code:addons/voip/static/src/flow_editor/node_types/ivr.js:0
 #: code:addons/voip/static/src/flow_editor/node_types/terminal_record_flow_node.js:0
 msgid "Open a Menu"
-msgstr ""
+msgstr "Menü öffnen"
 
 #. module: voip
 #. odoo-javascript
@@ -5134,22 +5313,25 @@ msgid ""
 "enter a menu input while it is playing and must wait for the menu sound to "
 "start."
 msgstr ""
+"Optionale Einleitung, die einmal vor dem Menüton abgespielt wird. Anrufer "
+"können während der Wiedergabe keine Menüeingabe vornehmen und müssen warten, "
+"bis der Menüton einsetzt."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Options"
-msgstr ""
+msgstr "Optionen"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_request__state__ordered
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_search_view
 msgid "Ordered"
-msgstr ""
+msgstr "Angefordert"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number__state__ordering
 msgid "Ordering"
-msgstr ""
+msgstr "Wurde angefordert"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_call__direction__outgoing
@@ -5323,8 +5505,8 @@ msgstr ""
 msgid ""
 "PBX conversation id grouping the call's SIP legs (Wazo conversation_id)."
 msgstr ""
-"Unterhaltungs-ID der TK-Anlage, die die SIP-Segmente des Anrufs gruppiert "
-"(Wazo conversation_id)."
+"Gesprächs-ID der TK-Anlage, die die SIP-Segmente des Anrufs gruppiert (Wazo "
+"conversation_id)."
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_extension
@@ -5342,12 +5524,12 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_call_leg__role__participant
 msgid "Participant"
-msgstr ""
+msgstr "Teilnehmer"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.view_requirement_form
 msgid "Passport/ID Document"
-msgstr ""
+msgstr "Reisepass/Ausweisdokument"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users__linphone_provisioning_url
@@ -5366,7 +5548,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue_agent__is_paused
 msgid "Paused"
-msgstr ""
+msgstr "Pausiert"
 
 #. module: voip
 #. odoo-python
@@ -5389,7 +5571,7 @@ msgstr "„Bezahlen“-Bezeichnung"
 #: model:ir.model.fields,field_description:voip.field_voip_call_cost_line__payload
 #: model:ir.model.fields,field_description:voip.field_voip_phone_service_event__payload
 msgid "Payload"
-msgstr ""
+msgstr "Nutzlast"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__pbx_call_id
@@ -5400,12 +5582,12 @@ msgstr "Anruf der TK-Anlage"
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_request__state__pending
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_search_view
 msgid "Pending"
-msgstr ""
+msgstr "Ausstehend"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement_group__status__pending_approval
 msgid "Pending Approval"
-msgstr ""
+msgstr "Ausstehende Genehmigung"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition__period_ids
@@ -5440,6 +5622,7 @@ msgstr ""
 #. module: voip
 #: model:ir.module.module,shortdesc:base.module_voip
 #: model:ir.ui.menu,name:voip.menu_voip_root
+#: model:res.groups.privilege,name:voip.res_groups_privilege_voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 msgid "Phone"
@@ -5478,7 +5661,7 @@ msgstr "Telefonnummer"
 #. module: voip
 #: model:ir.model,name:voip.model_voip_did_number_request_wizard
 msgid "Phone Number Request"
-msgstr ""
+msgstr "Anfrage einer Telefonnummer"
 
 #. module: voip
 #. odoo-python
@@ -5512,7 +5695,7 @@ msgstr ""
 #. module: voip
 #: model:mail.template,subject:voip.mail_template_phone_number_request
 msgid "Phone number request"
-msgstr ""
+msgstr "Anfrage einer Telefonnummer"
 
 #. module: voip
 #: model:mail.message.subtype,description:voip.mt_did_number_state
@@ -5527,6 +5710,7 @@ msgstr "Art der Telefonnummer aus phone_service (z. B. „local“, „toll_free
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/no_phone_number_card.xml:0
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
 msgid "Phone numbers"
 msgstr "Telefonnummern"
 
@@ -5546,7 +5730,7 @@ msgstr ""
 #: code:addons/voip/static/src/flow_editor/node_types/audio_message.js:0
 #: code:addons/voip/static/src/flow_editor/node_types/terminal_record_flow_node.js:0
 msgid "Play Audio"
-msgstr ""
+msgstr "Audio abspielen"
 
 #. module: voip
 #. odoo-javascript
@@ -5556,7 +5740,7 @@ msgstr ""
 
 #. module: voip
 #. odoo-javascript
-#: code:addons/voip/static/src/core/web/session.js:0
+#: code:addons/voip/static/src/core/web/audio_manager.js:0
 msgid "Please accept use of the microphone."
 msgstr "Bitte lassen Sie die Nutzung des Mikrofons zu."
 
@@ -5620,7 +5804,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_did_number_request__state__processing
 msgid "Processing"
-msgstr ""
+msgstr "Verarbeitung"
 
 #. module: voip
 #. odoo-javascript
@@ -5644,17 +5828,22 @@ msgid ""
 "Prompts callers to choose an input. Callers can enter an input while this "
 "sound is playing; the timeout starts after it finishes."
 msgstr ""
+"Fordert den Anrufer auf, eine Eingabe auszuwählen. Der Anrufer kann während "
+"der Wiedergabe dieses Tons eine Eingabe vornehmen. Das Zeitlimit beginnt "
+"nach dessen Ende."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__candidate_numbers
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_form_view
 msgid "Proposed Phone Numbers"
-msgstr ""
+msgstr "Vorgeschlagene Telefonnummern"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_wizard__selected_prorated_total
 msgid "Prorated first-month credits charged now for the selected numbers"
 msgstr ""
+"Die anteiligen Guthaben für den ersten Monat werden jetzt für die "
+"ausgewählten Nummern in Rechnung gestellt"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_requirement__review_status__provided
@@ -5672,7 +5861,7 @@ msgstr "Anbieter"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_request__provider_synced_comment_ids
 msgid "Provider Synced Comment"
-msgstr ""
+msgstr "Vom Anbieter synchronisierter Kommentar"
 
 #. module: voip
 #: model:ir.ui.menu,name:voip.voip_provider_view_inner_menu
@@ -5767,17 +5956,17 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_queue
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Queue"
-msgstr ""
+msgstr "Warteschlange"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_queue_status
 msgid "Queue Status"
-msgstr ""
+msgstr "Warteschlangenstatus"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue__queue_timeout
 msgid "Queue Timeout"
-msgstr ""
+msgstr "Zeitlimit der Warteschlange"
 
 #. module: voip
 #. odoo-javascript
@@ -5787,12 +5976,14 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_extension_view_search
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_list
 msgid "Queues"
-msgstr ""
+msgstr "Warteschlangen"
 
 #. module: voip
 #: model_terms:ir.actions.act_window,help:voip.action_voip_queue
 msgid "Queues keep callers waiting and connect them with available agents."
 msgstr ""
+"Warteschlangen halten Anrufer in der Warteschleife und verbinden sie mit "
+"verfügbaren Agenten."
 
 #. module: voip
 #: model:ir.model,name:voip.model_ir_qweb
@@ -5809,7 +6000,7 @@ msgstr "Für die Funktion von VoIP ist RTC-Unterstützung erforderlich."
 #: model:ir.model.fields.selection,name:voip.selection__voip_music_on_hold__sort__random
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__random
 msgid "Random"
-msgstr ""
+msgstr "Zufällig"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_music_on_hold__sort__random_start
@@ -5919,7 +6110,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/outcall.js:0
 msgid "Redirect to an External Number"
-msgstr ""
+msgstr "An externe Nummer weiterleiten"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_list_view
@@ -5929,7 +6120,7 @@ msgstr "Aktualisieren"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_queue_view_form
 msgid "Refresh Agents List"
-msgstr ""
+msgstr "Agentenliste aktualisieren"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
@@ -5974,6 +6165,8 @@ msgid ""
 "Regulatory requirements are no longer eligible (provider policy change). A "
 "new group must be created."
 msgstr ""
+"Regulatorische Anforderungen sind nicht mehr zulässig (Änderung der "
+"Anbieterrichtlinien). Es muss eine neue Gruppe angelegt werden."
 
 #. module: voip
 #. odoo-python
@@ -6178,6 +6371,10 @@ msgid ""
 "outgoing one), a participant was reached by it, a routing leg only relayed "
 "it."
 msgstr ""
+"Ermittelte Rolle des Endpunkts dieser Etappe innerhalb des Gesprächs: Die "
+"Quelle hat sie eröffnet (der externe Anrufer bei einem eingehenden Anruf, "
+"die eigene Etappe des Benutzers bei einem ausgehenden Anruf), ein Teilnehmer "
+"wurde darüber erreicht, eine Routing-Etappe hat sie lediglich weitergeleitet."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number__activity_user_id
@@ -6221,7 +6418,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__ringall
 msgid "Ring All"
-msgstr ""
+msgstr "Alle anrufen"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_queue__strategy
@@ -6234,6 +6431,14 @@ msgid ""
 "joining the queue.\n"
 "Random: choose an agent randomly."
 msgstr ""
+"Alle anrufen: Alle Agenten werden gleichzeitig angerufen.\n"
+"Linear: Der erste Agent in der Liste wird zuerst angerufen.\n"
+"Reihum: Der Agent, der zuletzt aufgelegt hat, wird zuerst angerufen.\n"
+"Am längsten ohne Anruf: Der Agent, dessen letzter Gesprächsabschluss am "
+"längsten zurückliegt, wird zuerst angerufen.\n"
+"Wenigste Anrufe: Der Agent, der seit seinem Beitritt zur Warteschlange die "
+"wenigsten Anrufe erhalten hat, wird zuerst angerufen.\n"
+"Zufällig: Ein Agent wird nach dem Zufallsprinzip ausgewählt."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_ring_concurrent_calls
@@ -6258,7 +6463,7 @@ msgstr "Es klingelt …"
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "Ringtone"
-msgstr ""
+msgstr "Klingelton"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__role
@@ -6268,13 +6473,13 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_queue__strategy__rrmemory
 msgid "Round Robin"
-msgstr ""
+msgstr "Reihum"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr.js:0
 msgid "Route the call according to the caller's input."
-msgstr ""
+msgstr "Leiten Sie den Anruf entsprechend der Eingabe des Anrufers weiter."
 
 #. module: voip
 #. odoo-javascript
@@ -6300,7 +6505,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/queue.js:0
 msgid "Route the call to a queue."
-msgstr ""
+msgstr "Leiten Sie den Anruf an eine Warteschlange weiter."
 
 #. module: voip
 #. odoo-javascript
@@ -6318,7 +6523,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/outcall.js:0
 msgid "Route the call to an external extension."
-msgstr ""
+msgstr "Leiten Sie den Anruf an eine externe Nebenstelle weiter."
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_call_leg__role__routing
@@ -6370,6 +6575,18 @@ msgstr "Kontakte suchen …"
 #: code:addons/voip/static/src/softphone/country_selector_items.xml:0
 msgid "Search country or prefix"
 msgstr "Land oder Vorwahl suchen"
+
+#. module: voip
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
+msgid ""
+"Search for a number to buy. If none are available,<br>\n"
+"                    click Request Numbers to submit a request and track it "
+"here."
+msgstr ""
+"Suchen Sie nach einer Nummer, die Sie erwerben möchten. Falls keine "
+"verfügbar ist, <br>\n"
+"                    klicken Sie auf „Nummern kaufen“, um eine Anfrage zu "
+"stellen und diese hier zu verfolgen."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_wizard__ends_with
@@ -6477,7 +6694,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/queue.js:0
 msgid "Select a queue before applying."
-msgstr ""
+msgstr "Wählen Sie vor der Anwendung eine Warteschlange aus."
 
 #. module: voip
 #. odoo-javascript
@@ -6529,7 +6746,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__selected_line_ids
 msgid "Selected Line"
-msgstr ""
+msgstr "Ausgewählte Zeile"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__selected_prorated_total_label
@@ -6583,14 +6800,14 @@ msgstr ""
 #: code:addons/voip/static/src/flow_editor/node_types/terminal_record_flow_node.js:0
 #: code:addons/voip/static/src/flow_editor/node_types/voicemail.js:0
 msgid "Send to Voicemail"
-msgstr ""
+msgstr "An Voicemail senden"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/queue.js:0
 #: code:addons/voip/static/src/flow_editor/node_types/terminal_record_flow_node.js:0
 msgid "Send to a Queue"
-msgstr ""
+msgstr "In die Warteschlange"
 
 #. module: voip
 #. odoo-javascript
@@ -6676,7 +6893,7 @@ msgstr "„Bezahlen“ anzeigen"
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 msgid "Show QR code"
-msgstr ""
+msgstr "QR-Code anzeigen"
 
 #. module: voip
 #. odoo-javascript
@@ -6711,19 +6928,19 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/linphone_provisioning_qr_code/linphone_provisioning_qr_code_field.js:0
 msgid "Size"
-msgstr ""
+msgstr "Größe"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/flow_editor/node_types/ivr_utils.js:0
 msgid "Skip"
-msgstr ""
+msgstr "Überspringen"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "Some documents are required for regulatory purposes"
-msgstr ""
+msgstr "Einige Dokumente sind aus regulatorischen Gründen erforderlich"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_form_view
@@ -6732,6 +6949,9 @@ msgid ""
 "                    Review the guidelines in the chatter, then update the "
 "requirements."
 msgstr ""
+"Einige Anforderungen wurden abgelehnt.\n"
+"                    Überprüfen Sie die Richtlinien im Chatter und "
+"aktualisieren Sie anschließend die Anforderungen."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
@@ -6739,6 +6959,8 @@ msgid ""
 "Some selected numbers require regulatory documentation. Please fill in the "
 "required information below."
 msgstr ""
+"Für einige ausgewählte Nummern sind behördliche Dokumente erforderlich. "
+"Bitte geben Sie unten die erforderlichen Informationen ein."
 
 #. module: voip
 #. odoo-javascript
@@ -6749,7 +6971,7 @@ msgstr "Etwas ist schiefgelaufen …"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_music_on_hold__sort
 msgid "Sort"
-msgstr ""
+msgstr "Sortieren"
 
 #. module: voip
 #. odoo-javascript
@@ -6780,7 +7002,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_sound
 #: model_terms:ir.ui.view,arch_db:voip.voip_sound_view_form
 msgid "Sound"
-msgstr ""
+msgstr "Ton"
 
 #. module: voip
 #: model:ir.actions.act_window,name:voip.action_voip_sound
@@ -6788,18 +7010,18 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_sound_view_list
 msgid "Sounds"
-msgstr ""
+msgstr "Töne"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_call_leg__role__source
 msgid "Source"
-msgstr ""
+msgstr "Quelle"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__source_type
 #: model:ir.model.fields,field_description:voip.field_voip_sound__source_type
 msgid "Source Type"
-msgstr ""
+msgstr "Quelltyp"
 
 #. module: voip
 #. odoo-javascript
@@ -6807,7 +7029,7 @@ msgstr ""
 #: code:addons/voip/models/voip_call_flow.py:0
 #: code:addons/voip/static/src/flow_editor/node_types/start.js:0
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__start_date
@@ -6829,7 +7051,7 @@ msgstr "Status"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_requirement__address_state
 msgid "State/Province"
-msgstr ""
+msgstr "Bundesland/Provinz/Kanton"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue_agent__status
@@ -6847,12 +7069,12 @@ msgstr "Status"
 #. module: voip
 #: model:mail.message.subtype,name:voip.mt_did_number_state
 msgid "Status Changed"
-msgstr ""
+msgstr "Status geändert"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue_agent__status_last_sync
 msgid "Status Last Sync"
-msgstr ""
+msgstr "Status der letzten Synchronisierung"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_queue_agent__status_sort_order
@@ -6867,11 +7089,15 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
+"Status basierend auf Aktivitäten\n"
+"Überfällig: Fälligkeitsdatum bereits überschritten\n"
+"Heute: Aktivität ist für heute geplant\n"
+"Geplant: zukünftige Aktivitäten."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_wizard__step
 msgid "Step"
-msgstr ""
+msgstr "Schritt"
 
 #. module: voip
 #. odoo-javascript
@@ -6912,7 +7138,7 @@ msgstr "Absenden & %(credits)s Guthaben bezahlen"
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
 msgid "Submit Request"
-msgstr ""
+msgstr "Anfrage absenden"
 
 #. module: voip
 #. odoo-javascript
@@ -7015,6 +7241,8 @@ msgstr "Die ID der Telnyx-Anforderungsgruppe muss eindeutig sein!"
 #: model:ir.model.fields,help:voip.field_voip_sound__tts_voice
 msgid "Telnyx voice identifier used to generate the audio."
 msgstr ""
+"Zur Erzeugung der Audioaufnahme wurde der Telnyx-Stimmerkennungsdienst "
+"verwendet."
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__tts_text
@@ -7032,13 +7260,13 @@ msgstr "Textwert"
 #. odoo-python
 #: code:addons/voip/models/voip_sound.py:0
 msgid "Text and Voice are required to generate audio."
-msgstr ""
+msgstr "Text und Ton sind erforderlich, um Audio zu generieren."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_ivr__tts_text
 #: model:ir.model.fields,help:voip.field_voip_sound__tts_text
 msgid "Text that will be synthesized into an audio file."
-msgstr ""
+msgstr "Text, der zu einer Audiodatei synthetisiert werden soll."
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_sound__source_type__tts
@@ -7124,7 +7352,7 @@ msgstr "Die IP-Adresse Ihres TK-Anlagenservers"
 #. odoo-python
 #: code:addons/voip/models/voip_ivr.py:0
 msgid "The IVR option must contain only digits, '*' or '#'."
-msgstr "Die IVR-Option darf nur Ziffern, „*“ oder „#“ enthalten."
+msgstr "Die Sprachmenü-Option darf nur Ziffern, „*“ oder „#“ enthalten."
 
 #. module: voip
 #. odoo-python
@@ -7157,6 +7385,8 @@ msgid ""
 "The Odoo Phone Service returned an invalid number request. Please try again "
 "later."
 msgstr ""
+"Der Odoo-Telefon-Dienst hat eine ungültige Nummer zurückgegeben. Bitte "
+"versuchen Sie es später erneut."
 
 #. module: voip
 #. odoo-python
@@ -7198,7 +7428,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "The Start node must have exactly one output and no input."
-msgstr ""
+msgstr "Der Startknoten muss genau einen Ausgang und keinen Eingang haben."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_provider__ws_server
@@ -7411,25 +7641,25 @@ msgstr ""
 #. odoo-python
 #: code:addons/voip/models/voip_voicemail.py:0
 msgid "The mailbox number must contain only digits."
-msgstr ""
+msgstr "Die Mailbox darf nur Ziffern enthalten."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_ivr.py:0
 msgid "The maximum number of tries must be positive."
-msgstr ""
+msgstr "Die maximale Anzahl der Versuche muss positiv sein."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/call_flow/call_flow_field.js:0
 msgid "The module rejected this connection."
-msgstr ""
+msgstr "Das Modul hat diese Verbindung abgelehnt."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/call_flow/call_flow_field.js:0
 msgid "The module returned an invalid validation result."
-msgstr ""
+msgstr "Das Modul hat ein ungültiges Validierungsergebnis zurückgegeben."
 
 #. module: voip
 #. odoo-python
@@ -7441,25 +7671,25 @@ msgstr ""
 #. odoo-python
 #: code:addons/voip/models/res_users_settings.py:0
 msgid "The no answer timeout must be positive."
-msgstr ""
+msgstr "Das Zeitlimit bei Nichtannahme muss positiv sein."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "The node connected after Start has an invalid destination."
-msgstr ""
+msgstr "Der nach „Start“ verbundene Knoten hat ein ungültiges Ziel."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "The node connected after Start has no destination."
-msgstr ""
+msgstr "Der nach „Start“ verbundene Knoten hat kein Ziel."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_call_flow.py:0
 msgid "The node connected after Start is invalid."
-msgstr ""
+msgstr "Der nach „Start“ verbundene Knoten ist ungültig."
 
 #. module: voip
 #. odoo-javascript
@@ -7485,6 +7715,33 @@ msgstr ""
 msgid ""
 "The options of an IVR used in a Call Flow can only be modified from that "
 "Call Flow."
+msgstr ""
+"Die Optionen eines Sprachmenüs, das in einem Anrufsablauf verwendet wird, "
+"können nur aus diesem Anrufsablauf heraus geändert werden."
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s could not be completed. You can "
+"find more details on the phone number."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s has been received and is under "
+"review. The documents you have submitted are being evaluated. You will be "
+"notified if we need more information to complete the order."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s is complete. Your number is now "
+"active and you can assign it."
 msgstr ""
 
 #. module: voip
@@ -7636,6 +7893,8 @@ msgid ""
 "The sound played when the caller chooses an invalid option. Not used if an "
 "invalid destination is set."
 msgstr ""
+"Der Ton, der abgespielt wird, wenn der Anrufer eine ungültige Option wählt. "
+"Wird nicht verwendet, wenn ein ungültiges Ziel eingestellt ist."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
@@ -7643,6 +7902,9 @@ msgid ""
 "The sound played when the caller reaches the maximum number of tries. Not "
 "used if an abort destination is set."
 msgstr ""
+"Der Ton, der abgespielt wird, wenn der Anrufer die maximale Anzahl an "
+"Versuchen erreicht hat. Wird nicht verwendet, wenn ein Ziel bei Abbruch "
+"festgelegt ist."
 
 #. module: voip
 #. odoo-javascript
@@ -7684,13 +7946,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/call_flow/call_flow_field.js:0
 msgid "The target node no longer exists."
-msgstr ""
+msgstr "Der Zielknoten existiert nicht mehr."
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/call_flow/call_flow_field.js:0
 msgid "The target port no longer exists."
-msgstr ""
+msgstr "Der Zielport existiert nicht mehr."
 
 #. module: voip
 #. odoo-python
@@ -7699,12 +7961,14 @@ msgid ""
 "The text is too long to be converted to speech (maximum %(max_length)s "
 "characters)."
 msgstr ""
+"Der Text ist zu lang, um in Sprache umgewandelt zu werden (maximal %"
+"(max_length)s Zeichen)."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/phone_service_api.py:0
 msgid "The text is too long to be converted to speech."
-msgstr ""
+msgstr "Der Text ist zu lang, um in Sprache umgewandelt zu werden."
 
 #. module: voip
 #. odoo-javascript
@@ -7713,12 +7977,14 @@ msgid ""
 "The text or voice changed while the audio was being generated. Generate it "
 "again."
 msgstr ""
+"Der Text oder Ton hat sich während der Audio-Generierung geändert. "
+"Generieren Sie die Audio erneut."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_ivr.py:0
 msgid "The timeout cannot be negative."
-msgstr ""
+msgstr "Das Zeitlimit darf nicht negativ sein."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call__call_count
@@ -7730,7 +7996,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/voip/models/phone_service_api.py:0
 msgid "The uploaded document is too large."
-msgstr ""
+msgstr "Das hochgeladene Dokument ist zu groß."
 
 #. module: voip
 #. odoo-javascript
@@ -7747,6 +8013,8 @@ msgstr ""
 #: model:ir.model.fields,help:voip.field_res_users_settings__voip_username
 msgid "The username that will be used to register with the PBX server."
 msgstr ""
+"Der Benutzername, der für die Registrierung beim Server der TK-Anlage "
+"verwendet wird."
 
 #. module: voip
 #. odoo-javascript
@@ -7768,6 +8036,8 @@ msgstr "Es scheint ein Problem mit der WebSocket-Verbindung zu geben."
 msgid ""
 "These numbers are not charged yet. Reply below to approve or decline them."
 msgstr ""
+"Diese Nummern wurden noch nicht abgerechnet. Antworten Sie unten, um sie zu "
+"genehmigen oder abzulehnen."
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_search_wizard_form
@@ -7775,12 +8045,14 @@ msgid ""
 "These numbers require regulatory documentation. Please fill in the required "
 "information below."
 msgstr ""
+"Für diese Nummern sind behördliche Dokumente erforderlich. Bitte geben Sie "
+"unten die erforderlichen Informationen ein."
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "These phone numbers cannot be ordered again."
-msgstr ""
+msgstr "Diese Telefonnummern können nicht erneut bestellt werden."
 
 #. module: voip
 #. odoo-javascript
@@ -7840,6 +8112,8 @@ msgid ""
 "This number request could not be fulfilled. Review the latest message below "
 "for details."
 msgstr ""
+"Diese Nummernanfrage konnte nicht erfüllt werden. Weitere Informationen "
+"finden Sie in der aktuellen Nachricht unten."
 
 #. module: voip
 #. odoo-python
@@ -7848,6 +8122,8 @@ msgid ""
 "This number request has been processed. Phone numbers will appear here as "
 "their individual orders complete."
 msgstr ""
+"Diese Nummernanfrage wurde bearbeitet. Die Telefonnummern werden hier "
+"angezeigt, sobald die jeweiligen Einkäufe abgeschlossen sind."
 
 #. module: voip
 #. odoo-python
@@ -7917,17 +8193,17 @@ msgstr "Zeitbedingungen"
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__timeout
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 msgid "Timeout"
-msgstr ""
+msgstr "Zeitlimit"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__timeout_destination_ref
 msgid "Timeout Destination"
-msgstr ""
+msgstr "Ziel bei Zeitlimit"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition__timezone
 msgid "Timezone"
-msgstr ""
+msgstr "Zeitzone"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_time_condition_view_form
@@ -7998,7 +8274,7 @@ msgstr "Weiterleiten"
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/transfer_confirmation.xml:0
 msgid "Transfer Now"
-msgstr ""
+msgstr "Jetzt weiterleiten"
 
 #. module: voip
 #. odoo-javascript
@@ -8263,7 +8539,7 @@ msgstr "Benutzereinstellungen"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_group__user_timeout
 msgid "User Timeout"
-msgstr ""
+msgstr "Zeitlimit für Benutzer"
 
 #. module: voip
 #. odoo-javascript
@@ -8275,7 +8551,7 @@ msgstr "Benutzer ist in einem Anruf"
 #. odoo-javascript
 #: code:addons/voip/static/src/im_status_patch.js:0
 msgid "User is on a call and busy"
-msgstr "Benutzer ist in einem Anruf und beschäftigt"
+msgstr "Benutzer ist in einem Anruf und besetzt"
 
 #. module: voip
 #. odoo-javascript
@@ -8357,11 +8633,6 @@ msgstr "Kundendaten anzeigen"
 #: model_terms:ir.ui.view,arch_db:voip.voip_provider_tree_view
 msgid "Visible to all"
 msgstr "Für alle sichtbar"
-
-#. module: voip
-#: model:res.groups.privilege,name:voip.res_groups_privilege_voip
-msgid "VoIP"
-msgstr "VoIP"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_mail_call_artifact__voip_call_id
@@ -8451,7 +8722,7 @@ msgstr "VoIP-Warteschlange"
 #. module: voip
 #: model:ir.model,name:voip.model_voip_queue_agent
 msgid "VoIP Queue Agent"
-msgstr ""
+msgstr "VoIP-Warteschlangen-Agent"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_requirement
@@ -8512,12 +8783,12 @@ msgstr ""
 #. module: voip
 #: model:mail.template,name:voip.mail_template_voicemail_message
 msgid "VoIP: New Mailbox Message"
-msgstr ""
+msgstr "VoIP: Neue Mailbox-Nachricht"
 
 #. module: voip
 #: model:mail.template,name:voip.mail_template_phone_number_request
 msgid "VoIP: Phone Number Request"
-msgstr ""
+msgstr "VoIP: Anfrage nach einer Telefonnummer"
 
 #. module: voip
 #: model:ir.actions.server,name:voip.ir_cron_voip_sync_number_statuses_ir_actions_server
@@ -8586,22 +8857,22 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_destination_kind
 msgid "Voip Busy Destination Kind"
-msgstr ""
+msgstr "VoIP: Art des besetzten Ziels"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_destination_ref
 msgid "Voip Busy Destination Ref"
-msgstr ""
+msgstr "VoIP: Ref. des besetzten Ziels"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_destination_type
 msgid "Voip Busy Destination Type"
-msgstr ""
+msgstr "VoIP: Typ des besetzten Ziels"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_outcall_number
 msgid "Voip Busy Outcall Number"
-msgstr ""
+msgstr "VoIP: Nummer für ausgehende Anrufe besetzt"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__voip_call_id
@@ -8626,37 +8897,37 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_disconnected_outcall_number
 msgid "Voip Disconnected Outcall Number"
-msgstr ""
+msgstr "Nummer für ausgehende Anrufe getrennt"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_destination_kind
 msgid "Voip No Answer Destination Kind"
-msgstr ""
+msgstr "VoIP: Art des Ziels der Nichtannahme"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_destination_ref
 msgid "Voip No Answer Destination Ref"
-msgstr ""
+msgstr "VoIP: Ref. des Ziels der Nichtannahme"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_destination_type
 msgid "Voip No Answer Destination Type"
-msgstr ""
+msgstr "VoIP: Typ des Ziels der Nichtannahme"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_immediate_destination
 msgid "Voip No Answer Immediate Destination"
-msgstr ""
+msgstr "VoIP: Sofortiges Ziel der Nichtannahme"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_outcall_number
 msgid "Voip No Answer Outcall Number"
-msgstr ""
+msgstr "Nichtannahme bei Nummer für ausgehende Anrufe"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_timeout
 msgid "Voip No Answer Timeout"
-msgstr ""
+msgstr "Zeitlimit bei „Nichtannahme“"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_provider_id
@@ -8692,7 +8963,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__week_days
 msgid "Week Days"
-msgstr ""
+msgstr "Wochentag"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_requirement__address_is_filled
@@ -8782,7 +9053,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "You can order at most %(max)s numbers at once."
-msgstr "Sie können maximal %(max)s Nummern auf einmal bestellen."
+msgstr "Sie können maximal %(max)s Nummern auf einmal anfordern."
 
 #. module: voip
 #. odoo-python
@@ -8904,11 +9175,29 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number has been released (%(number)s)"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number is active! (%(number)s)"
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_service.js:0
 msgid ""
 "Your number is active. Your phone setup is still being finalized. Calling "
 "will be available once setup is complete."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number is suspended (%(number)s)"
 msgstr ""
 
 #. module: voip
@@ -8960,6 +9249,18 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number order has failed (%(number)s)"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number order is under review (%(number)s)"
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Your numbers"
@@ -8968,19 +9269,24 @@ msgstr ""
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
-msgid "Your phone number activation has failed."
+msgid ""
+"Your phone number %(number)s has been released. It is no longer yours and "
+"can no longer be used to make or receive calls."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"Your phone number %(number)s has been suspended because your credit balance "
+"could not cover its monthly fee. Buy credits to reactivate it, otherwise it "
+"will be released."
 msgstr ""
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Your phone number is in \"%(state)s\" state."
-msgstr ""
-
-#. module: voip
-#. odoo-python
-#: code:addons/voip/models/voip_did_number.py:0
-msgid "Your phone number is now active and can be assigned."
 msgstr ""
 
 #. module: voip
@@ -9156,6 +9462,9 @@ msgstr ""
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "phone_disabled"
 msgstr ""
+
+#~ msgid "VoIP"
+#~ msgstr "VoIP"
 
 #~ msgid "PBX Auth Password"
 #~ msgstr "Authentifizierungspasswort der TK-Anlage"

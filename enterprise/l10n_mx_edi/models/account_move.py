@@ -891,7 +891,7 @@ class AccountMove(models.Model):
             if move.company_id and move.l10n_mx_edi_cfdi_uuid:
                 move.l10n_mx_edi_cfdi_cancel_id = move.search(
                     [
-                        ('l10n_mx_edi_cfdi_origin', '=like', f'04|{move.l10n_mx_edi_cfdi_uuid}%'),
+                        ('l10n_mx_edi_cfdi_origin', '=ilike', f'04|{move.l10n_mx_edi_cfdi_uuid}%'),
                         ('company_id', '=', move.company_id.id)
                     ],
                     limit=1,
@@ -1289,7 +1289,23 @@ class AccountMove(models.Model):
         if same_currency:
             payment_rate = None
         else:
-            raw_payment_rate = abs(total_in_company_curr / total_in_payment_curr) if total_in_payment_curr else 0.0
+            delta_foreign_rounding = self.currency_id.rounding / 10 * 5
+            delta_comp_rounding = company_currency.rounding / 10 * 5
+            num = abs(total_in_company_curr) - delta_comp_rounding
+            den = abs(total_in_payment_curr) + delta_foreign_rounding
+            raw_payment_rate_lower_bound = num / den if den else 0.0
+            num = abs(total_in_company_curr) + delta_comp_rounding
+            den = abs(total_in_payment_curr) - delta_foreign_rounding
+            raw_payment_rate_upper_bound = num / den if den else 0.0
+            expected_rate = self._get_expected_currency_rate_at(self.date)
+            theorical_rate = 1 / expected_rate if expected_rate else None
+            if (
+                theorical_rate and
+                raw_payment_rate_lower_bound <= theorical_rate <= raw_payment_rate_upper_bound
+            ):
+                raw_payment_rate = theorical_rate
+            else:
+                raw_payment_rate = abs(total_in_company_curr / total_in_payment_curr) if total_in_payment_curr else 0.0
             payment_rate = float_round(raw_payment_rate, precision_digits=payment_cfdi_values['tipo_cambio_dp'])
 
         payment_cfdi_values.update({
@@ -1437,7 +1453,8 @@ class AccountMove(models.Model):
         # Bank information.
         bank_account = customer.bank_ids.filtered(lambda x: x.company_id.id in (False, company.id))[:1]
 
-        if bank_account.country_id and bank_account.country_code != 'MX':
+        is_foreign_partner_bank = bank_account.country_id and bank_account.country_code != 'MX'
+        if is_foreign_partner_bank:
             partner_bank_vat = 'XEXX010101000'
         else:  # if no partner_bank (e.g. cash payment), partner_bank_vat is not set.
             partner_bank_vat = bank_account.l10n_mx_edi_vat
@@ -1454,7 +1471,7 @@ class AccountMove(models.Model):
 
             pay.update({
                 'rfc_emisor_cta_ord': is_payment_code_emitter_ok and partner_bank_vat,
-                'nom_banco_ord_ext': is_payment_code_bank_ok and bank_account.bank_name,
+                'nom_banco_ord_ext': is_foreign_partner_bank and is_payment_code_bank_ok and bank_account.bank_name,
                 'cta_ordenante': is_payment_code_emitter_ok and payment_account_ord,
                 'rfc_emisor_cta_ben': is_payment_code_receiver_ok and self.journal_id.bank_account_id.l10n_mx_edi_vat,
                 'cta_beneficiario': is_payment_code_receiver_ok and payment_account_receiver,

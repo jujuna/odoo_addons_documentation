@@ -7,7 +7,7 @@
         <xpath expr="//div[contains(@t-attf-class, 'o_fp_table')]" position="inside">
             <t t-set="firstAppointment" t-value="table.firstAppointment"/>
             <div
-                t-if="firstAppointment and firstAppointment.appointment_status !== 'attended' and !this.floorPlanStore.isKanban()"
+                t-if="firstAppointment and !this.floorPlanStore.isKanban()"
                 t-att-data-appointment-id="firstAppointment.id"
                 t-on-click="this.onClickAppointment"
                 class="appointment-label d-flex flex-column justify-content-center bg-opacity-50 mt-2 py-1 rounded position-absolute top-100 start-50 translate-middle-x"
@@ -41,7 +41,7 @@
                 >
                 <div class="d-flex align-items-center px-1 rounded flex-column " t-attf-class="{{this.getTimerClasses(table)}}">
                     <div class="px-0 py-0 pb-0" t-attf-class="{{firstAppointment and isFloorPlanKanban ? 'pb-0' : ''}}">
-                    <span t-if="firstAppointment and firstAppointment.appointment_status !== 'attended' and isFloorPlanKanban" class="text-start rounded p-0 me-1">
+                    <span t-if="firstAppointment and isFloorPlanKanban" class="text-start rounded p-0 me-1">
                         <t t-out="this.pos.getTime(firstAppointment.start)"/>
                     </span>
                     <span
@@ -52,7 +52,7 @@
                         <t t-out="this.state.tableTimer[table.id]"/>
                     </span>
                     </div>
-                    <t t-if="firstAppointment and firstAppointment.appointment_status !== 'attended' and isFloorPlanKanban">
+                    <t t-if="firstAppointment and isFloorPlanKanban">
                         <div class="px-0 pb-0 pt-0 d-flex align-items-center justify-content-center w-100">
                             <span class="me-1" t-if="!this.pos.isAppointmentTransferMode" t-out="'[' + firstAppointment.waiting_list_capacity + 'p]'"/>
                             <span class="flex-grow-1 text-truncate" t-if="(!this.pos.isAppointmentTransferMode or firstAppointment.id === this.pos.bookingSelectionAppointment?.id)" t-out="firstAppointment.attendeeName"/>

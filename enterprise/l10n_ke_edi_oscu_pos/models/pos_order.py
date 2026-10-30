@@ -3,7 +3,7 @@ from zoneinfo import ZoneInfo
 
 from odoo import _, api, models, modules, fields, tools
 from odoo.exceptions import UserError
-from odoo.tools.float_utils import json_float_round
+from odoo.tools.float_utils import json_float_round, float_compare
 
 TAX_CODE_LETTERS = ['A', 'B', 'C', 'D', 'E']
 
@@ -147,21 +147,52 @@ class PosOrder(models.Model):
 
     def _l10n_ke_oscu_get_json_from_order_lines(self):
         """ Return the values that should be sent to eTIMS for the lines in self. """
+        def get_base_line_extra_values(line, **kwargs):
+            return {
+                'quantity': line.qty,
+                'price_unit': line.price_unit,
+                'discount': line.discount,
+                'tax_ids': line.tax_ids_after_fiscal_position if line.order_id.fiscal_position_id else line.tax_ids,
+                'product_id': line.product_id,
+                'product_uom_id': line.product_uom_id,
+                'is_refund': float_compare(line.qty * line.price_unit, 0, precision_digits=line.currency_id.decimal_places) < 0,
+                **kwargs,
+            }
+
         self.ensure_one()
+        AccountTax = self.env['account.tax']
         lines_values = []
+        ke_tax_ids = self.lines.tax_ids_after_fiscal_position.filtered(
+            lambda t: t.l10n_ke_tax_type_id
+        )
         for index, line in enumerate(self.lines.filtered(lambda l: l.product_id.type != 'combo')):
             product = line.product_id  # for ease of reference
             product_uom_qty = line.product_uom_id._compute_quantity(line.qty, product.uom_id)
+            price_subtotal_after_discount = 0
+            price_subtotal_before_discount = 0
+            price_tax_amount = 0
 
-            if line.qty and line.discount != 100:
-                # By computing the price_unit this way, we ensure that we get the price before the VAT tax, regardless of what
-                # other price_include / price_exclude taxes are defined on the product.
-                price_subtotal_before_discount = line.price_subtotal / (1 - (line.discount / 100))
-                price_unit = price_subtotal_before_discount / line.qty
-            else:
-                price_unit = line.price_unit
-                price_subtotal_before_discount = price_unit * line.qty
-            discount_amount = price_subtotal_before_discount - line.price_subtotal
+            # mirroring js method PosOrderLine.get_all_prices()
+            base_line = AccountTax._prepare_base_line_for_taxes_computation(
+                line, **get_base_line_extra_values(line)
+            )
+            base_line_no_discount = AccountTax._prepare_base_line_for_taxes_computation(
+                line, **get_base_line_extra_values(line, discount=0)
+            )
+            for base, detail_type in ((base_line, 'discount'), (base_line_no_discount, 'non-discount')):
+                AccountTax._add_tax_details_in_base_line(base, line.company_id)
+                AccountTax._round_base_lines_tax_details([base], line.company_id)
+                for tax_details in base['tax_details']['taxes_data']:
+                    if tax_details['tax'] in ke_tax_ids:
+                        if detail_type == 'discount':
+                            price_subtotal_after_discount = tax_details['base_amount']
+                            price_tax_amount = tax_details['tax_amount']
+                        else:
+                            price_subtotal_before_discount = tax_details['base_amount']
+                        break
+
+            price_unit = price_subtotal_before_discount / line.qty if line.qty else 0
+            discount_amount = price_subtotal_before_discount - price_subtotal_after_discount
 
             line_values = {
                 'itemSeq':   index + 1,                                             # Line number
@@ -177,9 +208,9 @@ class PosOrder(models.Model):
                 'dcRt':      line.discount,
                 'dcAmt':     discount_amount,
                 'taxTyCd':   line.tax_ids.l10n_ke_tax_type_id.code,
-                'taxblAmt':  line.price_subtotal,
-                'taxAmt':    line.price_subtotal_incl - line.price_subtotal,
-                'totAmt':    line.price_subtotal_incl,
+                'taxblAmt':  price_subtotal_after_discount,
+                'taxAmt':    price_tax_amount,
+                'totAmt':    price_subtotal_after_discount + price_tax_amount,
             }
 
             fields_to_round = ('pkg', 'qty', 'prc', 'splyAmt', 'dcRt', 'dcAmt', 'taxblAmt', 'taxAmt', 'totAmt')
@@ -206,8 +237,9 @@ class PosOrder(models.Model):
         # For a refund, eTIMS needs the KRA invoice number of the order being refunded, not this order's own number.
         order_number = self.refunded_order_id.l10n_ke_oscu_order_number if self.refunded_order_id else self.sequence_number
         line_items = self._l10n_ke_oscu_get_json_from_order_lines()
-
         tax_codes, tax_rates, taxable_amounts, tax_amounts = self.env["account.move"]._get_taxes_data(line_items)
+        total_ke_tax_amounts = json_float_round(sum(tax_amounts.values()), 2)
+        taxable_amount = json_float_round(sum(taxable_amounts.values()), 2)
 
         content = {
             'invcNo':           '',                                         # KRA Invoice Number (set at the point of sending)
@@ -219,10 +251,10 @@ class PosOrder(models.Model):
             **taxable_amounts,
             **tax_amounts,
             **tax_rates,
-            'totTaxblAmt':      json_float_round(self.amount_total - self.amount_tax, 2),    # amount without taxes
-            'totTaxAmt':        json_float_round(self.amount_tax, 2),                        # only taxes
-            'totAmt':           json_float_round(self.amount_total, 2),                      # total amount with taxes
-            'totItemCnt':       len(line_items),                                                          # Total Item count
+            'totTaxblAmt':      taxable_amount,                             # amount without taxes
+            'totTaxAmt':        total_ke_tax_amounts,                       # only taxes
+            'totAmt':           json_float_round(taxable_amount + total_ke_tax_amounts, 2),     # total amount with taxes
+            'totItemCnt':       len(line_items),                                                # Total Item count
             'itemList':         line_items,
             **self.company_id._l10n_ke_get_user_dict(self.create_uid, self.write_uid),
         }

@@ -13,29 +13,37 @@ class HrEmployee(models.Model):
         groups="hr.group_hr_manager",
     )
 
+    def _get_employee_signatory_sign_items(self, partners):
+        employee_role = self.env.ref('hr_sign.sign_item_role_employee_signatory', raise_if_not_found=False)
+        if not partners or not employee_role:
+            return self.env['sign.request.item']
+        return self.env['sign.request.item'].search_fetch(
+            [
+                ('partner_id', 'in', partners.ids),
+                ('role_id', '=', employee_role.id),
+            ],
+            ['partner_id', 'sign_request_id'],
+        )
+
     def _compute_sign_request_count(self):
+        contracts_per_employee = self.env['hr.version'].sudo().search([('employee_id', 'in', self.ids)]).grouped('employee_id')
+        sign_items_per_partner = self._get_employee_signatory_sign_items(
+            self.user_id.partner_id | self.work_contact_id).grouped('partner_id')
         for employee in self:
-            contracts = self.env['hr.version'].sudo().search([('employee_id', 'in', employee.ids)])
+            contracts = contracts_per_employee.get(employee, self.env['hr.version'])
             sign_from_contract = contracts.mapped('sign_request_ids')
 
             sign_from_role = self.env['sign.request'].browse([])
-            partner_ids = employee.user_id.partner_id | employee.work_contact_id
-            if partner_ids:
-                sign_from_role = self.env['sign.request.item'].search([
-                    ('partner_id', 'in', partner_ids.ids),
-                    ('role_id', '=', self.env.ref('hr_sign.sign_item_role_employee_signatory').id)]).mapped('sign_request_id')
+            partners = employee.user_id.partner_id | employee.work_contact_id
+            for partner in partners:
+                sign_from_role |= sign_items_per_partner.get(partner, self.env['sign.request.item']).sign_request_id
             employee.sign_request_count = len(set(sign_from_contract + sign_from_role + employee.sign_request_ids))
 
     def open_employee_sign_requests(self):
         self.ensure_one()
         contracts = self.env['hr.version'].sudo().search([('employee_id', '=', self.id)])
         sign_from_contract = contracts.mapped('sign_request_ids')
-        sign_from_role = self.env['sign.request']
-        partner_ids = self.user_id.partner_id | self.work_contact_id
-        if partner_ids:
-            sign_from_role = self.env['sign.request.item'].search([
-                ('partner_id', 'in', partner_ids.ids),
-                ('role_id', '=', self.env.ref('hr_sign.sign_item_role_employee_signatory').id)]).mapped('sign_request_id')
+        sign_from_role = self._get_employee_signatory_sign_items(self.user_id.partner_id | self.work_contact_id).sign_request_id
         sign_request_ids = sign_from_contract + sign_from_role + self.sign_request_ids
         if len(sign_request_ids.ids) == 1:
             return sign_request_ids.go_to_document()

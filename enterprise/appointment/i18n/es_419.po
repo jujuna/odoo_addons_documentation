@@ -5,15 +5,16 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 # "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-17 22:43+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-19 23:33+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/appointment/es_419/>\n"
+"odoo-20/appointment/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -76,7 +77,7 @@ msgstr "N. de ausencias"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_count
 msgid "# Ratings"
-msgstr ""
+msgstr "Número de calificaciones"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__suggested_resource_count
@@ -138,12 +139,12 @@ msgstr "%s cierre"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
 msgid "%s seats cannot be assigned. Would you like to update the details?"
-msgstr ""
+msgstr "No se pueden asignar %s lugares. ¿Quieres actualizar los detalles?"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "'e.g. \"John Doe\""
-msgstr ""
+msgstr "Por ejemplo, \"Juan Pérez\""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
@@ -294,6 +295,130 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 13px; color: #374151;  background-color: white;\">\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not ctx.get"
+"('calendar_template_ignore_recurrence')\"/>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or ctx.get"
+"('mail_tz')\"/>\n"
+"    <t t-set=\"customer\" t-value=\"object.appointment_booker_id or "
+"object.find_partner_customer() or object.partner_id\"/>\n"
+"    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151; margin-"
+"bottom: 28px;\">\n"
+"       Cita cancelada\n"
+"        <img src=\"/calendar/static/src/img/times-circle.png\" "
+"style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
+"decoration:none; vertical-align: bottom;\"/>\n"
+"    </h1>\n"
+"    <p style=\"margin: 0;\">\n"
+"        <t t-if=\"customer\">\n"
+"            Hola, <t t-out=\"customer.display_name or ''\">John Booker</t>:\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            Hola,\n"
+"        </t>\n"
+"        <br/>\n"
+"        <span style=\"display: block; margin-top: 8px;\">Tu cita para <t t-"
+"out=\"object.appointment_type_id.name or ''\">Demostración técnica</t> <t t-"
+"if=\"object.appointment_type_id.category not in ['custom', 'anytime'] and "
+"object.appointment_type_id.schedule_based_on == 'users' and "
+"object.partner_id\"> con <t t-out=\"object.partner_id.name or ''\">Brandon "
+"Freeman</t></t> ha sido cancelada.</span>\n"
+"    </p>\n"
+"    <div style=\"margin: 32px 0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}}"
+";\">Detalles</h2>\n"
+"        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
+"size: 13px; color: #374151;\">\n"
+"            <tr>\n"
+"                <td style=\"width: 100px; color: #676F7B;\">Fecha y hora</td>"
+"\n"
+"                <td style=\"font-weight: bold;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='EEEE', lang_code=object.env.lang) "
+"or ''\">Miércoles</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='d', lang_code=object.env.lang) or "
+"''\">1</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='MMMM y', "
+"lang_code=object.env.lang) or ''\">de enero de 2020</t>\n"
+"                    <t t-if=\"not object.allday\">\n"
+"                        <t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''\">8:00</t>"
+"\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <span style=\"font-size: 11px; font-weight: "
+"normal;\">\n"
+"                                (<t t-out=\"mail_tz\">Europa/Bruselas</t>)\n"
+"                            </span>\n"
+"                        </t>\n"
+"                    </t>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr t-if=\"recurrent\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: "
+"#676F7B;\">Cuándo</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-"
+"out=\"object.recurrence_id.name or ''\">Cada 1 semana, durante 3 eventos</t>"
+"</td>\n"
+"            </tr>\n"
+"            <tr t-if=\"not object.appointment_type_id.hide_duration and not "
+"object.allday and object.duration\" style=\"padding-top: 6px;\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: "
+"#676F7B;\">Duración</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-out=\"('%dH%02d' % "
+"(object.duration,round(object.duration*60)%60)) or ''\">0H30</t></td>\n"
+"            </tr>\n"
+"            <tr t-if=\"object.location\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B; "
+"vertical-align: top;\">Ubicación</td>\n"
+"                <td style=\"padding-top: 6px;\">\n"
+"                    <t t-out=\"object.location or ''\">Bruselas</t>\n"
+"                    <a target=\"_blank\" t-if=\"object.location != "
+"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\" style=\"margin-"
+"left: 12px; font-size: 12px; color: #008f8c; text-decoration: underline;\">"
+"Ver mapa</a>\n"
+"                </td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    <div style=\"margin: 32px 0 0;\">\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}}"
+";\">Asistentes</h2>\n"
+"        <div t-foreach=\"object.attendee_ids[:max_shown_attendees]\" t-"
+"as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
+"            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
+"img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
+"15px; vertical-align: text-bottom;\"/>\n"
+"            <t t-if=\"attendee.common_name\">\n"
+"                <span style=\"margin-left: 5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                <span style=\"margin-left:5px\">Tú</span>\n"
+"            </t>\n"
+"        </div>\n"
+"        <div t-if=\"len(object.attendee_ids) &gt; max_shown_attendees\" "
+"style=\"margin-bottom: 5px;\">\n"
+"            ... y <t t-out=\"len(object.attendee_ids) - "
+"max_shown_attendees\">2</t> más\n"
+"        </div>\n"
+"    </div>\n"
+"    <div t-if=\"not is_html_empty(object.description)\" style=\"margin: 32px "
+"0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}}"
+";\">Descripción del evento</h2>\n"
+"        <div t-out=\"object.description\">Presentación interna de los "
+"productos.</div>\n"
+"    </div>\n"
+"</div>\n"
+"            "
 
 #. module: appointment
 #: model:mail.template,body_html:appointment.appointment_feedback_mail_template
@@ -397,6 +522,104 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
+"    <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
+"size: 13px; color: #374151; width: 100%;\">\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px;\">\n"
+"                Hola, <t t-out=\"object.appointment_booker_id.name or "
+"''\">Juan Pérez</t>:\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px;\">\n"
+"                Gracias por reservar con nosotros.<br/>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 24px;\">\n"
+"                Tómate un momento para contarnos sobre tu experiencia. Tus "
+"comentarios nos ayudan a mejorar de forma continua y a ofrecer un mejor "
+"servicio a nuestros huéspedes.\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td>\n"
+"                <h2 t-attf-style=\"margin: 0 0 8px 0; font-size: 14px; font-"
+"weight: bold; font-style: italic; color: "
+"{{ object.user_id.company_id.email_secondary_color or '#875A7B' }};\">\n"
+"                    Cuéntanos cómo te sentiste durante tu visita\n"
+"                </h2>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px; color: #676F7B; font-style: "
+"italic;\">\n"
+"                Haz clic en una de las opciones a continuación:\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 24px;\">\n"
+"                <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" "
+"style=\"font-size: 13px; color: #374151;\">\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_5.png\" "
+"alt=\"Satisfecho\" style=\"width: 20px; height: 20px; border: 0; vertical-"
+"align: middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/5\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                Excelente experiencia\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_3.png\" "
+"alt=\"Bien\" style=\"width: 20px; height: 20px; border: 0; vertical-align: "
+"middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/3\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                Estuvo bien\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_1.png\" "
+"alt=\"Insatisfecho\" style=\"width: 20px; height: 20px; border: 0; vertical-"
+"align: middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/1\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                No me gustó\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"color: #676F7B; font-style: italic;\">\n"
+"                Agradecemos tus comentarios, esperamos verte pronto.\n"
+"            </td>\n"
+"        </tr>\n"
+"    </table>\n"
+"</div>\n"
+"            "
 
 #. module: appointment
 #: model:mail.template,body_html:appointment.attendee_invitation_mail_template
@@ -1154,6 +1377,212 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
+"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
+"ctx.get('mail_tz')\"/>\n"
+"    <t t-set=\"customer\" t-value=\"object.appointment_booker_id or "
+"object.find_partner_customer() or object.partner_id\"/>\n"
+"    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151;\">\n"
+"        <t t-if=\"not object.appointment_type_id.is_always_confirm and "
+"object.appointment_status == 'request'\">Cita solicitada</t>\n"
+"        <t t-else=\"\">\n"
+"            Reservación confirmada\n"
+"            <img src=\"/calendar/static/src/img/check-circle.png\" "
+"style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
+"decoration:none; vertical-align: bottom;\"/>\n"
+"        </t>\n"
+"    </h1>\n"
+"    <p style=\"margin: 0;\">\n"
+"        <span style=\"display: block; margin-top: 8px;\">\n"
+"            <t t-out=\"customer.display_name or ''\">John Booker</t>\n"
+"            <t t-if=\"not object.appointment_type_id.is_always_confirm and "
+"object.appointment_status == 'request'\"> solicitó </t>\n"
+"            <t t-else=\"\"> agendó </t>\n"
+"            una cita: <t t-out=\"object.appointment_type_id.name or "
+"''\">Demostración técnica</t>\n"
+"            <t t-if=\"object.appointment_type_id.category not in ['custom', "
+"'anytime'] and object.appointment_type_id.schedule_based_on == 'users' and "
+"object.partner_id\">\n"
+"                con <t t-out=\"object.partner_id.name or ''\">Brandon "
+"Freeman</t>\n"
+"            </t>.\n"
+"        </span>\n"
+"    </p>\n"
+"    <div style=\"text-align: center; padding: 16px 0px 16px 0px; margin-top: "
+"16px;\">\n"
+"        <a t-attf-href=\"/calendar/meeting/join?"
+"token={{ object.sudo().access_token }}\" t-attf-style=\"display: inline-"
+"block; padding: 7px 14px; color: {{user.company_id.email_primary_color or "
+"'#FFFFFF'}}; text-decoration: none; background-color: "
+"{{user.company_id.email_secondary_color or '#875A7B'}}; border-radius: "
+"3px\">\n"
+"            Únete</a>\n"
+"        <a t-attf-href=\"/odoo/calendar.event/{{ object.id }}\" "
+"style=\"display: inline-block; margin-left: 12px; padding: 7px 14px; color: "
+"#111827; text-decoration: none; background-color: #E7E9ED; border-radius: "
+"3px;\">\n"
+"            Ver</a>\n"
+"    </div>\n"
+"    <div style=\"margin: 16px 0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Detalles</h2>\n"
+"        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
+"size: 13px; color: #374151;\">\n"
+"            <tr>\n"
+"                <td style=\"width: 100px; color: #676F7B;\">Fecha y hora</"
+"td>\n"
+"                <td style=\"font-weight: bold;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='EEEE', lang_code=object.env.lang) "
+"or ''\">Miércoles</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='d', lang_code=object.env.lang) or "
+"''\">1</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='MMMM y', "
+"lang_code=object.env.lang) or ''\">de enero de 2020</t>\n"
+"                    <t t-if=\"not object.allday\">\n"
+"                        <t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''\">8:00</"
+"t>\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <span style=\"font-size: 11px; font-weight: "
+"normal;\">\n"
+"                                (<t t-out=\"mail_tz\">Europa/Bruselas</t>)\n"
+"                            </span>\n"
+"                        </t>\n"
+"                    </t>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr t-if=\"recurrent\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">Cuándo</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-"
+"out=\"object.recurrence_id.name or ''\">Cada 1 semana, por 3 eventos</t></"
+"td>\n"
+"            </tr>\n"
+"            <tr t-if=\"not object.appointment_type_id.hide_duration and not "
+"object.allday and object.duration\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">Duración</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-out=\"('%dH%02d' % "
+"(object.duration,round(object.duration*60)%60)) or ''\">0H30</t></td>\n"
+"            </tr>\n"
+"            <tr t-if=\"object.location\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B; "
+"vertical-align: top;\">Ubicación</td>\n"
+"                <td style=\"padding-top: 6px;\">\n"
+"                    <t t-out=\"object.location or ''\">Bruselas</t>\n"
+"                    <a target=\"_blank\" t-if=\"object.location != "
+"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\" style=\"margin-"
+"left: 12px; font-size: 12px; color: #008f8c; text-decoration: underline;"
+"\">Ver mapa</a>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr t-if=\"object.appointment_type_id.manage_capacity\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">Para</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-"
+"out=\"object.total_capacity_reserved\">2</t> personas</td>\n"
+"            </tr>\n"
+"            <tr t-if=\"not object.appointment_type_id.is_auto_assign and "
+"object.appointment_resource_ids\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B; "
+"vertical-align: top;\">Recursos</td>\n"
+"                <td style=\"padding-top: 6px;\">\n"
+"                    <ul style=\"padding: 0 15px;\">\n"
+"                        <li t-foreach=\"object.appointment_resource_ids\" t-"
+"as=\"resource\">\n"
+"                            <span style=\"margin-left:5px\" t-"
+"out=\"resource.name or ''\">Mesa 1</span>\n"
+"                        </li>\n"
+"                    </ul>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr t-if=\"object.videocall_redirection\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">\n"
+"                    <t t-if=\"object.videocall_source == 'discuss'\">Únete "
+"con</t>\n"
+"                    <t t-else=\"\">Únete</t>\n"
+"                </td>\n"
+"                <td style=\"padding-top: 6px;\">\n"
+"                    <a t-attf-href=\"{{ object.videocall_redirection }}\" "
+"target=\"_blank\" style=\"color: #008f8c;\">\n"
+"                        <t t-if=\"object.videocall_source == "
+"'discuss'\">Conversaciones de Odoo</t>\n"
+"                        <t t-else=\"\">Videollamada</t>\n"
+"                    </a>\n"
+"                </td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    <div style=\"margin: 32px 0 0;\">\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Asistentes</h2>\n"
+"        <div t-foreach=\"object.attendee_ids[:max_shown_attendees]\" t-"
+"as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
+"            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
+"img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
+"15px; vertical-align: text-bottom;\"/>\n"
+"            <t t-if=\"attendee.common_name\">\n"
+"                <span style=\"margin-left: 5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                <span style=\"margin-left:5px\">Tú</span>\n"
+"            </t>\n"
+"        </div>\n"
+"        <div t-if=\"len(object.attendee_ids) &gt; max_shown_attendees\" "
+"style=\"margin-bottom: 5px;\">\n"
+"            ... y <t t-out=\"len(object.attendee_ids) - "
+"max_shown_attendees\">2</t> más\n"
+"        </div>\n"
+"    </div>\n"
+"    <div t-if=\"not is_html_empty(object.description)\" style=\"margin: 32px "
+"0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Descripción del evento</h2>\n"
+"        <div t-out=\"object.description\">Presentación interna de productos."
+"</div>\n"
+"    </div>\n"
+"    <t t-set=\"upcoming_appointments\" t-"
+"value=\"(object.appointment_booker_id.upcoming_appointment_ids - "
+"object).sorted('start')\"/>\n"
+"    <div t-if=\"upcoming_appointments\" style=\"margin: 32px 0 0;\">\n"
+"        <t t-set=\"appointment_booker_id\" t-"
+"value=\"object.appointment_booker_id.id\"/>\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Tus próximas citas</h2>\n"
+"        <ul style=\"margin: 6px 0 0; padding: 0 18px;\">\n"
+"            <li style=\"margin-top: 6px;\" t-"
+"foreach=\"upcoming_appointments\" t-as=\"upcoming_appointment\">\n"
+"                <span t-out=\"upcoming_appointment.appointment_type_id.name "
+"or ''\">Demostración técnica</span>\n"
+"                <span style=\"margin: 0 10px;\">-</span>\n"
+"                <span t-out=\"upcoming_appointment.start or ''\" t-"
+"options=\"{&quot;widget&quot;: &quot;datetime&quot;, &quot;format&quot;: "
+"&quot;medium&quot;, &quot;tz_name&quot;: mail_tz}\" style=\"font-weight: "
+"bold;\">20 de junio, 15:00</span>\n"
+"                <a t-attf-href=\"/calendar/view/"
+"#{upcoming_appointment.sudo().access_token}?"
+"partner_id=#{appointment_booker_id}\" target=\"_blank\" style=\"margin-left: "
+"10px; font-size: 12px; color: #008f8c; text-decoration: underline;\">Ver "
+"detalles</a>\n"
+"            </li>\n"
+"        </ul>\n"
+"    </div>\n"
+"</div>\n"
+"            "
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
@@ -1264,6 +1693,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"event_upcoming\" aria-"
 "label=\"Slot Creation Mode\"/>"
 msgstr ""
+" <i class=\"oi oi-filled text-muted\" data-icon=\"event_upcoming\" aria-"
+"label=\"Modo de creación de espacios\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1324,6 +1755,8 @@ msgid ""
 "<i class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Appointment "
 "Type\"/>"
 msgstr ""
+"<i class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Tipo de "
+"cita\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
@@ -1351,6 +1784,76 @@ msgstr ""
 "                    <span class=\"o_not_editable\">En línea</span>"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"calendar_today\" aria-label=\"Booked\" "
+"title=\"Booked\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Booked</span>"
+msgstr ""
+"<i class=\"oi oi-fw\" data-icon=\"calendar_today\" aria-label=\"Reservado\" "
+"title=\"Reservado\" role=\"img\"/>\n"
+"                                    <span class=\"d-none d-md-inline\"> "
+"Reservado</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"check\" aria-label=\"Attended\" "
+"title=\"Attended\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Attended</span>"
+msgstr ""
+"<i class=\"oi oi-fw\" data-icon=\"check\" aria-label=\"Asistió\" "
+"title=\"Asistió\" role=\"img\"/>\n"
+"                                    <span class=\"d-none d-md-inline\"> "
+"Asistió</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"close\" aria-label=\"Cancelled\" "
+"title=\"Cancelled\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Cancelled</span>"
+msgstr ""
+"<i class=\"oi oi-fw\" data-icon=\"close\" aria-label=\"Cancelado\" "
+"title=\"Cancelado\" role=\"img\"/>\n"
+"                                    <span class=\"d-none d-md-inline\"> "
+"Cancelado</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<i class=\"oi oi-fw\" data-icon=\"map\" title=\"Google Reserve\"/>"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"map\" title=\"Reserva con Google\"/>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"schedule\" aria-label=\"Request\" "
+"title=\"Request\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Request</span>"
+msgstr ""
+"<i class=\"oi oi-fw\" data-icon=\"schedule\" aria-label=\"Solicitud\" "
+"title=\"Solicitud\" role=\"img\"/>\n"
+"                                    <span class=\"d-none d-md-inline\"> "
+"Solicitud</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"visibility_off\" aria-label=\"No Show\" "
+"title=\"No Show\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"No Show</span>"
+msgstr ""
+"<i class=\"oi oi-fw\" data-icon=\"visibility_off\" aria-label=\"No asistió\" "
+"title=\"No asistió\" role=\"img\"/>\n"
+"                                    <span class=\"d-none d-md-inline\"> No "
+"asistió</span>"
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
 msgid ""
 "<i class=\"oi oi-stack oi-filled flex-shrink-0 rounded-1 text-muted text-"
@@ -1371,7 +1874,7 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "<i class=\"oi\" data-icon=\"archive\"/> Archive"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"archive\"/> Archivar"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -1387,11 +1890,12 @@ msgstr " <i class=\"oi\" data-icon=\"inventory_2\" title=\"Recursos\"/>"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Staff Member\"/>"
 msgstr ""
+"<i class=\"oi\" data-icon=\"inventory_2\" title=\"Miembro del equipo\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "<i class=\"oi\" data-icon=\"unarchive\"/> Unarchive"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"unarchive\"/> Desarchivar"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -1454,6 +1958,9 @@ msgid ""
 "                                    Rating\n"
 "                                </span>"
 msgstr ""
+"<span class=\"o_stat_text\">\n"
+"                                    Calificación\n"
+"                               </span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
@@ -1480,6 +1987,13 @@ msgid "<span>people</span>"
 msgstr "<span>personas</span>"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<span>to get restaurant bookings through Google Maps and Search.</span>"
+msgstr ""
+"<span>para recibir reservaciones de restaurantes a través de Google Maps y "
+"la búsqueda de Google.\\</span>"
+
+#. module: appointment
 #. odoo-python
 #: code:addons/appointment/models/appointment_type.py:0
 msgid "A %s appointment type shouldn't be limited by datetimes."
@@ -1493,7 +2007,7 @@ msgstr "Una pregunta predeterminada debe ser reutilizable."
 #. module: appointment
 #: model:ir.model.constraint,message:appointment.constraint_calendar_event_check_no_draft_bookings
 msgid "A event with an appointment_type_id cannot be a draft."
-msgstr ""
+msgstr "Un evento con un appointment_type_id no puede estar en borrador."
 
 #. module: appointment
 #. odoo-python
@@ -1653,7 +2167,7 @@ msgstr "Permitir reservaciones"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__allow_guests
 msgid "Allow guests"
-msgstr ""
+msgstr "Permitir invitados"
 
 #. module: appointment
 #: model:ir.module.module,summary:base.module_appointment
@@ -1762,7 +2276,7 @@ msgstr "Respuestas de la cita"
 #: model:mail.message.subtype,name:appointment.mt_appointment_type_booked
 #: model:mail.message.subtype,name:appointment.mt_calendar_event_booked
 msgid "Appointment Booked"
-msgstr "Se agendó la cita"
+msgstr "Cita agendada"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_appointment_booking_line
@@ -1800,7 +2314,7 @@ msgstr "La duración de la cita debe ser mayor a 0.00."
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_fields_can_edit
 msgid "Appointment Fields Can Edit"
-msgstr ""
+msgstr "Los campos de citas se pueden editar"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_invite_id
@@ -1841,7 +2355,7 @@ msgstr "Preguntas de la cita"
 #. module: appointment
 #: model:ir.actions.act_window,name:appointment.rating_rating_action_appointment
 msgid "Appointment Ratings"
-msgstr ""
+msgstr "Calificaciones de citas"
 
 #. module: appointment
 #: model:mail.message.subtype,description:appointment.mt_calendar_event_requested
@@ -1981,12 +2495,12 @@ msgstr "Cita: Invitación del asistente"
 #. module: appointment
 #: model:mail.template,name:appointment.appointment_feedback_mail_template
 msgid "Appointment: Feedback Request"
-msgstr ""
+msgstr "Cita: Solicitud de comentarios"
 
 #. module: appointment
 #: model:ir.actions.server,name:appointment.ir_cron_appointment_send_feedback_emails_ir_actions_server
 msgid "Appointment: Send Feedback Emails"
-msgstr ""
+msgstr "Cita: Enviar correos con comentarios"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_appointment_slot
@@ -2150,12 +2664,12 @@ msgstr "Avatar 512"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_avg
 msgid "Average Rating"
-msgstr ""
+msgstr "Calificación promedio"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_avg_percentage
 msgid "Average Rating (%)"
-msgstr ""
+msgstr "Calificación promedio (%)"
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__slot_interval_capacity
@@ -2203,7 +2717,7 @@ msgstr "Reservar un recurso"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
 msgid "Book regardless"
-msgstr ""
+msgstr "Reservar de todas formas"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_list_item
@@ -2233,7 +2747,7 @@ msgstr "Capacidad reservada"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
 msgid "Booked User"
-msgstr ""
+msgstr "Usuario agendado"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_tree_booking
@@ -2243,13 +2757,13 @@ msgstr "Reservado por"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
 msgid "Booked resource"
-msgstr ""
+msgstr "Recurso agendado"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 msgid "Booker"
-msgstr ""
+msgstr "Reservado por"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__calendar_event_id
@@ -2275,7 +2789,7 @@ msgstr "Líneas de reservación"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Booking Pages"
-msgstr "Páginas de reserva"
+msgstr "Páginas de reservación"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__event_start
@@ -2286,7 +2800,7 @@ msgstr "Inicio de la reservación"
 #. odoo-python
 #: code:addons/appointment/models/appointment_booking_line.py:0
 msgid "Booking line must have a user set."
-msgstr ""
+msgstr "La línea de la reservación debe tener un usuario definido."
 
 #. module: appointment
 #: model:ir.ui.menu,name:appointment.menu_appointment_reporting_bookings
@@ -2316,7 +2830,7 @@ msgstr "Por visitante"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.js:0
 msgid "Bye-bye, record!"
-msgstr ""
+msgstr "Registro eliminado"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_calendar_attendee
@@ -2332,12 +2846,12 @@ msgstr "Evento del calendario"
 #. module: appointment
 #: model:ir.model,name:appointment.model_calendar_event_archive_or_unlink_wizard
 msgid "Calendar Event Archive Or Unlink Wizard"
-msgstr ""
+msgstr "Asistente para archivar o desvincular eventos del calendario"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_calendar_event_multi_archive_or_unlink_wizard
 msgid "Calendar Event Multi Archive Or Unlink Wizard"
-msgstr ""
+msgstr "Asistente para archivar o desvincular varios eventos del calendario"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__anytime
@@ -2434,7 +2948,7 @@ msgstr "Categoría"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "Check In"
-msgstr ""
+msgstr "Registrar entrada"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
@@ -2545,7 +3059,7 @@ msgstr "Días de cierre para las citas y sus usuarios o recursos"
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 msgid "Comment"
-msgstr ""
+msgstr "Comentario"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2658,7 +3172,7 @@ msgstr "Continuar"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "Copied!"
-msgstr ""
+msgstr "¡Copiado!"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_tree
@@ -2884,7 +3398,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.js:0
 msgid "Delete"
-msgstr ""
+msgstr "Eliminar"
 
 #. module: appointment
 #: model:appointment.type,name:appointment.appointment_type_dental_care
@@ -2991,12 +3505,6 @@ msgid "Does not repeat"
 msgstr "No se repite"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Done"
-msgstr ""
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Drag blocks here to add them on all appointments"
 msgstr "Arrastra los bloques aquí para agregarlos a todas las citas"
@@ -3044,7 +3552,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #. module: appointment
 #. odoo-javascript
@@ -3061,6 +3569,11 @@ msgstr "Correo electrónico*"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Emails & SMS"
 msgstr "Correos y SMS"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Enable Google Reserve"
+msgstr "Habilita Reserva con Google"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -3098,7 +3611,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model,name:appointment.model_calendar_alarm
 msgid "Event Alarm"
-msgstr ""
+msgstr "Alerta de evento"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3109,6 +3622,8 @@ msgstr "Cada"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Existing invitations will cease working. Archive anyways?"
 msgstr ""
+"Las invitaciones existentes dejarán de funcionar. ¿Quieres archivarlas de "
+"todas formas?"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__extra_comment
@@ -3128,7 +3643,7 @@ msgstr "Información adicional que se muestra una vez que se agenda la cita."
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__feedback_mail_template_id
 msgid "Feedback Email"
-msgstr ""
+msgstr "Correo para comentarios"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__custom
@@ -3192,7 +3707,7 @@ msgstr "Escribe un título para tu reunión."
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
 msgid "Go back"
-msgstr ""
+msgstr "Regresar"
 
 #. module: appointment
 #. odoo-javascript
@@ -3205,6 +3720,11 @@ msgstr "Vuelve a la pantalla de inicio de Citas."
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Go back to the previous screen."
 msgstr "Vuelve a la pantalla anterior."
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Google Bookings"
+msgstr "Reservaciones de Google"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -3239,7 +3759,7 @@ msgstr "Enrutamiento HTTP"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Happy"
-msgstr ""
+msgstr "Satisfecho"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_leave__has_appointment_type_tz_mismatch
@@ -3273,7 +3793,7 @@ msgstr ""
 #. module: appointment
 #: model:mail.template,subject:appointment.appointment_feedback_mail_template
 msgid "How was your experience? ({{ object.name }})"
-msgstr ""
+msgstr "¿Cómo estuvo tu experiencia? ({{ object.name }})"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__id
@@ -3328,7 +3848,7 @@ msgstr "Si está seleccionado, algunos mensajes tienen error de envío."
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "If empty, Odoo will not ask feedback"
-msgstr ""
+msgstr "Si está vacío, Odoo no solicitará comentarios"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3387,6 +3907,8 @@ msgid ""
 "If set, an email will be sent to the customer after the appointment to "
 "request some feedback."
 msgstr ""
+"Si esta opción está activa, se enviará un correo al cliente después de la "
+"cita para pedirle sus comentarios."
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_resource__active
@@ -3693,13 +4215,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
 msgid "Managing bookings for %s"
-msgstr ""
+msgstr "Gestionar reservaciones para %s"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
 msgid "Managing bookings for the selected appointment type"
-msgstr ""
+msgstr "Gestionar reservaciones para el tipo de cita seleccionado"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3764,7 +4286,7 @@ msgstr "Mensajes"
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__total_capacity_unassigned
 msgid "Missing Seats"
-msgstr ""
+msgstr "Lugares faltantes"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__weekday__1
@@ -3784,7 +4306,7 @@ msgstr "Texto multilínea"
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__slot_creation_mode__split
 msgid "Multiple"
-msgstr ""
+msgstr "Múltiple"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__my_activity_date_deadline
@@ -3800,7 +4322,7 @@ msgstr "Mis citas"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
 msgid "My Availabilities"
-msgstr ""
+msgstr "Mi disponibilidad"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
@@ -3816,7 +4338,7 @@ msgstr "Mis enlaces"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
 msgid "My availabilities"
-msgstr ""
+msgstr "Mi disponibilidad"
 
 #. module: appointment
 #. odoo-python
@@ -3834,19 +4356,19 @@ msgstr "¿Necesita cambiar la cita?"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Neutral"
-msgstr ""
+msgstr "Neutral"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
 msgid "New Appointment"
-msgstr ""
+msgstr "Nueva cita"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
 msgid "New Booking"
-msgstr ""
+msgstr "Nueva reservación"
 
 #. module: appointment
 #. odoo-javascript
@@ -3854,7 +4376,7 @@ msgstr ""
 #: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
 #: code:addons/appointment/static/src/views/list/list_controller.js:0
 msgid "New Closing Day"
-msgstr ""
+msgstr "Nuevo día de cierre"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__activity_calendar_event_id
@@ -3926,7 +4448,7 @@ msgstr "Todavía no hay información"
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.rating_rating_action_appointment
 msgid "No ratings yet!"
-msgstr ""
+msgstr "¡Todavía no hay calificaciones!"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
@@ -3937,7 +4459,7 @@ msgstr "No se presentó"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.js:0
 msgid "No, keep it"
-msgstr ""
+msgstr "No, consérvalo"
 
 #. module: appointment
 #. odoo-python
@@ -3990,13 +4512,13 @@ msgstr "Solo una vez"
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__slot_creation_mode__single
 msgid "One by one"
-msgstr ""
+msgstr "Uno por uno"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
 msgid "One-time link"
-msgstr ""
+msgstr "Enlace de un solo uso"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -4042,18 +4564,18 @@ msgstr "¡Uy! La extensión \""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "Oops! This appointment cannot be rescheduled online.<br/>"
-msgstr ""
+msgstr "Lo sentimos, no es posible reprogramar esta cita en línea.<br/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "Oops! Your appointment is scheduled in less than"
-msgstr "Lo sentimos, programó su sita en menos de"
+msgstr "Lo sentimos, tu cita está programada en menos de"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
 #. module: appointment
 #. odoo-javascript
@@ -4116,7 +4638,7 @@ msgstr "Anterior"
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__rating_percentage_satisfaction
 msgid "Percentage of happy ratings"
-msgstr ""
+msgstr "Porcentaje de calificaciones positivas"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_booker_id
@@ -4198,17 +4720,17 @@ msgstr "Radio (una respuesta)"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 msgid "Rated User"
-msgstr ""
+msgstr "Usuario que realizó la calificación"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_rating_rating
 msgid "Rating"
-msgstr ""
+msgstr "Calificación"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_percentage_satisfaction
 msgid "Rating Satisfaction"
-msgstr ""
+msgstr "Calificación de satisfacción"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_ids
@@ -4220,6 +4742,8 @@ msgstr "Calificaciones"
 #: model_terms:ir.actions.act_window,help:appointment.rating_rating_action_appointment
 msgid "Ratings given by bookers after their appointments will appear here."
 msgstr ""
+"Las calificaciones que los clientes proporcionen después de sus citas "
+"aparecerán aquí."
 
 #. module: appointment
 #. odoo-javascript
@@ -4278,7 +4802,7 @@ msgstr "Solicitudes"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__require_appointment_feedback_mail
 msgid "Require feedback mail"
-msgstr ""
+msgstr "Correo para solicitar comentarios"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
@@ -4411,9 +4935,15 @@ msgid "Saturday"
 msgstr "Sábado"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Save & copy URL"
+msgstr "Guardar y copiar URL"
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Save &amp; Pick Slots"
-msgstr ""
+msgstr "Guardar y seleccionar horarios"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__category_slot_scheduling
@@ -4508,7 +5038,7 @@ msgstr "Seleccionar la fecha y la hora primero"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Select this appointment type"
-msgstr ""
+msgstr "Selecciona este tipo de cita"
 
 #. module: appointment
 #. odoo-javascript
@@ -4539,7 +5069,7 @@ msgstr "Se envía a todos los asistentes cuando se cancela una cita"
 #. module: appointment
 #: model:mail.template,description:appointment.appointment_feedback_mail_template
 msgid "Sent to booker to request feedback after their visit"
-msgstr ""
+msgstr "Se envía al cliente para solicitarle comentarios después de su visita"
 
 #. module: appointment
 #: model:mail.template,description:appointment.appointment_booking_mail_template
@@ -4630,7 +5160,7 @@ msgstr "Una sola línea de texto"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_creation_mode
 msgid "Slot Creation Mode"
-msgstr ""
+msgstr "Modo de creación de horarios"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_duration
@@ -4729,7 +5259,7 @@ msgstr "Reservación del personal"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
 msgid "Staff Member"
-msgstr ""
+msgstr "Miembro del personal"
 
 #. module: appointment
 #. odoo-javascript
@@ -4787,9 +5317,12 @@ msgid "Starts with"
 msgstr "Empieza con"
 
 #. module: appointment
+#. odoo-python
+#: code:addons/appointment/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_tree_booking
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 msgid "Status"
 msgstr "Estado"
 
@@ -5153,7 +5686,7 @@ msgstr "hasta"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "To make any changes, please contact"
-msgstr "Para realizar cambios póngase en contacto con"
+msgstr "Para realizar cambios, comunícate con"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -5232,7 +5765,7 @@ msgstr "Incierto"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Unhappy"
-msgstr ""
+msgstr "Insatisfecho"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -5365,7 +5898,7 @@ msgstr "Videollamada"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "Video Call URL"
-msgstr ""
+msgstr "URL de la videollamada"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__event_videocall_source
@@ -5661,7 +6194,7 @@ msgstr "reuniones"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "missing seats"
-msgstr ""
+msgstr "lugares faltantes"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -5683,7 +6216,7 @@ msgstr "o"
 #: code:addons/appointment/static/src/views/kanban/kanban_header.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_kanban
 msgid "p"
-msgstr ""
+msgstr "p"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
@@ -5694,7 +6227,7 @@ msgstr "personas"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "seats are not assigned to any resource or user."
-msgstr ""
+msgstr "lugares que no están asignados a ningún recurso o usuario."
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form

@@ -63,7 +63,7 @@ class AccountJournal(models.Model):
                     address_element = etree.SubElement(PstlAdr, 'BldgNb')
                     address_element.text = sanitize_communication(street_number, 16)
 
-                for node_name, attr, size in [('PstCd', 'zip', 140), ('TwnNm', 'city', 140), ('Ctry', 'country', 2)]:
+                for node_name, attr, size in [('PstCd', 'zip', 16), ('TwnNm', 'city', 35), ('Ctry', 'country', 2)]:
                     if postal_address[attr]:
                         address_element = etree.SubElement(PstlAdr, node_name)
                         address_element.text = sanitize_communication(postal_address[attr], size)

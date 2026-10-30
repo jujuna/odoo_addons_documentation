@@ -88,4 +88,4 @@ class MailActivity(models.Model):
     @api.ondelete(at_uninstall=False)
     def _unlink_archive_requested_document(self):
         # requested_document_ids are cleared once their corresponding document requests have been fulfilled.
-        self.sudo().requested_document_ids.action_archive()
+        self.sudo().requested_document_ids.filtered(lambda d: d.type == 'request').action_archive()

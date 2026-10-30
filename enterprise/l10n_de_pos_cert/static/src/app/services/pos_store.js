@@ -172,8 +172,7 @@ patch(PosStore.prototype, {
     },
     async cancelTransaction(order) {
         const result = await this.finalizeReceiptTransaction(order, "CANCELLED");
-        order.l10n_de_fiskaly_transaction_uuid = "";
-        order.uiState.receiptState = "inactive";
+        order.receiptCancelled();
         return result;
     },
     async finalizeReceiptTransaction(order, state) {
@@ -268,7 +267,7 @@ patch(PosStore.prototype, {
         const newLine = await super.addLineToCurrentOrder(vals, opts, configure);
         // This call initiates the receipt transaction when the first item is added to the cart.
         // for restaurants we need to initialize them at the time of first payment line addition
-        if (isEmptyOrder && order.isReceiptInactive) {
+        if (isEmptyOrder && (order.isReceiptInactive || order.isReceiptCancelled)) {
             try {
                 await this.createTransaction(order);
             } catch (error) {
@@ -285,7 +284,6 @@ patch(PosStore.prototype, {
                 if (order.isReceiptStarted) {
                     await this.cancelTransaction(order);
                     order.uiState.transactionState = "inactive";
-                    order.l10n_de_fiskaly_transaction_uuid = "";
                     order.uiState.tx_revision = 1;
                 }
             }
@@ -425,7 +423,7 @@ patch(PosStore.prototype, {
         // we need to do the transaction calls if the order is paid and still they are not properly fulfilled
         let updated = false;
         if (this.isCountryGermanyAndFiskaly() && order.state == "paid") {
-            if (orderObject.isReceiptInactive) {
+            if (orderObject.isReceiptInactive || orderObject.isReceiptCancelled) {
                 await this.createTransaction(order);
                 updated = true;
             }

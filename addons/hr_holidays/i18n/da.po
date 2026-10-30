@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:37+0000\n"
+"POT-Creation-Date: 2026-10-16 17:41+0000\n"
 "PO-Revision-Date: 2026-09-09 13:58+0000\n"
 "Last-Translator: \"Kira Petersen François (peti)\" <peti@odoo.com>\n"
 "Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
@@ -181,6 +181,12 @@ msgstr "%(label)s, tilbage den %(date)s"
 #: code:addons/hr_holidays/models/hr_leave.py:0
 msgid "%(leave_name)s has been cancelled for the following reason: %(reason)s"
 msgstr "%(leave_name)s blev annulleret af følgende årsag: %(reason)s"
+
+#. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/models/res_users.py:0
+msgid "%(name)s !!✈ Back on %(date)s!!"
+msgstr ""
 
 #. module: hr_holidays
 #. odoo-python
@@ -537,6 +543,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_work_entry_type_view_form
 msgid "<span class=\"o_stat_text\">Time Off</span>"
 msgstr "<span class=\"o_stat_text\">Fravær</span>"
+
+#. module: hr_holidays
+#: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_form_dashboard
+msgid ""
+"<span class=\"text-danger\" invisible=\"not work_entry_type_support_document "
+"or supported_attachment_ids\">Required</span>"
+msgstr ""
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_work_entry_type_view_form
@@ -1366,12 +1379,6 @@ msgid "Available:"
 msgstr ""
 
 #. module: hr_holidays
-#. odoo-python
-#: code:addons/hr_holidays/models/res_users.py:0
-msgid "Back on"
-msgstr "Tilbage den"
-
-#. module: hr_holidays
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/core/common/hr_employee_model_patch.js:0
 msgid "Back on %(date)s"
@@ -1453,17 +1460,8 @@ msgstr "Kan validere"
 
 #. module: hr_holidays
 #: model:res.groups,comment:hr_holidays.group_hr_holidays_manager
-msgid ""
-"Can manage and configure all holidays and leave requests.\n"
-"\n"
-"A user without any rights on Time Off will be able to see the application, "
-"create his own holidays and manage the requests of the users he's manager of."
+msgid "Can manage and configure all holidays and leave requests."
 msgstr ""
-"Kan administrere og konfigurere alle ferieformer og ferieansøgninger.\n"
-"\n"
-"En bruger uden generelle fraværsrettigheder kan stadig se appen, oprette "
-"egne ferieanmodninger og behandle ansøgninger fra de medarbejdere, "
-"vedkommende er leder for."
 
 #. module: hr_holidays
 #. odoo-python
@@ -2166,6 +2164,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_report_calendar__employee_id
 #: model:res.groups,name:hr_holidays.group_hr_holidays_employee
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_employee_report_filter
+#: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_report_calendar_view_search
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_form_manager
 #: model_terms:ir.ui.view,arch_db:hr_holidays.view_hr_holidays_filter
 #: model_terms:ir.ui.view,arch_db:hr_holidays.view_hr_holidays_filter_report
@@ -5657,6 +5656,12 @@ msgid "dates"
 msgstr ""
 
 #. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/models/hr_leave.py:0
+msgid "day"
+msgstr ""
+
+#. module: hr_holidays
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
 msgid "day(s)"
@@ -5913,6 +5918,22 @@ msgstr ""
 #: code:addons/hr_holidays/models/hr_time_rule.py:0
 msgid "your HR manager"
 msgstr ""
+
+#~ msgid ""
+#~ "Can manage and configure all holidays and leave requests.\n"
+#~ "\n"
+#~ "A user without any rights on Time Off will be able to see the "
+#~ "application, create his own holidays and manage the requests of the users "
+#~ "he's manager of."
+#~ msgstr ""
+#~ "Kan administrere og konfigurere alle ferieformer og ferieansøgninger.\n"
+#~ "\n"
+#~ "En bruger uden generelle fraværsrettigheder kan stadig se appen, oprette "
+#~ "egne ferieanmodninger og behandle ansøgninger fra de medarbejdere, "
+#~ "vedkommende er leder for."
+
+#~ msgid "Back on"
+#~ msgstr "Tilbage den"
 
 #~ msgid "By Employee's Approver"
 #~ msgstr "Af medarbejderens godkender"

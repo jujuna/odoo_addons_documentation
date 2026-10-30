@@ -29,6 +29,7 @@
         'demo/demo_equity_transaction.xml',
         'demo/demo_equity_ubo.xml',
         'demo/demo_equity_valuation.xml',
+        'demo/demo_res_users.xml',
     ],
     'application': True,
     'assets': {

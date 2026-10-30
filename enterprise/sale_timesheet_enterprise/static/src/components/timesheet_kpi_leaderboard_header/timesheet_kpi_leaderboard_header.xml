@@ -8,8 +8,8 @@
              t-att-class="this.timesheetLeaderboardService.showLeaderboard ? 'd-flex': 'd-inline-flex'"
         >
             <div name="period" class="d-flex flex-column lh-1 text-muted text-uppercase small fw-bold text-center">
-                <span t-out="this.props.date.monthShort"/>
-                <span t-out="this.props.date.year"/>
+                <span t-out="this.date.monthShort"/>
+                <span t-out="this.date.year"/>
             </div>
 
             <TimesheetKpi
@@ -38,7 +38,7 @@
 
             <TimesheetLeaderboard
                 t-if="this.timesheetLeaderboardService.showLeaderboard"
-                date="this.props.date"
+                date="this.date"
                 displayEarnYourRank="!this.timesheetKpiService.data.billable_time"
             />
         </div>

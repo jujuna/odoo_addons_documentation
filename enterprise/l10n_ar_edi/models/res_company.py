@@ -169,7 +169,8 @@ class ResCompany(models.Model):
 
     def _parse_arca_data(self, available_currencies):
         """Fetch the currency rates from ARCA based on the ARCA Currency Code."""
-        if not (self.l10n_ar_afip_ws_key_id and self.l10n_ar_afip_ws_crt_id):
+        company = self.filtered(lambda c: c.l10n_ar_afip_ws_key_id and c.l10n_ar_afip_ws_crt_id)[:1]
+        if not company:
             raise UserError(
                 _("Please set the ARCA Certificate and Private Key in order to fetch currency rates from ARCA")
             )
@@ -183,7 +184,7 @@ class ResCompany(models.Model):
         result = {}
         ar_currency = self.env.ref('base.ARS')
         arca_date = fields.Datetime.today()
-        currency_rates = (available_currencies - ar_currency)._l10n_ar_get_last_business_day_rate(date_formatting=False)
+        currency_rates = (available_currencies - ar_currency).with_company(company)._l10n_ar_get_last_business_day_rate(date_formatting=False)
         for name, (date, rate) in currency_rates.items():
             if not rate:
                 continue

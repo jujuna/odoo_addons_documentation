@@ -123,7 +123,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         payslip = self._generate_payslip(date(2026, 4, 1), date(2026, 4, 30), employee_id=self.saudi_employee.id,
             version_id=self.saudi_employee.version_id.id,
             struct_id=self.env.ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure').id)
-        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -3113.64, 'ALPPOUT': 1868.18, 'EOSP': 441.1, 'ANNUALP': 1089.77, 'GROSS': 13700.0, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 9318.86, 'NETCOST': 13313.86}
+        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -3113.64, 'ALPPOUT': 1868.18, 'EOSP': 441.1, 'ANNUALP': 1089.77, 'GROSS': 10586.36, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 9318.86, 'NETCOST': 13313.86}
         self._validate_payslip(payslip, payslip_results)
 
     def test_saudi_payslip_laid_off(self):
@@ -177,7 +177,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'work_entry_type_id': ot_work_entry_type.id,
         })
         payslip.compute_sheet()
-        payslip_results = {'BASIC': 10000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 200.0, 'OTALLOW': 150.0, 'GOSI_COMP': 0.0, 'GOSI_EMP': 0.0, 'OT': 238.89, 'EOSP': 895.83, 'ANNUALP': 796.3, 'GROSS': 10988.89, 'NET': 10988.89, 'NETCOST': 10988.89}
+        payslip_results = {'BASIC': 10000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 200.0, 'OTALLOW': 150.0, 'GOSI_COMP': 0.0, 'GOSI_EMP': 0.0, 'OT': 233.7, 'EOSP': 895.83, 'ANNUALP': 778.99, 'GROSS': 10983.7, 'NET': 10983.7, 'NETCOST': 10983.7}
         self._validate_payslip(payslip, payslip_results)
 
     def test_payslip_overtime_2(self):
@@ -192,7 +192,7 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'work_entry_type_id': sa_ot_work_entry_type.id,
         })
         payslip.compute_sheet()
-        payslip_results = {'BASIC': 10000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 200.0, 'OTALLOW': 150.0, 'GOSI_COMP': 0.0, 'GOSI_EMP': 0.0, 'OT': 732.95, 'EOSP': 895.83, 'ANNUALP': 814.39, 'GROSS': 11482.95, 'NET': 11482.95, 'NETCOST': 11482.95}
+        payslip_results = {'BASIC': 10000.0, 'HOUALLOW': 400.0, 'TRAALLOW': 200.0, 'OTALLOW': 150.0, 'GOSI_COMP': 0.0, 'GOSI_EMP': 0.0, 'OT': 701.09, 'EOSP': 895.83, 'ANNUALP': 778.99, 'GROSS': 11451.09, 'NET': 11451.09, 'NETCOST': 11451.09}
         self._validate_payslip(payslip, payslip_results)
 
     def test_salary_advance_payslip(self):
@@ -208,10 +208,9 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'date_to': date(2024, 1, 31),
         }])
         self.assertEqual(payslip._get_input_line_amount('ADV'), 0.0)
-        for code, value in {
+        payslip._set_input_values({
             l10n_sa_salary_advance.code: 2500.0,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'ADV': 2500.0, 'NET': 2500.0}
         self._validate_payslip(payslip, payslip_results)
@@ -228,10 +227,9 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'date_to': date(2024, 1, 31),
         }])
 
-        for code, value in {
+        adv_payslip._set_input_values({
             l10n_sa_salary_advance.code: 2500.0,
-        }.items():
-            adv_payslip._set_input_value(code, value)
+        })
         adv_payslip.compute_sheet()
         adv_payslip.action_payslip_done()
         payslip = self.env['hr.payslip'].create([{
@@ -258,10 +256,9 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'date_from': date(2024, 1, 1),
             'date_to': date(2024, 1, 31),
         }])
-        for code, value in {
+        loan_payslip._set_input_values({
             loan_amount_rule.code: 5000.0,
-        }.items():
-            loan_payslip._set_input_value(code, value)
+        })
         loan_payslip.compute_sheet()
         loan_payslip.action_payslip_done()
         payslip = self.env['hr.payslip'].create([{
@@ -388,5 +385,5 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             employee_id=self.saudi_employee.id,
             version_id=self.saudi_employee.version_id.id,
             struct_id=self.env.ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure').id)
-        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -893.48, 'EOSP': 533.61, 'ANNUALP': 1042.39, 'GROSS': 13700.0, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 11539.02, 'NETCOST': 15534.02}
+        payslip_results = {'BASIC': 12000.0, 'HOUALLOW': 1000.0, 'TRAALLOW': 200.0, 'OTALLOW': 500.0, 'GOSI_COMP': -1527.5, 'GOSI_EMP': -1267.5, 'UNPAID': -893.48, 'EOSP': 533.61, 'ANNUALP': 1042.39, 'GROSS': 12806.52, 'MEDICAL': 400.0, 'IQAMA': 500.0, 'WORKPER': 300.0, 'NET': 11539.02, 'NETCOST': 15534.02}
         self._validate_payslip(payslip, payslip_results)

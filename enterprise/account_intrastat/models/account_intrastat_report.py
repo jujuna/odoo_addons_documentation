@@ -162,6 +162,13 @@ class AccountIntrastatReportHandler(models.AbstractModel):
         # TO OVERRIDE
         return True
 
+    def _get_ignored_partner_vat_prefix(self):
+        """Return the VAT prefix of the partners that cannot be the acquirer of a dispatch: one
+        identified in our own country is not identified in the country the goods are shipped to."""
+        # TO EXTEND
+        code = self.env.company.account_fiscal_country_id.code
+        return 'EL' if code == 'GR' else code
+
     def _get_exporting_query_data(self):
         # TO OVERRIDE
         return SQL()
@@ -316,6 +323,7 @@ class AccountIntrastatReportHandler(models.AbstractModel):
         )
         lang = self.env.user.lang or get_lang(self.env).code
         self_lang = self.with_context(lang=lang)
+        ignored_vat_prefix = self._get_ignored_partner_vat_prefix()
         query = SQL("""
             SELECT
                 %(select_from_groupby)s AS grouping_key,
@@ -344,7 +352,8 @@ class AccountIntrastatReportHandler(models.AbstractModel):
                 SUM(SIGN(account_move_line.quantity) * SIGN(account_move_line.price_unit) * ABS(account_move_line.amount_currency)) AS value_currency,
                 CASE WHEN product_country.code = 'GB' THEN 'XU' ELSE COALESCE(product_country.code, %(unknown_country_code)s) END AS intrastat_product_origin_country_code,
                 %(product_country_name)s AS intrastat_product_origin_country_name,
-                CASE WHEN partner.vat IS NOT NULL THEN partner.vat
+                CASE
+                     WHEN partner.vat IS NOT NULL %(partner_vat_condition)s THEN partner.vat
                      WHEN partner.vat IS NULL AND partner.is_company IS FALSE THEN %(unknown_individual_vat)s
                      ELSE 'QV999999999999'
                 END AS partner_vat,
@@ -408,6 +417,10 @@ class AccountIntrastatReportHandler(models.AbstractModel):
             unknown_country_code=_unknown_country_code.get(self.env.company.country_id.code, 'QV'),
             product_country_name=self_lang.env['res.country']._field_to_sql('product_country', 'name'),
             unknown_individual_vat='QN999999999999' if self.env.company.country_id.code in _qn_unknown_individual_vat_country_codes else 'QV999999999999',
+            partner_vat_condition=SQL(
+                "AND (account_move.move_type IN ('in_invoice', 'out_refund') OR NOT STARTS_WITH(partner.vat, %s))",
+                ignored_vat_prefix,
+            ) if ignored_vat_prefix else SQL(),
             system=SQL(
                 "CASE WHEN account_move.move_type IN ('in_invoice', 'out_refund') THEN %s ELSE %s END AS intrastat_type,"
                 "CASE WHEN account_move.move_type IN ('in_invoice', 'out_refund') THEN 'arrival' ELSE 'dispatch' END AS intrastat_type_code",
@@ -506,7 +519,7 @@ class AccountIntrastatReportHandler(models.AbstractModel):
 
         domain_dict['region_code'] = self._build_region_code_domain_block(grouping_key_dict['region_code'])
 
-        if grouping_key_dict['system'] == _merchandise_import_code.get(self.env.company.country_id.code, '29'):
+        if is_arrival := (grouping_key_dict['system'] == _merchandise_import_code.get(self.env.company.country_id.code, '29')):
             domain_dict['system'] = [('move_id.move_type', 'in', ['in_invoice', 'out_refund'])]
         else:
             domain_dict['system'] = [('move_id.move_type', 'not in', ['in_invoice', 'out_refund'])]
@@ -524,6 +537,11 @@ class AccountIntrastatReportHandler(models.AbstractModel):
 
         if grouping_key_dict['partner_vat'] in ['QN999999999999', 'QV999999999999']:
             domain_dict['partner_vat'] = [('move_id.partner_id.vat', '=', False)]
+            if not is_arrival and grouping_key_dict['partner_vat'] == 'QV999999999999' and (prefix := self._get_ignored_partner_vat_prefix()):
+                domain_dict['partner_vat'] = Domain.OR([
+                    domain_dict['partner_vat'],
+                    [('move_id.partner_id.vat', '=like', f'{prefix}%')],
+                ])
         else:
             domain_dict['partner_vat'] = [
                 ('move_id.partner_id.vat', '=', grouping_key_dict['partner_vat'])
@@ -733,6 +751,9 @@ class AccountIntrastatServicesReportHandler(models.AbstractModel):
     _name = 'account.intrastat.services.report.handler'
     _inherit = 'account.intrastat.report.handler'
     _description = 'Intrastat Services Report Custom Handler'
+
+    def _get_ignored_partner_vat_prefix(self):
+        return None
 
     def _get_intrastat_report_query(self, report, options, current_groupby, query_params=None, warnings=None, order_by=True):
         query_params = {

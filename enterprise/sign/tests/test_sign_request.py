@@ -888,6 +888,22 @@ class TestSignRequest(SignRequestCommon, MockEmail):
         with self.assertRaises(UserError):
             self.create_sign_request_1_role(signer=alias_partner, cc_partners=self.env['res.partner'])
 
+    def test_sign_server_action_create_saves_signer_config(self):
+        """ Creating a sign action should save the signer configuration on the role. """
+        role = self.template_1_role.sign_item_ids.responsible_id
+        action = self.env['ir.actions.server'].create({
+            'model_id': self.env['ir.model']._get_id('res.partner'),
+            'name': 'Test Sign Action Create',
+            'state': 'sign',
+            'sign_template_id': self.template_1_role.id,
+            'sign_role_ids': [
+                Command.link(role.id),
+                Command.update(role.id, {'signer_type': 'fixed', 'sign_action_partner_id': self.partner_1.id})
+            ]
+        })
+        self.assertEqual(role.sign_action_partner_id, self.partner_1)
+        self.assertEqual(role.ir_actions_server_id, action)
+
     def test_sign_request_cancel_signed_document(self):
         """ Ensure that a fully signed document cannot be canceled. """
         sign_request = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4)

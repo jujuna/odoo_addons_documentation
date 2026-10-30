@@ -11,9 +11,13 @@
 
     .o_knowledge_header {
         .o_hierarchy_article_name input {
-            &:hover, &:focus {
-                border-bottom: $input-border-width solid $o-brand-primary !important;
-                border-top: $input-border-width solid transparent !important;  // keeps input centered
+            field-sizing: content;
+
+            &:not(:hover):not(:focus) {
+                --o-input-border-color: transparent;
+            }
+            &:focus {
+                @include print-variable(o-input-border-color, $o-action);
             }
         }
     }
@@ -28,7 +32,7 @@
         padding-left: var(--editor-gutter-size) !important;
         padding-right: var(--editor-gutter-size) !important;
     }
-    .o_knowledge_body:has(.note-editable > [data-selection-placeholder] + [data-embedded="view"]:nth-child(2)) {
+    .o_knowledge_body.o_knowledge_body_top_embedded_view {
         > span:first-child {
             display: none;
         }

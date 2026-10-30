@@ -362,6 +362,13 @@ class L10nBeMealVouchersLine(models.Model):
     _name = 'l10n_be.meal.vouchers.line'
     _description = 'Belgian Meal Vouchers Line'
     _auto = False
+    _depends = {
+        'hr.payslip': ['company_id', 'date_from', 'l10n_be_meal_vouchers_report_id', 'state', 'version_id'],
+        'hr.payslip.line': ['amount', 'employee_id', 'quantity', 'salary_rule_id', 'slip_id'],
+        'hr.salary.rule': ['code'],
+        'hr.version': ['meal_voucher_amount'],
+        'l10n_be.meal.vouchers.report': ['month', 'state', 'year'],
+    }
 
     report_id = fields.Many2one('l10n_be.meal.vouchers.report', string='Meal Voucher Report', readonly=True)
     company_id = fields.Many2one('res.company', string='Company', readonly=True)

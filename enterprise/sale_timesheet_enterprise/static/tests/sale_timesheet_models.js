@@ -207,13 +207,6 @@ const kpiData = {
         billing_rate: 1.0,
         uom: "hours",
     },
-    "2019-03-01": {
-        worked_time: 20,
-        billable_time: 10,
-        billable_time_target: 20,
-        billing_rate: 0.5,
-        uom: "hours",
-    },
 };
 
 const rankingData = {
@@ -324,20 +317,6 @@ const rankingData = {
         ],
         employee_id: 1,
         tip: "May excellence tip!",
-    },
-    "2019-03-01": {
-        leaderboard: [
-            {
-                id: 6,
-                name: "User 5",
-                billable_time_target: 100.0,
-                billable_time: 148.0,
-                total_time: 148.0,
-                billing_rate: 148.0,
-            },
-        ],
-        employee_id: 1,
-        tip: "March productivity tip!",
     },
 };
 projectModels.ProjectProject = ProjectProject;

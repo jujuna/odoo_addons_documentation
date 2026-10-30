@@ -32,6 +32,7 @@ import {
 import { location } from "@web/core/browser/browser";
 import { downloadFile } from "@web/core/network/download";
 import { WebClient } from "@web/webclient/webclient";
+import { TEST_LOCALES } from "@spreadsheet/../tests/helpers/locale";
 
 const { topbarMenuRegistry } = spreadsheet.registries;
 const { toZone } = spreadsheet.helpers;
@@ -41,36 +42,6 @@ defineDocumentSpreadsheetModels();
 describe.current.tags("desktop");
 
 /** @typedef {import("@spreadsheet/o_spreadsheet/o_spreadsheet").Model} Model */
-
-const TEST_LOCALES = [
-    {
-        name: "United States",
-        code: "en_US",
-        thousandsSeparator: ",",
-        decimalSeparator: ".",
-        dateFormat: "m/d/yyyy",
-        timeFormat: "hh:mm:ss a",
-        formulaArgSeparator: ",",
-    },
-    {
-        name: "France",
-        code: "fr_FR",
-        thousandsSeparator: " ",
-        decimalSeparator: ",",
-        dateFormat: "dd/mm/yyyy",
-        timeFormat: "hh:mm:ss",
-        formulaArgSeparator: ";",
-    },
-    {
-        name: "Odooland",
-        code: "od_OO",
-        thousandsSeparator: "*",
-        decimalSeparator: ".",
-        dateFormat: "yyyy/mm/dd",
-        timeFormat: "hh:mm:ss",
-        formulaArgSeparator: ",",
-    },
-];
 
 test("open spreadsheet with deprecated `active_id` params", async function () {
     await prepareWebClientForSpreadsheet();
@@ -364,7 +335,7 @@ test("Spreadsheet is created with locale in data", async function () {
             {
                 id: 3000,
                 name: "My template spreadsheet",
-                spreadsheet_data: JSON.stringify({ settings: { locale: TEST_LOCALES[1] } }),
+                spreadsheet_data: JSON.stringify({ settings: { locale: TEST_LOCALES.fr_FR } }),
             },
         ],
     };
@@ -377,7 +348,7 @@ test("Odoo locales are displayed in setting side panel", async function () {
     const { env } = await createSpreadsheet({
         mockRPC: function (route, { method, model }) {
             if (method === "get_locales_for_spreadsheet") {
-                return TEST_LOCALES;
+                return Object.values(TEST_LOCALES);
             }
         },
     });

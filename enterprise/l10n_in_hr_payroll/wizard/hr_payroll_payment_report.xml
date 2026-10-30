@@ -28,9 +28,6 @@
                 <field name="l10n_in_enet_csv" filename="l10n_in_enet_filename_csv"
                     invisible="export_format != 'enet' or not l10n_in_state_csv"/>
             </group>
-            <xpath expr="//field[@name='effective_date']" position="attributes">
-                <attribute name="invisible">export_format == 'enet'</attribute>
-            </xpath>
             <xpath expr="//button[@name='download_report']" position="attributes">
                 <attribute name="invisible">export_format in ['manual', 'advice', 'enet']</attribute>
             </xpath>

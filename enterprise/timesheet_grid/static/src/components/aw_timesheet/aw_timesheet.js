@@ -231,7 +231,9 @@ export class TimesheetsAssistant extends Component {
     }
 
     get records() {
-        return Object.values(this.model.data.recordsByStart);
+        return Object.values(this.model.data.recordsByStart).filter((record) =>
+            this.model.isVisible(record)
+        );
     }
 
     get visualRecords() {
@@ -244,7 +246,7 @@ export class TimesheetsAssistant extends Component {
                         groupKey: groupKey,
                     }))
                 )
-                .filter((a) => a.type !== "afk");
+                .filter((a) => a.type !== "afk" && this.model.isVisible(a));
         }
         return this.records;
     }
@@ -506,27 +508,22 @@ export class TimesheetsAssistant extends Component {
                 return this.model.data.grouped[groupKey]?.suggestions?.[title];
             })
             .filter(Boolean);
-        const recordsWithoutTemplate = selectedRecords.filter(
-            (record) => record.template === undefined && record.description === undefined
-        );
-        const groupedRecords = Object.groupBy(
-            selectedRecords.filter(
-                (record) => record.template !== undefined || record.description !== undefined
-            ),
-            ({ template, description }) => description || template
+        const groupedRecords = Map.groupBy(
+            selectedRecords,
+            ({ template, description, title }) => description || template || title
         );
         const groupNames = [];
-        for (const [template, records] of Object.entries(groupedRecords)) {
-            let groupName = template;
-            for (let i = 1; i < records[0].matches.length; i++) {
+        for (const [pattern, records] of groupedRecords) {
+            const recordsWithMatches = records.filter(({ matches }) => matches);
+            let groupName = pattern;
+            for (let i = 1; i < (recordsWithMatches[0]?.matches.length ?? 0); i++) {
                 const values = [
-                    ...new Set(records.map((record) => record.matches[i] ?? "")),
+                    ...new Set(recordsWithMatches.map(({ matches }) => matches[i])),
                 ].filter(Boolean);
                 groupName = groupName.replace(`$${i}`, formatList(values));
             }
             groupNames.push(groupName);
         }
-        groupNames.push(...recordsWithoutTemplate.map((record) => record.title));
         return groupNames.join("; ");
     }
 
@@ -535,8 +532,8 @@ export class TimesheetsAssistant extends Component {
             return this.selectedTimesheet;
         }
 
-        let project_id = this.currentRecord?.data?.project_id ?? false;
-        let task_id = this.currentRecord?.data?.task_id ?? false;
+        let project_id = this.model._getResId(this.currentRecord?.data?.project_id);
+        let task_id = this.model._getResId(this.currentRecord?.data?.task_id);
         let totalAmount = 0.0;
 
         for (const row of this.state.selectedRows) {
@@ -550,7 +547,9 @@ export class TimesheetsAssistant extends Component {
 
             if (!project_id && params.project_id) {
                 project_id = params.project_id;
-                task_id = params.task_id || false;
+            }
+            if (!task_id && params.task_id && params.project_id === project_id) {
+                task_id = params.task_id;
             }
 
             totalAmount += params.unit_amount;

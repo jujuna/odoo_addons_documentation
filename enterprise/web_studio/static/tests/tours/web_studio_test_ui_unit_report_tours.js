@@ -1254,7 +1254,11 @@ registry.category("web_tour.tours").add("web_studio.test_xml_and_form_diff", {
             run: "click",
         },
         {
-            trigger: ":not(.o_form_view)",
+            trigger: ".o_web_studio_leave a",
+            run: "click",
+        },
+        {
+            trigger: ":not(.o_studio)",
         },
     ],
 });

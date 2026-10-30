@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from datetime import timedelta
 from freezegun import freeze_time
 from markupsafe import Markup
+from requests.exceptions import ConnectionError as RequestsConnectionError
 from unittest.mock import patch
 
 from odoo.exceptions import UserError
@@ -456,3 +457,15 @@ class TestMockupMonsterIntegration(TestMonsterIntegration):
     def test_stop_finished_campaign(self):
         with self.patch_monster_requests():
             super().test_stop_finished_campaign()
+
+    def test_service_unavailable(self):
+        with patch(
+            'odoo.addons.hr_recruitment_integration_monster.models.hr_recruitment_platform.Client',
+            side_effect=RequestsConnectionError('Connection aborted.'),
+        ):
+            job_post = self.create_publish_job_post(self.job1.id, self.today)
+        self.assertEqual(job_post.status, 'failure')
+        self.assertEqual(
+            job_post.status_message,
+            'Service not available: Monster.com service is not available. Please try again later.',
+        )

@@ -93,31 +93,25 @@ registry.category("web_tour.tours").add("test_gs1_inventory_lot_serial", {
                 helper.assertLineQty(line, "5");
             },
         },
-        // Scans product + lot, and then scans the quantity after the line's creation.
+        // Scans the quantity then scan the lot to assign scanned quantities to it.
         {
+            content: "Scan 5 units.",
             trigger: ".o_barcode_client_action",
+            run: "scan 30005",
+        },
+        {
+            content: "Scan 5 units again.",
+            trigger: ".o_scan_message .o_scanned_quantity:text('5 Units')",
+            run: "scan 30000005",
+        },
+        {
+            content: "Scan the product and the lot LOT-AAB to apply the 10 scanned units to it.",
+            trigger: ".o_scan_message .o_scanned_quantity:text('10 Units')",
             run: "scan 010011115555571710LOT-AAB",
         },
         {
             trigger: '.o_sublines .o_barcode_line:contains("AAB")',
             run: "click",
-        },
-        {
-            trigger: '.o_sublines .o_barcode_line.o_selected:contains("AAB")',
-            run: function () {
-                helper.assertLinesCount(1);
-                helper.assertSublinesCount(2);
-                const parentLine = helper.getLine({ selected: true });
-                const subline = helper.getSubline({ selected: true });
-                helper.assertLineProduct(parentLine, "PRO_GTIN_12_lot");
-                helper.assertLineQty(parentLine, "6");
-                helper.assertLineTrackingNumber(subline, "LOT-AAB");
-                helper.assertLineQty(subline, "1");
-            },
-        },
-        {
-            trigger: ".o_barcode_client_action",
-            run: "scan 30009",
         },
         {
             trigger: '.o_barcode_line.o_selected .qty-done:contains("10")',
@@ -132,11 +126,25 @@ registry.category("web_tour.tours").add("test_gs1_inventory_lot_serial", {
                 helper.assertLineQty(subline, "10");
             },
         },
-        // Scans a second time a quantity (should increment the current line).
         {
+            content: "Scan 5 more units, the quantity should not be added until the lot is scanned",
             trigger: ".o_barcode_client_action",
             run: "scan 305",
         },
+        {
+            trigger: ".o_scan_message .o_scanned_quantity:text('5 Units')",
+            run: function () {
+                helper.assertLinesCount(1);
+                helper.assertSublinesCount(2);
+                const parentLine = helper.getLine({ selected: true });
+                const subline = helper.getSubline({ selected: true });
+                helper.assertLineProduct(parentLine, "PRO_GTIN_12_lot");
+                helper.assertLineQty(parentLine, "15");
+                helper.assertLineTrackingNumber(subline, "LOT-AAB");
+                helper.assertLineQty(subline, "10");
+            },
+        },
+        { trigger: ".o_barcode_client_action", run: "scan LOT-AAB" },
         {
             trigger: '.o_sublines .o_barcode_line.o_selected .qty-done:contains("15")',
             run: function () {
@@ -229,7 +237,7 @@ registry.category("web_tour.tours").add("test_gs1_inventory_lot_serial", {
             run: "scan 011522222222221921Serial3\x1D3020",
         },
         {
-            trigger: ".o_notification_bar.bg-danger",
+            trigger: ".o_notification:has(.o_notification_bar.bg-danger) .o_notification_close",
             run: "click",
         },
         {
@@ -957,17 +965,16 @@ registry.category("web_tour.tours").add("test_gs1_receipt_lot_serial", {
         //      - (01)00000076543210    > product barcode (76543210)
         //      - (30)00000008          > quantity (8)
         ...stepUtils.inputManuallyBarcode("((01)00000076543210(30)00000008)"),
-
         {
-            trigger: ".o_barcode_line.o_selected",
+            trigger:
+                ".o_scan_message.o_scan_product_or_lot:contains('You scanned 8 Units of Battle Droid.')",
             run: function () {
                 helper.assertLinesCount(1);
                 helper.assertLineIsHighlighted(0, true);
-                helper.assertLineQty(0, "8/40");
+                helper.assertLineQty(0, "0/40");
             },
         },
-        // Scans the lot: as the line has already done quantity but no lot,
-        // it should apply the lot without increase the quantity.
+        // Scans the lot: it should apply the lot and the buffered quantity.
         {
             trigger: ".o_barcode_client_action",
             run: "scan 10b1-b001",
@@ -1067,11 +1074,14 @@ registry.category("web_tour.tours").add("test_gs1_receipt_lot_serial", {
                 helper.assertLineIsHighlighted(sublines[2], true);
             },
         },
-        // ... then scan a GS1 barcode to add 5 more qty., without lot reference,
-        // to be sure the qty. will go on the last selected line.
+        // ... then scan a GS1 barcode to add 5 more qty. without lot reference,
+        // the scanned quantity must be buffered, waiting a lot to be scanned.
+        { trigger: ".o_barcode_client_action", run: "scan 3000000005" },
         {
-            trigger: ".o_barcode_client_action",
-            run: "scan 3000000005",
+            content: "Scan b1-b003 to apply the 5 scanned units to this lot",
+            trigger:
+                ".o_scan_message.o_scan_product_or_lot:contains('You scanned 5 Units of Battle Droid. Scan more quantities or scan a lot number to apply the scanned quantity to it.')",
+            run: "scan b1-b003",
         },
         {
             trigger: '.o_sublines .o_barcode_line.o_selected:contains("8")',
@@ -1185,10 +1195,10 @@ registry.category("web_tour.tours").add("test_gs1_receipt_lot_serial", {
                 helper.assertLineIsHighlighted(sublines[4], true);
             },
         },
-        // Now scans the quantity.
         {
+            content: "Scans the quantity followed by the lot which will get this quantity.",
             trigger: ".o_barcode_client_action",
-            run: "scan 3000007",
+            run: "scan 3000007,b1-b005",
         },
         {
             trigger: '.o_sublines .o_barcode_line:contains("b1-b005") .qty-done:contains("8")',

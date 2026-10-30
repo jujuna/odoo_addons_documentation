@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:34+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-23 09:33+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "account_online_synchronization/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -44,6 +44,10 @@ msgid ""
 "online bank accounts (for supported banking institutions), and configure\n"
 "a periodic and automatic synchronization of their bank statements.\n"
 msgstr ""
+"\n"
+"باستخدام هذا التطبيق، سيتمكن المستخدمون من ربط دفاتر اليومية البنكية\n"
+"بحساباتهم البنكية عبر الإنترنت (للمنشآت البنطية المدعومة)، وتهيئة\n"
+"مزامنة دورية وائتمانية لكشوف حساباتهم البنكية.\n"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -93,6 +97,38 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <t t-set=\"base_url\" t-value=\"object.get_base_url()\"/>"
+"\n"
+"                    <p>\n"
+"                        Dear <t t-out=\"object.bank_account_id.holder_name "
+"or ''\">مارك ديمو</t>,<br/><br/>\n"
+"                        الاتصال بين <b><a t-att-href=\"base_url\" t-"
+"out=\"base_url or ''\">https://yourcompany.odoo.com</a></b>\n"
+"                        و <t t-out=\"object.account_online_link_id.name or "
+"''\">Belfius</t>\n"
+"                        <t t-if=\"not "
+"object.expiring_synchronization_due_day\">قد انتهت صلاحيته.</t>\n"
+"                        <t t-else=\"\">ستنتهي صلاحيته خلال <t t-"
+"out=\"object.expiring_synchronization_due_day or ''\">10</t> أيام.</t>\n"
+"                    </p>\n"
+"                    <p>يرجى تجديد موافقتك لضمان استمرار الربط والمزامنة "
+"المباشرة بين حسابك البنكي ونظام أودو دون انقطاع.</p>\n"
+"                    <t t-set=\"renew_concent_url\" t-value=\"base_url + '/"
+"renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"/>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"renew_concent_url\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            تجديد الموافقة\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    <p>هذه رسالة تذكيرية آليّة من تطبيق أودو المحاسبي، "
+"لتنبيهك بضرورة تجديد موافقة المزامنة المصرفية قبل انتهائها.</p>\n"
+"                </div>\n"
+"            "
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
@@ -179,7 +215,7 @@ msgstr "زخرفة استثناء النشاط"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "خطط النشاط"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_state
@@ -281,7 +317,7 @@ msgstr "اختر التاريخ ودفتر اليومية الذي ترغب في
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 msgid "Choose a date from which you want to check the transactions."
-msgstr ""
+msgstr "اختر التاريخ الذي تريد التحقق من المعاملات التي تمت فيه."
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__client_id
@@ -340,7 +376,7 @@ msgstr "متصل"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Connected until"
-msgstr ""
+msgstr "متصل حتى"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__renewal_contact_email
@@ -435,7 +471,7 @@ msgstr "التاريخ الذي ستنتهي فيه صلاحية المزامن�
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Extend Connection"
-msgstr ""
+msgstr "تمديد الإذن"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__account_data
@@ -477,7 +513,7 @@ msgstr "حالة الجلب"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Fetching..."
-msgstr ""
+msgstr "جري جلب..."
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -598,7 +634,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "Import Transactions"
-msgstr ""
+msgstr "استيراد المعاملات"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__name
@@ -668,7 +704,7 @@ msgstr "آخر مزامنة"
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__last_sync
 msgid "Last Transaction Synchronized on"
-msgstr ""
+msgstr "آخر مزامنة للمعاملات في"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__write_uid
@@ -703,8 +739,8 @@ msgstr "قم بربط حساب بنكي واحد بدفتر اليومية ال�
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
-msgid "Manual Bank Statement Lines"
-msgstr "بنود كشف الحساب البنكي اليدوية"
+msgid "Manual Bank Transactions"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__activity_type_icon
@@ -848,7 +884,7 @@ msgstr "معرف المعاملات عبر الإنترنت"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_bank_statement.py:0
 msgid "Opening Statement: First Synchronization"
-msgstr ""
+msgstr "البيان الافتتاحي: المزامنة الأولى"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__partner_name
@@ -864,7 +900,7 @@ msgstr "مرجع الدفع"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "Payments"
-msgstr ""
+msgstr "المدفوعات"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_bank_statement_line_transient__state__pending
@@ -955,7 +991,7 @@ msgstr "إعادة توجيه"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Refresh"
-msgstr ""
+msgstr "تحديث"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__refresh_token
@@ -998,7 +1034,7 @@ msgstr "خطأ في تسليم الرسائل النصية القصيرة"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "Search over"
-msgstr ""
+msgstr "البحث"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
@@ -1012,7 +1048,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "See error"
-msgstr ""
+msgstr "انظر إلى الخطأ"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1057,7 +1093,7 @@ msgstr "عرض إجراءات المزامنة"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/views/account_online_authorization_kanban_controller.xml:0
 msgid "Some transactions"
-msgstr ""
+msgstr "بعض المعاملات"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__date
@@ -1110,7 +1146,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "There are cancelled"
-msgstr ""
+msgstr "توجد معاملات ملغاة"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1246,6 +1282,8 @@ msgid ""
 "synchronization\n"
 "                    ("
 msgstr ""
+"أنت تقوم باستيراد المعاملات قبل إنشاء المزامنة عبر الإنترنت\n"
+"                    ("
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1257,7 +1295,7 @@ msgstr "يمكنك التواصل مع فريق الدعم لدى أودو"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "You can manage your bank synchronization consent for this connection %s"
-msgstr ""
+msgstr "يمكنك إدارة موافقتك على مزامنة البيانات المصرفية لهذا الاتصال %s"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1289,7 +1327,7 @@ msgstr "لا يمكنك استيراد المعاملات المعلقة."
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "You have"
-msgstr ""
+msgstr "لديك"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1306,7 +1344,7 @@ msgstr "سوف ينتهي اتصال البنك الخاص بك قريباً"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "banks"
-msgstr ""
+msgstr "البنوك"
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1318,7 +1356,7 @@ msgstr "القيود"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "here."
-msgstr ""
+msgstr "هنا."
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1330,7 +1368,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "loading..."
-msgstr ""
+msgstr "جاري التحميل..."
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1352,20 +1390,23 @@ msgstr "تمثيل لحساب بنكي عبر الإنترنت"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "transactions fetched"
-msgstr ""
+msgstr "تم جلب المعاملات"
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid ""
 "within this period that were not created using the online synchronization."
-msgstr ""
+msgstr "خلال هذه الفترة والتي لم يتم إنشاؤها باستخدام المزامنة عبر الإنترنت."
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "within this period."
-msgstr ""
+msgstr "خلال هذه الفترة."
+
+#~ msgid "Manual Bank Statement Lines"
+#~ msgstr "بنود كشف الحساب البنكي اليدوية"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "بند كشف الحساب البنكي"

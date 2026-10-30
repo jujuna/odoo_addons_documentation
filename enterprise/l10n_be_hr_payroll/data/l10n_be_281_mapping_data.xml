@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
+
+        <!-- ======================================================= -->
+        <!--  Report 273S Mappings                                   -->
+        <!-- ======================================================= -->
         <record id="l10n_be_281_mapping_273s_gross_income" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">273s_gross_income</field>
@@ -15,6 +19,2215 @@
             <field name="evaluation_type">salary_rule</field>
             <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_ip_deduction')])]"/>
         </record>
+        <record id="l10n_be_281_mapping_274_18_taxable" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">274_18_taxable</field>
+            <field name="declaration_code">274.18</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue')])]"/>
+        </record>
+        <record id="l10n_be_281_mapping_274_18_withholding" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">274_18_withholding</field>
+            <field name="declaration_code">274.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = -mapped_total['REPLACEMENT_REVENUE.P.P']</field>
+        </record>
+
+        <!-- ==================================== -->
+        <!--           274.10 Mappings            -->
+        <!-- ==================================== -->
+        <record id="l10n_be_281_mapping_274_10_taxable" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">274_10_taxable</field>
+            <field name="declaration_code">274.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = sum(taxable_values[p.id] for p in payslips)
+            </field>
+        </record>
+        <record id="l10n_be_281_mapping_274_10_withholding" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">274_10_withholding</field>
+            <field name="declaration_code">274.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
+                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
+                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
+            ])]"/>
+        </record>
+
+        <!-- ==================================== -->
+        <!--           274.20 Mappings            -->
+        <!-- ==================================== -->
+        <record id="l10n_be_281_mapping_274_20_taxable" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">274_20_taxable</field>
+            <field name="declaration_code">274.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = sum(taxable_values[p.id] for p in payslips)
+            </field>
+        </record>
+        <record id="l10n_be_281_mapping_274_20_withholding" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">274_20_withholding</field>
+            <field name="declaration_code">274.20</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
+                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
+                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
+            ])]"/>
+        </record>
+
+        <!-- ======================================================= -->
+        <!--  Report 281.10 Mappings                                 -->
+        <!-- ======================================================= -->
+
+        <record id="l10n_be_281_mapping_281_10_2031" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2031_associationactivity</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2035" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2035_verantwoordingsstukken</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2036" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2036_inwonersdeenfr</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2037" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2037_vergoedingkosten</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2038" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2038_seasonalworker</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2039" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2039_optiebuitvennoots</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = '0'</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2040" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2040_individualconvention</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2041" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2041_overheidspersoneel</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2042" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2042_sailorcode</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2045" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2045_code</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2055" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2055_datumvanindienstt</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = mapped_total['entry_date']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2056" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2056_datumvanvertrek</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = mapped_total['departure_date']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2060" model="l10n.be.281.mapping">
+            <!-- The benefits in kind and the commuting reimbursement are part of the taxable salary: they are declared in boxes 6b and 14 instead -->
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2060_gewonebezoldiginge</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['total_gross'] + mapped_total['cct90_payslip_exemption'] - mapped_total['cct90_exempted'] \
+    - mapped_total['termination_gross'] - mapped_total['arrear_gross'] - mapped_total['warrant_gross'] - mapped_total['holiday_gross'] \
+    - mapped_total['atn_total'] - mapped_total['private_transport_reimbursement']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2061" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2061_bedragoveruren300horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_amount'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2063" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2063_vervroegdvakantieg</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['holiday_gross']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2064" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2064_afzbelachterstall</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['arrear_gross']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2065" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2065_opzeggingsreclasseringsverg</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['termination_gross']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2066" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2066_impulsfund</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2067" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2067_rechtvermindering66_81</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2068" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2068_rechtvermindering57_75</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['overtime_base']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2069" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2069_fidelitystamps</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2070" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2070_decemberremuneration</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2072" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2072_pensioentoezetting</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2073" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2073_tipamount</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2075" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2075_bijzonderbijdrage</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = -mapped_total['M.ONSS']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2076" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2076_voordelenaardbedrag</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = max(sum(mapped_total[atn_code] for atn_code in atn_mapping) - mapped_total.get('company_car_exemption', 0), 0)
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2078" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2078_compensationamountwithoutstandards</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [ref(
+                'l10n_be_hr_payroll.cp200_employees_salary_representation_fees_volatile')
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2079" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2079_covidovertimeremuneration2023</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = max(mapped_total['relance_amount'][2023], 0)</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2081" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2081_gewonebijdragenenpremies</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_group_insurance_employee_contribution_input'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_group_insurance_employee_voluntary_input'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2082" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2082_bedrag</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['warrant_gross']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2083" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2083_bedrag</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2084" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2084_mobiliteitsvergoedi</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2085" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2085_forfbezoldiging</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2086" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2086_openbaargemeenschap</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_public_transport'),
+                ref('l10n_be_hr_payroll.employees_salary_train_transport'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_third_party_transport'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2087" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2087_bedrag</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2088" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2088_andervervoermiddel</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['other_transport_mean']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2090" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2090_outborderdays</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2092" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2092_othercode1</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2094" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2094_othercode2</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2095" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2095_aantaluren</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2096" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2096_othercode3</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2097" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2097_aantaluren</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['overtime_hours'] + mapped_total['overtime_hours_360']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2098" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2098_othercode4</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2099" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2099_aard</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = ''
+for atn_code, report_code in atn_mapping.items():
+    if mapped_total.get(atn_code, 0) and report_code not in result:
+        result += report_code
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2102" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2102_kas</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2103" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2103_kasvrijaanvullendpensioen</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2106" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2106_percentages</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = '00,00' if round(mapped_total['warrant_gross'], 2) else ''
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2109" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2109_fiscaalidentificat</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2110" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2110_aantaloveruren360</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['overtime_hours_360']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2111" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2111_achterstalloveruren300horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_amount'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2113" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2113_forfaitrsz</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2115" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2115_bonus</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_employment_bonus_volet_A')
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2116" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2116_badweatherstamps</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2117" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2117_nonrecurrentadvantages</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['cct90_exempted']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2118" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2118_overtimehours180</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['overtime_hours']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2119" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2119_sportremuneration</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2120" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2120_sportvacancysavings</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2121" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2121_sportoutdated</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2122" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2122_sportindemnificationofretraction</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2123" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2123_managerremuneration</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2124" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2124_managervacancysavings</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2125" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2125_manageroutdated</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2126" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2126_managerindemnificationofretraction</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2127" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2127_nonrecurrentadvantagesoutdated</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2128" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2128_vrijaanvullendpensioenwerknemers</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2129" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2129_exemptincomesubjecttoprogressivity</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2130" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2130_privatepc</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2131" model="l10n.be.281.mapping">
+            <!-- The replacement revenues, the economic unemployment complements and the presence tokens are declared with their withholding taxes on the 281.18, 281.13 and 281.30.
+                 The tax on the profit sharing bonus is a withholding tax on movable income, declared on the 273S. -->
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2131_bedrijfsvoorheffingvanwerkgever</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
+                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
+                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_low_PP'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_high_PP'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2132" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2132_horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_horeca_occasional_taxable'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2133" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2133_bedrijfsvoorheffingbuitenlvenverbondenwerkgever</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2134" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2134_totaalbedragmobiliteitsbudget</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['mobility_budget']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2136" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2136_amountcontractofstudent</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['student_remuneration']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2137" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2137_amountstudentspecificperiod</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2138" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2138_covidovertimehours2023</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['relance_hours'][2023]</field>
+        </record>
+
+
+        <record id="l10n_be_281_mapping_281_10_2142" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2142_totalovertimehours180</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['overtime_hours']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2143" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2143_bedragoveruren360horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_amount'] if mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2165" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2165_achterstalloveruren360horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_amount'] if mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2166" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2166_flexi_job</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['flexi_exemption'] if mapped_total['is_flexi_pensioner'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2167" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2167_aantaloveruren300horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_hours'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2168" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2168_achterstallaantaloveruren300horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_hours'] if not mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2169" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2169_aantaloveruren360horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_hours'] if mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2170" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2170_achterstallaantaloveruren360horeca</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['horeca_overtime_arrears_hours'] if mapped_total['horeca_white_cash_register'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2176" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2176_overtimehours180</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2177" model="l10n.be.281.mapping">
+            <!-- Box 26e: the net profit sharing bonus, after the solidarity contribution and the withholding tax -->
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2177_winstpremies</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_low'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_high'),
+                ref('l10n_be_hr_payroll.l10n_be_hr_payroll_structure_cp200_profit_sharing_bonus_solidarity_contributions'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_low_PP'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_high_PP'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2178" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2178_pensioner</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_10_2141" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2141_total</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_10_2132'),
+                ref('l10n_be_281_mapping_281_10_2178'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2179" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2179_startersjob</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_compensatory_supplement'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2180" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2180_onkostenbrandweerenambulanciers</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2181" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2181_remunerationetrang</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2182" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2182_aandelenetrang</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2183" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2183_bonuspremieoaandelenoptiesetrang</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2184" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2184_anderevaaetrang</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2185" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2185_amountother1</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2186" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2186_amountother2</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2187" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2187_amountother3</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2188" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2188_amountother4</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2195" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2195_relanceovertimeremuneration</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = max(mapped_total['relance_amount'][2024], 0)</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2196" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2196_relanceovertimehours</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['relance_hours'][2024]</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2198" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2198_flexijobnotpension</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['flexi_exemption'] if not mapped_total['is_flexi_pensioner'] else 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2200" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2200_compensationwithstandards</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_representation_fees'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_homeworking_fees'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2201" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2201_compensationwithdocuments</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_expense_reimbursement_manual'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_expense_refund'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2202" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2202_amount</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2203" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2203_amount</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2204" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2204_repaidsums</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2206" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2206_grossamountremuneration</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2207" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2207_travelbicycleorspeedpedelec</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_cycle_transportation')
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2208" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2208_benefitprovisionbicycleorspeedpedelec</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2209" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2209_overtimehours</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2210" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2210_workbonus5254</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_employment_bonus_volet_B')
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2226" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2226_kmzone2207</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.km_home_work * 2 for p in payslips if all_line_values['CYCLE'][p.id]['total']))
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2227" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2227_relanceovertimeremuneration2025</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = max(mapped_total['relance_amount'][2025], 0)</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2228" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2228_relanceovertimehours2025</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['relance_hours'][2025]</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2257" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2257_employeecontribution</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = mapped_total['total_employee_contribution']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2062" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2062_totaal</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_10_2060'),
+                ref('l10n_be_281_mapping_281_10_2069'),
+                ref('l10n_be_281_mapping_281_10_2076'),
+                ref('l10n_be_281_mapping_281_10_2082'),
+                ref('l10n_be_281_mapping_281_10_2083'),
+                ref('l10n_be_281_mapping_281_10_2204'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2074" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2074_bedrijfsvoorheffing</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_10_2131'),
+                ref('l10n_be_281_mapping_281_10_2133'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2077" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2077_totaal</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_10_2086'),
+                ref('l10n_be_281_mapping_281_10_2087'),
+                ref('l10n_be_281_mapping_281_10_2088'),
+                ref('l10n_be_281_mapping_281_10_2207'),
+                ref('l10n_be_281_mapping_281_10_2208'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_10_2059" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f10_2059_totaalcontrole</field>
+            <field name="declaration_code">281.10</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_10_2060'),
+                ref('l10n_be_281_mapping_281_10_2061'),
+                ref('l10n_be_281_mapping_281_10_2062'),
+                ref('l10n_be_281_mapping_281_10_2063'),
+                ref('l10n_be_281_mapping_281_10_2064'),
+                ref('l10n_be_281_mapping_281_10_2065'),
+                ref('l10n_be_281_mapping_281_10_2066'),
+                ref('l10n_be_281_mapping_281_10_2067'),
+                ref('l10n_be_281_mapping_281_10_2068'),
+                ref('l10n_be_281_mapping_281_10_2069'),
+                ref('l10n_be_281_mapping_281_10_2070'),
+                ref('l10n_be_281_mapping_281_10_2072'),
+                ref('l10n_be_281_mapping_281_10_2073'),
+                ref('l10n_be_281_mapping_281_10_2074'),
+                ref('l10n_be_281_mapping_281_10_2075'),
+                ref('l10n_be_281_mapping_281_10_2076'),
+                ref('l10n_be_281_mapping_281_10_2077'),
+                ref('l10n_be_281_mapping_281_10_2078'),
+                ref('l10n_be_281_mapping_281_10_2081'),
+                ref('l10n_be_281_mapping_281_10_2082'),
+                ref('l10n_be_281_mapping_281_10_2083'),
+                ref('l10n_be_281_mapping_281_10_2084'),
+                ref('l10n_be_281_mapping_281_10_2085'),
+                ref('l10n_be_281_mapping_281_10_2086'),
+                ref('l10n_be_281_mapping_281_10_2087'),
+                ref('l10n_be_281_mapping_281_10_2088'),
+            ])]"/>
+        </record>
+
+        <!-- ======================================================= -->
+        <!--  Report 281.20 Mappings                                 -->
+        <!-- ======================================================= -->
+
+        <record id="l10n_be_281_mapping_281_20_2031" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2031_stopzettingexploitatie</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2033" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2033_optiebuitvennoots</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = '0'</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2035" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2035_verantwoordingsstukken</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2045" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2045_rsz</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2055" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2055_datumvanindienstt</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2056" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2056_datumvanvertrek</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = mapped_total['departure_date']
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2060" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <!-- The benefits in kind and the rent are part of the taxable salary, they are declared in 2068 and 2073 -->
+            <field name="tag">f20_2060_periodieke</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['GROSS'] - sum(mapped_total[atn_code] for atn_code in atn_mapping) - mapped_total['ATN_RENT']</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2061" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2061_covidovertimeremuneration2023</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2062" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2062_anderebezoldiginge</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.l10n_be_hr_payroll_structure_cp200_employee_yearly_salary_gross_salary_rule')])]"
+            />
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2064" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2064_vervroegdvakantieg</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2065" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2065_opzeggingsreclasseringsverg</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2067" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2067_bijzonderbijdrage</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2068" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2068_bedrag</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = sum(mapped_total[atn_code] for atn_code in atn_mapping)
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2069" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2069_compensationamountwithoutstandards</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2071" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2071_pensioengewonebijdragen</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_group_insurance_employee_contribution_input'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_group_insurance_employee_voluntary_input'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2073" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2073_periodieke</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp999_employees_salary_atn_rent')
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2074" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2074_anderen</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2076" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2076_nonrecurrentadvantages</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = sum(all_line_values['BONUS_GROSS'][p.id]['total'] for p in payslips if p.struct_id.code == 'BECCT90')
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2078" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2078_pensioentoezegging</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2079" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2079_bedrag</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = sum(all_line_values['WARRANT_GROSS'][p.id]['total'] for p in payslips if p.struct_id.code == 'BEWARRANT')
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2080" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2080_bedrag</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2081" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2081_bezoldigingen</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2082" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2082_occasionalworkhoreca</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2083" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2083_bonus</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2084" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2084_bonus5254</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2087" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2087_code420</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2088" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2088_impulsfund</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2092" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2092_othercode1</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2094" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2094_othercode2</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2096" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2096_othercode3</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2098" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2098_othercode4</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2099" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2099_aard</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = ''
+for atn_code, report_code in atn_mapping.items():
+    if mapped_total.get(atn_code, 0) and report_code not in result:
+        result += report_code
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2102" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2102_kas</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2103" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2103_kasvrijaanvullendpensioen</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2106" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2106_percentages</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <!-- Only for the stock options (warrants), as on the 281.10 -->
+            <field name="evaluation_value">result = '00,00' if round(mapped_total['WARRANT_GROSS'], 2) else ''</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2109" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2109_fiscaalidentificat</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2128" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2128_vrijaanvullendpensioenwerknemers</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2131" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2131_bedrijfsvoorheffingvanwerkgever</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total'),
+                ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue_withholding_tax'),
+                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_tax'),
+                ref('l10n_be_hr_payroll.l10n_be_presence_token_withholding_tax'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2133" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2133_bedrijfsvoorheffingbuitenlvenverbondenwerkgever</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2134" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2134_totaalbedragmobiliteitsbudget</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2138" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2138_covidovertimehours2023</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2181" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2181_remunerationetrang</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2182" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2182_aandelenetrang</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2183" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2183_bonuspremieoaandelenoptiesetrang</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2184" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2184_anderevaaetrang</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2185" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2185_amountother1</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2186" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2186_amountother2</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2187" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2187_amountother3</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2188" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2188_amountother4</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2195" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2195_relanceovertimeremuneration</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2196" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2196_relanceovertimehours</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2200" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2200_compensationwithstandards</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2201" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2201_compensationwithdocuments</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2202" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2202_amount</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2203" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2203_amount</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2204" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2204_repaidsums</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2205" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2205_recuperation</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2206" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2206_grossamountremuneration</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2207" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2207_travelbicycleorspeedpedelec</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_cycle_transportation')
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2208" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2208_benefitprovisionbicycleorspeedpedelec</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2226" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2226_kmzone2207</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = str(int(sum(all_line_values['CYCLE'][p.id]['quantity'] * p.version_id.km_home_work * 2 for p in payslips if all_line_values['CYCLE'][p.id]['total'])))
+            </field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2227" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2227_relanceovertimeremuneration2025</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2228" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2228_relanceovertimehours2025</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2063" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2063_totaal</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_20_2060'),
+                ref('l10n_be_281_mapping_281_20_2062'),
+                ref('l10n_be_281_mapping_281_20_2068'),
+                ref('l10n_be_281_mapping_281_20_2079'),
+                ref('l10n_be_281_mapping_281_20_2080'),
+                ref('l10n_be_281_mapping_281_20_2204'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2075" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2075_totaal</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_20_2073'),
+                ref('l10n_be_281_mapping_281_20_2074'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2209" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2209_totalcontributiontravelexpenses</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_20_2207'),
+                ref('l10n_be_281_mapping_281_20_2208'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2066" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2066_totaalbedrijfsvoorheffing</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_20_2131'),
+                ref('l10n_be_281_mapping_281_20_2133'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_20_2059" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f20_2059_totaalcontrole</field>
+            <field name="declaration_code">281.20</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_20_2060'),
+                ref('l10n_be_281_mapping_281_20_2061'),
+                ref('l10n_be_281_mapping_281_20_2062'),
+                ref('l10n_be_281_mapping_281_20_2063'),
+                ref('l10n_be_281_mapping_281_20_2064'),
+                ref('l10n_be_281_mapping_281_20_2065'),
+                ref('l10n_be_281_mapping_281_20_2066'),
+                ref('l10n_be_281_mapping_281_20_2067'),
+                ref('l10n_be_281_mapping_281_20_2068'),
+                ref('l10n_be_281_mapping_281_20_2069'),
+                ref('l10n_be_281_mapping_281_20_2071'),
+                ref('l10n_be_281_mapping_281_20_2073'),
+                ref('l10n_be_281_mapping_281_20_2074'),
+                ref('l10n_be_281_mapping_281_20_2075'),
+                ref('l10n_be_281_mapping_281_20_2076'),
+                ref('l10n_be_281_mapping_281_20_2078'),
+                ref('l10n_be_281_mapping_281_20_2079'),
+                ref('l10n_be_281_mapping_281_20_2080'),
+                ref('l10n_be_281_mapping_281_20_2081'),
+                ref('l10n_be_281_mapping_281_20_2082'),
+                ref('l10n_be_281_mapping_281_20_2083'),
+                ref('l10n_be_281_mapping_281_20_2084'),
+                ref('l10n_be_281_mapping_281_20_2087'),
+                ref('l10n_be_281_mapping_281_20_2088'),
+            ])]"/>
+        </record>
+
+        <!-- ==================================== -->
+        <!--           274.30 Mappings            -->
+        <!-- ==================================== -->
+        <record id="l10n_be_281_mapping_274_30_taxable" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">274_30_taxable</field>
+            <field name="declaration_code">274.30</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.l10n_be_presence_token_salary_rule')])]"/>
+        </record>
+        <record id="l10n_be_281_mapping_274_30_withholding" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">274_30_withholding</field>
+            <field name="declaration_code">274.30</field>
+            <field name="evaluation_type">salary_rule</field>
+            <!-- All the withholding taxes of the employee, as on the 281.30 (box 2063): the 274.10 leaves them out -->
+            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total')])]"/>
+        </record>
+
+        <!-- ==================================== -->
+        <!--           281.30 Mappings            -->
+        <!-- ==================================== -->
+        <record id="l10n_be_281_mapping_281_30_2030" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2030_beneficiarynature</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <!-- 1: natural person -->
+            <field name="evaluation_value">result = 1</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2035" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2035_verantwoordingsstukken</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2060" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2060_toegekendbedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2061" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2061_vrijstelling</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2062" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2062_bedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2063" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2063_bedrijfsvoorheffing</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.cp200_employees_salary_withholding_taxes_total')
+            ])]"/>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2064" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2064_presentiegelden</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['PRESENCE_TOKEN'] if employee.l10n_be_resident_situation == 'resident' else 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2065" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2065_toegekendbedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2066" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2066_vrijstelling</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2067" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2067_bedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2068" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2068_zonderberoepskarak</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2069" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2069_bijzonderbijdrage</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2070" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2070_toegekendbedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2071" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2071_vrijstelling</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2072" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2072_bedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2073" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2073_toegekendbedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2074" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2074_vrijstelling</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2075" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2075_bedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2076" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2076_peronderhoudsuitke</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2077" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2077_onderhoudsuitkering</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2078" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2078_olympicbonus</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2079" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2079_totalamount</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2080" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2080_winstofbaten</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2081" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2081_retributies</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = mapped_total['PRESENCE_TOKEN'] if employee.l10n_be_resident_situation != 'resident' else 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2082" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2082_buitverrichtingen</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2083" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2083_podiumkunstenaars</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2084" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2084_winst</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2085" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2085_art2283</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2086" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2086_bedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">
+result = sum(mapped_total[code] for code in atn_mapping)
+            </field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2087" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2087_bedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2088" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2088_bedrag</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2089" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2089_numberpeople</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2090" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2090_numberdays</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2095" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2095_foreignolympicbonus</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2097" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2097_totalamount</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2099" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2099_aard</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">
+result = ''
+for atn_code, report_code in atn_mapping.items():
+    if mapped_total[atn_code] and report_code not in result:
+        result += report_code
+            </field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2109" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2109_fiscaalidentificat</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2113" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2113_sportlimitedremuneration</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2115" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2115_sportunlimitedotherremuneration</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2116" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2116_sportmorethan30daysprofit</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2117" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2117_managerprofit</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2205" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2205_recuperation</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_30_2059" model="l10n.be.281.mapping">
+            <field name="date_from">2020-01-01</field>
+            <field name="tag">f30_2059_totaalcontrole</field>
+            <field name="declaration_code">281.30</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_30_2060'),
+                ref('l10n_be_281_mapping_281_30_2061'),
+                ref('l10n_be_281_mapping_281_30_2062'),
+                ref('l10n_be_281_mapping_281_30_2063'),
+                ref('l10n_be_281_mapping_281_30_2064'),
+                ref('l10n_be_281_mapping_281_30_2065'),
+                ref('l10n_be_281_mapping_281_30_2066'),
+                ref('l10n_be_281_mapping_281_30_2067'),
+                ref('l10n_be_281_mapping_281_30_2068'),
+                ref('l10n_be_281_mapping_281_30_2069'),
+                ref('l10n_be_281_mapping_281_30_2070'),
+                ref('l10n_be_281_mapping_281_30_2071'),
+                ref('l10n_be_281_mapping_281_30_2072'),
+                ref('l10n_be_281_mapping_281_30_2073'),
+                ref('l10n_be_281_mapping_281_30_2074'),
+                ref('l10n_be_281_mapping_281_30_2075'),
+                ref('l10n_be_281_mapping_281_30_2076'),
+                ref('l10n_be_281_mapping_281_30_2077'),
+                ref('l10n_be_281_mapping_281_30_2078'),
+                ref('l10n_be_281_mapping_281_30_2079'),
+                ref('l10n_be_281_mapping_281_30_2080'),
+                ref('l10n_be_281_mapping_281_30_2081'),
+                ref('l10n_be_281_mapping_281_30_2082'),
+                ref('l10n_be_281_mapping_281_30_2083'),
+                ref('l10n_be_281_mapping_281_30_2084'),
+                ref('l10n_be_281_mapping_281_30_2085'),
+                ref('l10n_be_281_mapping_281_30_2086'),
+                ref('l10n_be_281_mapping_281_30_2087'),
+                ref('l10n_be_281_mapping_281_30_2088'),
+            ])]"/>
+        </record>
+
+        <!-- ==================================== -->
+        <!--           281.45 Mappings            -->
+        <!-- ==================================== -->
+
+        <!-- ======================================================= -->
+        <!--  Report 281.45 Mappings                                 -->
+        <!-- ======================================================= -->
+
         <record id="l10n_be_281_mapping_281_45_2069" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
             <field name="tag">f45_2069_paidamount51</field>
@@ -71,7 +2284,8 @@
             <field name="declaration_code">281.45</field>
             <field name="evaluation_type">python</field>
             <field name="is_monetary" eval="True"/>
-            <field name="evaluation_value">result = mapped_total['IP'] / 2.0</field>
+            <!-- Only when the amount booked as expense differs from the amounts paid (2069 + 2070) -->
+            <field name="evaluation_value">result = 0</field>
         </record>
         <record id="l10n_be_281_mapping_281_45_2099" model="l10n.be.281.mapping">
             <field name="date_from">2020-01-01</field>
@@ -107,6 +2321,541 @@
                 ref('l10n_be_281_mapping_281_45_2069'),
                 ref('l10n_be_281_mapping_281_45_2070'),
                 ref('l10n_be_281_mapping_281_45_2071'),
+            ])]"/>
+        </record>
+
+        <record id="l10n_be_281_mapping_281_18_2035" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2035_verantwoordingsstukken</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2060" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2060_zonderclausulevergoedingen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2061" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2061_zonderclausuleachterstallen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2062" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2062_metclausulevergoedingen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2063" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2063_metclausuleachterstallen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2064" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2064_ziekteofinvaliditeit</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [ref('l10n_be_hr_payroll.cp200_employees_salary_replacement_revenue')])]"/>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2065" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2065_beroepsziekte</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2066" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2066_anderegebeurtenissen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2067" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2067_belastbareachterstallen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2068" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2068_gewonebijdragen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2069" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2069_individuelevoortzettingbijdragen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2070" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2070_bedrijfsvoorheffing</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = -mapped_total['REPLACEMENT_REVENUE.P.P']</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2071" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2071_bijzonderebijdrage</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2072" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2072_decembercompensationwithclause</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2073" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2073_decembercompensationwithoutclause</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2074" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2074_decembercompensation</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2075" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2075_vergoedingen_tot31122015</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2076" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2076_vergoedingen_vanaf01012016</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2077" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2077_decembercompensation</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2078" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2078_achterstallen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2079" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2079_vergoedingenvrijstelling</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2080" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2080_achterstallen_vanaf01012016</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2081" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2081_bonus</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2090" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2090_dagen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = round(sum(worked_days[code] for code in ('082.00', '072.00', '072.01')))</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2091" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2091_dagen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2102" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2102_kas</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2103" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2103_kasvrijaanvullendpensioen</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2109" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2109_fiscaalidentificat</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2128" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2128_vrijaanvullendpensioenwerknemers</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_18_2059" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f18_2059_totaalcontrole</field>
+            <field name="declaration_code">281.18</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_18_2060'),
+                ref('l10n_be_281_mapping_281_18_2061'),
+                ref('l10n_be_281_mapping_281_18_2062'),
+                ref('l10n_be_281_mapping_281_18_2063'),
+                ref('l10n_be_281_mapping_281_18_2064'),
+                ref('l10n_be_281_mapping_281_18_2065'),
+                ref('l10n_be_281_mapping_281_18_2066'),
+                ref('l10n_be_281_mapping_281_18_2067'),
+                ref('l10n_be_281_mapping_281_18_2068'),
+                ref('l10n_be_281_mapping_281_18_2069'),
+                ref('l10n_be_281_mapping_281_18_2070'),
+                ref('l10n_be_281_mapping_281_18_2071'),
+                ref('l10n_be_281_mapping_281_18_2072'),
+                ref('l10n_be_281_mapping_281_18_2073'),
+                ref('l10n_be_281_mapping_281_18_2074'),
+                ref('l10n_be_281_mapping_281_18_2075'),
+                ref('l10n_be_281_mapping_281_18_2076'),
+                ref('l10n_be_281_mapping_281_18_2077'),
+                ref('l10n_be_281_mapping_281_18_2078'),
+                ref('l10n_be_281_mapping_281_18_2079'),
+                ref('l10n_be_281_mapping_281_18_2080'),
+                ref('l10n_be_281_mapping_281_18_2081'),
+            ])]"/>
+        </record>
+
+        <!-- ==================================== -->
+        <!--           274.13 Mappings            -->
+        <!-- ==================================== -->
+        <record id="l10n_be_281_mapping_274_13_taxable" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">274_13_taxable</field>
+            <field name="declaration_code">274.13</field>
+            <field name="evaluation_type">salary_rule</field>
+            <field name="salary_rule_ids" eval="[(6, 0, [
+                ref('l10n_be_hr_payroll.l10n_be_economic_unemployment_compensation'),
+                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_compensation'),
+                ref('l10n_be_hr_payroll.cp200_employees_economic_unemployment_bonus'),
+            ])]"/>
+        </record>
+        <record id="l10n_be_281_mapping_274_13_withholding" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">274_13_withholding</field>
+            <field name="declaration_code">274.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = -mapped_total['ECONOMIC_UNEMPLOYMENT.P.P']</field>
+        </record>
+
+        <!-- ==================================== -->
+        <!--           281.13 Mappings            -->
+        <!-- ==================================== -->
+        <record id="l10n_be_281_mapping_281_13_2031" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2031_repaymentneo</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2035" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2035_verantwoordingsstukken</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2060" model="l10n.be.281.mapping">
+            <!-- Box 10: the complements, the arrears are declared in box 11 -->
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2060_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = sum(mapped_total[code] - mapped_total['arrears'][code] for code in ('EUC', 'EUC_CP200', 'EUB'))</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2061" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2061_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2064" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2064_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2065" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2065_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2066" model="l10n.be.281.mapping">
+            <!-- Box 11: the arrears taxable separately -->
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2066_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = sum(mapped_total['arrears'][code] for code in ('EUC', 'EUC_CP200', 'EUB'))</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2067" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2067_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2070" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2070_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2071" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2071_bedrag</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2072" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2072_werkloosheidzonder</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_13_2060'),
+            ])]"/>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2073" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2073_decemberallowance</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2074" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2074_werkloosheidmetancienniteit</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2075" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2075_werkloosheidzonder</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_13_2066'),
+            ])]"/>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2077" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2077_werkloosheidmetancienniteit</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2078" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2078_bedrijfsvoorheffing</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = -mapped_total['ECONOMIC_UNEMPLOYMENT.P.P']</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2079" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2079_werkloosheidzonder</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+            <!-- Belcotax refuses 0, the zone is left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2081" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2081_werkloosheidmetancienniteit</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+            <!-- Belcotax refuses 0, the zone is left out when empty -->
+            <field name="skip_if_falsy" eval="True"/>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2082" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2082_bijdragenpremies</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2083" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2083_voortzetting</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2084" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2084_movingexpenses</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2089" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2089_werkloosheidzonder</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = round(sum(wd.number_of_days for wd in payslips.worked_days_line_ids if wd.work_entry_type_id.l10n_be_economic_unemployment))</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2091" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2091_werkloosheidmetancienniteit</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2099" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2099_referentienummerui</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2102" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2102_kas</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2103" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2103_kasvrijaanvullendpensioen</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2109" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2109_fiscaalidentificat</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="evaluation_value">result = ''</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2128" model="l10n.be.281.mapping">
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2128_vrijaanvullendpensioenwerknemers</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">python</field>
+            <field name="is_monetary" eval="True"/>
+            <field name="evaluation_value">result = 0</field>
+        </record>
+        <record id="l10n_be_281_mapping_281_13_2059" model="l10n.be.281.mapping">
+            <!-- Sum of the zones 2060 to 2088 -->
+            <field name="date_from">1990-01-01</field>
+            <field name="tag">f13_2059_totaalcontrole</field>
+            <field name="declaration_code">281.13</field>
+            <field name="evaluation_type">control</field>
+            <field name="control_mapping_ids" eval="[(6, 0, [
+                ref('l10n_be_281_mapping_281_13_2060'),
+                ref('l10n_be_281_mapping_281_13_2061'),
+                ref('l10n_be_281_mapping_281_13_2064'),
+                ref('l10n_be_281_mapping_281_13_2065'),
+                ref('l10n_be_281_mapping_281_13_2066'),
+                ref('l10n_be_281_mapping_281_13_2067'),
+                ref('l10n_be_281_mapping_281_13_2070'),
+                ref('l10n_be_281_mapping_281_13_2071'),
+                ref('l10n_be_281_mapping_281_13_2072'),
+                ref('l10n_be_281_mapping_281_13_2073'),
+                ref('l10n_be_281_mapping_281_13_2074'),
+                ref('l10n_be_281_mapping_281_13_2075'),
+                ref('l10n_be_281_mapping_281_13_2077'),
+                ref('l10n_be_281_mapping_281_13_2078'),
+                ref('l10n_be_281_mapping_281_13_2079'),
+                ref('l10n_be_281_mapping_281_13_2081'),
+                ref('l10n_be_281_mapping_281_13_2082'),
+                ref('l10n_be_281_mapping_281_13_2083'),
+                ref('l10n_be_281_mapping_281_13_2084'),
             ])]"/>
         </record>
     </data>

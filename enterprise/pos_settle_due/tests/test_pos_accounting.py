@@ -42,8 +42,14 @@ class TestPosAccountingSettleDue(TestPosAccounting):
         )
 
         self.assertEqual(self.partner_1.total_due, 5.6)
-        self.assertEqual(account_move.payment_state, 'partial')
-        self.assertEqual(account_move.amount_residual, 5.6)
+        # The closing invoice is paid at closing, the debt is on the transfer entry
+        transfer_line = self.env['account.move.line'].search([
+            ('partner_id', '=', self.partner_1.id),
+            ('account_id', '=', self.partner_1.property_account_receivable_id.id),
+            ('move_id.move_type', '=', 'entry'),
+            ('balance', '>', 0),
+        ])
+        self.assertEqual(transfer_line.amount_residual, 5.6)
 
     def test_settle_customer_invoice_multi_payment(self):
         session = self.open_pos_session()
@@ -65,5 +71,5 @@ class TestPosAccountingSettleDue(TestPosAccounting):
         )
 
         self.assertEqual(self.partner_1.total_due, 0)
-        self.assertEqual(account_move.payment_state, account_move._get_invoice_in_payment_state())      # Waiting for card payment to be reconciled
+        self.assertEqual(account_move.payment_state, 'paid')      # Waiting for card payment to be reconciled
         self.assertEqual(account_move.amount_residual, 0)

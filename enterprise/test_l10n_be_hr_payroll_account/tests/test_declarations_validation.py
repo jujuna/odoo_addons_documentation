@@ -362,8 +362,10 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'payslip_run_id': cls.batch.id,
         } for i in range(cls.EMPLOYEES_COUNT)])
         for payslip in cls.december_2021:
-            payslip._set_input_value('SIMPLE_DECEMBER', 150)
-            payslip._set_input_value('DOUBLE_DECEMBER_BASIC', 100)
+            payslip._set_input_values({
+                'SIMPLE_DECEMBER': 150,
+                'DOUBLE_DECEMBER_BASIC': 100,
+            })
             payslip.compute_sheet()
 
         cls.thirteen_2021 = cls.env['hr.payslip'].create([{
@@ -466,6 +468,31 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
                 error.append("    '%s': %s," % (field_name, declaration[field_name]))
             error.append("}")
         self.assertEqual(len(error), 0, '\n' + '\n'.join(error))
+
+    def _validate_281_report(self, actual_report, expected_report):
+        """
+        Check the totals of reports against the expected results.
+        """
+        error = []
+        for code, value in expected_report.items():
+            if code not in actual_report:
+                error.append(f"{'FIELD NOT COMPUTED':>20} │ {code:<50} │ {value:>15} |")
+            elif actual_report[code] != value:
+                error.append(f"{'WRONG CALCULATION':>20} │ {code:<50} │ {value:>15} │ {actual_report[code]:>15} |")
+        for code, value in actual_report.items():
+            if code not in expected_report:
+                error.append(f"{'MISSING FIELD':>20} │ {code:<50} │ {'/':>15} │")
+        if error:
+            error.insert(
+                0,
+                f"{'ERROR':>20} │ {'CODE':<50} │ {'EXPECTED':>15} │ {'REALITY':>15} │\n"
+                f"{'':>20} │ {'':<50} │ {'':>15} │ {'':>15} │")
+            error.append("Report Actual Values: ")
+            error.append("        actual_report = {")
+            error.extend(f"            '{code}': {value}," for code, value in actual_report.items())
+            error.append("        }")
+        self.assertEqual(len(error), 0, '\n\n' + '\n'.join(error))
+        return expected_report
 
     def test_274_declaration(self):
         declaration = self.env['l10n_be.274_xx'].create({
@@ -585,7 +612,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'month': '12',
         })
         declaration_results = {
-            'pp_amount_10': 7639.22,
+            'pp_amount_10': 7825.57,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
@@ -662,7 +689,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         })
 
         expected_declaration_results = {
-            'pp_amount_10': 0.0,
+            'pp_amount_10': 1200.13,
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
@@ -1051,9 +1078,11 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         })
         declaration_281 = declaration_281_xx.l10n_be_281_10_ids
         data_281 = declaration_281._get_rendering_data(self.employees)
+
         for employee_data in data_281['employees_data']:
             if employee_data['f2011_nationaalnr'] == self.employees[0].niss:
-                self.assertEqual(employee_data['f10_2055_datumvanindienstt'], '31-12-2018')
+                # Employed since 2018: no entry date in 2021, and not the one of the comeback in 2022
+                self.assertEqual(employee_data['f10_2055_datumvanindienstt'], '')
 
     def test_281_10_departure(self):
         departure_notice = self.env['hr.employee.departure'].create({
@@ -1572,7 +1601,7 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         self.env.ref('l10n_be_hr_payroll.l10n_be_time_rule_night_cp302').sudo().write({'active': False})
 
         self.extra_hours_employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302')
-        self._run_extra_hours_payslip(
+        payslip, _ = self._run_extra_hours_payslip(
             name="Payslip Jan 2026",
             rule_vals_list=[
                 {
@@ -1631,9 +1660,8 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         # pp_amount_10 = PPTOTAL = 5187.44 - 2702.70 = 2484.74€
         #
         # taxable_amount_55 (274_55 overtime exemption):
-        #   040.00 = 156h; cap = 60h (no white cash register) or 90h (with)
-        #   no cash register:  60h x 30€ = 1800€; deducted = 1800 x 41.25% = 742.5€
-        #   with cash register: 90h x 30€ = 2700€; deducted = 2700 x 41.25% = 1113.75€
+        #   040.00 = 156h; cap = 360h for the hotel industry, with or without a white cash register
+        #   156h x 30€ = 4680€; deducted = 4680 x 41.25% = 1930.5€
         base_results = {
             'pp_amount_10': 2484.74,
             'pp_amount_13': 0.0,
@@ -1654,35 +1682,164 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_33': 0.0,
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 0.0,
-            'taxable_amount_55': 1800.0,
-            'deducted_amount': 742.5,
+            'taxable_amount_55': 4680.0,
+            'deducted_amount': 1930.5,
             'deducted_amount_32': 0.0,
             'deducted_amount_33': 0.0,
             'deducted_amount_34': 0.0,
             'deducted_amount_44': 0.0,
-            'deducted_amount_55': 742.5,
+            'deducted_amount_55': 1930.5,
             'capped_amount_34': 0.0,
         }
 
-        # Test the 60h/year exemption limit for companies without a white cash register
-        self.env.company.l10n_be_has_white_cash_register = False
-        declaration = self.env['l10n_be.274_xx'].create({'year': 2026, 'month': '1'})
-        self.validate_results(declaration, {
-            **base_results,
-            'taxable_amount_55': 1800.0,
-            'deducted_amount': 742.5,
-            'deducted_amount_55': 742.5,
-        })
+        # The 360h/year exemption limit holds with or without a white cash register
+        for white_cash_register in (False, True):
+            self.env.company.l10n_be_has_white_cash_register = white_cash_register
+            declaration = self.env['l10n_be.274_xx'].create({'year': 2026, 'month': '1'})
+            self.validate_results(declaration, base_results)
 
-        # Test the 90h/year exemption limit for companies with a white cash register
-        self.env.company.l10n_be_has_white_cash_register = True
+        # The payslip's withholding tax (2484.74€) covers the whole exemption
+        line_values = payslip._get_line_values(['WITHHOLDING_TAX_EX_274_55', 'WITHHOLDING_TAX_EX_TOT'])
+        for code in ('WITHHOLDING_TAX_EX_274_55', 'WITHHOLDING_TAX_EX_TOT'):
+            self.assertAlmostEqual(line_values[code][payslip.id]['total'], 1930.5, 2, code)
+
+    def test_extra_hours_55_CP_302_voluntary(self):
+        self.env.ref('l10n_be_hr_payroll.l10n_be_time_rule_sunday').sudo().write({'active': False})
+        self.env.ref('l10n_be_hr_payroll.l10n_be_time_rule_night_cp302').sudo().write({'active': False})
+
+        self.extra_hours_employee.l10n_be_joint_committee_id = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302')
+        payslip, _ = self._run_extra_hours_payslip(
+            name="Payslip Jan 2026",
+            rule_vals_list=[
+                {
+                    'name': 'Voluntary hours',
+                    'working_hours_mode': 'day',
+                    'work_entry_type_id': self.volo150_type.id,
+                    'condition_work_entry_type_ids': [(4, self.be_attendance_type.id)],
+                    'timing_start': 0,
+                    'timing_stop': 12,
+                    'apply_saturday': False,
+                    'apply_sunday': False,
+                },
+            ],
+            # working days Jan 1(Thu),2(Fri),5-9(Mon-Fri): 7 days x 24h local each
+            attendance_periods=[
+                (datetime.datetime(2026, 1, 1, 0, 0), datetime.datetime(2026, 1, 2, 0, 0)),   # Jan 1 Thu
+                (datetime.datetime(2026, 1, 2, 0, 0), datetime.datetime(2026, 1, 3, 0, 0)),   # Jan 2 Fri
+                (datetime.datetime(2026, 1, 5, 0, 0), datetime.datetime(2026, 1, 6, 0, 0)),   # Jan 5 Mon
+                (datetime.datetime(2026, 1, 6, 0, 0), datetime.datetime(2026, 1, 7, 0, 0)),   # Jan 6 Tue
+                (datetime.datetime(2026, 1, 7, 0, 0), datetime.datetime(2026, 1, 8, 0, 0)),   # Jan 7 Wed
+                (datetime.datetime(2026, 1, 8, 0, 0), datetime.datetime(2026, 1, 9, 0, 0)),   # Jan 8 Thu
+                (datetime.datetime(2026, 1, 9, 0, 0), datetime.datetime(2026, 1, 10, 0, 0)),  # Jan 9 Fri
+            ],
+            date_from=datetime.datetime(2026, 1, 1),
+            date_to=datetime.datetime(2026, 1, 31),
+        )
+        # 040.27 (timing 0-12h): 12h per day -> 7x12 = 84h, voluntary overtime with its legal 50% premium:
+        #   84 x 30 x 1.5 = 3780€; the exemption is on the hours' pay: 84 x 30 = 2520€; 2520 x 41.25% = 1039.5€
         declaration = self.env['l10n_be.274_xx'].create({'year': 2026, 'month': '1'})
-        self.validate_results(declaration, {
-            **base_results,
-            'taxable_amount_55': 2700.0,
-            'deducted_amount': 1113.75,
-            'deducted_amount_55': 1113.75,
+        self.assertAlmostEqual(declaration.taxable_amount_55, 2520, 2)
+        self.assertAlmostEqual(declaration.deducted_amount_55, 1039.5, 2)
+
+        # The payslip's withholding tax (1963€) covers the whole exemption
+        line_values = payslip._get_line_values(['PPTOTAL', 'WITHHOLDING_TAX_EX_274_55'])
+        self.assertAlmostEqual(line_values['PPTOTAL'][payslip.id]['total'], 1963, 2)
+        self.assertAlmostEqual(line_values['WITHHOLDING_TAX_EX_274_55'][payslip.id]['total'], 1039.5, 2)
+
+    def test_extra_hours_44_recoverable_payslip(self):
+        self.env.ref('l10n_be_hr_payroll.l10n_be_time_rule_sunday').sudo().write({'active': False})
+
+        self.extra_hours_employee.l10n_be_joint_committee_id = self.env.ref(
+            'l10n_be_hr_payroll.l10n_be_joint_committee_200')
+        recoverable_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_overtime_recoverable')
+        payslip, _ = self._run_extra_hours_payslip(
+            name="Payslip Jan 2026",
+            rule_vals_list=[
+                {
+                    'name': 'Overtime hours to recover',
+                    'working_hours_mode': 'day',
+                    'work_entry_type_id': recoverable_type.id,
+                    'condition_work_entry_type_ids': [(4, self.be_attendance_type.id)],
+                    'timing_start': 0,
+                    'timing_stop': 12,
+                    'apply_saturday': False,
+                    'apply_sunday': False,
+                },
+            ],
+            # working days Jan 1(Thu),2(Fri),5-9(Mon-Fri): 7 days x 24h local each
+            attendance_periods=[
+                (datetime.datetime(2026, 1, 1, 0, 0), datetime.datetime(2026, 1, 2, 0, 0)),   # Jan 1 Thu
+                (datetime.datetime(2026, 1, 2, 0, 0), datetime.datetime(2026, 1, 3, 0, 0)),   # Jan 2 Fri
+                (datetime.datetime(2026, 1, 5, 0, 0), datetime.datetime(2026, 1, 6, 0, 0)),   # Jan 5 Mon
+                (datetime.datetime(2026, 1, 6, 0, 0), datetime.datetime(2026, 1, 7, 0, 0)),   # Jan 6 Tue
+                (datetime.datetime(2026, 1, 7, 0, 0), datetime.datetime(2026, 1, 8, 0, 0)),   # Jan 7 Wed
+                (datetime.datetime(2026, 1, 8, 0, 0), datetime.datetime(2026, 1, 9, 0, 0)),   # Jan 8 Thu
+                (datetime.datetime(2026, 1, 9, 0, 0), datetime.datetime(2026, 1, 10, 0, 0)),  # Jan 9 Fri
+            ],
+            date_from=datetime.datetime(2026, 1, 1),
+            date_to=datetime.datetime(2026, 1, 31),
+        )
+        # 026.00 (timing 0-12h): 12h per day -> 7x12 = 84h, paid now for their 50% premium alone:
+        #   84 x 30 x 0.5 = 1260€ (the hours themselves are paid when they are recovered)
+        recoverable_line = payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id == recoverable_type)
+        self.assertAlmostEqual(recoverable_line.number_of_hours, 84, 2)
+        self.assertAlmostEqual(recoverable_line.amount, 1260, 2)
+
+        # The exemption is on the whole pay of the hours: 84 x 30 = 2520€; 2520 x 41.25% = 1039.5€
+        declaration = self.env['l10n_be.274_xx'].create({'year': 2026, 'month': '1'})
+        self.assertAlmostEqual(declaration.taxable_amount_44, 2520, 2)
+        self.assertAlmostEqual(declaration.deducted_amount_44, 1039.5, 2)
+
+        # The payslip keeps at most its own withholding tax (791€ once the employee's overtime tax reduction is applied)
+        line_values = payslip._get_line_values(['PPTOTAL', 'WITHHOLDING_TAX_EX_274_44', 'WITHHOLDING_TAX_EX_TOT'])
+        for code, amount in [('PPTOTAL', 791), ('WITHHOLDING_TAX_EX_274_44', 791), ('WITHHOLDING_TAX_EX_TOT', 791)]:
+            self.assertAlmostEqual(line_values[code][payslip.id]['total'], amount, 2, code)
+
+    def test_extra_hours_44_part_time_additional_hours_150(self):
+        # A part-timer's additional hours paid at 150% (003.12) are overtime of the exemption, on their base pay
+        self.env.ref('l10n_be_hr_payroll.l10n_be_time_rule_sunday').sudo().write({'active': False})
+
+        self.extra_hours_employee.l10n_be_joint_committee_id = self.env.ref(
+            'l10n_be_hr_payroll.l10n_be_joint_committee_200')
+        additional_hours_type = self.env.ref('hr_work_entry.be_work_entry_type_additional_hours_50')
+        self.env['hr.time.rule'].sudo().create({
+            'name': 'Additional hours 150%',
+            'working_hours_mode': 'day',
+            'work_entry_type_id': additional_hours_type.id,
+            'condition_work_entry_type_ids': [(4, self.be_attendance_type.id)],
+            'timing_start': 0,
+            'timing_stop': 2,
+            'apply_saturday': False,
+            'apply_sunday': False,
+            'employee_domain': f"[('id', '=', {self.extra_hours_employee.id})]",
         })
+        tz = ZoneInfo(self.extra_hours_employee.sudo()._get_tz())
+        # working days Jan 1(Thu),2(Fri),5-9(Mon-Fri): 7 days x 24h local each
+        for day in (1, 2, 5, 6, 7, 8, 9):
+            check_in = datetime.datetime(2026, 1, day).replace(tzinfo=tz).astimezone(ZoneInfo('UTC')).replace(tzinfo=None)
+            self.env['hr.attendance'].sudo().create({
+                'employee_id': self.extra_hours_employee.id,
+                'check_in': check_in,
+                'check_out': check_in + datetime.timedelta(days=1),
+            })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Jan 2026',
+            'version_id': self.extra_hours_employee.version_id.id,
+            'date_from': datetime.date(2026, 1, 1),
+            'date_to': datetime.date(2026, 1, 31),
+            'employee_id': self.extra_hours_employee.id,
+            'company_id': self.env.company.id,
+        })
+        payslip.compute_sheet()
+
+        # 003.12 (timing 0-2h): 2h per day -> 7x2 = 14h at 150%: 14 x 30 x 1.5 = 630€
+        additional_line = payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id == additional_hours_type)
+        self.assertAlmostEqual(additional_line.number_of_hours, 14, 2)
+        self.assertAlmostEqual(additional_line.amount, 630, 2)
+
+        # The exemption is on the pay of the hours without the premium: 14 x 30 = 420€; 420 x 41.25% = 173.25€
+        line_values = payslip._get_line_values(['WITHHOLDING_TAX_EX_274_44'])
+        self.assertAlmostEqual(line_values['WITHHOLDING_TAX_EX_274_44'][payslip.id]['total'], 173.25, 2)
 
     def test_30_declarations(self):
         employee_tokens = self.employees[0]
@@ -1710,9 +1867,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'pp_amount_13': 0.0,
             'pp_amount_18': 0.0,
             'pp_amount_20': 0.0,
-            'pp_amount_30': 747.0,
+            'pp_amount_30': 860.72,  # the withholding taxes of the presence tokens and of the salary
             'pp_amount_32': 0.0,
-            'pp_amount_33': 113.74,
+            'pp_amount_33': 113.72,
             'pp_amount_34': 0.0,
             'pp_amount_44': 0.0,
             'pp_amount_55': 0.0,
@@ -1726,9 +1883,9 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
             'taxable_amount_34': 0.0,
             'taxable_amount_44': 0.0,
             'taxable_amount_55': 0.0,
-            'deducted_amount': 90.99,
+            'deducted_amount': 90.98,
             'deducted_amount_32': 0.0,
-            'deducted_amount_33': 90.99,
+            'deducted_amount_33': 90.98,
             'deducted_amount_34': 0.0,
             'deducted_amount_44': 0.0,
             'deducted_amount_55': 0.0,
@@ -1744,6 +1901,605 @@ class TestDeclarationsValidation(TestPayslipValidationCommon, TestBelgiumCommon)
         self.assertIn(self.employees[0].niss, {emp_data['f2011_nationaalnr'] for emp_data in data_281['employees_data']})
         for employee_data in data_281['employees_data']:
             if employee_data['f2011_nationaalnr'] == self.employees[0].niss:
-                self.assertAlmostEqual(employee_data['f30_2063_bedrijfsvoorheffing'], 11154.67, places=2)
+                self.assertAlmostEqual(employee_data['f30_2063_bedrijfsvoorheffing'], 11140.15, places=2)
                 self.assertAlmostEqual(employee_data['f30_2064_presentiegelden'], 24000.0, places=2)
                 self.assertAlmostEqual(employee_data['f30_2086_bedrag'], 2046.03, places=2)
+
+    @freeze_time("2025-12-31")
+    def test_281_10_all_fields(self):
+        """
+        Test that all fields for the 281.10 declaration are correctly mapped and validated.
+        """
+        brand = self.env['fleet.vehicle.model.brand'].sudo().create({'name': "Test Brand"})
+        model = self.env['fleet.vehicle.model'].sudo().create({'name': "Test Model", 'brand_id': brand.id})
+
+        test_car = self.env['fleet.vehicle'].sudo().create({
+            'name': "Test Car",
+            'model_id': model.id,
+            'brand_id': brand.id,
+            'company_id': self.env.company.id,
+            'car_value': 40000.0,
+            'co2': 88.0,
+            'fuel_type': 'diesel',
+            'acquisition_date': datetime.date(2025, 1, 1),
+        })
+        self.env['fleet.vehicle.log.contract'].sudo().create({
+            'name': "Test Contract",
+            'vehicle_id': test_car.id,
+            'company_id': self.env.company.id,
+            'start_date': datetime.date(2025, 10, 8),
+            'expiration_date': datetime.date(2026, 10, 8),
+            'state': "open",
+            'cost_generated': 0.0,
+            'cost_frequency': "monthly",
+            'recurring_cost_amount_depreciated': 450.0
+        })
+
+        emp = self.env['hr.employee'].create({
+            'name': "Complete Employee",
+            'private_street': 'Employee Street',
+            'private_zip': '1000',
+            'private_city': 'Brussels',
+            'private_country_id': self.env.ref('base.be').id,
+            'company_id': self.env.company.id,
+            'niss': '91072845880',
+            'certificate': 'master',
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'date_version': datetime.date(2025, 1, 1),
+            'wage': 4000.0,
+            'laptop': True,
+            'internet': 38.0,
+            'mobile_amount': 30.0,
+            'transport_mode_car': True,
+            'car_id': test_car.id,
+            'housing_fiscal_amount': 1200.0,
+            'housing_onss_amount': 300.0,
+            'heating_amount': 300.0,
+            'electricity_amount': 200.0,
+            'mobile': 50.0,
+            'rent_amount': 800.0,
+            'train_transport_employee_kilometer': 50,
+            'private_car_employee_kilometer': 20,
+            'has_bicycle': True,
+            'km_home_work': 15,
+            'fuel_card': 100,
+            'l10n_be_lsa_homeworking_amount': 150.0,
+            'l10n_be_has_group_insurance': True,
+            'l10n_be_group_insurance_employee_contribution': 0.50,
+            'l10n_be_group_insurance_employee_voluntary': 0.25,
+            'l10n_be_mobility_budget': True,
+            'l10n_be_mobility_budget_amount': 500.0,
+            'bike_transport_employee_kilometer': 15,
+            'l10n_be_lsa_daily_misc_other_amount': 75.0,
+            'l10n_be_lsa_monthly_misc_other_amount': 100,
+            'bus_transport_employee_amount': 25.0,
+        })
+
+        departure_notice = self.env['hr.employee.departure'].create({
+            'employee_id': emp.id,
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+            'dismissal_date': datetime.date(2025, 12, 30),
+            'l10n_be_notice_respect': 'without',
+            'departure_description': 'foo',
+            'action_date': datetime.date(2025, 12, 31),
+        })
+        departure_notice.action_register()
+        departure_payslips = departure_notice._generate_termination_payslip()
+        departure_payslips += departure_notice._generate_termination_holidays()
+
+        struct_id = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_termination_fees')
+        termination_fees = departure_payslips.filtered(lambda dep: dep.struct_id == struct_id)
+        termination_fees.compute_sheet()
+        termination_fees.employee_id.write({'review_state': '1_reviewed'})
+        termination_fees.action_payslip_done()
+
+        holiday_pays = departure_payslips - termination_fees
+        holiday_pays.employee_id.write({'review_state': '1_reviewed'})
+        holiday_pays.action_payslip_done()
+
+        payslip_regular = self.env['hr.payslip'].create({
+            'name': 'Regular Month',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'date_from': datetime.date(2025, 1, 1),
+            'date_to': datetime.date(2025, 1, 31),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+        payslip_regular._set_input_value('CYCLE', 10)
+        payslip_regular._set_input_value('EXPENSE_MANUAL', 75)
+
+        payslip_arrear = self.env['hr.payslip'].create({
+            'name': 'Arrear Month',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'date_from': datetime.date(2025, 2, 1),
+            'date_to': datetime.date(2025, 2, 28),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+            'l10n_be_arrear_salary': True,
+        })
+
+        payslip_warrant = self.env['hr.payslip'].create({
+            'name': 'Warrant',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant').id,
+            'date_from': datetime.date(2025, 3, 1),
+            'date_to': datetime.date(2025, 3, 31),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+        payslip_warrant._set_input_value('WARRANT_WITHOUT_ONSS', 1000)
+
+        payslip_cct90 = self.env['hr.payslip'].create({
+            'name': 'CCT90',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90').id,
+            'date_from': datetime.date(2025, 4, 1),
+            'date_to': datetime.date(2025, 4, 30),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+        payslip_cct90._set_input_value('CCT90_GROSS', 500)
+
+        all_payslips = payslip_regular | payslip_arrear | payslip_warrant | payslip_cct90 | termination_fees | holiday_pays
+        all_payslips.compute_sheet()
+        emp.write({'review_state': '1_reviewed'})
+        all_payslips.action_payslip_done()
+
+        all_payslips.write({'state': 'validated'})
+
+        declaration_281_xx = self.env['l10n_be.281_xx'].create({'year': 2025})
+        sheet = declaration_281_xx.l10n_be_281_10_ids
+
+        data_281 = sheet.with_context(round_281=True)._get_rendering_data(emp)
+        emp_data = {key: value for key, value in data_281['employees_data'][0].items() if key.startswith('f10_')}
+
+        EXPECTED_RESULTS = {
+            'f10_2031_associationactivity': 0,
+            'f10_2035_verantwoordingsstukken': 0,
+            'f10_2036_inwonersdeenfr': 0,
+            'f10_2037_vergoedingkosten': 0,
+            'f10_2038_seasonalworker': 0,
+            'f10_2039_optiebuitvennoots': '0',
+            'f10_2040_individualconvention': 0,
+            'f10_2041_overheidspersoneel': 0,
+            'f10_2042_sailorcode': 0,
+            'f10_2045_code': 0,
+            'f10_2055_datumvanindienstt': '01-01-2025',
+            'f10_2056_datumvanvertrek': '30-12-2025',
+            'f10_2060_gewonebezoldiginge': 331679,
+            'f10_2061_bedragoveruren300horeca': 0,
+            'f10_2063_vervroegdvakantieg': 0,
+            'f10_2064_afzbelachterstall': 342379,
+            'f10_2065_opzeggingsreclasseringsverg': 939326,
+            'f10_2066_impulsfund': 0,
+            'f10_2067_rechtvermindering66_81': 0,
+            'f10_2068_rechtvermindering57_75': 0,
+            'f10_2069_fidelitystamps': 0,
+            'f10_2070_decemberremuneration': 0,
+            'f10_2072_pensioentoezetting': 0,
+            'f10_2073_tipamount': 0,
+            'f10_2074_bedrijfsvoorheffing': 409260,
+            'f10_2075_bijzonderbijdrage': 16910,
+            'f10_2076_voordelenaardbedrag': 351703,
+            'f10_2078_compensationamountwithoutstandards': 0,
+            'f10_2079_covidovertimeremuneration2023': 0,
+            'f10_2081_gewonebijdragenenpremies': 481850,
+            'f10_2082_bedrag': 18000,
+            'f10_2083_bedrag': 0,
+            'f10_2084_mobiliteitsvergoedi': 0,
+            'f10_2085_forfbezoldiging': 0,
+            'f10_2086_openbaargemeenschap': 35590,
+            'f10_2087_bedrag': 0,
+            'f10_2088_andervervoermiddel': 49000,
+            'f10_2090_outborderdays': 0,
+            'f10_2092_othercode1': 0,
+            'f10_2094_othercode2': 0,
+            'f10_2095_aantaluren': 0,
+            'f10_2096_othercode3': 0,
+            'f10_2097_aantaluren': 0,
+            'f10_2098_othercode4': 0,
+            'f10_2099_aard': 'BCDFHIJK',
+            'f10_2102_kas': 0,
+            'f10_2103_kasvrijaanvullendpensioen': 0,
+            'f10_2106_percentages': '00,00',
+            'f10_2109_fiscaalidentificat': '',
+            'f10_2110_aantaloveruren360': 0,
+            'f10_2111_achterstalloveruren300horeca': 0,
+            'f10_2113_forfaitrsz': 0,
+            'f10_2115_bonus': 0,
+            'f10_2116_badweatherstamps': 0,
+            'f10_2117_nonrecurrentadvantages': 0,
+            'f10_2118_overtimehours180': 0,
+            'f10_2119_sportremuneration': 0,
+            'f10_2120_sportvacancysavings': 0,
+            'f10_2121_sportoutdated': 0,
+            'f10_2122_sportindemnificationofretraction': 0,
+            'f10_2123_managerremuneration': 0,
+            'f10_2124_managervacancysavings': 0,
+            'f10_2125_manageroutdated': 0,
+            'f10_2126_managerindemnificationofretraction': 0,
+            'f10_2127_nonrecurrentadvantagesoutdated': 0,
+            'f10_2128_vrijaanvullendpensioenwerknemers': 0,
+            'f10_2129_exemptincomesubjecttoprogressivity': 0,
+            'f10_2130_privatepc': 0,
+            'f10_2131_bedrijfsvoorheffingvanwerkgever': 409260,
+            'f10_2132_horeca': 0,
+            'f10_2133_bedrijfsvoorheffingbuitenlvenverbondenwerkgever': 0,
+            'f10_2134_totaalbedragmobiliteitsbudget': 49863,
+            'f10_2136_amountcontractofstudent': 0,
+            'f10_2137_amountstudentspecificperiod': 0,
+            'f10_2138_covidovertimehours2023': 0,
+            'f10_2141_total': 0,
+            'f10_2142_totalovertimehours180': 0,
+            'f10_2143_bedragoveruren360horeca': 0,
+            'f10_2165_achterstalloveruren360horeca': 0,
+            'f10_2166_flexi_job': 0,
+            'f10_2167_aantaloveruren300horeca': 0,
+            'f10_2168_achterstallaantaloveruren300horeca': 0,
+            'f10_2169_aantaloveruren360horeca': 0,
+            'f10_2170_achterstallaantaloveruren360horeca': 0,
+            'f10_2176_overtimehours180': 0,
+            'f10_2177_winstpremies': 0,
+            'f10_2178_pensioner': 0,
+            'f10_2179_startersjob': 0,
+            'f10_2180_onkostenbrandweerenambulanciers': 0,
+            'f10_2181_remunerationetrang': 0,
+            'f10_2182_aandelenetrang': 0,
+            'f10_2183_bonuspremieoaandelenoptiesetrang': 0,
+            'f10_2184_anderevaaetrang': 0,
+            'f10_2185_amountother1': 0,
+            'f10_2186_amountother2': 0,
+            'f10_2187_amountother3': 0,
+            'f10_2188_amountother4': 0,
+            'f10_2195_relanceovertimeremuneration': 0,
+            'f10_2196_relanceovertimehours': 0,
+            'f10_2198_flexijobnotpension': 0,
+            'f10_2200_compensationwithstandards': 0,
+            'f10_2201_compensationwithdocuments': 7500,
+            'f10_2202_amount': 0,
+            'f10_2203_amount': 0,
+            'f10_2204_repaidsums': 0,
+            'f10_2206_grossamountremuneration': 0,
+            'f10_2207_travelbicycleorspeedpedelec': 34400,
+            'f10_2208_benefitprovisionbicycleorspeedpedelec': 0,
+            'f10_2209_overtimehours': 0,
+            'f10_2210_workbonus5254': 0,
+            'f10_2226_kmzone2207': 1290,
+            'f10_2227_relanceovertimeremuneration2025': 0,
+            'f10_2228_relanceovertimehours2025': 0,
+            'f10_2062_totaal': 701382,
+            'f10_2077_totaal': 118990,
+            'f10_2059_totaalcontrole': 3796069,
+            'f10_2257_employeecontribution': 481800,
+        }
+        self._validate_281_report(emp_data, EXPECTED_RESULTS)
+
+    @freeze_time("2025-12-31")
+    def test_281_20_all_fields(self):
+        """
+        Test that all fields for the 281.20 declaration are correctly mapped and validated.
+        """
+        brand = self.env['fleet.vehicle.model.brand'].sudo().create({'name': "Test Brand"})
+        model = self.env['fleet.vehicle.model'].sudo().create({'name': "Test Model", 'brand_id': brand.id})
+
+        test_car = self.env['fleet.vehicle'].sudo().create({
+            'name': "Test Car",
+            'model_id': model.id,
+            'brand_id': brand.id,
+            'company_id': self.env.company.id,
+            'car_value': 40000.0,
+            'co2': 88.0,
+            'fuel_type': 'diesel',
+            'acquisition_date': datetime.date(2025, 1, 1),
+        })
+        self.env['fleet.vehicle.log.contract'].sudo().create({
+            'name': "Test Contract",
+            'vehicle_id': test_car.id,
+            'company_id': self.env.company.id,
+            'start_date': datetime.date(2025, 10, 8),
+            'expiration_date': datetime.date(2026, 10, 8),
+            'state': "open",
+            'cost_generated': 0.0,
+            'cost_frequency': "monthly",
+            'recurring_cost_amount_depreciated': 450.0
+        })
+
+        jc_999 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_999')
+        emp = self.env['hr.employee'].create({
+            'name': "Complete Executive Employee",
+            'private_street': 'Director Street',
+            'private_zip': '1000',
+            'private_city': 'Brussels',
+            'private_country_id': self.env.ref('base.be').id,
+            'company_id': self.env.company.id,
+            'niss': '91072845880',
+            'certificate': 'master',
+            'l10n_be_joint_committee_id': jc_999.id,
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'date_version': datetime.date(2025, 1, 1),
+            'rent_amount': 1200.0,
+            'wage': 5000.0,
+            'laptop': 200,
+            'internet': 38.0,
+            'mobile_amount': 30.0,
+            'transport_mode_car': True,
+            'car_id': test_car.id,
+            'has_bicycle': True,
+            'km_home_work': 15,
+            'l10n_be_has_group_insurance': True,
+            'l10n_be_group_insurance_employee_contribution': 0.5,
+            'l10n_be_group_insurance_employee_voluntary': 0.25,
+            'bike_transport_employee_kilometer': 15,
+        })
+
+        self.env['hr.employee.departure'].create({
+            'employee_id': emp.id,
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+            'dismissal_date': datetime.date(2025, 12, 31),
+            'l10n_be_notice_respect': 'without',
+        })
+
+        payslip_regular = self.env['hr.payslip'].create({
+            'name': 'Regular Month',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'date_from': datetime.date(2025, 1, 1),
+            'date_to': datetime.date(2025, 1, 31),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+
+        payslip_regular._set_input_value('CYCLE', 10)
+
+        payslip_warrant = self.env['hr.payslip'].create({
+            'name': 'Warrant',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant').id,
+            'date_from': datetime.date(2025, 3, 1),
+            'date_to': datetime.date(2025, 3, 31),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+
+        payslip_warrant._set_input_value('WARRANT_WITHOUT_ONSS', 1000)
+
+        payslip_cct90 = self.env['hr.payslip'].create({
+            'name': 'CCT90',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90').id,
+            'date_from': datetime.date(2025, 4, 1),
+            'date_to': datetime.date(2025, 4, 30),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+
+        payslip_cct90._set_input_value('CCT90_GROSS', 500)
+
+        payslip_holiday = self.env['hr.payslip'].create({
+            'name': 'Holiday',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n_holidays').id,
+            'date_from': datetime.date(2025, 6, 1),
+            'date_to': datetime.date(2025, 6, 30),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        })
+
+        all_payslips = payslip_regular | payslip_warrant | payslip_cct90 | payslip_holiday
+        all_payslips.compute_sheet()
+        emp.write({'review_state': '1_reviewed'})
+        all_payslips.action_payslip_done()
+
+        all_payslips.write({'state': 'validated'})
+
+        declaration_281_xx = self.env['l10n_be.281_xx'].create({'year': 2025})
+
+        sheet = self.env['l10n_be.281_20'].create({
+            'declaration_id': declaration_281_xx.id
+        })
+
+        data_281 = sheet.with_context(round_281=True)._get_rendering_data(emp)
+        emp_data = {key: value for key, value in data_281['employees_data'][0].items() if key.startswith('f20_')}
+
+        EXPECTED_RESULTS = {
+            'f20_2031_stopzettingexploitatie': 0,
+            'f20_2033_optiebuitvennoots': '0',
+            'f20_2035_verantwoordingsstukken': 0,
+            'f20_2045_rsz': 0,
+            'f20_2055_datumvanindienstt': 0,
+            'f20_2056_datumvanvertrek': '',
+            'f20_2060_periodieke': 500000,
+            'f20_2061_covidovertimeremuneration2023': 0,
+            'f20_2062_anderebezoldiginge': 0,
+            'f20_2064_vervroegdvakantieg': 0,
+            'f20_2065_opzeggingsreclasseringsverg': 0,
+            'f20_2067_bijzonderbijdrage': 0,
+            'f20_2069_compensationamountwithoutstandards': 0,
+            'f20_2071_pensioengewonebijdragen': 310725,
+            'f20_2073_periodieke': 120000,
+            'f20_2074_anderen': 0,
+            'f20_2076_nonrecurrentadvantages': 0,
+            'f20_2078_pensioentoezegging': 0,
+            'f20_2079_bedrag': 18000,
+            'f20_2080_bedrag': 0,
+            'f20_2081_bezoldigingen': 0,
+            'f20_2082_occasionalworkhoreca': 0,
+            'f20_2083_bonus': 0,
+            'f20_2084_bonus5254': 0,
+            'f20_2087_code420': 0,
+            'f20_2088_impulsfund': 0,
+            'f20_2092_othercode1': '',
+            'f20_2094_othercode2': '',
+            'f20_2096_othercode3': '',
+            'f20_2098_othercode4': '',
+            'f20_2102_kas': '',
+            'f20_2103_kasvrijaanvullendpensioen': '',
+            'f20_2106_percentages': '00,00',
+            'f20_2109_fiscaalidentificat': 0,
+            'f20_2128_vrijaanvullendpensioenwerknemers': 0,
+            'f20_2131_bedrijfsvoorheffingvanwerkgever': 94916,
+            'f20_2133_bedrijfsvoorheffingbuitenlvenverbondenwerkgever': 0,
+            'f20_2134_totaalbedragmobiliteitsbudget': 0,
+            'f20_2138_covidovertimehours2023': 0,
+            'f20_2181_remunerationetrang': 0,
+            'f20_2182_aandelenetrang': 0,
+            'f20_2183_bonuspremieoaandelenoptiesetrang': 0,
+            'f20_2184_anderevaaetrang': 0,
+            'f20_2185_amountother1': 0,
+            'f20_2186_amountother2': 0,
+            'f20_2187_amountother3': 0,
+            'f20_2188_amountother4': 0,
+            'f20_2195_relanceovertimeremuneration': 0,
+            'f20_2196_relanceovertimehours': 0,
+            'f20_2200_compensationwithstandards': 0,
+            'f20_2201_compensationwithdocuments': 0,
+            'f20_2202_amount': 0,
+            'f20_2203_amount': 0,
+            'f20_2204_repaidsums': 0,
+            'f20_2205_recuperation': 0,
+            'f20_2206_grossamountremuneration': 0,
+            'f20_2207_travelbicycleorspeedpedelec': 16560,
+            'f20_2208_benefitprovisionbicycleorspeedpedelec': 0,
+            'f20_2209_totalcontributiontravelexpenses': 16560,
+            'f20_2226_kmzone2207': '690',
+            'f20_2227_relanceovertimeremuneration2025': 0,
+            'f20_2228_relanceovertimehours2025': 0,
+            'f20_2068_bedrag': 25860,
+            'f20_2099_aard': 'FHIJ',
+            'f20_2063_totaal': 543860,
+            'f20_2075_totaal': 120000,
+            'f20_2066_totaalbedrijfsvoorheffing': 94916,
+            'f20_2059_totaalcontrole': 1733361,
+        }
+
+        self._validate_281_report(emp_data, EXPECTED_RESULTS)
+
+    @freeze_time("2025-12-31")
+    def test_281_30_all_fields(self):
+        """
+        Test that all fields for the 281.30 declaration are correctly mapped and validated.
+        """
+        emp = self.env['hr.employee'].create({
+            'name': "Complete Board Member",
+            'private_street': 'Board Street',
+            'private_zip': '1000',
+            'private_city': 'Brussels',
+            'private_country_id': self.env.ref('base.be').id,
+            'company_id': self.env.company.id,
+            'niss': '91072845880',
+            'certificate': 'master',
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'contract_date_start': datetime.date(2025, 1, 1),
+            'date_version': datetime.date(2025, 1, 1),
+            'wage': 4000.0,
+            'l10n_be_include_employee_in_281_30': True,
+            'l10n_be_resident_situation': 'resident',
+            'laptop': True,
+            'internet': 38.0,
+            'mobile_amount': 30.0,
+            'transport_mode_car': True,
+            'heating_amount': 300.0,
+            'electricity_amount': 200.0,
+            'mobile': 50.0,
+        })
+
+        car_brand = self.env['fleet.vehicle.model.brand'].sudo().create({'name': "Test Brand"})
+        car_model = self.env['fleet.vehicle.model'].sudo().create({'name': "Test Model", 'brand_id': car_brand.id})
+        test_car = self.env['fleet.vehicle'].sudo().create({
+            'name': "Test Car",
+            'model_id': car_model.id,
+            'brand_id': car_brand.id,
+            'company_id': self.env.company.id,
+            'car_value': 40000.0,
+            'co2': 88.0,
+            'fuel_type': 'diesel',
+            'acquisition_date': datetime.date(2025, 1, 1),
+        })
+        emp.car_id = test_car.id
+
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Board Fees {i}',
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'date_from': datetime.date(2025, i, 1),
+            'date_to': datetime.date(2025, i, 1) + relativedelta(day=31),
+            'company_id': self.env.company.id,
+            'journal_id': self.journal.id,
+        } for i in range(1, 13)])
+        for payslip in payslips:
+            payslip._set_input_value('PRESENCE_TOKEN', 2000)
+        payslips.compute_sheet()
+        emp.write({'review_state': '1_reviewed'})
+        payslips.action_payslip_done()
+        payslips.write({'state': 'validated'})
+
+        declaration_281_xx = self.env['l10n_be.281_xx'].create({'year': 2025})
+        sheet = declaration_281_xx.l10n_be_281_30_ids
+
+        data_281 = sheet.with_context(round_281=True)._get_rendering_data(emp)
+        emp_data = {key: value for key, value in data_281['employees_data'][0].items() if key.startswith('f30_')}
+
+        EXPECTED_RESULTS = {
+            'f30_2030_beneficiarynature': 1,
+            'f30_2035_verantwoordingsstukken': 0,
+            'f30_2059_totaalcontrole': 5602375,
+            'f30_2060_toegekendbedrag': 0,
+            'f30_2061_vrijstelling': 0,
+            'f30_2062_bedrag': 0,
+            'f30_2063_bedrijfsvoorheffing': 2292778,
+            'f30_2064_presentiegelden': 2400000,
+            'f30_2065_toegekendbedrag': 0,
+            'f30_2066_vrijstelling': 0,
+            'f30_2067_bedrag': 0,
+            'f30_2068_zonderberoepskarak': 0,
+            'f30_2069_bijzonderbijdrage': 0,
+            'f30_2070_toegekendbedrag': 0,
+            'f30_2071_vrijstelling': 0,
+            'f30_2072_bedrag': 0,
+            'f30_2073_toegekendbedrag': 0,
+            'f30_2074_vrijstelling': 0,
+            'f30_2075_bedrag': 0,
+            'f30_2076_peronderhoudsuitke': 0,
+            'f30_2077_onderhoudsuitkering': 0,
+            'f30_2078_olympicbonus': 0,
+            'f30_2079_totalamount': 0,
+            'f30_2080_winstofbaten': 0,
+            'f30_2081_retributies': 0,
+            'f30_2082_buitverrichtingen': 0,
+            'f30_2083_podiumkunstenaars': 0,
+            'f30_2084_winst': 0,
+            'f30_2085_art2283': 0,
+            'f30_2086_bedrag': 909597,
+            'f30_2087_bedrag': 0,
+            'f30_2088_bedrag': 0,
+            'f30_2089_numberpeople': 0,
+            'f30_2090_numberdays': 0,
+            'f30_2095_foreignolympicbonus': 0,
+            'f30_2097_totalamount': 0,
+            'f30_2099_aard': 'CDFHIJK',
+            'f30_2109_fiscaalidentificat': 0,
+            'f30_2113_sportlimitedremuneration': 0,
+            'f30_2115_sportunlimitedotherremuneration': 0,
+            'f30_2116_sportmorethan30daysprofit': 0,
+            'f30_2117_managerprofit': 0,
+            'f30_2205_recuperation': 0,
+        }
+        self._validate_281_report(emp_data, EXPECTED_RESULTS)

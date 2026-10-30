@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from odoo.addons.marketing_automation.tests.common import MarketingAutomationCommon
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Datetime
@@ -168,3 +170,31 @@ class TestMarketingCampaignIntegrity(MarketingAutomationCommon):
         with self.assertRaises(ValidationError):
             campaign.write({'view_coordinates': {'trigger': {'x': {'duh': 'the bad guy'}, 'y': 0}}})
         campaign.write({'view_coordinates': {'trigger': {'x': 1, 'y': 2}}})
+
+    @users('user_marketing_automation')
+    def test_domain_restricted_field(self):
+        """ Filter domain referencing a field restricted to system users
+        should be rejected, on both the campaign and its activities. """
+        field = self.env['mailing.contact']._fields['name']
+        for group in ('base.group_system', 'base.group_erp_manager'):
+            with self.subTest(group=group), patch.object(field, 'groups', group):
+                campaign = self.env['marketing.campaign'].create({
+                    'model_id': self.env['ir.model']._get_id('mailing.contact'),
+                    'name': 'Restricted Domain Campaign',
+                })
+                with self.assertRaises(ValidationError):
+                    campaign.write({'enroll_domain': "[('name', '=', 'test')]"})
+
+                activity = self._create_activity_mail(campaign, user=self.user_marketing_automation)
+                with self.assertRaises(ValidationError):
+                    activity.write({'activity_domain': "[('name', '=', 'test')]"})
+
+    @users('user_marketing_automation')
+    def test_domain_falsy_leaf(self):
+        """ A domain using the falsy sentinel leaf ([(0, '=', 1)]) should not
+        crash the domain check. """
+        campaign = self.env['marketing.campaign'].create({
+            'model_id': self.env['ir.model']._get_id('mailing.contact'),
+            'name': 'Falsy Domain Campaign',
+        })
+        campaign.write({'enroll_domain': "[(0, '=', 1)]"})

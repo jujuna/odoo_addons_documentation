@@ -19,6 +19,8 @@ from .types import AIMessageParts
 
 _logger = getLogger(__name__)
 
+AI_SUPPORTED_IMG_TYPES = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+
 # formats are the same as content_image method in Binary controller
 IMAGE_PATH_FORMATS = [
     '/web/image',
@@ -43,6 +45,23 @@ IMAGE_PATH_FORMATS = [
 """
 All the methods are adapted from `ir.binary` and `ir.attachment`.
 """
+
+
+def _is_ai_supported_mimetype(mimetype):
+    extension = (mimetype or '').split('/')[-1]
+    return extension in AI_SUPPORTED_IMG_TYPES
+
+
+def _unsupported_image_text_part(image_path, mimetype):
+    return {
+        'type': 'text',
+        'text': (
+            f"The existing image at '{image_path}' is in a format ({mimetype}) that cannot be read or "
+            "edited. If the request requires viewing or modifying this exact image, ask the user to "
+            "provide it as a JPEG, PNG, GIF or WEBP file, or to describe it in enough detail to recreate "
+            "it from scratch. Ignore this note if the request is to generate a brand-new image instead."
+        ),
+    }
 
 
 def retrieve_image_parts_from_path(env: Environment, image_path: str) -> AIMessageParts:
@@ -74,6 +93,9 @@ def _retrieve_image_parts_from_file(image_file_path: str) -> AIMessageParts:
         file_path = image_file_path[1:]
         with file_open(file_path, 'rb') as file:
             content = file.read()
+            mimetype = mimetypes.guess_type(file_path)[0]
+            if not _is_ai_supported_mimetype(mimetype):
+                return [_unsupported_image_text_part(image_file_path, mimetype)]
             return [{
                 'type': 'inline_data',
                 'mimetype': f'{mimetypes.guess_type(file_path)[0]}',
@@ -108,17 +130,19 @@ def _retrieve_record_args_from_path(image_path: str) -> dict[str, Any]:
 
 def _retrieve_image_parts_from_record(record, field_name: str, image_path=None) -> AIMessageParts:
     image_data = retrieve_image_data_from_record(record, field_name)
-    if image_data['content']:
-        return [{
-            'type': 'inline_data',
-            'mimetype': image_data['mimetype'],
-            'data': base64.b64encode(image_data['content']).decode(),
-            'metadata': {
-                'image_path': image_path if image_path else field_to_image_path(record, field_name),
-                'aspect_ratio': _get_aspect_ratio_from_raw(image_data['content'])
-            }
-        }]
-    return []
+    if not image_data['content']:
+        return []
+    if not _is_ai_supported_mimetype(image_data['mimetype']):
+        return [_unsupported_image_text_part(image_path, image_data['mimetype'])]
+    return [{
+        'type': 'inline_data',
+        'mimetype': image_data['mimetype'],
+        'data': base64.b64encode(image_data['content']).decode(),
+        'metadata': {
+            'image_path': image_path if image_path else field_to_image_path(record, field_name),
+            'aspect_ratio': _get_aspect_ratio_from_raw(image_data['content'])
+        }
+    }]
 
 
 def retrieve_image_data_from_record(record, field_name: str) -> dict:

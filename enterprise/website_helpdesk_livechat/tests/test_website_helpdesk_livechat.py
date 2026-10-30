@@ -116,7 +116,9 @@ class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon, BusCase):
             'Only one text-type attachment should be attached to the ticket.')
         expected_message = Markup(
             '<div class="o_mail_notification" data-oe-type="create-ticket">created a new ticket: '
-            '<a href="#" data-oe-model="helpdesk.ticket" data-oe-id="%(ticket_id)s">'
+            '<a href="/mail/view?model=helpdesk.ticket&amp;res_id=%(ticket_id)s" '
+            'data-oe-model="helpdesk.ticket" '
+            'data-oe-id="%(ticket_id)s">'
             '%(ticket_name)s (#%(ticket_ref)s)</a></div>'
         ) % {
             "ticket_id": ticket.id,

@@ -24,13 +24,21 @@ export class TaskGanttModel extends TaskGanttModelCommon {
         }).getHighlightIds;
     }
 
-    getDialogContext() {
+    getDialogContext(params = {}) {
         const context = super.getDialogContext(...arguments);
         this._replaceSpecialMany2manyKeys(context);
         if ("user_ids" in context && !context.user_ids) {
             delete context.user_ids;
         }
-        return { ...context, search_default_open_tasks: true };
+        const { start, stop } = params;
+        const coversWholeDays = Boolean(
+            start && stop && start.equals(start.startOf("day")) && stop.equals(stop.startOf("day"))
+        );
+        return {
+            ...context,
+            search_default_open_tasks: true,
+            use_working_schedule: this.metaData.scale.interval !== "hour" || coversWholeDays,
+        };
     }
 
     /**

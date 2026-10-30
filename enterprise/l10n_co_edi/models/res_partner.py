@@ -79,6 +79,7 @@ class ResPartner(models.Model):
             **data,
             'parent_id': partner.id,
             'type': 'invoice',
+            'company_id': partner.company_id.id,
         })
 
     @api.model

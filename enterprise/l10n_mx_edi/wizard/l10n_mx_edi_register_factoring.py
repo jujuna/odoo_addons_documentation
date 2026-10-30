@@ -251,7 +251,7 @@ class L10n_Mx_Edi_RegisterFactoringLine(models.TransientModel):
         exchange_diff = self.statement_line_id._lines_get_account_balance_exchange_diff(move_line.currency_id, move_line.balance, move_line.amount_currency)
         amount_total_company_currency = move_line.balance + exchange_diff
 
-        rate_company2move_currency = abs(move_line.balance / amount_total_company_currency) if amount_total_company_currency else 0.0
+        rate_company2move_currency = abs(move_line.amount_currency / amount_total_company_currency) if amount_total_company_currency else 0.0
 
         amount_paid_move_currency = move_line.currency_id.round(self.amount * rate_company2move_currency)
         compensation_move_currency = move_line.currency_id.round(self.compensation_amount * rate_company2move_currency)

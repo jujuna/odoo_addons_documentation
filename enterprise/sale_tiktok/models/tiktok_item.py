@@ -108,6 +108,10 @@ class TikTokItem(models.Model):
                         "default_codes": items.mapped("product_id.default_code"),
                         "message": str(error),
                     })
+                if auto_commit:
+                    # Count failed and skipped items as processed too, otherwise the cron
+                    # never reaches remaining=0 and is rescheduled in a loop.
+                    self.env["ir.cron"]._commit_progress(len(items))
             if error_messages:
                 shop._handle_sync_failure(flow="inventory_sync", error_messages=error_messages)
 
@@ -143,8 +147,6 @@ class TikTokItem(models.Model):
                 body={"skus": skus_payload},
             )
             items_to_update.last_inventory_sync_date = fields.Datetime.now()
-            if auto_commit:
-                self.env["ir.cron"]._commit_progress(len(items_to_update))
 
     def _prepare_sync_inventory_payload(self, shop, sku_extern_id):
         """Return the inventory update payload for this item and shop.

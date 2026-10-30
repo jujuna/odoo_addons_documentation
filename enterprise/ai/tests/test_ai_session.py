@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import timedelta
+from itertools import pairwise
 from textwrap import dedent
 from unittest.mock import patch
 
@@ -179,6 +180,37 @@ class TestAISession(TestAICallbackCommon, BusCase):
 
         self.assertEqual(session.channel_id.name, "Updated conversation title")
 
+    def test_webhook_user_relation_write(self):
+        """Admin starts an exchange -> Public receives the callback -> the tool links a user.
+
+        Like audit approver_ids, res.role.user_ids checks res.users access as
+        the transaction user, even when the tool's environment is Admin.
+        """
+        session = self._create_ai_session(self.agent)
+        role = self.env['res.role'].create({'name': 'Audit reviewers'})
+        update_tool = self.env.ref('ai.ir_actions_server_update_records')
+        tool_response = self.mock_tool_response(update_tool, {
+            'explanation': 'Add the reviewer to the role',
+            'preview_menus': [],
+            'updates': [{
+                'model_name': 'res.role',
+                'domain': f"[('id', '=', {role.id})]",
+                'changes': [{
+                    'field': 'user_ids',
+                    'x2m_commands': f'[(4, {self.user_internal.id}, 0)]',
+                }],
+            }],
+        })
+        with (
+            self.mock_default_tools(update_tool),
+            self.mock_callback_completions([tool_response, self.mock_text_response('Done')]),
+        ):
+            self._post_user_message_on_session(session, 'Add the reviewer', ai_session_config={'auto_confirm': True})
+
+        tool_result = self._get_tool_result(session, tool_response[0]['call_id'])
+        self.assertTrue(tool_result['success'], tool_result)
+        self.assertEqual(role.user_ids, self.user_internal)
+
     def test_agent_instructions_intermediary_messages_protocol(self):
         """Check that the instructions about the intermediary messages only asks to provide
         technical details when the debug mode is active"""
@@ -248,6 +280,44 @@ class TestAISession(TestAICallbackCommon, BusCase):
         self.assertEqual(session.event_ids[0].metadata['role'], 'user')
         self.assertEqual(session.event_ids[1].metadata['role'], 'assistant')
         self.assertEqual(session.request_payload['messages'][-1]['role'], 'user')
+
+    def test_context_date_is_preserved_during_exchange(self):
+        """Keep the context date fixed while the exchange's history grows.
+
+        Exchange 1, with the clock advancing between requests:
+          10:00: user message + context(10:00)
+          10:01: same prefix + tool call/result
+          10:02: same prefix + tool call/result
+          10:03: same prefix + tool call/result
+
+        Exchange 2:
+          10:04: earlier history + new user message + context(10:04)
+        """
+        session = self._create_ai_session(self.agent)
+
+        def mocked_responses():
+            for _ in range(3):
+                self.frozen_datetime_mock.tick(timedelta(minutes=1))
+                yield self.mock_tool_response(self.tool)
+            yield self.mock_text_response('Done')
+
+        with (
+            self.mock_default_tools(self.tool),
+            self.mock_datetime_and_now('2026-10-14 10:00:00'),
+        ):
+            with self.mock_callback_completions(mocked_responses()) as request:
+                self._post_user_message_on_session(session, 'First exchange')
+            messages = [call.args[2]['messages'] for call in request.call_args_list]
+            self.assertEqual(len(messages), 4)
+            self.assertIn('2026-10-14 10:00:00', messages[0][-1]['content'][-1]['text'])
+            for previous_messages, current_messages in pairwise(messages):
+                # Clock changes must leave the previously sent message prefix unchanged.
+                self.assertEqual(current_messages[: len(previous_messages)], previous_messages)
+            # A new exchange must use the current date instead of the previous exchange's date.
+            self.frozen_datetime_mock.tick(timedelta(minutes=1))
+            with self.mock_callback_completions([self.mock_text_response('Done')]) as request:
+                self._post_user_message_on_session(session, 'Second exchange')
+            self.assertIn('2026-10-14 10:04:00', request.call_args.args[2]['messages'][-1]['content'][-1]['text'])
 
     def test_intermediary_message_and_tool_summary_are_posted(self):
         """Check that when the agent sends a message with a tool call, the message and the tool
@@ -468,6 +538,81 @@ class TestAISession(TestAICallbackCommon, BusCase):
         messages = root.channel_id.message_ids
         prompt = messages.filtered(lambda msg: 'ai_user_input_request' in (msg.body or ''))
         self.assertEqual(prompt.author_id, root.agent_id.partner_id)
+
+    def test_subsession_depth_limit(self):
+        self.agent.allowed_agent_ids = self.agent
+        sessions = [self._create_ai_session(self.agent)]
+        for _ in range(4):
+            sessions.append(self.env['ai.session'].sudo().create({
+                'agent_id': self.agent.id,
+                'parent_session_id': sessions[-1].id,
+                'channel_id': sessions[0].channel_id.id,
+            }))
+        subagent_tools = (
+            self.env.ref('ai.ir_actions_server_start_session')
+            | self.env.ref('ai.ir_actions_server_continue_session')
+        )
+        for value, limit in [(None, 4), (2, 2), (5, 5), (1, 1), (0, 1), (-1, 1)]:
+            with self.subTest(value=value):
+                self.env['ir.config_parameter'].sudo().set_int('ai.max_subsession_depth', value)
+                for depth, session in enumerate(sessions, start=1):
+                    available_tools = session._get_session_default_tools()
+                    if depth < limit:
+                        self.assertEqual(available_tools & subagent_tools, subagent_tools)
+                    else:
+                        self.assertFalse(available_tools & subagent_tools)
+
+    def test_subsession_depth_limit_through_skill(self):
+        self.env['ir.config_parameter'].sudo().set_int('ai.max_subsession_depth', 1)
+        self.agent.allowed_agent_ids = self.agent
+        subagent_tools = (
+            self.env.ref('ai.ir_actions_server_start_session')
+            | self.env.ref('ai.ir_actions_server_continue_session')
+        )
+        self.skill.tool_ids = subagent_tools | self.tool
+        session = self._create_ai_session(self.agent)
+        load_skills = self.mock_tool_response(self.skill_loading_tool, {'skill_ids': self.skill.ids})
+        with self.mock_callback_completions([
+            load_skills,
+            self.mock_text_response('Skill loaded'),
+            self.mock_text_response('Still here'),
+        ]) as transport_mock:
+            self._post_user_message_on_session(session, 'Load the skill')
+            self._post_user_message_on_session(session, 'Continue')
+
+        self.assertEqual(transport_mock.call_count, 3)
+        subagent_tool_names = set(subagent_tools.mapped('ai_tool_name'))
+        for call in transport_mock.call_args_list:
+            tool_names = {tool['name'] for tool in call.args[2]['tools']}
+            self.assertFalse(tool_names & subagent_tool_names)
+        for call in transport_mock.call_args_list[1:]:
+            self.assertIn(self.tool.ai_tool_name, {tool['name'] for tool in call.args[2]['tools']})
+        self.assertIn(self.skill.id, session.state['loaded_skills'])
+        self.assertFalse(set(session.state['available_tools']) & set(subagent_tools.ids))
+        self.assertFalse(self.env['ai.session'].sudo().search([('parent_session_id', '=', session.id)]))
+
+    @mute_logger("odoo.addons.ai.models.ai_session")
+    def test_active_session_limit(self):
+        self.env['ir.config_parameter'].sudo().set_int('ai.max_active_sessions', 2)
+        self.agent.allowed_agent_ids = self.agent
+        session = self._create_ai_session(self.agent)
+        start_tool = self.env.ref('ai.ir_actions_server_start_session')
+        start_args = {'agent_id': self.agent.id, 'message': 'Do the work'}
+        start_calls = [self.mock_tool_response(start_tool, start_args)[0] for _ in range(2)]
+
+        with self.mock_callback_completions([
+            start_calls,
+            self.mock_text_response('Child done'),
+            self.mock_text_response('Root done'),
+        ]):
+            self._post_user_message_on_session(session, 'Delegate the work')
+
+        children = self.env['ai.session'].sudo().search([('parent_session_id', '=', session.id)])
+        self.assertEqual(len(children), 1)
+        first_call_result = self._get_tool_result(session, start_calls[0]['call_id'])
+        second_call_result = self._get_tool_result(session, start_calls[1]['call_id'])
+        self.assertTrue(first_call_result['success'])
+        self.assertFalse(second_call_result['success'])
 
     def test_record_preview_suffix_across_callbacks(self):
         session = self._create_ai_session(self.agent)

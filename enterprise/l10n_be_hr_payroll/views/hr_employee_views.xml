@@ -15,7 +15,7 @@
                         invisible="not show_dimona_button or country_code != 'BE' or l10n_be_egov3_code == '999'"/>
                 </div>
             </header>
-            <xpath expr="//button[hasclass('o_button_plan_wizard_action')]" position="before">
+            <field name="user_state" position="before">
                 <button name="action_send_dimona"
                     string="Send Dimona"
                     type="object"
@@ -46,7 +46,7 @@
                             invisible="not l10n_be_thirteen_month_eligible"/>
                     </div>
                 </div>
-            </xpath>
+            </field>
             <div name="button_box" position="inside">
                 <button name="action_open_relation"
                     class="oe_stat_button"
@@ -118,7 +118,7 @@
                 <field name="disabled_spouse_bool" invisible="marital not in ['married', 'cohabitant'] or country_code != 'BE'"/>
             </xpath>
             <field name="disabled" position="after">
-                <field name="l10n_be_is_retired" invisible="age &lt;= 60"/>
+                <field name="l10n_be_is_retired" invisible="age &lt;= 60 and marital != 'widower'"/>
                 <field name="l10n_be_contribute_to_fse" invisible="not l10n_be_is_retired or l10n_be_retirement_date &gt;= '2016-01-01'"/>
             </field>
             <xpath expr="//field[@name='private_country_id']" position="replace">
@@ -213,7 +213,7 @@
                 <field name="l10n_be_joint_committee_id" placeholder="e.g. CP200, CP302"
                     invisible="country_code != 'BE'"
                     options="{'no_create': True, 'no_open': True}"
-                    context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_joint_committee_see_more_view_list'}"
+                    context="{'list_view_ref': 'l10n_be_hr_payroll.l10n_be_joint_committee_see_more_view_list', 'active_test': False}"
                     domain="[('selectable', '=', True), ('id', 'in', allowed_joint_committee_ids)]"/>
             </field>
             <xpath expr="//group[@name='payroll_group']//div[@name='contract_dates']" position="after">
@@ -271,19 +271,10 @@
                 <group string="Taxes &amp; Reduction" name="taxes_reduction_group" invisible="1">
                     <field name="l10n_be_is_starterjob"/>
                 </group>
-                <group string="Dimona" invisible="country_code != 'BE' or l10n_be_egov3_code == '999' or not l10n_be_dimona_environment">
-                    <field name="l10n_be_dimona_declaration_id" string="Dimona In" options="{'no_create': True}"/>
-                    <field name="l10n_be_last_dimona_declaration_id" options="{'no_create': True}"/>
-                    <field name="l10n_be_dimona_relation_date_start"/>
-                    <field name="l10n_be_needs_dimona_in" string="Needs Dimona In" groups="base.group_no_one"/>
-                    <field name="l10n_be_needs_dimona_update" string="Needs Dimona Update" groups="base.group_no_one"/>
-                    <field name="l10n_be_needs_dimona_out" string="Needs Dimona Out" groups="base.group_no_one"/>
-                    <field name="l10n_be_needs_dimona_cancel" string="Needs Dimona Cancel" groups="base.group_no_one"/>
-                </group>
                 <group string="Seniority" name="seniority" invisible="country_code != 'BE'">
                     <field name="l10n_be_fictive_hire_date"/>
-                    <label for="l10n_be_scale_seniority" string="At Hiring"/>
-                    <div class="d-flex">
+                    <label for="l10n_be_scale_seniority" string="At Hiring" invisible="l10n_be_egov3_code != '200'"/>
+                    <div class="d-flex" invisible="l10n_be_egov3_code != '200'">
                         <div class="oe_inline">
                             <field name="l10n_be_scale_seniority" class="o_hr_narrow_field-2 me-1"/>
                             <span class="me-4">years</span>
@@ -316,7 +307,7 @@
                 </div>
             </xpath>
             <xpath expr="//field[@name='structure_type_id']" position="after">
-                <field name='l10n_be_salary_scale_id' string="Salary Scale" placeholder="Not submitted to Salary Grid" invisible="not display_l10n_be_scale" domain="[('l10n_be_joint_committee', '=', l10n_be_joint_committee_id)]" options="{'no_create': True, 'no_create_edit': True}"/>
+                <field name='l10n_be_salary_scale_id' string="Salary Scale" invisible="not display_l10n_be_scale" required="display_l10n_be_scale" domain="[('l10n_be_joint_committee', '=', l10n_be_joint_committee_id)]" options="{'no_create': True, 'no_create_edit': True}"/>
                 <field name="display_l10n_be_scale" invisible="1"/>
                 <field name="l10n_be_in_position_years" invisible="1"/>
                 <field name="l10n_be_in_position_months" invisible="1"/>
@@ -352,7 +343,7 @@
                 </page>
             </page>
             <field name="resource_calendar_id" position="replace">
-                <field name="resource_calendar_id" widget="working_schedule_field" options="{'no_quick_create': True}"/>
+                <field name="resource_calendar_id" widget="working_schedule_field" options="{'no_quick_create': True}" context="{'employee_id': id}"/>
             </field>
             <field name="resource_calendar_id" position="after">
                 <field name="l10n_be_reorganisation_measure_ids" string="" widget="many2many_tags"
@@ -563,6 +554,15 @@
         </field>
     </record>
 
+    <record id="l10n_be_hr_payroll_action_update_too_old_worker_codes" model="ir.actions.server">
+        <field name="name">Update Employees</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">
+employees = records if records else env['hr.employee']._get_l10n_be_too_old_worker_code_employees()
+action = employees.l10n_be_action_update_worker_codes()
+        </field>
+    </record>
 
     <record id="l10n_be_hr_employee_view_list_missing_indexation" model="ir.ui.view">
         <field name="name">l10n.be.hr.employee.view.list.missing.indexation</field>

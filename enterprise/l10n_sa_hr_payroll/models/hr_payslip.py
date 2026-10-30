@@ -1,5 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from collections import defaultdict
+from datetime import datetime, time
+from zoneinfo import ZoneInfo
+
+from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 
@@ -295,3 +299,32 @@ class HrPayslip(models.Model):
                 'level': 'warning',
             })
         return issues or None
+
+    def _l10n_sa_get_versions_with_effective_dates(self):
+        self.ensure_one()
+        versions = self.employee_id._get_versions_with_contract_overlap_with_period(self.date_from, self.date_to)
+        date_from = self.date_from
+        versions_with_dates = []
+        for version_index in range(len(versions)):
+            if version_index == len(versions) - 1:
+                date_to = self.date_to
+            else:
+                date_to = versions[version_index + 1].date_version - relativedelta(days=1)
+            versions_with_dates.append((versions[version_index], date_from, date_to))
+            date_from = date_to + relativedelta(days=1)
+        return versions_with_dates
+
+    def _l10n_sa_get_theoretical_work_days(self):
+        self.ensure_one()
+        versions_with_dates = self._l10n_sa_get_versions_with_effective_dates()
+        total_number_of_work_days = 0
+        work_days_per_version = {}
+        for version, date_from, date_to in versions_with_dates:
+            reference_calendar = version.resource_calendar_id or version.company_id.resource_calendar_id
+            work_days_per_version[version] = reference_calendar.get_work_duration_data(
+                datetime.combine(date_from, time.min).replace(tzinfo=ZoneInfo(version.tz)),
+                datetime.combine(date_to, time.max).replace(tzinfo=ZoneInfo(version.tz)),
+                compute_leaves=False,
+            )['days']
+            total_number_of_work_days += work_days_per_version[version]
+        return total_number_of_work_days, work_days_per_version

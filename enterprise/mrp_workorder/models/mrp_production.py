@@ -16,7 +16,13 @@ class MrpProduction(models.Model):
 
     check_ids = fields.One2many('quality.check', 'production_id', string="Checks")
 
-    employee_ids = fields.Many2many('hr.employee', string="working employees", compute='_compute_employee_ids', compute_sudo=True)
+    employee_ids = fields.Many2many(
+        "hr.employee",
+        string="working employees",
+        compute="_compute_employee_ids",
+        compute_sudo=True,
+        bypass_search_access=True,
+    )
 
     picking_type_auto_close = fields.Boolean(related='picking_type_id.auto_close_production')
 

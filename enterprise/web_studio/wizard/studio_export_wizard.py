@@ -16,12 +16,12 @@ DEFAULT_MODELS_TO_EXPORT = [
     "report.paperformat",
     "ir.model",
     "ir.model.fields",
-    "ir.ui.view",
     "ir.actions.act_window",
-    "ir.actions.act_window.view",
     "ir.actions.report",
     "mail.template",
     "ir.actions.server",
+    "ir.ui.view",
+    "ir.actions.act_window.view",
     "ir.ui.menu",
     "ir.filters",
     "base.automation",
@@ -503,30 +503,32 @@ class StudioExportWizard(models.TransientModel):
                 add(export_model, export_model.model_name, to_export)
 
                 if export_model.model_name == "website":
-                    attachments = self.env["ir.attachment"].search(
-                        [
-                            ("type", "=", "binary"),
-                            ("website_id", "in", to_export.ids),
-                            "!",
-                            ("name", "=like", "%.js.map"),
-                            "!",
-                            ("name", "=like", "%.css.map"),
-                            (
-                                "mimetype",
-                                "not in",
-                                ["application/javascript", "text/css", "text/plain"],
-                            ),
-                        ]
-                    )
-                    add(export_model, "ir.attachment", attachments, post=True)
+                    if website_id_field := next(iter(f.name for f in self.env["ir.attachment"]._fields.values() if f.relational and f.comodel_name == 'website'), None):
+                        attachments = self.env["ir.attachment"].search(
+                            [
+                                ("type", "=", "binary"),
+                                (website_id_field, "in", to_export.ids),
+                                "!",
+                                ("name", "=like", "%.js.map"),
+                                "!",
+                                ("name", "=like", "%.css.map"),
+                                (
+                                    "mimetype",
+                                    "not in",
+                                    ["application/javascript", "text/css", "text/plain"],
+                                ),
+                            ]
+                        )
+                        add(export_model, "ir.attachment", attachments, post=True)
 
-                    website_views = self.env["ir.ui.view"].search(
-                        [
-                            ("website_id", "in", to_export.ids),
-                            ("arch_updated", "=", True),
-                        ]
-                    )
-                    add(export_model, "ir.ui.view", website_views)
+                    if website_id_field := next(iter(f.name for f in self.env["ir.ui.view"]._fields.values() if f.relational and f.comodel_name == 'website'), None):
+                        website_views = self.env["ir.ui.view"].search(
+                            [
+                                (website_id_field, "in", to_export.ids),
+                                ("arch_updated", "=", True),
+                            ]
+                        )
+                        add(export_model, "ir.ui.view", website_views)
 
                 if export_model.model_name == "project.task.type":
                     mail_templates = to_export.mail_template_id

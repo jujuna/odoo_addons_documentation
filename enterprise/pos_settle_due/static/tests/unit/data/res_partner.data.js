@@ -12,6 +12,9 @@ patch(ResPartner.prototype, {
             "commercial_partner_id",
         ];
     },
+    deposit_money_from_pos() {
+        return true;
+    },
 });
 
 ResPartner._records = [

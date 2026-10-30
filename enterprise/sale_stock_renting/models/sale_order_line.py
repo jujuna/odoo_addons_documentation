@@ -175,6 +175,13 @@ class SaleOrderLine(models.Model):
                     rentable_qty = line.product_id.with_context(
                         from_date=from_date, to_date=to_date, warehouse_id=warehouse_id
                     ).qty_available
+                    # The rented_qty_during_period can overlap with ongoing rentals already picked up
+                    # and therefore already subtracted from qty_available
+                    rentable_qty += line.product_id._get_physical_unavailable_qty_in_rent(
+                        pivot_date=from_date,
+                        ignored_soline_id=line and line.state == 'draft' and line.id,
+                        warehouse_id=line.order_id.warehouse_id.id,
+                    )
                 else:
                     # For performance reason it is not reasonable to find the minimal forecasted
                     # quantity during the rental period so that we fallback on the forecasted

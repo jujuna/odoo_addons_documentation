@@ -78,8 +78,8 @@ class L10n_AuAuditLoggingMixin(models.AbstractModel):
             before_groups = {rec.id: rec.group_ids for rec in records_to_log}
         # Log from res.groups the same as when write is triggered on res.user
         elif self._name == "res.groups" and "user_ids" in vals:
-            users_changed = self.env["res.users"].browse(vals.get("user_ids")[0][2]).sudo()._records_to_log()
-            before_groups = {user.id: user.group_ids for user in users_changed}
+            members_before = records_to_log.user_ids
+            members_before_groups = {user.id: user.group_ids for user in members_before}
 
         res = super().write(vals)
 
@@ -88,6 +88,11 @@ class L10n_AuAuditLoggingMixin(models.AbstractModel):
             records_to_log._create_audit_logs(["group_ids"], before_groups=before_groups, after_groups=after_groups)
         # _create_audit_logs is called on the users so the same logic can be reused
         elif self._name == "res.groups" and "user_ids" in vals:
+            users_changed = (members_before | records_to_log.user_ids)._records_to_log()
+            before_groups = {
+                user.id: members_before_groups.get(user.id, user.group_ids - records_to_log)
+                for user in users_changed
+            }
             after_groups = {user.id: user.group_ids for user in users_changed}
             users_changed._create_audit_logs(["group_ids"], before_groups=before_groups, after_groups=after_groups)
 

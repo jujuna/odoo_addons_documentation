@@ -1693,6 +1693,108 @@ class TestDocumentsAccess(TransactionCaseDocuments, MailCase):
             )
             self.assertIn('Portal user rights changed from\nViewer\nto\nEditor', html2plaintext(message.body))
 
+    def test_tracking_with_deleted_partners(self):
+        """Members can be deleted between the access change and the cron run.
+        The cron must not crash on missing partners, whether they were added,
+        updated or removed."""
+        Partner = self.env['res.partner']
+        added, updated, removed = Partner.create([
+            {'name': 'Added partner'},
+            {'name': 'Updated partner'},
+            {'name': 'Removed partner'},
+        ])
+        document = self.env['documents.document'].create({
+            'name': 'Tracked document',
+            'raw': b'some bytes',
+            'access_ids': [
+                Command.create({'partner_id': updated.id, 'role': 'view'}),
+                Command.create({'partner_id': removed.id, 'role': 'view'}),
+            ],
+        })
+        self.env['documents.access.tracking'].search([]).unlink()
+        with RecordCapturer(self.env['documents.access.tracking']) as capture:
+            document.action_update_access_rights(partners={
+                added.id: ('view', False),
+                updated.id: ('edit', False),
+                removed.id: (False, False),
+            })
+        tracking = capture.records
+        self.assertEqual(len(tracking), 1)
+        self.assertEqual(
+            {action: len(partners) for action, partners in tracking.changes['members'].items()},
+            {'added': 1, 'updated': 1, 'removed': 1},
+        )
+
+        (added | updated | removed).unlink()
+
+        with self.mock_mail_gateway(), self.mock_mail_app(), self.enter_registry_test_mode():
+            self.env.ref('documents.ir_cron_documents_access_tracking').method_direct_trigger()
+        self.assertFalse(self.env['documents.access.tracking'].search([]))
+
+        expected_msg = f"""<span>The following members/groups gained access:</span>
+                <ul class="mb-1">
+                        <li>
+                            Deleted Contact (#{added.id}) has gained access as
+                            Viewer
+                        </li>
+                </ul>
+                <span>The following members/groups had their rights changed:</span>
+                <ul class="mb-1">
+                        <li>
+                                <span>Deleted Contact (#{updated.id})</span> rights changed from
+                                Viewer
+                                to
+                                Editor
+                        </li>
+                </ul>
+                <span>The following members/groups accesses were removed:</span>
+                <ul class="mb-1">
+                        <li>
+                            <span>Deleted Contact (#{removed.id})</span>
+                        </li>
+                </ul>"""
+        self.assertEqual(str(self._new_msgs.body), expected_msg)
+
+    def test_tracking_deleted_document(self):
+        """The document can be deleted between the access change and the cron run."""
+        partner_id = self.internal_user.partner_id.id
+        access_ids = [Command.create({'partner_id': partner_id, 'role': 'view'})]
+        deleted, kept = self.env['documents.document'].create([
+            {'name': 'Deleted document', 'access_ids': access_ids, 'raw': b'some bytes'},
+            {'name': 'Kept document', 'access_ids': access_ids, 'raw': b'some bytes'},
+        ])
+        self.env['documents.access.tracking'].search([]).unlink()
+        with RecordCapturer(self.env['documents.access.tracking']) as capture:
+            (deleted | kept).action_update_access_rights(partners={
+                partner_id: ('edit', False),
+            })
+        tracking = capture.records
+        self.assertEqual(len(tracking), 1)
+
+        deleted.unlink()
+
+        with self.mock_mail_gateway(), self.mock_mail_app(), self.enter_registry_test_mode():
+            self.env.ref('documents.ir_cron_documents_access_tracking').method_direct_trigger()
+        self.assertFalse(self.env['documents.access.tracking'].search([]))
+        self.assertEqual(self._new_msgs.mapped('res_id'), kept.ids)
+
+    def test_tracking_deleted_document_access_fields(self):
+        """The document can be deleted between the access field change and the cron run."""
+        deleted, kept = self.env['documents.document'].create([
+            {'name': 'Deleted document', 'access_internal': 'view', 'raw': b'some bytes'},
+            {'name': 'Kept document', 'access_internal': 'view', 'raw': b'some bytes'},
+        ])
+        self.env['documents.access.tracking'].search([]).unlink()
+        with RecordCapturer(self.env['documents.access.tracking']) as capture:
+            (deleted | kept).action_update_access_rights(access_internal='edit')
+        self.assertEqual(len(capture.records), 1)
+        deleted.unlink()
+
+        with self.mock_mail_gateway(), self.mock_mail_app(), self.enter_registry_test_mode():
+            self.env.ref('documents.ir_cron_documents_access_tracking').method_direct_trigger()
+        self.assertFalse(self.env['documents.access.tracking'].search([]))
+        self.assertEqual(self._new_msgs.mapped('res_id'), kept.ids)
+
     def test_members_access_on_move_documents(self):
         tomorrow = fields.Datetime.today() + datetime.timedelta(days=1)
         self.document_txt.action_update_access_rights(

@@ -344,7 +344,9 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
             }],
         })
 
-        payload = order._prepare_l10n_br_avatax_document_service_call(order._get_l10n_br_avatax_service_params())
+        with freeze_time('2025-03-15'):
+            payload = order._prepare_l10n_br_avatax_document_service_call(order._get_l10n_br_avatax_service_params())
+        self.assertEqual(payload['header']['invoiceAccessKey'][2:6], '2503')  # Year and month
         expected_dict = {
             'paymentInfo': {
                 'paymentMode': [

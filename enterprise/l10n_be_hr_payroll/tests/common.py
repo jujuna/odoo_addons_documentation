@@ -20,7 +20,7 @@ class TestBelgiumCommon(TransactionCase):
         super().setUpClass()
         cls.env['res.lang']._activate_lang('fr_BE')
         cls.env.user.lang = 'fr_BE'
-        cls.env.company.payroll_config_ids[-1].write({
+        cls.env.company.with_user(SUPERUSER_ID).payroll_config_ids[-1].write({
             'onss_importance_code': '1',
             'l10n_be_employer_category_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010').id,
             'l10n_be_main_joint_committee': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
@@ -29,8 +29,17 @@ class TestBelgiumCommon(TransactionCase):
         cls.env['res.lang']._activate_lang('fr_BE')
         cls.env.user.lang = 'fr_BE'
         # Activate the JC200 & JC302 & JC999
-        jcs_to_activate = cls.env['l10n.be.joint.committee'].with_context(active_test=False).search([('egov3_code', 'in', ('200', '302', '999'))])
+        jcs_to_activate = cls.env['l10n.be.joint.committee'].with_user(SUPERUSER_ID)\
+            .with_context(active_test=False).search([('egov3_code', 'in', ('200', '302', '999'))])
         jcs_to_activate.write({'active': True})
+        # Activate the secondary benefits, archived at install
+        cls.env['hr.contract.salary.benefit'].browse([cls.env.ref(xmlid).id for xmlid in (
+            'l10n_be_hr_payroll.l10n_be_transport_temporary_car',
+            'l10n_be_hr_payroll.l10n_be_transport_company_bike',
+            'l10n_be_hr_payroll.l10n_be_onss_restructuring',
+            'l10n_be_hr_payroll.l10n_be_time_in_rnd_benefit',
+            'l10n_be_hr_payroll.l10n_be_posted_employees_benefit',
+        )]).write({'active': True})
 
     @classmethod
     def load_onss_rates(cls):
@@ -57,14 +66,21 @@ class TestBelgiumCommon(TransactionCase):
             '010_812_2', '010_812_3', '010_831_0', '010_840_0', '010_841_0', '010_847_0', '010_852_0', '010_855_0',
             '010_856_0', '010_857_0', '010_859_0', '010_863_0', '010_865_0', '010_868_0', '010_869_0', '010_878_0',
             '010_888_0', '010_889_0', '017_015_1', '017_253_0', '017_255_0', '017_256_0', '017_450_0', '017_484_0',
-            '017_800_0', '017_800_2', '017_809_4', '017_809_5', '017_810_0', '017_820_0', '017_820_5', '017_825_0',
+            '017_495_0', '017_800_0', '017_800_2', '017_809_0', '017_809_4', '017_809_5', '017_810_0', '017_820_0', '017_820_5', '017_825_0',
             '017_825_8', '017_830_0', '017_830_5', '017_835_0', '017_835_1', '017_840_0', '017_841_0', '017_855_0',
             '017_859_0', '048_015_1', '048_253_0', '048_255_0', '048_256_0', '048_450_0', '048_484_0', '048_809_0',
             '048_809_4', '048_809_5', '048_810_0', '048_825_1', '048_825_2', '048_835_0', '048_835_1', '048_835_8',
             '048_840_0', '048_841_0', '048_855_0', '048_859_0', '010_046_1',
+            # employer category 317: Horeca occasional workers (extras)
+            '317_011_1', '317_253_0', '317_255_0', '317_256_0', '317_260_0', '317_260_3', '317_260_4', '317_260_5',
+            '317_260_6', '317_260_7', '317_261_0', '317_261_3', '317_261_4', '317_261_5', '317_261_6', '317_261_7',
+            '317_809_2', '317_809_4', '317_810_2', '317_811_2', '317_820_0', '317_820_5', '317_847_0', '317_852_0',
+            '317_856_0', '317_857_0', '317_859_0', '317_863_0', '317_868_0', '317_869_0', '317_888_0', '317_889_0',
+            '317_496_0', '317_830_0', '317_830_5',
         ])
         load('onss_combinations', [
-            '010_015', '010_027', '010_046', '010_439', '010_484', '010_495', '017_015', '017_484', '048_015', '048_484',
+            '010_015', '010_027', '010_046', '010_439', '010_484', '010_495', '017_015', '017_484', '017_495', '048_015', '048_484',
+            '317_011', '317_496',
         ])
 
 

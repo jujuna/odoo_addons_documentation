@@ -57,8 +57,8 @@ class TestNLIntrastatReport(TestAccountReportsCommon):
         options = self._generate_options(self.report, '2023-10-01', '2023-10-31')
         csv_file = self.report_handler.l10n_nl_export_to_csv(options)['file_content']
         expected_csv = """9801123456782B90202310company_1_data                                18.0 20260430111813                            
-2023107123456782B9000001BE BE 300000 9403105100+0000000032++00000000000000040000+00000000002023/00001    000       11BE0477472701     
-2023106123456782B9000002   BE 300000 9403105100+0000000032++00000000000000040000+000000000023/10/0001    000       11BE0477472701     
+2023107123456782B9000001BE BE 300000 9403105100+0000000008++00000000000000040000+00000000002023/00001    000       11BE0477472701     
+2023106123456782B9000002   BE 300000 9403105100+0000000008++00000000000000040000+000000000023/10/0001    000       11BE0477472701     
 9899                                                                                                               """  # noqa: W291
         # We don't take the first line, as it contains the Odoo version, it will break on each fwp
         for csv_line, expected_csv_line in zip(csv_file.split('\n')[1:], expected_csv.split('\n')[1:]):

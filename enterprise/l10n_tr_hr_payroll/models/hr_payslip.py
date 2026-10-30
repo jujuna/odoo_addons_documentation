@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from collections import defaultdict
+from datetime import datetime, time
+from dateutil.relativedelta import relativedelta
+from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models
 from odoo.tools import float_round
@@ -92,7 +94,7 @@ class HrPayslip(models.Model):
         A safe version of Newton's method using the secant method to avoid division by zero.
         """
         self.ensure_one()
-        guess1, guess2 = self.version_id.wage, self.version_id.wage * 2
+        guess1, guess2 = target, target * 2
         for _ in range(max_iterations):
             value1 = self._l10n_tr_calculate_net_guess_accuracy(guess1, target)
             value2 = self._l10n_tr_calculate_net_guess_accuracy(guess2, target)
@@ -116,7 +118,8 @@ class HrPayslip(models.Model):
     def _compute_l10n_tr_current_month_gross(self):
         for payslip in self:
             if payslip.country_code == 'TR' and payslip.version_id.l10n_tr_is_net_to_gross:
-                payslip.l10n_tr_current_month_gross = payslip._estimate_l10n_tr_gross_from_net(payslip.version_id.wage)
+                paid_amount = sum(line.amount for line in self.worked_days_line_ids)
+                payslip.l10n_tr_current_month_gross = payslip._estimate_l10n_tr_gross_from_net(paid_amount)
             else:
                 payslip.l10n_tr_current_month_gross = 0
 
@@ -140,14 +143,10 @@ class HrPayslip(models.Model):
             elif slip.struct_id.code == 'TRADV':
                 sick_leave_adv_rule_code = self.env.ref('l10n_tr_hr_payroll.l10n_tr_advance_pay_sick_leave').sudo().code
                 annual_leave_adv_rule_code = self.env.ref('l10n_tr_hr_payroll.l10n_tr_advance_pay_annual_leave').sudo().code
-                slip._set_input_value(
-                    sick_leave_adv_rule_code,
-                    self.worked_days_line_ids.filtered(lambda wd: wd.code == '013.00').number_of_days,
-                )
-                slip._set_input_value(
-                    annual_leave_adv_rule_code,
-                    self.worked_days_line_ids.filtered(lambda wd: wd.code == '016.00').number_of_days,
-                )
+                slip._set_input_values({
+                    sick_leave_adv_rule_code: self.worked_days_line_ids.filtered(lambda wd: wd.code == '013.00').number_of_days,
+                    annual_leave_adv_rule_code: self.worked_days_line_ids.filtered(lambda wd: wd.code == '016.00').number_of_days,
+                })
         return res
 
     def _get_salary_advance_balances(self):
@@ -249,3 +248,30 @@ class HrPayslip(models.Model):
                 'data/hr_rule_parameter_data.xml',
                 'data/hr_salary_rule_data.xml',
             ])]
+
+    def _l10n_tr_get_versions_with_effective_dates(self):
+        self.ensure_one()
+        versions = self.employee_id._get_versions_with_contract_overlap_with_period(self.date_from, self.date_to)
+        date_from = self.date_from
+        versions_with_dates = []
+        for version_index in range(len(versions)):
+            if version_index == len(versions) - 1:
+                date_to = self.date_to
+            else:
+                date_to = versions[version_index + 1].date_version - relativedelta(days=1)
+            versions_with_dates.append((versions[version_index], date_from, date_to))
+            date_from = date_to + relativedelta(days=1)
+        return versions_with_dates
+
+    def _l10n_tr_get_theoretical_work_days(self):
+        self.ensure_one()
+        versions_with_dates = self._l10n_tr_get_versions_with_effective_dates()
+        total_number_of_work_days = 0
+        for version, date_from, date_to in versions_with_dates:
+            reference_calendar = version.resource_calendar_id or version.company_id.resource_calendar_id
+            total_number_of_work_days += reference_calendar.get_work_duration_data(
+                datetime.combine(date_from, time.min).replace(tzinfo=ZoneInfo(version.tz)),
+                datetime.combine(date_to, time.max).replace(tzinfo=ZoneInfo(version.tz)),
+                compute_leaves=False,
+            )['days']
+        return total_number_of_work_days

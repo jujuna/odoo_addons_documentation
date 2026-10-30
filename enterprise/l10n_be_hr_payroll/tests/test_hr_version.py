@@ -238,6 +238,29 @@ class TestPayrollHrVersion(TestPayrollCommon):
         result = dimona_emp.version_id._check_dimona_out_requirements()
         self.assertFalse(result, "Should return False because employee has no departure reason set.")
 
+    def test_dimona_name_uses_legal_names(self):
+        """ A single-word employee name is enough when the legal first and last names are set """
+        dimona_emp = self.env["hr.employee"].create({
+            'name': "Dimona",
+            'company_id': self.test_company.id,
+            'l10n_be_legal_first_name': "John",
+            'l10n_be_legal_last_name': "Doe",
+        })
+        self.assertEqual(dimona_emp._get_split_name(), ("John", "Doe"))
+        issues = dimona_emp.version_id._l10n_be_dimona_issues('in')
+        self.assertNotIn('- The employee name is incomplete', issues)
+
+        dimona_emp.write({'l10n_be_legal_first_name': False, 'l10n_be_legal_last_name': False})
+        issues = dimona_emp.version_id._l10n_be_dimona_issues('in')
+        self.assertIn('- The employee name is incomplete', issues)
+
+        # The fallback split and the legal name compute agree on the order
+        dimona_emp.name = "John Doe"
+        self.assertEqual(dimona_emp._l10n_be_split_name(), ("John", "Doe"))
+        self.assertEqual(
+            (dimona_emp.l10n_be_legal_first_name, dimona_emp.l10n_be_legal_last_name),
+            ("John", "Doe"))
+
     @freeze_time('2026-01-01')
     def test_computed_seniority_batch_cp200(self):
         employees = self.env['hr.employee'].create([{
@@ -257,6 +280,8 @@ class TestPayrollHrVersion(TestPayrollCommon):
         self.assertEqual(employees.version_id.mapped('l10n_be_computed_seniority_years'), [2, 3])
 
     def test_mobility_budget_too_low(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.employee = self.employee.with_env(self.env)
         self.employee.write({
             'wage': 3000.0,
             'l10n_be_mobility_budget': True,
@@ -275,6 +300,8 @@ class TestPayrollHrVersion(TestPayrollCommon):
         ))
 
     def test_mobility_budget_too_high(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.employee = self.employee.with_env(self.env)
         self.employee.write({
             'wage': 3000.0,
             'l10n_be_mobility_budget': True,
@@ -293,6 +320,8 @@ class TestPayrollHrVersion(TestPayrollCommon):
         ))
 
     def test_mobility_budget_within_limits(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        self.employee = self.employee.with_env(self.env)
         min_budget = self.env['hr.rule.parameter']._get_parameter_from_code('mobility_budget_min', raise_if_not_found=False) or 3233
         max_budget = self.env['hr.rule.parameter']._get_parameter_from_code('mobility_budget_max', raise_if_not_found=False) or 17244
         valid_amount = (min_budget + max_budget) / 2
@@ -307,3 +336,38 @@ class TestPayrollHrVersion(TestPayrollCommon):
         self.assertFalse(any("Mobility Budget amount is below the minimum allowed value" in msg for msg in messages))
         self.assertFalse(any("Mobility Budget amount exceeds the maximum allowed value" in msg for msg in messages))
         self.assertFalse(any("Mobility Budget amount exceeds 20% of the yearly wage" in msg for msg in messages))
+
+    def test_occupation_weekly_days_change(self):
+        employee = self.create_employee({
+            'name': 'Changing schedule employee',
+            'date_version': date(2025, 7, 1),
+            'contract_date_start': date(2025, 7, 1),
+        })
+        fixed = employee.version_id
+        calendar = fixed.resource_calendar_id
+        variable_calendar = self.env['resource.calendar'].create({
+            'name': 'Variable full-time schedule',
+            'company_id': employee.company_id.id,
+            'calendar_type': 'variable',
+            'hours_per_week': calendar.hours_per_week,
+            'days_per_week': calendar.days_per_week,
+            'full_time_required_hours': calendar.full_time_required_hours,
+            'reference_calendar_id': calendar.id,
+            'attendance_ids': [(5, 0, 0)],
+        })
+        variable = fixed.copy({
+            'date_version': date(2025, 8, 1),
+            'resource_calendar_id': variable_calendar.id,
+        })
+        fixed_again = fixed.copy({'date_version': date(2025, 9, 1)})
+        salary_change = fixed_again.copy({'date_version': date(2025, 9, 15), 'wage': 2700})
+        self.assertTrue(fixed._is_same_occupation(variable))
+        variable_calendar.days_per_week = 4.5
+        self.assertFalse(fixed._is_same_occupation(variable))
+        self.assertFalse(variable._is_same_occupation(fixed_again))
+        self.assertTrue(fixed_again._is_same_occupation(salary_change))
+        groups = employee.version_ids.sorted('date_start', reverse=True)._get_occupation_dates()
+        self.assertEqual(len(groups), 3)
+        self.assertEqual({frozenset(versions.ids) for versions, _start, _end in groups}, {
+            frozenset(fixed.ids), frozenset(variable.ids), frozenset((fixed_again | salary_change).ids),
+        })

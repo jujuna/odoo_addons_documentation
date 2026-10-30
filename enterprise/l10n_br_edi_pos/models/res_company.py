@@ -8,10 +8,12 @@ class ResCompany(models.Model):
     l10n_br_edi_csc_identifier = fields.Char(
         "CSC ID",
         size=5,
+        groups='base.group_user',
         help="Brazil: the CSC ID or CSC Token is an identification of the Taxpayer Security Code, which can have 1 to 6 digits and is available on the website of the State Department of Finance (SEFAZ) of your state.",
     )
     l10n_br_edi_csc_number = fields.Char(
         "CSC Number",
+        groups='base.group_user',
         help="Brazil: the CSC Number is a code of up to 36 characters that only you and the Department of Finance know. It is used to generate the QR Code of the NFC-e and ensure the authenticity of the DANFE.",
     )
     l10n_br_edi_url_key_override = fields.Char(

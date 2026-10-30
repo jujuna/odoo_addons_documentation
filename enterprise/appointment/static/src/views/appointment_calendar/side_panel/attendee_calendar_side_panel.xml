@@ -10,14 +10,15 @@
                     <div class="d-flex align-items-center justify-content-center flex-column gap-1 w-100">
                         <span class="w-100 text-truncate pe-none" t-out="this.editingAppointmentValues.name"/>
                         <div class="d-flex flex-row flex-wrap gap-1 w-100">
-                            <button class="btn btn-secondary px-1 py-0" title="Edit Appointment"
+                            <button class="flex-fill btn btn-secondary px-1 py-0" title="Save &amp; copy URL"
+                                t-on-click.stop.prevent="() => this.appointmentProps.saveAndCopyAppointmentUrl(this.editingAppointmentValues.id)">
+                                <i class="oi oi-filled" data-icon="check"/>
+                                Save &amp; copy URL
+                            </button>
+                            <button class="flex-fill btn btn-secondary px-1 py-0" title="Edit Appointment"
                                 t-on-click.stop.prevent="() => this.appointmentProps.openAppointmentForm(this.editingAppointmentValues.id)">
                                 <i class="oi oi-filled" data-icon="edit"/>
                                 Options
-                            </button>
-                            <button class="btn btn-secondary px-1 py-0" title="Done" t-on-click.stop.prevent="() => this.appointmentProps.setEditingAppointmentId(false)">
-                                <i class="oi oi-filled" data-icon="check"/>
-                                Done
                             </button>
                         </div>
                     </div>
@@ -28,7 +29,7 @@
                 <t t-elif="this.props.model.originalDefaultAppointmentTypeId and !this.uiService.isSmall">
                     <span class="btn btn-secondary" t-on-click.stop.prevent="() => this.appointmentProps.setEditingAppointmentId(this.defaultAppointment.id)">Edit Appointment</span>
                 </t>
-                <t t-elif="!this.props.model.originalDefaultAppointmentTypeId and !this.uiService.isSmall">
+                <t t-elif="!this.props.model.originalDefaultAppointmentTypeId and !this.uiService.isSmall and this.listedUserAppointments.length">
                     <span class="d-flex align-items-center" type="button" t-on-click.stop.prevent="this.toggleAppointmentOptions">
                         <span class="o_cw_filter_label fw-bolder text-truncate flex-grow-1">Booking Pages</span>
                         <i class="o_cw_filter_collapse_icon oi ms-1" t-att-data-icon="this.state.appointmentOptionsCollapsed ? 'arrow_left' : 'arrow_drop_down'"/>

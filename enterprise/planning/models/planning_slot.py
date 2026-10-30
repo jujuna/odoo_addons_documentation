@@ -989,7 +989,7 @@ class PlanningSlot(models.Model):
                 resources = Resource.browse(resource_ids)
                 if not vals.get('company_id') and len(resources.company_id) == 1:
                     vals['company_id'] = resources.company_id.id
-                if all(resource.resource_type == 'material' for resource in resources):
+                if resources and all(resource.resource_type == 'material' for resource in resources):
                     vals['state'] = '2_published'
             if not vals.get('company_id'):
                 vals['company_id'] = self.env.company.id

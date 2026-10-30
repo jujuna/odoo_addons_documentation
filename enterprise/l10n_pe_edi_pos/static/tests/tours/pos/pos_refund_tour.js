@@ -28,6 +28,9 @@ registry.category("web_tour.tours").add("l10n_pe_edi_pos.RefundWithReasonTour", 
             TicketScreen.selectFilter("Active"),
             TicketScreen.selectFilter("Paid"),
             TicketScreen.selectOrder("0001"),
+            {
+                trigger: `button:disabled:contains("Invoice")`,
+            },
             TicketScreen.confirmRefund(),
             // Additional Refund Information Dialog
             Dialog.confirm("Ok"),

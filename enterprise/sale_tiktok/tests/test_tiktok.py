@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from odoo import _, fields
+from odoo import Command, _, fields
 from odoo.tests.common import tagged
 from odoo.tools import mute_logger
 
@@ -23,6 +23,30 @@ class TestTikTokShop(common.TestTikTokShopCommon):
         cls.startClassPatcher(freeze_time("2020-02-01"))
 
     # Order
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_order_ignores_existing_currency_pricelist_discount(self):
+        """An existing percentage pricelist in the order currency does not discount imported lines."""
+        self.env.user.group_ids += self.env.ref("sale.group_discount_per_so_line")
+        currency = self.env.ref("base.IDR")
+        currency.active = True
+        self.product.list_price = 100.0
+        self.env["product.pricelist"].create({
+            "name": "Existing IDR",
+            "currency_id": currency.id,
+            "company_id": self.shop.company_id.id,
+            "sequence": 1,
+            "item_ids": [Command.create({
+                "compute_price": "discount",
+                "price_discount": 10.0,
+            })],
+        })
+
+        order = self.shop._create_order_from_data(common.ORDER_MOCK["orders"][0])
+
+        self.assertEqual(order.pricelist_id.name, f"TikTok {currency.name}")
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertEqual(product_line.discount, 0.0)
+
     @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
     def test_sync_orders_full(self):
         """Test the orders synchronization with on-the-fly creation of all required records."""
@@ -350,6 +374,49 @@ class TestTikTokShop(common.TestTikTokShopCommon):
             self.assertEqual(self.shop.tiktok_item_ids, self.item)
             with self.assertRaises(HandleSyncFailureMockError):
                 self.shop._sync_inventory(auto_commit=False)
+
+    @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")
+    def test_sync_inventory_error_progress(self):
+        """Ensure items failing on TikTok's side are counted as processed in the cron progress,
+        otherwise the cron is never fully done and is rescheduled in a loop."""
+        failing_item = self.env["tiktok.item"].create({
+            "product_id": self.env["product.product"].create({
+                "name": "Test Product 2", "type": "consu", "is_storable": True,
+            }).id,
+            "shop_id": self.shop.id,
+            "tiktok_sku_extern_id": "failing_sku_id",
+            "tiktok_item_extern_id": "failing_item_id",
+            "last_inventory_sync_date": self.initial_sync_date,
+        })
+
+        def get_tiktok_api_response_mock(_shop, operation_, *_args, path_params=None, **_kwargs):
+            if path_params["tiktok_item_extern_id"] == failing_item.tiktok_item_extern_id:
+                raise utils.TikTokApiError(_shop, operation_, "REQ-1", "ERROR", "Mock failure")
+            return common.OPERATIONS_RESPONSES_MAP[operation_]
+
+        progress = {"done": 0, "remaining": 0}
+
+        def _commit_progress(_cron, processed=0, *, remaining=None, **_kwargs):
+            # mimic ir.cron._commit_progress accounting, without committing
+            if remaining is None:
+                remaining = max(progress["remaining"] - processed, 0)
+            progress.update(done=progress["done"] + processed, remaining=remaining)
+            return 1
+
+        self.patch(self.registry["ir.cron"], "_commit_progress", _commit_progress)
+        with (
+            patch(
+                "odoo.addons.sale_tiktok.utils.make_tiktok_api_request",
+                new=get_tiktok_api_response_mock,
+            ),
+            patch("odoo.addons.sale_tiktok.models.tiktok_shop.TikTokShop._handle_sync_failure"),
+        ):
+            self.shop.synchronize_inventory = True
+            self.shop._sync_inventory()
+
+        self.assertEqual(progress, {"done": 2, "remaining": 0})
+        self.assertEqual(self.item.last_inventory_sync_date, fields.Datetime.now())
+        self.assertEqual(failing_item.last_inventory_sync_date, self.initial_sync_date)
 
     #  Picking
     @mute_logger("odoo.addons.sale_tiktok.models.tiktok_shop")

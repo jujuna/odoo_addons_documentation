@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
 "PO-Revision-Date: 2026-09-17 22:51+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
@@ -138,8 +138,8 @@ msgstr ""
 "dotyczącymi identyfikacji klientów, musimy zgłaszać osoby fizyczne, które "
 "bezpośrednio lub pośrednio\n"
 "                        posiadają lub kontrolują co najmniej 25% kapitału "
-"lub praw głosu w <b><t t-out=\"user_id.company_id.name\"/></b> . <br/> <br/>"
-"\n"
+"lub praw głosu w <b><t t-out=\"user_id.company_id.name\"/></b> . <br/> <br/"
+">\n"
 "                        Proszę wypełnić wniosek UBO, korzystając z "
 "powyższego linku.<br/> <br/>\n"
 "                        Dziękujemy,\n"
@@ -232,8 +232,8 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span>Akcjonariusz<span invisible=\"equity_shareholders_count == 1\">e</span>"
-"</span>"
+"<span>Akcjonariusz<span invisible=\"equity_shareholders_count == 1\">e</"
+"span></span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -475,6 +475,12 @@ msgid "Cannot change security class type because it has linked transactions"
 msgstr ""
 "Nie można zmienić typu klasy bezpieczeństwa, ponieważ ma ona powiązane "
 "transakcje"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Cannot create new UBO for an existing holder"
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -1314,8 +1320,8 @@ msgstr ""
 "przykład osoby pełniące funkcję (lub jej odpowiednik) Prezesa Zarządu (CEO), "
 "Dyrektora Finansowego (CFO) lub Skarbnika. Jeżeli osoba prawna wykonuje "
 "mandat w zarządzie spółki, należy wskazać wszystkich faktycznych członków "
-"organu zarządzającego, wraz z określeniem pełnionych przez nich funkcji. "
-"<br/>Osoby fizyczne, które nie posiadają pakietu kontrolnego w spółce ani "
+"organu zarządzającego, wraz z określeniem pełnionych przez nich funkcji. <br/"
+">Osoby fizyczne, które nie posiadają pakietu kontrolnego w spółce ani "
 "formalnego mandatu, lecz de facto sprawują podobną kontrolę nad spółką."
 
 #. module: equity
@@ -1512,6 +1518,12 @@ msgstr "Kontrahent"
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids_all_have_email
 msgid "Partner Ids All Have Email"
 msgstr "Wszystkie ID partnerów mają email"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Partner is not allowed to fill UBO form"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript

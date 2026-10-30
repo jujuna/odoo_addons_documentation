@@ -44,7 +44,9 @@ class DocumentsAccessTracking(models.Model):
 
     def _create_message_track(self):
         self.ensure_one()
-        document_ids = self.env['documents.document'].browse(self.documents)
+        document_ids = self.env['documents.document'].browse(self.documents).exists()
+        if not document_ids:
+            return
         if initial_values := self._get_initial_values():
             if 'members' in self.changes or 'groups' in self.changes:
                 track_body = self._get_members_change_template_body()
@@ -90,12 +92,25 @@ class DocumentsAccessTracking(models.Model):
         type_model = 'res.partner' if type == 'members' else 'res.group.functional'
         type_map = {}
         type_dict = self.changes[type]
+        Model = self.env[type_model]
         for operation in ['added', 'updated']:
             # must cast into int because fields.Json set all keys in string
-            record_ids = self.env[type_model].browse([int(id) for id in type_dict[operation]])
+            record_ids = Model.browse([int(id) for id in type_dict[operation]])
             type_map.update(dict(zip(type_dict[operation].keys(), record_ids)))
 
-        record_ids = self.env[type_model].browse(type_dict['removed'])
+        record_ids = Model.browse(type_dict['removed'])
         type_map.update(dict(zip(type_dict['removed'], record_ids)))
 
-        return type_map
+        # partners deleted since the change are mapped to a "new" recordset
+        existing = Model.union(type_map.values()).exists()
+        return {
+            key: record
+            if record in existing else Model.new({
+                'name': self.env._(
+                    'Deleted %(model_name)s (#%(record_id)s)',
+                    model_name=Model._description,
+                    record_id=key
+                )
+            })
+            for key, record in type_map.items()
+        }

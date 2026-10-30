@@ -11,6 +11,7 @@ from .common import TestPayrollCommon
 class TestEgyptianHrPayslip(TestPayrollCommon):
 
     def test_errors_on_slip_required_field_not_found_eta_form2(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         self.employee_payslip = self.env['hr.payslip'].create({
             'employee_id': self.employee.id,
             'struct_id': self.employee.structure_id.id,
@@ -32,6 +33,7 @@ class TestEgyptianHrPayslip(TestPayrollCommon):
         self.assertFalse(self.employee_payslip.issues)
 
     def test_warnings_on_slip_required_field_not_found_eta_form2(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         self.employee_payslip = self.env['hr.payslip'].create({
             'employee_id': self.employee.id,
             'struct_id': self.employee.structure_id.id,

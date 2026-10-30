@@ -1,15 +1,9 @@
 import { _t } from "@web/core/l10n/translation";
 import { Plugin } from "@html_editor/plugin";
-import {
-    firstLeaf,
-    lastLeaf,
-    closestElement,
-    getCommonAncestor,
-} from "@html_editor/utils/dom_traversal";
+import { firstLeaf, lastLeaf, getCommonAncestor } from "@html_editor/utils/dom_traversal";
 import { withSequence } from "@html_editor/utils/resource";
 import { isContentEditable } from "@html_editor/utils/dom_info";
 import { nodeSize } from "@html_editor/utils/position";
-import { unwrapContents } from "@html_editor/utils/dom";
 import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
 import { user } from "@web/core/user";
 import { MAIL_CORE_PLUGINS } from "@mail/core/common/plugin/plugin_sets";
@@ -25,6 +19,7 @@ export class ChatGPTPlugin extends Plugin {
         "dialog",
         "split",
         "format",
+        "delete",
     ];
     static shared = ["openDialog"];
     resources = {
@@ -61,8 +56,11 @@ export class ChatGPTPlugin extends Plugin {
             commandId: "openChatGPTDialog",
             icon: "o_ai_icon",
         }),
-        clean_for_save_processors: this.cleanForSave.bind(this),
     };
+
+    setup() {
+        this.cachedSelections = {};
+    }
 
     isNotReplaceableByAI(selection = this.dependencies.selection.getEditableSelection()) {
         if (selection.isCollapsed) {
@@ -75,6 +73,7 @@ export class ChatGPTPlugin extends Plugin {
         return cannotReplace || isEmpty;
     }
 
+    // TODO Remove in master
     createSelectBlock(nodes) {
         const connectedNodes = nodes.filter((node) => node.isConnected);
         if (!connectedNodes.length) {
@@ -103,55 +102,80 @@ export class ChatGPTPlugin extends Plugin {
         const dialogParams = {
             insert: (content, selection) => {
                 if (selection) {
-                    this.dependencies.selection.setSelection(selection);
+                    selection.restore();
                     this.dependencies.format.removeSelectionFormats();
+                    this.dependencies.delete.deleteSelection();
+                }
+                const isTextLines = content.textContent.includes("\n") && !content.children.length; // text nodes only
+                if (isTextLines) {
+                    const fragment = this.document.createDocumentFragment();
+                    for (const line of content.textContent.split("\n")) {
+                        const textNode = this.document.createTextNode(line.trim());
+                        const container = this.document.createElement(
+                            // First line inline
+                            fragment.children.length ? "p" : "span"
+                        );
+                        container.appendChild(textNode);
+                        fragment.appendChild(container);
+                    }
+                    content = fragment;
                 }
                 const insertedNodes = this.dependencies.dom.insert(content);
                 this.dependencies.history.commit();
                 // Add a frame around the inserted content to highlight it for 2
                 // seconds.
-                const start = insertedNodes?.length && closestElement(insertedNodes[0]);
-                const end =
-                    insertedNodes?.length &&
-                    closestElement(insertedNodes[insertedNodes.length - 1]);
-                if (start && end) {
+                if (insertedNodes?.length) {
                     const divContainer = this.editable.parentElement;
-                    let [parent, left, top] = [
-                        start.offsetParent,
-                        start.offsetLeft,
-                        start.offsetTop - start.scrollTop,
-                    ];
-                    while (parent && !parent.contains(divContainer)) {
-                        left += parent.offsetLeft;
-                        top += parent.offsetTop - parent.scrollTop;
-                        parent = parent.offsetParent;
+                    let editorLeftOffset = 0;
+                    let offsetEl = divContainer;
+                    while (offsetEl) {
+                        editorLeftOffset += offsetEl.offsetLeft;
+                        offsetEl = offsetEl.offsetParent;
                     }
-                    let [endParent, endTop] = [end.offsetParent, end.offsetTop - end.scrollTop];
-                    while (endParent && !endParent.contains(divContainer)) {
-                        endTop += endParent.offsetTop - endParent.scrollTop;
-                        endParent = endParent.offsetParent;
+                    const rectangleOf = (node) => {
+                        const range = this.document.createRange();
+                        range.selectNodeContents(node);
+                        return range.getBoundingClientRect();
+                    };
+                    const bigRect = { left: Infinity, right: 0, top: Infinity, bottom: 0 };
+                    for (const node of insertedNodes) {
+                        if (!node.isConnected) {
+                            continue;
+                        }
+                        const rect = rectangleOf(node);
+                        if (!rect.left || !rect.top) {
+                            continue;
+                        }
+                        bigRect.left = Math.min(bigRect.left, rect.left);
+                        bigRect.right = Math.max(bigRect.right, rect.right);
+                        bigRect.top = Math.min(bigRect.top, rect.top);
+                        bigRect.bottom = Math.max(bigRect.bottom, rect.bottom);
                     }
+                    const rectDiv = rectangleOf(divContainer);
                     const div = document.createElement("div");
                     div.classList.add("o-chatgpt-content");
                     const FRAME_PADDING = 3;
-                    div.style.left = `${left - FRAME_PADDING}px`;
-                    div.style.top = `${top - FRAME_PADDING}px`;
-                    div.style.width = `${
-                        Math.max(start.offsetWidth, end.offsetWidth) + FRAME_PADDING * 2
-                    }px`;
-                    div.style.height = `${endTop + end.offsetHeight - top + FRAME_PADDING * 2}px`;
+                    div.style.left = `${bigRect.left - editorLeftOffset - FRAME_PADDING}px`;
+                    div.style.top = `${bigRect.top - rectDiv.top - FRAME_PADDING}px`;
+                    div.style.width = `${bigRect.right - bigRect.left + FRAME_PADDING * 2}px`;
+                    div.style.height = `${bigRect.bottom - bigRect.top + FRAME_PADDING * 2}px`;
                     divContainer.prepend(div);
                     setTimeout(() => div.remove(), 2000);
+                    const selectionAfterInsert = this.dependencies.selection.getEditableSelection();
+                    this.dependencies.selection.setSelection(
+                        {
+                            anchorNode: insertedNodes[0],
+                            anchorOffset: 0,
+                            focusNode: selectionAfterInsert.anchorNode,
+                            focusOffset: selectionAfterInsert.anchorOffset,
+                        },
+                        { normalize: false }
+                    );
                 }
+                return this.dependencies.selection.preserveSelection();
             },
-            selectPreviousInsertion: (selectionId) => {
-                const targetElement = this.editable.querySelector(
-                    `[data-ai-selection-id="${selectionId}"]`
-                );
-                if (targetElement) {
-                    return this.createSelectBlock([targetElement]);
-                }
-            },
+            selectPreviousInsertion: (selectionId) => this.cachedSelections[selectionId],
+            setCursor: (selectionId, cursor) => (this.cachedSelections[selectionId] = cursor),
             ...params,
         };
         dialogParams.baseContainer = this.dependencies.baseContainer.getDefaultNodeName();
@@ -197,20 +221,14 @@ export class ChatGPTPlugin extends Plugin {
 
             const textOfSelection = selection.toString();
             const selectionId = `ai-selection-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-            const wrapper = this.document.createElement("span");
-            wrapper.dataset.aiSelectionId = selectionId;
-            wrapper.classList.add("o_ai_selection_wrapper");
-
-            const range = this.document.getSelection().getRangeAt(0);
-            const contents = range.extractContents();
-            wrapper.appendChild(contents);
-            range.insertNode(wrapper);
 
             textSelection = {
                 selectionId: selectionId,
                 textContent: textOfSelection,
             };
         }
+        this.cachedSelections[textSelection.selectionId] =
+            this.dependencies.selection.preserveSelection();
         await this.services.aiChatLauncher.launchAIChat({
             interfaceKey: callerComp,
             recordModel: recordModel,
@@ -220,6 +238,7 @@ export class ChatGPTPlugin extends Plugin {
             aiSpecialActions: {
                 insert: dialogParams.insert,
                 selectPreviousInsertion: dialogParams.selectPreviousInsertion,
+                setCursor: dialogParams.setCursor,
             },
             channelTitle: channelTitle,
             aiChatSourceId: callerId,
@@ -239,15 +258,6 @@ export class ChatGPTPlugin extends Plugin {
                 this.document.getSelection()?.removeAllRanges();
             });
         }
-    }
-
-    cleanForSave(root) {
-        const aiInsertedElements = root.querySelectorAll(`span[data-ai-selection-id]`);
-        const elements = [...aiInsertedElements];
-        for (const element of elements) {
-            unwrapContents(element);
-        }
-        return root;
     }
 
     destroy() {

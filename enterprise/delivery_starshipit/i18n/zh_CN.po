@@ -4,15 +4,16 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 03:22+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-11 06:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/delivery_starshipit/zh_Hans/>\n"
+"projects/odoo-20/delivery_starshipit/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,6 +34,14 @@ msgid ""
 "you can streamline every step of your fulfilment process,\n"
 "reduce handling time and improve customer experience.\n"
 msgstr ""
+"\n"
+"通过 Starshipit 寄送您的货物并在线跟踪\n"
+"============================================================\n"
+"\n"
+"Starshipit 是为成长型电子商务企业提供集成配送与跟踪解决方案的领先供应商。\n"
+"它与众多快递公司和平台无缝集成，\n"
+"帮助您简化订单履行流程的每一个环节，\n"
+"缩短处理时间并提升客户体验。\n"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -53,7 +62,7 @@ msgstr ""
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.choose_delivery_carrier_view_form
 msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Get more delivery methods"
-msgstr ""
+msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>获取更多送货方式"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -69,7 +78,7 @@ msgstr ""
 msgid ""
 "<i class=\"oi\" data-icon=\"warning\"/> Do not forget to select a service "
 "for a valid configuration."
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"warning\"/> 别忘了选择一项服务，配置才能生效。"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
@@ -89,7 +98,7 @@ msgstr ""
 msgid ""
 "<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
 "the api keys."
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"warning\"/> 只有管理员才能配置 API 密钥。"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -423,7 +432,7 @@ msgstr "Starshipit 退件包裹参考"
 #. module: delivery_starshipit
 #: model:ir.module.module,shortdesc:base.module_delivery_starshipit
 msgid "Starshipit Shipping"
-msgstr ""
+msgstr "Starshipit 配送"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_subscription_key
@@ -498,6 +507,15 @@ msgid "The Shipping Cost is being fetched in the background."
 msgstr "正在后台获取运输成本。"
 
 #. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The address of your company/warehouse is incomplete or wrong (Missing "
+"field(s):  \n"
+" %s)"
+msgstr "您公司或仓库的地址有误(缺少字段%s)"
+
+#. module: delivery_starshipit
 #: model:ir.model.fields,help:delivery_starshipit.field_delivery_carrier__starshipit_carrier_code
 msgid ""
 "The carrier on starshipit used by this carrier. The service code belongs to "
@@ -537,6 +555,16 @@ msgstr ""
 #. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The recipient address is incomplete or wrong (Missing field(s):  \n"
+" %s)"
+msgstr ""
+"收件人地址有误(缺少字段 : \n"
+"%s)"
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid "The return label creation failed."
 msgstr "退货标签创建失败。"
 
@@ -567,8 +595,8 @@ msgid ""
 "There are no shipping services available, please verify the shipping address "
 "or activate suitable carriers in your starshipit account."
 msgstr ""
-"没有可用的送货服务，请核实送货地址或在您的 starshipit 账户中激活合适的承运商"
-"。"
+"没有可用的送货服务，请核实送货地址或在您的 starshipit 账户中激活合适的承运"
+"商。"
 
 #. module: delivery_starshipit
 #. odoo-python

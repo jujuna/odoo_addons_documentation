@@ -53,7 +53,7 @@ export class FlowNode extends Component {
 
     get style() {
         const size = getNodeSize(this.props.node, this.props.defaultSize);
-        return `left: ${this.props.node.position.x}px; top: ${this.props.node.position.y}px; width: ${size.width}px; height: ${size.height}px;`;
+        return `inset-inline-start: ${this.props.node.position.x}px; top: ${this.props.node.position.y}px; width: ${size.width}px; height: ${size.height}px;`;
     }
 
     get headerStyle() {

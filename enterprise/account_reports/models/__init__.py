@@ -13,6 +13,7 @@ from . import account_generic_tax_report
 from . import account_journal_group
 from . import account_journal_report
 from . import account_cash_flow_report
+from . import account_cash_flow_indirect_report
 from . import account_deferred_reports
 from . import account_multicurrency_revaluation_report
 from . import account_move_line

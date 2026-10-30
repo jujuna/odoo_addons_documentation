@@ -8,14 +8,15 @@
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 # Burkay Yıldızhan <seyil@odoo.com>, 2026.
+# setenayp <seat@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-17 22:45+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-21 10:33+0000\n"
+"Last-Translator: setenayp <seat@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "appointment/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -30,6 +31,8 @@ msgid ""
 "\n"
 "Allow clients to Schedule Appointments through the Portal\n"
 msgstr ""
+"\n"
+"Müşterilerin Portal üzerinden Randevu Planlamasına izin verin\n"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -40,7 +43,7 @@ msgstr "\" zaten kullanımda. Lütfen başka bir tane toplayın."
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "\" on"
-msgstr ""
+msgstr "\" üzerine"
 
 #. module: appointment
 #. odoo-python
@@ -72,12 +75,12 @@ msgstr "# Davet Bağlantıları"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_leave_count
 msgid "# Leaves"
-msgstr ""
+msgstr "# Izinler"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_count
 msgid "# Ratings"
-msgstr ""
+msgstr "# Değerlendirmeler"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__suggested_resource_count
@@ -88,7 +91,7 @@ msgstr "# Kaynaklar"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_count
 msgid "# Slots"
-msgstr ""
+msgstr "# Slotlar"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__suggested_staff_user_count
@@ -133,24 +136,24 @@ msgstr "%s - Tanışalım"
 #. odoo-python
 #: code:addons/appointment/models/appointment_leave.py:0
 msgid "%s closing"
-msgstr ""
+msgstr "%s kapanış"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
 msgid "%s seats cannot be assigned. Would you like to update the details?"
-msgstr ""
+msgstr "%s Koltuklar atanamaz. Ayrıntıları güncellemek ister misiniz?"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "'e.g. \"John Doe\""
-msgstr ""
+msgstr "'örneğin \"John Doe\""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
-msgstr ""
+msgstr "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
 
 #. module: appointment
 #. odoo-javascript
@@ -159,12 +162,14 @@ msgid ""
 ".stgrey0{fill:#E3E3E3}\n"
 "                .stgrey1{fill:#F2F2F2}"
 msgstr ""
+".stgrey0{fill:#E3E3E3}\n"
+"                .stgrey1{fill:#F2F2F2}"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "<b>Create your first appointment.</b>"
-msgstr ""
+msgstr "<b>İlk randevunuzu oluşturun.</b>"
 
 #. module: appointment
 #: model:mail.template,body_html:appointment.appointment_canceled_mail_template
@@ -886,12 +891,12 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
 msgid "<i class=\"oi me-1 fs-4\" data-icon=\"schedule\" title=\"Duration\"/>"
-msgstr ""
+msgstr "<i class=\"oi me-1 fs-4\" data-icon=\"schedule\" title=\"Süre\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
 msgid "<i class=\"oi me-1\" data-icon=\"add\"/>Add"
-msgstr ""
+msgstr "<i class=\"oi me-1\" data-icon=\"add\"/>Ekle"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -904,6 +909,8 @@ msgid ""
 "<i class=\"oi me-1\" data-icon=\"calendar_add_on\"/>\n"
 "                                    Book another appointment"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"calendar_add_on\"/>\n"
+"                                    Başka bir randevu alın"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
@@ -914,6 +921,11 @@ msgid ""
 "                        Exact timings might differ depending on the "
 "appointment timezone."
 msgstr ""
+"<i class=\"oi me-2\" data-icon=\"warning\"/>\n"
+"                        Seçilen randevuların son günleri için referans "
+"olarak mevcut saat diliminiz kullanılacaktır.\n"
+"                        Kesin zamanlar, randevunun saat dilimine bağlı "
+"olarak farklılık gösterebilir."
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -961,6 +973,10 @@ msgid ""
 "                                    <span "
 "class=\"o_appointment_kanban_button_name\">Preview</span>"
 msgstr ""
+"<i class=\"oi o_appointment_kanban_button_icon d-none\" data-"
+"icon=\"public\"/>\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Önizleme</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
@@ -970,6 +986,10 @@ msgid ""
 "                                    <span "
 "class=\"o_appointment_kanban_button_name\">Configure</span>"
 msgstr ""
+"<i class=\"oi oi-filled o_appointment_kanban_button_icon d-none\" data-"
+"icon=\"settings\"/>\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Yapılandır</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -984,6 +1004,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"location_on\" aria-"
 "label=\"Location\"/>"
 msgstr ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"location_on\" aria-"
+"label=\"Location\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1045,6 +1067,56 @@ msgid ""
 "<i class=\"oi oi-fw oi-filled lh-base\" data-icon=\"videocam\" "
 "role=\"presentation\"/>\n"
 "                    <span class=\"o_not_editable\">Online</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"calendar_today\" aria-label=\"Booked\" "
+"title=\"Booked\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Booked</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"check\" aria-label=\"Attended\" "
+"title=\"Attended\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Attended</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"close\" aria-label=\"Cancelled\" "
+"title=\"Cancelled\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Cancelled</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<i class=\"oi oi-fw\" data-icon=\"map\" title=\"Google Reserve\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"schedule\" aria-label=\"Request\" "
+"title=\"Request\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Request</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"visibility_off\" aria-label=\"No Show\" "
+"title=\"No Show\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"No Show</span>"
 msgstr ""
 
 #. module: appointment
@@ -1159,6 +1231,11 @@ msgstr "<span>ziyaretçi tarafından</span>"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<span>people</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<span>to get restaurant bookings through Google Maps and Search.</span>"
 msgstr ""
 
 #. module: appointment
@@ -2299,12 +2376,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_sync_button/appointment_sync_button.xml:0
 msgid "Connect"
-msgstr ""
+msgstr "Bağlan"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__connectors_displayed
 msgid "Connectors Displayed"
-msgstr ""
+msgstr "Görüntülenen Bağlayıcılar"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_res_partner
@@ -2326,7 +2403,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "Copied!"
-msgstr ""
+msgstr "Kopyalandı!"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_tree
@@ -2338,7 +2415,7 @@ msgstr "Bağlantıyı kopyala"
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_invite/appointment_invite_copy_close.xml:0
 msgid "Copy Link & Close"
-msgstr ""
+msgstr "Bağlantıyı Kopyala ve Kapat"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -2644,12 +2721,6 @@ msgid "Does not repeat"
 msgstr ""
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Done"
-msgstr ""
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Drag blocks here to add them on all appointments"
 msgstr ""
@@ -2712,6 +2783,11 @@ msgid "Emails & SMS"
 msgstr "E-postalar ve SMS"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Enable Google Reserve"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "End"
 msgstr ""
@@ -2746,7 +2822,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model,name:appointment.model_calendar_alarm
 msgid "Event Alarm"
-msgstr ""
+msgstr "Etkinlik Alarmı"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2852,6 +2928,11 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Go back to the previous screen."
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Google Bookings"
 msgstr ""
 
 #. module: appointment
@@ -3723,7 +3804,7 @@ msgstr "Düzenleyen"
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "Our first availability is"
-msgstr ""
+msgstr "İlk müsaitlik durumumuz"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -4044,6 +4125,12 @@ msgid "Saturday"
 msgstr "Cumartesi"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Save & copy URL"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Save &amp; Pick Slots"
 msgstr ""
@@ -4300,13 +4387,13 @@ msgstr "Formda bazı gerekli cevaplar eksiktir."
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "Sorry,"
-msgstr ""
+msgstr "Pardon"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "Sorry, it is no longer possible to schedule an appointment."
-msgstr ""
+msgstr "Üzgünüz, artık randevu oluşturmak mümkün değil."
 
 #. module: appointment
 #. odoo-javascript
@@ -4320,13 +4407,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "Sorry, we have no availability for an appointment."
-msgstr ""
+msgstr "Üzgünüz, randevu için müsait durumumuz yok."
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "Sorry, we have no more slots available for this month."
-msgstr ""
+msgstr "Üzgünüz, bu ay için başka slot yok."
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__source_resource_ids
@@ -4414,9 +4501,12 @@ msgid "Starts with"
 msgstr "Şununla başlayan"
 
 #. module: appointment
+#. odoo-python
+#: code:addons/appointment/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_tree_booking
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 msgid "Status"
 msgstr "Durumu"
 
@@ -4466,7 +4556,7 @@ msgstr "Belirtiler"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Synchronize your Calendar to avoid double-booking"
-msgstr ""
+msgstr "Çifte rezervasyonu önlemek için Takviminizi senkronize edin"
 
 #. module: appointment
 #. odoo-python
@@ -4523,6 +4613,8 @@ msgid ""
 "The configuration has changed and synchronization is not possible anymore. "
 "Please reload the page."
 msgstr ""
+"Yapılandırma değişti ve artık senkronizasyon mümkün değil. Lütfen sayfayı "
+"yeniden yükleyin."
 
 #. module: appointment
 #: model:ir.model.constraint,message:appointment.constraint_appointment_slot_check_start_and_end_hour
@@ -4632,7 +4724,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "Their first availability is"
-msgstr ""
+msgstr "İlk kullanılabilirlikleri"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointments_selection
@@ -5052,7 +5144,7 @@ msgstr "Çalışma Saatleri"
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "You already booked \""
-msgstr ""
+msgstr "Zaten rezervasyon yaptınız \""
 
 #. module: appointment
 #. odoo-javascript
@@ -5101,6 +5193,7 @@ msgstr ""
 #: code:addons/appointment/static/src/components/appointment_sync_button/appointment_sync_button.js:0
 msgid "Your calendar is already configured and was successfully synchronized."
 msgstr ""
+"Takviminiz halihazırda yapılandırılmış ve başarıyla senkronize edilmiştir."
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
@@ -5242,13 +5335,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "has no availability for an appointment."
-msgstr ""
+msgstr "randevu için müsait değildir."
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "has no more slots available for this month."
-msgstr ""
+msgstr "bu ay için daha fazla slot yok."
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -5325,7 +5418,7 @@ msgstr "başlayın"
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_slots.xml:0
 msgid "to"
-msgstr ""
+msgstr "den"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form

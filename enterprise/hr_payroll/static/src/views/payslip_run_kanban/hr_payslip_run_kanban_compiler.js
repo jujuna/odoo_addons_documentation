@@ -49,12 +49,10 @@ export class PayRunKanbanCompiler extends CardCompiler {
                 isSmartButton: JSON.stringify(options?.is_smart_button),
                 isPriority: JSON.stringify(options?.is_priority),
             });
-            // compileNode strips the button's classes if we don't clone the node
-            const button = child.cloneNode(true);
-            button.classList.add("border-0", "flex-grow-1", "oe_stat_button");
-            append(mainSlot, this.compileNode(button, params, false));
+            append(mainSlot, this.compileNode(child, params, false));
             append(buttonBox, mainSlot);
         }
+
         return buttonBox;
     }
 }

@@ -190,7 +190,7 @@ class TestSwedishIsoCreditTransfer(TestISO20022CommonCreditTransfer):
             'street': '',
             'city': '',
             'zip': '',
-            'iso20022_orgid_id': '0123456789',
+            'iso20022_orgid_id': '065555555555B001',
         })
         res['default_journal_bank'].update({
             'bank_account_number': 'SE7335536296831513338982',

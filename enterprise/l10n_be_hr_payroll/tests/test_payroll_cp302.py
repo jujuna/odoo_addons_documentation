@@ -45,14 +45,6 @@ class TestPayrollCP302(TransactionCase):
         """Create a CP302 CDI version (no employee type); in-position seniority equals time since start."""
         return self._make_cp302_version(contract_date_start, category_id, wage_type=wage_type)
 
-    def _make_cp302_crew_version(self, contract_date_start, initial_category_id=None):
-        """Create a CP302 CREW version; category is auto-managed by the compute method."""
-        return self._make_cp302_version(
-            contract_date_start,
-            initial_category_id or self.env.ref('l10n_be_hr_payroll.cp302_5').id,
-            employee_type_ref='l10n_be_hr_payroll.l10n_be_contract_type_crew',
-        )
-
     def _make_cp302_temporary_version(self):
         """Create a CP302 Temporary version starting one month ago; seniority is driven by work entries."""
         return self._make_cp302_version(
@@ -136,6 +128,7 @@ class TestPayrollCP302(TransactionCase):
         return next(iter(all_warnings), None)
 
     def _has_min_wage_issue(self, version):
+        version = version.with_context(hr_payroll_force_compute_issue=True)
         version.invalidate_recordset(['issues'])
         issues = version.issues or {}
         return any(
@@ -170,34 +163,6 @@ class TestPayrollCP302(TransactionCase):
         version = self._make_cp302_cdi_version(date.today() - relativedelta(months=27), self.env.ref('l10n_be_hr_payroll.cp302_5').id)
         self.assertEqual(version.l10n_be_computed_seniority_years, 2)
         self.assertEqual(version.l10n_be_computed_seniority_months, version.l10n_be_in_position_months)
-
-    # -------------------------------------------------------------------------
-    # CREW seniority
-    # -------------------------------------------------------------------------
-
-    def test_crew_less_than_6_months_category_forced_to_3_seniority_0(self):
-        """Below 6 months in position, CREW category is forced to cp302_3 and seniority is 0."""
-        version = self._make_cp302_crew_version(date.today() - relativedelta(months=3))
-        self.assertEqual(version.l10n_be_computed_seniority_years, 0)
-        self.assertEqual(version.l10n_be_computed_seniority_months, 0)
-        self.assertEqual(version.l10n_be_salary_scale_id, self.env.ref('l10n_be_hr_payroll.cp302_3'))
-
-    def test_crew_at_6_months_promoted_to_category_4_seniority_1(self):
-        """At 6 months, CREW category is promoted to cp302_4 and seniority is frozen at 1."""
-        version = self._make_cp302_crew_version(date.today() - relativedelta(months=7))
-        self.assertEqual(version.l10n_be_computed_seniority_years, 1)
-        self.assertEqual(version.l10n_be_computed_seniority_months, 0)
-        self.assertEqual(version.l10n_be_salary_scale_id, self.env.ref('l10n_be_hr_payroll.cp302_4'))
-
-    def test_crew_over_24_months_seniority_increases_normally_no_category_change(self):
-        """After 2 full years, CREW seniority tracks in_position_years and category stays at cp302_4."""
-        version = self._make_cp302_crew_version(
-            date.today() - relativedelta(months=27),
-            initial_category_id=self.env.ref('l10n_be_hr_payroll.cp302_4').id,
-        )
-        self.assertEqual(version.l10n_be_computed_seniority_years, 2)
-        self.assertEqual(version.l10n_be_computed_seniority_months, version.l10n_be_in_position_months)
-        self.assertEqual(version.l10n_be_salary_scale_id, self.env.ref('l10n_be_hr_payroll.cp302_4'))
 
     # -------------------------------------------------------------------------
     # Temporary seniority (work-entry based thresholds)
@@ -282,6 +247,20 @@ class TestPayrollCP302(TransactionCase):
         self.assertEqual(v1.l10n_be_computed_seniority_years, 5)
         v2 = self._apply_category_change(v1, 'l10n_be_hr_payroll.cp302_4')
         self.assertEqual(v2.l10n_be_base_computed_seniority, 3)
+
+    def test_salary_scale_change_by_amendment_restarts_in_position_seniority(self):
+        """A salary scale change through an amendment of the same contract restarts the
+        in-position seniority and bridges the seniority of the previous occupation."""
+        v1 = self._make_cp302_cdi_version(date(2023, 9, 1), self.env.ref('l10n_be_hr_payroll.cp302_5').id)
+        v2 = v1.employee_id.create_version({
+            'date_version': date(2025, 10, 1),
+            'l10n_be_salary_scale_id': self.env.ref('l10n_be_hr_payroll.cp302_4').id,
+        })
+        self.assertEqual(v2.contract_date_start, date(2023, 9, 1))
+        self.assertEqual((v1.l10n_be_in_position_years, v1.l10n_be_in_position_months), (2, 0))
+        self.assertEqual((v2.l10n_be_in_position_years, v2.l10n_be_in_position_months), (0, 6))
+        # cat5 seniority 2 -> first cat4 monthly entry >= 2877.04 is [7]
+        self.assertEqual(v2.l10n_be_base_computed_seniority, 7)
 
     # -------------------------------------------------------------------------
     # Wage adjustment and dashboard warnings

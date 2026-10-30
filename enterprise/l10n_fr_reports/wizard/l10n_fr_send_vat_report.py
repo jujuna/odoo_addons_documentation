@@ -1,4 +1,3 @@
-import base64
 import re
 
 from odoo import api, Command, fields, models, _
@@ -636,7 +635,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
                 'value': self.reimbursement_date.strftime("%Y%m%d"),
             })
         if self.is_reimbursement_comment and self.reimbursement_comment:
-            zones.append({'id': 'FJ', 'value': self.reimbursement_comment})
+            zones.append({'id': 'FJ', 'ftx_1': self.reimbursement_comment})
 
         declarations = {
             'type': 'RBT',
@@ -721,7 +720,7 @@ class L10n_Fr_ReportsSendVatReport(models.TransientModel):
         ])
         decoded_xml_content = xml_content.decode('iso8859_15').strip()
         for document in same_period_declarations.document_ids:
-            decoded_attachment_content = base64.b64decode(document.attachment).decode().strip()
+            decoded_attachment_content = document.attachment.decode().strip()
             if decoded_attachment_content == decoded_xml_content:
                 return True
 

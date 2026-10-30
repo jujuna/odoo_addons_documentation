@@ -79,6 +79,7 @@ class TestEmployeeJobChange(common.TestPayrollAccountCommon):
             'date_version': datetime.date(2020, 1, 1),
             'contract_date_start': datetime.date(2020, 1, 1),
             'l10n_be_joint_committee_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'l10n_be_salary_scale_id': cls.env.ref('l10n_be_hr_payroll.cp200_b').id,
         })
         cls.env['res.users'].create({
             'create_employee_id': cls.employee.id,

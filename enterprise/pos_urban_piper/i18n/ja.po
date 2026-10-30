@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"POT-Creation-Date: 2026-10-16 17:54+0000\n"
 "PO-Revision-Date: 2026-09-18 03:56+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
@@ -24,11 +24,25 @@ msgstr ""
 "X-Generator: Weblate 2026.8.1\n"
 
 #. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid ""
+"\n"
+"Items that could not be synced:\n"
+msgstr ""
+
+#. module: pos_urban_piper
 #: model:ir.module.module,description:base.module_pos_urban_piper
 msgid ""
 "\n"
 "This module integrates with UrbanPiper to receive and manage orders from "
 "various food delivery platforms.\n"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid " - %(label)s: %(value)s\n"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -54,8 +68,8 @@ msgstr " はオンラインです。"
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/services/pos_store.js:0
 msgid "%s is %s online food delivery for all platform in this locations."
 msgstr ""
-"%s は、これらの地域すべてのプラットフォームに対応した %s の"
-"オンラインフードデリバリーサービスです。"
+"%s は、これらの地域すべてのプラットフォームに対応した %s のオンラインフードデ"
+"リバリーサービスです。"
 
 #. module: pos_urban_piper
 #. odoo-javascript
@@ -373,6 +387,12 @@ msgid "Create or update system webhooks for UrbanPiper event synchronization."
 msgstr ""
 
 #. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Created"
+msgstr ""
+
+#. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_delivery_provider__create_uid
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urban_piper_webhook__create_uid
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__create_uid
@@ -431,6 +451,12 @@ msgstr ""
 #. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_urbanpiper_store_aggregator__default_customer_id
 msgid "Default Customer"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Deleted"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -647,6 +673,12 @@ msgstr "準備表示中の出荷オーダ配信エラー。"
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/services/pos_store.js:0
 msgid "Error to send in preparation display."
 msgstr "送信準備表示でエラーが発生しました。"
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Errors"
+msgstr ""
 
 #. module: pos_urban_piper
 #: model:ir.model.fields.selection,name:pos_urban_piper.selection__pos_urbanpiper_store__tax_type__total_excluded
@@ -952,6 +984,12 @@ msgstr "食事タイプ"
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Menu"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/utils/urbanpiper_connector.py:0
+msgid "Menu sync initiated on UrbanPiper."
 msgstr ""
 
 #. module: pos_urban_piper
@@ -1576,7 +1614,8 @@ msgstr "オーダを却下"
 #. odoo-javascript
 #: code:addons/pos_urban_piper/static/src/point_of_sale_override/screens/ticket_screen/ticket_screen.js:0
 msgid "Rejecting this order is not allowed for \"%(providerName)s\""
-msgstr "このオーダを却下することは \"%(providerName)s\" に対して許可されていません。"
+msgstr ""
+"このオーダを却下することは \"%(providerName)s\" に対して許可されていません。"
 
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
@@ -1727,6 +1766,12 @@ msgid "Status of the order as provided by UrbanPiper."
 msgstr "UrbanPiperから提供されるオーダのステータス"
 
 #. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Store %(action)s completed on UrbanPiper."
+msgstr ""
+
+#. module: pos_urban_piper
 #: model:ir.model.fields,field_description:pos_urban_piper.field_pos_urbanpiper_store__aggregator_lines
 msgid "Store Aggregators"
 msgstr ""
@@ -1777,8 +1822,22 @@ msgstr "店舗が閉まっています"
 
 #. module: pos_urban_piper
 #. odoo-python
-#: code:addons/pos_urban_piper/utils/urbanpiper_connector.py:0
-msgid "Store menu successfully synced on UrbanPiper (%s products)"
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Store menu synced successfully on UrbanPiper.\n"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid ""
+"Store sync failed on UrbanPiper.\n"
+"Error: %(error)s"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Store sync initiated on UrbanPiper."
 msgstr ""
 
 #. module: pos_urban_piper
@@ -1876,12 +1935,6 @@ msgid ""
 msgstr "顧客がオーダの準備が整うのを待たなければならない最短時間。"
 
 #. module: pos_urban_piper
-#. odoo-python
-#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
-msgid "The store has been successfully updated on UrbanPiper."
-msgstr ""
-
-#. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__urbanpiper_username
 msgid "The username of the UrbanPiper API account."
 msgstr ""
@@ -1891,12 +1944,6 @@ msgstr ""
 #: code:addons/pos_urban_piper/utils/urbanpiper_connector.py:0
 msgid "There are no products to sync."
 msgstr "同期するプロダクトはありません。"
-
-#. module: pos_urban_piper
-#. odoo-python
-#: code:addons/pos_urban_piper/models/pos_order.py:0
-msgid "This delivery order has already been printed automatically."
-msgstr ""
 
 #. module: pos_urban_piper
 #: model:ir.model.fields,help:pos_urban_piper.field_pos_urbanpiper_store__urbanpiper_synced_json
@@ -1944,6 +1991,12 @@ msgstr ""
 #. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "Update Store"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "Updated"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -2090,8 +2143,8 @@ msgstr "Walletクレジット"
 #. odoo-python
 #: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
 msgid ""
-"You cannot change the Point of Sale while a store session is still open and "
-"the store has already been synchronizedPlease close the active session first."
+"You cannot change the store while its Point of Sale has an active session.\n"
+"Please close the active session first."
 msgstr ""
 
 #. module: pos_urban_piper
@@ -2100,6 +2153,18 @@ msgstr ""
 msgid ""
 "You cannot delete this store while its session is still open.\n"
 "Please close the active session first."
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "creation"
+msgstr ""
+
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "deleted"
 msgstr ""
 
 #. module: pos_urban_piper
@@ -2125,6 +2190,12 @@ msgid "enabled"
 msgstr "有効"
 
 #. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "errors"
+msgstr ""
+
+#. module: pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_urban_piper.view_pos_urbanpiper_store_form
 msgid "f2d9cdfa227c4296804912e0b31fdce"
 msgstr ""
@@ -2134,8 +2205,20 @@ msgstr ""
 msgid "minutes"
 msgstr "分"
 
-msgid "Edit"
-msgstr "編集"
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "update"
+msgstr ""
 
-msgid "Min(s)"
-msgstr "分"
+#. module: pos_urban_piper
+#. odoo-python
+#: code:addons/pos_urban_piper/models/pos_urbanpiper_store.py:0
+msgid "updated"
+msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr "編集"
+
+#~ msgid "Min(s)"
+#~ msgstr "分"

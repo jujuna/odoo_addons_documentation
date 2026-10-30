@@ -266,6 +266,13 @@ class TestCreditTime(TestPayslipValidationCommon, TestBelgiumCommon):
         payslip_run._generate_payslips()
 
         self.assertEqual(len(payslip_run.slip_ids), 1)
+        # Shorter periods are valorized with their own hourly rates:
+        #   version 1: 22.8h * (3000 * 3 / (38 * 13)) = 415.38
+        # The longest period uses the deduction method:
+        #   version 1 theoretical hours = 22.8 * 30.4 / 38 = 18.24
+        #   version 2 wage = 3000 * .8 (l10n_be_credit_time_proration_rate) = 2400
+        #   version 2 amount = wage - shoter periods theoretical hours * hourly rate = 2400 - (18.24) * (2400 * 3 / (30.4 * 13)) = 2067.69
+        #   Basic salary = 2067.69 + 415.38 = 2483.07
 
         payslip = payslip_run.slip_ids[0]
         payslip_versions = payslip.worked_days_line_ids.mapped('version_id')
@@ -279,7 +286,7 @@ class TestCreditTime(TestPayslipValidationCommon, TestBelgiumCommon):
 
         self.assertIn(new_version, payslip_versions)
         attendance_line_new_version = payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '002.00' and wd.version_id == new_version)
-        self.assertAlmostEqual(attendance_line_new_version.amount, 1984.62, places=2)
+        self.assertAlmostEqual(attendance_line_new_version.amount, 2067.69, places=2)
         self.assertEqual(attendance_line_new_version.number_of_days, 16.0)
         self.assertEqual(float_compare(attendance_line_new_version.number_of_hours, 121.6, 2), 0)
         credit_time_line = payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '147.00' and wd.version_id == new_version)

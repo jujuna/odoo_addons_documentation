@@ -16,7 +16,7 @@ async function executeAccountReportDownload({ action }) {
 
     try {
         await download({ url, data });
-        if (!data.no_closing_after_download ?? true)
+        if (!data.no_closing_after_download)
             if (data.next_action) {
                 actionPlugin.doAction(data.next_action);
             } else {

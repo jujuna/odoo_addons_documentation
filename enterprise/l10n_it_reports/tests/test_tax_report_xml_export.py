@@ -88,7 +88,6 @@ class TestItalianTaxReportXmlExport(TestItalianTaxReport):
             "AnnoImposta",
             "PartitaIVA",
             "PIVAControllante",
-            "UltimoMese",
             "CFDichiarante",
             "CodiceCaricaDichiarante",
             "CodiceFiscaleSocieta",
@@ -156,7 +155,6 @@ class TestItalianTaxReportXmlExport(TestItalianTaxReport):
                         <iv:CodiceFiscale>12345670546</iv:CodiceFiscale>
                         <iv:AnnoImposta>2025</iv:AnnoImposta>
                         <iv:PartitaIVA>78926680725</iv:PartitaIVA>
-                        <iv:UltimoMese>5</iv:UltimoMese>
                         <iv:CFDichiarante>12345670546</iv:CFDichiarante>
                         <iv:CodiceCaricaDichiarante>1</iv:CodiceCaricaDichiarante>
                         <iv:CodiceFiscaleSocieta>78926680725</iv:CodiceFiscaleSocieta>
@@ -239,7 +237,6 @@ class TestItalianTaxReportXmlExport(TestItalianTaxReport):
                         <iv:CodiceFiscale>12345670546</iv:CodiceFiscale>
                         <iv:AnnoImposta>2025</iv:AnnoImposta>
                         <iv:PartitaIVA>78926680725</iv:PartitaIVA>
-                        <iv:UltimoMese>5</iv:UltimoMese>
                         <iv:CFDichiarante>12345670546</iv:CFDichiarante>
                         <iv:CodiceCaricaDichiarante>1</iv:CodiceCaricaDichiarante>
                         <iv:CodiceFiscaleSocieta>78926680725</iv:CodiceFiscaleSocieta>

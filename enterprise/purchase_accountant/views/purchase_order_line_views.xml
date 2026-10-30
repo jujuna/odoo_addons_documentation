@@ -19,10 +19,15 @@
                     domain="[('product_type', '=', 'service')]"
                     help="Only service lines"/>
                 <filter
-                    string="Goods"
-                    name="goods"
-                    domain="[('product_type', '=', 'consu')]"
-                    help="Only goods lines"/>
+                    string="Tracked Goods"
+                    name="tracked_goods"
+                    domain="[('product_type', '=', 'consu'), ('product_id.is_storable', '=', True)]"
+                    help="Only storable goods lines"/>
+                <filter
+                    string="Untracked Goods"
+                    name="untracked_goods"
+                    domain="[('product_type', '=', 'consu'), ('product_id.is_storable', '=', False)]"
+                    help="Only non-storable goods lines"/>
                 <group>
                     <filter name="groupby_vendor" string="Vendor" context="{'group_by': 'partner_id'}"/>
                     <filter name="groupby_company" string="Company" context="{'group_by': 'company_id'}"/>
@@ -53,7 +58,7 @@
                 <field name="qty_invoiced_at_date" string="Billed"/>
                 <field name="uom_id" groups="uom.group_uom"/>
                 <field name="price_unit" widget="monetary"/>
-                <field name="amount_to_invoice_at_date" widget="monetary"/>
+                <field name="amount_to_invoice_at_date" widget="monetary" sum="Total"/>
             </list>
         </field>
     </record>

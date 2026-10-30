@@ -12,7 +12,7 @@ class PlanningSlot(models.Model):
 
     def _inverse_lot_ids(self):
         for slot in self:
-            material_lots = slot.sale_order_id.order_line.filtered(
+            material_lots = slot.sale_order_id.sudo().order_line.filtered(
                 lambda sol: sol.planning_slot_id == slot and sol.product_uom_qty > 0
             ).fsm_lot_id
             slot.lot_ids -= material_lots

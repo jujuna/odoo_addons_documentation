@@ -170,12 +170,11 @@ class SaleOrderLogReport(models.Model):
 
     def _query(self):
         return SQL(
-            "WITH %s SELECT %s FROM %s WHERE %s GROUP BY %s",
+            "WITH %s SELECT %s FROM %s WHERE %s",
             self._with(),
             self._select(),
             self._from(),
             self._where(),
-            self._group_by(),
         )
 
     def action_open_sale_order(self):

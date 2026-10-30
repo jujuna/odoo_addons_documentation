@@ -1,15 +1,16 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* planning_field_service
+# * planning_field_service
 #
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 00:00+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-25 00:33+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-20/"
 "planning_field_service/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -23,38 +24,32 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/components/planned_date_range_with_allocated_hours/planning_date_range_with_allocated_hours.js:0
 msgid "%(allocatedHoursFormatted)s + %(breakTimeFormatted)s break"
-msgstr ""
+msgstr "%(allocatedHoursFormatted)s + %(breakTimeFormatted)s przerwy"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "%(display_name)s (%(partner_city)s)"
-msgstr ""
+msgstr "%(display_name)s (%(partner_city)s)"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "%(employee)s requested a replacement for this shift."
-msgstr ""
-
-#. module: planning_field_service
-#. odoo-javascript
-#: code:addons/planning_field_service/static/src/js/tours/planning_field_service_tour.js:0
-msgid ""
-"<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "
-"equipment if needed.</i>"
-msgstr ""
+msgstr "%(employee)s poprosił/a o zastąpienie na tej zmianie."
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/js/tours/planning_field_service_tour.js:0
 msgid "<b>Create a shift</b><br/><i>Open the form to enter shift details.</i>"
 msgstr ""
+"<b>Utwórz zmianę</b><br/><i> Otwórz formularz, aby wprowadzić szczegóły "
+"zmiany.</i>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_shift_ics_description_inherit
 msgid "<b>Customer:</b>"
-msgstr ""
+msgstr "<b>Klient:</b>"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -63,11 +58,13 @@ msgid ""
 "<b>Mark the shift as complete</b><br/><i>Close the shift once the work is "
 "finished.</i>"
 msgstr ""
+"<b>Oznacz zmianę jako zakończoną</b><br/><i> Zamknij zmianę po zakończeniu "
+"pracy.</i>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_shift_ics_description_inherit
 msgid "<b>Phone:</b>"
-msgstr ""
+msgstr "<b>Telefon:</b>"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -76,6 +73,8 @@ msgid ""
 "<b>Publish the shift</b><br/><i>This officially schedules the shift and "
 "makes it visible to technicians.</i>"
 msgstr ""
+"<b>Opublikuj zmianę</b><br/><i> Spowoduje to oficjalne zaplanowanie zmiany i "
+"udostępnienie jej technikom.</i>"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -84,13 +83,15 @@ msgid ""
 "<b>Select the customer</b><br/><i>Add an address to automatically generate "
 "directions.</i>"
 msgstr ""
+"<b>Wybierz klienta</b><br/><i> Dodaj adres, aby automatycznie wygenerować "
+"wskazówki dojazdu.</i>"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/js/tours/planning_field_service_tour.js:0
 msgid ""
 "<b>Select the shift</b><br/><i>You can view the details of the shift.</i>"
-msgstr ""
+msgstr "<b>Wybierz zmianę</b><br/><i> Możesz wyświetlić szczegóły zmiany.</i>"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -98,6 +99,8 @@ msgstr ""
 msgid ""
 "<b>Start managing your onsite shifts</b><br/><i>Everything begins here.</i>"
 msgstr ""
+"<b>Zacznij zarządzać swoimi pracami na miejscu</b><br/><i> Wszystko zaczyna "
+"się tutaj.</i>"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -106,6 +109,8 @@ msgid ""
 "<b>Start onsite</b><br/><i>Start the shift when you arrive at the customer "
 "location.</i>"
 msgstr ""
+"<b>Rozpocznij pracę na miejscu</b><br/><i> Rozpocznij zmianę po przybyciu do "
+"siedziby klienta.</i>"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_details
@@ -151,6 +156,47 @@ msgid ""
 "</div>\n"
 "        "
 msgstr ""
+"<div>\n"
+"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.start_datetime, "
+"dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
+"\"/>\n"
+"    <t t-set=\"time_begin\" t-value=\"format_time(object.start_datetime, "
+"time_format='short', tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.end_datetime, "
+"dt_format='MMM d', tz=object.partner_id.tz, lang_code=object.partner_id.lang)"
+"\"/>\n"
+"    <t t-set=\"time_end\" t-value=\"format_time(object.end_datetime, "
+"time_format='short', tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
+"\n"
+"    Dzień dobry <t t-out=\"object.partner_id.name or 'kliencie'\"/>,<br/>"
+"<br/>\n"
+"    <t t-if=\"date_begin and date_end\">\n"
+"        <t t-if=\"object.start_datetime.date() == object.end_datetime.date()"
+"\">\n"
+"            Twoja interwencja została zaplanowana na <t t-out=\"date_begin "
+"or ''\">17 lis</t> od <t t-out=\"time_begin or ''\">8:00</t> do <t t-"
+"out=\"time_end or ''\">10:00</t>.\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            Twoja interwencja została zaplanowana od <t t-out=\"date_begin "
+"or ''\">17 lis</t> o <t t-out=\"time_begin or ''\">8:00</t> do <t t-"
+"out=\"date_end or ''\">18 lis</t> o <t t-out=\"time_end or ''\">10:00</t>.\n"
+"        </t>\n"
+"    </t>\n"
+"    <t t-else=\"\">\n"
+"        Twoja interwencja została zaplanowana.\n"
+"    </t>\n"
+"    <br/><br/>\n"
+"    Z poważaniem,\n"
+"    <t t-if=\"user.signature\">\n"
+"        <br/>\n"
+"        <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"    </t>\n"
+"</div>\n"
+"        "
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -158,6 +204,8 @@ msgid ""
 "<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
 "                                Back to Shift"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"arrow_back\"/>\n"
+"                                Powrót do zmiany"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
@@ -172,6 +220,15 @@ msgid ""
 "icon=\"sentiment_sad\" invisible=\"rating_avg &gt;= 2.33\" title=\"Unhappy\"/"
 ">"
 msgstr ""
+"<i class=\"oi oi-fw o_button_icon text-success\" data-"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" "
+"title=\"Zadowolony\"/>\n"
+"                    <i class=\"oi oi-fw o_button_icon text-warning\" data-"
+"icon=\"sentiment_neutral\" invisible=\"rating_avg &lt; 2.33 or rating_avg "
+"&gt;= 3.66\" title=\"Neutralny\"/>\n"
+"                    <i class=\"oi oi-fw o_button_icon text-danger\" data-"
+"icon=\"sentiment_sad\" invisible=\"rating_avg &gt;= 2.33\" "
+"title=\"Niezadowolony\"/>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -179,6 +236,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"check\"/>\n"
 "                                Sign Report"
 msgstr ""
+"<i class=\"oi\" data-icon=\"check\"/>\n"
+"                                Podpisz raport"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -186,6 +245,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"print\"/>\n"
 "                                Print"
 msgstr ""
+"<i class=\"oi\" data-icon=\"print\"/>\n"
+"                                Drukuj"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.mail_template_data_intervention_report
@@ -201,26 +262,35 @@ msgid ""
 "            </p>\n"
 "        "
 msgstr ""
+"<p>\n"
+"                Dzień dobry <t t-out=\"object.partner_id.name or "
+"'Kliencie'\"/>,<br/><br/>\n"
+"                W załączniku przesyłamy raport z serwisu terenowego "
+"dotyczący ostatniej interwencji. <br/><br/>\n"
+"                W razie jakichkolwiek pytań prosimy o kontakt.<br/><br/>\n"
+"                Z poważaniem,<br/><br/>\n"
+"            </p>\n"
+"        "
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "<small class=\"text-muted\">Customer</small>"
-msgstr ""
+msgstr "<small class=\"text-muted\">Klient</small>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "<small class=\"text-muted\">Technicians</small>"
-msgstr ""
+msgstr "<small class=\"text-muted\">Technicy</small>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "<span class=\"o_stat_text text-wrap\">Customer Preview</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text text-wrap\">Podgląd klienta</span>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
 msgid "<span class=\"o_stat_text\">Rating</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Ocena</span>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
@@ -238,6 +308,18 @@ msgid ""
 "                            Signed\n"
 "                        </span>"
 msgstr ""
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: rotate(45deg)"
+";                             width: 100px; height: auto; display: "
+"block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
+"                            Podpisano\n"
+"                        </span>"
 
 #. module: planning_field_service
 #: model_terms:web_tour.tour,rainbow_man_message:planning_field_service.planning_field_service_tour
@@ -245,16 +327,18 @@ msgid ""
 "<span><b>You're all set!</b><br>You're ready to manage your shifts.\n"
 "        </span>"
 msgstr ""
+"<span><b>Wszystko gotowe!</b><br>Możesz już zarządzać swoimi zmianami.\n"
+"        </span>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "<strong>Customer: </strong>"
-msgstr ""
+msgstr "<strong>Klient: </strong>"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
 msgid "<strong>Technician: </strong>"
-msgstr ""
+msgstr "<strong>Technik: </strong>"
 
 #. module: planning_field_service
 #: model:mail.template,body_html:planning_field_service.rating_shift_request_email_template
@@ -331,49 +415,120 @@ msgid ""
 "            </div>\n"
 "        "
 msgstr ""
+"<t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>\n"
+"            <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"            <t t-set=\"date_start\" t-value=\"format_datetime"
+"(object.start_datetime, dt_format='MMM d', tz=partner.tz, "
+"lang_code=partner.lang)\"/>\n"
+"            <t t-set=\"date_end\" t-value=\"format_datetime"
+"(object.end_datetime, dt_format='MMM d', tz=partner.tz, "
+"lang_code=partner.lang)\"/>\n"
+"            <div>\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin:0;\">\n"
+"                    <tbody>\n"
+"                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+"                            Dzień dobry <t t-out=\"partner.name or ''\">"
+"Brandon Freeman</t>,<br/><br/>\n"
+"                            Prosimy o poświęcenie chwili na ocenienie swoich "
+"wrażeń z interwencji usług terenowych dnia <t t-out=\"date_end or date_start "
+"or ''\">Nov 25</t>.\n"
+"                        </td></tr>\n"
+"                        <tr><td style=\"text-align: center;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: "
+"inline-table;\">\n"
+"                                <tr><td style=\"font-size: 14px; text-"
+"align:center;\">\n"
+"                                    <strong>Jak oceniasz swoje zadowolenie z "
+"interwencji?</strong><br/>\n"
+"                                    <span style=\"text-color: #888888\">"
+"(kliknij na jedną z poniższych emotikon, aby zostawić swoją opinię)</span>\n"
+"                                </td></tr>\n"
+"                                <tr><td style=\"font-size: 14px;\">\n"
+"                                    <table style=\"width:100%;text-"
+"align:center;margin-top:2rem;\">\n"
+"                                        <tr>\n"
+"                                            <td>\n"
+"                                                <a t-attf-href=\"/rate/{{ "
+"access_token }}/5\" t-att-class=\"'pe-none' if object._rating_get_operator() "
+"else ''\">\n"
+"                                                    <img alt=\"Happy\" "
+"src=\"/rating/static/src/img/rating_5.png\" title=\"Zadowolony\"/>\n"
+"                                                </a>\n"
+"                                            </td>\n"
+"                                            <td>\n"
+"                                                <a t-attf-href=\"/rate/{{ "
+"access_token }}/3\" t-att-class=\"'pe-none' if object._rating_get_operator() "
+"else ''\">\n"
+"                                                    <img alt=\"Neutral\" "
+"src=\"/rating/static/src/img/rating_3.png\" title=\"Neutralny\"/>\n"
+"                                                </a>\n"
+"                                            </td>\n"
+"                                            <td>\n"
+"                                                <a t-attf-href=\"/rate/{{ "
+"access_token }}/1\" t-att-class=\"'pe-none' if object._rating_get_operator() "
+"else ''\">\n"
+"                                                    <img alt=\"Unhappy\" "
+"src=\"/rating/static/src/img/rating_1.png\" title=\"Niezadowolony\"/>\n"
+"                                                </a>\n"
+"                                            </td>\n"
+"                                        </tr>\n"
+"                                    </table>\n"
+"                                </td></tr>\n"
+"                            </table>\n"
+"                        </td></tr>\n"
+"                        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+"                            Dziękujemy za ocenę. Pomaga nam stale ulepszać "
+"nasze usługi.\n"
+"                        </td></tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"            </div>\n"
+"        "
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__access_warning
 msgid "Access warning"
-msgstr ""
+msgstr "Ostrzeżenie o dostępie"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_needaction
 msgid "Action Needed"
-msgstr ""
+msgstr "Konieczne działania"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_ids
 msgid "Activities"
-msgstr ""
+msgstr "Aktywności"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr ""
+msgstr "Dekoracja wyjątku aktywności"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.mail_activity_plan_action_config_field_service_plan
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_plans_ids
 #: model:ir.ui.menu,name:planning_field_service.project_field_service_menu_mail_activity_plan
 msgid "Activity Plans"
-msgstr ""
+msgstr "Plany aktywności"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_state
 msgid "Activity State"
-msgstr ""
+msgstr "Stan aktywności"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_type_icon
 msgid "Activity Type Icon"
-msgstr ""
+msgstr "Ikona typu aktywności"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.mail_activity_type_action_config_field_service_types
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_activity_type
 msgid "Activity Types"
-msgstr ""
+msgstr "Typy aktywności"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_plan_action_config_field_service_plan
@@ -381,82 +536,84 @@ msgid ""
 "Activity plans are used to assign a list of activities in just a few clicks\n"
 "                    (e.g. \"Progress Report\", \"Stand-up Meeting\", ...)"
 msgstr ""
+"Plany działań służą do przypisania listy działań za pomocą kilku kliknięć\n"
+"(np. „Raport z postępu prac”, „Spotkanie stand-up”, ...)"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.mail_followers_edit_action_from_planning_slot
 msgid "Add/Remove Followers"
-msgstr ""
+msgstr "Dodaj/usuń obserwujących"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_address
 msgid "Address (without name)"
-msgstr ""
+msgstr "Adres (bez nazwy)"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_all
 msgid "All"
-msgstr ""
+msgstr "Wszystko"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__allocated_hours
 msgid "Allocated Time"
-msgstr ""
+msgstr "Przydzielony czas"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_appliance_tech
 msgid "Appliance Technician"
-msgstr ""
+msgstr "Technik sprzętu AGD"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/fields/field_service_slot_status_bar.js:0
 msgid "Are you sure you want to mark this shift as complete?"
-msgstr ""
+msgstr "Czy na pewno chcesz oznaczyć tę zmianę jako zakończoną?"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_attachment_count
 msgid "Attachment Count"
-msgstr ""
+msgstr "Liczba załączników"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_avg
 msgid "Average Rating"
-msgstr ""
+msgstr "Średnia ocena"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__break_time
 msgid "Break Time"
-msgstr ""
+msgstr "Przerwa"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_maps_by_resource
 msgid "By Resource"
-msgstr ""
+msgstr "Według zasobu"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_carpenter
 msgid "Carpenter"
-msgstr ""
+msgstr "Stolarz"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_city
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_city
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "City"
-msgstr ""
+msgstr "Miasto"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Close"
-msgstr ""
+msgstr "Zamknij"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_company
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__company_id
 msgid "Company"
-msgstr ""
+msgstr "Firma"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_base_document_layout
@@ -488,7 +645,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Konfiguracja ustawień"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_email
@@ -498,28 +655,28 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_country_id
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_country_id
 msgid "Country"
-msgstr ""
+msgstr "Kraj"
 
 #. module: planning_field_service
 #: model:ir.model,website_form_label:planning_field_service.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "Utwórz klienta"
 
 #. module: planning_field_service
 #: model:ir.model,website_form_label:planning_field_service.model_planning_slot
 msgid "Create a Shift"
-msgstr ""
+msgstr "Utwórz zmianę"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_plan_action_config_field_service_plan
 msgid "Create a Shift Activity Plan"
-msgstr ""
+msgstr "Stwórz plan aktywności na zmianę"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_id
@@ -528,7 +685,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Customer"
-msgstr ""
+msgstr "Klient"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__access_url
@@ -539,7 +696,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:planning_field_service.rating_rating_action_planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_customer_ratings
 msgid "Customer Ratings"
-msgstr ""
+msgstr "Oceny klienta"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_state_id
@@ -556,7 +713,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -576,6 +733,9 @@ msgid ""
 "Create open shifts based on the roles needed for a mission, then assign "
 "those shifts to available resources."
 msgstr ""
+"Określ role, które będą pełnić Twoi pracownicy (np. szef kuchni, barman, "
+"kelner). Utwórz otwarte zmiany w oparciu o role potrzebne do realizacji "
+"zadania, a następnie przypisz te zmiany do dostępnych pracowników."
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -598,7 +758,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:planning_field_service.field_res_users__display_name
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nazwa wyświetlana"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -609,18 +769,18 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_in
 msgid "Distance from previous shift (or work location) to this shift."
-msgstr ""
+msgstr "Odległość od poprzedniej zmiany (lub miejsca pracy) do tej zmiany."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_distance_out
 msgid "Distance from this shift to the next (or work location)."
-msgstr ""
+msgstr "Odległość z tej zmiany do następnej (lub miejsca pracy)."
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer.xml:0
 msgid "Duration"
-msgstr ""
+msgstr "Czas trwania"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_electrician
@@ -636,20 +796,20 @@ msgstr ""
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.mail_template_data_intervention_report
 msgid "Email sent when the shift is completed."
-msgstr ""
+msgstr "E-mail wysyłany po zakończeniu zmiany."
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_form_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_search_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_tree_planning_field_service
 msgid "Employee"
-msgstr ""
+msgstr "Pracownik"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__end_datetime
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_live_map
 msgid "End Date"
-msgstr ""
+msgstr "Data zakończenia"
 
 #. module: planning_field_service
 #: model:ir.module.module,shortdesc:base.module_planning_field_service
@@ -657,7 +817,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_home_menu_planning_field_service
 msgid "Field Service"
-msgstr ""
+msgstr "Serwis Terenowy"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_email
@@ -667,17 +827,19 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Email Template"
-msgstr ""
+msgstr "Szablon wiadomości e-mail z potwierdzeniem usług terenowych"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Mail Template"
-msgstr ""
+msgstr "Szablon wiadomości e-mail z potwierdzeniem usług terenowych"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__rating_shift_request_mail_template_id
 msgid "Field Service Intervention Customer Rating Mail Template"
 msgstr ""
+"Szablon wiadomości e-mail dotyczący oceny klienta w zakresie interwencji "
+"Serwisu Terenowego"
 
 #. module: planning_field_service
 #. odoo-python
@@ -697,14 +859,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Field Service Report - %(date)s"
-msgstr ""
+msgstr "Raport usług terenowych - %(date)s"
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Field Service Report - %s"
-msgstr ""
+msgstr "Raport usług terenowych - %s"
 
 #. module: planning_field_service
 #: model:mail.template,name:planning_field_service.mail_template_data_intervention_report
@@ -727,16 +889,23 @@ msgid ""
 "Find here your planning. Assign yourself open shifts that match your roles, "
 "or indicate your unavailability."
 msgstr ""
+"Tutaj znajdziesz tutaj swoje grafiki. Przydziel sobie otwarte zmiany, które "
+"pasują do twoich ról, lub wskaż swoją niedostępność."
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "Obserwujący"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_partner_ids
 msgid "Followers (Partners)"
-msgstr ""
+msgstr "Obserwujący (partnerzy)"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Future Activities"
+msgstr "Przyszłe czynności"
 
 #. module: planning_field_service
 #. odoo-python
@@ -753,7 +922,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__has_message
 msgid "Has Message"
-msgstr ""
+msgstr "Ma wiadomość"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_heating_engineer
@@ -766,7 +935,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "High"
-msgstr ""
+msgstr "Wysoki"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
@@ -788,28 +957,30 @@ msgstr ""
 #: model:ir.model.fields,field_description:planning_field_service.field_res_users__id
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Ikona"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr ""
+msgstr "Ikona wskazująca na działanie stanowiące wyjątek."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr ""
+msgstr "Jeśli opcja jest zaznaczona, nowe wiadomości wymagają Twojej uwagi."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_has_error
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
+"Jeśli ta opcja jest zaznaczona, niektóre wiadomości napotkały błędy podczas "
+"doręczenia."
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_slot__state__3_in_progress
@@ -826,6 +997,11 @@ msgid ""
 "format_time(object.start_datetime, time_format='short', "
 "tz=object.partner_id.tz, lang_code=object.partner_id.lang) or '' }}"
 msgstr ""
+"Interwencja zaplanowana {{ object.start_datetime and 'for ' + format_datetime"
+"(object.start_datetime, dt_format='MMM d', tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang) + ' at ' + format_time"
+"(object.start_datetime, time_format='short', tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang) or '' }}"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_activity
@@ -847,7 +1023,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_is_follower
 msgid "Is Follower"
-msgstr ""
+msgstr "Jest obserwatorem"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
@@ -864,6 +1040,11 @@ msgstr ""
 #: model:planning.role,name:planning_field_service.planning_role_landscaper
 msgid "Landscaper"
 msgstr ""
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Late Activities"
+msgstr "Czynności zaległe"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_latitude
@@ -909,7 +1090,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Low"
-msgstr ""
+msgstr "Niski"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_my_map
@@ -932,13 +1113,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Mapbox could not compute the route."
-msgstr ""
+msgstr "Mapbox nie mógł obliczyć trasy."
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_by_resource
 #: model:ir.ui.menu,name:planning_field_service.planning_field_service_menu_maps
 msgid "Maps"
-msgstr ""
+msgstr "Mapy"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.worksheet_custom_page
@@ -948,7 +1129,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Ikona symboli materiałów, np. lista kontrolna"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
@@ -956,6 +1137,8 @@ msgid ""
 "Measure your customer satisfaction by sending rating requests when "
 "interventions are done."
 msgstr ""
+"Mierz poziom zadowolenia klientów, wysyłając prośby o ocenę po zakończeniu "
+"interwencji."
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__1
@@ -963,22 +1146,22 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Medium"
-msgstr ""
+msgstr "Medium"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_ui_menu
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "Błąd doręczenia wiadomości"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "Wiadomości"
 
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_my
@@ -986,9 +1169,14 @@ msgid "My"
 msgstr ""
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "My Activities"
+msgstr "Moje czynności"
+
+#. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr ""
+msgstr "Ostateczny termin moich aktywności"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_my_map
@@ -999,12 +1187,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/__init__.py:0
 msgid "My Planning"
-msgstr ""
+msgstr "Mój plan"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_name
 msgid "Name"
-msgstr ""
+msgstr "Nazwa"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1017,27 +1205,27 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr ""
+msgstr "Następna Czynność wydarzenia w kalendarzu"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr ""
+msgstr "Termin kolejnej czynności"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_summary
 msgid "Next Activity Summary"
-msgstr ""
+msgstr "Podsumowanie kolejnej czynności"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_type_id
 msgid "Next Activity Type"
-msgstr ""
+msgstr "Typ następnej czynności"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_type_action_config_field_service_types
 msgid "No activity types found. Let's create one!"
-msgstr ""
+msgstr "Nie znaleziono typów aktywności. Stwórzmy jakieś!"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
@@ -1050,27 +1238,27 @@ msgstr ""
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_map_timeline
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_my_map
 msgid "No shifts found. Let's create one!"
-msgstr ""
+msgstr "Nie znaleziono zmian. Utwórz nową!"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_needaction_counter
 msgid "Number of Actions"
-msgstr ""
+msgstr "Liczba akcji"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_error_counter
 msgid "Number of errors"
-msgstr ""
+msgstr "Liczba błędów"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr ""
+msgstr "Liczba wiadomości wymagających akcji"
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr ""
+msgstr "Liczba wiadomości z błędami przy doręczeniu"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_view_form
@@ -1081,12 +1269,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_phone
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_card
 msgid "Phone"
-msgstr ""
+msgstr "Telefon"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_shift_ics_description_inherit
 msgid "Phone:"
-msgstr ""
+msgstr "Telefon:"
 
 #. module: planning_field_service
 #: model:ir.module.module,summary:base.module_planning_field_service
@@ -1096,22 +1284,24 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_my_planning_internal_user
 msgid "Planning"
-msgstr ""
+msgstr "Planowanie"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_analysis_report
 msgid "Planning Analysis Report"
-msgstr ""
+msgstr "Raport z analizy planistycznej"
 
 #. module: planning_field_service
 #: model:ir.actions.server,name:planning_field_service.ir_cron_remove_outdated_technician_live_location_ir_actions_server
 msgid "Planning Field Service: remove technicians' location older than one day"
 msgstr ""
+"Planowanie Serwisu Terenowego: usuwanie starszych niż jeden dzień "
+"lokalizacji techników"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_slot
 msgid "Planning Shift"
-msgstr ""
+msgstr "Planowanie zmian"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_plumber
@@ -1126,7 +1316,7 @@ msgstr ""
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Print"
-msgstr ""
+msgstr "Drukuj"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__priority
@@ -1134,7 +1324,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_analysis_report_view_search_inherit_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Priority"
-msgstr ""
+msgstr "Priorytet"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1143,6 +1333,8 @@ msgid ""
 "Privacy first: Location is recorded only after sign-in and with your "
 "permission."
 msgstr ""
+"Prywatność przede wszystkim: lokalizacja jest rejestrowana dopiero po "
+"zalogowaniu się i za Twoją zgodą."
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_action_schedule_by_resource_view_graph_inherit_planning
@@ -1190,7 +1382,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__rating_ids
 msgid "Ratings"
-msgstr ""
+msgstr "Oceny"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_replacement_requested
@@ -1201,39 +1393,39 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_ir_actions_report
 msgid "Report Action"
-msgstr ""
+msgstr "Zgłoś akcję"
 
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_resource_resource
 msgid "Resource"
-msgstr ""
+msgstr "Zasób"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__resource_ids
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 msgid "Resources"
-msgstr ""
+msgstr "Zasoby"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__activity_user_id
 msgid "Responsible User"
-msgstr ""
+msgstr "Użytkownik odpowiedzialny"
 
 #. module: planning_field_service
 #: model:portal.entry,description:planning_field_service.portal_field_service
 msgid "Review and sign your intervention reports"
-msgstr ""
+msgstr "Sprawdź i podpisz swoje raporty z interwencji"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__role_id
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_map
 msgid "Role"
-msgstr ""
+msgstr "Rola"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr ""
+msgstr "Błąd dostarczenia wiadomości SMS"
 
 #. module: planning_field_service
 #: model:planning.role,name:planning_field_service.planning_role_safety
@@ -1247,11 +1439,13 @@ msgid ""
 "Schedule your human and material resources across roles, projects and sales "
 "orders."
 msgstr ""
+"Zaplanuj zasoby ludzkie i materialne w podziale na stanowiska, projekty i "
+"zamówienia sprzedaży."
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 msgid "Scheduled"
-msgstr ""
+msgstr "Zaplanowane"
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.action_intervention_send_mail
@@ -1267,7 +1461,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_planning_send
 msgid "Send Planning"
-msgstr ""
+msgstr "Wyślij grafik"
 
 #. module: planning_field_service
 #: model:ir.actions.server,name:planning_field_service.action_intervention_send_report
@@ -1278,23 +1472,24 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.res_config_settings_view_form
 msgid "Send a confirmation email to the customer when a shift is published"
 msgstr ""
+"Wyślij klientowi wiadomość e-mail z potwierdzeniem po opublikowaniu zmiany"
 
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.rating_shift_request_email_template
 msgid "Sent to customers to collect ratings after a shift is completed"
-msgstr ""
+msgstr "Wysyłane do klientów w celu zebrania ocen po zakończeniu zmiany"
 
 #. module: planning_field_service
 #: model:mail.template,description:planning_field_service.mail_template_data_intervention_details
 msgid "Sent to customers when a shift is published"
-msgstr ""
+msgstr "Wysyłane do klientów po opublikowaniu zmiany"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_form_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_search_planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.rating_rating_view_tree_planning_field_service
 msgid "Shift"
-msgstr ""
+msgstr "Zmiana"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_shift_assigned
@@ -1336,6 +1531,11 @@ msgid "Shifts to Schedule"
 msgstr ""
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Show all records whose next activity date is past"
+msgstr "Pokaż wszystkie rekordy, których data następnej aktywności minęła"
+
+#. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Sign Field Service Report"
 msgstr ""
@@ -1375,7 +1575,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Some routing points are too far apart"
-msgstr ""
+msgstr "Niektóre punkty przekierowania są zbyt daleko od siebie"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1390,14 +1590,14 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__start_datetime
 msgid "Start Date"
-msgstr ""
+msgstr "Data rozpoczęcia"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__state
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #. module: planning_field_service
 #: model:mail.message.subtype,description:planning_field_service.mt_intervention_status_changed
@@ -1413,18 +1613,22 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
+"Status na podstawie aktywności\n"
+"Zaległe: Termin już minął\n"
+"Dzisiaj: Data aktywności przypada na dzisiaj\n"
+"Zaplanowane: Przyszłe aktywności."
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_street
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_street
 msgid "Street"
-msgstr ""
+msgstr "Ulica"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_street2
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_street2
 msgid "Street2"
-msgstr ""
+msgstr "Ulica2"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
@@ -1448,23 +1652,26 @@ msgid ""
 "The field service report is unavailable for the selected interventions as "
 "they do not contain any timesheets, products, or worksheets."
 msgstr ""
+"Raport Serwisu Terenowego jest niedostępny dla wybranych interwencji, "
+"ponieważ nie zawierają one żadnych kart ewidencji czasu pracy, produktów ani "
+"arkuszy roboczych."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/controllers/portal.py:0
 msgid "The intervention report is not in a state requiring customer signature."
-msgstr ""
+msgstr "Raport z interwencji nie wymaga podpisu klienta."
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "There are no intervention reports to review and sign."
-msgstr ""
+msgstr "Nie ma żadnych raportów z interwencji do przejrzenia i podpisania."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "There are no reports to send."
-msgstr ""
+msgstr "Nie ma żadnych raportów do wysłania."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1474,12 +1681,15 @@ msgid ""
 "customer ratings for shifts. Choose another template or disable the feature "
 "in Planning settings."
 msgstr ""
+"Ten szablon wiadomości e-mail nie może zostać usunięty, ponieważ jest "
+"niezbędny do zbierania ocen dotyczących zmian od klientów. Wybierz inny "
+"szablon lub wyłącz tę funkcję w ustawieniach Planowania."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This method must take two slots in argument."
-msgstr ""
+msgstr "Ta metoda musi zajmować dwa miejsca w argumencie."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1491,7 +1701,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "This shift is already in progress."
-msgstr ""
+msgstr "Ta zmiana już trwa."
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.mail_activity_type_action_config_field_service_types
@@ -1499,6 +1709,8 @@ msgid ""
 "Those represent the different categories of things you have to do (e.g. "
 "\"Call\" or \"Send email\")."
 msgstr ""
+"Określają one różne kategorie czynności, które należy wykonać (np. „Zadzwoń” "
+"lub „Wyślij e-mail”)."
 
 #. module: planning_field_service
 #: model:ir.actions.act_window,name:planning_field_service.planning_field_service_action_map_timeline
@@ -1514,6 +1726,11 @@ msgid "To Review"
 msgstr ""
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Today Activities"
+msgstr "Dzisiejsze czynności"
+
+#. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Token invalid"
@@ -1523,13 +1740,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "Too many requests, try again in a few minutes"
-msgstr ""
+msgstr "Zbyt wiele żądań, spróbuj ponownie za kilka minut"
 
 #. module: planning_field_service
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_field_service_live_map/planning_field_service_live_map_renderer.xml:0
 msgid "Track technicians’ locations and shifts in progress."
-msgstr ""
+msgstr "Śledź lokalizacje techników i trwające zmiany."
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.planning_field_service_action_live_map
@@ -1537,6 +1754,8 @@ msgid ""
 "Track technicians’ locations and shifts in progress. Privacy first: Location "
 "is recorded only after sign-in and with your permission."
 msgstr ""
+"Śledź lokalizacje techników i trwające zmiany. Prywatność przede wszystkim: "
+"lokalizacja jest rejestrowana dopiero po zalogowaniu się i za Twoją zgodą."
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__travel_distance_in
@@ -1578,12 +1797,12 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_in
 msgid "Travel time from previous shift (or work location) to this shift."
-msgstr ""
+msgstr "Czas dojazdu z poprzedniej zmiany (lub miejsca pracy) na tę zmianę."
 
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__travel_time_out
 msgid "Travel time from this shift to the next (or work location)."
-msgstr ""
+msgstr "Czas dojazdu z tej zmiany do następnej (lub miejsca pracy)."
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -1594,7 +1813,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
+msgstr "Typ wyjątku aktywności na rekordzie."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1612,7 +1831,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/planning_field_service/static/src/views/planning_gantt/planning_gantt_renderer_controls.js:0
 msgid "Update travel times as they are out-of-date"
-msgstr ""
+msgstr "Zaktualizuj czasy podróży, ponieważ są nieaktualne"
 
 #. module: planning_field_service
 #: model:ir.model.fields.selection,name:planning_field_service.selection__planning_analysis_report__priority__3
@@ -1625,7 +1844,7 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model,name:planning_field_service.model_res_users
 msgid "User"
-msgstr ""
+msgstr "Użytkownik"
 
 #. module: planning_field_service
 #. odoo-python
@@ -1658,6 +1877,8 @@ msgid ""
 "You can't move this shift to draft because it is already in progress or "
 "completed."
 msgstr ""
+"Nie można przenieść tej zmiany do wersji roboczej, ponieważ jest ona już w "
+"trakcie realizacji lub została zakończona."
 
 #. module: planning_field_service
 #. odoo-python
@@ -1666,18 +1887,20 @@ msgid ""
 "You can't unschedule this shift because it's already in progress or "
 "completed."
 msgstr ""
+"Nie można odwołać tej zmiany, ponieważ jest ona już w toku lub została "
+"zakończona."
 
 #. module: planning_field_service
 #. odoo-python
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "You cannot set a slot to draft."
-msgstr ""
+msgstr "Nie można ustawić slotu jako wersji roboczej."
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_analysis_report__partner_zip
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__partner_zip
 msgid "ZIP"
-msgstr ""
+msgstr "Kod pocztowy"
 
 #. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_card
@@ -1696,3 +1919,5 @@ msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name }}: Service "
 "Rating Request"
 msgstr ""
+"{{ object.company_id.name or object.user_id.company_id.name }}: Prośba o "
+"ocenę usługi"

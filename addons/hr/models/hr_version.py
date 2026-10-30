@@ -1,29 +1,19 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime, time
 from dateutil.relativedelta import relativedelta
 from babel.dates import format_date, get_date_format
 from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models
+from odoo.fields import Domain
 from odoo.addons.base.models.res_partner import _tz_get
 from odoo.exceptions import ValidationError
-from odoo.tools import get_lang, babel_locale_parse
+from odoo.tools import SQL, get_lang, babel_locale_parse
 
 import logging
-import operator as py_operator
 _logger = logging.getLogger(__name__)
-
-PY_OPERATORS = {
-    '>': py_operator.gt,
-    '<': py_operator.lt,
-    '>=': py_operator.ge,
-    '<=': py_operator.le,
-    '=': py_operator.eq,
-    '!=': py_operator.ne,
-    'in': lambda elem, container: elem in container,
-}
 
 
 def format_date_abbr(env, date):
@@ -45,15 +35,6 @@ class HrVersion(models.Model):
         address = self.env.company.partner_id.address_get(['default'])
         return address['default'] if address else False
 
-    def _get_default_work_location_id(self):
-        if self.env['hr.work.location'].has_access('read'):
-            work_location_id = self.env['hr.work.location'].search([('company_id', '=', self.env.company.id)])
-            if len(work_location_id) == 1 and self.env.company.country_code == 'BE':
-                return work_location_id
-            elif work_location_id and self.env.company.country_code != 'BE':
-                return work_location_id[0]
-        return False
-
     def _default_salary_structure(self):
         return (
                 self.env['hr.payroll.structure.type'].sudo().search([('country_id', '=', self.env.company.country_id.id)], limit=1)
@@ -61,7 +42,7 @@ class HrVersion(models.Model):
         )
 
     def _get_hr_responsible_domain(self):
-        return "[('share', '=', False), ('company_ids', 'in', company_id), ('all_group_ids', 'in', %s)]" % self.env.ref('hr.group_hr_user').id
+        return [('share', '=', False), ('company_ids', 'in', self.env.company.ids), ('all_group_ids', 'in', self.env.ref('hr.group_hr_user').id)]
 
     company_id = fields.Many2one('res.company', compute='_compute_company_id', readonly=False,
                                  store=True, index=True, default=lambda self: self.env.company, tracking=1)
@@ -144,7 +125,8 @@ class HrVersion(models.Model):
         readonly=False,
         check_company=True,
         tracking=1)
-    work_location_id = fields.Many2one('hr.work.location', 'Work Location', default=lambda self: self._get_default_work_location_id(),
+    work_location_id = fields.Many2one('hr.work.location', 'Work Location', compute='_compute_work_location_id',
+                                       store=True, readonly=False,
                                        domain="[('address_id', '=', address_id)]", index=True, tracking=1)
 
     departure_id = fields.Many2one('hr.employee.departure', string="Departure", copy=False, index='btree_not_null')
@@ -196,7 +178,7 @@ class HrVersion(models.Model):
 
     hr_responsible_id = fields.Many2one(
         'res.users', 'HR Responsible', tracking=1,
-        help='Person responsible for validating the employee\'s contracts.', domain=_get_hr_responsible_domain,
+        help='Person responsible for validating the employee\'s contracts.', domain=lambda self: self._get_hr_responsible_domain(),
         default=lambda self: self.env.user, required=True, groups="hr.group_hr_user")
 
     _check_contract_start_date_defined = models.Constraint(
@@ -219,6 +201,19 @@ class HrVersion(models.Model):
         for version in self:
             if version.employee_id:
                 version.company_id = version.employee_id.company_id
+
+    @api.depends('company_id')
+    def _compute_work_location_id(self):
+        for version in self:
+            if version.work_location_id and version.work_location_id.company_id in version.company_id.parent_ids:
+                continue
+            work_locations = self.env['hr.work.location']
+            if version.company_id and self.env['hr.work.location'].has_access('read'):
+                work_locations = self.env['hr.work.location'].search([
+                    ('company_id', 'in', version.company_id.parent_ids.ids),
+                    ('location_type', '=', 'office'),
+                ])
+            version.work_location_id = work_locations if len(work_locations) == 1 else False
 
     @api.depends('job_id.name')
     def _compute_job_title(self):
@@ -431,19 +426,21 @@ class HrVersion(models.Model):
         for version in self:
             version.is_in_contract = version._is_in_contract()
 
-    def _is_in_contract(self, date=fields.Date.today()):
-        # Return True if the employee is in contract on a given date
+    def _is_in_contract(self, date=None):
+        # Return True if the employee is in contract on a given date (today by default)
         if not self.contract_date_start:
             return False
+        if date is None:
+            date = fields.Date.context_today(self)
         return self.date_start <= date and (not self.date_end or self.date_end >= date)
 
     def _is_flexible(self):
         self.ensure_one()
-        return self.resource_calendar_id._is_flexible()
+        return bool(self.resource_calendar_id) and self.resource_calendar_id._is_flexible()
 
     def _is_fully_flexible(self):
         self.ensure_one()
-        return self.resource_calendar_id._is_fully_flexible()
+        return bool(self.resource_calendar_id) and self.resource_calendar_id._is_fully_flexible()
 
     def _is_overlapping_period(self, date_from, date_to):
         """
@@ -635,42 +632,36 @@ class HrVersion(models.Model):
         return NotImplemented
 
     def _search_end_date(self, operator, value):
-
-        def _compare_dates(date_end, operator, value):
-            op = PY_OPERATORS.get(operator)
-            if not op:
-                return False
-            if not date_end and operator in ('>', '>=', '<', '<='):
-                return False
-            return op(date_end, value)
-
-        all_versions = self.search([('company_id', 'in', self.env.companies.ids)])
-        matching_ids = []
-
-        next_version_map = {}
-        prev_version_per_employee = {}
-
-        for version in all_versions:
-            emp_id = version.employee_id.id
-            if emp_id in prev_version_per_employee:
-                next_version_map[prev_version_per_employee[emp_id].id] = version
-            prev_version_per_employee[emp_id] = version
-
-        for version in all_versions:
-            next_version = next_version_map.get(version.id)
-            date_version_end = next_version.date_version + relativedelta(days=-1) if next_version else False
-
-            if date_version_end and version.contract_date_end:
-                date_end = min(date_version_end, version.contract_date_end)
-            elif date_version_end:
-                date_end = date_version_end
-            else:
-                date_end = version.contract_date_end
-
-            if _compare_dates(date_end, operator, value):
-                matching_ids.append(version.id)
-
-        return [('id', 'in', matching_ids)]
+        if operator not in ('<', '<=', '>', '>=', 'in'):
+            return NotImplemented
+        # Same logic as _compute_dates: the version ends the day before the next
+        # active version of the employee, or at the end of its contract.
+        date_end_sql = SQL("""
+            LEAST(
+                (
+                    SELECT MIN(next_version.date_version)
+                      FROM hr_version next_version
+                     WHERE next_version.employee_id = hr_version.employee_id
+                       AND next_version.active
+                       AND next_version.date_version > hr_version.date_version
+                ) - 1,
+                hr_version.contract_date_end
+            )
+        """)
+        if operator == 'in':
+            dates = [fields.Date.to_date(d) for d in value if d]
+            conditions = []
+            if dates:
+                conditions.append(SQL("%s IN %s", date_end_sql, tuple(dates)))
+            if False in value:
+                conditions.append(SQL("%s IS NULL", date_end_sql))
+            if not conditions:
+                return Domain.FALSE
+            condition = SQL(" OR ").join(conditions)
+        else:
+            sql_operator = {'<': SQL('<'), '<=': SQL('<='), '>': SQL('>'), '>=': SQL('>=')}[operator]
+            condition = SQL("%s %s %s::date", date_end_sql, sql_operator, value)
+        return [('id', 'in', SQL("(SELECT hr_version.id FROM hr_version WHERE %s)", condition))]
 
     @api.model
     def _get_marital_status_selection(self):
@@ -725,7 +716,7 @@ class HrVersion(models.Model):
 
     def _get_field_block_start_date(self, field_name):
         """
-        Return the contract_date_start of the earliest contiguous version
+        Return the date_start of the earliest contiguous version
         that shares the same value for `field_name` as the current version.
 
         Useful to determine since when a given field value has been
@@ -739,7 +730,9 @@ class HrVersion(models.Model):
         if not current_value:
             return None
 
-        versions = self.employee_id.version_ids.sorted(key=lambda v: v.contract_date_start or date.min)
+        # version_ids are ordered by date_version, which is also the date_start
+        # order as the contracts of an employee cannot overlap
+        versions = self.employee_id.version_ids
 
         try:
             idx = next(i for i, v in enumerate(versions) if v.id == self.id)
@@ -749,11 +742,35 @@ class HrVersion(models.Model):
         start_version = versions[idx]
         for j in range(idx - 1, -1, -1):
             prev = versions[j]
-            if prev[field_name] != current_value:
+            if prev[field_name] != current_value or not prev._is_continuous_with(start_version):
                 break
             start_version = prev
 
-        return start_version.contract_date_start
+        return start_version.date_start
+
+    def _has_work_hours_between_versions(self, version_to):
+        # we consider two versions to be consecutive if no work hours are
+        # in the period between the two versions
+        tz = ZoneInfo(self._get_tz())
+        date_from = datetime.combine(self.date_end, time.max, tz) if self.date_end else date.max
+        date_to = datetime.combine(version_to.date_start, time.min, tz)
+        calendar_id = self.resource_calendar_id
+        if not calendar_id:
+            return False
+        if self.date_end and self.date_end + relativedelta(days=1) == version_to.date_start:
+            # fast path: back-to-back versions cannot have work hours between them.
+            # We can bypass the expensive calendar lookup
+            return False
+        return bool(calendar_id.get_work_hours_count(date_from, date_to, compute_leaves=False))
+
+    def _is_continuous_with(self, next_version):
+        """
+        return whether `next_version` continues `self` without breaking
+        continuity. By default, any gap between contracts is ignored
+        Localizations can override this to define a tolerated gap.
+        """
+        self.ensure_one()
+        return True
 
     def action_open_version(self):
         self.ensure_one()

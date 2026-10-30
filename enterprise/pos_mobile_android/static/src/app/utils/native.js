@@ -12,6 +12,7 @@ export class NativeError extends Error {
     }
 }
 
+// TODO remove in master: check `mobileNative.<method>` instead
 export function hasMobileNative(method) {
     return typeof mobile.methods[method] === "function";
 }
@@ -30,5 +31,5 @@ export function mobileNativeCall(method, args = {}) {
 }
 
 export const mobileNative = new Proxy(Object.create(null), {
-    get: (_, method) => (args) => mobileNativeCall(method, args),
+    get: (_, method) => mobile.methods[method] && ((args) => mobileNativeCall(method, args)),
 });

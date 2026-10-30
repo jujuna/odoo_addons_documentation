@@ -3,6 +3,8 @@ from datetime import date, datetime, UTC
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
+from freezegun import freeze_time
+
 from odoo import fields
 from odoo.exceptions import ValidationError
 from odoo.fields import Domain
@@ -520,14 +522,14 @@ class TestHrLeaveGantt(TestHolidayContract):
         gantt_data_half = self.env['hr.leave'].with_context(allowed_company_ids=self.jules_emp.company_id.ids).get_gantt_data(
             gantt_domain, ['employee_id'], read_specification, unavailability_fields=['employee_id'],
             progress_bar_fields=['employee_id'], start_date=start_date_half, stop_date=stop_date_half, scale='day')
-        self.assertEqual(gantt_data_half['progress_bars']['employee_id'][self.jules_emp.id]['value'], 4)
+        self.assertAlmostEqual(gantt_data_half['progress_bars']['employee_id'][self.jules_emp.id]['value'], 4, places=8)
 
         start_date_hour = '2026-03-25 00:00:00'
         stop_date_hour = '2026-03-25 23:59:59'
         gantt_data_hour = self.env['hr.leave'].with_context(allowed_company_ids=self.jules_emp.company_id.ids).get_gantt_data(
             gantt_domain, ['employee_id'], read_specification, unavailability_fields=['employee_id'],
             progress_bar_fields=['employee_id'], start_date=start_date_hour, stop_date=stop_date_hour, scale='day')
-        self.assertEqual(gantt_data_hour['progress_bars']['employee_id'][self.jules_emp.id]['value'], 4)
+        self.assertAlmostEqual(gantt_data_hour['progress_bars']['employee_id'][self.jules_emp.id]['value'], 4, places=8)
 
     def test_gantt_data_only_shows_employees_from_selected_company(self):
         """
@@ -627,6 +629,7 @@ class TestHrLeaveGantt(TestHolidayContract):
             "standard 40h schedule over a full month.",
         )
 
+    @freeze_time('2026-09-01')
     def test_gantt_view_employee_available_leave_types(self):
         """
         Checks that for each employee, correct available leave types are returned in the Gantt view.
@@ -672,6 +675,16 @@ class TestHrLeaveGantt(TestHolidayContract):
             'number_of_days': 10,
             'date_from': '2026-01-01',
             'date_to': '2026-12-31',
+        }).action_approve()
+        # not valid yet: not counted in the remaining days
+        self.env['hr.leave.allocation'].create({
+            'name': 'Next Year Allocation',
+            'employee_id': employee.id,
+            'state': 'confirm',
+            'work_entry_type_id': leave_type_with_allocation.id,
+            'number_of_days': 5,
+            'date_from': '2027-01-01',
+            'date_to': '2027-12-31',
         }).action_approve()
 
         leave = self.env['hr.leave'].create({
@@ -822,3 +835,152 @@ class TestHrLeaveGantt(TestHolidayContract):
             self.assertFalse(form._get_modifier('number_of_hours', 'invisible'), "The duration is the only hour input.")
             self.assertTrue(form._get_modifier('request_hour_from', 'invisible'), "request_hour_from stays technical.")
             self.assertTrue(form._get_modifier('request_hour_to', 'invisible'), "request_hour_to stays technical.")
+
+    def test_gantt_view_flex_schedule_partial_hours_leave(self):
+        """A flexible-schedule leave of a few hours (neither half nor full day) must only take
+        its requested hours, not the whole day."""
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 56,
+            'hours_per_day': 8,
+        })
+        self.jules_emp.write({'resource_calendar_id': flexible_calendar.id})
+        work_entry_type_hours = self.env['hr.work.entry.type'].create({
+            'name': 'Hours',
+            'count_as': 'absence',
+            'requires_allocation': False,
+            'request_unit': 'hour',
+            'code': 'HOURS',
+            'unit_of_measure': 'hour',
+        })
+        hours_leave = self.env['hr.leave'].create({
+            'name': 'Hour Leave',
+            'work_entry_type_id': work_entry_type_hours.id,
+            'employee_id': self.jules_emp.id,
+            'request_date_from': datetime(2026, 3, 25),
+            'request_date_to': datetime(2026, 3, 25),
+            'request_hour_from': 9.0,
+            'request_hour_to': 11.0,
+            'work_entry_type_request_unit': 'hour',
+        })
+        self.env['resource.calendar.leaves'].create({
+            'resource_id': self.jules_emp.resource_id.id,
+            'date_from': datetime(2026, 3, 25, 9, 0, 0),
+            'date_to': datetime(2026, 3, 25, 11, 0, 0),
+            'holiday_id': hours_leave.id,
+            'count_as': 'absence',
+        })
+        hours_leave.action_approve()
+
+        work_data = self.jules_emp._get_work_days_data_batch(
+            datetime(2026, 3, 25, 0, 0, tzinfo=UTC),
+            datetime(2026, 3, 25, 23, 59, 59, tzinfo=UTC),
+        )
+        self.assertAlmostEqual(
+            work_data[self.jules_emp.id]['hours'], 6, places=8,
+            msg="Only the 2 requested hours should be off, leaving 6 of the 8 working hours",
+        )
+
+    def test_subsequent_flexible_leave_intervals(self):
+        """Ensure that subsequent flexible leaves do not overlap."""
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 56,
+            'hours_per_day': 8,
+        })
+        self.jules_emp.write({'resource_calendar_id': flexible_calendar.id})
+
+        work_entry_type_half_day, work_entry_type_hours = self.env['hr.work.entry.type'].create([{
+            'name': 'Paid Time Off Half',
+            'count_as': 'absence',
+            'requires_allocation': False,
+            'request_unit': 'half_day',
+            'code': 'HALF_DAY',
+            'leave_validation_type': 'no_validation',
+        }, {
+            'name': 'Paid Time Off Hour',
+            'count_as': 'absence',
+            'requires_allocation': False,
+            'request_unit': 'hour',
+            'code': 'HOURS',
+            'leave_validation_type': 'no_validation',
+        }])
+        self.env['hr.leave'].create([{
+            'name': 'Half Day Leave AM',
+            'work_entry_type_id': work_entry_type_half_day.id,
+            'employee_id': self.jules_emp.id,
+            'request_date_from': datetime(2026, 3, 24),
+            'request_date_to': datetime(2026, 3, 24),
+            'work_entry_type_request_unit': 'half_day',
+            'request_date_from_period': 'am',
+            'request_date_to_period': 'am'
+        }, {
+            'name': 'Half Day Leave PM',
+            'work_entry_type_id': work_entry_type_half_day.id,
+            'employee_id': self.jules_emp.id,
+            'request_date_from': datetime(2026, 3, 24),
+            'request_date_to': datetime(2026, 3, 24),
+            'work_entry_type_request_unit': 'half_day',
+            'request_date_from_period': 'pm',
+            'request_date_to_period': 'pm'
+        }, {
+            'name': 'Hours Leave AM',
+            'work_entry_type_id': work_entry_type_hours.id,
+            'employee_id': self.jules_emp.id,
+            'request_date_from': datetime(2026, 3, 25),
+            'request_date_to': datetime(2026, 3, 25),
+            'work_entry_type_request_unit': 'hour',
+            'request_hour_from': 7.5,
+            'request_hour_to': 11.5,
+        }, {
+            'name': 'Hours Leave PM',
+            'work_entry_type_id': work_entry_type_hours.id,
+            'employee_id': self.jules_emp.id,
+            'request_date_from': datetime(2026, 3, 25),
+            'request_date_to': datetime(2026, 3, 25),
+            'work_entry_type_request_unit': 'hour',
+            'request_hour_from': 12.5,
+            'request_hour_to': 16.5,
+        }, {
+            "name": "Hours Leave 9-10",
+            "work_entry_type_id": work_entry_type_hours.id,
+            "employee_id": self.jules_emp.id,
+            "request_date_from": datetime(2026, 3, 26),
+            "request_date_to": datetime(2026, 3, 26),
+            'work_entry_type_request_unit': 'hour',
+            "request_hour_from": 9.0,
+            "request_hour_to": 10.0,
+        }, {
+            "name": "Hours Leave 10-11",
+            "work_entry_type_id": work_entry_type_hours.id,
+            "employee_id": self.jules_emp.id,
+            "request_date_from": datetime(2026, 3, 26),
+            "request_date_to": datetime(2026, 3, 26),
+            'work_entry_type_request_unit': 'hour',
+            "request_hour_from": 10.0,
+            "request_hour_to": 11.0,
+        }])
+
+        start_date = datetime(2026, 3, 23, 0, 0, tzinfo=UTC)
+        stop_date = datetime(2026, 3, 26, 23, 59, 59, tzinfo=UTC)
+        leave_intervals = self.env['resource.calendar']._leave_intervals_batch(start_date, stop_date, self.jules_emp.resource_id._get_resources_per_tz())
+        resource_intervals = list(leave_intervals[self.jules_emp.resource_id.id])
+
+        self.assertEqual(
+            [(start, end) for start, end, dummy in resource_intervals],
+            [
+                (datetime(2026, 3, 24, 0, 0, tzinfo=UTC), datetime(2026, 3, 24, 11, 59, 59, 999999, tzinfo=UTC)),
+                (datetime(2026, 3, 24, 12, 0, tzinfo=UTC), datetime(2026, 3, 24, 23, 59, 59, 999999, tzinfo=UTC)),
+                (datetime(2026, 3, 25, 0, 0, tzinfo=UTC), datetime(2026, 3, 25, 11, 59, 59, 999999, tzinfo=UTC)),
+                (datetime(2026, 3, 25, 12, 0, tzinfo=UTC), datetime(2026, 3, 25, 23, 59, 59, 999999, tzinfo=UTC)),
+                (datetime(2026, 3, 26, 9, 0, tzinfo=UTC), datetime(2026, 3, 26, 9, 59, 59, 999999, tzinfo=UTC)),
+                (datetime(2026, 3, 26, 10, 0, tzinfo=UTC), datetime(2026, 3, 26, 10, 59, 59, 999999, tzinfo=UTC)),
+            ],
+            "Each hourly leave must keep its own interval",
+        )
+        for dummy_start, dummy_end, leaves in resource_intervals:
+            leaves.ensure_one()

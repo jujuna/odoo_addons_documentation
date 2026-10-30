@@ -12,7 +12,7 @@ class ReportSaleDetails(models.AbstractModel):
         def get_name_for(order):
             return order.account_move.name if order.to_invoice else order.name
 
-        data = super().get_sale_details(date_start, date_stop, config_ids, session_ids)
+        data = super().get_sale_details(date_start, date_stop, config_ids, session_ids, **kwargs)
 
         data['l10n_co_edi_pos_enable'] = self.env.company.l10n_co_edi_pos_dian_enabled
 

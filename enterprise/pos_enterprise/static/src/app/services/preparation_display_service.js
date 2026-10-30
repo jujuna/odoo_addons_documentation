@@ -129,22 +129,35 @@ export class PrepDisplay extends WithLazyGetterTrap {
     get prepDisplay() {
         return this.data.models["pos.prep.display"].get(this.id);
     }
+
+    getOrderKey(order) {
+        if (order._key) {
+            return order._key;
+        }
+        if (order.prepLines?.length) {
+            return this.getFilteredOrdersKey(order.prepLines[0]);
+        }
+        return order.prepOrder?.id + "-" + order.stage?.id;
+    }
+
     async changeStateStageAnimation(selectedTicket, prepLines) {
         if (prepLines.length === selectedTicket.prepLines.length) {
-            this.stageChangedOrderIds.push(selectedTicket.prepOrder.id);
+            const orderKey = this.getOrderKey(selectedTicket);
+            this.stageChangedOrderIds.push(orderKey);
             setTimeout(async () => {
-                this.lastStageChange = await this.changeStateStage(prepLines, 1);
-                this.clearChangeTimeout(selectedTicket.prepOrder.id);
+                try {
+                    this.lastStageChange = await this.changeStateStage(prepLines, 1);
+                } catch {
+                    this.clearChangeTimeout(orderKey);
+                }
             }, 250);
         } else {
             this.lastStageChange = await this.changeStateStage(prepLines, 1);
         }
     }
 
-    clearChangeTimeout(prepOrderId) {
-        this.stageChangedOrderIds = this.stageChangedOrderIds.filter(
-            (orderId) => orderId !== prepOrderId
-        );
+    clearChangeTimeout(orderKey) {
+        this.stageChangedOrderIds = this.stageChangedOrderIds.filter((key) => key !== orderKey);
     }
 
     async printPreparationTicket(selectedTicket) {
@@ -454,7 +467,9 @@ export class PrepDisplay extends WithLazyGetterTrap {
             ) {
                 const key = this.getFilteredOrdersKey(line);
                 if (!ordersToDisplay.has(key)) {
-                    ordersToDisplay.set(key, this.getOrderlineInfo(line));
+                    const orderInfo = this.getOrderlineInfo(line);
+                    orderInfo._key = key;
+                    ordersToDisplay.set(key, orderInfo);
                 }
                 ordersToDisplay.get(key).prepLines.push(line);
             }

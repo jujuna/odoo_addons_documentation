@@ -274,6 +274,22 @@ class TestTaskGanttView(TestProjectCommon):
             else:
                 self.assertDictEqual(milestone_result, project_pigs_milestone_2_expected)
 
+    @freeze_time('2020-01-12')
+    def test_get_all_deadlines_1(self):
+        """ Test if get_all_deadlines() correctly avoids milestones whose project is archived. """
+        (self.project_pigs + self.project_goats).allow_milestones = True
+        self.project_pigs.write({'date_start': '2020-01-05', 'date': '2020-02-10'})
+        self.project_goats.write({'date_start': '2019-01-01', 'date': '2020-01-15'})
+        self.env['project.milestone'].create([
+            {'name': 'Milestone 1 (project pigs)', 'project_id': self.project_pigs.id, 'deadline': '2020-01-10'},
+            {'name': 'Milestone 1 (project goats)', 'project_id': self.project_goats.id, 'deadline': '2020-01-15'},
+        ])
+        self.project_pigs.active = False
+        results = self.env['project.task'].get_all_deadlines("2020-01-01", "2020-01-31")
+        projects, milestones = results['project_id'], results['milestone_id']
+        self.assertEqual(len(projects), 1)
+        self.assertEqual(len(milestones), 1)
+
     def test_plan_tasks_no_assignee_allocated_hours(self):
         self.tasks.write({
             'planned_date_begin': '2024-03-07 00:00:00',

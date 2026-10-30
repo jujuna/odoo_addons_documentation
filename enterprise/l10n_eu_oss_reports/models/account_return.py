@@ -111,6 +111,7 @@ class AccountReturn(models.Model):
             business_partners_count = len(business_partner_ids)
             review_action = {
                 'type': 'ir.actions.act_window',
+                'name': self.env._("Business customers"),
                 'view_mode': 'list',
                 'res_model': 'res.partner',
                 'domain': [('id', 'in', business_partner_ids)],

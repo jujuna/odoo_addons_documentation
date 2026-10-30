@@ -11,6 +11,7 @@
                 <field name="is_multi_ledger_company" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="account_asset_id" invisible="1" readonly="state == 'close'"/>
+                <field name="can_edit_asset_accounts" invisible="1"/>
                 <field name="state" invisible="1"/>
                 <field name="total_depreciation_entries_count" invisible="1"/>
                 <field name="parent_id" invisible="1"/>
@@ -91,12 +92,12 @@
                                         </span>
                                     </span>
                                     <field name="gross_increase_value" widget="monetary" invisible="gross_increase_value == 0" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="acquisition_date" readonly="state != 'draft' or not is_main_variant"/>
+                                    <field name="acquisition_date" readonly="state != 'draft' or not is_main_variant" required="1"/>
                                     <field
                                         name="account_asset_id"
                                         domain="[
                                             ('company_ids', 'parent_of', company_id),
-                                            ('depreciation_model_id', '!=', None),
+                                            ('account_type', '=', 'asset_fixed'),
                                         ]"
                                         context="{
                                             'default_account_type': 'asset_fixed',
@@ -128,12 +129,35 @@
                                         string="Depreciation Model"
                                         options="{'no_quick_create': True}"
                                         readonly="state != 'draft' or not is_main_variant"
-                                        required="1"/>
+                                        placeholder="No depreciation"
+                                        />
                                     <field name="prorata_computation_type" readonly="state != 'draft'" invisible="method == 'no_depreciation'"/>
+                                    <field name="prorata_date" readonly="state != 'draft'" invisible="method == 'no_depreciation' or prorata_computation_type == 'none'"/>
                                 </group>
                                 <group string="Accounting">
                                     <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company" readonly="state != 'draft'"/>
-                                    <field name="journal_id" invisible="method == 'no_depreciation'"/>
+                                    <field
+                                        name="import_account_depreciation_id"
+                                        string="Depreciation Account"
+                                        domain="[
+                                            ('company_ids', 'parent_of', company_id),
+                                            ('account_type', 'in', ('asset_fixed', 'asset_non_current')),
+                                            ('depreciation_model_id', '=', False),
+                                        ]"
+                                        invisible="not method or method == 'no_depreciation'"
+                                        readonly="not can_edit_asset_accounts"
+                                        required="can_edit_asset_accounts and model_id"/>
+                                    <field
+                                        name="import_account_depreciation_expense_id"
+                                        string="Expense Account"
+                                        domain="[
+                                            ('company_ids', 'parent_of', company_id),
+                                            ('account_type', 'in', ('expense_depreciation', 'expense')),
+                                        ]"
+                                        invisible="not method or method == 'no_depreciation'"
+                                        readonly="not can_edit_asset_accounts"
+                                        required="can_edit_asset_accounts and model_id"/>
+                                    <field name="journal_id"/>
                                     <field name="analytic_distribution" string="Analytic" groups="analytic.group_analytic_accounting" widget="analytic_distribution"
                                            options="{'account_field': 'account_depreciation_expense_id', 'business_domain': 'general'}"
                                            readonly="0"/>
@@ -249,7 +273,7 @@
                 <field name="original_value" readonly="state != 'draft'"/>
                 <field name="book_value" readonly="1"/>
                 <field name="value_residual" widget="monetary" readonly="1" optional="hide"/>
-                <field name="account_asset_id" width="120px" readonly="state not in ['draft', 'open']"/>
+                <field name="account_asset_id" width="120px" readonly="state not in ['draft', 'open']" optional="show"/>
                 <field name="analytic_distribution" widget="analytic_distribution" groups="analytic.group_analytic_accounting" options="{'multi_edit': true}" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="state != 'draft'"/>
                 <field name="company_id" groups="!base.group_multi_company" column_invisible="True" readonly="state != 'draft'"/>

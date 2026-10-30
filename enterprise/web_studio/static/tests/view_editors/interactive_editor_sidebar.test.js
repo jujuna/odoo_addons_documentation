@@ -1,6 +1,6 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
-import { edit, press, queryAllTexts } from "@odoo/hoot-dom";
+import { edit, press, queryAllProperties, queryAllTexts } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { onMounted } from "@odoo/owl";
 import {
@@ -545,4 +545,17 @@ test("autofocus field label in the sidebar", async () => {
     expect(".o_web_studio_sidebar input[name='class']").toBeFocused();
     await contains(".o_field_widget[name='date']").click();
     expect(".o_web_studio_sidebar input[name='string']").toBeFocused();
+});
+
+test("sidebar tab buttons fill their nav item", async () => {
+    await mountViewEditor({
+        type: "form",
+        resModel: "partner",
+        arch: `<form><field name="display_name"/></form>`,
+    });
+
+    const headers = ".o_web_studio_sidebar .o_notebook_headers";
+    const itemWidths = queryAllProperties(`${headers} .nav-item`, "offsetWidth");
+    expect(itemWidths).toHaveLength(3);
+    expect(queryAllProperties(`${headers} .nav-link`, "offsetWidth")).toEqual(itemWidths);
 });

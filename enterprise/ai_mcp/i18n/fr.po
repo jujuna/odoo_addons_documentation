@@ -7,11 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 05:07+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
-"ai_mcp/fr/>\n"
+"POT-Creation-Date: 2026-10-02 17:48+0000\n"
+"PO-Revision-Date: 2026-10-05 07:33+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/ai_mcp/"
+"fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,19 +87,28 @@ msgid ""
 "    2. NEVER add your token in a text field on your MCP client. ALWAYS use "
 "fields of type Credential or Password as they are encrypted.\n"
 msgstr ""
+"\n"
+"- Pour vous connecter à votre serveur MCP Odoo :\n"
+"    1. Définissez l’URL du serveur MCP comme l’URL d’Odoo avec le suffixe /"
+"mcp. Par exemple, si l’URL d’Odoo est 'https://example.odoo.com', l’URL du "
+"serveur MCP serait 'https://example.odoo.com/mcp'.\n"
+"    2. Générez une clé API afin de l’utiliser comme jeton d’authentification "
+"avec votre client MCP favori :\n"
+"        a. Connectez-vous à Odoo.\n"
+"        b. Cliquez sur l’avatar de l’utilisateur.\n"
+"        c. Accédez à l’onglet Sécurité.\n"
+"        d. Générez une clé API. Définissez le périmètre sur MCP.\n"
+"- Important :\n"
+"    1. Ne partagez JAMAIS votre jeton. Toute personne ayant accès à votre "
+"jeton peut utiliser le serveur MCP comme si elle était vous.\n"
+"    2. N’ajoutez JAMAIS votre jeton dans un champ texte de votre client MCP. "
+"Utilisez TOUJOURS des champs de type Identifiant ou Mot de passe, car ils "
+"sont chiffrés.\n"
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "/mcp"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "<Pick a name>"
-msgstr ""
+msgstr "/mcp"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.view_users_form_mcp
@@ -109,16 +118,19 @@ msgid ""
 "                    Connect via RPC or MCP\n"
 "                </span>"
 msgstr ""
+"<span class=\"text-muted\">\n"
+"                    Connecter via RPC ou MCP\n"
+"                </span>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "<span class=\"visually-hidden\">Authorizing...</span>"
-msgstr ""
+msgstr "<span class=\"visually-hidden\">Autorisation en cours...</span>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "<strong>Header: </strong>"
-msgstr ""
+msgstr "<strong>En-tête : </strong>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
@@ -126,11 +138,13 @@ msgid ""
 "<strong>Server Name: </strong>\n"
 "                                <span>&lt;Pick a name&gt;</span>"
 msgstr ""
+"<strong>Nom du serveur : </strong>\n"
+"                                <span>&lt;Choisissez un nom&gt;</span>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "<strong>Server URL: </strong>"
-msgstr ""
+msgstr "<strong>URL du serveur : </strong>"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
@@ -138,16 +152,18 @@ msgid ""
 "<strong>To connect via MCP, add these details to your AI Assistant's "
 "settings:</strong>"
 msgstr ""
+"<strong>Pour vous connecter via MCP, ajoutez ces informations aux paramètres "
+"de votre assistant IA :</strong>"
 
 #. module: ai_mcp
 #: model_terms:ir.actions.act_window,help:ai_mcp.oauth_client_action
 msgid "A client registered here can generate access tokens through OAuth."
-msgstr ""
+msgstr "Un client enregistré ici peut générer des jetons d’accès via OAuth."
 
 #. module: ai_mcp
 #: model:ir.module.module,shortdesc:base.module_ai_mcp
 msgid "AI MCP Server"
-msgstr ""
+msgstr "Serveur MCP IA"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ai_tool
@@ -167,43 +183,43 @@ msgstr "Description de la clé API"
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__active
 msgid "Active"
-msgstr ""
+msgstr "Actif"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "Allow"
-msgstr ""
+msgstr "Autoriser"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "Allow Dynamic Client Registration (DCR)"
-msgstr ""
+msgstr "Autoriser l’enregistrement dynamique des clients (DCR)"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_res_config_settings__mcp_enable_dcr
 msgid "Allow MCP clients to register automatically."
-msgstr ""
+msgstr "Autoriser les clients MCP à s’enregistrer automatiquement."
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_res_config_settings__mcp_allowed_cimd_urls
 msgid "Allowed Client ID Metadata Document (CIMD)"
-msgstr ""
+msgstr "Document de métadonnées d’ID client autorisé (CIMD)"
 
 #. module: ai_mcp
 #: model:ir.model.constraint,message:ai_mcp.constraint_oauth_client_client_id_unique
 msgid "Another client is already registered with this client ID."
-msgstr ""
+msgstr "Un autre client est déjà enregistré avec cet ID client."
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__apikey_expiration_date
 msgid "Apikey Expiration Date"
-msgstr ""
+msgstr "Date d’expiration de la clé API"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_search
 msgid "Archived"
-msgstr ""
+msgstr "Archivé"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_oauth_client__active
@@ -211,24 +227,25 @@ msgid ""
 "Archiving a client makes the authorization server block any new "
 "authorization or token request made with its client_id."
 msgstr ""
+"L’archivage d’un client fait en sorte que le serveur d’autorisation bloque "
+"toute nouvelle demande d’autorisation ou de jeton effectuée avec son "
+"client_id."
 
 #. module: ai_mcp
 #: model:ir.model.constraint,message:ai_mcp.constraint_oauth_client_redirect_uris_not_empty
 msgid "At least one redirect URI is required."
-msgstr ""
+msgstr "Au moins un URI de redirection est requis."
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "At least one redirect_uri is required."
-msgstr ""
+msgstr "Au moins un redirect_uri est requis."
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "Authorization: Bearer"
-msgstr ""
+msgstr "Autorisation : Bearer"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ir_actions_server__use_in_mcp
@@ -243,53 +260,55 @@ msgid ""
 "CIMD URL %(url)s isn't allowed. If you want this client to be able to "
 "connect, allow its URL in the settings."
 msgstr ""
+"L’URL CIMD %(url)s n’est pas autorisée. Si vous souhaitez que ce client "
+"puisse se connecter, autorisez son URL dans les paramètres."
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__client_id
 msgid "Client"
-msgstr ""
+msgstr "Client"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__client_id
 msgid "Client ID"
-msgstr ""
+msgstr "ID client"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__client_name
 msgid "Client Name"
-msgstr ""
+msgstr "Nom du client"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__code_challenge
 msgid "Code Challenge"
-msgstr ""
+msgstr "Défi de code"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Paramètres de configuration"
 
 #. module: ai_mcp
 #: model:ir.module.module,summary:base.module_ai_mcp
 msgid "Connect Odoo to any external server via the MCP"
-msgstr ""
+msgstr "Connecter Odoo à n’importe quel serveur externe via le MCP"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__create_uid
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Créé par"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__create_date
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Créé le"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "Deny"
-msgstr ""
+msgstr "Refuser"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ai_mcp_request_dispatcher__display_name
@@ -317,12 +336,12 @@ msgstr ""
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_res_config_settings__mcp_enable_dcr
 msgid "Dynamic Client Registration"
-msgstr ""
+msgstr "Enregistrement dynamique des clients"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__expiration_date
 msgid "Expiration Date"
-msgstr ""
+msgstr "Date d’expiration"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_oauth_authorization_code__apikey_expiration_date
@@ -330,22 +349,18 @@ msgid ""
 "Expiration date the user consented to for the API key this code will be "
 "redeemed for. Empty for an API key that never expires."
 msgstr ""
+"Date d’expiration à laquelle l’utilisateur a consenti pour la clé API contre "
+"laquelle ce code sera échangé. Vide pour une clé API qui n’expire jamais."
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "Grant Access"
-msgstr ""
+msgstr "Accorder l’accès"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Header:"
-msgstr ""
+msgstr "Routage HTTP"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ai_mcp_request_dispatcher__id
@@ -363,25 +378,25 @@ msgstr "ID"
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "Invalid CIMD URL %s"
-msgstr ""
+msgstr "URL CIMD non valide %s"
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "Invalid CIMD URL %s."
-msgstr ""
+msgstr "URL CIMD non valide %s."
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/models/oauth_authorization_code.py:0
 msgid "Invalid PKCE code_verifier"
-msgstr ""
+msgstr "code_verifier PKCE non valide"
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/models/oauth_authorization_code.py:0
 msgid "Invalid authorization code"
-msgstr ""
+msgstr "Code d’autorisation non valide"
 
 #. module: ai_mcp
 #. odoo-python
@@ -389,6 +404,8 @@ msgstr ""
 msgid ""
 "Invalid redirect_uri %(uri)s: a redirect_uri must not include a fragment."
 msgstr ""
+"redirect_uri %(uri)s non valide : un redirect_uri ne doit pas inclure de "
+"fragment."
 
 #. module: ai_mcp
 #. odoo-python
@@ -397,28 +414,31 @@ msgid ""
 "Invalid redirect_uri %(uri)s: only https:// URIs are allowed (or http:// for "
 "a loopback address)."
 msgstr ""
+"redirect_uri %(uri)s non valide : seuls les URI https:// sont autorisés (ou "
+"http:// pour une adresse loopback)."
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__write_uid
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Mise à jour par"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__write_date
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Mise à jour le"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "Lets any MCP client register itself and request tokens."
 msgstr ""
+"Permet à tout client MCP de s’enregistrer lui-même et de demander des jetons."
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_layout
 msgid "Logo"
-msgstr ""
+msgstr "Logo"
 
 #. module: ai_mcp
 #: model:ir.model.fields.selection,name:ai_mcp.selection__res_users_apikeys_description__scope__mcp
@@ -428,7 +448,7 @@ msgstr "MCP"
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "MCP OAuth"
-msgstr ""
+msgstr "OAuth MCP"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ai_mcp_request_dispatcher
@@ -438,35 +458,38 @@ msgstr "Répartiteur de requêtes MCP"
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_oauth_authorization_code
 msgid "OAuth 2.1 Authorization Code"
-msgstr ""
+msgstr "Code d’autorisation OAuth 2.1"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_oauth_client
 msgid "OAuth Client Application"
-msgstr ""
+msgstr "Application cliente OAuth"
 
 #. module: ai_mcp
 #: model:ir.actions.act_window,name:ai_mcp.oauth_client_action
 #: model:ir.ui.menu,name:ai_mcp.oauth_client_menu
 msgid "OAuth Clients"
-msgstr ""
+msgstr "Clients OAuth"
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_res_config_settings__mcp_allowed_cimd_urls
 msgid "One client ID metadata document URL per line."
-msgstr ""
+msgstr "Une URL de document de métadonnées d’ID client par ligne."
 
 #. module: ai_mcp
 #: model:ir.model.fields,help:ai_mcp.field_oauth_client__redirect_uris
 msgid ""
 "One redirect URI per line. Must be HTTPS, except for http:// loopback URIs."
 msgstr ""
+"Un URI de redirection par ligne. Doit être en HTTPS, sauf pour les URI "
+"http:// loopback."
 
 #. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/utils/oauth_utils.py:0
 msgid "Only internal users are allowed to use oauth for mcp"
 msgstr ""
+"Seuls les utilisateurs internes sont autorisés à utiliser OAuth pour mcp"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
@@ -474,11 +497,13 @@ msgid ""
 "Only the AI clients whose metadata URL (CIMD) is listed below can get OAuth "
 "tokens for your MCP server."
 msgstr ""
+"Seuls les clients IA dont l’URL de métadonnées (CIMD) est listée ci-dessous "
+"peuvent obtenir des jetons OAuth pour votre serveur MCP."
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_layout
 msgid "Powered by <span>Odoo</span>"
-msgstr ""
+msgstr "Généré par <span>Odoo</span>"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_ir_actions_server__is_readonly
@@ -489,22 +514,22 @@ msgstr "Outil d'accès en lecture"
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 msgid "Redirect URIs"
-msgstr ""
+msgstr "URIs de redirection"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__redirect_uri
 msgid "Redirect Uri"
-msgstr ""
+msgstr "URI de redirection"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__redirect_uris
 msgid "Redirect Uris"
-msgstr ""
+msgstr "URIs de redirection"
 
 #. module: ai_mcp
 #: model_terms:ir.actions.act_window,help:ai_mcp.oauth_client_action
 msgid "Register a client"
-msgstr ""
+msgstr "Enregistrer un client"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_res_users_apikeys_description__scope
@@ -515,18 +540,6 @@ msgstr "Scope"
 #: model:ir.model,name:ai_mcp.model_ir_actions_server
 msgid "Server Action"
 msgstr "Action serveur"
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Server Name:"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Server URL:"
-msgstr ""
 
 #. module: ai_mcp
 #. odoo-python
@@ -540,6 +553,8 @@ msgstr "L'action '%s' ne peut pas être utilisée comme outil MCP."
 msgid ""
 "The client ID is generated once at registration and can never be changed."
 msgstr ""
+"L’ID client est généré une seule fois lors de l’enregistrement et ne peut "
+"jamais être modifié."
 
 #. module: ai_mcp
 #. odoo-python
@@ -548,17 +563,13 @@ msgid ""
 "The client_id of the metadata document does not match the URL %(url)s it was "
 "fetched from."
 msgstr ""
+"Le client_id du document de métadonnées ne correspond pas à l’URL %(url)s "
+"depuis laquelle il a été récupéré."
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 msgid "The redirect URIs one per line"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "To connect via MCP, add these details to your AI Assistant's settings:"
-msgstr ""
+msgstr "Les URIs de redirection, un par ligne"
 
 #. module: ai_mcp
 #. odoo-python
@@ -566,31 +577,33 @@ msgstr ""
 msgid ""
 "Unsupported token_endpoint_auth_method, The only supported option is 'none'"
 msgstr ""
+"token_endpoint_auth_method non pris en charge, la seule option prise en "
+"charge est 'none'"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__user_id
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "You will be redirected to"
-msgstr ""
+msgstr "Vous serez redirigé vers"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
 msgid "access expires after:"
-msgstr ""
+msgstr "l’accès expire après :"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 msgid "e.g. Claude Desktop"
-msgstr ""
+msgstr "par ex. Claude Desktop"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
 msgid "e.g. https://claude.ai/oauth/mcp-oauth-client-metadata"
-msgstr ""
+msgstr "par ex. https://claude.ai/oauth/mcp-oauth-client-metadata"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
@@ -599,3 +612,6 @@ msgid ""
 "                account for\n"
 "                <strong>MCP (Model Context Protocol)</strong>."
 msgstr ""
+"demande l’accès à votre compte Odoo\n"
+"                  pour\n"
+"                  <strong>MCP (Model Context Protocol)</strong>."

@@ -1,5 +1,3 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from datetime import date
 from freezegun import freeze_time
 
@@ -41,9 +39,9 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'EOSPROV': 3393.333,
             'ANNUALP': 1583.556,
             'GROSS': 40720.0,
-            'GROSSY': 476640.0,
-            'TXB': -9721.666,
-            'NET': 30747.159
+            'GROSSY': 479640.0,
+            'TXB': -9784.166,
+            'NET': 30684.659
         }
         self._validate_payslip(payslip, payslip_results)
 
@@ -64,9 +62,9 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'EOSPROV': 3393.333,
             'ANNUALP': 1583.556,
             'GROSS': 40720.0,
-            'GROSSY': 476640.0,
-            'TXB': -9721.666,
-            'NET': 28032.492
+            'GROSSY': 479640.0,
+            'TXB': -9784.166,
+            'NET': 27969.992
         }
         self._validate_payslip(payslip, payslip_results)
 
@@ -109,12 +107,12 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'EOSPROV': 3393.333,
             'ANNUALP': 1583.556,
             'GROSS': 40720.0,
-            'GROSSY': 476640.0,
-            'TXB': -9721.666,
+            'GROSSY': 479640.0,
+            'TXB': -9784.166,
             'EOSB': 376613.516,
             'EOSLEAVES': 4750.667,
             'EOSTXD': -90403.372,
-            'NET': 321707.97,
+            'NET': 321645.47,
         }
         self._validate_payslip(payslip, payslip_results)
 
@@ -159,8 +157,8 @@ class TestPayslipValidation(TestPayslipValidationCommon):
             'EOSPROV': 3393.333,
             'ANNUALP': 1583.556,
             'GROSS': 41174.546,
-            'GROSSY': 482094.552,
-            'TXB': -9835.303,
-            'NET': 31088.068,
+            'GROSSY': 485094.552,
+            'TXB': -9897.803,
+            'NET': 31025.568,
         }
         self._validate_payslip(payslip, payslip_results)

@@ -24,13 +24,19 @@ export default class BarcodeModel extends EventBus {
         this.validateContext = {};
         // Keeps the history of all barcodes scanned (start with the most recent.)
         this.scanHistory = [];
-        // Keeps track of list scanned record(s) by type.
+        this.trackedQuantityBuffer = false;
+        // Keeps track of last scanned record(s) by type.
         this.lastScanned = { packageId: false, product: false, sourceLocation: false };
         this._currentLocation = false; // Reminds the current source when the scanned one is forgotten.
         this.needSourceConfirmation = false;
         this.useTrackingNumber = true;
         this.uriCache = new Set(); // Avoid to scan multiple times the same URI.
         this.notificationCache = new Set(); // Avoid to display same notification
+    }
+
+    dropBufferedQuantity() {
+        this.trackedQuantityBuffer = false;
+        this.trigger("update");
     }
 
     setData(data, preSelectedLineId = false) {
@@ -504,6 +510,14 @@ export default class BarcodeModel extends EventBus {
      * @param {Boolean} [avoidDuplicate=true] if true, a notification won't be displayed if already displayed
      */
     notification(message, options = {}, avoidDuplicate = true) {
+        const paramOnClose = options.onClose;
+        options.onClose = () => {
+            if (paramOnClose) {
+                paramOnClose();
+            }
+            // Remove the message from anti-duplicate cache when the notification's popup is closed.
+            this.notificationCache.delete(message);
+        };
         if (this.notificationCache.has(message)) {
             return; // Don't display the notification if it's already displayed.
         }
@@ -792,6 +806,24 @@ export default class BarcodeModel extends EventBus {
     async _getMissingRecords() {
         const params = this._getMissingRecordsParams();
         await this.cache.getMissingRecords(params);
+    }
+
+    /**
+     * Returns filters, either specific by model or for all models, which can help to
+     * get the right record when multiple records have the same model and barcode pair.
+     * @returns {Object}
+     */
+    getFetchFilters() {
+        // Constrain DB reads to records which belong to the company defined on the open operation.
+        const filters = {
+            all: { company_id: [false].concat(this._getCompanyId() || []) },
+        };
+        if (this.trackedQuantityBuffer?.product) {
+            filters["stock.lot"] = { product_id: this.trackedQuantityBuffer.product.id };
+        } else if (["lot", "serial"].includes(this.selectedLine?.product_id?.tracking)) {
+            filters["stock.lot"] = { product_id: this.selectedLine.product_id.id };
+        }
+        return filters;
     }
 
     async getGs1Filters(gs1RulesData) {
@@ -1311,21 +1343,7 @@ export default class BarcodeModel extends EventBus {
     async _processBarcode(barcode) {
         let barcodeData = {};
         let currentLine = false;
-        // Creates a filter if needed, which can help to get the right record
-        // when multiple records have the same model and barcode.
-        const filters = {};
-        if (
-            this.selectedLine &&
-            ["lot", "serial"].includes(this.selectedLine.product_id.tracking)
-        ) {
-            filters["stock.lot"] = {
-                product_id: this.selectedLine.product_id.id,
-            };
-        }
-        // Constrain DB reads to records which belong to the company defined on the open operation
-        filters["all"] = {
-            company_id: [false].concat(this._getCompanyId() || []),
-        };
+        const filters = this.getFetchFilters();
         try {
             barcodeData = await this._parseBarcode(barcode, filters);
             if (this._shouldSearchForAnotherLot(barcodeData, filters)) {
@@ -1454,7 +1472,22 @@ export default class BarcodeModel extends EventBus {
                 barcodeData.product = currentLine.product_id;
             }
         }
-        const { product } = barcodeData;
+        let { product } = barcodeData;
+        if (
+            !product &&
+            this.trackedQuantityBuffer &&
+            this.trackedQuantityBuffer.product &&
+            (barcodeData.lot || (!barcodeData.match && this.canCreateNewLot))
+        ) {
+            // If no product was found for the current scan but there are some
+            // buffered quantities, we use those quantities' product.
+            product = this.trackedQuantityBuffer.product;
+            Object.assign(barcodeData, this.trackedQuantityBuffer);
+            this.trackedQuantityBuffer = false;
+            if (!barcodeData.match) {
+                barcodeData.lotName = barcodeData.barcode;
+            }
+        }
         if (!product) {
             // Product is mandatory, if no product, raises a warning.
             return this.noProductToast(barcodeData);
@@ -1468,7 +1501,36 @@ export default class BarcodeModel extends EventBus {
 
         // Searches and selects a line if needed.
         if (!currentLine || this._shouldSearchForAnotherLine(currentLine, barcodeData)) {
-            currentLine = this._findLine(barcodeData);
+            const findParameters = { ...barcodeData };
+            if (this.trackedQuantityBuffer?.uom) {
+                findParameters.uom = this.trackedQuantityBuffer.uom;
+            }
+            currentLine = this._findLine(findParameters);
+        }
+
+        if (this.trackedQuantityBuffer && product.id != this.trackedQuantityBuffer.product.id) {
+            const message = _t(
+                "You still have unassigned quantities for product %(product)s. Scan a lot to assign them before scanning another product.",
+                { product: this.trackedQuantityBuffer.product.display_name }
+            );
+            return this.notification(message, { type: "danger" });
+        }
+        if (
+            product.tracking === "lot" &&
+            barcodeData.quantity &&
+            !(barcodeData.lot || barcodeData.lotName)
+        ) {
+            const uom = barcodeData.uom || (await this.cache.getRecord("uom.uom", product.uom_id));
+            if (this.addQuantityInBuffer(product, uom, barcodeData.quantity)) {
+                // Keep only product and UoM data to avoid any operation other than select the line.
+                barcodeData = { product: barcodeData.product, uom };
+            } else {
+                return;
+            }
+        }
+        if (this.trackedQuantityBuffer && (barcodeData.lotName || barcodeData.lot)) {
+            Object.assign(barcodeData, this.trackedQuantityBuffer);
+            this.trackedQuantityBuffer = false;
         }
 
         // Default quantity set to 1 by default if the product is untracked or
@@ -1716,6 +1778,34 @@ export default class BarcodeModel extends EventBus {
         return false;
     }
 
+    /**
+     * @param {Object} product
+     * @param {Object} uom
+     * @param {Number} quantity
+     * @returns {Boolean} true if the quantity was added, false otherwise.
+     */
+    addQuantityInBuffer(product, uom, quantity) {
+        if (!this.trackedQuantityBuffer) {
+            this.trackedQuantityBuffer = {
+                product,
+                quantity,
+                uom,
+            };
+        } else {
+            if (uom.factor !== this.trackedQuantityBuffer.uom.factor) {
+                // Avoid to mix different factor UoM to avoid strange quantity sum.
+                const errorMessage = _t(
+                    "You already scanned %(packaging_name)s, please scan a lot before scanning another type of packaging.",
+                    { packaging_name: this.trackedQuantityBuffer.uom.name }
+                );
+                this.notification(errorMessage, { type: "danger" });
+                return false;
+            }
+            this.trackedQuantityBuffer.quantity += quantity;
+        }
+        return true;
+    }
+
     noProductToast(barcodeData) {
         if (!barcodeData.error) {
             if (this.groups.group_tracking_lot) {
@@ -1914,9 +2004,15 @@ export default class BarcodeModel extends EventBus {
         let foundLine = false;
         const { lot, lotName, product } = barcodeData;
         const quantPackage = barcodeData.quantPackage || barcodeData.package;
-        const uomId = barcodeData.uom ? barcodeData.uom.id : barcodeData.product?.uom_id;
+        const uomId = barcodeData.uom ? barcodeData.uom.id : product?.uom_id;
         const dataLotName = lotName || (lot && lot.name) || false;
         const pageLines = [...this.pageLines];
+        const scannedLotNameIsNotUsed = dataLotName
+            ? !pageLines.some(
+                  (line) =>
+                      line.product_id.id === product.id && this.getlotName(line) === dataLotName
+              )
+            : true;
         // If a line is selected, unshift it to the first position to start the search by it
         if (this.selectedLineVirtualId) {
             const selectedLineIndex = pageLines.findIndex(
@@ -1982,7 +2078,8 @@ export default class BarcodeModel extends EventBus {
                         this.lineIsInTheCurrentLocation(line) &&
                         (!line.product_id.tracking ||
                             !dataLotName ||
-                            dataLotName === lineLotName) &&
+                            dataLotName === lineLotName ||
+                            (!lineLotName && scannedLotNameIsNotUsed)) &&
                         ((line.uom_id.id === uomId && !line.packaging_uom_id) ||
                             line.packaging_uom_id.id === uomId)
                     ) {

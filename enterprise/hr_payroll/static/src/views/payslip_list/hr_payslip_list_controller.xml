@@ -11,7 +11,7 @@
 
     <t t-name="hr_payroll.PayslipListView.Buttons" t-inherit="web.ListView.Buttons" t-inherit-mode="primary">
         <xpath expr="//button[hasclass('o_list_button_add')]" position="attributes">
-            <attribute name="t-if">!this.payRunReactive.payRunId &amp;&amp; !this.env.inDialog</attribute>
+            <attribute name="t-if">!this.payslipListPlugin.payRunId() &amp;&amp; !this.env.inDialog</attribute>
         </xpath>
         <xpath expr="//button[hasclass('o_list_button_add')]" position="inside">
             Off-Cycle
@@ -20,7 +20,7 @@
         <xpath expr="." position="inside">
           <t t-if="!this.env.inDialog">
 
-            <t t-if="this.payRunReactive.payRunId"> <!-- we have a payrun id, viewing payslips from a payrun -->
+            <t t-if="this.payslipListPlugin.payRunId()"> <!-- we have a payrun id, viewing payslips from a payrun -->
               <PayrunNewDropdown
                   onCreatePayslip="() => this.createNewPayslip()"
                   onCreatePayRun="() => this.createNewPayRun()"

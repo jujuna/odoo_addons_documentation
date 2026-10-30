@@ -8,13 +8,13 @@ Object.assign(ActivityListPopoverItem.components, { Approval });
 
 patch(ActivityListPopoverItem.prototype, {
     get hasEditButton() {
-        if (this.activity().approval) {
+        if (this.activity().approver_id) {
             return false;
         }
         return super.hasEditButton;
     },
     get hasMarkDoneButton() {
-        if (this.activity().approval) {
+        if (this.activity().approver_id) {
             return false;
         }
         return super.hasMarkDoneButton;

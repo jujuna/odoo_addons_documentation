@@ -33,6 +33,7 @@ class L10nBeDimonaManualWizard(models.TransientModel):
             }.get(dimona_type, self.env._("Dimona")),
             'res_model': self._name,
             'view_mode': 'form',
+            'views': [(False, 'form')],
             'target': 'new',
             'context': {
                 'default_version_id': version.id,

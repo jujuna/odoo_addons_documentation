@@ -68,7 +68,7 @@ class TestPayrollCreditTime(TestPayrollCommon):
 
         # Apply allocation changes directly - Credit time exit
         full_time_contract = self.employee_georges.version_ids[-1]
-        self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(full_time_contract.contract_date_start)
+        self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(full_time_contract.date_version)
         self.assertEqual(georges_allocation.number_of_days, 13.5)
         self.assertAlmostEqual(georges_allocation.number_of_hours, initial_hours, 2)
 
@@ -120,7 +120,7 @@ class TestPayrollCreditTime(TestPayrollCommon):
 
         # Apply allocation changes directly - Credit time exit
         continuation_contract = self.employee_john.version_ids[-1]
-        self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(continuation_contract.contract_date_start)
+        self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(continuation_contract.date_version)
         self.assertEqual(john_allocation.number_of_days, 9.5)
 
     def test_credit_time_for_a(self):
@@ -151,7 +151,7 @@ class TestPayrollCreditTime(TestPayrollCommon):
 
         # Apply allocation changes directly
         full_time_contract = self.employee_a.version_ids[-1]
-        self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(full_time_contract.contract_date_start)
+        self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(full_time_contract.date_version)
         self.assertEqual(a_allocation.number_of_days, 20)
 
     def test_remaining_leaves_with_credit_time(self):
@@ -241,5 +241,5 @@ class TestPayrollCreditTime(TestPayrollCommon):
 
             full_time_contract = self.employee_a.version_ids[-1]
             self.assertEqual(a_allocation.number_of_days, 15)
-            self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(full_time_contract.contract_date_start)
+            self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(full_time_contract.date_version)
             self.assertEqual(a_allocation.number_of_days, 14.0)

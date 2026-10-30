@@ -17,7 +17,7 @@ class AccountJournal(models.Model):
 
     def _get_SvcLvlText(self, payment_method_code):
         if payment_method_code == 'iso20022_us':
-            return 'NURG'
+            return 'URGP' if self.env.context.get('iso20022_priority') in ('HIGH', 'URGP') else 'NURG'
         return super()._get_SvcLvlText(payment_method_code)
 
     def _get_PmtTpInf(self, payment_method_code, priority):

@@ -81,7 +81,7 @@ class AccountMissingTransactionWizard(models.TransientModel):
         bank_statement_lines = self._get_manual_bank_statement_lines()
 
         return {
-            'name': _("Manual Bank Statement Lines"),
+            'name': self.env._("Manual Bank Transactions"),
             'type': 'ir.actions.act_window',
             'res_model': 'account.bank.statement.line',
             'views': [(False, 'list'), (False, 'form')],

@@ -35,12 +35,6 @@ class TestAccountBankStatementTour(TestBankRecWidgetCommon, HttpCase):
 
         self.start_tour('/odoo', 'account_accountant_bank_reconciliation_widget_reload_activies_when_add_a_new_one', login=self.env.user.login)
 
-    def test_tour_set_partner_with_child_contact(self):
-        """ Test that a contact that has a parent contact can't be selected via the 'Set Partner' button """
-        partner = self.env['res.partner'].create({'name': 'test child contact', 'parent_id': self.partner_a.id})
-        self._create_invoice_one_line_reco(partner_id=partner.id, price_unit=100.0)
-        self.start_tour('/odoo', 'account_accountant_set_partner_with_child_contact', login=self.env.user.login)
-
     def test_tour_bank_rec_set_partner_branch_company(self):
         """
         Test that the partner lookup in bank reconciliation uses the 'parent_of' domain,

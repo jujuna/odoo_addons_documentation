@@ -2,11 +2,21 @@
 <templates xml:space="preserve">
     <t t-name="hr_holidays_gantt.AvatarCard" t-inherit="mail.AvatarCard" t-inherit-mode="primary">
         <xpath expr="//div[hasclass('card-body')]" position="after">
-            <div class="o_avatar_card_leave_summary o_avatar_card_details card-footer d-flex flex-column rounded-bottom bg-100">
-            <button type="button" class="btn btn-link d-flex align-items-center fw-bold fs-5 p-0" t-on-click="this.onTimeOffClick">
-                <i class="oi oi-filled me-2" data-icon="calendar_today"/>
-                <t t-out="this.workingScheduleLabel || 'Time Off'"/> 
-            </button>
+            <div class="o_avatar_card_leave_summary px-3 pb-2 d-flex flex-column rounded-bottom bg-100">
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                    <button type="button" class="btn btn-link d-flex align-items-center fw-bold fs-5 p-0" t-on-click="this.onTimeOffClick">
+                        <i class="oi oi-filled me-2" data-icon="calendar_today"/>
+                        <t t-out="this.workingScheduleLabel"/> 
+                    </button>
+                    <button
+                        t-if="this.canCreateEmployeeRecord"
+                        t-ref="this.datetimePickerTargetRef"
+                        title="New Employee Record"
+                        t-on-click="this.onClickDateTimePickerBtn"
+                        class="btn p-0 px-1">
+                        <i class="oi" data-icon="edit"/>
+                    </button>
+                </div>
                 <t t-foreach="this.leaveSummary" t-as="leave" t-key="leave_index">
                     <div class="d-flex align-items-baseline small">
                         <span class="me-1">
@@ -27,6 +37,12 @@
                     </div>
                 </t>
             </div>
+        </xpath>
+    </t>
+
+    <t t-name="hr.HrHolidaysGanttEmployeeAvatar" t-inherit="hr.GanttEmployeeAvatar">
+        <xpath expr="//div[hasclass('o-mail-Avatar')]/img" position="attributes">
+            <attribute name="t-ref">this.imageRef</attribute>
         </xpath>
     </t>
 </templates>

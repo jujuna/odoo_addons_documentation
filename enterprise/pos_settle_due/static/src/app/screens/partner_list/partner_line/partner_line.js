@@ -1,8 +1,9 @@
 import { PartnerLine } from "@point_of_sale/app/screens/partner_list/partner_line/partner_line";
 import { patch } from "@web/core/utils/patch";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
-import { CustomSelectCreateDialog } from "@pos_settle_due/app/views/view_dialogs/select_create_dialog";
+import { CustomSelectCreateDialog } from "@point_of_sale/app/components/custom_select_create_dialog/custom_select_create_dialog";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 patch(PartnerLine.prototype, {
     setup() {
@@ -42,6 +43,7 @@ patch(PartnerLine.prototype, {
         const partnerId = this.props.partner.id;
         const commercialPartnerId = this.props.partner.raw.commercial_partner_id;
         this.dialog.add(CustomSelectCreateDialog, {
+            title: _t("Invoices"),
             resModel: "account.move",
             noCreate: true,
             multiSelect: true,

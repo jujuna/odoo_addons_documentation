@@ -34,6 +34,9 @@ class LuxembourgAssetsReportTaxesTest(TestAccountReportsCommon):
 
         line_taxes = [{'taxes': []}, {'taxes': [cls.tax_3]}, {'taxes': [cls.tax_3, cls.tax_17]}]
         cls.inv1 = cls._post_invoice(line_taxes)
+        # Posting the bill creates an asset per line: remove them, the tests create their own from the lines
+        cls.inv1.asset_ids.set_to_draft()
+        cls.inv1.asset_ids.unlink()
 
         cls.company_data['default_account_assets'].depreciation_model_id = cls.env['account.depreciation.model'].create({
             'method': 'linear',

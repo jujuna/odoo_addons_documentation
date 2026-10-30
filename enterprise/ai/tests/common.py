@@ -196,6 +196,8 @@ class TestAICallbackCommon(HttpCase, TestAICommon):
         self.assertFalse(self._iap_requests)
 
     def _deliver_iap_callbacks(self):
+        # IAP callbacks do not carry the initiating user's login session.
+        self.authenticate(None, None)
         while self._iap_requests:
             submitted = self._iap_requests.popleft()
             if submitted["usage"] == "channel_name":

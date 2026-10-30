@@ -37,22 +37,49 @@
         </field>
     </record>
 
+    <record id="planning_slot_view_search_activities" model="ir.ui.view">
+        <field name="name">planning.slot.inherit.view.search.activities</field>
+        <field name="model">planning.slot</field>
+        <field name="inherit_id" ref="planning.planning_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="before">
+                <separator invisible="1"/>
+                <filter invisible="1" string="My Activities" name="filter_activities_my"
+                    domain="[('activity_user_id', '=', uid)]"/>
+                <separator invisible="1"/>
+                <filter invisible="1" string="Late Activities" name="activities_overdue"
+                    domain="[('my_activity_date_deadline', '&lt;', 'today')]"
+                    help="Show all records whose next activity date is past"/>
+                <filter invisible="1" string="Today Activities" name="activities_today"
+                    domain="[('my_activity_date_deadline', '=', 'today')]"/>
+                <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+                    domain="[('my_activity_date_deadline', '&gt;', 'today')]"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="planning_view_form" model="ir.ui.view">
         <field name="name">planning.slot.inherit.view.form</field>
         <field name="model">planning.slot</field>
         <field name="inherit_id" ref="planning.planning_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_send']" position="before">
+                <button name="action_sign_report" type="object" string="Sign Report" class="btn-secondary" groups="planning.group_planning_manager" invisible="not show_sign_report or not partner_id or state != '4_completed' or worksheet_signature"/>
+                <t groups="!planning.group_planning_manager">
+                    <button name="action_sign_report" type="object" string="Sign Report" class="btn-secondary" groups="planning.group_planning_user" invisible="not show_sign_report or uid not in user_ids or not partner_id or state != '4_completed' or worksheet_signature"/>
+                </t>
+            </xpath>
             <xpath expr="//header/button[@name='action_send']" position="after">
                 <button name="action_sign_in" string="Start" type="object" invisible="state != '2_published' or not partner_id" groups="planning.group_planning_manager"/>
                 <button name="action_complete" class="btn-primary" string="Complete" type="object" invisible="state != '3_in_progress' or not partner_id or not start_datetime or not end_datetime" groups="planning.group_planning_manager"/>
-                <button name="action_sign_report" type="object" string="Sign Report" class="btn-secondary" groups="planning.group_planning_manager" invisible="not show_sign_report or not partner_id"/>
+                <button name="action_sign_report" type="object" string="Sign Report" class="btn-secondary" groups="planning.group_planning_manager" invisible="not show_sign_report or not partner_id or state == '4_completed' or worksheet_signature"/>
                 <t groups="!planning.group_planning_manager">
                     <button name="action_sign_in" string="Start" type="object" invisible="state != '2_published' or uid not in user_ids or not partner_id" groups="planning.group_planning_user"/>
                     <button name="action_complete" class="btn-primary" string="Complete" type="object" invisible="state != '3_in_progress' or uid not in user_ids or not partner_id or not start_datetime or not end_datetime" groups="planning.group_planning_user"/>
                       <button name="action_sign_report" type="object" string="Sign Report"
                         class="btn-secondary"
                         groups="planning.group_planning_user"
-                        invisible="not show_sign_report or uid not in user_ids or not partner_id"/>
+                        invisible="not show_sign_report or uid not in user_ids or not partner_id or state == '4_completed' or worksheet_signature"/>
 
                 </t>
             </xpath>
@@ -191,7 +218,7 @@
         <field name="inherit_id" ref="planning.planning_view_card"/>
         <field name="arch" type="xml">
             <xpath expr="//main" position="attributes">
-                <attribute name="t-att-class">['4_completed'].includes(record.state.raw_value) ? 'opacity-50' : ''</attribute>
+                <attribute name="t-att-class">['4_completed'].includes(record.state.raw_value) ? 'o_planning_slot_completed' : ''</attribute>
             </xpath>
             <xpath expr="//div[@name='role']" position="before">
                 <field name="state" invisible="1"/>
@@ -379,6 +406,22 @@
         </field>
     </record>
 
+    <record id="planning.planning_action_my_calendar" model="ir.actions.act_window">
+        <field name="context">{
+            'search_default_my_shifts': 1,
+            'my_planning_action': 1,
+            'planning_expand_resource': 1,
+            'planning_expand_role': 1,
+            'planning_expand_project': 1,
+            'planning_expand_task': 1,
+            'planning_expand_sale_line_id': 1,
+            'search_default_start_datetime': 'today',
+            'search_default_unpublished_shifts': 1,
+            'search_default_published_shifts': 1,
+            'search_default_in_progress_filter': 1,
+        }</field>
+    </record>
+
     <record id="planning_action_my_calendar_view_map" model="ir.actions.act_window.view">
         <field name="sequence" eval="5"/>
         <field name="view_mode">map</field>
@@ -427,6 +470,10 @@
             'my_planning_action': 1,
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
+            'search_default_start_datetime': 'today',
+            'search_default_unpublished_shifts': 1,
+            'search_default_published_shifts': 1,
+            'search_default_in_progress_filter': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -503,7 +550,7 @@
         <field name="res_model">planning.slot</field>
         <field name="path">planning-map-by-resource</field>
         <field name="view_mode">map,gantt,calendar,list,form,kanban,pivot,graph</field>
-        <field name="mobile_view_mode">calendar</field>
+        <field name="mobile_view_mode">map</field>
         <field name="domain">[('partner_id', '!=', False)]</field>
         <field name="context">{'planning_expand_resource': 1, 'planning_expand_role': 1, 'search_default_group_by_resource': 1}</field>
         <field name="help" type="html">

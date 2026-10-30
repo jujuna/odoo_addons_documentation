@@ -607,6 +607,83 @@ class TestPayslipBase(TestPayrollBase):
             Command.link(cls.env.ref('hr_payroll.group_hr_payroll_officer').id),
         ]})
 
+    def _sealand_fake_country_setup(self):
+        """
+        This common file uses as US-based company. This may cause issues if your
+        test's result changes if the us locale is installed. Calling this
+        function will setup your environment so that you can test on a fake
+        country "Sealand" (i.e.: no locale will influence the test)
+        """
+        self.country_sealand = self.env['res.country'].create({
+            'name': 'Principality of Sealand',
+            'code': '_S',
+        })
+        self.company_sealand = self.env['res.company'].create({
+            'name': 'Sealand Company',
+            'country_id': self.country_sealand.id,
+        })
+
+        admin_user = self.env.ref('base.user_admin')
+        admin_user.company_ids |= self.company_sealand
+        admin_user.company_id = self.company_sealand.id
+        # records created without an explicit company_id will now default to sealand
+        self.env = self.env(context=dict(
+            self.env.context,
+            allowed_company_ids=[self.company_sealand.id],
+        ))
+
+        self.sealand_structure_type = self.env['hr.payroll.structure.type'].create({
+            'name': 'Sealand Structure Type',
+        })
+        self.sealand_pay_structure = self.env['hr.payroll.structure'].create({
+            'name': 'Sealand Salary Structure',
+            'type_id': self.sealand_structure_type.id,
+            'sequence': 1,
+        })
+
+        self.sealand_employee_paddy, self.sealand_employee_michael = self.env['hr.employee'].create([
+            {
+                'name': "Paddy Roy Bates",
+                'country_id': self.country_sealand.id,
+                'date_version': Date.to_date('2025-01-01'),
+                'contract_date_start': Date.to_date('2025-01-01'),
+                'wage': 3000,
+                'structure_type_id': self.sealand_structure_type.id,
+            },
+            {
+                'name': "Michael Bates",
+                'country_id': self.country_sealand.id,
+                'date_version': Date.to_date('2024-02-01'),
+                'contract_date_start': Date.to_date('2024-02-01'),
+                'wage': 3200,
+                'structure_type_id': self.sealand_structure_type.id,
+            },
+        ])
+
+        self.env['hr.payslip.run'].create({
+            'date_start': date(2026, 8, 1),
+            'date_end': date(2026, 8, 31),
+            'name': 'Test pay run',
+            'company_id': self.company_sealand.id,
+            'structure_id': self.sealand_pay_structure.id,
+            'version_ids': [
+                Command.link(self.sealand_employee_paddy.version_id.id),
+                Command.link(self.sealand_employee_michael.version_id.id),
+            ],
+        })._generate_payslips()
+
+        # the payment report wizard extensions (e.g. hr_payroll_account_iso20022)
+        # require a bank journal (journal_id)
+        # TODO will be removed on master, where we can drop journal_id's required.
+        # -> will be done in task 6650918
+        if 'account.journal' in self.env:
+            self.sealand_bank_journal = self.env['account.journal'].create({  # noqa: OLS03001
+                'name': 'Sealand Bank',
+                'code': 'SEABNK',
+                'type': 'bank',
+                'company_id': self.company_sealand.id,
+            })
+
     @classmethod
     def get_default_groups(cls):
         # to create res.partner.bank in setup

@@ -1,7 +1,8 @@
 import { useEnv } from "@web/owl2/utils";
+import { insertText } from "@html_editor/../tests/_helpers/user_actions";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { describe, expect, queryOne, test } from "@odoo/hoot";
-import { hover, waitFor } from "@odoo/hoot-dom";
+import { describe, expect, test } from "@odoo/hoot";
+import { hover, queryOne, waitFor } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { Component, onPatched, proxy, t, useProps, xml } from "@odoo/owl";
 import {
@@ -14,14 +15,16 @@ import {
     mountWithCleanup,
     onRpc,
     serverState,
+    patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 import { ReportEditorModel } from "@web_studio/client_action/report_editor/report_editor_model";
+import { ReportEditorWysiwyg } from "@web_studio/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg";
 import { defineStudioEnvironment } from "../../studio_tests_context";
 import { IrModel } from "@web/../tests/_framework/mock_server/mock_models/ir_model";
 import { patch } from "@web/core/utils/patch";
 import { location } from "@web/core/browser/browser";
-import { setContent } from "@html_editor/../tests/_helpers/selection";
+import { setContent, setSelection } from "@html_editor/../tests/_helpers/selection";
 
 describe.current.tags("desktop");
 
@@ -202,4 +205,75 @@ test("open report form view from cog", async () => {
     await waitFor(".o_studio .o-web-studio-report-editor");
     expect(".o_web_studio_breadcrumb .breadcrumb-item").toHaveCount(2);
     expect(".o_web_studio_breadcrumb").toHaveText("REPORTS\nTEST REPORT");
+});
+
+test("undo/redo buttons are reset after saving", async () => {
+    defineStudioEnvironment();
+
+    const reportQweb = (text) => `
+        <html><body><div id="wrapwrap"><main>
+            <div ws-view-id="99"><p class="test-p">${text}</p></div>
+        </main></div></body></html>`;
+    const reportData = {
+        id: 1,
+        name: "Test Report",
+        model: "partner",
+        report_name: "test_report",
+        group_ids: [],
+        paperformat_id: false,
+        binding_model_id: false,
+        attachment_use: false,
+        attachment: false,
+        domain: false,
+    };
+
+    onRpc("/web_studio/load_report_editor", () => ({
+        report_data: reportData,
+        paperformat: {},
+        report_qweb: reportQweb("Some text"),
+        qweb_error: false,
+    }));
+    onRpc("/web_studio/save_report", () => {
+        expect.step("save_report");
+        return {
+            report_data: reportData,
+            paperformat: {},
+            report_qweb: reportQweb("Some text edited"),
+        };
+    });
+
+    let editor;
+    patchWithCleanup(ReportEditorWysiwyg.prototype, {
+        instantiateEditor() {
+            editor = super.instantiateEditor(...arguments);
+            return editor;
+        },
+    });
+
+    await mountWithCleanup(WebClientEnterprise);
+    await contains("a.o_app[data-menu-xmlid=app_1]").click();
+    await contains(".o_web_studio_navbar_item:not(.o_disabled)").click();
+    getService("studio").setParams({ editorTab: "reports", editedReport: { res_id: 1 } });
+    await waitFor(":iframe #wrapwrap.odoo-editor-editable .test-p");
+
+    expect("button[title=Undo]").not.toBeEnabled();
+    expect("button[title=Redo]").not.toBeEnabled();
+    expect(".o-web-studio-save-report").not.toBeEnabled();
+
+    setSelection({ anchorNode: queryOne(":iframe .test-p").firstChild, anchorOffset: 9 });
+    await insertText(editor, " edited");
+    await animationFrame();
+
+    expect("button[title=Undo]").toBeEnabled();
+    expect(".o-web-studio-save-report").toBeEnabled();
+
+    await contains(".o-web-studio-save-report").click();
+    await waitFor(":iframe #wrapwrap.odoo-editor-editable .test-p:contains(Some text edited)");
+    await animationFrame();
+    expect.verifySteps(["save_report"]);
+
+    // The editor has been re-instantiated with a fresh history after the save
+    expect("button[title=Undo]").not.toBeEnabled();
+    expect("button[title=Redo]").not.toBeEnabled();
+    expect(".o-web-studio-save-report").not.toBeEnabled();
 });

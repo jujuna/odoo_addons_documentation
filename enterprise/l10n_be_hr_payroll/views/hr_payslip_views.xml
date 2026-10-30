@@ -5,12 +5,19 @@
         <field name="model">hr.payslip</field>
         <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
         <field name="arch" type="xml">
-            <field name='number_of_days' position="before">
-                <field name="l10n_be_joint_committee_id" optional="hide" column_invisible="parent.country_code != 'BE'"/>
-                <field name="l10n_be_reorganisation_measure_ids" widget="many2many_tags" optional="hide" column_invisible="parent.country_code != 'BE'"/>
-            </field>
-            <xpath expr="//field[@name='worked_days_line_ids']/list//field[@name='amount']" position="after">
-                <field name="l10n_be_replacement_amount" widget="monetary" optional="hide" column_invisible="parent.country_code != 'BE'"/>
+            <xpath expr="//field[@name='worked_days_line_ids']/form//field[@name='number_of_days']" position="before">
+                <field name="l10n_be_joint_committee_id" invisible="parent.country_code != 'BE'"/>
+                <field name="l10n_be_reorganisation_measure_ids" widget="many2many_tags" invisible="parent.country_code != 'BE'"/>
+            </xpath>
+            <xpath expr="//field[@name='worked_days_line_ids']/form//field[@name='amount']" position="after">
+                <field name="l10n_be_replacement_amount" widget="monetary" invisible="parent.country_code != 'BE'"/>
+            </xpath>
+            <!-- an unpaid worked day shows its replacement amount instead of its 0 amount -->
+            <xpath expr="//field[@name='worked_days_line_ids']/kanban//field[@name='amount']" position="attributes">
+                <attribute name="invisible" add="not amount and l10n_be_replacement_amount" separator=" or "/>
+            </xpath>
+            <xpath expr="//field[@name='worked_days_line_ids']/kanban//field[@name='amount']" position="after">
+                <field name="l10n_be_replacement_amount" widget="monetary" class="text-muted text-nowrap" invisible="amount or not l10n_be_replacement_amount"/>
             </xpath>
             <xpath expr="//field[@name='line_ids']/list//field[@name='total']" position="after">
                 <field name="l10n_be_follow_pay_period" optional="hide" readonly="0"
@@ -78,8 +85,8 @@
                 <button string="Flexi@Work" class="btn-primary" name="action_create_flxwage_declaration" type="object"/>
             </header>
             <field name="net_wage" position="before">
-                <field name="l10n_be_onss_contribution" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total NSSO"/>
-                <field name="l10n_be_withholding_taxes" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total Withholding"/>
+                <field name="l10n_be_onss_contribution" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total NSSO" optional="hide"/>
+                <field name="l10n_be_withholding_taxes" string="Taxes" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total Withholding" optional="hide"/>
                 <field name="l10n_be_fiscal_date" optional="hide"/>
             </field>
         </field>

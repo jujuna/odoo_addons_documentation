@@ -61,7 +61,7 @@ class HrPayslipWorkedDays(models.Model):
                     worked_day.fte = work_time_rate * work_rate
 
     @api.depends(
-        'is_paid', 'number_of_hours', 'payslip_id', 'version_id.wage', 'version_id.hourly_wage', 'payslip_id.sum_worked_hours',
+        'is_paid', 'number_of_hours', 'payslip_id', 'version_id.wage', 'version_id.hourly_wage',
         'work_entry_type_id.amount_rate', 'work_entry_type_id.is_extra_hours')
     def _compute_amount(self):
         all_calendar_periods = dict()
@@ -75,7 +75,7 @@ class HrPayslipWorkedDays(models.Model):
                 if calendar._is_flexible():
                     continue
                 version_start, version_end = version.date_start or date_from, version.date_end or date_to
-                old_period = all_calendar_periods.get(calendar, (version_start, version_end))
+                old_period = all_calendar_periods.get(version, (version_start, version_end))
                 all_calendar_periods[version] = (
                     min(version_start, old_period[0], date_from),
                     max(version_end, old_period[1], date_to),
@@ -106,7 +106,7 @@ class HrPayslipWorkedDays(models.Model):
                         work_time = sum_work_time / 3600
                     else:
                         work_time = sum(wd.number_of_hours for wd in payslip_id.worked_days_line_ids if not wd.work_entry_type_id.is_extra_hours)
-                work_times_per_payslip[payslip_id] = float_round(work_time, 2)
+                work_times_per_payslip[payslip_id, version] = float_round(work_time, 2)
 
         for worked_days in self:
             if worked_days.payslip_id.edited or worked_days.payslip_id.state != 'draft':
@@ -119,7 +119,7 @@ class HrPayslipWorkedDays(models.Model):
             if version.wage_type == "hourly":
                 hourly_rate = version._get_contract_wage()
             else:
-                hourly_rate = version._get_contract_wage() / (work_times_per_payslip[worked_days.payslip_id] or 1)
+                hourly_rate = version._get_contract_wage() / (work_times_per_payslip[worked_days.payslip_id, version] or 1)
             worked_days.amount = hourly_rate * worked_days.number_of_hours * amount_rate if worked_days.is_paid else 0
 
     def _is_incomplete_day(self):

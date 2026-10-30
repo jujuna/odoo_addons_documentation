@@ -26,16 +26,18 @@ registerMessageAction("insertToComposer", {
         );
         const fragment = document.createDocumentFragment();
         const content_root = document.createElement("span");
-        content_root.setAttribute("data-ai-selection-id", channel.textSelection?.selectionId);
         setElementContent(content_root, message.body);
         // check if the content is enclosed in a <p> element, if so, unwrap it
         const paragraphElements = content_root.querySelectorAll("p");
         if (paragraphElements.length === 1) {
             unwrapContents(paragraphElements[0]);
         }
-        fragment.appendChild(content_root);
+        for (const child of content_root.childNodes) {
+            fragment.appendChild(child);
+        }
 
-        channel.aiSpecialActions.insert(fragment, targetElementSelection);
+        const newCursor = channel.aiSpecialActions.insert(fragment, targetElementSelection);
+        channel.aiSpecialActions.setCursor?.(channel.textSelection?.selectionId, newCursor);
 
         if (store.env.services.ui.isSmall) {
             channel.closeChatWindow();

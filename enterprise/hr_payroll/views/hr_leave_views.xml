@@ -40,7 +40,6 @@
         <field name="inherit_id" ref="hr_holidays.hr_leave_view_form_manager"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('o_hr_leave_content')]" position="before">
-                <field name="issues" class="w-100 mt-3" widget="actionable_warnings" invisible="not issues" groups="hr_payroll.group_hr_payroll_user"/>
                 <div class="oe_button_box" name="button_box">
                     <button type="object" class="oe_stat_button" name="action_open_payslips" id="open_payslips"
                         icon="payments" invisible="payslip_count == 0"
@@ -57,20 +56,36 @@
         <field name="model">hr.leave</field>
         <field name="inherit_id" ref="hr_holidays.hr_leave_view_form" />
         <field name="arch" type="xml">
+            <xpath expr="//header" position="after">
+                <field name="issues" class="w-100" widget="actionable_warnings" invisible="not issues"/>
+            </xpath>
             <xpath expr="//div[field[@name='work_entry_type_id']]" position="after">
-                <div groups="hr_payroll.group_hr_payroll_user">
-                    <div class="d-flex gap-2" 
-                        invisible="not options_on_work_entry_type_ids">
-                        <i class="oi oi-lg align-self-center" data-icon="add_circle" title="Options"/>
-                        <label for="category_options_ids"/>
-                    </div>
+                <!-- 
+                    Hide Options when the selected work entry type has no available options 
+                    AND no options are currently selected on this leave, keeping the form clean.
+                    If options are already set, keep visible so users clear them manually.
+                -->
+                <div class="d-flex gap-2" invisible="not options_on_work_entry_type_ids and not category_options_ids" groups="hr_payroll.group_hr_payroll_user">
+                    <i class="oi oi-lg align-self-center" data-icon="add_circle" title="Options"/>
+                    <label for="category_options_ids" string="Options"/>
                 </div>
-                <div groups="hr_payroll.group_hr_payroll_user">
+                <div invisible="not options_on_work_entry_type_ids and not category_options_ids" groups="hr_payroll.group_hr_payroll_user">
                     <field name="category_options_ids" widget="many2many_tags" nolabel="1"
                         options="{'no_create': True}"
-                        invisible="not options_on_work_entry_type_ids"/>
+                        readonly="state in ['cancel', 'refuse', 'validate', 'validate1']"/>
                 </div>
             </xpath>
+        </field>
+    </record>
+
+    <record id="hr_leave_view_form_dashboard" model="ir.ui.view">
+        <field name="name">hr.leave.view.form.dashboard.inherit.hr.payroll</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form_dashboard"/>
+        <field name="arch" type="xml">
+            <label for="category_options_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </label>
         </field>
     </record>
 
@@ -92,19 +107,19 @@
         <field name="inherit_id" ref="hr_holidays_gantt.hr_leave_gantt_multi_create_view"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('o_form_label')][label[@for='name']]" position="before">
-                <div groups="hr_payroll.group_hr_payroll_user">
-                    <div class="o_form_label"
-                        invisible="not options_on_work_entry_type_ids"
-                        groups="hr_payroll.group_hr_payroll_user">
-                        <i class="oi oi-lg align-self-center" data-icon="add_circle" title="Options"/>
-                        <label for="category_options_ids" string=""/>
-                    </div>
+                <!-- 
+                    Hide Options when the selected work entry type has no available options 
+                    AND no options are currently selected on this leave, keeping the form clean.
+                    If options are already set, keep visible so users clear them manually.
+                -->
+                <div class="d-flex gap-2" invisible="not options_on_work_entry_type_ids and not category_options_ids" groups="hr_payroll.group_hr_payroll_user">
+                    <i class="oi oi-lg align-self-center" data-icon="add_circle" title="Options"/>
+                    <label for="category_options_ids" string=""/>
                 </div>
-                <div groups="hr_payroll.group_hr_payroll_user">
-                    <field name="category_options_ids" widget="many2many_tags"
-                        nolabel="1"
+                <div invisible="not options_on_work_entry_type_ids and not category_options_ids" groups="hr_payroll.group_hr_payroll_user">
+                    <field name="category_options_ids" widget="many2many_tags" nolabel="1"
                         options="{'no_create': True}"
-                        invisible="not options_on_work_entry_type_ids"/>
+                        readonly="state != 'confirm'"/>
                 </div>
             </xpath>
         </field>

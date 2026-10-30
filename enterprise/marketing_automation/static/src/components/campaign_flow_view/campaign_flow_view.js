@@ -1346,7 +1346,7 @@ export class CampaignFlowView extends FlowViewMixin(X2ManyField) {
 export const campaignFlowView = {
     ...x2ManyField,
     component: CampaignFlowView,
-    additionalClasses: ["d-flex", "flex-column", "flex-grow-1", "flex-basis-0", "m-0"],
+    additionalClasses: ["d-flex", "flex-column", "flex-grow-1", "flex-md-row", "flex-basis-0", "m-0"],
     fieldDependencies: [
         { name: "model_id", type: "many2one" },
         { name: "enroll_type", type: "selection" },

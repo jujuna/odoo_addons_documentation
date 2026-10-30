@@ -433,14 +433,14 @@ else:
     <record id="cap57_employees_salary_internet" model="hr.salary.rule">
         <field name="category_ids" eval="[(6, 0, [ref('l10n_hk_hr_payroll.ALLOWANCE_RAP')])]"/>
         <field name="name">Internet Allowance</field>
-        <field name="code">ALW.INT</field>
+        <field name="code">ALW_INT</field>
         <field name="sequence">30</field>
         <field name="condition_select">python</field>
         <field name="condition_python">result = bool(not payslip.is_outside_contract and version.l10n_hk_internet)</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 target_amount = version.l10n_hk_internet * worked_days_prorata_rate
-remaining_budget = max(version.l10n_hk_internet - l10n_hk_payrun_totals['ALW.INT'], 0.0)
+remaining_budget = max(version.l10n_hk_internet - l10n_hk_payrun_totals['ALW_INT'], 0.0)
 
 result = min(target_amount, remaining_budget)
         </field>

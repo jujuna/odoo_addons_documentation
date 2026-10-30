@@ -5,15 +5,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 03:24+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-11 06:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/delivery_ups_rest/zh_Hans/>\n"
+"projects/odoo-20/delivery_ups_rest/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -95,6 +96,9 @@ msgid ""
 "Sold To party's country code must be the same as the Ship To party's country "
 "code with the exception of Canada and satellite countries.\""
 msgstr ""
+"验证发货 %(delivery_name)s 时检测到问题。为避免 UPS 报出以下错误，商业发票的"
+"开票地址已默认使用 %(ship_to_partner)s，而非 %(sold_to_partner)s：“除加拿大及"
+"卫星国家外，Sold To 方的国家代码必须与 Ship To 方的国家代码一致。”"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__display_name
@@ -208,7 +212,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid ""
 "Now open your app, you'll have your <b>Client ID</b> and <b>Client Secret</b>"
-msgstr "现在，开启您的应用程序，将会有您的<b>客户识别码</b> 以及<b>客户密钥</b>"
+msgstr ""
+"现在，开启您的应用程序，将会有您的<b>客户识别码</b> 以及<b>客户密钥</b>"
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
@@ -266,7 +271,7 @@ msgstr "收件人"
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid "Recipient Phone must be between 1 and 15 alphanumeric characters."
-msgstr ""
+msgstr "收件人电话必须为 1 到 15 个字母数字字符。"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_require_signature
@@ -310,6 +315,8 @@ msgid ""
 "the UPS connector is compatiblewith the newest version of the UPS REST APIs "
 "available at https://developer.ups.com/"
 msgstr ""
+"通过 UPS 寄送您的货物并在线跟踪。此新版 UPS 连接器兼容 https://"
+"developer.ups.com/ 提供的最新版 UPS REST API。"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_duty_payment__sender
@@ -329,14 +336,14 @@ msgid ""
 "Shipment created into UPS<br/><b>Tracking Numbers:</b> %"
 "(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"已在 UPS 中创建货运<br/><b>追踪编号：</b>%(tracking_numbers)s<br/><b>包裹</b>"
-"%(packages)s"
+"已在 UPS 中创建货运<br/><b>追踪编号：</b>%(tracking_numbers)s<br/><b>包裹</"
+"b>%(packages)s"
 
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid "Shipper Phone must be between 1 and 15 alphanumeric characters."
-msgstr ""
+msgstr "寄件人电话必须为 1 到 15 个字母数字字符。"
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -463,9 +470,19 @@ msgid "UPS Configuration"
 msgstr "UPS配置"
 
 #. module: delivery_ups_rest
+#: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__74
+msgid "UPS Express Midday"
+msgstr ""
+
+#. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__03
 msgid "UPS Ground"
 msgstr "UPS 陆运"
+
+#. module: delivery_ups_rest
+#: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__75
+msgid "UPS Heavy Goods"
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_label_file_type
@@ -510,12 +527,22 @@ msgstr "UPS服务方式"
 #. module: delivery_ups_rest
 #: model:ir.module.module,shortdesc:base.module_delivery_ups_rest
 msgid "UPS Shipping"
-msgstr ""
+msgstr "UPS 配送"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__11
 msgid "UPS Standard"
 msgstr "UPS 标准"
+
+#. module: delivery_ups_rest
+#: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__72
+msgid "UPS Worldwide Economy DDP"
+msgstr ""
+
+#. module: delivery_ups_rest
+#: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__17
+msgid "UPS Worldwide Economy DDU"
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__08
@@ -533,6 +560,11 @@ msgid "UPS Worldwide Express Freight"
 msgstr "UPS 全球快递货运"
 
 #. module: delivery_ups_rest
+#: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__71
+msgid "UPS Worldwide Express Freight Midday"
+msgstr ""
+
+#. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__54
 msgid "UPS Worldwide Express Plus"
 msgstr "UPS 全球特快加急服务"
@@ -548,7 +580,8 @@ msgstr "UPS帐号"
 msgid ""
 "UPS address lines can only contain a maximum of 35 characters. You can split "
 "the contacts addresses on multiple lines to try to avoid this limitation."
-msgstr "UPS地址行最多只能包含35个字符。您可以将联系人地址拆分为多行以避免此限制。"
+msgstr ""
+"UPS地址行最多只能包含35个字符。您可以将联系人地址拆分为多行以避免此限制。"
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -570,7 +603,7 @@ msgstr "UPS 包裹重量单位"
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid "Warehouse Phone must be between 1 and 15 alphanumeric characters."
-msgstr ""
+msgstr "仓库电话必须为 1 到 15 个字母数字字符。"
 
 #. module: delivery_ups_rest
 #. odoo-python

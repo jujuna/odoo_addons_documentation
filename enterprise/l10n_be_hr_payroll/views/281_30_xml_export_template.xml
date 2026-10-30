@@ -75,7 +75,8 @@
                             <f2016_postcodebelgisch t-out="employee_data['f2016_postcodebelgisch']"/>
                         </t>
 
-                        <!-- <f2017_gemeente /> 27 AN commune du bénéficiaire -->
+                        <!-- <f2017_gemeente /> 27 AN commune du bénéficiaire, mandatory for the non-residents -->
+                        <f2017_gemeente t-out="employee_data['employee_city']"/>
 
                         <!-- <f2018_landwoonplaats /> 5 N Code pays du domicile du bénéficiaire
                         des revenus, zéro si Belgique -->
@@ -118,49 +119,7 @@
                         <!-- <f2114_voornamen /> 15 AN Prénom du bénéficiaire des revenus -->
                         <f2114_voornamen t-out="employee_data['f2114_voornamen']"/>
 
-                        <f30_2030_beneficiarynature t-out="employee_data['f30_2030_beneficiarynature']"/>
-                        <f30_2035_verantwoordingsstukken t-out="employee_data['f30_2035_verantwoordingsstukken']"/>
-                        <f30_2059_totaalcontrole t-out="employee_data['f30_2059_totaalcontrole']"/>
-                        <f30_2060_toegekendbedrag t-out="employee_data['f30_2060_toegekendbedrag']"/>
-                        <f30_2061_vrijstelling t-out="employee_data['f30_2061_vrijstelling']"/>
-                        <f30_2062_bedrag t-out="employee_data['f30_2062_bedrag']"/>
-                        <f30_2063_bedrijfsvoorheffing t-out="employee_data['f30_2063_bedrijfsvoorheffing']"/>
-                        <f30_2064_presentiegelden t-out="employee_data['f30_2064_presentiegelden']"/>
-                        <f30_2065_toegekendbedrag t-out="employee_data['f30_2065_toegekendbedrag']"/>
-                        <f30_2066_vrijstelling t-out="employee_data['f30_2066_vrijstelling']"/>
-                        <f30_2067_bedrag t-out="employee_data['f30_2067_bedrag']"/>
-                        <f30_2068_zonderberoepskarak t-out="employee_data['f30_2068_zonderberoepskarak']"/>
-                        <f30_2069_bijzonderbijdrage t-out="employee_data['f30_2069_bijzonderbijdrage']"/>
-                        <f30_2070_toegekendbedrag t-out="employee_data['f30_2070_toegekendbedrag']"/>
-                        <f30_2071_vrijstelling t-out="employee_data['f30_2071_vrijstelling']"/>
-                        <f30_2072_bedrag t-out="employee_data['f30_2072_bedrag']"/>
-                        <f30_2073_toegekendbedrag t-out="employee_data['f30_2073_toegekendbedrag']"/>
-                        <f30_2074_vrijstelling t-out="employee_data['f30_2074_vrijstelling']"/>
-                        <f30_2075_bedrag t-out="employee_data['f30_2075_bedrag']"/>
-                        <f30_2076_peronderhoudsuitke t-out="employee_data['f30_2076_peronderhoudsuitke']"/>
-                        <f30_2077_onderhoudsuitkering t-out="employee_data['f30_2077_onderhoudsuitkering']"/>
-                        <f30_2078_olympicbonus t-out="employee_data['f30_2078_olympicbonus']"/>
-                        <f30_2079_totalamount t-out="employee_data['f30_2079_totalamount']"/>
-                        <f30_2080_winstofbaten t-out="employee_data['f30_2080_winstofbaten']"/>
-                        <f30_2081_retributies t-out="employee_data['f30_2081_retributies']"/>
-                        <f30_2082_buitverrichtingen t-out="employee_data['f30_2082_buitverrichtingen']"/>
-                        <f30_2083_podiumkunstenaars t-out="employee_data['f30_2083_podiumkunstenaars']"/>
-                        <f30_2084_winst t-out="employee_data['f30_2084_winst']"/>
-                        <f30_2085_art2283 t-out="employee_data['f30_2085_art2283']"/>
-                        <f30_2086_bedrag t-out="employee_data['f30_2086_bedrag']"/>
-                        <f30_2087_bedrag t-out="employee_data['f30_2087_bedrag']"/>
-                        <f30_2088_bedrag t-out="employee_data['f30_2088_bedrag']"/>
-                        <f30_2089_numberpeople t-out="employee_data['f30_2089_numberpeople']"/>
-                        <f30_2090_numberdays t-out="employee_data['f30_2090_numberdays']"/>
-                        <f30_2095_foreignolympicbonus t-out="employee_data['f30_2095_foreignolympicbonus']"/>
-                        <f30_2097_totalamount t-out="employee_data['f30_2097_totalamount']"/>
-                        <f30_2099_aard t-out="employee_data['f30_2099_aard']"/>
-                        <f30_2109_fiscaalidentificat t-out="employee_data['f30_2109_fiscaalidentificat']"/>
-                        <f30_2113_sportlimitedremuneration t-out="employee_data['f30_2113_sportlimitedremuneration']"/>
-                        <f30_2115_sportunlimitedotherremuneration t-out="employee_data['f30_2115_sportunlimitedotherremuneration']"/>
-                        <f30_2116_sportmorethan30daysprofit t-out="employee_data['f30_2116_sportmorethan30daysprofit']"/>
-                        <f30_2117_managerprofit t-out="employee_data['f30_2117_managerprofit']"/>
-                        <f30_2205_recuperation t-out="employee_data['f30_2205_recuperation']"/>
+                        <t t-out="employee_data['_xml_declaration_fields']"/>
                     </Fiche28130>
                 </t>
             </Opgave32530>

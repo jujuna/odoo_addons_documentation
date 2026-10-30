@@ -140,6 +140,8 @@ class L10nPayrollAccountCommon(AccountTestInvoicingCommon):
             'address_id': cls.env['res.partner'].create({'name': "Fund A Partner"}).id,
             'usi': "112312312312"
         })
+        if 'is_valid' in super_fund._fields:
+            super_fund.is_valid = True
         cls.env['l10n_au.super.account'].create([
             {
                 "date_from": date(2023, 6, 1),

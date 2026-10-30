@@ -21,14 +21,15 @@
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:30+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-20 12:15+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "account_batch_payment/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -52,6 +53,17 @@ msgid ""
 "When you reconcile, simply select the corresponding batch payment to "
 "reconcile all the payments in the batch.\n"
 msgstr ""
+"\n"
+"Toplu Ödemeler\n"
+"=======================================\n"
+"Toplu ödemeler, ödemelerin gruplandırılmasına izin verir.\n"
+"\n"
+"Örneğin, birkaç çeki tek bir toplu işlemle bankaya yatırmadan önce gruplamak "
+"için kullanılırlar.\n"
+"Yatırılan toplam tutar daha sonra banka ekstrenizde tek bir işlem olarak "
+"görünür.\n"
+"Mutabakat yaparken, ilgili toplu ödemeyi seçerek toplu işlemdeki tüm "
+"ödemeleri mutabık hale getirin.\n"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -689,12 +701,6 @@ msgstr ""
 "alınmayacaktır."
 
 #. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_payment.py:0
-msgid "Only outbound payments can be exported."
-msgstr ""
-
-#. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
 msgid "Outbound"
 msgstr "Giden"
@@ -865,6 +871,8 @@ msgid ""
 "Some batches have an export file already generated and all payments marked "
 "as sent. You can't delete them."
 msgstr ""
+"Bazı gruplarda halihazırda oluşturulmuş bir dışa aktarma dosyası bulunur ve "
+"tüm ödemeler \"gönderildi\" olarak işaretlenmiştir. Bunları silemezsiniz."
 
 #. module: account_batch_payment
 #. odoo-python
@@ -963,6 +971,8 @@ msgid ""
 "To validate the batch, payments must be paid. But some are already matched "
 "with a bank statement."
 msgstr ""
+"Toplu işlemi onaylamak için ödemelerin gerçekleştirilmesi gerekir. Ancak "
+"bazıları halihazırda banka ekstresiyle eşleştirilmiştir."
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount_unsigned
@@ -1030,6 +1040,8 @@ msgid ""
 "You can't delete a batch payment when an export file is already generated "
 "and all payments are marked as sent."
 msgstr ""
+"Dışa aktarım dosyası zaten oluşturulmuşsa ve tüm ödemeler \"gönderildi\" "
+"olarak işaretlenmişse, toplu ödemeyi silemezsiniz."
 
 #. module: account_batch_payment
 #. odoo-python
@@ -1068,7 +1080,7 @@ msgstr "Çakışan ödemeler içeren gruplar oluşturamazsınız."
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You must select at least one payment to generate a file."
-msgstr ""
+msgstr "Bir dosya oluşturmak için en az bir ödeme seçeneği seçmelisiniz."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment

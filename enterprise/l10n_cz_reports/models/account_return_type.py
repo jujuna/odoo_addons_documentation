@@ -6,6 +6,13 @@ from odoo import api, fields, models
 class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
+    @api.depends('report_id')
+    def _compute_report_return_type(self):
+        # The VAT Control Statement is a variant of the tax report, should not generate a tax closing entry
+        super()._compute_report_return_type()
+        control_statement_type = self.env.ref('l10n_cz_reports.cz_vat_control_statement_return_type', raise_if_not_found=False)
+        self.filtered(lambda r: r == control_statement_type).is_tax_return_type = False
+
     @api.model
     def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)

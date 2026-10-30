@@ -155,7 +155,7 @@ class L10n_AuPayrollRegister(models.TransientModel):
                             action=self.journal_id._get_records_action(name=_("Configure Journal"), target="new"),
                             button_text=_("Configure Journal Bank Account")
                         )
-            if not bank_account._get_clearing_number('AU') or not bank_account.bank_bic:
+            if not bank_account._get_clearing_number('AU') or not bank_account.bank_name:
                 raise RedirectWarning(
                     message=_("The account %(account_number)s, of journal '%(journal_name)s', is not valid.\n"
                     "Either its account number is incorrect or it has no BSB or Bank set.",

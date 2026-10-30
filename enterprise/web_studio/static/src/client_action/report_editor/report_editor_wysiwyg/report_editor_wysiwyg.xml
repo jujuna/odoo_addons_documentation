@@ -2,7 +2,7 @@
 
 <t t-name="web_studio.ReportEditorWysiwyg">
   <div class="o-web-studio-report-editor-wysiwyg h-100 w-100 position-relative">
-    <ReportEditorIframe iframeSource="this.iframeSource" onIframeLoaded.bind="this.onIframeLoaded" />
+    <ReportEditorIframe iframeSource="this.iframeSource" onIframeLoaded.bind="this.onIframeLoaded" onIframeRemoved.bind="this.destroyEditor" />
     <LocalOverlayContainer localOverlay="this.overlayRef" identifier="this.localOverlayContainerKey"/>
   </div>
 </t>

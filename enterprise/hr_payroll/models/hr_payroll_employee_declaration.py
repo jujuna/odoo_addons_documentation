@@ -104,8 +104,9 @@ class HrPayrollEmployeeDeclaration(models.Model):
             if 'error' in rendering_data:
                 sheet.pdf_error = rendering_data['error']
                 continue
+            declarations_by_employee = declarations.grouped('employee_id')
             for employee, error_msg in rendering_data.get('employees_with_error', {}).items():
-                declaration = declarations.filtered(lambda d: d.employee_id == employee)
+                declaration = declarations_by_employee.get(employee)
                 if declaration:
                     declaration.declaration_error = error_msg
             rendering_data = sheet._post_process_rendering_data_pdf(rendering_data)
@@ -114,7 +115,7 @@ class HrPayrollEmployeeDeclaration(models.Model):
             sheet_count = len(rendering_data)
             counter = 1
             for employee, employee_data in rendering_data.items():
-                if (employee and employee not in declarations.employee_id) or (not employee and not has_global):
+                if (employee and employee not in declarations_by_employee) or (not employee and not has_global):
                     continue
                 _logger.info('Printing %s (%s/%s)', sheet._description, counter, sheet_count)
                 counter += 1

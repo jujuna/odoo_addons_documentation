@@ -38,12 +38,11 @@ class TestL10nVnPayrollAccounting(TestPayslipValidationCommon):
 
     def test_payroll_accounts_configuration(self):
         # The chart template loading configured the salary journal and the accounts of the rules.
-        # The Vietnamese chart pads the account codes to four digits: 334 is stored as 3340.
         rule = self.env.ref
         self.assertEqual(self.structure.journal_id.code, 'SLR')
         self.assertEqual(self.structure.journal_id.default_account_id.code, '6421')
         self.assertEqual(rule('l10n_vn_hr_payroll.l10n_vn_rule_basic').account_debit.code, '6421')
-        self.assertEqual(rule('l10n_vn_hr_payroll.l10n_vn_rule_net').account_credit.code, '3340')
+        self.assertEqual(rule('l10n_vn_hr_payroll.l10n_vn_rule_net').account_credit.code, '334')
         self.assertTrue(rule('l10n_vn_hr_payroll.l10n_vn_rule_net').employee_move_line)
         self.assertEqual(rule('l10n_vn_hr_payroll.l10n_vn_rule_social_insurance_employee').account_debit.code, '3383')
         self.assertEqual(rule('l10n_vn_hr_payroll.l10n_vn_rule_personal_income_tax').account_debit.code, '3335')
@@ -58,7 +57,7 @@ class TestL10nVnPayrollAccounting(TestPayslipValidationCommon):
         #   UI            3386  1% + 1% of 32m = 640,000
         #   union fees    3382  dues capped at 234,000 + fund 640,000 = 874,000
         #   PIT           3335  5% of (32m - 3.36m - 15.5m - 6.2m) = 347,000
-        #   employees     3340  net 32,000,000 - 3,360,000 - 234,000 - 347,000 = 28,059,000
+        #   employees     334   net 32,000,000 - 3,360,000 - 234,000 - 347,000 = 28,059,000
         position_allowance = self.env.ref('l10n_vn_hr_payroll.l10n_vn_rule_position_allowance')
         payslip = self._generate_payslip(
             date(2026, 3, 1), date(2026, 3, 31),
@@ -88,11 +87,11 @@ class TestL10nVnPayrollAccounting(TestPayslipValidationCommon):
             '3386': (0.0, 640_000.0),
             '3382': (0.0, 874_000.0),
             '3335': (0.0, 347_000.0),
-            '3340': (0.0, 28_059_000.0),
+            '334': (0.0, 28_059_000.0),
         })
         self.assertFalse(move.line_ids.filtered(lambda line: line.name == 'Adjustment Entry'),
                          "Every payslip line reaching the net must have its accounts")
-        net_line = move.line_ids.filtered(lambda line: line.account_id.code == '3340')
+        net_line = move.line_ids.filtered(lambda line: line.account_id.code == '334')
         self.assertEqual(net_line.partner_id, self.employee.work_contact_id)
 
     def test_deductions_and_advanced_benefits_journal_entry(self):
@@ -107,9 +106,9 @@ class TestL10nVnPayrollAccounting(TestPayslipValidationCommon):
         )
         payslip.action_payslip_done()
         amounts = self._amounts_by_account(payslip.move_id)
-        self.assertEqual(amounts['1410'], (0.0, 1_000_000.0), "The recovered advance is credited to the advances account")
+        self.assertEqual(amounts['141'], (0.0, 1_000_000.0), "The recovered advance is credited to the advances account")
         # 8% + 17.5% of 30m credited, the 3m benefit advanced on behalf of the fund debited
         self.assertEqual(amounts['3383'], (3_000_000.0, 7_650_000.0))
         # net: 30m - 3.15m insurance - 234,000 dues - 5% x (30m - 3.15m - 21.7m) tax - 1m advance + 3m benefit
-        self.assertEqual(amounts['3340'], (0.0, 28_358_500.0))
+        self.assertEqual(amounts['334'], (0.0, 28_358_500.0))
         self.assertEqual(sum(payslip.move_id.line_ids.mapped('debit')), sum(payslip.move_id.line_ids.mapped('credit')))

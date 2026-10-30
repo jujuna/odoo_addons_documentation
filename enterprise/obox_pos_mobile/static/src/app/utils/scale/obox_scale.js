@@ -8,7 +8,10 @@ patch(OboxScale.prototype, {
     },
 
     async _readWeight() {
-        this._localAddress ??= await resolveDeviceAddress(super.address);
+        this._localAddress ??= await resolveDeviceAddress(
+            super.address,
+            this._scaleDevice.obox_id?.serial_number
+        );
         return super._readWeight(...arguments);
     },
 });

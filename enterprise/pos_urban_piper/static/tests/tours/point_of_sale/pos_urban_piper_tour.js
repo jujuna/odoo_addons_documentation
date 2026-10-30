@@ -317,8 +317,8 @@ registry.category("web_tour.tours").add("test_product_level_discount", {
             Dialog.confirm("Open Register"),
             UrbanPiper.fetchDeliveryData(),
             {
-                content: "Check 20% discount applied on orderline",
-                trigger: ".orderline .info-list li.price-per-unit em:contains(20%)",
+                content: "Check 40% discount applied on orderline",
+                trigger: ".orderline .info-list li.price-per-unit em:contains(40%)",
             },
             UrbanPiper.checkNewOrderCount(1),
             UrbanPiper.onDropdownStatus("New"),

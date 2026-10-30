@@ -29,8 +29,8 @@ class TestSEPACreditTransferUpdateCommon(AccountTestInvoicingCommon):
             'country_id': cls.env.ref('base.be'),
             'iso20022_lei': '506700GE1G29325QX363',
             'street': 'Test street',
-            'zip': '12345',
-            'city': 'testcity',
+            'zip': '12345678901234567',
+            'city': 'testcity that is way longer than thirty-five characters',
         })
         cls.env['res.partner.bank'].create({
             'partner_id': cls.partner_a.id,
@@ -100,8 +100,8 @@ class TestSEPACreditTransferUpdate(TestSEPACreditTransferUpdateCommon):
         end_to_end_id = sct_doc.find('.//ns:CdtTrfTxInf/ns:PmtId/ns:EndToEndId', namespaces=namespaces)
 
         self.assertEqual(street, self.partner_a.street)
-        self.assertEqual(postal_code, self.partner_a.zip)
-        self.assertEqual(city, self.partner_a.city)
+        self.assertEqual(postal_code, self.partner_a.zip[:16])
+        self.assertEqual(city, self.partner_a.city[:35])
         self.assertFalse(adr_line)
         self.assertEqual(end_to_end_id.text, self.payment.transaction_uuid)
 

@@ -36,6 +36,8 @@ class L10n_SeTaxReportHandler(models.AbstractModel):
         template_context['org_number'] = report._get_sender_company_for_export(options).org_number
         template_context['period'] = (options['date']['date_to'][:4] + options['date']['date_to'][5:7])
         template_context['comment'] = ''
+        vat_codes = ('se_10', 'se_11', 'se_12', 'se_30', 'se_31', 'se_32', 'se_60', 'se_61', 'se_62')
+        template_context['se_49'] = str(sum(int(template_context[code]) for code in vat_codes) - int(template_context['se_48']))
 
         qweb = self.env['ir.qweb']
         doc = qweb._render(export_template, values=template_context)

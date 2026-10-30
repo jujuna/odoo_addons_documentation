@@ -3,14 +3,15 @@
 # * l10n_tr_nilvera_einvoice
 #
 # "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-11 18:14+0000\n"
-"PO-Revision-Date: 2026-08-31 15:08+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-s19-4/"
+"PO-Revision-Date: 2026-10-20 12:16+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "l10n_tr_nilvera_einvoice/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -319,6 +320,8 @@ msgstr ""
 #: code:addons/l10n_tr_nilvera_einvoice/models/account_move_send.py:0
 msgid "Cannot send via Nilvera: One or more line items are missing a tax rate."
 msgstr ""
+"Nilvera üzerinden gönderilemez: Bir veya daha fazla satırda vergi oranı "
+"eksik."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -437,6 +440,13 @@ msgid ""
 "Export Registration: Used for invoices that are related to registered export "
 "transactions."
 msgstr ""
+"Sebebin amacını sınıflandırır. Bu, Odoo'nun farklı bölümlerinde doğru "
+"kodları filtrelemek için kullanılır: \n"
+"Stopaj: Stopaj vergisi bulunan faturalar için kullanılır. \n"
+"İstisna: Vergiden muaf faturalar için kullanılır. \n"
+"İhracat İstisnası: Belirli vergilerden muaf olan ürün ihracatlarıyla ilgili "
+"faturalar için kullanılır. \n"
+"İhracat Kaydı: Kayıtlı ihracat işlemleriyle ilgili faturalar için kullanılır."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:l10n_tr_nilvera_einvoice.account.tax.code,name:l10n_tr_nilvera_einvoice.account_tax_code_612
@@ -614,6 +624,13 @@ msgid ""
 "(government) institutions.\n"
 "- Commercial: Allows the recipient to accept or reject the invoice via GİB."
 msgstr ""
+"Resmi GİB (Türkiye Gelir İdaresi) e-fatura senaryosunu tanımlar. \n"
+"- Temel: Alıcı tarafından GİB portalı üzerinden reddedilemeyen standart e-"
+"fatura. \n"
+"- Kamu Sektörü: Özellikle kamu (devlet) kurumlarına düzenlenen faturalar "
+"için kullanılır.\n"
+"- Ticari: Alıcının GİB aracılığıyla faturayı kabul etmesine veya "
+"reddetmesine olanak tanır."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:l10n_tr_nilvera_einvoice.account.tax.code,name:l10n_tr_nilvera_einvoice.account_tax_code_228
@@ -621,6 +638,8 @@ msgid ""
 "Deliveries Made Free of Charge to the Institutions and Organizations Listed "
 "in Article (17/1) of Law 17/2-b"
 msgstr ""
+"17/2-b Kanunun (17/1) Maddesinde Sayılan Kurum ve Kuruluşlara Bedelsiz "
+"Olarak Yapılan Teslimler"
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:l10n_tr_nilvera_einvoice.account.tax.code,name:l10n_tr_nilvera_einvoice.account_tax_code_619
@@ -633,6 +652,8 @@ msgid ""
 "Delivery of Copper, Zinc, Iron-Steel, Aluminum and Lead Ingots Other Than "
 "Those Obtained from Scrap Metal"
 msgstr ""
+"Hurda Metalden Elde Edilenler Dışındaki Bakır, Çinko, Demir-Çelik, Alüminyum "
+"ve Kurşun Külçe Teslimi"
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:l10n_tr_nilvera_einvoice.account.tax.code,name:l10n_tr_nilvera_einvoice.account_tax_code_627
@@ -645,6 +666,8 @@ msgid ""
 "Delivery of Raw Materials Obtained from Metal, Plastic, Rubber, Paper and "
 "Glass Scrap and Waste"
 msgstr ""
+"Metal, Plastik, Kauçuk, Kağıt ve Cam Hurdası ile Atıklardan Elde Edilen "
+"Hammaddelerin Teslimatı"
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:l10n_tr_nilvera_einvoice.account.tax.code,name:l10n_tr_nilvera_einvoice.account_tax_code_623
@@ -679,6 +702,10 @@ msgid ""
 "independent numbering\n"
 "                                sequence."
 msgstr ""
+"Aşağıdaki tüm koşullara uyan belgeler, dergi kodunun yerine\n"
+"                                bu seriyi kullanır. Her serinin kendine ait "
+"bağımsız bir numaralandırma\n"
+"                                dizisi vardır."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields.selection,name:l10n_tr_nilvera_einvoice.selection__account_move__l10n_tr_shipping_type__8
@@ -782,7 +809,7 @@ msgstr ""
 msgid ""
 "Export Registered Sales within the scope of Article 11/1-c of the VAT Law "
 "No. 3065"
-msgstr ""
+msgstr "3065 s. KDV Kanununun 11/1-c md. Kapsamındaki İhraç Kayıtlı Satış"
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields.selection,name:l10n_tr_nilvera_einvoice.selection__l10n_tr_nilvera_einvoice_account_tax_code__code_type__export_registration
@@ -821,6 +848,8 @@ msgid ""
 "For 0% EX VAT on sales invoices, an exemption reason is required. Odoo has "
 "set the default as \"351 - Other Non-Exempt VAT\""
 msgstr ""
+"Satış faturalarında 0% E'lik KDV için bir muafiyet nedeni gereklidir. Odoo, "
+"varsayılan değeri \"351 - Diğer Muaf Olmayan KDV\" olarak belirlemiştir."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -829,6 +858,8 @@ msgid ""
 "For Public Sector e-Invoices, the Public Spending Unit must have a valid "
 "address and Tax ID defined."
 msgstr ""
+"Kamu Sektörü e-Faturaları için, Kamu Harcama Birimi'nin geçerli bir adresi "
+"ve Vergi Kimlik Numarası tanımlanmış olmalıdır."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -837,6 +868,8 @@ msgid ""
 "For Registered for Export type invoices with a 702 reason code, the Customer "
 "Line Code must be filled in per product in the invoice lines."
 msgstr ""
+"702 neden koduna sahip \"İhracat için Kayıtlı\" türündeki faturalar için, "
+"fatura satırlarında her ürün için Müşteri Satır Kodu doldurulmalıdır."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model_terms:ir.ui.view,arch_db:l10n_tr_nilvera_einvoice.l10n_tr_nilvera_einvoice_account_tax_code_view_form
@@ -851,6 +884,9 @@ msgid ""
 "percentage as the returned quantity.\n"
 "The following mismatch was found:\n"
 msgstr ""
+"İade faturalarında, vergi tutarının iade edilen miktarla aynı yüzdeye denk "
+"gelmesi beklenir.\n"
+"Aşağıdaki uyuşmazlık tespit edildi:\n"
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:l10n_tr_nilvera_einvoice.account.tax.code,name:l10n_tr_nilvera_einvoice.account_tax_code_624
@@ -1116,6 +1152,8 @@ msgid ""
 "Nilvera has already received a response for this invoice.\n"
 "The latest response has been fetched and updated on the invoice."
 msgstr ""
+"Nilvera bu fatura için zaten bir yanıt almıştır.\n"
+"En son yanıt alınmış ve faturaya eklenmiştir."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1196,6 +1234,8 @@ msgid ""
 "Odoo could not perform this action at the moment, try again later.\n"
 "%(reason)s - %(status)s"
 msgstr ""
+"Odoo şu anda bu işlemi gerçekleştiremedi, lütfen daha sonra tekrar deneyin.\n"
+"%(reason)s - %(status)s"
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1204,6 +1244,8 @@ msgid ""
 "Only e-Archive invoices that have been sent successfully to Nilvera can be "
 "cancelled."
 msgstr ""
+"Yalnızca Nilvera'ya başarıyla gönderilmiş e-Arşiv faturaları iptal "
+"edilebilir."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1303,6 +1345,8 @@ msgid ""
 "Please ensure that your company contact has either the 'Mersis Number' or "
 "'Trade Registry Number' has a value."
 msgstr ""
+"Lütfen şirket irtibat kişisinin \"Mersis Numarası\" veya \"Ticaret Sicil "
+"Numarası\" alanlarının doldurulduğundan emin olun."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields.selection,name:l10n_tr_nilvera_einvoice.selection__account_move__l10n_tr_shipping_type__5
@@ -1429,6 +1473,9 @@ msgid ""
 "account on vendor documents, is this one. Leave empty to apply it whatever "
 "their account."
 msgstr ""
+"Bu seriyi, alacak hesabı veya satıcı belgelerindeki borç hesabı bu olan "
+"ortaklarla sınırlayın. Hesaplarından bağımsız olarak uygulamak için boş "
+"bırakın."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields,help:l10n_tr_nilvera_einvoice.field_l10n_tr_nilvera_einvoice_invoice_sequence__l10n_tr_nilvera_customer_status
@@ -1451,6 +1498,8 @@ msgid ""
 "Return invoices can only be sent if the original invoice has already been "
 "successfully sent to Nilvera"
 msgstr ""
+"İade faturaları, yalnızca orijinal fatura Nilvera'ya başarıyla gönderilmişse "
+"gönderilebilir"
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields.selection,name:l10n_tr_nilvera_einvoice.selection__account_move__l10n_tr_shipping_type__3
@@ -1517,6 +1566,8 @@ msgid ""
 "Sending as draft is only available for export invoices in Draft state whose "
 "customer's Nilvera status has been verified."
 msgstr ""
+"Taslak olarak gönderme özelliği, yalnızca Taslak durumundaki ve müşterinin "
+"Nilvera durumu doğrulanmış olan ihracat faturaları için kullanılabilir."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields.selection,name:l10n_tr_nilvera_einvoice.selection__account_move__l10n_tr_nilvera_send_status__sent
@@ -1583,6 +1634,8 @@ msgid ""
 "Some PDFs could not be retrieved because they have not yet been retrieved "
 "from Nilvera. Please try again once the PDFs have been received."
 msgstr ""
+"Bazı PDF'ler, Nilvera'dan henüz alınmadıkları için elde edilemedi. PDF'ler "
+"alındığında lütfen tekrar deneyin."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields,help:l10n_tr_nilvera_einvoice.field_res_partner__l10n_tr_nilvera_customer_alias_id
@@ -1619,6 +1672,17 @@ msgid ""
 "canceled goods/services.\n"
 "- Withholding Return: Reverses a previously issued withholding invoice.\n"
 msgstr ""
+"E-fatura/e-arşiv için vergi muamelesi ve doğrulama kurallarını belirleyen "
+"resmi GİB sınıflandırmasını belirtir. \n"
+"- Satış: Standart bir satış faturası. \n"
+"Stopaj: Alıcının KDV'nin bir kısmını ödemekten sorumlu olduğu fatura. \n"
+"İhracat Kayıtlı: Daha sonra ihraç edilecek mallar için düzenlenen fatura. - "
+"Seçildiğinde, bir 'Muafiyet Nedeni' girilmesi zorunludur. \n"
+"- Vergiden Muaf: KDV'den muaf mallar/hizmetler için düzenlenen fatura. "
+"Seçildiğinde, bir \"Muafiyet Nedeni\" girilmesi zorunludur.\n"
+"- İade: İade edilen veya iptal edilen mallar/hizmetler için daha önce "
+"düzenlenmiş bir satış faturasını iptal eder.\n"
+"- Stopaj İadesi: Daha önce düzenlenmiş bir stopaj faturasını iptal eder.\n"
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields.selection,name:l10n_tr_nilvera_einvoice.selection__account_move__l10n_tr_nilvera_send_status__succeed
@@ -1683,6 +1747,8 @@ msgid ""
 "Taxes collected after deducting withholding taxes for this product on the "
 "original invoice."
 msgstr ""
+"Bu ürün için orijinal faturada stopaj vergileri düşüldükten sonra tahsil "
+"edilen vergiler."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields,help:l10n_tr_nilvera_einvoice.field_account_bank_statement_line__l10n_tr_exemption_code_domain_list
@@ -1692,6 +1758,9 @@ msgid ""
 "available exemption codes based on the selected GIB Invoice Type or other "
 "criteria."
 msgstr ""
+"Teknik alan (kullanıcılar için değildir). Seçilen GIB Fatura Türüne veya "
+"diğer kriterlere göre mevcut muafiyet kodları listesini dinamik olarak "
+"filtrelemek için kullanılır."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:l10n_tr_nilvera_einvoice.account.tax.code,name:l10n_tr_nilvera_einvoice.account_tax_code_609
@@ -1699,6 +1768,8 @@ msgid ""
 "Textile and Garment Works, Bag and Shoe Sewing Works and Intermediary "
 "Services for These Works"
 msgstr ""
+"Tekstil ve Giyim İşleri, Çanta ve Ayakkabı Dikim İşleri ve Bu İşlere İlişkin "
+"Aracılık Hizmetleri"
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1726,19 +1797,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_tr_nilvera_einvoice/models/account_move_send.py:0
 msgid "The Tax Office is not set on the following TR Company(s)."
-msgstr ""
+msgstr "Aşağıdaki TR Şirket(ler) Vergi Dairesi Alanı eksik."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
 #: code:addons/l10n_tr_nilvera_einvoice/models/account_move_send.py:0
 msgid "The Tax Office is not set on the following TR Partner(s)."
-msgstr ""
+msgstr "Aşağıdaki TR Ortak(lar) Vergi Dairesi Alanı eksik."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
 #: code:addons/l10n_tr_nilvera_einvoice/models/account_move.py:0
 msgid "The bill must be in 'Successful' status before sending a response."
-msgstr ""
+msgstr "Yanıt göndermeden önce faturanın durumu 'Başarılı' olmalıdır."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1747,6 +1818,8 @@ msgid ""
 "The credit note must be linked to the original invoice, or include the "
 "invoice reference in the reference field."
 msgstr ""
+"Alacak notu, orijinal faturaya bağlanmalı veya referans alanına fatura "
+"referansı eklenmelidir."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1755,6 +1828,8 @@ msgid ""
 "The credit notes must have a valid reference to the original invoice in the "
 "reference field"
 msgstr ""
+"Kredi notlarında, referans alanında orijinal faturaya geçerli bir referans "
+"bulunmalıdır"
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1850,6 +1925,8 @@ msgid ""
 "The invoice could not be converted to the Nilvera format:\n"
 "%s"
 msgstr ""
+"Fatura, Nilvera formatına dönüştürülemedi:\n"
+"%s"
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -1882,6 +1959,8 @@ msgid ""
 "The invoice must have either a completed online payment transaction or a "
 "registered manual payment."
 msgstr ""
+"Faturada ya tamamlanmış bir çevrimiçi ödeme işlemi ya da kaydedilmiş bir "
+"manuel ödeme bulunmalıdır."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields,help:l10n_tr_nilvera_einvoice.field_l10n_tr_nilvera_einvoice_invoice_sequence__l10n_tr_gib_invoice_type
@@ -1926,6 +2005,9 @@ msgid ""
 "This field is mandatory if the 'GIB Invoice Type' is set to 'Registered for "
 "Export' or 'Tax Exempt'"
 msgstr ""
+"Resmi GİB vergi muafiyeti nedeni. \n"
+"'GİB Fatura Türü' 'İhracat Kayıtlı' veya 'Vergiden Muaf' olarak ayarlanmışsa "
+"bu alan zorunludur."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields,help:l10n_tr_nilvera_einvoice.field_l10n_tr_nilvera_einvoice_account_tax_code__name
@@ -1933,6 +2015,8 @@ msgid ""
 "The official description for this GİB code (e.g., 'Kısmi Tevkifat - Yapım "
 "İşleri' or 'Tam İstisna - İhracat')."
 msgstr ""
+"Bu GİB kodunun resmi açıklaması (örn., 'Kısmi Tevkifat - Yapım İşleri' veya "
+"'Tam İstisna - İhracat')."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields,help:l10n_tr_nilvera_einvoice.field_l10n_tr_nilvera_einvoice_account_tax_code__code
@@ -1980,6 +2064,8 @@ msgid ""
 "This code is a unique identifier for the product in Turkey's Centralized "
 "Trade and Stock Management System (CTSP)."
 msgstr ""
+"Bu kod, Türkiye'nin Merkezi Ticaret ve Stok Yönetim Sistemi'nde (CTSP) ürün "
+"için benzersiz bir tanımlayıcıdır."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -2008,6 +2094,9 @@ msgid ""
 "To finalize: Click <b>Confirm</b> and use <b>Send</b> to officially issue it "
 "via Nilvera."
 msgstr ""
+"Sonlandırmak için: \" <b>\" seçeneğine tıklayın. \"</b> \" seçeneğini "
+"onaylayın ve \" <b>\" seçeneğini kullanın. \"</b> \" seçeneğini göndererek "
+"Nilvera aracılığıyla resmi olarak yayınlayın."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -2018,12 +2107,18 @@ msgid ""
 "invoices cannot be reused once an error occurs. Please create a new invoice "
 "to continue."
 msgstr ""
+"Muhasebe bütünlüğünü korumak ve yasal gerekliliklere uymak amacıyla, bir "
+"hata oluştuğunda faturalar yeniden kullanılamaz. Devam etmek için lütfen "
+"yeni bir fatura oluşturun."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model_terms:ir.ui.view,arch_db:l10n_tr_nilvera_einvoice.account_nilvera_view_move_form
 msgid ""
 "To update: Use <b>Send as Draft</b> to sync your latest changes with Nilvera."
 msgstr ""
+"Güncellemek için: <b>adresini kullanın. En son değişikliklerinizi Nilvera "
+"ile senkronize etmek için</b> adresine Taslak Olarak Gönder seçeneğini "
+"kullanın."
 
 #. module: l10n_tr_nilvera_einvoice
 #: model:ir.model.fields,help:l10n_tr_nilvera_einvoice.field_account_bank_statement_line__l10n_tr_nilvera_send_status
@@ -2201,6 +2296,8 @@ msgid ""
 "Within the scope of the IPAC, it refers to the reference linenumber of the "
 "input (purchase/import) item on the document."
 msgstr ""
+"IPAC kapsamında, bu terim belgedeki giriş (Satınalma/ithalat) kaleminin "
+"referans numarasını ifade eder."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python
@@ -2208,6 +2305,8 @@ msgstr ""
 msgid ""
 "You cannot reset to draft an entry that has been sent/received from Nilvera."
 msgstr ""
+"Nilvera'dan gönderilmiş/alınmış bir girişi taslak haline geri "
+"döndüremezsiniz."
 
 #. module: l10n_tr_nilvera_einvoice
 #. odoo-python

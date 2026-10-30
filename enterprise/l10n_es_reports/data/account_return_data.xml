@@ -45,5 +45,12 @@
             <field name="country_id" ref="base.es"/>
             <field name="states_workflow">generic_state_review_submit</field>
         </record>
+        <record id="es_mod420_tax_return_type" model="account.return.type">
+            <field name="name">Tax Return (Mod 420) (ES)</field>
+            <field name="report_id" ref="l10n_es.mod_420"/>
+            <field name="country_id" ref="base.es" />
+            <field name="default_deadline_days_delay">20</field>
+            <field name="auto_generate" eval="False"/>
+        </record>
     </data>
 </odoo>

@@ -206,3 +206,35 @@ class TestHrPayrollEmployeeDepartureNotice(TestPayrollCommon):
         departure.action_register()
 
         self.assertTrue(version.fixed_term)
+
+    def test_departure_without_dismissal_date(self):
+        Departure = self.env['hr.employee.departure'].with_context(
+            default_employee_id=self.employee_a.id,
+        )
+        departure_form = Form(Departure)
+        departure_form.departure_reason_id = self.env.ref('hr.departure_fired')
+        departure_form.dismissal_date = False
+
+    @freeze_time("2026-10-01")
+    def test_notice_period_regime_with_amendment_after_august_2026(self):
+        """ The notice regime applicable from 01/08/2026 depends on the start of
+            the employment, not on the start of the current amendment.
+        """
+        employee = self.create_employee({
+            'name': 'Employee Hired Before August 2026',
+            'date_version': date(2026, 6, 1),
+            'contract_date_start': date(2026, 6, 1),
+        })
+        employee.create_version({
+            'date_version': date(2026, 9, 1),
+            'wage': 3000,
+        })
+        self.assertEqual(employee.current_version_id.date_start, date(2026, 9, 1))
+        departure = self.env['hr.employee.departure'].create({
+            'employee_id': employee.id,
+            'dismissal_date': '2026-10-01',
+            'departure_reason_id': self.leaving_type_fired.id,
+        })
+        self.assertEqual(departure.l10n_be_first_contract_date, date(2026, 6, 1))
+        # 4 months of seniority: 4 weeks with the regime before 01/08/2026 (1 week after)
+        self.assertEqual(departure.l10n_be_notice_duration_week_after_2014, 4)

@@ -96,7 +96,7 @@ export class FakeEventsPlugin extends Plugin {
             () => ({
                 title: `${randomChoice(gdocTitles)} - Google Docs`,
                 url: `https://docs.google.com/document/d/${Math.random().toString(36).slice(2)}`,
-                type: "word",
+                type: "document",
             }),
         ];
 
@@ -121,9 +121,9 @@ export class FakeEventsPlugin extends Plugin {
             {
                 app: "Discord",
                 title: `@${randomChoice(discordContacts)} - Discord`,
-                type: "communication",
+                type: "messaging",
             },
-            { app: "Terminal", title: "Terminal", type: "code" },
+            { app: "Terminal", title: "Terminal", type: "development" },
         ];
 
         while (cursor < end) {
@@ -131,7 +131,7 @@ export class FakeEventsPlugin extends Plugin {
             const stop = Math.min(cursor + duration * 1000, end);
             const r = Math.random();
 
-            const eventData = (data, url = null, type = "code") => {
+            const eventData = (data, url = null, type = "development") => {
                 const ev = {
                     timestamp: new Date(cursor).toISOString(),
                     duration: Math.floor((stop - cursor) / 1000),

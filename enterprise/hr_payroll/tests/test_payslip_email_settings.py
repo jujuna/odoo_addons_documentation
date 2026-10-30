@@ -181,23 +181,12 @@ class TestPayslipEmailSettings(TestPayslipBase):
             )
 
     def test_multi_company(self):
-        company_send_on_confirm_payslips = sum(
-            [self.payslip_1, self.payslip_2], self.env['hr.payslip']
-        )
-        company_send_on_paid_payslips = sum(
-            [self.payslip_3, self.payslip_4], self.env['hr.payslip']
-        )
-        company_never_send = sum(
-            [self.payslip_5, self.payslip_6], self.env['hr.payslip']
-        )
-        all_payslips = sum(
-            [
-                company_send_on_confirm_payslips,
-                company_send_on_paid_payslips,
-                company_never_send,
-            ],
-            self.env['hr.payslip'],
-        )
+        company_send_on_confirm_payslips = self.payslip_1 | self.payslip_2 | self.payslip_1.copy() | self.payslip_1.copy() | self.payslip_1.copy() | self.payslip_1.copy()
+        company_send_on_paid_payslips = self.payslip_3 | self.payslip_4 | self.payslip_3.copy() | self.payslip_3.copy() | self.payslip_3.copy() | self.payslip_3.copy()
+        company_never_send = self.payslip_5 | self.payslip_6 | self.payslip_5.copy() | self.payslip_5.copy() | self.payslip_5.copy() | self.payslip_5.copy()
+        all_payslips = company_send_on_confirm_payslips \
+                     | company_send_on_paid_payslips \
+                     | company_never_send
 
         self._validate_payslip(all_payslips)
 

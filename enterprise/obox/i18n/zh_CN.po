@@ -3,15 +3,16 @@
 # * obox
 #
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-18 04:52+0000\n"
+"POT-Creation-Date: 2026-10-16 17:49+0000\n"
+"PO-Revision-Date: 2026-10-22 06:40+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/obox/zh_Hans/>\n"
+"projects/odoo-20/obox/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,6 +30,12 @@ msgid ""
 "        it as processed in an atomic way to avoid conflicts.\n"
 "    "
 msgstr ""
+"\n"
+"        队列只是一个用于存储 Obox 设备待执行操作的模型。设备会通过\n"
+"        get_next_action 方法获取下一个要执行的操作，该方法会返回该操作并以原"
+"子方式\n"
+"        将其标记为已处理，以避免冲突。\n"
+"    "
 
 #. module: obox
 #: model:ir.module.module,description:base.module_obox
@@ -42,103 +49,110 @@ msgid ""
 "This module allows you to manage your Obox devices, their certificates,\n"
 "and their connections to your Odoo databases.\n"
 msgstr ""
+"\n"
+"本模块用于在 Odoo 中管理您的 Odoo 物联网盒（Obox）。\n"
+"Obox 即 Odoo 物联网盒，是一种硬件设备，可用于连接外部\n"
+"设备（如打印机、秤、支付终端等）到 Odoo。\n"
+"\n"
+"本模块让您可以管理 Obox 设备、其证书，\n"
+"以及它们与 Odoo 数据库的连接。\n"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_queue.py:0
 msgid "%s devices found"
-msgstr ""
+msgstr "找到 %s 台设备"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_offline_connect_wizard_view_form
 msgid "192.168.1.x"
-msgstr ""
+msgstr "192.168.1.x"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_view_kanban
 msgid "<i class=\"oi\" data-icon=\"power\" title=\"Devices\"/>"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"power\" title=\"设备\"/>"
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__action_type__action
 msgid "Action"
-msgstr ""
+msgstr "操作"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_form
 msgid "Action Queue"
-msgstr ""
+msgstr "操作队列"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.view_obox_queue_search
 msgid "Action Type"
-msgstr ""
+msgstr "操作类型"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__active
 msgid "Active"
-msgstr ""
+msgstr "有效"
 
 #. module: obox
 #: model:res.groups,comment:obox.group_obox_user
 msgid "Allows the management of Obox devices"
-msgstr ""
+msgstr "允许管理 Obox 设备"
 
 #. module: obox
 #: model:ir.model.constraint,message:obox.constraint_obox_obox_unique_serial_number
 msgid "An Obox must have a unique serial number."
-msgstr ""
+msgstr "Obox 必须具有唯一的序列号。"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_action_button.js:0
 msgid "Are you sure that you want to restart this Obox?"
-msgstr ""
+msgstr "您确定要重启此 Obox 吗？"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_action_button.js:0
 msgid "Are you sure that you want to test the connection with this Obox?"
-msgstr ""
+msgstr "您确定要测试与此 Obox 的连接吗？"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_remote_debug.xml:0
 msgid "Be careful:"
-msgstr ""
+msgstr "请注意："
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_device__type__camera
 msgid "Camera"
-msgstr ""
+msgstr "摄像头"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_offline_connect_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_list
 #: model_terms:ir.ui.view,arch_db:obox.obox_offline_connect_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:obox.obox_view_kanban
 msgid "Connect"
-msgstr ""
+msgstr "连接"
 
 #. module: obox
 #: model:ir.model,name:obox.model_obox_offline_connect_wizard
 msgid "Connect Obox Offline"
-msgstr ""
+msgstr "离线连接 Obox"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_device__connection_type
 msgid "Connection Type"
-msgstr ""
+msgstr "连接类型"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/client_actions/offline_connect_wizard.js:0
 msgid "Could not find any Obox with this IP address"
-msgstr ""
+msgstr "未找到使用此 IP 地址的 Obox"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_device__create_uid
@@ -146,7 +160,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:obox.field_obox_offline_connect_wizard__create_uid
 #: model:ir.model.fields,field_description:obox.field_obox_queue__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "创建人"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_device__create_date
@@ -154,65 +168,65 @@ msgstr ""
 #: model:ir.model.fields,field_description:obox.field_obox_offline_connect_wizard__create_date
 #: model:ir.model.fields,field_description:obox.field_obox_queue__create_date
 msgid "Created on"
-msgstr ""
+msgstr "创建日期"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.view_obox_queue_search
 msgid "Creation Date"
-msgstr ""
+msgstr "创建日期"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__device_ids
 msgid "Device"
-msgstr ""
+msgstr "设备"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__device_count
 msgid "Device Count"
-msgstr ""
+msgstr "设备计数"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_device_view_kanban
 msgid "Device type is {{0}}"
-msgstr ""
+msgstr "装置类型是 {{0}}"
 
 #. module: obox
 #: model:ir.actions.act_window,name:obox.action_obox_device_list
 #: model:ir.ui.menu,name:obox.menu_obox_device
 #: model_terms:ir.ui.view,arch_db:obox.obox_form
 msgid "Devices"
-msgstr ""
+msgstr "设备"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_remote_debug.xml:0
 msgid "Disable"
-msgstr ""
+msgstr "禁用"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_remote_debug.xml:0
 msgid "Discard"
-msgstr ""
+msgstr "丢弃"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_action_button.js:0
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__action_type__disconnect
 msgid "Disconnect"
-msgstr ""
+msgstr "中断连接"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_action_button.js:0
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__action_type__discover_devices
 msgid "Discover Devices"
-msgstr ""
+msgstr "发现设备"
 
 #. module: obox
 #: model:ir.actions.client,name:obox.action_discover_obox
 msgid "Discover Obox"
-msgstr ""
+msgstr "发现 Obox"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_ir_actions_report__display_name
@@ -222,75 +236,75 @@ msgstr ""
 #: model:ir.model.fields,field_description:obox.field_obox_queue__display_name
 #: model:ir.model.fields,field_description:obox.field_printer_printer__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "显示名称"
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__status__done
 msgid "Done"
-msgstr ""
+msgstr "已完成"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_remote_debug.xml:0
 msgid "Enable"
-msgstr ""
+msgstr "启用"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "Error reading scale: %s"
-msgstr ""
+msgstr "读取秤时出错：%s"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "Error taking photo: %s"
-msgstr ""
+msgstr "拍照时出错：%s"
 
 #. module: obox
 #: model:ir.model.constraint,message:obox.constraint_obox_device_unique_identifier
 msgid "Every device connected to an Obox must have a unique identifier."
-msgstr ""
+msgstr "连接到 Obox 的每台设备都必须具有唯一标识符。"
 
 #. module: obox
 #: model:ir.model,name:obox.model_printer_printer
 msgid "External Printer"
-msgstr ""
+msgstr "外部打印机"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/client_actions/discover_obox.js:0
 msgid "Failed to discover Oboxes on local network"
-msgstr ""
+msgstr "无法在本地网络中发现 Obox"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/client_actions/discover_obox.js:0
 msgid "Failed to pair Obox %s"
-msgstr ""
+msgstr "配对 Obox %s 失败"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_action_button.js:0
 msgid "Failed to perform the action on Obox"
-msgstr ""
+msgstr "在 Obox 上执行操作失败"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "Failed to reach device"
-msgstr ""
+msgstr "无法连接设备"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_queue.py:0
 msgid "Failed to toggle remote debug"
-msgstr ""
+msgstr "切换远程调试失败"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__finished_queue_ids
 msgid "Finished Actions"
-msgstr ""
+msgstr "已完成的操作"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_ir_actions_report__id
@@ -332,7 +346,7 @@ msgstr "最后更新日期"
 #. odoo-python
 #: code:addons/obox/models/printer.py:0
 msgid "Linked Obox device is not a printer"
-msgstr ""
+msgstr "关联的 Obox 设备不是打印机"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_device__local_ip
@@ -344,13 +358,13 @@ msgstr "本地网络 IP"
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_status.js:0
 msgid "Local Network reachable"
-msgstr ""
+msgstr "本地网络可达"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_status.js:0
 msgid "Local Network unreachable"
-msgstr ""
+msgstr "本地网络不可达"
 
 #. module: obox
 #: model:ir.ui.menu,name:obox.menu_obox_queue
@@ -374,7 +388,7 @@ msgstr ""
 #. module: obox
 #: model:ir.ui.menu,name:obox.menu_obox_manage_printers
 msgid "Manage Printers"
-msgstr ""
+msgstr "管理打印机"
 
 #. module: obox
 #: model:res.groups,name:obox.group_obox_user
@@ -385,7 +399,7 @@ msgstr "管理 Obox 设备"
 #. odoo-python
 #: code:addons/obox/models/printer.py:0
 msgid "Must be an Obox printer"
-msgstr ""
+msgstr "必须是 Obox 打印机"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_device__name
@@ -397,12 +411,12 @@ msgstr "名称"
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_device__connection_type__network
 msgid "Network"
-msgstr ""
+msgstr "网络"
 
 #. module: obox
 #: model:res.groups.privilege,placeholder:obox.privilege_obox
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #. module: obox
 #: model_terms:ir.actions.act_window,help:obox.action_obox_list
@@ -412,7 +426,7 @@ msgstr "未找到 Obox 设备"
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_queue_view_form
 msgid "No payload available"
-msgstr ""
+msgstr "无可用负载"
 
 #. module: obox
 #: model_terms:ir.actions.act_window,help:obox.action_obox_queue_list
@@ -436,88 +450,88 @@ msgstr "ODO010000xx"
 #: model_terms:ir.ui.view,arch_db:obox.obox_form
 #: model_terms:ir.ui.view,arch_db:obox.view_obox_queue_search
 msgid "Obox"
-msgstr ""
+msgstr "Obox"
 
 #. module: obox
 #: model:ir.module.module,shortdesc:base.module_obox
 msgid "Obox - Odoo IoT management"
-msgstr ""
+msgstr "Obox - Odoo 物联网管理"
 
 #. module: obox
 #: model:ir.model,name:obox.model_obox_device
 msgid "Obox Device"
-msgstr ""
+msgstr "Obox 设备"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_printer_printer__obox_device_id
 msgid "Obox Printer Device"
-msgstr ""
+msgstr "Obox 打印机设备"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_queue_view_form
 #: model_terms:ir.ui.view,arch_db:obox.obox_queue_view_list
 #: model_terms:ir.ui.view,arch_db:obox.view_obox_queue_search
 msgid "Obox Queue"
-msgstr ""
+msgstr "Obox 队列"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_offline_connect_wizard__serial_number
 #: model:ir.model.fields,field_description:obox.field_obox_queue__obox_serial_number
 msgid "Obox Serial Number"
-msgstr ""
+msgstr "Obox 序列号"
 
 #. module: obox
 #: model:ir.model.fields,help:obox.field_obox_queue__obox_id
 msgid "Obox id"
-msgstr ""
+msgstr "Obox ID"
 
 #. module: obox
 #: model:ir.actions.act_window,name:obox.action_obox_queue_list
 msgid "Obox queue"
-msgstr ""
+msgstr "Obox 队列"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_queue.py:0
 msgid "Only one pending action of this type is allowed per device."
-msgstr ""
+msgstr "每台设备只允许存在一个该类型的待处理操作。"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "PDF report"
-msgstr ""
+msgstr "PDF 报表"
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_obox__state__02_paired
 msgid "Paired"
-msgstr ""
+msgstr "已配对"
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_obox__state__01_pairing
 msgid "Pairing"
-msgstr ""
+msgstr "配对中"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_queue__payload
 #: model_terms:ir.ui.view,arch_db:obox.obox_queue_view_form
 msgid "Payload"
-msgstr ""
+msgstr "负载"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_queue__payload_length
 msgid "Payload Length"
-msgstr ""
+msgstr "负载长度"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_queue_view_form
 msgid "Payload of the action will be displayed here if available."
-msgstr ""
+msgstr "操作的负载（如有）将显示在此处。"
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__status__pending
 msgid "Pending"
-msgstr ""
+msgstr "待处理"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__pending_queue_ids
@@ -537,19 +551,19 @@ msgstr "打印机"
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__status__processing
 msgid "Processing"
-msgstr ""
+msgstr "处理中"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_obox.py:0
 msgid "Queue"
-msgstr ""
+msgstr "队列"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "Receipt"
-msgstr ""
+msgstr "小票"
 
 #. module: obox
 #. odoo-javascript
@@ -557,24 +571,24 @@ msgstr ""
 #: code:addons/obox/static/src/widgets/obox_remote_debug.xml:0
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__action_type__remote_debug
 msgid "Remote Debug"
-msgstr ""
+msgstr "远程调试"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__remote_debug_enabled
 msgid "Remote Debug Enabled"
-msgstr ""
+msgstr "已启用远程调试"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_queue.py:0
 msgid "Remote debug is disabled"
-msgstr ""
+msgstr "远程调试已禁用"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_queue.py:0
 msgid "Remote debug is enabled"
-msgstr ""
+msgstr "远程调试已启用"
 
 #. module: obox
 #. odoo-javascript
@@ -585,112 +599,120 @@ msgid ""
 "                and local network. If this is unintended, click on "
 "\"Disable\" below."
 msgstr ""
+"已启用远程调试，您所提供令牌的所有者可以访问您的 Obox\n"
+"                和本地网络。如果这不是您想要的结果，请点击下方的\"禁用\"。"
 
 #. module: obox
 #: model:ir.model,name:obox.model_ir_actions_report
 msgid "Report Action"
-msgstr ""
+msgstr "报表操作"
 
 #. module: obox
 #: model:ir.ui.menu,name:obox.menu_obox_reporting_section
 msgid "Reporting"
-msgstr ""
+msgstr "报表"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_queue__action_type
 msgid "Request type"
-msgstr ""
+msgstr "请求类型"
 
 #. module: obox
 #: model:ir.ui.menu,name:obox.menu_obox_reset_printers
 msgid "Reset Linked Printers"
-msgstr ""
+msgstr "重置链接的打印机"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_action_button.js:0
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__action_type__restart
 msgid "Restart"
-msgstr ""
+msgstr "重启"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_queue__result
 #: model_terms:ir.ui.view,arch_db:obox.obox_queue_view_form
 msgid "Result"
-msgstr ""
+msgstr "结果"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_queue_view_form
 msgid "Result of the action will be displayed here."
-msgstr ""
+msgstr "操作的结果将显示在此处。"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_queue__retry
 msgid "Retry"
-msgstr ""
+msgstr "重试"
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_device__type__scale
 msgid "Scale"
-msgstr ""
+msgstr "秤"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "Scale reads %skg"
-msgstr ""
+msgstr "秤读数为 %skg"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.xml:0
 msgid "Select test print type"
-msgstr ""
+msgstr "选择测试打印类型"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__serial_number
 msgid "Serial Number"
-msgstr ""
+msgstr "序列号"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__services
 msgid "Services"
-msgstr ""
+msgstr "服务"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/client_actions/obox_printer_handler.js:0
 msgid "Started printing operation on printer %s..."
-msgstr ""
+msgstr "打印机 %s 已开始打印操作⋯"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__state
 msgid "State"
-msgstr ""
+msgstr "状态"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_queue__status
 #: model_terms:ir.ui.view,arch_db:obox.view_obox_queue_search
 msgid "Status"
-msgstr ""
+msgstr "状态"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.xml:0
 #: model:ir.model.fields.selection,name:obox.selection__obox_queue__action_type__test
 msgid "Test"
-msgstr ""
+msgstr "测试"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_action_button.js:0
 msgid "Test Connection"
-msgstr ""
+msgstr "连接测试"
+
+#. module: obox
+#. odoo-javascript
+#: code:addons/obox/static/src/widgets/test_obox_device.js:0
+msgid "Test print failed: %s"
+msgstr "测试打印失败：%s"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "Test print successful"
-msgstr ""
+msgstr "测试打印成功"
 
 #. module: obox
 #. odoo-javascript
@@ -698,7 +720,7 @@ msgstr ""
 msgid ""
 "This action will scan for any new devices connected to the Obox. It can take "
 "up to a minute to complete."
-msgstr ""
+msgstr "此操作将扫描连接到 Obox 的任何新设备。最多可能需要一分钟才能完成。"
 
 #. module: obox
 #. odoo-javascript
@@ -706,88 +728,88 @@ msgstr ""
 #: model:ir.model.fields,field_description:obox.field_obox_obox__token
 #: model:ir.model.fields,field_description:obox.field_obox_offline_connect_wizard__token
 msgid "Token"
-msgstr ""
+msgstr "令牌"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_queue.py:0
 msgid "Token is invalid"
-msgstr ""
+msgstr "令牌无效"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_device__type
 #: model:ir.model.fields,field_description:obox.field_printer_printer__type
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #. module: obox
 #: model:ir.model.fields.selection,name:obox.selection__obox_device__connection_type__usb
 msgid "USB"
-msgstr ""
+msgstr "USB"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_queue__uuid
 msgid "UUID"
-msgstr ""
+msgstr "唯一识别码 (UUID)"
 
 #. module: obox
 #: model:ir.actions.act_window,name:obox.action_obox_offline_connect_offline
 #: model_terms:ir.ui.view,arch_db:obox.obox_offline_connect_wizard_view_form
 msgid "We couldn't automatically pair your Obox"
-msgstr ""
+msgstr "我们无法自动配对您的 Obox"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_status.js:0
 msgid "WebSocket connected"
-msgstr ""
+msgstr "WebSocket 已连接"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_status.js:0
 msgid "WebSocket disconnected"
-msgstr ""
+msgstr "WebSocket 已断开"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__external_websocket_channel
 msgid "Websocket Channel for the device"
-msgstr ""
+msgstr "设备的 Websocket 通道"
 
 #. module: obox
 #: model:ir.model.fields,field_description:obox.field_obox_obox__internal_websocket_channel
 msgid "Websocket Channel within Odoo"
-msgstr ""
+msgstr "Odoo 内的 Websocket 通道"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_remote_debug.xml:0
 msgid ""
 "You can enable remote debug on your Obox by providing a Tailscale token."
-msgstr ""
+msgstr "您可以通过提供 Tailscale 令牌来在 Obox 上启用远程调试。"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/test_obox_device.js:0
 msgid "ZPL label"
-msgstr ""
+msgstr "ZPL 标签"
 
 #. module: obox
 #: model_terms:ir.ui.view,arch_db:obox.obox_device_view_kanban
 msgid "connection_type"
-msgstr ""
+msgstr "connection_type"
 
 #. module: obox
 #. odoo-javascript
 #: code:addons/obox/static/src/widgets/obox_remote_debug.xml:0
 msgid ""
 "it enables remote access to your local network to the owner of the token."
-msgstr ""
+msgstr "它会让令牌所有者可以远程访问您的本地网络。"
 
 #. module: obox
 #. odoo-python
 #: code:addons/obox/models/obox_obox.py:0
 msgid "obox_id"
-msgstr ""
+msgstr "obox_id"
 
 #~ msgid "Pending action(s)"
 #~ msgstr "待处理操作"

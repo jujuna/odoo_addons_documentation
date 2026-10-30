@@ -20,7 +20,7 @@ _logger = logging.getLogger(__name__)
 ACCESS_KEY_RE = re.compile(r"(?:NFe)?(\d{22}(\d{3})(\d{9})\d{10})")
 
 SANDBOX_URL = "https://api-test.envia.com/"
-SANDBOX_QUERY_URL = "https://queries-test.envia.com/"
+SANDBOX_QUERY_URL = "https://queries.test.envia.com/"
 SANDBOX_LABEL_URL = "https://dev.envia.com/"
 PROD_URL = "https://api.envia.com/"
 PROD_QUERY_URL = "https://queries.envia.com/"

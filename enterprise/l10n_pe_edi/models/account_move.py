@@ -44,7 +44,7 @@ CATALOG52 = [
 REFUND_REASON = [
     ('01', 'Cancellation of the operation'),
     ('02', 'Cancellation by error in the RUC'),
-    ('03', 'Correction by error in the description'),
+    ('03', 'Correction by error in the description and/or SUNAT product code'),
     ('04', 'Global discount'),
     ('05', 'Discount per item'),
     ('06', 'Total refund'),
@@ -89,7 +89,7 @@ class AccountMove(models.Model):
         help="Peru: Reason given by the user for cancelling this move, structure of voided summary: sac:VoidReasonDescription.")
     l10n_pe_edi_operation_type = fields.Selection(
         selection=[
-            ('0101', '[0101] Internal sale'),
+            ('0101', '[0101] Internal sale not subject to detraction or perception'),
             ('0112', '[0112] Internal Sale - Sustains Natural Person Deductible Expenses'),
             ('0113', '[0113] Internal Sale-NRUS'),
             ('0200', '[0200] Export of Goods'),
@@ -102,13 +102,14 @@ class AccountMove(models.Model):
             ('0207', '[0207] Exportation of Services - Supply of electric power in favor of subjects domiciled in ZED'),
             ('0208', '[0208] Exportation of Services - Provision of services partially carried out abroad'),
             ('0301', '[0301] Operations with air waybill (issued in the national scope)'),
-            ('0302', '[0302] Passenger rail transport operations'), ('0303', '[0303] Oil royalty Pay Operations'),
+            ('0302', '[0302] Passenger rail transport operations'), ('0303', '[0303] Oil royalty Pay Operations (Obsolete)'),
             ('0401', '[0401] Non-domiciled sales that do not qualify as an export'),
             ('1001', '[1001] Operation Subject to Detraction'),
             ('1002', '[1002] Operation Subject to Detraction - Hydrobiological Resources'),
             ('1003', '[1003] Operation Subject to Drawdown - Passenger Transport Services'),
             ('1004', '[1004] Operation Subject to Drawdown - Cargo Transportation Services'),
-            ('2001', '[2001] Operation Subject to Perception')
+            ('2001', '[2001] Operation Subject to Perception'),
+            ('2106', '[2106] National sale to tourists - Tax Free'),
         ],
         string="Operation Type (PE)",
         store=True, readonly=False,
@@ -223,7 +224,10 @@ class AccountMove(models.Model):
                 move.state == 'draft'
                 and move.country_code == 'PE'
                 and move.partner_id.l10n_pe_sunat_id_code != PE_RUC_SUNAT_CODE
-                and move.l10n_pe_edi_operation_type in ('0200', '0201', '0202', '0203', '0204', '0205', '0206', '0207', '0208')
+                and (
+                    move.l10n_pe_edi_operation_type in ('0200', '0201', '0202', '0203', '0204', '0205', '0206', '0207', '0208')
+                    or move.l10n_pe_edi_operation_type == '2106' and move.move_type == 'out_invoice'
+                )
                 and move.journal_id.type == 'sale'
             )
         )
@@ -386,6 +390,10 @@ class AccountMove(models.Model):
                 'raw': zip_edi_str,
                 'mimetype': 'application/zip',
             })
+            # Creating the ZIP via res_field doesn't trigger the depends chain, so
+            # l10n_pe_edi_attachment_id may be stale in cache. Invalidate to ensure
+            # any caller sees the new attachment immediately (e.g. Send & Print email).
+            self.invalidate_recordset(fnames=['l10n_pe_edi_attachment_file', 'l10n_pe_edi_attachment_id'])
 
             if self.company_id.l10n_pe_edi_test_env:
                 message = self.env._("Testing environment is active, care that those documents are not synced with SUNAT!")
@@ -1118,7 +1126,7 @@ class AccountMove(models.Model):
         if cdr:
             return 'https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl'
         if self.company_id.l10n_pe_edi_test_env:
-            return 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl'
+            return self._l10n_pe_edi_get_sunat_beta_wsdl()
         return self._l10n_pe_edi_get_sunat_wsdl()
 
     @api.model
@@ -1254,10 +1262,9 @@ class AccountMove(models.Model):
 
         lines = self.invoice_line_ids.filtered(lambda line: line.display_type not in ('line_section', 'line_subsection', 'line_note'))
 
-        # Withholding taxes must be on all invoice lines or none. (Note they are the only type of IGV taxes that can be joined with other IGV taxes.
         withholding_tax_group_id = self.env['account.chart.template'].with_company(self.company_id).ref('tax_group_igv_withholding', raise_if_not_found=False)
-        if withholding_tax_group_id and len({withholding_tax_group_id in line.tax_ids.tax_group_id for line in lines}) != 1:
-            res['l10n_pe_mixed_withholding'] = {'message': self.env._("All invoice lines must have the same withholding setting when the customer is a withholding agent. You cannot mix lines with withholding and lines without withholding on the same invoice."), 'level': 'danger'}
+        if withholding_error := self._l10n_pe_edi_get_igv_withholding_error():
+            res['l10n_pe_mixed_withholding'] = {'message': withholding_error, 'level': 'danger'}
 
         for line in lines:
             taxes = line.tax_ids
@@ -1282,6 +1289,17 @@ class AccountMove(models.Model):
         if self.l10n_pe_edi_is_required and self.l10n_latam_document_type_id.code in ('07', '08') and any(self.invoice_line_ids.mapped('discount')):
             res['l10n_pe_no_discount_on_credit_debit'] = {'message': self.env._("Credit and Debit notes with discounts are not allowed in SUNAT. Please adjust the lines to confirm the document."), 'level': 'danger'}
         return res
+
+    def _l10n_pe_edi_get_igv_withholding_error(self):
+        """Return an error when the IGV withholding tax is on some lines taxed with IGV but not all."""
+        self.ensure_one()
+        withholding_tax_group = self.env['account.chart.template'].with_company(self.company_id).ref('tax_group_igv_withholding', raise_if_not_found=False)
+        if not withholding_tax_group:
+            return False
+        igv_lines = self.invoice_line_ids.filtered(lambda line: '1000' in line.tax_ids.mapped('l10n_pe_edi_tax_code'))
+        if len({withholding_tax_group in line.tax_ids.tax_group_id for line in igv_lines}) > 1:
+            return self.env._("Withholding tax applies to all taxable items (with IGV). Ensure retention is applied to all IGV-eligible products on this invoice.")
+        return False
 
     def _l10n_pe_edi_transform_error(self, api_error):
         allowed_keys = ['message', 'level', 'action_call', 'action_text', 'action']
@@ -1358,6 +1376,167 @@ class AccountMove(models.Model):
                 </wsdl:port>
             </wsdl:service>
             </wsdl:definitions>''')
+
+    @api.model
+    def _l10n_pe_edi_get_sunat_beta_wsdl(self):
+        """Return the self-contained WSDL of the SUNAT beta billService, with the types and messages inlined instead of
+        imported, so that zeep does not need to fetch any additional resource from the beta server.
+        """
+        return io.BytesIO(b'''
+            <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://service.sunat.gob.pe" targetNamespace="http://service.sunat.gob.pe">
+            <wsdl:types>
+                <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" version="1.0" targetNamespace="http://service.sunat.gob.pe">
+                    <xs:element name="getStatus" type="tns:getStatus"/>
+                    <xs:element name="getStatusResponse" type="tns:getStatusResponse"/>
+                    <xs:element name="sendBill" type="tns:sendBill"/>
+                    <xs:element name="sendBillResponse" type="tns:sendBillResponse"/>
+                    <xs:element name="sendPack" type="tns:sendPack"/>
+                    <xs:element name="sendPackResponse" type="tns:sendPackResponse"/>
+                    <xs:element name="sendSummary" type="tns:sendSummary"/>
+                    <xs:element name="sendSummaryResponse" type="tns:sendSummaryResponse"/>
+                    <xs:complexType name="getStatus">
+                        <xs:sequence>
+                            <xs:element name="ticket" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="getStatusResponse">
+                        <xs:sequence>
+                            <xs:element name="status" type="tns:statusResponse" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="statusResponse">
+                        <xs:sequence>
+                            <xs:element name="content" type="xs:base64Binary" minOccurs="0"/>
+                            <xs:element name="statusCode" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="sendBill">
+                        <xs:sequence>
+                            <xs:element name="fileName" type="xs:string" minOccurs="0"/>
+                            <xs:element name="contentFile" xmime:expectedContentTypes="application/octet-stream" type="xs:base64Binary" minOccurs="0"/>
+                            <xs:element name="partyType" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="sendBillResponse">
+                        <xs:sequence>
+                            <xs:element name="applicationResponse" type="xs:base64Binary" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="sendPack">
+                        <xs:sequence>
+                            <xs:element name="fileName" type="xs:string" minOccurs="0"/>
+                            <xs:element name="contentFile" xmime:expectedContentTypes="application/octet-stream" type="xs:base64Binary" minOccurs="0"/>
+                            <xs:element name="partyType" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="sendPackResponse">
+                        <xs:sequence>
+                            <xs:element name="ticket" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="sendSummary">
+                        <xs:sequence>
+                            <xs:element name="fileName" type="xs:string" minOccurs="0"/>
+                            <xs:element name="contentFile" xmime:expectedContentTypes="application/octet-stream" type="xs:base64Binary" minOccurs="0"/>
+                            <xs:element name="partyType" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:complexType name="sendSummaryResponse">
+                        <xs:sequence>
+                            <xs:element name="ticket" type="xs:string" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:schema>
+            </wsdl:types>
+            <wsdl:message name="getStatus">
+                <wsdl:part name="parameters" element="tns:getStatus"/>
+            </wsdl:message>
+            <wsdl:message name="getStatusResponse">
+                <wsdl:part name="parameters" element="tns:getStatusResponse"/>
+            </wsdl:message>
+            <wsdl:message name="sendBill">
+                <wsdl:part name="parameters" element="tns:sendBill"/>
+            </wsdl:message>
+            <wsdl:message name="sendBillResponse">
+                <wsdl:part name="parameters" element="tns:sendBillResponse"/>
+            </wsdl:message>
+            <wsdl:message name="sendPack">
+                <wsdl:part name="parameters" element="tns:sendPack"/>
+            </wsdl:message>
+            <wsdl:message name="sendPackResponse">
+                <wsdl:part name="parameters" element="tns:sendPackResponse"/>
+            </wsdl:message>
+            <wsdl:message name="sendSummary">
+                <wsdl:part name="parameters" element="tns:sendSummary"/>
+            </wsdl:message>
+            <wsdl:message name="sendSummaryResponse">
+                <wsdl:part name="parameters" element="tns:sendSummaryResponse"/>
+            </wsdl:message>
+            <wsdl:portType name="billService">
+                <wsdl:operation name="getStatus">
+                    <wsdl:input name="getStatusRequest" message="tns:getStatus"/>
+                    <wsdl:output name="getStatusResponse" message="tns:getStatusResponse"/>
+                </wsdl:operation>
+                <wsdl:operation name="sendBill">
+                    <wsdl:input name="sendBillRequest" message="tns:sendBill"/>
+                    <wsdl:output name="sendBillResponse" message="tns:sendBillResponse"/>
+                </wsdl:operation>
+                <wsdl:operation name="sendPack">
+                    <wsdl:input name="sendPackRequest" message="tns:sendPack"/>
+                    <wsdl:output name="sendPackResponse" message="tns:sendPackResponse"/>
+                </wsdl:operation>
+                <wsdl:operation name="sendSummary">
+                    <wsdl:input name="sendSummaryRequest" message="tns:sendSummary"/>
+                    <wsdl:output name="sendSummaryResponse" message="tns:sendSummaryResponse"/>
+                </wsdl:operation>
+            </wsdl:portType>
+            <wsdl:binding name="BillServicePortBinding" type="tns:billService">
+                <soap11:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+                <wsdl:operation name="getStatus">
+                    <soap11:operation soapAction="urn:getStatus" style="document"/>
+                    <wsdl:input name="getStatusRequest">
+                        <soap11:body use="literal"/>
+                    </wsdl:input>
+                    <wsdl:output name="getStatusResponse">
+                        <soap11:body use="literal"/>
+                    </wsdl:output>
+                </wsdl:operation>
+                <wsdl:operation name="sendBill">
+                    <soap11:operation soapAction="urn:sendBill" style="document"/>
+                    <wsdl:input name="sendBillRequest">
+                        <soap11:body use="literal"/>
+                    </wsdl:input>
+                    <wsdl:output name="sendBillResponse">
+                        <soap11:body use="literal"/>
+                    </wsdl:output>
+                </wsdl:operation>
+                <wsdl:operation name="sendPack">
+                    <soap11:operation soapAction="urn:sendPack" style="document"/>
+                    <wsdl:input name="sendPackRequest">
+                        <soap11:body use="literal"/>
+                    </wsdl:input>
+                    <wsdl:output name="sendPackResponse">
+                        <soap11:body use="literal"/>
+                    </wsdl:output>
+                </wsdl:operation>
+                <wsdl:operation name="sendSummary">
+                    <soap11:operation soapAction="urn:sendSummary" style="document"/>
+                    <wsdl:input name="sendSummaryRequest">
+                        <soap11:body use="literal"/>
+                    </wsdl:input>
+                    <wsdl:output name="sendSummaryResponse">
+                        <soap11:body use="literal"/>
+                    </wsdl:output>
+                </wsdl:operation>
+            </wsdl:binding>
+            <wsdl:service name="billService">
+                <wsdl:port name="BillServicePort" binding="tns:BillServicePortBinding">
+                    <soap11:address location="https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService"/>
+                </wsdl:port>
+            </wsdl:service>
+            </wsdl:definitions>
+            '''
+        )
 
     @api.model
     def _l10n_pe_edi_get_general_error_messages(self):

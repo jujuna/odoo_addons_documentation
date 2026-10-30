@@ -28,7 +28,7 @@ class Testl10nBeHrPayrollAccountUi(MockEmail, common.TestPayrollAccountCommon):
             self.assertTrue(new_employee_id, 'An employee has been created')
             self.assertFalse(new_employee_id.active, 'Employee is not yet active')
             self.assertEqual(new_version.bus_transport_employee_amount, 100)
-            self.assertEqual(new_version._get_public_transport_reimbursed_amount('bus'), 30)
+            self.assertAlmostEqual(new_version._get_public_transport_reimbursed_amount('bus'), 40.0, places=2)
             self.assertEqual(new_version.rd_percentage, 0.75)
 
             # asserts that '0' values automatically filled are actually being saved

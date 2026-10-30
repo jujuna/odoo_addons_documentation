@@ -692,6 +692,34 @@ class TestLazada(common.TestLazadaCommon):
         self.assertEqual(len(adjustment_lines), 0)
         self.assertEqual(order.amount_total, float(order_data["price"]))
 
+    @mute_logger("odoo.addons.sale_lazada.models.lazada_shop")
+    def test_order_ignores_existing_currency_pricelist_discount(self):
+        """An existing percentage pricelist in the order currency does not discount imported lines."""
+        self.env.user.group_ids += self.env.ref("sale.group_discount_per_so_line")
+        currency = self.env.ref("base.USD")
+        self.env["product.pricelist"].create({
+            "name": "Existing USD",
+            "currency_id": currency.id,
+            "company_id": self.shop.company_id.id,
+            "sequence": 1,
+            "item_ids": [Command.create({
+                "compute_price": "discount",
+                "price_discount": 10.0,
+            })],
+        })
+        order_data = common.build_order_mock(
+            order_id="PRICELIST_001",
+            items=[dict(common.ORDER_ITEM_MOCK, currency="USD")],
+            shipping_fee=0,
+            currency="USD",
+        )
+
+        order = self.shop._create_order_from_data(order_data)
+
+        self.assertEqual(order.pricelist_id.name, f"Lazada {currency.name}")
+        product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+        self.assertEqual(product_line.discount, 0.0)
+
     # --- Test Shipping Lines --- #
 
     @mute_logger("odoo.addons.sale_lazada.models.lazada_shop")

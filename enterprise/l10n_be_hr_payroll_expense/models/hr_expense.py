@@ -102,10 +102,10 @@ class HrExpense(models.Model):
         if not self.employee_id or not self.date:
             return {}
         employee = self.employee_id
-        version = employee.sudo().current_version_id
-        if not version or not version.date_version:
+        version = employee.sudo()._get_version(self.date)
+        if not version or not version.contract_date_start:
             return {}
-        period_start = max(self.date.replace(month=1, day=1), version.date_version)
+        period_start = max(self.date.replace(month=1, day=1), version.contract_date_start)
         period_end = self.date.replace(month=12, day=31)
 
         action = {

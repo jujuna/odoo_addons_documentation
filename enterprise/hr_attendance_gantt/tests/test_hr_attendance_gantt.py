@@ -2,6 +2,7 @@
 
 from datetime import date, datetime, UTC
 from zoneinfo import ZoneInfo
+from odoo.tests import Form
 from odoo.tests.common import tagged, TransactionCase
 
 
@@ -10,6 +11,8 @@ class TestHrAttendanceGantt(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # unavailabilities are shown at the employee's clock in the reader's timezone
+        cls.env.user.tz = 'UTC'
         # Shared flexible calendars, reused across the flexible-schedule tests below instead of
         # each one creating its own.
         cls.flexible_calendar_40_8, cls.fully_flexible_calendar = cls.env['resource.calendar'].create([
@@ -221,6 +224,33 @@ class TestHrAttendanceGantt(TransactionCase):
         self.assertEqual(interval_non_utc[emp1.id]['max_value'], 8)
         self.assertEqual(interval_non_utc[emp2.id]['max_value'], 8)
 
+    def test_gantt_progress_flexible_employee_negative_utc_offset(self):
+        employee = self.env['hr.employee'].create({
+            'name': 'Costa Rica Employee',
+            'tz': 'America/Costa_Rica',
+            'resource_calendar_id': self.flexible_calendar_40_8.id,
+        })
+        self.env.user.tz = 'America/Costa_Rica'  # UTC-6
+
+        # Day scale: Tuesday 2024-01-09 00:00 -> 2024-01-10 00:00 in Costa Rica time
+        progress_bar = self.env['hr.attendance']._gantt_progress_bar(
+            'employee_id',
+            employee.ids,
+            datetime(2024, 1, 9, 6, 0),
+            datetime(2024, 1, 10, 6, 0),
+        )
+        self.assertEqual(progress_bar[employee.id]['max_value'], 8)
+
+        # Tests with the user in a different timezone
+        self.env.user.tz = 'UTC'
+        progress_bar = self.env['hr.attendance']._gantt_progress_bar(
+            'employee_id',
+            employee.ids,
+            datetime(2024, 1, 9, 0, 0),
+            datetime(2024, 1, 10, 0, 0),
+        )
+        self.assertEqual(progress_bar[employee.id]['max_value'], 8)
+
     def test_gantt_unavailability(self):
         self.calendar = self.env['resource.calendar'].create({
             'name': 'Calendar 8h',
@@ -408,3 +438,9 @@ class TestHrAttendanceGantt(TransactionCase):
         )
         self.assertEqual(unavailabilities[employee.id][0]['start'], datetime(2019, 1, 4, 23, 0).astimezone(UTC))
         self.assertEqual(unavailabilities[employee.id][0]['stop'], datetime(2019, 1, 5, 22, 59, 59).astimezone(UTC))
+
+    def test_onchange_check_in_without_date(self):
+        attendance_form = Form(self.env['hr.attendance'].with_context(scale='month'))
+        checkout = attendance_form.check_out
+        attendance_form.check_in = False
+        self.assertEqual(attendance_form.check_out, checkout)

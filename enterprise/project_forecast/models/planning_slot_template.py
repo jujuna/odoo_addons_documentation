@@ -9,7 +9,7 @@ class PlanningSlotTemplate(models.Model):
     project_id = fields.Many2one('project.project', string="Project", copy=True, domain="[('is_template', '=', False), '|', ('company_id', '=', False), ('company_id', '=?',  company_id)]", check_company=True)
     task_id = fields.Many2one('project.task', string="Task", copy=True, domain="[('is_template', '=', False), ('project_id', '=?', project_id)]", check_company=True)
 
-    @api.depends('company_id')
+    @api.depends('project_id.company_id')
     def _compute_company_id(self):
         super()._compute_company_id()
 

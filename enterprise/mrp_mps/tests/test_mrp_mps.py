@@ -1439,6 +1439,59 @@ class TestMpsMps(common.TransactionCase):
         self.assertEqual(screw_wizard_2.moves_qty, 24)
         self.assertEqual(screw_wizard_2.rfq_qty, 12)
 
+    @freeze_time('2026-09-17 12:00:00')
+    def test_mps_forecasted_stock(self):
+        """Receiving then delivering the same quantity in the first period
+        must leave the forecasted stock at zero.
+        """
+        self.env.company.manufacturing_period_to_display_day = 2
+        receipt_type = self.warehouse.in_type_id
+        self.env['stock.picking'].create({
+            'picking_type_id': receipt_type.id,
+            'location_id': receipt_type.default_location_src_id.id,
+            'location_dest_id': receipt_type.default_location_dest_id.id,
+            'move_ids': [Command.create({
+                'product_id': self.chair.id,
+                'product_uom_qty': 300,
+                'quantity': 300,
+                'location_id': receipt_type.default_location_src_id.id,
+                'location_dest_id': receipt_type.default_location_dest_id.id,
+            })],
+        }).button_validate()
+        self._create_and_process_delivery_at_date([(self.chair, 300)])
+
+        forecasts = self.mps_chair.get_production_schedule_view_state(period_scale='day')[0]['forecast_ids']
+        forecast_fields = ('incoming_qty', 'outgoing_qty', 'starting_inventory_qty', 'safety_stock_qty')
+        self.assertDictEqual(
+            {index: {field: forecast[field] for field in forecast_fields} for index, forecast in enumerate(forecasts)},
+            {
+                0: {'incoming_qty': 300, 'outgoing_qty': 300, 'starting_inventory_qty': 0, 'safety_stock_qty': 0},
+                1: {'incoming_qty': 0, 'outgoing_qty': 0, 'starting_inventory_qty': 0, 'safety_stock_qty': 0},
+            },
+        )
+
+    @freeze_time('2026-09-17 12:00:00')
+    def test_mps_forecasted_stock_replenishment(self):
+        """Completed demand must trigger replenishment in the current period
+        to restore the safety stock target.
+        """
+        self.env.company.manufacturing_period_to_display_day = 3
+        self.mps_chair.forecast_target_qty = 50
+        self.env['stock.quant']._update_available_quantity(self.chair, self.warehouse.lot_stock_id, 100)
+        self._create_and_process_delivery_at_date([(self.chair, 100)])
+        self.assertEqual(self.chair.qty_available, 0)
+
+        forecasts = self.mps_chair.get_production_schedule_view_state(period_scale='day')[0]['forecast_ids']
+        forecast_fields = ('replenish_qty', 'safety_stock_qty')
+        self.assertDictEqual(
+            {index: {field: forecast[field] for field in forecast_fields} for index, forecast in enumerate(forecasts)},
+            {
+                0: {'replenish_qty': 50, 'safety_stock_qty': 50},
+                1: {'replenish_qty': 0, 'safety_stock_qty': 50},
+                2: {'replenish_qty': 0, 'safety_stock_qty': 50},
+            },
+        )
+
     def test_actual_indirect_demand(self):
         """Test that Indirect Actual Demand is correctly computed apart from
         Actual Demand (direct).

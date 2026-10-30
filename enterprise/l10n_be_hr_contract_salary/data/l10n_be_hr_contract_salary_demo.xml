@@ -194,7 +194,7 @@
         <field name="l10n_be_joint_committee_id" ref="l10n_be_hr_payroll.l10n_be_joint_committee_200"/>
     </record>
 
-    <function name="create_version" model="hr.employee">
+    <function name="create_version" model="hr.employee" context="{'allowed_company_ids': [ref('base.demo_company_be')]}">
         <value eval="[ref('l10n_be_hr_contract_salary.hr_employee_laurie_poiret')]"/>
         <value eval="{
             'date_version': DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-1),

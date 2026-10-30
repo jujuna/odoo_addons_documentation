@@ -105,6 +105,31 @@ test("Fallback to id when no default view exists", async function () {
     expect(pivotDef.columns).toEqual([{ name: "id", string: "ID" }]);
 });
 
+test("Create a new list from an arch with a groupby on a co-model", async function () {
+    const serverData = getBasicServerData();
+    serverData.views["partner,false,list"] = /* xml */ `
+        <list>
+            <field name="foo"/>
+            <field name="product_id"/>
+            <groupby name="product_id">
+                <field name="name"/>
+            </groupby>
+        </list>
+    `;
+    const { env, model } = await createSpreadsheetWithList({ serverData });
+    await openSidePanel(model, env);
+    await contains(".o_model_selector input").click();
+    await contains(".o_model_selector_partner").click();
+    await contains(".o_new_list_side_panel .primary").click();
+
+    const listIds = model.getters.getListIds();
+    expect(listIds).toHaveLength(2);
+    expect(model.getters.getListDefinition(listIds[1]).columns).toEqual([
+        { name: "foo", string: "Foo" },
+        { name: "product_id", string: "Product" },
+    ]);
+});
+
 test("List insertion inserts 80 records", async () => {
     const serverData = getBasicServerData();
     serverData.models.partner.records = Array.from({ length: 200 }, (_, i) => ({

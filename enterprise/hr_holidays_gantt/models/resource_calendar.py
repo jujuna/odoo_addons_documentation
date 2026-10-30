@@ -1,6 +1,8 @@
 from odoo import models
 from datetime import datetime, time
+from dateutil.relativedelta import relativedelta
 from odoo.tools import float_compare
+from odoo.tools.date_utils import float_to_time
 
 
 class ResourceCalendar(models.Model):
@@ -16,7 +18,7 @@ class ResourceCalendar(models.Model):
         tz = dt0.tzinfo
         if leave.sudo().holiday_id.work_entry_type_request_unit == 'half_day':
             dt0 = at_time(dt0) if leave.holiday_id.request_date_from_period == 'am' else at_time(dt0, 12)
-            dt1 = at_time(dt1, 12) if leave.holiday_id.request_date_to_period == 'am' else at_time(dt1, 23, 59, 59, 999999)
+            dt1 = at_time(dt1, 11, 59, 59, 999999) if leave.holiday_id.request_date_to_period == 'am' else at_time(dt1, 23, 59, 59, 999999)
             return dt0, dt1
 
         if leave.holiday_id.work_entry_type_request_unit == 'hour':
@@ -25,8 +27,13 @@ class ResourceCalendar(models.Model):
 
             if float_compare(leave.holiday_id.number_of_hours, leave.resource_id.hours_per_day / 2, 2) == 0:
                 if leave.holiday_id.request_hour_to <= 12.0:
-                    return at_time(dt0), at_time(dt1, 12)
+                    return at_time(dt0), at_time(dt1, 11, 59, 59, 999999)
                 if leave.holiday_id.request_hour_from >= 12.0:
                     return at_time(dt0, 12), at_time(dt1, 23, 59, 59, 999999)
+
+            return (
+                datetime.combine(dt0.date(), float_to_time(leave.holiday_id.request_hour_from)).replace(tzinfo=tz),
+                (datetime.combine(dt1.date(), float_to_time(leave.holiday_id.request_hour_to)) - relativedelta(microseconds=1)).replace(tzinfo=tz),
+            )
 
         return super()._handle_flexible_leave_interval(dt0, dt1, leave)

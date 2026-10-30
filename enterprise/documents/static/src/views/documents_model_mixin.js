@@ -126,7 +126,7 @@ export const DocumentsModelMixin = (RelationalModel) =>
         }
 
         get isDomainSelected() {
-            return this.root.isDomainSelected && !this.documentService.previewedDocument;
+            return this.root.isDomainSelected && !this.documentService.state.previewedDocument;
         }
 
         getResIds(extraDomain) {

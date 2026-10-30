@@ -2,6 +2,7 @@ import { useCapTableSampleData } from "@equity/components/cap_table/cap_table_sa
 import { Component, markup, onWillStart, proxy, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
 import { ActionHelper } from "@web/views/action_helper";
@@ -24,9 +25,11 @@ export class CapTable extends Component {
         this.partnerData = proxy({});
         this.classData = proxy({});
         this.isSample = false;
+        this.isEquityManager = false;
         this.sampleData = useCapTableSampleData();
 
         onWillStart(async () => {
+            this.isEquityManager = await user.hasGroup("equity.group_equity_manager");
             let res = await this.orm.call("equity.cap.table", "get_cap_table_data", [(this.props.action.context?.active_ids || [])]);
             if (Object.keys(res["partner_holder_data"]).length === 0) { // no data, then use sample data
                 res = this.sampleData.getSampleData();

@@ -14,6 +14,14 @@ capabilities for orders received through various food delivery platforms.
     'demo': [
         'demo/demo_data.xml',
     ],
+    'assets': {
+        'point_of_sale._assets_pos': [
+            'pos_self_order_urban_piper/static/src/**/*',
+        ],
+        'web.assets_unit_tests': [
+            'pos_self_order_urban_piper/static/tests/unit/**/*',
+        ],
+    },
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

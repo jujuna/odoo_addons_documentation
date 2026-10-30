@@ -166,3 +166,15 @@ class IrActionsServer(models.Model):
                     subtype_xmlid='mail.mt_note',
                 )
         return False
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        # sign_role_ids is a non stored field. On create, UPDATE commands on
+        # template roles are not saved. Pop it from create vals and apply it
+        # in a follow-up write() once the action exists.
+        role_commands_list = [vals.pop('sign_role_ids', None) for vals in vals_list]
+        actions = super().create(vals_list)
+        for action, role_commands in zip(actions, role_commands_list):
+            if role_commands:
+                action.write({'sign_role_ids': role_commands})
+        return actions

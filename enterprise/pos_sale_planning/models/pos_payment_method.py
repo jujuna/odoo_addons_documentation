@@ -12,6 +12,20 @@ class PosPaymentMethod(models.Model):
     )
 
     @api.model
+    def _get_or_create_resource_payment_method(self, company_id):
+        """Get the resource payment method for the given company, creating it if it does not exist yet."""
+        payment_method = self.search(
+            [('type', '=', 'resource'), ('company_id', '=', company_id)], limit=1
+        )
+        if not payment_method:
+            payment_method = self.create({
+                'name': self.env._('Transfer to Room'),
+                'type': 'resource',
+                'company_id': company_id,
+            })
+        return payment_method
+
+    @api.model
     def _load_pos_data_fields(self, config):
         res = super()._load_pos_data_fields(config)
         res += ['resource_ids']

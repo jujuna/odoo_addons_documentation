@@ -661,16 +661,14 @@ class LatvianTaxReportCustomHandler(models.AbstractModel):
 
     def _report_engine_l10n_lv_vat_main_tax_report_attachment_1ii(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         # Transactions are identified by `move_id` and `transaction_type`.
-        # But we aggregate small transactions per partner / globally; they have special `transaction_type` values:
-        # - 'V': Transactions with a single partner with base amount < 150€ that total at least 150€
-        #        (there is max one line per partner in the report)
-        # - 'T': Transactions with base amount < 150€ (that are not 'V')
-        #        (there is max one line in the report)
+        # Unlike PVN 1-I, the 150 EUR grouping threshold does NOT apply here:
+        # - Every EU-partner invoice must be exported individually, with full partner and document details.
+        # - Only the real transaction codes 'P', 'G', or 'C' are used.
+        # - The 'T' and 'V' aggregation codes must never appear in Annex PVN 1-II.
         transaction_tag_names = ['P', 'G', 'C (art. 9)']
         l10n_lv_options = {
             'transaction_tax_tags': self._get_tax_tags([('name', 'in', transaction_tag_names)]),
             'want_eu_partners': True,
-            'aggregate_transaction_type': True,
             'transaction_keys': ['move_id', 'partner_id', 'transaction_type'],
             'move_types': self.env['account.move'].get_purchase_types(include_receipts=True),
         }

@@ -76,8 +76,8 @@
     'demo': [
         'data/hr_payroll_structure_demo.xml',
         'data/hr_payroll_structure_type_demo.xml',
+        'data/hr_salary_rule_demo.xml',
         'data/hr_payroll_demo.xml',
-        'data/hr_salary_rule_demo.xml'
         ],
     'assets': {
         "im_livechat.assets_embed_core": [

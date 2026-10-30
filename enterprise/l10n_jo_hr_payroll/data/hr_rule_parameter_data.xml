@@ -50,9 +50,20 @@
         <field name="country_id" ref="base.jo"/>
     </record>
     <record id="l10n_jo_rule_parameter_taxable_yearly_gross_exemption_value_2024" model="hr.rule.parameter.value">
-        <field name="parameter_value">12000.00</field>
+        <field name="parameter_value">9000.00</field>
         <field name="rule_parameter_id" ref="l10n_jo_rule_parameter_taxable_yearly_gross_exemption"/>
-        <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+        <field name="date_from" eval="datetime(2020, 1, 1).date()"/>
+    </record>
+
+    <record id="l10n_jo_rule_parameter_dependants_exemption" model="hr.rule.parameter">
+        <field name="name">Jordan Dependants Exemption Amount</field>
+        <field name="code">l10n_jo_dependants_exemption_amount</field>
+        <field name="country_id" ref="base.jo"/>
+    </record>
+    <record id="l10n_jo_rule_parameter_dependants_exemption_value_2020" model="hr.rule.parameter.value">
+        <field name="parameter_value">9000.00</field>
+        <field name="rule_parameter_id" ref="l10n_jo_rule_parameter_dependants_exemption"/>
+        <field name="date_from" eval="datetime(2020, 1, 1).date()"/>
     </record>
 
     <record id="l10n_jo_rule_parameter_eos_exemption" model="hr.rule.parameter">

@@ -1,28 +1,42 @@
+import { aiModels } from "@ai/../tests/ai_test_helpers";
+import { aiClientToolsRegistry } from "@ai/discuss/core/common/ai_client_tool_registry";
 import { aiSessionIdentifier } from "@ai/utils/ai_session_identifier";
-import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { advanceTime, queryAll, queryFirst, waitFor, waitForNone } from "@odoo/hoot-dom";
+import { dragenterFiles, dropFiles, startServer } from "@mail/../tests/mail_test_helpers";
 import {
-    setupWebsiteBuilder,
-    defineWebsiteModels,
-    setupSidebarBuilderForTranslation,
-} from "@website/../tests/builder/website_helpers";
+    advanceTime,
+    beforeEach,
+    describe,
+    expect,
+    queryAll,
+    queryFirst,
+    test,
+    waitFor,
+    waitForNone,
+} from "@odoo/hoot";
 import {
+    authenticate,
     contains,
-    patchWithCleanup,
+    defineModels,
     MockServer,
     mockService,
     onRpc,
+    patchWithCleanup,
     webModels,
-    authenticate,
 } from "@web/../tests/web_test_helpers";
 import { waitUntil } from "@web/core/macro";
-import { dragenterFiles, dropFiles, startServer } from "@mail/../tests/mail_test_helpers";
-import { defineAIModels } from "@ai/../tests/ai_test_helpers";
+import {
+    defineWebsiteModels,
+    setupSidebarBuilderForTranslation,
+    setupWebsiteBuilder,
+} from "@website/../tests/builder/website_helpers";
 import { setupAiWebsiteBuilder } from "./ai_website_test_helpers";
-import { aiClientToolsRegistry } from "@ai/discuss/core/common/ai_client_tool_registry";
+import { WebsiteAIComposer } from "./mock_server/mock_models/ai_composer";
 
 function defineAiWebsiteModels() {
-    defineAIModels();
+    defineModels({
+        ...aiModels,
+        AIComposer: WebsiteAIComposer,
+    });
     defineWebsiteModels({
         // `defineAIModels` already calls `defineMailModels` and overrides one
         // of them (i.e. DiscussChannel).
@@ -166,7 +180,10 @@ describe("AI Website Builder Plugin", () => {
                         content: `<section id="other_page"></section>`,
                     },
                 ],
-                target_page: { main_object: { model: "website.page", id: 2 }, location: "/about-us" },
+                target_page: {
+                    main_object: { model: "website.page", id: 2 },
+                    location: "/about-us",
+                },
             })
         ).rejects.toThrow("The page being edited has changed; the changes were NOT applied.");
 
@@ -211,7 +228,7 @@ describe("AI Website Builder Plugin", () => {
             `<section><img class="target" src="/web/image" style="transform: rotate(0deg);"/></section>`,
             {
                 openEditor: false,
-            },
+            }
         );
         onRpc("ir.ui.view", "save", () => {
             // should clean ai scripts modifications when saving.
@@ -303,10 +320,10 @@ describe("AI Website Builder Plugin", () => {
         // Only the script that threw is paused.
         expect(":iframe script[data-ai-script-id^='broken_script']").toHaveAttribute(
             "data-ai-script-stopped",
-            "1",
+            "1"
         );
         expect(":iframe script[data-ai-script-id^='healthy_script']").not.toHaveAttribute(
-            "data-ai-script-stopped",
+            "data-ai-script-stopped"
         );
         // The other script should be running.
         await contains(":iframe .paint_btn").click();
@@ -361,8 +378,8 @@ describe("AI Website Builder Plugin", () => {
         const contentDiv = await waitFor(":iframe #wrap > #nested_content");
         expect(
             [...queryFirst(":iframe #wrap").childNodes, ...contentDiv.childNodes].every((node) =>
-                [Node.ELEMENT_NODE, Node.TEXT_NODE].includes(node.nodeType),
-            ),
+                [Node.ELEMENT_NODE, Node.TEXT_NODE].includes(node.nodeType)
+            )
         ).toBe(true, { message: "There should be only element and text nodes" });
         expect(":iframe #wrap > *").toHaveCount(1);
         // The <script> with data-ai-script-id should be kept.
@@ -387,6 +404,20 @@ describe("AI Website Builder Plugin", () => {
 
         await waitFor(`:iframe section[data-script-ran="1"]`);
         expect(":iframe section > script[data-ai-script-id^='script_a']").toHaveCount(1);
+    });
+
+    test("should not allow restricted editors to remove AI scripts", async () => {
+        mockService("website", {
+            get isDesigner() {
+                return false;
+            },
+        });
+        await setupAiWebsiteBuilder(
+            `<section><script data-ai-script-id="page_script"></script></section>`,
+        );
+        expect(".o_script_entry button:has([data-icon='delete'])").not.toBeEnabled();
+        expect(".o_script_entry button:has([data-icon='delete'])").toHaveAttribute("data-tooltip");
+        expect(".o_script_entry button:has([data-icon='pause'])").toBeEnabled();
     });
 
     test("should fold/unfold existing AI chat when leaving/opening editor", async () => {
@@ -547,7 +578,7 @@ describe("AI Website Builder Plugin", () => {
         await setupWebsiteBuilder(
             `<section id="target_1"></section>
              <section id="target_2"></section>
-             <section id="target_3"></section>`,
+             <section id="target_3"></section>`
         );
 
         await mockApplyHTML([
@@ -902,7 +933,9 @@ describe("AI chat messages posting", () => {
     });
 
     for (const failFinalization of [false, true]) {
-        test(`should resume a scraped page build when finalization ${failFinalization ? "fails" : "succeeds"}`, async () => {
+        test(`should resume a scraped page build when finalization ${
+            failFinalization ? "fails" : "succeeds"
+        }`, async () => {
             const { getEditor } = await setupWebsiteBuilder("");
             authenticate("admin", "admin");
             onRpc("/website/theme_customize_bundle_reload", () => true);
@@ -914,7 +947,7 @@ describe("AI chat messages posting", () => {
             let ready = false;
             let payload;
             let resumeAttempts = 0;
-            onRpc("/ai_website/ready_scraper_results", () => ready ? [payload] : []);
+            onRpc("/ai_website/ready_scraper_results", () => (ready ? [payload] : []));
             onRpc("/ai/start_session_advance", async (request) => {
                 const { params } = await request.json();
                 channelId = params.channel_id;
@@ -938,6 +971,7 @@ describe("AI chat messages posting", () => {
                     );
                     resumeAttempts++;
                     ready = false;
+                    notifySession(channelId, sessionId, { loop_state: "waiting_model" });
                     expect.step("continue after scraping");
                     return { loop_state: "waiting_model", interactionConsumed: true };
                 }
@@ -953,6 +987,7 @@ describe("AI chat messages posting", () => {
                               },
                           }
                 );
+                notifySession(channelId, sessionId, { loop_state: "ready" });
                 expect.step("resumed");
                 return { loop_state: "ready", interactionConsumed: true };
             });
@@ -998,17 +1033,29 @@ describe("AI chat messages posting", () => {
             expect(":iframe .o_loading_screen").toHaveCount(0);
 
             // Resuming must send the current editor contents, not the original request's snapshot.
-            await mockApplyHTML([{
-                zone: "main", mode: "replace", content: '<section id="edited_while_scraping"></section>',
-            }]);
+            await mockApplyHTML([
+                {
+                    zone: "main",
+                    mode: "replace",
+                    content: '<section id="edited_while_scraping"></section>',
+                },
+            ]);
             // A different editor must not resume the pending request.
             await plugin.resumeAfterScraping({
                 ...payload,
                 target_page: { main_object: { model: "website.page", id: 2 } },
             });
             ready = true;
-            MockServer.env["bus.bus"]._sendone("broadcast", "ai_website/scraper_result_ready", payload);
-            MockServer.env["bus.bus"]._sendone("broadcast", "ai_website/scraper_result_ready", payload);
+            MockServer.env["bus.bus"]._sendone(
+                "broadcast",
+                "ai_website/scraper_result_ready",
+                payload
+            );
+            MockServer.env["bus.bus"]._sendone(
+                "broadcast",
+                "ai_website/scraper_result_ready",
+                payload
+            );
             await expect.waitForSteps(["continue after scraping"]);
             await waitUntil(() => plugin.scraperResumes.size === 0);
             await waitFor(".o_builder_disabled");
@@ -1047,7 +1094,8 @@ describe("AI chat messages posting", () => {
         const pyEnv = await startServer();
         authenticate("admin", "admin");
         pyEnv["website"].create({});
-        const { ai_channel_id: channelId } = pyEnv["ai.agent"].action_launch_ai_chat("website_builder_ai");
+        const { ai_channel_id: channelId } =
+            pyEnv["ai.agent"].action_launch_ai_chat("website_builder_ai");
         const [sessionId] = pyEnv["ai.session"].search([["channel_id", "=", channelId]]);
         const resumeToken = "saved-scrape-token";
         const clientToolToken = "recovered-page-token";
@@ -1057,7 +1105,9 @@ describe("AI chat messages posting", () => {
             resume_token: resumeToken,
         });
         const payload = {
-            channel_id: channelId, session_id: sessionId, resume_token: resumeToken,
+            channel_id: channelId,
+            session_id: sessionId,
+            resume_token: resumeToken,
             tool_call_id: "saved-scrape",
             target_page: { main_object: { model: "website.page", id: 1 }, website_id: 1 },
         };
@@ -1076,9 +1126,11 @@ describe("AI chat messages posting", () => {
             if (params.response.kind !== "async") {
                 expect(params.resume_token).toBe(clientToolToken);
                 expect(params.response).toEqual({
-                    kind: "client_result", value: [{ description: "replace in main" }],
+                    kind: "client_result",
+                    value: [{ description: "replace in main" }],
                 });
                 expect(".o_builder_disabled").toHaveCount(1);
+                notifySession(channelId, sessionId, { loop_state: "ready" });
                 expect.step("applied");
                 return { loop_state: "ready", interactionConsumed: true };
             }
@@ -1091,6 +1143,8 @@ describe("AI chat messages posting", () => {
             if (ready) {
                 // Keep recovery pending until editor setup and the busy assertion finish.
                 await busyResponse.promise;
+            } else {
+                notifySession(channelId, sessionId, { loop_state: "waiting_model" });
             }
             return {
                 loop_state: ready ? "waiting_external_result" : "waiting_model",
@@ -1117,7 +1171,11 @@ describe("AI chat messages posting", () => {
                 name: "website_apply_html",
                 params: {
                     actions: [
-                        { zone: "main", mode: "replace", content: '<section id="recovered"></section>' },
+                        {
+                            zone: "main",
+                            mode: "replace",
+                            content: '<section id="recovered"></section>',
+                        },
                     ],
                     target_page: payload.target_page,
                 },
@@ -1135,7 +1193,8 @@ describe("AI chat messages posting", () => {
     test("should recover a scraping notification missed before reconnecting", async () => {
         const pyEnv = await startServer();
         pyEnv["website"].create({});
-        const { ai_channel_id: channelId } = pyEnv["ai.agent"].action_launch_ai_chat("website_builder_ai");
+        const { ai_channel_id: channelId } =
+            pyEnv["ai.agent"].action_launch_ai_chat("website_builder_ai");
         const [sessionId] = pyEnv["ai.session"].search([["channel_id", "=", channelId]]);
         const resumeToken = "reconnected-scrape-token";
         pyEnv["ai.session"].write([sessionId], {
@@ -1144,11 +1203,22 @@ describe("AI chat messages posting", () => {
             resume_token: resumeToken,
         });
         let ready = false;
-        onRpc("/ai_website/ready_scraper_results", () => ready ? [{
-            channel_id: channelId, session_id: sessionId, resume_token: resumeToken,
-            tool_call_id: "reconnected-scrape",
-            target_page: { main_object: { model: "website.page", id: 1 }, website_id: 1 },
-        }] : []);
+        onRpc("/ai_website/ready_scraper_results", () =>
+            ready
+                ? [
+                      {
+                          channel_id: channelId,
+                          session_id: sessionId,
+                          resume_token: resumeToken,
+                          tool_call_id: "reconnected-scrape",
+                          target_page: {
+                              main_object: { model: "website.page", id: 1 },
+                              website_id: 1,
+                          },
+                      },
+                  ]
+                : []
+        );
         onRpc("/ai/resume_pending_interaction", async (request) => {
             const { params } = await request.json();
             expect(params.channel_id).toBe(channelId);

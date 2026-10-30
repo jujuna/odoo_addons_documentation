@@ -243,6 +243,7 @@ class WebsiteAppointmentSaleTest(AppointmentAccountPaymentCommon):
         event = sale_order_line.calendar_event_id
         self.assertTrue(event)
         self.assertEqual(event, calendar_booking.calendar_event_id)
+        self.assertEqual((event.res_model, event.res_id), ('sale.order', sale_order.id))
 
         # Assert Capacity is Reduced to 2
         resources_remaining_capacity = appointment_type._get_resources_remaining_capacity(appointment_type.resource_ids, start, stop)
@@ -321,6 +322,7 @@ class WebsiteAppointmentSaleTest(AppointmentAccountPaymentCommon):
         event = sale_order_line.calendar_event_id
         self.assertTrue(event)
         self.assertEqual(event, calendar_booking.calendar_event_id)
+        self.assertEqual((event.res_model, event.res_id), ('sale.order', sale_order.id))
 
         # Space is now reserved
         slots = appointment_type._get_appointment_slots('UTC')

@@ -43,3 +43,30 @@ class TestPosPreparationStatusScreen(TestPoSCommon):
         prep_line.change_prep_line_stage(prep_display.id)
         orders_status = prep_display._get_pos_orders()
         self.assertDictEqual(orders_status, {'done': [], 'notDone': [], 'ordersCompletedReadyDate': {}})
+
+    def test_two_stage_display_removes_done_orders_from_ready(self):
+        prep_display = self.env['pos.prep.display'].create({
+            'name': 'Two-stage Preparation Display',
+            'pos_config_ids': [Command.link(self.config.id)],
+            'stage_ids': [
+                Command.create({'name': 'To Cook', 'sequence': 1}),
+                Command.create({'name': 'Completed', 'sequence': 2}),
+            ],
+        })
+        self.open_new_session()
+        order = next(iter(self._create_orders([{'pos_order_lines_ui_args': [(self.product, 1)]}]).values()))
+        self.env['pos.prep.order'].update_last_order_change(order)
+        prep_line = self.env['pos.prep.line'].search([('pos_order_line_id', '=', order.lines[0].id)])
+
+        self.assertEqual(prep_display._get_pos_orders()['notDone'], [order.tracking_number])
+
+        prep_line.change_prep_line_stage(prep_display.id)
+        orders_status = prep_display._get_pos_orders()
+        self.assertEqual(orders_status['done'], [order.tracking_number])
+        self.assertEqual(orders_status['notDone'], [])
+
+        prep_line.change_state_status({str(prep_line.id): False})
+
+        orders_status = prep_display._get_pos_orders()
+        self.assertEqual(orders_status['done'], [])
+        self.assertEqual(orders_status['notDone'], [])

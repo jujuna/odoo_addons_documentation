@@ -161,3 +161,38 @@ class TestPayrollConfigSettings(TransactionCase):
         company = self.env['res.company'].create({'name': 'Fresh Company'})
         self.assertTrue(company.payroll_config_ids,
             "A new company must always have a payroll configuration.")
+
+    def test_company_create_with_past_first_payrun_date(self):
+        """The first config of a company starting payroll in the past starts at the first payrun date."""
+        company = self.env['res.company'].create({
+            'name': 'Past Payroll Company',
+            'first_payrun_date': date(2020, 9, 15),
+        })
+        self.assertEqual(company.payroll_config_ids.date_version, date(2020, 9, 15))
+
+    def test_first_payrun_date_backdates_first_config(self):
+        """Setting a past first payrun date moves the earliest config back to that date."""
+        company = self.env['res.company'].create({'name': 'Past Payroll Company'})
+        first = company.payroll_config_ids
+        first.date_version = date(2020, 9, 28)
+        second = company.create_payroll_config(date(2020, 11, 1))
+
+        company.first_payrun_date = date(2020, 9, 1)
+        self.assertEqual(first.date_version, date(2020, 9, 1))
+        self.assertEqual(second.date_version, date(2020, 11, 1), "Only the earliest config is moved.")
+
+        # A config already covering the first payrun date is never moved forward
+        company.first_payrun_date = date(2020, 10, 1)
+        self.assertEqual(first.date_version, date(2020, 9, 1))
+
+    def test_first_payrun_date_backdates_branch_configs(self):
+        """Branches inheriting the first payrun date get their first config backdated too."""
+        company = self.env['res.company'].create({'name': 'Past Payroll Company'})
+        branch = self.env['res.company'].create({'name': 'Past Payroll Branch', 'parent_id': company.id})
+        company_config = company.payroll_config_ids
+        branch_config = branch.payroll_config_ids
+
+        company.first_payrun_date = date(2020, 9, 1)
+        self.assertEqual(company_config.date_version, date(2020, 9, 1))
+        self.assertEqual(branch_config.date_version, date(2020, 9, 1))
+        self.assertEqual(branch_config.parent_id, company_config)

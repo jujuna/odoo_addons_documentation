@@ -16,16 +16,12 @@ class TestSalarySacrificePayroll(TestPayrollCommon):
 
     def test_cafeteria_plan_salary_rules(self):
         """
-        The cafeteria plan comes with new salary rules. This test checks that they are applied correctly.
+        The cafeteria plan comes with its salary rules. This test checks that they are applied correctly.
 
-        1. The salary sacrifice should be included in the BASIC - which then represents the shadow salary.
+        1. The wage is the wage after the salary sacrifice: the sacrifice only keeps track of the shadow wage (wage
+           + sacrifice) and changes neither the BASIC nor the ONSS of a month.
 
-        2. Employee ONSS is due on salary sacrifice.
-            This test makes sure that the ONSS_BASE hold that into account.
-
-        3. Salary sacrifice should appear on the payslip between ONSS and WITHHOlDING tax (as negative value)
-
-        4. Net contribution is deduced from the NET basket.
+        2. Net contribution is deduced from the NET basket.
         """
 
         # SETUP
@@ -48,45 +44,17 @@ class TestSalarySacrificePayroll(TestPayrollCommon):
             months=[2],
         )
 
-        line_basic_without = payslip_without.line_ids.filtered(lambda line: line.code == 'BASIC')
-        line_basic_with = payslip_with.line_ids.filtered(lambda line: line.code == 'BASIC')
+        # 1. BASIC and ONSS are those of the wage
+        for code in ('BASIC', 'ONSS'):
+            self.assertAlmostEqual(
+                payslip_with.line_ids.filtered(lambda line: line.code == code).total,
+                payslip_without.line_ids.filtered(lambda line: line.code == code).total,
+                places=2,
+                msg=f"The salary sacrifice should not change {code}.",
+            )
 
-        line_salary_sacrifice_onss_without = payslip_without.line_ids.filtered(lambda line: line.code == "SALARY.SACRIFICE.ONSS")
-        # line_salary_sacrifice_onss_with = payslip_with.line_ids.filtered(lambda line: line.code == "SALARY.SACRIFICE.ONSS")
-
-        line_onss_without = payslip_without.line_ids.filtered(lambda line: line.code == 'ONSS')
-        line_onss_with = payslip_with.line_ids.filtered(lambda line: line.code == 'ONSS')
-
-        line_sacrifice = payslip_with.line_ids.filtered(lambda line: line.code == 'SALARY.SACRIFICE')
+        # 2. Net contribution line exists and appears on payslip
         line_net_contrib = payslip_with.line_ids.filtered(lambda line: line.code == 'NET.CONTRIBUTION')
-
-        # 1. BASIC should be equal to wage + salary sacrifice
-        self.assertAlmostEqual(
-            line_basic_with.total,
-            line_basic_without.total + 300.0,
-            places=2,
-            msg="BASIC should be equal to contract wage + salary sacrifice."
-        )
-
-        # 2. Compare ONSS amount -> Should be salary_sacrifice * 13.07% higher
-        expected_onss_amount = 300.0 * 0.1307
-        onss_diff = abs(line_onss_with.total) - abs(line_onss_without.total)
-
-        self.assertAlmostEqual(onss_diff, expected_onss_amount)
-
-        self.assertAlmostEqual(
-            onss_diff,
-            expected_onss_amount,
-            msg="ONSS amount should be higher by salary_sacrifice * 13.07%."
-        )
-        self.assertFalse(line_salary_sacrifice_onss_without)
-
-        # 3. Salary sacrifice appears on payslip
-        self.assertTrue(line_sacrifice, "Salary sacrifice line should exist.")
-        self.assertTrue(line_sacrifice.appears_on_payslip, "Salary sacrifice should appear on the payslip.")
-        self.assertAlmostEqual(line_sacrifice.total, -300.0)
-
-        # 4. Net contribution line exists and appears on payslip
         self.assertTrue(line_net_contrib, "Net contribution line should exist.")
         self.assertTrue(line_net_contrib.appears_on_payslip, "Net contribution should appear on the payslip.")
         self.assertAlmostEqual(line_net_contrib.total, -200.0)
@@ -110,8 +78,4 @@ class TestSalarySacrificePayroll(TestPayrollCommon):
             months=[1],
         )
 
-        codes = payslip.line_ids.mapped('code')
-
-        self.assertNotIn('SALARY.SACRIFICE', codes)
-        self.assertNotIn('NET.CONTRIBUTION', codes)
-        self.assertNotIn('SALARY.SACRIFICE.ONSS', codes)
+        self.assertNotIn('NET.CONTRIBUTION', payslip.line_ids.mapped('code'))

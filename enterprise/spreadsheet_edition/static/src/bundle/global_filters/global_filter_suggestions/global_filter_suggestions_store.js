@@ -2,6 +2,7 @@ import { stores } from "@odoo/o-spreadsheet";
 import { globalFieldMatchingRegistry } from "@spreadsheet/global_filters/helpers";
 
 import { SearchArchParser } from "@web/search/search_arch_parser";
+import { waitForDataSourcesToBeReady } from "../helpers";
 
 const { SpreadsheetStore } = stores;
 
@@ -25,10 +26,13 @@ export class GlobalFilterSuggestionsStore extends SpreadsheetStore {
      * @private
      */
     async _getGlobalFilterSuggestions() {
-        const [searchFiltersPerModels] = await Promise.all([
+        const [searchFiltersPerModels, allModelsExist] = await Promise.all([
             this.searchFilters.searchFiltersPromise,
-            this._loadAllMetaData(),
+            waitForDataSourcesToBeReady(this.getters),
         ]);
+        if (!allModelsExist) {
+            return [];
+        }
         const dataSourceModels = new Set();
         for (const matcher of globalFieldMatchingRegistry.getAll()) {
             for (const dataSourceId of matcher.getIds(this.getters)) {
@@ -72,17 +76,6 @@ export class GlobalFilterSuggestionsStore extends SpreadsheetStore {
             });
         }
         return suggestions;
-    }
-
-    async _loadAllMetaData() {
-        const promises = globalFieldMatchingRegistry
-            .getAll()
-            .flatMap((matcher) =>
-                matcher
-                    .getIds(this.getters)
-                    .map((dataSourceId) => matcher.waitForReady(this.getters, dataSourceId))
-            );
-        return Promise.all(promises);
     }
 
     /**

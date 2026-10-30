@@ -3,6 +3,8 @@ import { deserializeDate } from "@web/core/l10n/dates";
 import { patch } from "@web/core/utils/patch";
 import { useProjectModelActions } from "../project_highlight_tasks";
 
+const IS_ALL_DAY_CELL_KEY = "__is_all_day_cell";
+
 patch(ProjectTaskCalendarModel.prototype, {
     setup() {
         super.setup(...arguments);
@@ -21,7 +23,17 @@ patch(ProjectTaskCalendarModel.prototype, {
 });
 
 export class ProjectEnterpriseTaskCalendarModel extends ProjectTaskCalendarModel {
+    buildRawRecord(partialRecord, options = {}) {
+        const rawRecord = super.buildRawRecord(partialRecord, options);
+        if (!partialRecord.id) {
+            rawRecord[IS_ALL_DAY_CELL_KEY] = partialRecord.isAllDay;
+        }
+        return rawRecord;
+    }
+
     makeContextDefaults(record) {
+        const isAllDayCell = record[IS_ALL_DAY_CELL_KEY];
+        delete record[IS_ALL_DAY_CELL_KEY];
         const { default_planned_date_start, ...context } = super.makeContextDefaults(record);
         if (
             ["day", "week"].includes(this.meta.scale) ||
@@ -33,6 +45,6 @@ export class ProjectEnterpriseTaskCalendarModel extends ProjectTaskCalendarModel
             context.default_planned_date_begin = default_planned_date_start;
         }
 
-        return { ...context, scale: this.meta.scale };
+        return { ...context, scale: this.meta.scale, use_working_schedule: isAllDayCell };
     }
 }

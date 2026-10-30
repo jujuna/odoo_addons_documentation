@@ -3,20 +3,20 @@
     <t t-name="knowledge.KnowledgeHierarchy">
         <!-- Root Article -->
         <div t-if="this.rootId !== this.props.record.resId" class="o_hierarchy_item d-flex min-w-0 align-items-center"> 
-            <a role="button" class="btn btn-light border-0 px-2 text-truncate"
+            <a role="button" class="btn btn-light border-0 text-muted text-truncate"
                 t-on-click="() => this.env.openArticle(this.rootId)"
                 t-att-title="this.rootName">
                 <i t-if="!this.rootIcon" class="oi oi-fw text-muted me-1" data-icon="description"/>
                 <t t-out="this.rootName"/>
             </a>
-            <span class="text-muted px-1">/</span>
+            <i class="oi text-muted" data-icon="chevron_forward" aria-hidden="true"/>
         </div>
         <!-- Dropdown with all articles between the root and the direct parent -->
         <div t-if="this.displayDropdownToggle" class="o_hierarchy_item d-flex w-auto align-items-center">
             <Dropdown beforeOpen.bind="this.onBeforeOpen">
-                <a type="button" class="btn btn-light border-0 px-2 me-1">
-                    ...
-                </a>
+                <button class="btn btn-light btn-sm px-1 p-0 lh-1" aria-label="Show hidden parent articles">
+                    <i class="oi align-middle" data-icon="more_horiz" aria-hidden="true"/>
+                </button>
                 <t t-set-slot="content">
                     <i t-if="this.state.isLoadingArticleHierarchy" class="oi oi-spin mx-auto" data-icon="autorenew"/>
                     <t t-else="">
@@ -33,17 +33,17 @@
                     </t>
                 </t>
             </Dropdown>
-            <span class="px-1">/</span>
+            <i class="oi text-muted" data-icon="chevron_forward" aria-hidden="true"/>
         </div>
         <!-- Parent Article -->
         <div t-if="this.parentId and this.parentId !== this.rootId" class="o_hierarchy_item d-flex min-w-0 align-items-center">
-            <a role="button" class="btn btn-light border-0 px-2 text-truncate"
+            <a role="button" class="btn btn-light border-0 text-muted text-truncate"
                 t-on-click="() => this.env.openArticle(this.parentId)"
                 t-att-title="this.parentName">
                 <i t-if="!this.parentIcon" class="oi oi-fw text-muted me-1" data-icon="description"/>
                 <t t-out="this.parentName"/>
             </a>
-            <span class="px-1">/</span>
+            <i class="oi text-muted" data-icon="chevron_forward" aria-hidden="true"/>
         </div>
         <!-- Current Article -->
         <div class="o_hierarchy_item d-flex min-w-0 align-items-center ms-1">
@@ -52,18 +52,14 @@
                 <t t-if="this.props.record.data.name" t-out="this.props.record.data.name" />
                 <t t-else="">Untitled</t>
             </div>
-            <div t-else="" class="o_hierarchy_article_name position-relative text-truncate" t-on-click="this.env.ensureArticleName">
-                <input class="o_input position-absolute top-50 start-50 translate-middle fw-bold text-truncate text-body border-0"
+            <div t-else="" class="o_hierarchy_article_name d-flex min-w-0" t-on-click="this.env.ensureArticleName">
+                <input class="o_input mw-100 min-w-0 fw-bold text-truncate text-body"
                     t-model.proxy="this.state.articleName"
                     t-on-change="ev => this.env.renameArticle(ev.target.value)"
                     type="text"
                     autocomplete="off"
+                    aria-label="Article name"
                     placeholder="Untitled"/>
-                <!-- span forces the input to match the length of its value -->
-                <span class="d-inline-block pe-1 fw-bold text-truncate invisible">
-                    <t t-if="this.state.articleName" t-out="this.state.articleName"/>
-                    <t t-else="">Untitled</t>
-                </span>
             </div>
             <i t-if="this.props.record.data.is_locked"
                 class="oi oi-fw ms-1 py-1 px-2" data-icon="lock"

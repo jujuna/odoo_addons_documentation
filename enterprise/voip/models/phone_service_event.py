@@ -11,9 +11,11 @@ from odoo.exceptions import ConcurrencyError
 from odoo.http import Response
 from odoo.modules.registry import Registry
 from odoo.sql_db import PG_CONCURRENCY_EXCEPTIONS_TO_RETRY
+from odoo.tools import SQL
 
 from odoo.addons.voip.models.utils import is_valid_uuid4, normalize_caller_number, same_number
 from odoo.addons.voip.models.voip_call import LIVE_CALL_STATES, TERMINAL_CALL_STATES
+from odoo.addons.voip.tools.concurrency import expected_unique_violation
 
 _logger = logging.getLogger(__name__)
 
@@ -69,7 +71,7 @@ def _notify_event_not_processed(registry, uid, event_id):
         if user:
             user.partner_id._bus_send(
                 "voip.call/event_not_processed",
-                {"id": event.id, "from": event.payload.get("caller_id_number")})
+                {"id": event.id, "from": event._get_display_phone_number_from_pbx_call_event(event.payload)})
 
 
 def _process_event_after_response(dbname, uid, event_id):
@@ -134,7 +136,7 @@ class VoipPhoneServiceEvent(models.Model):
         if self.sudo().search_count([("event_id", "=", event_id)]):
             return self.browse()
         try:
-            with self.env.cr.savepoint():
+            with self.env.cr.savepoint(), expected_unique_violation():
                 return self.sudo().create({
                     "event_id": event_id,
                     "event_type": event_type,
@@ -185,12 +187,25 @@ class VoipPhoneServiceEvent(models.Model):
                 self._handle_call_cost()
 
     def _handle_call_created(self):
+        if self._find_ended_leg(self.payload):
+            # A late copy: ringing again would resurrect the call, or build a
+            # new one for a leg its SIP Call-ID cannot tie back to it.
+            return
         _conversation, call, _leg = self._ensure_call_records(
             self.payload, "call_created", self.occurred_at)
         if call:
             call._notify_devices()
 
     def _handle_call_answered(self):
+        if ended_leg := self._find_ended_leg(self.payload):
+            # A late copy, or the answer of a leg whose hangup came first: it
+            # can only date the start of the call that hangup ended answered,
+            # never revive a call it ended unanswered.
+            calls = ended_leg.voip_call_id.filtered(lambda call: call.state == "terminated")
+            if calls and not ended_leg.answered_at:
+                ended_leg.answered_at = self.occurred_at
+            self._apply_answered(calls, self.occurred_at)
+            return
         conversation, _call, leg = self._ensure_call_records(
             self.payload, "call_answered", self.occurred_at)
         if not self._is_unbridged_trunk_answer(self.payload):
@@ -220,7 +235,7 @@ class VoipPhoneServiceEvent(models.Model):
         if not payload.get("user_uuid"):
             return
         call = self._find_call(payload.get("conversation_id"), payload.get("sip_call_id"))
-        if not call or call.state != "ongoing":
+        if not call or call.state != "ongoing" or self._was_superseded_by("call_updated", ["sip_call_id"]):
             return
         number = payload.get("peer_caller_id_number")
         if not number or is_valid_uuid4(number):
@@ -235,8 +250,39 @@ class VoipPhoneServiceEvent(models.Model):
         call.get_contact_info()
         self._notify_call_update(call)
 
+    def _was_superseded_by(self, event_type, keys, or_simultaneous=False):
+        """Whether an ``event_type`` event on the same ``keys`` of the payload,
+        which happened after this one, was received.
+
+        Events are recorded before they are processed, so one that arrived
+        first is found here even while it is still being processed.
+        """
+        self.flush_model(["event_type", "payload", "occurred_at"])
+        self.env.cr.execute(SQL(
+            """
+            SELECT 1
+              FROM voip_phone_service_event
+             WHERE event_type = %s
+               AND %s
+               AND occurred_at %s %s
+             LIMIT 1
+            """,
+            event_type,
+            SQL(" AND ").join(SQL("payload->>%s = %s", key, self.payload.get(key)) for key in keys),
+            SQL(">=" if or_simultaneous else ">"),
+            self.occurred_at,
+        ))
+        return bool(self.env.cr.fetchone())
+
     def _handle_odoo_call_push_notification(self):
         payload = self.payload
+        if self._was_superseded_by(
+            "odoo_call_cancel_push_notification", ["user_uuid", "conversation_id", "call_id"],
+            or_simultaneous=True,
+        ):
+            # Its cancel came first, or this is a late copy of a push already
+            # cancelled: ringing now would leave a call nobody settles.
+            return
         call = self._ensure_pushed_call(payload)
         if not call:
             _logger.warning(
@@ -464,15 +510,8 @@ class VoipPhoneServiceEvent(models.Model):
         return call_sudo
 
     @api.model
-    def _ensure_leg(self, payload, conversation, call, event_type, occurred_at):
-        """Upsert the leg for this SIP Call-ID and stamp its lifecycle timing.
-
-        Reconciles onto a leg an earlier INVITE (browser stub) or webhook may
-        already have created, keyed by Call-ID then by ``(conversation, pbx_call_id)``,
-        so one physical leg never splits into two rows. Endpoint fields are
-        (re)resolved only on creation or on the rich ``call_created`` event, so
-        a timing-only answered/hangup stamp never clobbers them.
-        """
+    def _find_leg(self, payload, conversation):
+        """The leg this payload describes, by SIP Call-ID then by PBX channel."""
         Leg = self.env["voip.call.leg"].sudo()
         sip_call_id = payload.get("sip_call_id")
         pbx_call_id = payload.get("call_id")
@@ -480,11 +519,40 @@ class VoipPhoneServiceEvent(models.Model):
         if not leg and pbx_call_id:
             leg = Leg.search(
                 [("conversation_id", "=", conversation.id), ("pbx_call_id", "=", pbx_call_id)], limit=1)
+        return leg.with_env(self.env)
+
+    @api.model
+    def _find_ended_leg(self, payload):
+        """The user leg this payload describes, if it has already hung up.
+
+        The trunk leg is left out: the PBX answers it itself, and a late bridged
+        answer on it is what recovers a call its device leg ended as rejected.
+        """
+        if self._is_inbound_external_leg(payload):
+            return self.env["voip.call.leg"]
+        conversation = self.env["voip.conversation"].sudo().search(
+            [("conversation_identifier", "=", payload.get("conversation_id"))], limit=1)
+        return self._find_leg(payload, conversation).filtered("ended_at")
+
+    @api.model
+    def _ensure_leg(self, payload, conversation, call, event_type, occurred_at):
+        """Upsert the leg for this SIP Call-ID and stamp its lifecycle timing.
+
+        Reconciles onto a leg an earlier INVITE (browser stub) or webhook may
+        already have created, keyed by Call-ID then by ``(conversation, pbx_call_id)``,
+        so one physical leg never splits into two rows. Endpoint fields are
+        (re)resolved only on creation, on the rich ``call_created`` event, or
+        for a leg ``_add_sip_call_id`` stubbed without them, so a timing-only
+        answered/hangup stamp never clobbers them.
+        """
+        Leg = self.env["voip.call.leg"].sudo()
+        pbx_call_id = payload.get("call_id")
+        leg = self._find_leg(payload, conversation).sudo()
         if not leg and not pbx_call_id:
             # Not enough to key a new leg (bare state-only payload); reconcile only.
             return leg
         values = {"conversation_id": conversation.id}
-        if event_type == "call_created" or not leg:
+        if event_type == "call_created" or not leg.role:
             values.update(self._resolve_leg_endpoint(payload, conversation, call))
         elif call and not leg.voip_call_id:
             values["voip_call_id"] = call.id
@@ -498,7 +566,8 @@ class VoipPhoneServiceEvent(models.Model):
             leg.write(values)
             return leg
         try:
-            return Leg.create(values)
+            with expected_unique_violation():
+                return Leg.create(values)
         except UniqueViolation as e:
             raise ConcurrencyError() from e
 

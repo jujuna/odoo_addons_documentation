@@ -1,12 +1,12 @@
-import { onMounted, onWillStart, proxy, signal, status, useEffect } from "@odoo/owl";
-import { useSubEnv } from "@web/owl2/utils";
-import { useBus, useService } from "@web/core/utils/hooks";
+import { onMounted, providePlugins, proxy, signal, status, t, usePlugin } from "@odoo/owl";
+import { useBus } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { listView } from "@web/views/list/list_view";
 import { ListController } from "@web/views/list/list_controller";
 import { PayslipListRenderer } from "./hr_payslip_list_renderer";
 import { PayrunNewDropdown } from "@hr_payroll/views/payslip_run_new_dropdown/payslip_run_new_dropdown";
 import { PayRunLayout } from "@hr_payroll/search/payrun_layout";
+import { PayslipListPlugin } from "@hr_payroll/views/payslip_list/payslip_list_plugin";
 
 export class PayslipListController extends ListController {
     static template = "hr_payroll.PayslipListView";
@@ -18,57 +18,13 @@ export class PayslipListController extends ListController {
     setup() {
         super.setup();
 
-        this.rootRef = this.rootRef ?? signal.ref();
+        const payRunId = signal(
+            this.props.context?.payrun_id ?? null,
+            { type: t.or([t.number(), t.literal(null)]) },
+        );
+        providePlugins([PayslipListPlugin], {payRunId: payRunId});
+        this.payslipListPlugin = usePlugin(PayslipListPlugin);
 
-        let _resolvePayRun;
-        this.isPayRunReady = new Promise((resolve) => {
-            _resolvePayRun = resolve;
-        });
-        const self = this;
-        this.payRunReactive = proxy({
-            _payRunId: this.props.context?.payrun_id ?? null,
-            get payRunId() {
-                return this._payRunId;
-            },
-            set payRunId(value) {
-                this._payRunId = value;
-                if (value) {
-                    _resolvePayRun(value);
-                } else {
-                    self.isPayRunReady = new Promise((resolve) => {
-                        _resolvePayRun = resolve;
-                    });
-                }
-            },
-        });
-
-        useSubEnv({
-            payRunReactive: this.payRunReactive,
-            isPayRunReady: this.isPayRunReady,
-            rootRef: this.rootRef,
-        });
-        if (this.payRunReactive.payRunId) {
-            const id = this.payRunReactive.payRunId;
-            onWillStart(async () => {
-                _resolvePayRun(id);
-            });
-        }
-
-        let prevPayRunId = this.payRunReactive.payRunId;
-        useEffect(() => {
-            const currentId = this.payRunReactive.payRunId;
-            if (currentId !== prevPayRunId) {
-                prevPayRunId = currentId;
-                if (currentId) {
-                    this.env.bus.trigger("HR_PAYROLL:UPDATE_PAYRUN");
-                }
-            }
-        });
-
-        this.orm = useService("orm");
-        this.viewService = useService("view");
-        this.actionService = useService("action");
-        this.notificationService = useService("notification");
         this.state = proxy({});
 
         this.displayHeaderButtonsTransitions = {
@@ -82,8 +38,8 @@ export class PayslipListController extends ListController {
                 this.env.searchModel.domain.find(
                     ([field, operator]) => field === "payslip_run_id" && operator === "="
                 )?.[2] || null;
-            if (newId !== this.payRunReactive.payRunId) {
-                this.payRunReactive.payRunId = newId;
+            if (newId !== this.payslipListPlugin.payRunId()) {
+                this.payslipListPlugin.payRunId.set(newId);
             }
         };
         onMounted(syncPayRunFromDomain);
@@ -98,18 +54,12 @@ export class PayslipListController extends ListController {
             onRootLoaded: (root) => {
                 superOnRootLoaded?.(root);
                 if (status(this) === "mounted") {
+                    // component remounted, payrun may have changed, rerender the payrun
                     this.env.bus.trigger("HR_PAYROLL:UPDATE_PAYRUN");
                 }
             },
         };
         return params;
-    }
-
-    /**
-     * @override
-     */
-    async reload() {
-        await this.model.root.load();
     }
 
     getSelectionFields() {
@@ -140,13 +90,6 @@ export class PayslipListController extends ListController {
             : "paid";
 
         return (this.displayHeaderButtonsTransitions[effectiveState] || []).includes(btnName);
-    }
-
-    afterExecuteActionButton() {
-        // a payrun action button may change the payrun state, so we need to
-        // rerender the buttons to match it
-        this.env.bus.trigger("HR_PAYROLL:UPDATE_PAYRUN");
-        return super.afterExecuteActionButton(...arguments);
     }
 
     createNewPayslip() {

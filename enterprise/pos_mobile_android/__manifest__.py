@@ -11,6 +11,7 @@ requests and home screen shortcuts.
     'assets': {
         'web.assets_backend': [
             'pos_mobile_android/static/src/app/utils/native.js',
+            'pos_mobile_android/static/src/app/utils/lna_fetch.js',
         ],
         'point_of_sale._assets_pos': [
             'pos_mobile_android/static/src/app/**/*',

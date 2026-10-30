@@ -95,7 +95,14 @@ export class UboForm extends Component {
         if (!form.checkValidity()) {
             return form.reportValidity();
         }
-        const res = await rpc("/my/ubo/submit/data", { access_token: this.props.accessToken, data: this.ubos });
+        const res = await rpc("/my/ubo/submit/data", {
+            access_token: this.props.accessToken,
+            data: {
+                ubos: this.ubos,
+                rep_name: form.elements["rep_name"].value,
+                rep_position: form.elements["rep_position"].value,
+            },
+        });
         if (!res) {
             form.submit();
         } else {

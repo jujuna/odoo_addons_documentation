@@ -64,6 +64,7 @@
             'knowledge/static/src/web/**/*',
             'knowledge/static/src/js/knowledge_controller.js',
             'knowledge/static/src/js/knowledge_utils.js',
+            'knowledge/static/src/js/knowledge_article_body_plugin.js',
             'knowledge/static/src/js/knowledge_renderers.js',
             'knowledge/static/src/js/knowledge_views.js',
             'knowledge/static/src/webclient/**/*',

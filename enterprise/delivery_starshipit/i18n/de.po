@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
 "PO-Revision-Date: 2026-09-18 03:21+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
@@ -55,7 +55,8 @@ msgstr ""
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.choose_delivery_carrier_view_form
 msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Get more delivery methods"
-msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Weitere Liefermethoden abrufen"
+msgstr ""
+"<i class=\"oi me-1\" data-icon=\"east\"/>Weitere Liefermethoden abrufen"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -85,8 +86,8 @@ msgid ""
 "when printing labels."
 msgstr ""
 "<i class=\"oi\" data-icon=\"warning\"/> In der <b>Testumgebung</b>, werden "
-"Ihre Sendungen nach der Etiketterstellung automatisch <b>archiviert</b>. "
-"<br/>\n"
+"Ihre Sendungen nach der Etiketterstellung automatisch <b>archiviert</b>. <br/"
+">\n"
 "                        Bitte beachten Sie, dass bei der Erstellung von "
 "Etiketten immer noch Gebühren anfallen können und dass einige "
 "Versandunternehmen die Sendung beim Drucken von Etiketten automatisch "
@@ -531,6 +532,15 @@ msgid "The Shipping Cost is being fetched in the background."
 msgstr "Die Versankosten werden im Hintergrund abgerufen."
 
 #. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The address of your company/warehouse is incomplete or wrong (Missing "
+"field(s):  \n"
+" %s)"
+msgstr ""
+
+#. module: delivery_starshipit
 #: model:ir.model.fields,help:delivery_starshipit.field_delivery_carrier__starshipit_carrier_code
 msgid ""
 "The carrier on starshipit used by this carrier. The service code belongs to "
@@ -571,6 +581,14 @@ msgstr ""
 "Die Sequenz der Kommissionierung %(picking_name)s ist zu lang für "
 "Starshipit. Bitte aktualisieren Sie Ihre Kommissionierungssequenz, sodass "
 "Sie höchstens 50 Zeichen verwenden."
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The recipient address is incomplete or wrong (Missing field(s):  \n"
+" %s)"
+msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python

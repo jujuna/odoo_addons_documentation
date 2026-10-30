@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from freezegun import freeze_time
+import json
 
 from .common import TestAccountBudgetCommon
 from odoo.fields import Command
 from odoo.tests import tagged
+from odoo.addons.web.controllers.export import ExcelExport
 from itertools import product
+from unittest.mock import MagicMock, patch
 
 
 @tagged('post_install', '-at_install')
@@ -203,3 +206,40 @@ class TestAccountBudget(TestAccountBudgetCommon):
             self.assertEqual(row['budget_analytic_id'][0], self.budget_analytic_revenue.id)
         self.assertEqual(sum(row['budget:sum'] for row in rows), 55000.0)
         self.assertEqual(sum(row['achieved:sum'] for row in rows), 100.0)
+
+    def test_budget_report_grouped_export(self):
+        """ budget.report has string ids, check a grouped export works """
+        self.env['budget.analytic'].create([
+            {
+                'name': f'Budget Test {i}',
+                'date_from': '2026-01-01',
+                'date_to': '2026-12-31',
+                'budget_line_ids': [
+                    Command.create({
+                        self.project_column_name: self.analytic_account_partner_a.id,
+                        'budget_amount': 100 * i,
+                    }),
+                ],
+            }
+            for i in (1, 2)
+        ])
+
+        domain = [('budget_analytic_id', '=', self.budget_analytic_revenue.id)]
+        data = json.dumps({
+            'import_compat': False,
+            'context': {},
+            'domain': domain,
+            'fields': [{'name': 'budget', 'label': 'Budget'}],
+            'groupby': ['line_type'],
+            'ids': False,
+            'model': 'budget.report',
+        })
+        with (
+            patch('odoo.addons.web.controllers.export.request', MagicMock(env=self.env)),
+            patch.object(ExcelExport, 'from_group_data', autospec=True) as from_group_data,
+        ):
+            ExcelExport().base(data)
+
+        tree = from_group_data.call_args.args[-1]
+        rows = [row for group in tree.children.values() for row in group.data]
+        self.assertEqual(len(rows), self.env['budget.report'].search_count(domain))

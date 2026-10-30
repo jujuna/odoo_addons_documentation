@@ -7,11 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 05:07+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
-"ai_mcp/fi/>\n"
+"POT-Creation-Date: 2026-10-02 17:48+0000\n"
+"PO-Revision-Date: 2026-10-19 11:34+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/ai_mcp/"
+"fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,18 +87,27 @@ msgid ""
 "    2. NEVER add your token in a text field on your MCP client. ALWAYS use "
 "fields of type Credential or Password as they are encrypted.\n"
 msgstr ""
+"\n"
+"- Yhteyden muodostaminen Odoo MCP -palvelimeesi:\n"
+"    1. Määritä MCP-palvelimen URL-osoitteeksi Odoon URL päätteellä /mcp. "
+"Esimerkiksi jos Odoo-URL on 'https://example.odoo.com', MCP-palvelimen URL "
+"olisi 'https://example.odoo.com/mcp'.\n"
+"    2. Luo API-avain käyttääksesi sitä suosikki MCP-asiakkaasi "
+"todennustunnuksena:\n"
+"        a. Kirjaudu sisään Odooseen.\n"
+"        b. Klikkaa käyttäjän avatarta.\n"
+"        c. Siirry turvallisuus-välilehdelle.\n"
+"        d. Luo API-avain. Määritä laajuudeksi MCP.\n"
+"- Tärkeää:\n"
+"    1. ÄLÄ KOSKAAN jaa tunnuksiasi. Kuka tahansa, joka pääsee siihen "
+"käsiksi, voi käyttää MCP-palvelinta ikään kuin se olisit sinä.\n"
+"    2. ÄLÄ KOSKAAN lisää tunnuksiasi MCP-asiakasohjelman tekstikenttään. "
+"Käytä AINA käyttäjätunnus- tai salasana-tyyppisiä kenttiä, sillä ne ovat "
+"salattuja.\n"
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "/mcp"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "<Pick a name>"
 msgstr ""
 
 #. module: ai_mcp
@@ -147,7 +156,7 @@ msgstr ""
 #. module: ai_mcp
 #: model:ir.module.module,shortdesc:base.module_ai_mcp
 msgid "AI MCP Server"
-msgstr ""
+msgstr "Tekoäly MCP-palvelin"
 
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ai_tool
@@ -224,8 +233,6 @@ msgid "At least one redirect_uri is required."
 msgstr ""
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
 #: model_terms:ir.ui.view,arch_db:ai_mcp.form_res_users_key_show_mcp
 msgid "Authorization: Bearer"
 msgstr ""
@@ -272,19 +279,19 @@ msgstr ""
 #. module: ai_mcp
 #: model:ir.module.module,summary:base.module_ai_mcp
 msgid "Connect Odoo to any external server via the MCP"
-msgstr ""
+msgstr "Yhdistä Odoo mihin tahansa ulkoiseen palvelimeen MCP:n kautta"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__create_uid
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Luonut"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__create_date
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Luotu"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.consent
@@ -338,12 +345,6 @@ msgstr ""
 #. module: ai_mcp
 #: model:ir.model,name:ai_mcp.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Header:"
 msgstr ""
 
 #. module: ai_mcp
@@ -401,13 +402,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__write_uid
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Viimeksi päivittänyt"
 
 #. module: ai_mcp
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_authorization_code__write_date
 #: model:ir.model.fields,field_description:ai_mcp.field_oauth_client__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Viimeksi päivitetty"
 
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.res_config_settings_view_form
@@ -516,18 +517,6 @@ msgid "Server Action"
 msgstr "Palvelintoiminto"
 
 #. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Server Name:"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "Server URL:"
-msgstr ""
-
-#. module: ai_mcp
 #. odoo-python
 #: code:addons/ai_mcp/models/ir_actions_server.py:0
 msgid "The action '%s' cannot be used as an MCP tool."
@@ -551,12 +540,6 @@ msgstr ""
 #. module: ai_mcp
 #: model_terms:ir.ui.view,arch_db:ai_mcp.oauth_client_view_form
 msgid "The redirect URIs one per line"
-msgstr ""
-
-#. module: ai_mcp
-#. odoo-javascript
-#: code:addons/ai_mcp/static/src/xml/portal_security.xml:0
-msgid "To connect via MCP, add these details to your AI Assistant's settings:"
 msgstr ""
 
 #. module: ai_mcp

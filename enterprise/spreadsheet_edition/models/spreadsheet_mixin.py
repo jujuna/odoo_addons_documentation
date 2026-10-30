@@ -469,8 +469,15 @@ class SpreadsheetMixin(models.AbstractModel):
         """Build spreadsheet collaboration messages from the saved
         revision data"""
         self.ensure_one()
+        # Do not use self.spreadsheet_revision_ids because it loads all revisions
+        # into the cache, including archived ones.
+        revisions = self.env["spreadsheet.revision"].search([
+            ("res_model", "=", self._name),
+            ("res_id", "=", self.id),
+            ("active", "=", True),
+        ])
         result = []
-        for revision in self.spreadsheet_revision_ids:
+        for revision in revisions:
             server_revision_id = self._get_parent_uuid(revision)
             serialized = extend_serialized_json(
                 revision.commands,
@@ -616,7 +623,9 @@ class SpreadsheetMixin(models.AbstractModel):
 
     def fork_history(self, revision_id: int, spreadsheet_snapshot: dict, default: Optional[dict] = None):
         self.ensure_one()
-        default = default or {}
+        if not self.env.user._is_internal():
+            raise AccessError(_("You don't have the access rights to perform this operation."))
+        default = {field: default[field] for field in ("name", "display_thumbnail") if field in default} if default else {}
         default['spreadsheet_revision_ids'] = []
         default['spreadsheet_data'] = self.spreadsheet_data
         new_spreadsheet = self.copy(default)
@@ -628,6 +637,8 @@ class SpreadsheetMixin(models.AbstractModel):
 
     def restore_spreadsheet_version(self, revision_id: int, spreadsheet_snapshot: dict):
         self.ensure_one()
+        if not self.env.user._is_internal():
+            raise AccessError(_("You don't have the access rights to perform this operation."))
         self._check_collaborative_spreadsheet_access("write")
 
         spreadsheet = self.sudo()

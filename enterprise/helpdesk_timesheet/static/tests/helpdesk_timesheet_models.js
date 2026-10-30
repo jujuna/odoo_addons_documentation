@@ -3,6 +3,7 @@ import { hrTimesheetModels } from "@hr_timesheet/../tests/hr_timesheet_models";
 import { defineTimesheetModels } from "@timesheet_grid/../tests/hr_timesheet_models";
 import { helpdeskModels } from "@helpdesk/../tests/helpdesk_test_helpers";
 import { projectModels } from "@project/../tests/project_models";
+import { HrEmployee } from "@hr/../tests/mock_server/mock_models/hr_employee";
 
 export class HelpdeskTeam extends helpdeskModels.HelpdeskTeam {
     _name = "helpdesk.team";
@@ -81,12 +82,23 @@ export class ProjectProject extends projectModels.ProjectProject {
     has_helpdesk_team = fields.Boolean();
 }
 
+export class HelpdeskTicketReportAnalysis extends helpdeskModels.HelpdeskTicketReportAnalysis {
+    employee_id = fields.Many2one({ relation: "hr.employee" });
+}
+
 hrTimesheetModels.HRTimesheet = HRTimesheet;
 projectModels.ProjectProject = ProjectProject;
 helpdeskModels.HelpdeskTicket = HelpdeskTicket;
 helpdeskModels.HelpdeskTeam = HelpdeskTeam;
+helpdeskModels.HelpdeskTicketReportAnalysis = HelpdeskTicketReportAnalysis;
+helpdeskModels.HelpdeskTicket._views = {
+    "list": `<list><field name="name"/></list>`,
+};
 
 export function defineHelpdeskTimesheetModels() {
-    defineModels(helpdeskModels);
+    defineModels({
+        ...helpdeskModels,
+        HrEmployee,
+    });
     defineTimesheetModels();
 }

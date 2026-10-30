@@ -9,16 +9,22 @@ class StockMove(models.Model):
         res = super().create(vals_list)
         if not self.env.context.get('skip_intercompany_sync'):
             for move in res:
-                if not move.company_id.intercompany_sync_delivery_receipt:
+                if not move.company_id.intercompany_sync_delivery_receipt or move.origin_returned_move_id:
                     continue
                 if move.purchase_line_id:
                     corresponding_moves = move.sudo().purchase_line_id.auto_sale_order_line_id.move_ids
                     if corresponding_moves:
-                        move.sudo().write({'move_orig_ids': [Command.link(m.id) for m in corresponding_moves]})
+                        move.sudo().write({
+                            'procure_method': 'make_to_order',
+                            'move_orig_ids': [Command.link(m.id) for m in corresponding_moves],
+                        })
                 if move.sale_line_id:
                     corresponding_moves = move.sudo().sale_line_id.auto_purchase_order_line_id.move_ids
                     if corresponding_moves:
-                        move.sudo().write({'move_dest_ids': [Command.link(m.id) for m in corresponding_moves]})
+                        corresponding_moves.write({
+                            'procure_method': 'make_to_order',
+                            'move_orig_ids': [Command.link(move.id)],
+                        })
         return res
 
     def _prepare_move_line_vals(self, quantity=None, reserved_quant=None):

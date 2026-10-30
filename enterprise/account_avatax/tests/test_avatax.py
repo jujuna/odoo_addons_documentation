@@ -276,6 +276,37 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
         with self._capture_request(return_value={'lines': [], 'summary': []}):
             invoice.button_external_tax_calculation()
 
+    def test_invoice_branch_company_tax_shared(self):
+        """Test that taxes created from a branch are shared with the company holding the AvaTax credentials"""
+        branch = self.env['res.company'].create({
+            'name': "Branch A",
+            'parent_id': self.env.company.id,
+        })
+        self.cr.precommit.run()  # load the CoA
+
+        def mocked_response(invoice):
+            return {
+                'lines': [{
+                    'details': [{'rate': 0.04, 'taxName': 'CA STATE TAX', 'tax': 4.0}],
+                    'lineAmount': 100.0,
+                    'lineNumber': f'account.move.line,{invoice.invoice_line_ids.id}',
+                    'tax': 4.0,
+                }],
+                'summary': [],
+            }
+
+        branch_invoice = self._create_invoice_avatax(post=False, company_id=branch.id)
+        with self._capture_request(return_value=mocked_response(branch_invoice)):
+            branch_invoice.button_external_tax_calculation()
+
+        invoice = self._create_invoice_avatax(post=False)
+        with self._capture_request(return_value=mocked_response(invoice)):
+            invoice.button_external_tax_calculation()
+
+        tax = branch_invoice.invoice_line_ids.tax_ids
+        self.assertRecordValues(tax, [{'name': 'CA STATE 4%', 'company_id': self.env.company.id}])
+        self.assertEqual(invoice.invoice_line_ids.tax_ids, tax)
+
     def test_posted_invoice(self):
         invoice, _ = self._create_invoice_01_and_expected_response()
 

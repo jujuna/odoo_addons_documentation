@@ -1528,6 +1528,43 @@ class TestReconciliationMatchingRules(AccountTestInvoicingCommon, HttpCase):
             {'account_id': self.current_assets_account.id, 'balance': -50.0, 'amount_currency': -100, 'reconciled': False},
         ])
 
+    def test_reco_model_fixed_amount_currency_conversion(self):
+        """A fixed amount on a foreign-currency bank journal must convert balance to company currency."""
+        other_currency_bank = self.bank_journal.copy({'currency_id': self.other_currency_2.id})
+        bank_stmt_line = self._create_st_line(
+            amount=100,
+            date='2020-01-01',
+            payment_ref='fixed amount fees',
+            journal_id=other_currency_bank.id,
+        )
+
+        fixed_amount = -10
+        reco_model = self.env['account.reconcile.model'].create({
+            'name': 'Fixed amount conversion',
+            'line_ids': [Command.create({
+                'account_id': self.current_assets_account.id,
+                'amount_type': 'fixed',
+                'amount_string': str(fixed_amount),
+                'label': 'test fixed amount',
+            })],
+        })
+
+        reco_model._trigger_reconciliation_model(bank_stmt_line)
+
+        counterpart_line = bank_stmt_line.line_ids.filtered(
+            lambda line: line.reconcile_model_id == reco_model
+        )
+        self.assertEqual(len(counterpart_line), 1)
+        self.assertEqual(counterpart_line.amount_currency, -fixed_amount)
+
+        expected_balance = self.other_currency_2._convert(
+            -fixed_amount,
+            bank_stmt_line.company_currency_id,
+            bank_stmt_line.company_id,
+            bank_stmt_line.date,
+        )
+        self.assertAlmostEqual(counterpart_line.balance, expected_balance, places=2)
+
     def test_reco_model_with_activities(self):
         activity_type_id = self.env.ref('mail.mail_activity_data_todo').id
         reco_model = self.env['account.reconcile.model'].create({
@@ -2152,3 +2189,22 @@ class TestReconciliationMatchingRules(AccountTestInvoicingCommon, HttpCase):
             {'account_id': self.bank_journal.suspense_account_id.id, 'balance': -95.0, 'reconciled': False},
         ], reconciled_amls=[invoice_3])
         self.assertEqual(invoice_3.reconcile_model_id, self.partner_rule)
+
+    def test_sanitize_ref(self):
+        move = self.init_invoice(move_type='out_invoice', partner=self.partner_a, invoice_date='2019-09-01', amounts=[100])
+        move.payment_reference = '+++123/1234/123+++'
+        payment_register = self.env['account.payment.register'].with_context(
+            active_model='account.move',
+            active_ids=move.ids,
+        ).create({})
+        payment = payment_register._create_payments()
+        self.assertTrue(payment.move_id)
+        self.assertEqual(payment.move_id.ref, '+++123/1234/123+++')
+        self.assertFalse(payment.move_id.payment_reference)
+
+        st_line = self._create_st_line(amount=100, payment_ref='1231234123', partner_id=False)
+        st_line._try_auto_reconcile_statement_lines()
+        self.assertRecordValues(st_line.line_ids, [
+            {'account_id': st_line.journal_id.default_account_id.id, 'balance': 100.0, 'reconciled': False},
+            {'account_id': payment.outstanding_account_id.id, 'balance': -100.0, 'reconciled': True},
+        ])

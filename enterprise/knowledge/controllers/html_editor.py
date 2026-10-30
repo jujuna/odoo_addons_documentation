@@ -26,6 +26,7 @@ class HtmlEditorController(HTML_Editor):
             article = request.env["knowledge.article"].browse(int(last_segment)).exists()
 
             if article:
+                article.read(["summary", "cover_image_url", "display_name"])
                 return {
                     "description": article.summary,
                     "preview_image_url": article.cover_image_url,

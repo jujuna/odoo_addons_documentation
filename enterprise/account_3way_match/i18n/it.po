@@ -6,15 +6,15 @@
 # Martin Trigaux, 2022
 # Sergio Zanchetta <primes2h@gmail.com>, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:51+0000\n"
-"PO-Revision-Date: 2026-09-18 01:05+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-19 06:37+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "account_3way_match/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -50,6 +50,34 @@ msgid ""
 "    - No (The bill cannot be paid, nothing has been delivered yet)\n"
 "    - Exception (Received and invoiced quantities differ)\n"
 msgstr ""
+"\n"
+"Gestisci la triplice corrispondenza delle fatture dei fornitori\n"
+"=====================================\n"
+"\n"
+"Nel settore manifatturiero, le persone ricevono spesso le fatture dei "
+"fornitori prima\n"
+"di ricevere i beni che hanno acquistato, ma non vogliono pagare queste "
+"fatture fino a quando i beni\n"
+"sono stati consegnati.\n"
+"\n"
+"Per risolvere questa situazione, si deve creare la fattura del fornitore "
+"quando se la riceve\n"
+"(in base alle quantità ordinate) e si deve pagare la fattura solo quando le "
+"quantità \n"
+"ricevute (sulle righe degli ordini fornitori) corrispondono alla fattura del "
+"fornitore registrata.\n"
+"\n"
+"Questo modulo introduce un meccanismo di \"Consegna da pagare\"che indica "
+"se\n"
+"ogni fattura del fornitore può o non può essere pagata.\n"
+"\n"
+"Ogni fattura del fornitore ha uno di questi tre stati:\n"
+"\n"
+"    - Sì (La fattura può essere pagata)\n"
+"    - No (La fattura non può essere pagata. Non è stato ancora consegnato "
+"nulla)\n"
+"    - Eccezione (Le quantità ricevute sono diverse dalle quantità fatturate)"
+"\n"
 
 #. module: account_3way_match
 #: model:ir.model.fields,help:account_3way_match.field_account_bank_statement_line__release_to_pay_manual
@@ -181,7 +209,7 @@ msgstr ""
 #. module: account_3way_match
 #: model:ir.module.module,shortdesc:base.module_account_3way_match
 msgid "Vendor Bill: Release to Pay"
-msgstr ""
+msgstr "Fattura fornitore: autorizzazione al pagamento"
 
 #. module: account_3way_match
 #: model:ir.model.fields.selection,name:account_3way_match.selection__account_move__release_to_pay__yes

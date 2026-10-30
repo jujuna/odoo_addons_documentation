@@ -27,6 +27,7 @@ class ResCompany(models.Model):
         "First Payrun Month",
         help="When do you plan on starting Odoo for your Payroll?",
         compute="compute_fields_from_parent",
+        inverse="_inverse_first_payrun_date",
         store=True,
         readonly=False,
         recursive=True,
@@ -87,6 +88,10 @@ class ResCompany(models.Model):
                 if company.parent_id and not company[field_to_copy]:
                     company[field_to_copy] = company.parent_id[field_to_copy]
 
+    def _inverse_first_payrun_date(self):
+        # Branches inherit the first payrun date from their parent
+        self.search([('id', 'child_of', self.ids)]).sudo()._backdate_first_payroll_config()
+
     @api.constrains('ytd_reset_day', 'ytd_reset_month')
     def _check_valid_reset_date(self):
         for company in self:
@@ -129,6 +134,20 @@ class ResCompany(models.Model):
         date_configs = configs.filtered_domain([('date_version', '<=', date)])
         return max(date_configs, key=lambda v: v.date_version) if date_configs else configs[:1]
 
+    def _get_first_payroll_config_date(self):
+        self.ensure_one()
+        first_date = self.create_date.date()
+        if self.first_payrun_date:
+            first_date = min(first_date, self.first_payrun_date)
+        return first_date
+
+    def _backdate_first_payroll_config(self):
+        # Parents first: a branch config is linked to the parent config effective at its date
+        for company in self.filtered('first_payrun_date').sorted(lambda c: len(c.parent_path or '')):
+            first_config = company.payroll_config_ids.sorted('date_version')[:1]
+            if first_config and first_config.date_version > company.first_payrun_date:
+                first_config.date_version = company.first_payrun_date
+
     def create_payroll_config(self, date_version=None):
         if isinstance(date_version, str):
             date_version = fields.Date.to_date(date_version)
@@ -146,7 +165,7 @@ class ResCompany(models.Model):
             else:
                 vals_list.append({
                     'company_id': company.id,
-                    'date_version': date_version or company.create_date,
+                    'date_version': date_version or company._get_first_payroll_config_date(),
                 })
 
         payroll_configs = self.env['payroll.config.settings'].create(vals_list)

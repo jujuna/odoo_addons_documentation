@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 18:10+0000\n"
-"PO-Revision-Date: 2026-09-18 04:58+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 18:26+0000\n"
+"PO-Revision-Date: 2026-10-16 07:33+0000\n"
+"Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "l10n_at_pos/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -45,6 +45,27 @@ msgid ""
 "\n"
 "We have implemented all this using Fiskaly.\n"
 msgstr ""
+"\n"
+"Die österreichische Registrierkassensicherheitsverordnung (RKSV 2017).\n"
+"==========================================================================================\n"
+"* Schaffung der Grundlage für einen manipulationssicheren Betrieb von "
+"Registrierkassen in Österreich.\n"
+"* Einhaltung der gesetzlichen Bestimmungen der RKSV.\n"
+"* In Österreich ausgestellte Belege müssen mindestens folgende Angaben "
+"enthalten:\n"
+"\n"
+"    * Kassennummer\n"
+"    * Datum und Uhrzeit der Ausstellung\n"
+"    * Barzahlungsbetrag pro Steuersatz\n"
+"    * Diese Daten müssen im QR-Code enthalten sein\n"
+"    * Inhalt des maschinenlesbaren Codes\n"
+"\n"
+"* DEP7-Datenerfassungsprotokoll. Jede einzelne Bargeldtransaktion muss "
+"erfasst und gespeichert werden.\n"
+"\n"
+"    * Sie können die DEP7-Berichte der Sitzung exportieren\n"
+"\n"
+"All dies haben wir mit Fiskaly implementiert.\n"
 
 #. module: l10n_at_pos
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos.report_config_audit_template
@@ -75,7 +96,7 @@ msgstr "Alle Kassensysteme"
 #. module: l10n_at_pos
 #: model:ir.module.module,shortdesc:base.module_l10n_at_pos
 msgid "Austria - Security Regulation for Point of Sale"
-msgstr ""
+msgstr "Österreich – Sicherheitsvorschriften für Kassensystem"
 
 #. module: l10n_at_pos
 #: model_terms:ir.ui.view,arch_db:l10n_at_pos.res_config_settings_view_form_inherit_l10n_at_pos
@@ -257,8 +278,8 @@ msgstr "Fiskaly-API-Geheimnis (AUT)"
 #. module: l10n_at_pos
 #. odoo-python
 #: code:addons/l10n_at_pos/models/fiskaly_client.py:0
-msgid "Fiskaly API request failed, %s"
-msgstr "Anfrage an Fiskaly-API fehlgeschlagen, %s"
+msgid "Fiskaly API request failed, %(error)s%(detail)s"
+msgstr ""
 
 #. module: l10n_at_pos
 #. odoo-python
@@ -611,6 +632,14 @@ msgstr "Fiskaly testen"
 #. module: l10n_at_pos
 #: model:ir.module.module,summary:base.module_l10n_at_pos
 msgid "The Austrian Cash Security Regulation"
+msgstr "Registrierkassensicherheitsverordnung (RKSV)"
+
+#. module: l10n_at_pos
+#. odoo-python
+#: code:addons/l10n_at_pos/models/fiskaly_client.py:0
+msgid ""
+"The Fiskaly signature creation unit is still being created (state %"
+"(state)s). Please try again in a few minutes."
 msgstr ""
 
 #. module: l10n_at_pos
@@ -700,6 +729,9 @@ msgid ""
 msgstr ""
 "Ihre Fiskaly-Anmeldedaten sind konfiguriert, jedoch sind Sie nicht "
 "authentifiziert. Versuchen Sie, sich erneut zu authentifizieren."
+
+#~ msgid "Fiskaly API request failed, %s"
+#~ msgstr "Anfrage an Fiskaly-API fehlgeschlagen, %s"
 
 #~ msgid "Fetched data is empty"
 #~ msgstr "Die abgerufenen Daten sind leer"

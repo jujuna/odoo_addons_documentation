@@ -147,11 +147,6 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
         cls.picking_delivery_2.name = 'picking_delivery_2'
         cls.picking_delivery_package.name = 'picking_delivery_package'
 
-    def _get_client_action_url(self, record):
-        if record._name == 'stock.picking.batch':
-            return f'/odoo/{record.id}/action-stock_barcode.stock_barcode_picking_batch_client_action'
-        return super()._get_client_action_url(record)
-
     def test_barcode_batch_receipt_1(self):
         """ Create a batch picking with 3 receipts, then open the batch in
         barcode app and scan each product, SN or LN one by one.
@@ -1120,3 +1115,49 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
         url = self._get_client_action_url(batch)
         self.start_tour(url, 'test_barcode_batch_GS1_scan_barcode_with_new_serial', login='admin', timeout=180)
         self.assertEqual(picking_delivery_serial_1.lot_id.name, 'BATCHSN1')
+
+    def test_change_dest_location_multi_pickings(self):
+        """Asserts that we can change the destination location of a move in a batch,
+        even if it is not the first move.
+        """
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 1)
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 1)
+
+        self.picking_type_internal.write({
+            'restrict_scan_product': True,
+            'restrict_scan_dest_location': 'mandatory',
+        })
+        internal_pickings = self.env['stock.picking'].create([
+            {
+                'location_id': self.stock_location.id,
+                'location_dest_id': dest.id,
+                'picking_type_id': self.picking_type_internal.id,
+            } for dest in [self.shelf1, self.shelf2]
+        ])
+        self.env['stock.move'].create([
+            {
+                'product_id': product.id,
+                'product_uom_qty': 1,
+                'picking_id': picking.id,
+            } for picking, product in zip(internal_pickings, [self.product1, self.product2])
+        ])
+        internal_pickings.action_confirm()
+        internal_pickings.action_assign()
+        batch_internal = self.env['stock.picking.batch'].create({
+            'picking_ids': internal_pickings.ids
+        })
+        batch_internal.action_confirm()
+
+        url = self._get_client_action_url(batch_internal)
+        child_locations = self.env['stock.location'].create([
+            {
+                'name': f'Child {i + 1}',
+                'location_id': shelf.id,
+                'barcode': f'child{i + 1}',
+            } for i, shelf in enumerate([self.shelf1, self.shelf2])
+        ])
+        self.env.user.group_ids += self.env.ref('stock.group_stock_multi_locations')
+        self.start_tour(url, 'test_change_dest_location_multi_pickings', login='admin', timeout=180)
+        self.assertRecordValues(internal_pickings.move_line_ids, [
+            {'location_dest_id': child_locations[0].id}, {'location_dest_id': child_locations[1].id}
+        ])

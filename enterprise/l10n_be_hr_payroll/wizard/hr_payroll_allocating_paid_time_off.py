@@ -87,18 +87,34 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
 
         period_work_days_count = self._get_working_days_count(period_start, period_end)
 
+        # Each version only covers its own effective period (from its date_version
+        # to the day before the next version, within the contract dates)
         query = SQL("""
+              WITH version_periods AS (
+                    SELECT v.id,
+                           GREATEST(v.date_version, v.contract_date_start) AS date_start,
+                           LEAST(
+                               LEAD(v.date_version) OVER (PARTITION BY v.employee_id ORDER BY v.date_version) - 1,
+                               v.contract_date_end
+                           ) AS date_end
+                      FROM hr_version v
+                     WHERE v.active IS TRUE
+              )
             SELECT v.id AS version_id,
                    v.employee_id AS employee_id,
-                   v.contract_date_start AS date_start,
-                   v.contract_date_end AS date_end,
+                   vp.date_start AS date_start,
+                   vp.date_end AS date_end,
                    v.resource_calendar_id AS resource_calendar_id
               FROM hr_version v
+              JOIN version_periods vp ON vp.id = v.id
               JOIN hr_employee e ON v.employee_id = e.id
          LEFT JOIN l10n_be_worker_code w ON v.l10n_be_worker_code_id = w.id
          LEFT JOIN l10n_be_joint_committee jc ON v.l10n_be_joint_committee_id = jc.id
              WHERE v.contract_date_start <= %(stop)s
                AND (v.contract_date_end IS NULL OR v.contract_date_end >= %(start)s)
+               AND vp.date_start <= %(stop)s
+               AND (vp.date_end IS NULL OR vp.date_end >= %(start)s)
+               AND (vp.date_end IS NULL OR vp.date_end >= vp.date_start)
                AND e.active IS TRUE
                AND e.company_id IN %(company)s
                AND v.l10n_be_dimona_category = 'oth'
@@ -180,13 +196,15 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
             ]),
             ('active', '=', True),
             ('company_id', 'in', self.env.companies.ids),
+            ('date_version', '<=', next_period_end),
             ('contract_date_start', '<=', next_period_end),
             '|',
                 ('contract_date_end', '=', False),
                 ('contract_date_end', '>=', next_period_start),
         ]
         next_period_version_by_employee = {}
-        for version in self.env['hr.version'].search(next_period_domain, order='contract_date_start desc'):
+        # Take the latest version effective during the next period
+        for version in self.env['hr.version'].search(next_period_domain, order='date_version desc'):
             next_period_version_by_employee.setdefault(version.employee_id.id, version)
 
         allocation_data_by_employee = {}
@@ -448,7 +466,7 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
             '|',
                 ('contract_date_end', '=', False),
                 ('contract_date_end', '>=', date_start),
-        ])
+        ]).filtered(lambda v: v._is_overlapping_period(date_start, date_end))
 
         start_dt = datetime.combine(date_start, time.min, tzinfo=UTC)
         end_dt = datetime.combine(date_end, time.max, tzinfo=UTC)
@@ -461,8 +479,8 @@ class HrPayrollAllocPaidLeave(models.TransientModel):
             for version in versions:
                 versions_by_resource[version.employee_id.resource_id.id].append((
                     version.employee_id.id,
-                    max(start_dt, datetime.combine(version.contract_date_start, time.min, tzinfo=UTC)),
-                    min(end_dt, datetime.combine(version.contract_date_end or end_dt.date(), time.max, tzinfo=UTC)),
+                    max(start_dt, datetime.combine(version.date_start, time.min, tzinfo=UTC)),
+                    min(end_dt, datetime.combine(version.date_end or end_dt.date(), time.max, tzinfo=UTC)),
                 ))
 
             for resource_id, intervals in intervals_by_resource.items():

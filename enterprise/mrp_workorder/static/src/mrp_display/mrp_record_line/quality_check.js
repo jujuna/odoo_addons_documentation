@@ -117,8 +117,8 @@ export class QualityCheck extends MrpWorkorder {
         switch (this.type) {
             case "instructions":
                 if (this.isComplete) {
-                    this.props.record.data.quality_state = "none";
-                    return;
+                    await this.props.record.update({ quality_state: "none" });
+                    return this.props.record.save({ reload: false });
                 } else {
                     return this.doActionAndNext("action_next");
                 }

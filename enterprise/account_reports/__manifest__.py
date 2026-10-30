@@ -31,6 +31,7 @@ Accounting Reports
         'data/journal_report.xml',
         'data/generic_tax_report.xml',
         'data/interco_comparison_report.xml',
+        'data/cash_flow_indirect_report.xml',
         'views/account_report_view.xml',
         'data/account_report_actions.xml',
         'data/account_return_check_actions.xml',

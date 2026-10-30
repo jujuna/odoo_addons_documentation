@@ -20,6 +20,7 @@ patch(AttendeeCalendarSidePanel.prototype, {
         this.env = useEnv();
         this.uiService = useService("ui");
         this.appointmentProps = useProps({
+            saveAndCopyAppointmentUrl: t.function(),
             setEditingAppointmentId: t.function(),
             setSelectedAppointmentTypeId: t.function(),
             openAppointmentForm: t.function(),

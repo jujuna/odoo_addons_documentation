@@ -75,7 +75,8 @@
                             <f2016_postcodebelgisch t-out="employee_data['f2016_postcodebelgisch']"/>
                         </t>
 
-                        <!-- <f2017_gemeente /> 27 AN commune du bénéficiaire -->
+                        <!-- <f2017_gemeente /> 27 AN commune du bénéficiaire, mandatory for the non-residents -->
+                        <f2017_gemeente t-out="employee_data['employee_city']"/>
 
                         <!-- <f2018_landwoonplaats /> 5 N Code pays du domicile du bénéficiaire
                         des revenus, zéro si Belgique -->
@@ -118,74 +119,7 @@
                         <!-- <f2114_voornamen /> 15 AN Prénom du bénéficiaire des revenus -->
                         <f2114_voornamen t-out="employee_data['f2114_voornamen']"/>
 
-                        <f20_2031_stopzettingexploitatie t-out="employee_data['f20_2031_stopzettingexploitatie']"/>
-                        <f20_2033_optiebuitvennoots t-out="employee_data['f20_2033_optiebuitvennoots']"/>
-                        <f20_2035_verantwoordingsstukken t-out="employee_data['f20_2035_verantwoordingsstukken']"/>
-                        <f20_2045_rsz t-out="employee_data['f20_2045_rsz']"/>
-                        <f20_2055_datumvanindienstt t-out="employee_data['f20_2055_datumvanindienstt']"/>
-                        <f20_2056_datumvanvertrek t-out="employee_data['f20_2056_datumvanvertrek']"/>
-                        <f20_2059_totaalcontrole t-out="employee_data['f20_2059_totaalcontrole']"/>
-                        <f20_2060_periodieke t-out="employee_data['f20_2060_periodieke']"/>
-                        <f20_2061_covidovertimeremuneration2023 t-out="employee_data['f20_2061_covidovertimeremuneration2023']"/>
-                        <f20_2062_anderebezoldiginge t-out="employee_data['f20_2062_anderebezoldiginge']"/>
-                        <f20_2063_totaal t-out="employee_data['f20_2063_totaal']"/>
-                        <f20_2064_vervroegdvakantieg t-out="employee_data['f20_2064_vervroegdvakantieg']"/>
-                        <f20_2065_opzeggingsreclasseringsverg t-out="employee_data['f20_2065_opzeggingsreclasseringsverg']"/>
-                        <f20_2066_totaalbedrijfsvoorheffing t-out="employee_data['f20_2066_totaalbedrijfsvoorheffing']"/>
-                        <f20_2067_bijzonderbijdrage t-out="employee_data['f20_2067_bijzonderbijdrage']"/>
-                        <f20_2068_bedrag t-out="employee_data['f20_2068_bedrag']"/>
-                        <f20_2069_compensationamountwithoutstandards t-out="employee_data['f20_2069_compensationamountwithoutstandards']"/>
-                        <f20_2071_pensioengewonebijdragen t-out="employee_data['f20_2071_pensioengewonebijdragen']"/>
-                        <f20_2073_periodieke t-out="employee_data['f20_2073_periodieke']"/>
-                        <f20_2074_anderen t-out="employee_data['f20_2074_anderen']"/>
-                        <f20_2075_totaal t-out="employee_data['f20_2075_totaal']"/>
-                        <f20_2076_nonrecurrentadvantages t-out="employee_data['f20_2076_nonrecurrentadvantages']"/>
-                        <f20_2078_pensioentoezegging t-out="employee_data['f20_2078_pensioentoezegging']"/>
-                        <f20_2079_bedrag t-out="employee_data['f20_2079_bedrag']"/>
-                        <f20_2080_bedrag t-out="employee_data['f20_2080_bedrag']"/>
-                        <f20_2081_bezoldigingen t-out="employee_data['f20_2081_bezoldigingen']"/>
-                        <f20_2082_occasionalworkhoreca t-out="employee_data['f20_2082_occasionalworkhoreca']"/>
-                        <f20_2083_bonus t-out="employee_data['f20_2083_bonus']"/>
-                        <f20_2084_bonus5254 t-out="employee_data['f20_2084_bonus5254']"/>
-                        <f20_2087_code420 t-out="employee_data['f20_2087_code420']"/>
-                        <f20_2088_impulsfund t-out="employee_data['f20_2088_impulsfund']"/>
-                        <f20_2092_othercode1 t-out="employee_data['f20_2092_othercode1']"/>
-                        <f20_2094_othercode2 t-out="employee_data['f20_2094_othercode2']"/>
-                        <f20_2096_othercode3 t-out="employee_data['f20_2096_othercode3']"/>
-                        <f20_2098_othercode4 t-out="employee_data['f20_2098_othercode4']"/>
-                        <f20_2099_aard t-out="employee_data['f20_2099_aard']"/>
-                        <f20_2102_kas t-out="employee_data['f20_2102_kas']"/>
-                        <f20_2103_kasvrijaanvullendpensioen t-out="employee_data['f20_2103_kasvrijaanvullendpensioen']"/>
-                        <f20_2106_percentages t-out="employee_data['f20_2106_percentages']"/>
-                        <f20_2109_fiscaalidentificat t-out="employee_data['f20_2109_fiscaalidentificat']"/>
-                        <f20_2128_vrijaanvullendpensioenwerknemers t-out="employee_data['f20_2128_vrijaanvullendpensioenwerknemers']"/>
-                        <f20_2131_bedrijfsvoorheffingvanwerkgever t-out="employee_data['f20_2131_bedrijfsvoorheffingvanwerkgever']"/>
-                        <f20_2133_bedrijfsvoorheffingbuitenlvenverbondenwerkgever t-out="employee_data['f20_2133_bedrijfsvoorheffingbuitenlvenverbondenwerkgever']"/>
-                        <f20_2134_totaalbedragmobiliteitsbudget t-out="employee_data['f20_2134_totaalbedragmobiliteitsbudget']"/>
-                        <f20_2138_covidovertimehours2023 t-out="employee_data['f20_2138_covidovertimehours2023']"/>
-                        <f20_2181_remunerationetrang t-out="employee_data['f20_2181_remunerationetrang']"/>
-                        <f20_2182_aandelenetrang t-out="employee_data['f20_2182_aandelenetrang']"/>
-                        <f20_2183_bonuspremieoaandelenoptiesetrang t-out="employee_data['f20_2183_bonuspremieoaandelenoptiesetrang']"/>
-                        <f20_2184_anderevaaetrang t-out="employee_data['f20_2184_anderevaaetrang']"/>
-                        <f20_2185_amountother1 t-out="employee_data['f20_2185_amountother1']"/>
-                        <f20_2186_amountother2 t-out="employee_data['f20_2186_amountother2']"/>
-                        <f20_2187_amountother3 t-out="employee_data['f20_2187_amountother3']"/>
-                        <f20_2188_amountother4 t-out="employee_data['f20_2188_amountother4']"/>
-                        <f20_2195_relanceovertimeremuneration t-out="employee_data['f20_2195_relanceovertimeremuneration']"/>
-                        <f20_2196_relanceovertimehours t-out="employee_data['f20_2196_relanceovertimehours']"/>
-                        <f20_2200_compensationwithstandards t-out="employee_data['f20_2200_compensationwithstandards']"/>
-                        <f20_2201_compensationwithdocuments t-out="employee_data['f20_2201_compensationwithdocuments']"/>
-                        <f20_2202_amount t-out="employee_data['f20_2202_amount']"/>
-                        <f20_2203_amount t-out="employee_data['f20_2203_amount']"/>
-                        <f20_2204_repaidsums t-out="employee_data['f20_2204_repaidsums']"/>
-                        <f20_2205_recuperation t-out="employee_data['f20_2205_recuperation']"/>
-                        <f20_2206_grossamountremuneration t-out="employee_data['f20_2206_grossamountremuneration']"/>
-                        <f20_2207_travelbicycleorspeedpedelec t-out="employee_data['f20_2207_travelbicycleorspeedpedelec']"/>
-                        <f20_2208_benefitprovisionbicycleorspeedpedelec t-out="employee_data['f20_2208_benefitprovisionbicycleorspeedpedelec']"/>
-                        <f20_2209_totalcontributiontravelexpenses t-out="employee_data['f20_2209_totalcontributiontravelexpenses']"/>
-                        <f20_2226_kmzone2207 t-out="employee_data['f20_2226_kmzone2207']"/>
-                        <f20_2227_relanceovertimeremuneration2025 t-out="employee_data['f20_2227_relanceovertimeremuneration2025']"/>
-                        <f20_2228_relanceovertimehours2025 t-out="employee_data['f20_2228_relanceovertimehours2025']"/>
+                        <t t-out="employee_data['_xml_declaration_fields']"/>
                     </Fiche28120>
                 </t>
             </Opgave32520>

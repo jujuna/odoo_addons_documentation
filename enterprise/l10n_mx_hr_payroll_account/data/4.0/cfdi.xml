@@ -21,6 +21,15 @@
     t-att-LugarExpedicion="lugar_expedicion"
     t-att-NoCertificado="no_certificado"
     t-att-Certificado="certificado">
+    <t t-if="cfdi_relationado_data">
+        <t t-foreach="cfdi_relationado_data" t-as="code">
+            <cfdi:CfdiRelacionados t-if="cfdi_relationado_data[code]" t-att-TipoRelacion="code">
+                <t t-foreach="cfdi_relationado_data[code]" t-as="uuid">
+                    <cfdi:CfdiRelacionado t-att-UUID="uuid" />
+                </t>
+            </cfdi:CfdiRelacionados>
+        </t>
+    </t>
     <cfdi:Emisor
         t-att-Rfc="emisor['rfc']"
         t-att-Nombre="format_string(emisor['nombre'], 254)"

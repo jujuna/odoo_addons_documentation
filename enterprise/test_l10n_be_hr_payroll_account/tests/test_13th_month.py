@@ -199,6 +199,39 @@ class Test13thMonth(TestPayslipBase):
         })
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), version.wage * 11 / 12, msg='It should count 11/12 months')
 
+    def test_13th_month_paid_amount_month_start_after_public_holiday(self):
+        self.env['resource.calendar.leaves'].create({
+            'name': 'Labour Day',
+            'company_id': self.employee.company_id.id,
+            'resource_id': False,
+            'date_from': datetime(2026, 5, 1, 0, 0, 0),
+            'date_to': datetime(2026, 5, 1, 23, 59, 59),
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        })
+        self.payslip.write({
+            'date_from': datetime(2026, 12, 1),
+            'date_to': datetime(2026, 12, 31),
+        })
+        self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * 8 / 12, msg='May should count')
+
+    def test_13th_month_paid_amount_multiple_contracts_public_holiday(self):
+        self.update_version(date(2026, 1, 1), date(2026, 4, 30))
+        version = self.create_version(date(2026, 5, 4))  # starts the following Monday
+        self.env['resource.calendar.leaves'].create({
+            'name': 'Labour Day',
+            'company_id': self.employee.company_id.id,
+            'resource_id': False,
+            'date_from': datetime(2026, 5, 1, 0, 0, 0),
+            'date_to': datetime(2026, 5, 1, 23, 59, 59),
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        })
+        self.payslip.write({
+            'version_id': version.id,
+            'date_from': datetime(2026, 12, 1),
+            'date_to': datetime(2026, 12, 31),
+        })
+        self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), version.wage, msg='It should count all months')
+
     def test_13th_month_become_part_time(self):
         self.update_version(date(2019, 1, 1), date(2019, 6, 30), wage=5000)
         version = self.create_version(date(2019, 7, 1), wage=2500)
@@ -539,7 +572,7 @@ class Test13thMonth(TestPayslipBase):
             },
         ])
         # 200€ commission during the year -> average of 16.67€ per month. Should not depend if unpaid during the month
-        self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), (2500 * 11 / 12) + 16.67, places=2, msg='It should count full wage + commissions')
+        self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), (2500 * 11 / 12) + 16.67 * (11 / 12), places=2, msg='It should count full wage + commissions')
 
     def test_13th_month_unpredictable_reason_10_days(self):
         self.update_version(date(2015, 1, 1))
@@ -646,7 +679,7 @@ class Test13thMonth(TestPayslipBase):
 
     def test_13th_month_long_term_sick_back_to_work_not_enough(self):
         self.update_version(date(2015, 1, 1))
-        self.env['hr.leave'].create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -659,7 +692,14 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2019, 3, 14),
                 'request_date_to': date(2019, 12, 31),
             }
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
         # Already 31 days assimilated previous year -> only 29 left if no come back for 14 consecutive days
         # Only first 29 days of 2019 to be taken into account because come back of only 10 days (21 days of work + 8 days of work)
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * ((29 / 31) / 12 + (12 / 31) / 12), places=2)
@@ -681,7 +721,7 @@ class Test13thMonth(TestPayslipBase):
     def test_13th_month_long_term_sick_back_to_work_half_day_sick(self):
         self.update_version(date(2015, 1, 1))
         self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').request_unit = 'half_day'
-        self.env['hr.leave'].with_context(leave_skip_state_check=True).create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -702,13 +742,20 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2019, 4, 15),
                 'request_date_to': date(2019, 12, 31),
             }
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
         # Half day of sick time off doesn't interfere with the 14 consecutive days, but we remove half day in computation
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * (2 / 12 + ((1 / 31) / 12) + (13.5 / 30) / 12), places=2)
 
     def test_13th_month_multiple_sicknesses(self):
         self.update_version(date(2015, 1, 1))
-        self.env['hr.leave'].create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -727,7 +774,14 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2019, 8, 1),
                 'request_date_to': date(2019, 9, 30),
             },
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage * (10 / 12 + ((18 / 31) / 12)), places=2)
 
     def test_half_day_sick_time_offs(self):
@@ -751,7 +805,13 @@ class Test13thMonth(TestPayslipBase):
             else:
                 current_date += relativedelta(days=1)
 
-        self.env['hr.leave'].with_context(leave_skip_state_check=True).create(leaves_to_create)
+        prev_leave = self.env['hr.leave']
+        for leave_vals in leaves_to_create:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
 
         # 120 half days = 60 days. Every work entry should be treated as working time -> full wage for 13th month
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), self.version.wage, places=2)
@@ -889,7 +949,7 @@ class Test13thMonth(TestPayslipBase):
 
     def test_13th_month_full_leave(self):
         self.update_version(date(2024, 1, 1))
-        self.env['hr.leave'].create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -956,14 +1016,21 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2025, 11, 17),
                 'request_date_to': date(2025, 12, 31),
             },
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
         self.payslip.date_from = date(2025, 12, 1)
         self.payslip.date_to = date(2025, 12, 31)
         self.assertAlmostEqual(self.payslip._get_paid_amount_13th_month(), 0, places=2)
 
     def test_13th_month_maternity_leave(self):
         self.update_version(date(2025, 1, 1))
-        self.env['hr.leave'].create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -982,13 +1049,21 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2025, 8, 7),
                 'request_date_to': date(2025, 8, 12),
             },
-            {
-                'employee_id': self.employee.id,
-                'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_maternity').id,
-                'request_date_from': date(2025, 8, 13),
-                'request_date_to': date(2025, 11, 18),
-            }
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
+
+        self.env['hr.leave'].create({
+            'employee_id': self.employee.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_maternity').id,
+            'request_date_from': date(2025, 8, 13),
+            'request_date_to': date(2025, 11, 18),
+        })
 
         self.env['resource.calendar.leaves'].create([{
             'name': 'Public Holiday',
@@ -1008,7 +1083,7 @@ class Test13thMonth(TestPayslipBase):
 
     def test_13th_month_multiple_sick_leaves_1(self):
         self.update_version(date(2025, 1, 1), wage=4863.26)
-        self.env['hr.leave'].create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -1039,7 +1114,14 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2025, 10, 25),
                 'request_date_to': date(2025, 11, 16),
             },
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
 
         self.payslip.date_from = date(2025, 12, 1)
         self.payslip.date_to = date(2025, 12, 31)
@@ -1052,7 +1134,7 @@ class Test13thMonth(TestPayslipBase):
         version = self.create_version(date(2025, 3, 14), wage=4209.1)
         version.resource_calendar_id = self.calendar_40h
 
-        self.env['hr.leave'].create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -1071,13 +1153,21 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2025, 3, 15),
                 'request_date_to': date(2025, 5, 27),
             },
-            {
-                'employee_id': self.employee.id,
-                'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_maternity').id,
-                'request_date_from': date(2025, 5, 28),
-                'request_date_to': date(2025, 9, 2),
-            },
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
+
+        self.env['hr.leave'].create({
+            'employee_id': self.employee.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_maternity').id,
+            'request_date_from': date(2025, 5, 28),
+            'request_date_to': date(2025, 9, 2),
+        })
 
         self.payslip.date_from = date(2025, 12, 1)
         self.payslip.date_to = date(2025, 12, 31)
@@ -1085,7 +1175,7 @@ class Test13thMonth(TestPayslipBase):
 
     def test_13th_month_multiple_sick_leaves_3(self):
         self.update_version(date(2025, 1, 1), wage=2920.89)
-        self.env['hr.leave'].create([
+        all_leave_vals = [
             {
                 'employee_id': self.employee.id,
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -1097,12 +1187,6 @@ class Test13thMonth(TestPayslipBase):
                 'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
                 'request_date_from': date(2025, 3, 6),
                 'request_date_to': date(2025, 4, 9),
-            },
-            {
-                'employee_id': self.employee.id,
-                'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_maternity').id,
-                'request_date_from': date(2025, 4, 10),
-                'request_date_to': date(2025, 7, 22),
             },
             {
                 'employee_id': self.employee.id,
@@ -1140,7 +1224,21 @@ class Test13thMonth(TestPayslipBase):
                 'request_date_from': date(2025, 11, 20),
                 'request_date_to': date(2025, 11, 20),
             },
-        ])
+        ]
+        prev_leave = self.env['hr.leave']
+        for leave_vals in all_leave_vals:
+            prev_leave = self.env['hr.leave'].create([{
+                **leave_vals,
+                'l10n_be_sickness_relapse': bool(prev_leave),
+                'l10n_be_sickness_relapse_origin_leave_id': prev_leave.id or False,
+            }])
+
+        self.env['hr.leave'].create({
+            'employee_id': self.employee.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_maternity').id,
+            'request_date_from': date(2025, 4, 10),
+            'request_date_to': date(2025, 7, 22),
+        })
 
         self.payslip.date_from = date(2025, 12, 1)
         self.payslip.date_to = date(2025, 12, 31)

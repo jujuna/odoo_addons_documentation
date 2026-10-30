@@ -60,6 +60,9 @@ class HrExpense(models.Model):
             e.company_id.expense_extract_show_ocr_option_selection == 'auto_send'
             and e.extract_can_show_send_button
         )._filter_preprocess_skipped_ocr()
+
+        # Expenses with an existing amount should not be sent for auto-digitization.
+        to_extract = to_extract.filtered(lambda e: not e.total_amount_currency)
         if to_extract:
             to_extract._send_batch_for_digitization()
 

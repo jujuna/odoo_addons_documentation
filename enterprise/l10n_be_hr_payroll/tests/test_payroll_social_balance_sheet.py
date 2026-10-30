@@ -38,3 +38,33 @@ class TestPayrollSocialBalanceSheet(TestPayrollCommon):
 
         self.assertEqual(balance_sheet_data['1003_female'], .25, "Total full time employement for women should equal 3 payslips x 1 month / 12 month = 0.25")
         self.assertEqual(balance_sheet_data['1003_male'], 0., "Total full time employement for men should equal 0")
+
+    def test_full_and_part_time_workers(self):
+        """ Each worker is counted as full or part time according to its own version. """
+        employees = self.create_employee([{
+            'name': 'Full Time Employee',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'certificate': 'master',
+            'sex': 'male',
+        }, {
+            'name': 'Part Time Employee',
+            'date_version': date(2025, 1, 1),
+            'contract_date_start': date(2025, 1, 1),
+            'resource_calendar_id': self.resource_calendar_mid_time.id,
+            'certificate': 'master',
+            'sex': 'female',
+        }])
+        self.assertEqual(employees.version_id.mapped('work_time_rate'), [1.0, 0.5])
+        self.create_and_validate_payslips(employees=employees, year=2025, months=[1])
+        balance_sheet_data = self.env['l10n.be.social.balance.sheet'].with_company(self.belgian_company).create({
+            'date_from': date(2025, 1, 1),
+            'date_to': date(2025, 12, 31),
+        })._get_report_data()
+
+        self.assertFalse(balance_sheet_data['102']['total_gross']['male']['part'])
+        self.assertTrue(balance_sheet_data['102']['total_gross']['male']['full'])
+        self.assertFalse(balance_sheet_data['102']['total_gross']['female']['full'])
+        self.assertTrue(balance_sheet_data['102']['total_gross']['female']['part'])
+        self.assertEqual(balance_sheet_data['105'], {'full': 1, 'part': 1, 'fte': 1.5})
+        self.assertEqual(balance_sheet_data['205'], {'full': 1, 'part': 1, 'fte': 1.5})

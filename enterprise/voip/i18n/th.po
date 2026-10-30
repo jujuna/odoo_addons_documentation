@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-23 02:33+0000\n"
+"POT-Creation-Date: 2026-10-16 17:50+0000\n"
+"PO-Revision-Date: 2026-10-20 08:48+0000\n"
 "Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/voip/th/>\n"
 "Language: th\n"
@@ -679,6 +679,12 @@ msgid "A phone service event is processed only once."
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/pbx_service.py:0
+msgid "A tenant migration cannot reuse an identifier with a different mapping."
+msgstr ""
+
+#. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_call_check_unique_control_handle_per_user
 msgid "A user can only have one live call per control handle and direction."
 msgstr ""
@@ -1038,6 +1044,12 @@ msgstr ""
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/pbx_service.py:0
+msgid "An older tenant migration mapping cannot replace the current mapping."
+msgstr ""
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/voip_call.py:0
 msgid "Answer"
 msgstr ""
@@ -1300,6 +1312,7 @@ msgstr ""
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/no_phone_number_card.xml:0
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
 msgid "Buy a Number"
 msgstr ""
 
@@ -2200,6 +2213,12 @@ msgstr "วันที่"
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Date:"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Dear %(name)s,"
 msgstr ""
 
 #. module: voip
@@ -4468,6 +4487,11 @@ msgid "No number"
 msgstr ""
 
 #. module: voip
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
+msgid "No number requests found"
+msgstr ""
+
+#. module: voip
 #. odoo-python
 #: code:addons/voip/models/phone_service_api.py:0
 msgid ""
@@ -4766,6 +4790,12 @@ msgstr ""
 #. module: voip
 #: model:iap.service,name:voip.iap_service_phone_service
 msgid "Odoo Phone Service"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Odoo Phone Team"
 msgstr ""
 
 #. module: voip
@@ -5247,6 +5277,7 @@ msgstr ""
 #. module: voip
 #: model:ir.module.module,shortdesc:base.module_voip
 #: model:ir.ui.menu,name:voip.menu_voip_root
+#: model:res.groups.privilege,name:voip.res_groups_privilege_voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 msgid "Phone"
@@ -5332,6 +5363,7 @@ msgstr ""
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/no_phone_number_card.xml:0
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
 msgid "Phone numbers"
 msgstr ""
 
@@ -5361,9 +5393,9 @@ msgstr ""
 
 #. module: voip
 #. odoo-javascript
-#: code:addons/voip/static/src/core/web/session.js:0
+#: code:addons/voip/static/src/core/web/audio_manager.js:0
 msgid "Please accept use of the microphone."
-msgstr ""
+msgstr "โปรดยอมรับการใช้ไมโครโฟน"
 
 #. module: voip
 #. odoo-javascript
@@ -6168,6 +6200,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/country_selector_items.xml:0
 msgid "Search country or prefix"
+msgstr ""
+
+#. module: voip
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
+msgid ""
+"Search for a number to buy. If none are available,<br>\n"
+"                    click Request Numbers to submit a request and track it "
+"here."
 msgstr ""
 
 #. module: voip
@@ -7246,6 +7286,31 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s could not be completed. You can "
+"find more details on the phone number."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s has been received and is under "
+"review. The documents you have submitted are being evaluated. You will be "
+"notified if we need more information to complete the order."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s is complete. Your number is now "
+"active and you can assign it."
+msgstr ""
+
+#. module: voip
 #: model:ir.model.fields,help:voip.field_res_partner__t9_name
 #: model:ir.model.fields,help:voip.field_res_users__t9_name
 msgid ""
@@ -8092,14 +8157,9 @@ msgid "Visible to all"
 msgstr "มองเห็นได้ทุกคน"
 
 #. module: voip
-#: model:res.groups.privilege,name:voip.res_groups_privilege_voip
-msgid "VoIP"
-msgstr "VoIP"
-
-#. module: voip
 #: model:ir.model.fields,field_description:voip.field_mail_call_artifact__voip_call_id
 msgid "VoIP Call"
-msgstr ""
+msgstr "การโทร VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_call_cost_line
@@ -8109,29 +8169,29 @@ msgstr ""
 #. module: voip
 #: model:ir.model,name:voip.model_voip_call_flow
 msgid "VoIP Call Flow"
-msgstr ""
+msgstr "ขั้นตอนการโทร VoIP"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/voip_call_indicators_field.js:0
 msgid "VoIP Call Indicators"
-msgstr ""
+msgstr "ตัวบ่งชี้การโทร VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_did_number
 msgid "VoIP DID Number"
-msgstr ""
+msgstr "ตัวเลข VoIP DID"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_did_number_request
 msgid "VoIP DID Number Request"
-msgstr ""
+msgstr "คำขอตัวเลข VoIP DID"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/voip_duration_field.js:0
 msgid "VoIP Duration"
-msgstr ""
+msgstr "ระยะเวลา VoIP"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_provider__mode
@@ -8141,12 +8201,12 @@ msgstr "VoIP สภาพแวดล้อม"
 #. module: voip
 #: model:ir.model,name:voip.model_voip_voicemail
 msgid "VoIP Mailbox"
-msgstr ""
+msgstr "กล่องเสียง VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_voicemail_message
 msgid "VoIP Mailbox Message"
-msgstr ""
+msgstr "ข้อความในกล่องเสียง VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_music_on_hold
@@ -8161,7 +8221,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model,name:voip.model_voip_phone_service_event
 msgid "VoIP Phone Service Event"
-msgstr ""
+msgstr "อีเวนต์บริการโทรศัพท์ VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_provider
@@ -8174,7 +8234,7 @@ msgstr "ผู้ให้บริการ VoIP"
 #: model:ir.ui.menu,name:voip.voip_provider_view_menu
 #: model_terms:ir.ui.view,arch_db:voip.voip_provider_tree_view
 msgid "VoIP Providers"
-msgstr ""
+msgstr "ผู้ให้บริการ VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_queue
@@ -8189,27 +8249,27 @@ msgstr ""
 #. module: voip
 #: model:ir.model,name:voip.model_voip_requirement
 msgid "VoIP Regulatory Requirement"
-msgstr ""
+msgstr "ข้อกำหนดด้านกฎระเบียบของ VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_requirement_group
 msgid "VoIP Requirement Group"
-msgstr ""
+msgstr "กลุ่มข้อกำหนด VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_time_condition
 msgid "VoIP Time Condition"
-msgstr ""
+msgstr "เงื่อนไขเวลา VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_time_condition_period
 msgid "VoIP Time Condition Period"
-msgstr ""
+msgstr "ช่วงเวลาของเงื่อนไขเวลา VoIP"
 
 #. module: voip
 #: model:ir.model,name:voip.model_voip_activity_mixin
 msgid "VoIP multi-activity creation support"
-msgstr ""
+msgstr "การสนับสนุนการสร้างกิจกรรมหลายอย่างผ่าน VoIP"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_secret
@@ -8219,38 +8279,38 @@ msgstr "VoIP ลับ"
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users_settings__voip_username
 msgid "VoIP username"
-msgstr ""
+msgstr "ชื่อผู้ใช้ VoIP"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/ir_config_parameter.py:0
 msgid "VoIP webhook sync failed"
-msgstr ""
+msgstr "การซิงค์ webhook VoIP ล้มเหลว"
 
 #. module: voip
 #: model:ir.actions.server,name:voip.ir_cron_voip_cleanup_stuck_calls_ir_actions_server
 msgid "VoIP: Cleanup stuck calls"
-msgstr ""
+msgstr "VoIP: แก้ไขปัญหาการโทรที่ติดขัด"
 
 #. module: voip
 #: model:ir.actions.server,name:voip.ir_cron_voip_heal_provisioning_ir_actions_server
 msgid "VoIP: Heal Incomplete DID Provisioning"
-msgstr ""
+msgstr "VoIP: แก้ไขการจัดสรร DID ที่ไม่สมบูรณ์"
 
 #. module: voip
 #: model:ir.actions.server,name:voip.ir_cron_voip_link_orphan_cost_lines_ir_actions_server
 msgid "VoIP: Link Orphan Call Cost Lines"
-msgstr ""
+msgstr "VoIP: เชื่อมโยงบรรทัดค่าใช้จ่ายการโทรที่ไม่มีที่มา"
 
 #. module: voip
 #: model:mail.template,name:voip.mail_template_voicemail_message
 msgid "VoIP: New Mailbox Message"
-msgstr ""
+msgstr "VoIP: ข้อความเสียงใหม่ในกล่องจดหมาย"
 
 #. module: voip
 #: model:mail.template,name:voip.mail_template_phone_number_request
 msgid "VoIP: Phone Number Request"
-msgstr ""
+msgstr "VoIP: การขอหมายเลขโทรศัพท์"
 
 #. module: voip
 #: model:ir.actions.server,name:voip.ir_cron_voip_sync_number_statuses_ir_actions_server
@@ -8260,24 +8320,24 @@ msgstr ""
 #. module: voip
 #: model:ir.actions.server,name:voip.ir_cron_voip_sync_number_requests_ir_actions_server
 msgid "VoIP: Sync Number Requests"
-msgstr ""
+msgstr "VoIP: คำขอหมายเลขซิงค์"
 
 #. module: voip
 #: model:ir.actions.server,name:voip.ir_cron_voip_sync_webhook_event_url_ir_actions_server
 msgid "VoIP: Sync Webhook URL"
-msgstr ""
+msgstr "VoIP: ซิงค์ลิงก์ Webhook"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_ivr__tts_voice
 #: model:ir.model.fields,field_description:voip.field_voip_sound__tts_voice
 msgid "Voice"
-msgstr ""
+msgstr "เสียง"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/tts_voice_selection/tts_voice_selection_field.js:0
 msgid "Voice (with language filter)"
-msgstr ""
+msgstr "เสียง (พร้อมตัวกรองภาษา)"
 
 #. module: voip
 #. odoo-javascript
@@ -8306,7 +8366,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:voip.selection__voip_time_condition__open_destination_ref__voip_voicemail
 #: model_terms:ir.ui.view,arch_db:voip.voip_voicemail_view_form
 msgid "Voice Mailbox"
-msgstr ""
+msgstr "กล่องข้อความเสียง"
 
 #. module: voip
 #: model:ir.actions.act_window,name:voip.action_voip_voicemail
@@ -8314,22 +8374,22 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.voip_voicemail_view_list
 #: model_terms:ir.ui.view,arch_db:voip.voip_voicemail_view_search
 msgid "Voice Mailboxes"
-msgstr ""
+msgstr "กล่องข้อความเสียง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_destination_kind
 msgid "Voip Busy Destination Kind"
-msgstr ""
+msgstr "ชนิด VoIP จุดหมายปลายทางที่ใช้งานอยู่"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_destination_ref
 msgid "Voip Busy Destination Ref"
-msgstr ""
+msgstr "หมายเลขอ้างอิง VoIP จุดหมายปลายทางที่ใช้งานอยู่"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_destination_type
 msgid "Voip Busy Destination Type"
-msgstr ""
+msgstr "ประเภท VoIP จุดหมายปลายทางที่ใช้งานอยู่"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_busy_outcall_number
@@ -8339,37 +8399,37 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call_leg__voip_call_id
 msgid "Voip Call"
-msgstr ""
+msgstr "การโทรผ่าน VoIP"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_disconnected_destination_kind
 msgid "Voip Disconnected Destination Kind"
-msgstr ""
+msgstr "ชนิด VoIP ที่ตัดการเชื่อมต่อปลายทาง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_disconnected_destination_ref
 msgid "Voip Disconnected Destination Ref"
-msgstr ""
+msgstr "หมายเลขอ้างอิง VoIP ที่ตัดการเชื่อมต่อปลายทาง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_disconnected_destination_type
 msgid "Voip Disconnected Destination Type"
-msgstr ""
+msgstr "ประเภท VoIP ที่ตัดการเชื่อมต่อปลายทาง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_disconnected_outcall_number
 msgid "Voip Disconnected Outcall Number"
-msgstr ""
+msgstr "หมายเลข VoIP ที่ตัดการเชื่อมต่อการโทรออก"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_destination_kind
 msgid "Voip No Answer Destination Kind"
-msgstr ""
+msgstr "ชนิด VoIP ไม่มีผู้รับปลายทาง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_destination_ref
 msgid "Voip No Answer Destination Ref"
-msgstr ""
+msgstr "หมายเลขอ้างอิง VoIP ไม่มีผู้รับปลายทาง"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_destination_type
@@ -8379,7 +8439,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_immediate_destination
 msgid "Voip No Answer Immediate Destination"
-msgstr ""
+msgstr "จุดหมายปลายทาง VoIP ไม่มีผู้รับสายทันที"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_outcall_number
@@ -8389,7 +8449,7 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_no_answer_timeout
 msgid "Voip No Answer Timeout"
-msgstr ""
+msgstr "ระยะเวลารอสาย VoIP กรณีไม่มีผู้รับ"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_res_users__voip_provider_id
@@ -8425,12 +8485,12 @@ msgstr ""
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_time_condition_period__week_days
 msgid "Week Days"
-msgstr ""
+msgstr "วันในสัปดาห์"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_requirement__address_is_filled
 msgid "Whether required address fields are filled"
-msgstr ""
+msgstr "ว่าช่องข้อมูลที่จำเป็นต้องกรอกได้ถูกกรอกแล้วหรือไม่"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call__is_production
@@ -8438,49 +8498,51 @@ msgid ""
 "Whether the call happened in a production environment. True for all calls "
 "created before this tracking was implemented."
 msgstr ""
+"ระบุว่าการโทรเกิดขึ้นในสภาพแวดล้อมจริงหรือไม่ โดยจะมีค่าเป็น True สำหรับทุกสายที่สร้างขึ้นก่อนเริ่ม"
+"ใช้งานระบบติดตามนี้"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_did_number_search_wizard__needs_credits
 msgid "Whether the user must buy credits before purchasing."
-msgstr ""
+msgstr "ผู้ใช้ต้องซื้อเครดิตก่อนที่จะทำการซื้อหรือไม่"
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_requirement__is_fulfilled
 msgid "Whether this requirement has been fulfilled based on its type"
-msgstr ""
+msgstr "ว่าข้อกำหนดนี้ได้ปฏิบัติตามแล้วหรือไม่ ตามประเภท"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_did_number_request_view_form
 msgid "Why do you need a phone number?"
-msgstr ""
+msgstr "ทำไมคุณจึงต้องการหมายเลขโทรศัพท์?"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_call_group_view_search
 msgid "Without Extension"
-msgstr ""
+msgstr "ไม่มีส่วนขยาย"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_did_number_search_result_line__wizard_id
 msgid "Wizard"
-msgstr ""
+msgstr "ตัวช่วย"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number_request.py:0
 msgid "Write a message before sending it."
-msgstr ""
+msgstr "เขียนข้อความก่อนส่ง"
 
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.voip_ivr_view_form
 #: model_terms:ir.ui.view,arch_db:voip.voip_sound_view_form
 msgid "Write your text here"
-msgstr ""
+msgstr "เขียนข้อความของคุณที่นี่"
 
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/agenda.js:0
 msgid "Yes, I know what I'm doing"
-msgstr ""
+msgstr "รับทราบความเสี่ยง ยืนยันดำเนินการ"
 
 #. module: voip
 #. odoo-javascript
@@ -8493,7 +8555,7 @@ msgstr "เมื่อวาน"
 #. odoo-javascript
 #: code:addons/voip/static/src/widgets/simple_datetime_field.js:0
 msgid "Yesterday, %(time)s"
-msgstr ""
+msgstr "เมื่อวาน %(time)s"
 
 #. module: voip
 #. odoo-javascript
@@ -8505,19 +8567,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/voip/models/voip_queue_agent.py:0
 msgid "You can only join or leave queues assigned to you."
-msgstr ""
+msgstr "คุณสามารถเข้าร่วมหรือออกจากคิวที่ได้รับการจัดสรรให้คุณเท่านั้น"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "You can order at most %(max)s numbers at once."
-msgstr ""
+msgstr "คุณสามารถสั่งซื้อได้สูงสุด %(max)s ในครั้งเดียว"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "You can request between 1 and %(max)s numbers."
-msgstr ""
+msgstr "คุณสามารถขอหมายเลขได้ระหว่าง 1 ถึง %(max)s"
 
 #. module: voip
 #. odoo-python
@@ -8530,37 +8592,37 @@ msgstr ""
 #: code:addons/voip/models/phone_service_api.py:0
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "You do not have enough credits to complete this operation."
-msgstr ""
+msgstr "คุณมีเครดิตไม่เพียงพอเพื่อดำเนินการนี้"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "You don't have permission to purchase phone numbers."
-msgstr ""
+msgstr "คุณไม่มีสิทธิ์ซื้อหมายเลขโทรศัพท์"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "You don't have permission to request phone numbers."
-msgstr ""
+msgstr "คุณไม่มีสิทธิ์ที่จะขอหมายเลขโทรศัพท์"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "You don't have permission to search phone numbers."
-msgstr ""
+msgstr "คุณไม่มีสิทธิ์ในการค้นหาหมายเลขโทรศัพท์"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/wizards/voip_did_number_search_wizard.py:0
 msgid "You must activate your database to buy a phone number."
-msgstr ""
+msgstr "คุณต้องเปิดใช้งานฐานข้อมูลก่อนที่จะซื้อหมายเลขโทรศัพท์"
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "You must release phone numbers before deleting them."
-msgstr ""
+msgstr "คุณต้องปล่อยหมายเลขโทรศัพท์ก่อนที่จะลบมัน"
 
 #. module: voip
 #. odoo-python
@@ -8625,11 +8687,29 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number has been released (%(number)s)"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number is active! (%(number)s)"
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_service.js:0
 msgid ""
 "Your number is active. Your phone setup is still being finalized. Calling "
 "will be available once setup is complete."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number is suspended (%(number)s)"
 msgstr ""
 
 #. module: voip
@@ -8681,6 +8761,18 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number order has failed (%(number)s)"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number order is under review (%(number)s)"
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Your numbers"
@@ -8689,19 +8781,24 @@ msgstr ""
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
-msgid "Your phone number activation has failed."
+msgid ""
+"Your phone number %(number)s has been released. It is no longer yours and "
+"can no longer be used to make or receive calls."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"Your phone number %(number)s has been suspended because your credit balance "
+"could not cover its monthly fee. Buy credits to reactivate it, otherwise it "
+"will be released."
 msgstr ""
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Your phone number is in \"%(state)s\" state."
-msgstr ""
-
-#. module: voip
-#. odoo-python
-#: code:addons/voip/models/voip_did_number.py:0
-msgid "Your phone number is now active and can be assigned."
 msgstr ""
 
 #. module: voip
@@ -8877,6 +8974,9 @@ msgstr ""
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "phone_disabled"
 msgstr ""
+
+#~ msgid "VoIP"
+#~ msgstr "VoIP"
 
 #~ msgid "Website Messages"
 #~ msgstr "ข้อความเว็บไซต์"

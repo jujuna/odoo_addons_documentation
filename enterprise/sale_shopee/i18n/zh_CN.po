@@ -3,15 +3,16 @@
 # * sale_shopee
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 18:03+0000\n"
-"PO-Revision-Date: 2026-09-18 02:45+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-11 06:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/sale_shopee/zh_Hans/>\n"
+"projects/odoo-20/sale_shopee/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,6 +41,17 @@ msgid ""
 "synchronize the stock level to\n"
 "  Shopee\n"
 msgstr ""
+"\n"
+"在 Odoo 中导入您的 Shopee 订单并同步发货\n"
+"============================================================\n"
+"\n"
+"主要功能\n"
+"------------\n"
+"* 从多个账户和店铺导入订单\n"
+"* 订单依据内部参考（Shopee 中的 item_id 或 model_id）与 Odoo 产品匹配\n"
+"* 同时支持 Shopee 履约 (FBS)、卖家自发货 (FBM) 和跨境卖家履约（Hybrid）：\n"
+"* FBS：导入已完成的订单\n"
+"* FBM/Hybrid：从 Shopee 获取配送信息，跟踪库存水平并同步回 Shopee\n"
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -69,8 +81,9 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"                <p>Shopee 订单（参考单号 <t t-out=\"ctx.get"
-"('shopee_order_ref') or ''\">REF</t>）同步处理时出错，尚未完成。</p>\n"
+"                <p>Shopee 订单（参考单号 <t t-"
+"out=\"ctx.get('shopee_order_ref') or ''\">REF</t>）同步处理时出错，尚未完成。"
+"</p>\n"
 "                <p>除非订单在 Shopee 中取消，否则不会尝试其他同步操作。</p>\n"
 "                <p>安排新的同步尝试的步骤如下：\n"
 "                    </p><ol>\n"
@@ -79,12 +92,12 @@ msgstr ""
 "                        <li>导航至 “订单跟进” 选项卡。</li>\n"
 "                        <li>设置 “<em>订单最后同步</em>” 日期，将它设为早于订"
 "单最后状态更新的日期。</li>\n"
-"                        <li>保存变更，然后点击 “ <em>同步处理订单</em>” 按钮"
-"。</li>\n"
+"                        <li>保存变更，然后点击 “ <em>同步处理订单</em>” 按"
+"钮。</li>\n"
 "                    </ol>\n"
 "                \n"
-"                <p>若仍有问题，请联络 <a href=\"https://www.odoo.com/help/\">"
-"Odoo 技术支持</a>。</p>\n"
+"                <p>若仍有问题，请联络 <a href=\"https://www.odoo.com/help/"
+"\">Odoo 技术支持</a>。</p>\n"
 "            </div>\n"
 "        "
 
@@ -204,8 +217,8 @@ msgstr ""
 "            </style>\n"
 "            <body><div>\n"
 "                <p>Shopee 货运标签的同步工作遇到一些错误，未能完成。</p>\n"
-"                <p>请在再次手动同步拣货前纠正问题，因为将不会尝试其他同步操作"
-"。</p>\n"
+"                <p>请在再次手动同步拣货前纠正问题，因为将不会尝试其他同步操"
+"作。</p>\n"
 "                <p>以下是 Shopee 发送的错误信息：</p>\n"
 "                <table class=\"shopee_table\">\n"
 "                    <thead>\n"
@@ -224,8 +237,8 @@ msgstr ""
 "out=\"error['message']\"/>\n"
 "                                <t t-else=\"\">与 Shopee 同步过程中出现未知错"
 "误。\n"
-"                                    很遗憾，您需要手动检查订单状态是否正确"
-"。\n"
+"                                    很遗憾，您需要手动检查订单状态是否正"
+"确。\n"
 "                                    如果问题仍然存在，请联系 <a "
 "href=\"https://www.odoo.com/help/\">Odoo 技术支持</a>。\n"
 "                                </t>\n"
@@ -332,8 +345,8 @@ msgstr ""
 "            </style>\n"
 "            <body><div>\n"
 "                <p>Shopee 商店库存的同步\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">参考</t></b>"
-"\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">参考</t></"
+"b>\n"
 "                    遇到一些错误，未能完成。</p>\n"
 "                <p>以下是 Shopee 发送的错误信息：</p>\n"
 "                <table class=\"shopee_table\">\n"
@@ -346,8 +359,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></th>"
-"\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></"
+"th>\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -395,7 +408,7 @@ msgstr "访问令牌过期日期。使用 Shopee 返回的 expires_in 计算得�
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Account"
-msgstr ""
+msgstr "账户"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
@@ -480,7 +493,7 @@ msgstr "授权有效期剩余天数"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Authorize New Shop"
-msgstr ""
+msgstr "授权新店铺"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
@@ -541,7 +554,7 @@ msgstr "创建 Shopee 账户"
 #. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_shop_create
 msgid "Create Shopee Shop Wizard"
-msgstr ""
+msgstr "创建 Shopee 店铺向导"
 
 #. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
@@ -722,7 +735,7 @@ msgstr "如果该字段为空，则允许所有公司执行操作。"
 #. module: sale_shopee
 #: model:ir.module.module,summary:base.module_sale_shopee
 msgid "Import Shopee orders and sync deliveries"
-msgstr ""
+msgstr "Shopee订单导入与配送信息同步"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
@@ -784,7 +797,7 @@ msgstr "锁定"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Manage Accounts"
-msgstr ""
+msgstr "管理账户"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -806,12 +819,12 @@ msgstr "新建"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "New Account"
-msgstr ""
+msgstr "新账户"
 
 #. module: sale_shopee
 #: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
 msgid "New Shop"
-msgstr ""
+msgstr "新店铺"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -827,7 +840,7 @@ msgstr "订单数"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Order Discount"
-msgstr ""
+msgstr "订单折扣"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -878,6 +891,8 @@ msgid ""
 "Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
 "Original price: %(price)s"
 msgstr ""
+"促销：%(promotion_type)s - 编号：%(promotion_id)d\n"
+"原价：%(price)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
@@ -947,7 +962,7 @@ msgstr "保存和授权"
 msgid ""
 "Select the Shopee account on which to authorize the new shop, or register "
 "another account."
-msgstr ""
+msgstr "选择要在其上授权新店铺的 Shopee 账户，或注册另一个账户。"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
@@ -979,7 +994,7 @@ msgstr "运输标签未准备好"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Shipping: %(carrier)s"
-msgstr ""
+msgstr "运输方式：%(carrier)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -1055,7 +1070,7 @@ msgstr "Shopee 买家 ID"
 #. module: sale_shopee
 #: model:ir.module.module,shortdesc:base.module_sale_shopee
 msgid "Shopee Connector"
-msgstr ""
+msgstr "Shopee 连接器"
 
 #. module: sale_shopee
 #. odoo-python
@@ -1119,14 +1134,7 @@ msgstr "Shopee 订单%(shopee_order_ref)s（商店：%(shop_name)s）"
 #. module: sale_shopee
 #: model:product.template,name:sale_shopee.default_discount_product_product_template
 msgid "Shopee Order Discount"
-msgstr ""
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-#: code:addons/sale_shopee/tests/test_shopee.py:0
-msgid "Shopee Pricelist %(currency)s"
-msgstr "Shopee 价目表 %(currency)s"
+msgstr "Shopee 订单折扣"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_account__api_endpoint__production_brazil
@@ -1338,7 +1346,7 @@ msgstr ""
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
 msgid "The Shopee account on which the new shop is authorized."
-msgstr ""
+msgstr "新店铺所授权使用的 Shopee 账户。"
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
@@ -1521,3 +1529,6 @@ msgstr "shop_id"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "shopee_shop_id"
 msgstr "shopee_shop_id"
+
+#~ msgid "Shopee Pricelist %(currency)s"
+#~ msgstr "Shopee 价目表 %(currency)s"

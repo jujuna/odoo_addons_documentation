@@ -68,8 +68,8 @@ class L10nUsForm940(models.Model):
         self.ensure_one()
         return [
             ('state', 'in', ['validated', 'paid']),
-            ('date_from', '>=', date(int(self.year), 1, 1)),
-            ('date_to', '<=', date(int(self.year), 12, 31)),
+            ('paid_date', '>=', date(int(self.year), 1, 1)),
+            ('paid_date', '<=', date(int(self.year), 12, 31)),
             ('company_id', '=', self.company_id.id),
         ]
 
@@ -167,7 +167,7 @@ class L10nUsForm940(models.Model):
             "VISION",
         ], compute_sum=True)
 
-        quarter_to_payslips = self.payslip_ids.grouped(lambda payslip: date_utils.get_quarter_number(payslip.date_from))
+        quarter_to_payslips = self.payslip_ids.grouped(lambda payslip: date_utils.get_quarter_number(payslip.paid_date))
         quarter_to_futa = {
             quarter: payslips._get_line_values(["COMPANYFUTA"], compute_sum=True)["COMPANYFUTA"]["sum"]["total"]
             for quarter, payslips in sorted(quarter_to_payslips.items())

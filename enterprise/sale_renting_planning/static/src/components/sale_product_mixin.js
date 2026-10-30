@@ -24,17 +24,15 @@ const saleRentingPlanningProductMixin = () => ({
             }
 
             // Products with no configurable attributes may still have optional products.
-            // get_single_product_variant is the authoritative source for has_optional_products.
-            const productTmplId = this.props.record.data.product_template_id?.id;
-            if (!productTmplId) {
+            // The configurator values are the authoritative source for has_optional_products,
+            // and preload the data the configurator dialog needs.
+            if (!this.props.record.data.product_template_id?.id) {
                 return;
             }
 
-            const result = await this.orm.call("product.template", "get_single_product_variant", [
-                productTmplId,
-            ]);
-            if (result?.has_optional_products) {
-                this._openProductConfigurator();
+            const data = await this._getProductConfiguratorData();
+            if (data?.has_optional_products) {
+                this._openProductConfigurator({ data });
             }
         });
     },
@@ -46,6 +44,9 @@ const saleRentingPlanningProductMixin = () => ({
         ) {
             edit = false;
             this.rentalProductConfigure.markShown(this.props.record.resId);
+            // existing data was fetched for the edit flow (`only_main_product: true`).
+            // Therefore no optional products were fetched.
+            data = await this._getProductConfiguratorData();
         }
         return super._openProductConfigurator({ edit, selectedComboItems, data });
     },

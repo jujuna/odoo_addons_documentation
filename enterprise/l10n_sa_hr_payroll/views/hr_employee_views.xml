@@ -20,17 +20,20 @@
                     <label for="l10n_sa_housing_allowance" string="Housing"/>
                     <div class="o_row" name="l10n_sa_housing_allowance">
                         <field class="o_hr_narrow_field" name="l10n_sa_housing_allowance"/>
-                        <span>/ month</span>
+                        <span invisible="wage_type != 'monthly'">/ month</span>
+                        <span invisible="wage_type != 'hourly'">/ hour</span>
                     </div>
                     <label for="l10n_sa_transportation_allowance" string="Transportation"/>
                     <div class="o_row" name="l10n_sa_transportation_allowance">
                         <field class="o_hr_narrow_field" name="l10n_sa_transportation_allowance"/>
-                        <span>/ month</span>
+                        <span invisible="wage_type != 'monthly'">/ month</span>
+                        <span invisible="wage_type != 'hourly'">/ hour</span>
                     </div>
                     <label for="l10n_sa_other_allowances" string="Other"/>
                     <div class="o_row" name="l10n_sa_other_allowances">
                         <field class="o_hr_narrow_field" name="l10n_sa_other_allowances"/>
-                        <span>/ month</span>
+                        <span invisible="wage_type != 'monthly'">/ month</span>
+                        <span invisible="wage_type != 'hourly'">/ hour</span>
                     </div>
 
                     <separator string="Annual Leaves Provisions"/>

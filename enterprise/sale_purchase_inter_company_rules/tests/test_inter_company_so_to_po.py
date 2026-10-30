@@ -150,6 +150,17 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
         po = self.validate_generated_purchase_order(self.company_a, self.company_b)
         self.assertEqual(len(po.order_line), 2)
 
+    def test_inter_company_so_subscription_discount_line(self):
+        """ The subscription discount line of an upsell has no equivalent on the PO, it should become a note. """
+        if 'sale.subscription.plan' not in self.env:
+            self.skipTest("`sale_subscription` module not installed")
+        self.company_b.intercompany_generate_purchase_orders = True
+        so = self._generate_draft_sale_order(self.company_a, self.company_b.partner_id, self.res_users_company_a)
+        so.order_line = [Command.create({'display_type': 'subscription_discount', 'name': "Prorated discount"})]
+        so.action_confirm()
+        po = self.validate_generated_purchase_order(self.company_a, self.company_b)
+        self.assertEqual(po.order_line.mapped('display_type'), [False, 'line_note'])
+
     def test_04_inter_company_auto_validation(self):
         """ Configure "Sale/Purchase" option and tick auto validation.
         Find related purchase order to related company and confirm it.

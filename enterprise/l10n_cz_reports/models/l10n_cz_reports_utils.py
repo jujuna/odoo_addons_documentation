@@ -26,7 +26,7 @@ def validate_czech_company_fields(sender_company):
 def get_veta_d_vals(report, options, sender_company):
     report_to_form_mapping = {
         'l10n_cz_reports.control_statement_report': {'document': "KH1", 'control_report_form': "B"},
-        'l10n_cz_reports.vies_summary_report': {'document': "SHV", 'vies_report_form': "N"},
+        'l10n_cz_reports.vies_summary_report': {'document': "SHV", 'vies_report_form': "R"},
         'l10n_cz.l10n_cz_vat_declaration': {
             'document': "DP3",
             'vat_report_form': "B",

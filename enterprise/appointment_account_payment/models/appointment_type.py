@@ -30,26 +30,30 @@ class AppointmentType(models.Model):
     )
 
     def _get_booking_multiline_description(self, start, stop, user, tz):
-        """ Utility method returning a multiline description of the booking, including the
-            time range and the name of the user argument if set.
-            e.g.: '''Dental Care with Mitchell Admin
-                     28/11/2025 at 10:00:00AM to 28/11/2025 at 11:00:00AM (Europe/Brussels)'''
+        """Return a multiline description of the booking, including the start time and, if set,
+        the name of the user.
+
+        The resulting label on SOL will look like:
+        ```
+        Dental care
+        With Mitchell Admin
+        28/11/2025 at 10:00:00AM
+        ```
+
+        The first line is the appointment type name, while the remaining lines are
+        returned by this utility method.
         """
         env_tz = self.with_context(tz=tz).env
         common_args = {
-            'name': self.name,
             'date_start': format_date(env_tz, start),
             'time_start': format_time(env_tz, start, tz=tz),
-            'date_end': format_date(env_tz, stop),
-            'time_end': format_time(env_tz, stop, tz=tz),
-            'timezone': tz,
         }
         if user:
             return _(
-                "%(name)s with %(user_name)s\n%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%(timezone)s)",
+                "With %(user_name)s\n%(date_start)s at %(time_start)s",
                 user_name=user.display_name, **common_args
             )
         return _(
-            "%(name)s\n%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%(timezone)s)",
+            "%(date_start)s at %(time_start)s",
             **common_args
         )

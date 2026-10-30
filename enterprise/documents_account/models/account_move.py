@@ -9,7 +9,7 @@ class AccountMove(models.Model):
 
     suspense_statement_line_id = fields.Many2one(
         comodel_name='account.bank.statement.line',
-        string="Request document from a bank statement line",
+        string="Request document from a bank transaction",
         index='btree_not_null',
     )
 

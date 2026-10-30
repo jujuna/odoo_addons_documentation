@@ -13,6 +13,27 @@ from odoo.addons.ai.utils.ai_utils import get_text_from_parts
 
 logger = logging.getLogger(__name__)
 
+_PAGE_TEXT_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'replacements': {
+            'type': 'array',
+            'description': "One entry per placeholder ID received in the input",
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'id': {'type': 'string', 'description': "The placeholder ID, as received in the input (e.g. \"1\")"},
+                    'text': {'type': 'string', 'description': "The new text replacing the placeholder"},
+                },
+                'required': ['id', 'text'],
+                'additionalProperties': False,
+            },
+        },
+    },
+    'required': ['replacements'],
+    'additionalProperties': False,
+}
+
 
 class WebsitePage(models.Model):
     _name = 'website.page'
@@ -92,18 +113,19 @@ class WebsitePage(models.Model):
         prompt = json.dumps(batch, ensure_ascii=False)
         message_parts = [{'type': 'text', 'text': prompt}]
         try:
-            response = agent._generate_single_response(message_parts, extra_instructions=content_context)
+            response = agent._generate_single_response(message_parts, extra_instructions=content_context, schema=_PAGE_TEXT_SCHEMA)
             response_text = response and get_text_from_parts(response)
             if response_text:
-                response_dict = json.loads(response_text)
+                replacements = {
+                    replacement['id']: replacement['text']
+                    for replacement in json.loads(response_text)['replacements']
+                }
                 result = {}
-                for i, placeholder in enumerate(placeholders):
-                    key = str(i + 1)
-                    result[placeholder] = response_dict.get(key, "").strip() or placeholder
+                for key, placeholder in batch.items():
+                    result[placeholder] = replacements.get(key, "").strip() or placeholder
                 return result
-            else:
-                return {}
-        except (UserError, RequestException) as e:
+            return {}
+        except (UserError, RequestException, json.JSONDecodeError) as e:
             return {"error": str(e)}
 
     @api.model

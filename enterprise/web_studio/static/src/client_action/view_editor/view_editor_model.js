@@ -137,6 +137,13 @@ export class ViewEditorModel extends Reactive {
         this._decoratedRpc = this._decorateFunction(rpc);
 
         this._editionFlow = editionFlow;
+        this.breadcrumbsLength = computed(() => {
+            if (editionFlow.breadcrumbs.length <= 1) {
+                return 1;
+            }
+            return editionFlow.breadcrumbs.length;
+        });
+        this.breadcrumbs = editionFlow.breadcrumbs;
 
         this.GROUPABLE_TYPES = [...GROUPABLE_TYPES];
         this.MEASURABLE_TYPES = ["integer", "float", "monetary"];
@@ -277,10 +284,6 @@ export class ViewEditorModel extends Reactive {
 
         this._getUnprocessedXmlDoc = memoizeOnce((arch) => parseStringToXml(arch));
 
-        this.breadcrumbs = editionFlow.breadcrumbs;
-
-        this._editionFlow = editionFlow;
-
         this._views = {};
 
         this.studioViewArch = "";
@@ -327,7 +330,7 @@ export class ViewEditorModel extends Reactive {
             this.viewType,
             this.mode,
             this.resModel,
-            this.breadcrumbs.length > 1 ? this.breadcrumbs.length : 1
+            this.breadcrumbsLength()
         );
         return this._getControllerProps(key);
     }
@@ -348,7 +351,7 @@ export class ViewEditorModel extends Reactive {
     }
 
     get isEditingSubview() {
-        return this.breadcrumbs.length > 1;
+        return this.breadcrumbsLength() > 1;
     }
 
     set isInEdition(value) {
@@ -913,14 +916,11 @@ export class ViewEditorModel extends Reactive {
         if (!this.isEditingSubview) {
             return null;
         }
-        const length = this.breadcrumbs.length;
-        return this.breadcrumbs[length - 1].data;
+        return this.breadcrumbs[this.breadcrumbsLength() - 1].data;
     }
 
     get _fieldsAllowedRename() {
-        return this._getFieldsAllowedRename(
-            this.breadcrumbs.length > 1 ? this.breadcrumbs.length : 1
-        );
+        return this._getFieldsAllowedRename(this.breadcrumbsLength());
     }
 }
 

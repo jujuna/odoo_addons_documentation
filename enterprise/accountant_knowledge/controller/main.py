@@ -18,14 +18,7 @@ from odoo.tools import (
     html_sanitize,
     is_html_empty
 )
-try:
-    # only available in modern pypdf, which dropped add_link/addLink
-    from pypdf.annotations import Link
-    from pypdf.generic import Fit
-except ImportError:
-    Link = Fit = None
-
-from odoo.tools.pdf import PdfFileReader, PdfFileWriter, PdfReadError
+from odoo.tools.pdf import Fit, Link, PdfFileReader, PdfFileWriter, PdfReadError
 from odoo.addons.accountant_knowledge.tools.color_utils import lighten_color
 
 _logger = logging.getLogger(__name__)
@@ -137,10 +130,6 @@ def get_account_reports_pdfs(article, root):
                 account_report = account_report.with_company(company_id)
             result = account_report.dispatch_report_action(account_report_options, 'export_to_pdf')
             yield PdfFileReader(BytesIO(result.get('file_content')))
-
-
-def get_pdf_outline(pdf):
-    return pdf.outline if hasattr(pdf, 'outline') else pdf.outlines
 
 
 def flatten_outline(outlines, depth=0):
@@ -444,7 +433,7 @@ class KnowledgeAuditReportController(http.Controller):
                 title_page_pdf = get_title_page_pdf(article, title)
                 if generate_headings:
                     try:
-                        for (depth, outline) in flatten_outline(get_pdf_outline(title_page_pdf)):
+                        for (depth, outline) in flatten_outline(title_page_pdf.outline):
                             headings.append({
                                 'page_offset_in_body': page_offset_in_body,
                                 'depth': depth,
@@ -470,7 +459,7 @@ class KnowledgeAuditReportController(http.Controller):
                 article_pdf = get_article_pdf(article, root, template_variables, html_template_variables)
                 if generate_headings:
                     try:
-                        for (depth, outline) in flatten_outline(get_pdf_outline(article_pdf)):
+                        for (depth, outline) in flatten_outline(article_pdf.outline):
                             headings.append({
                                 'page_offset_in_body': page_offset_in_body,
                                 'depth': depth,
@@ -517,37 +506,21 @@ class KnowledgeAuditReportController(http.Controller):
 
         toc_pdf_num_pages = (len(toc_pdf.pages) if toc_pdf else 0)
         # Add the links:
-        add_link = getattr(writer, 'add_link', None) or getattr(writer, 'addLink', None)
         for link, heading in zip(toc_links, headings):
-            target_page = heading['outline']['/Page'] + len(front_cover_pdf.pages) + toc_pdf_num_pages + heading['page_offset_in_body']
-            if add_link:
-                # old PyPDF2 / transitional pypdf API
-                add_link(
-                    link['page_number'] + len(front_cover_pdf.pages),
-                    target_page,
-                    link['object']['/Rect'],
-                    [0, 0, 0],
-                    '/XYZ',
-                    heading['outline']['/Left'],
-                    heading['outline']['/Top'],
-                    heading['outline']['/Zoom'])
-            else:
-                # modern pypdf (>= 5.0) dropped add_link/addLink entirely
-                writer.add_annotation(
-                    link['page_number'] + len(front_cover_pdf.pages),
-                    Link(
-                        rect=link['object']['/Rect'],
-                        border=[0, 0, 0],
-                        target_page_index=target_page,
-                        fit=Fit.xyz(
-                            left=heading['outline']['/Left'],
-                            top=heading['outline']['/Top'],
-                            zoom=heading['outline']['/Zoom'])))
+            writer.add_annotation(
+                link['page_number'] + len(front_cover_pdf.pages),
+                Link(
+                    rect=link['object']['/Rect'],
+                    border=[0, 0, 0],
+                    target_page_index=heading['outline']['/Page'] + len(front_cover_pdf.pages) + toc_pdf_num_pages + heading['page_offset_in_body'],
+                    fit=Fit.xyz(
+                        left=heading['outline']['/Left'],
+                        top=heading['outline']['/Top'],
+                        zoom=heading['outline']['/Zoom'])))
 
         # Add the outlines:
         writer.page_mode = "/UseOutlines"
 
-        add_bookmark = getattr(writer, 'add_outline_item', None) or writer.add_bookmark
         bookmarks_stack = []
         for heading in headings:
             parent_heading_depth, parent_bookmark = bookmarks_stack[-1] \
@@ -558,30 +531,15 @@ class KnowledgeAuditReportController(http.Controller):
                 parent_heading_depth, parent_bookmark = bookmarks_stack[-1] \
                     if bookmarks_stack else (0, None)
 
-            page_number = heading['outline']['/Page'] + len(front_cover_pdf.pages) + toc_pdf_num_pages + heading['page_offset_in_body']
-            if Fit is not None:
-                # modern pypdf (>= 5.0): add_outline_item() gained a `before` parameter
-                # and now requires a Fit object instead of a fit-type string + xyz args
-                bookmark = add_bookmark(
-                    heading['outline']['/Title'],
-                    page_number,
-                    parent_bookmark, None, None, False, False,
-                    Fit.xyz(
-                        left=heading['outline']['/Left'],
-                        top=heading['outline']['/Top'],
-                        zoom=heading['outline']['/Zoom'])
-                )
-            else:
-                # old PyPDF2 / transitional pypdf API
-                bookmark = add_bookmark(
-                    heading['outline']['/Title'],
-                    page_number,
-                    parent_bookmark, None, False, False,
-                    '/XYZ',
-                    heading['outline']['/Left'],
-                    heading['outline']['/Top'],
-                    heading['outline']['/Zoom']
-                )
+            bookmark = writer.add_outline_item(
+                heading['outline']['/Title'],
+                heading['outline']['/Page'] + len(front_cover_pdf.pages) + toc_pdf_num_pages + heading['page_offset_in_body'],
+                parent=parent_bookmark,
+                fit=Fit.xyz(
+                    left=heading['outline']['/Left'],
+                    top=heading['outline']['/Top'],
+                    zoom=heading['outline']['/Zoom']),
+            )
 
             if heading['depth'] >= parent_heading_depth:
                 # Record heading depth to handle skipped levels

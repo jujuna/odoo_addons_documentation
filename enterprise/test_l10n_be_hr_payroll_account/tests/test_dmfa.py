@@ -3,9 +3,11 @@
 import time
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
+from lxml import etree
 from unittest.mock import MagicMock, patch
 
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import freeze_time, tagged
 
 from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
@@ -308,10 +310,10 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
         cls.partner_wallonia = cls.env['res.partner'].create({'name': 'WA Work Address'})
         cls.env["hr.work.location"].with_user(cls.payroll_manager).search([
             ("address_id", "=", company.partner_id.id),
-        ]).write({"bce_code": "8888888881", "location_type": "dmfa_unit"})
+        ]).write({"bce_code": "8888888176", "location_type": "dmfa_unit"})
         cls.env['hr.work.location'].with_user(cls.payroll_manager).create({
             'company_id': cls.belgian_company.id,
-            'bce_code': '8888888882',
+            'bce_code': '8888888275',
             'location_type': 'dmfa_unit',
             'address_id': cls.partner_wallonia.id,
             'competence': 'wa',
@@ -913,7 +915,7 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
 
         dmfa_dict = self._generate_dmfa_declaration()
         result_line = next(line for line in dmfa_dict['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['WorkerContribution'] if line['ContributionWorkerCode'] == '812')
-        expected_line = {'ContributionWorkerCode': '812', 'ContributionType': '1', 'ContributionCalculationBasis': '00004922412', 'ContributionAmount': '00000049224'}
+        expected_line = {'ContributionWorkerCode': '812', 'ContributionType': '1', 'ContributionCalculationBasis': '00004953541', 'ContributionAmount': '00000049535'}
         self.assertDictEqual(expected_line, result_line)
 
     @classmethod
@@ -932,6 +934,7 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
 
     @freeze_time("2026-07-01 10:00:00")
     def test_07_declaration_employee_notice_period(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         departure_notice = self.env['hr.employee.departure'].create({
             'employee_id': self.employee.id,
             'departure_reason_id': self.env.ref('hr.departure_fired').id,
@@ -1295,10 +1298,11 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
         self.assertEqual(dmfa_dict['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']['OccupationUserReference'], str(self.contract.id))
         self._assertDMFAEqual(dmfa_dict)
         ded3000 = self._get_ded3000(self.employee, payslip)
-        self.assertIn(152.96, ded3000.values(), "Computing structural deduction using payslips results in a different amount than via dmfa services")
+        self.assertIn(102.76, ded3000.values(), "Computing structural deduction using payslips results in a different amount than via dmfa services")
 
     @freeze_time("2025-04-10 10:00:00")
     def test_13_declaration_employee_partial_notice_period(self):
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         departure_notice = self.env['hr.employee.departure'].create({
             'employee_id': self.employee.id,
             'departure_reason_id': self.env.ref('hr.departure_fired').id,
@@ -1345,6 +1349,113 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
 
         dmfa_dict = self._generate_dmfa_declaration()
         self._assertDMFAEqual(dmfa_dict, ignore_keys=DMFA_IGNORE_KEYS + ('NOSSRegistrationNbr', 'CompanyID'))
+
+    @freeze_time("2025-04-10 10:00:00")
+    def test_15_declaration_services_on_full_credit_time(self):
+        # The March payslip is computed with a normal working schedule, then its version becomes a
+        # full time credit: its worked days would be declared on an occupation without hours,
+        # refused by the ONSS (anomaly 90018-094)
+        self.contract.contract_date_end = date(2025, 2, 28)
+        version_credit_time = self.employee.create_version({
+            'date_version': date(2025, 3, 1),
+            'contract_date_start': date(2025, 3, 1),
+            'contract_date_end': False,
+            'resource_calendar_id': self.calendar_38h.id,
+            'reference_calendar_id': self.calendar_38h.id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Mar 2025',
+            'version_id': version_credit_time.id,
+            'date_from': date(2025, 3, 1),
+            'date_to': date(2025, 3, 31),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        version_credit_time.resource_calendar_id = self.calendar_0_hours_per_week_credit_time
+        self.assertTrue(payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id.count_as == 'working_time'))
+
+        with self.assertRaisesRegex(UserError, "Services are declared on occupations without hours per week(.|\n)*%s, from 2025-03-01" % self.employee.name):
+            self._generate_dmfa_declaration()
+
+    @freeze_time("2025-04-10 10:00:00")
+    def test_14_declaration_multi_version_payslip_full_credit_time(self):
+        # A new contract starts on the 10th of March with a full time credit, and the work resumes
+        # on the 17th with a new version of that contract. The March payslip covers the three
+        # versions of the month: the work and remuneration of each period must be declared on the
+        # occupation of its version, never on the time credit one (ONSS anomaly 90018-094).
+        version_before = self.contract
+        version_before.contract_date_end = date(2025, 3, 9)
+        version_credit_time = self.employee.create_version({
+            'date_version': date(2025, 3, 10),
+            'contract_date_start': date(2025, 3, 10),
+            'contract_date_end': False,
+            'resource_calendar_id': self.calendar_0_hours_per_week_credit_time.id,
+            'reference_calendar_id': self.calendar_38h.id,
+        })
+        version_after = self.employee.create_version({
+            'date_version': date(2025, 3, 17),
+            'resource_calendar_id': self.calendar_38h.id,
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2025',
+            'version_id': version.id,
+            'date_from': date(2025, month, 1),
+            'date_to': date(2025, month, 1) + relativedelta(day=31),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for month, version in [(1, version_before), (2, version_before), (3, version_before)]])
+        self.employee.write({'review_state': '1_reviewed'})
+        for payslip in payslips:  # No batch compute and validate for ONSS regularization
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+        march_payslip = payslips[2]
+        # The versions of the same Dimona category and worker code are in the same payslip
+        self.assertEqual(march_payslip.worked_days_line_ids.version_id, version_before + version_credit_time + version_after)
+
+        dmfa = self._generate_dmfa_declaration(return_declaration=True)
+        occupations = {
+            int(occupation.findtext('OccupationUserReference')): occupation
+            for occupation in etree.fromstring(dmfa.xml_file.content).iter('Occupation')
+        }
+        self.assertEqual(set(occupations), set((version_before + version_credit_time + version_after).ids))
+
+        def services(version):
+            return {s.findtext('ServiceCode'): int(s.findtext('ServiceNbrHours')) / 100 for s in occupations[version.id].iter('Service')}
+
+        def remunerations(version):
+            return {r.findtext('RemunCode'): int(r.findtext('RemunAmount')) / 100 for r in occupations[version.id].iter('Remun')}
+
+        attendance = self.env.ref('hr_work_entry.be_work_entry_type_attendance')
+
+        def work_hours(version):
+            return sum(wd.number_of_hours for wd in payslips.worked_days_line_ids if wd.work_entry_type_id == attendance and wd.version_id == version)
+
+        def remuneration_001(payslips):
+            return sum(line.total for line in payslips.line_ids if line.salary_rule_id.l10n_be_remuneration_code == '1')
+
+        # Nothing on the time credit, neither work nor remuneration
+        self.assertEqual(occupations[version_credit_time.id].findtext('MeanWorkingHours'), '0000')
+        self.assertFalse(services(version_credit_time))
+        self.assertFalse(remunerations(version_credit_time))
+
+        # The work and remuneration of each period on the occupation of its version, the remuneration of
+        # the March payslip being split pro rata to the paid amount of the worked days of each version
+        def march_paid_amount(version):
+            return sum(wd.amount for wd in march_payslip.worked_days_line_ids if wd.is_paid and wd.version_id == version)
+
+        march_share_after = march_paid_amount(version_after) / (march_paid_amount(version_before) + march_paid_amount(version_after))
+        self.assertTrue(0 < march_share_after < 1)
+        self.assertAlmostEqual(services(version_before)['001'], work_hours(version_before))
+        self.assertAlmostEqual(services(version_after)['001'], work_hours(version_after))
+        self.assertAlmostEqual(
+            remunerations(version_after)['001'], remuneration_001(march_payslip) * march_share_after, places=2)
+        self.assertAlmostEqual(
+            remunerations(version_before)['001'] + remunerations(version_after)['001'], remuneration_001(payslips), places=2)
 
     @freeze_time("2025-04-10 10:00:00")
     def test_90_dmfa_sftp_flow_invalid_acrf(self):
@@ -2312,7 +2423,8 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
 
         # Company vehicle list:
         vehicles = _listify(dmfa_dict['DmfAOriginal']['Form']['EmployerDeclaration']['CompanyVehicle'])
-        self.assertTrue(any(v['LicensePlate'] == 'Eco Car 1' and v['EcoVehicle'] == '1' for v in vehicles))
+        # Only an eco-friendly car of a mobility budget is an eco vehicle
+        self.assertTrue(any(v['LicensePlate'] == 'Eco Car 1' and not v.get('EcoVehicle') for v in vehicles))
         self.assertTrue(any(v['LicensePlate'] == 'Eco Car 2' and v['EcoVehicle'] == '1' for v in vehicles))
         self.assertTrue(any(v['LicensePlate'] == 'TEST' for v in vehicles))
         self.assertFalse(any(v['LicensePlate'] == 'TEST' and v.get('EcoVehicle') == '1' for v in vehicles))
@@ -3718,6 +3830,867 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
         occupation_deductions = dmfa_dict['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']['OccupationDeduction']
         self.assertFalse(any(d['DeductionCode'] == '4300' for d in [occupation_deductions]))
 
+    @freeze_time("2026-07-01 10:00:00")
+    def test_manual_worker_contribution_rates(self):
+        """
+        Ensure that a manual worker is declared with the rates of the contribution type 1.
+        """
+        worker = self.env['hr.employee'].create({
+            'name': 'Manual Worker',
+            'company_id': self.belgian_company.id,
+            'country_id': self.env.ref('base.be').id,
+            'address_id': self.partner_wallonia.id,
+            'l10n_be_worker_code_id': self.env['l10n.be.worker.code'].search([('dmfa_code', '=', '015')]).id,
+            'niss': '85010100115',
+            'contract_date_start': datetime(2026, 1, 1),
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'work_contact_id': self.work_contact.id,
+            'wage': 3000,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'lang': 'fr_BE',
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Apr 2026',
+            'employee_id': worker.id,
+            'version_id': worker.version_id.id,
+            'date_from': datetime(2026, 4, 1),
+            'date_to': datetime(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+
+        worker_record = self._generate_dmfa_declaration(year=2026, quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        contribution = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == '015')
+        # The basis is multiplied by the 38.07 percent total rate of the manual workers.
+        expected_amount = round(int(contribution['ContributionCalculationBasis']) * 0.3807)
+        self.assertEqual(contribution['ContributionType'], '1', "Manual workers should use the contribution type 1.")
+        self.assertEqual(int(contribution['ContributionAmount']), expected_amount, "The contribution should use the worker rates.")
+        deduction = worker_record['Occupation']['OccupationDeduction']
+        self.assertGreater(int(deduction['DeductionAmount']), 0, "The structural deduction should not be zero.")
+        # The quarterly annual holidays contribution of the manual workers, computed on the payslip
+        self.assertTrue(payslip._get_line_values(['ONSSEMPLOYER_253'])['ONSSEMPLOYER_253'][payslip.id]['total'])
+        holidays = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == '253')
+        self.assertEqual(holidays['ContributionType'], '0')
+        self.assertEqual(holidays['ContributionCalculationBasis'], contribution['ContributionCalculationBasis'])
+        holidays_rate = payslip._get_onss_rates('253')['total_rate']
+        self.assertEqual(int(holidays['ContributionAmount']), round(int(holidays['ContributionCalculationBasis']) * holidays_rate / 100))
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_young_manual_worker_subsistence_first_hiring_date(self):
+        """
+        The subsistence fund contribution (826) of a manual worker younger than 25 uses the reduced
+        flat rate (contribution type 2), which requires the date of their first hiring.
+        """
+        worker = self.env['hr.employee'].create({
+            'name': 'Young Manual Worker',
+            'company_id': self.belgian_company.id,
+            'country_id': self.env.ref('base.be').id,
+            'address_id': self.partner_wallonia.id,
+            'l10n_be_worker_code_id': self.env['l10n.be.worker.code'].search([('dmfa_code', '=', '015')]).id,
+            'niss': '05010100113',
+            'birthday': date(2005, 1, 1),
+            'contract_date_start': datetime(2025, 9, 1),
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'work_contact_id': self.work_contact.id,
+            'wage': 3000,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'lang': 'fr_BE',
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Apr 2026',
+            'employee_id': worker.id,
+            'version_id': worker.version_id.id,
+            'date_from': datetime(2026, 4, 1),
+            'date_to': datetime(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        # The subsistence fund contribution is owed by this employer class for the manual workers,
+        # with a flat rate for the young ones (contribution type 2)
+        employer_class = payslip.payroll_config_id.l10n_be_employer_category_id.dmfa_code
+        code = f'l10n_be_onss_combinations_{employer_class}_015'
+        combinations = payslip._rule_parameter(code)
+        self.env['hr.rule.parameter.value'].sudo().create({
+            'rule_parameter_id': self.env['hr.rule.parameter'].sudo().search([('code', '=', code)]).id,
+            'parameter_value': str({**combinations, '826': ['0']}),
+            'date_from': date(2026, 4, 1),
+        })
+        self.env['hr.rule.parameter'].sudo().create({
+            'name': 'ONSS rates 826 type 2',
+            'code': f'l10n_be_onss_rates_{employer_class}_826_2',
+            'country_id': self.env.ref('base.be').id,
+            'parameter_version_ids': [(0, 0, {
+                'parameter_value': str({'personal_rate': 0, 'employer_rate': 10, 'salary_moderation_rate': 0, 'total_rate': 10}),
+                'date_from': date(2026, 1, 1),
+            })],
+        })
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+
+        worker_record = self._generate_dmfa_declaration(year=2026, quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        contribution = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == '826')
+        self.assertEqual(contribution['ContributionType'], '2')
+        self.assertEqual(contribution['FirstHiringDate'], '2025-09-01')
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_flemish_training_leave_hours(self):
+        """
+        The hours of absence for a Flemish training leave are declared in the occupation
+        informations (FlemishTrainingHolidayHoursNbr), in hundredths of hours.
+        """
+        flemish_training_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_flemish_training_time_off')
+        flemish_training_type.requires_allocation = False
+        self.env['hr.leave'].create({
+            'employee_id': self.employee.id,
+            'request_date_from': date(2026, 4, 14),
+            'request_date_to': date(2026, 4, 15),
+            'work_entry_type_id': flemish_training_type.id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Apr 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 4, 1),
+            'date_to': date(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        flemish_training_hours = sum(
+            payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id == flemish_training_type).mapped('number_of_hours'))
+        self.assertAlmostEqual(flemish_training_hours, 15.2)
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+
+        occupation = self._generate_dmfa_declaration(year=2026, quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']
+        self.assertEqual(occupation['OccupationInformations']['FlemishTrainingHolidayHoursNbr'], '0001520')
+
+    @freeze_time("2025-04-10 10:00:00")
+    def test_partial_parental_leave_services(self):
+        """ The parental leave days are known from the occupation (reorganisation measure): they
+        aren't declared as services, their DMFA code 998 isn't a service code """
+        calendar_parental_leave = self.calendar_4_5_wednesday_off.copy({'name': "4/5 Parental Leave Wednesday"})
+        calendar_parental_leave.attendance_ids.filtered(
+            lambda a: a.work_entry_type_id == self.env.ref('hr_work_entry.l10n_be_work_entry_type_credit_time')
+        ).work_entry_type_id = self.env.ref('hr_work_entry.l10n_be_work_entry_type_parental_time_off')
+        version_parental_leave = self.employee.create_version({
+            'date_version': date(2025, 3, 1),
+            'resource_calendar_id': calendar_parental_leave.id,
+            'reference_calendar_id': self.calendar_38h.id,
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2025',
+            'version_id': version.id,
+            'date_from': date(2025, month, 1),
+            'date_to': date(2025, month, 1) + relativedelta(day=31),
+            'employee_id': self.employee.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for month, version in [(1, self.contract), (2, self.contract), (3, version_parental_leave)]])
+        self.employee.write({'review_state': '1_reviewed'})
+        for payslip in payslips:
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+        self.assertIn('998', payslips[2].worked_days_line_ids.work_entry_type_id.mapped('dmfa_code'))
+
+        dmfa = self._generate_dmfa_declaration(return_declaration=True)
+        service_codes = [code.text for code in etree.fromstring(dmfa.xml_file.content).iter('ServiceCode')]
+        self.assertTrue(service_codes)
+        self.assertNotIn('998', service_codes)
+
+    @freeze_time("2027-01-15 10:00:00")
+    def test_wijninckx_contribution_unrelated_to_natural_person(self):
+        """ The Wijninckx contribution is declared globally, not per worker """
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Dec 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 12, 1),
+            'date_to': date(2026, 12, 31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip._set_input_value('ONSSEMPLOYER_867', 10000)
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+        wijninckx_amount = payslip._get_line_values(['ONSSEMPLOYER_867'], compute_sum=True)['ONSSEMPLOYER_867']['sum']['total']
+        self.assertTrue(wijninckx_amount)
+
+        declaration = xml_str_to_dict(self._generate_dmfa_declaration(year='2026', quarter='4', return_declaration=True).xml_file.content)
+        employer_declaration = declaration['DmfAOriginal']['Form']['EmployerDeclaration']
+        worker_contributions = employer_declaration['NaturalPerson']['WorkerRecord']['WorkerContribution']
+        self.assertNotIn('867', [c['ContributionWorkerCode'] for c in worker_contributions])
+        unrelated = employer_declaration['ContributionUnrelatedToNP']
+        wijninckx = next(c for c in (unrelated if isinstance(unrelated, list) else [unrelated]) if c['UnrelatedWorkerCode'] == '867')
+        self.assertEqual(wijninckx['UnrelatedCalculationBasis'], '00001000000')
+        self.assertEqual(int(wijninckx['UnrelatedAmount']), round(wijninckx_amount * 100))
+
+    @freeze_time("2027-01-15 10:00:00")
+    def test_contributions_unrelated_to_natural_person_all_workers(self):
+        """ The contributions declared globally are computed on the payslips of every worker """
+        employee_2 = self.env['hr.employee'].create({
+            'name': 'Employee 2',
+            'company_id': self.belgian_company.id,
+            'country_id': self.env.ref('base.be').id,
+            'niss': '99010112390',
+            'contract_date_start': datetime(2020, 1, 1),
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'work_contact_id': self.work_contact.copy().id,
+            'wage': 3000,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'lang': 'fr_BE',
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': 'Payslip Dec 2026',
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            'date_from': date(2026, 12, 1),
+            'date_to': date(2026, 12, 31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for employee in self.employee | employee_2])
+        for payslip in payslips:
+            payslip._set_input_value('ONSSEMPLOYER_867', 10000)
+        payslips.compute_sheet()
+        (self.employee | employee_2).write({'review_state': '1_reviewed'})
+        payslips.action_payslip_done()
+        wijninckx_amount = payslips._get_line_values(['ONSSEMPLOYER_867'], compute_sum=True)['ONSSEMPLOYER_867']['sum']['total']
+
+        declaration = xml_str_to_dict(self._generate_dmfa_declaration(year='2026', quarter='4', return_declaration=True).xml_file.content)
+        unrelated = declaration['DmfAOriginal']['Form']['EmployerDeclaration']['ContributionUnrelatedToNP']
+        wijninckx = next(c for c in (unrelated if isinstance(unrelated, list) else [unrelated]) if c['UnrelatedWorkerCode'] == '867')
+        self.assertEqual(wijninckx['UnrelatedCalculationBasis'], '00002000000')
+        self.assertEqual(int(wijninckx['UnrelatedAmount']), round(wijninckx_amount * 100))
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_wage_cap_reduction_calculation_basis(self):
+        """ The calculation basis of the wage cap reduction (1360) is mandatory: the remuneration above the cap """
+        self.contract.wage = 35000
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, month, 1),
+            'date_to': date(2026, month, 1) + relativedelta(day=31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for month in (1, 2, 3)])
+        self.employee.write({'review_state': '1_reviewed'})
+        for payslip in payslips:
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+        reduction = -payslips._get_line_values(['ONSSEMPLOYERBASICDEDUC'], compute_sum=True)['ONSSEMPLOYERBASICDEDUC']['sum']['total']
+        self.assertTrue(reduction)
+
+        worker_record = self._generate_dmfa_declaration(year='2026', quarter='1')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        worker_deductions = worker_record['WorkerDeduction']
+        deduction = next(d for d in (worker_deductions if isinstance(worker_deductions, list) else [worker_deductions]) if d['DeductionCode'] == '1360')
+        self.assertEqual(int(deduction['DeductionAmount']), round(reduction * 100))
+        rates = payslips[0]._get_onss_global_rates()
+        self.assertEqual(int(deduction['DeductionCalculationBasis']), round(reduction * 100 / (rates['employer_rate'] + rates['salary_moderation_rate']) * 100))
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_wage_cap_reduction_on_remuneration_code_1(self):
+        """ Only the remuneration code 1 counts to reach the ceiling of the wage cap reduction (1360): not the
+        commissions (remuneration code 2) """
+        self.contract.wage = 27000
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, month, 1),
+            'date_to': date(2026, month, 1) + relativedelta(day=31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for month in (1, 2, 3)])
+        self.employee.write({'review_state': '1_reviewed'})
+        for payslip in payslips:
+            payslip._set_input_value('COMMISSION', 3000)
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+        line_values = payslips._get_line_values(['SALARY', 'COMMISSION', 'ONSSEMPLOYERBASICDEDUC'], compute_sum=True)
+        self.assertGreater(line_values['SALARY']['sum']['total'], payslips[0]._rule_parameter('employer_contribution_capping_amount'))
+        self.assertLess(
+            line_values['SALARY']['sum']['total'] - line_values['COMMISSION']['sum']['total'],
+            payslips[0]._rule_parameter('employer_contribution_capping_amount'))
+        self.assertFalse(line_values['ONSSEMPLOYERBASICDEDUC']['sum']['total'])
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_one_natural_person_state_per_quarter(self):
+        """ The data declared for a worker in a quarter is kept once, for the later modifications """
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Jan 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+        self._generate_dmfa_declaration(year='2026', quarter='1')
+        states = self.env['l10n_be.dmfa.natural_person.state'].sudo().search([
+            ('employee_id', '=', self.employee.id), ('quarter_start', '=', date(2026, 1, 1))])
+        self.assertEqual(len(states), 1)
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_cct90_bonus_above_ceiling(self):
+        """ A CCT 90 bonus is remuneration subject to the ordinary contributions only above the ceiling """
+        payslips = self.env['hr.payslip'].create([{
+            'name': name,
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+            'struct_id': self.env.ref(struct_xmlid).id,
+            'company_id': self.belgian_company.id,
+        } for name, struct_xmlid in [
+            ('Payslip Jan 2026', 'l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary'),
+            ('CCT90 2026', 'l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_cct90'),
+        ]])
+        payslips[1]._set_input_value('CCT90BONUSPLAN', 10000)
+        payslips.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslips.action_payslip_done()
+        line_values = payslips._get_line_values(['SALARY', 'BONUS_SALARY'])
+        salary = line_values['SALARY'][payslips[0].id]['total']
+        bonus = line_values['BONUS_SALARY'][payslips[1].id]['total']
+        excess = bonus - payslips[1]._rule_parameter('cct90_employer_onss_threshold')
+        self.assertGreater(excess, 0)
+
+        worker_record = self._generate_dmfa_declaration(year='2026', quarter='1')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        remunerations = worker_record['Occupation']['Remun']
+        remunerations = remunerations if isinstance(remunerations, list) else [remunerations]
+        self.assertEqual([int(r['RemunAmount']) for r in remunerations if r['RemunCode'] == '002'], [round(excess * 100)])
+        contribution = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == worker_record['WorkerCode'])
+        self.assertEqual(int(contribution['ContributionCalculationBasis']), round((salary + excess) * 100))
+        # The special contribution (888) is due on the bonus up to the ceiling, employer and worker rates together
+        contribution = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == '888')
+        self.assertEqual(contribution['ContributionType'], '0')
+        ceiling = payslips[1]._rule_parameter('cct90_employer_onss_threshold')
+        self.assertEqual(int(contribution['ContributionCalculationBasis']), round(ceiling * 100))
+        self.assertEqual(int(contribution['ContributionAmount']), round(ceiling * 46.07))
+        # As on the payslip
+        employer_line = payslips[1].line_ids.filtered(lambda l: l.code == 'ONSSEMPLOYER_888')
+        self.assertEqual(employer_line.total, round(ceiling * 0.33, 2))
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_local_unit_of_the_quarter(self):
+        """ The establishment unit is the one of the work address of the quarter, not the current one """
+        self.employee.create_version({
+            'date_version': date(2026, 4, 1),
+            'address_id': self.partner_wallonia.id,
+        })
+        self.assertEqual(self.employee.address_id, self.partner_wallonia)
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Jan 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+        unit = self.env['hr.work.location'].search([('address_id', '=', self.contract.address_id.id), ('location_type', '=', 'dmfa_unit')])
+        self.assertEqual(unit.bce_code, '8888888176')
+
+        occupation = self._generate_dmfa_declaration(year='2026', quarter='1')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']
+        self.assertEqual(occupation['LocalUnitID'], '8888888176')
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_apprentice_apprenticeship(self):
+        """ The apprenticeship zone is mandatory for an apprentice """
+        self.employee.birthday = date(2009, 5, 1)
+        self.contract.write({
+            'l10n_be_worker_code_id': self.env['l10n.be.worker.code'].search([('dmfa_code', '=', '439')]).id,
+            'l10n_be_apprenticeship_contract_number': False,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Jan 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+
+        occupation = self._generate_dmfa_declaration(year='2026', quarter='1')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']
+        self.assertEqual(occupation.get('Apprenticeship'), '1')
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_part_time_working_days_system(self):
+        """ The working days system is the days a week of the worker's schedule: a half-time over 5 days
+        works 5 days a week """
+        self.contract.write({
+            'resource_calendar_id': self.env['resource.calendar'].create({
+                'name': 'Half-time 19 hours over 5 days',
+                'company_id': self.belgian_company.id,
+                'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                    'dayofweek': dayofweek,
+                    'hour_from': 8.0,
+                    'hour_to': 11.8,
+                }) for dayofweek in ['0', '1', '2', '3', '4']],
+            }).id,
+            'reference_calendar_id': self.calendar_38h.id,
+        })
+        self.assertAlmostEqual(self.contract.work_time_rate, 0.5, places=2)
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Jan 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 1, 1),
+            'date_to': date(2026, 1, 31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+
+        occupation = self._generate_dmfa_declaration(year='2026', quarter='1')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']
+        self.assertEqual(occupation['WorkingDaysSystem'], '500')
+        self.assertEqual(occupation['MeanWorkingHours'], '1900')
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_worker_code_change_in_quarter(self):
+        """ A worker changing of worker code in the quarter (a white collar becoming a blue collar) has a
+        worker record per worker code """
+        white_collar_code = self.contract.l10n_be_worker_code_id
+        blue_collar_code = self.env['l10n.be.worker.code'].search([('dmfa_code', '=', '015')])
+        self.assertNotEqual(white_collar_code, blue_collar_code)
+        blue_collar_version = self.employee.create_version({
+            'date_version': date(2026, 2, 1),
+            'l10n_be_worker_code_id': blue_collar_code.id,
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2026',
+            'employee_id': self.employee.id,
+            'version_id': version.id,
+            'date_from': date(2026, month, 1),
+            'date_to': date(2026, month, 1) + relativedelta(day=31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for month, version in ((1, self.contract), (2, blue_collar_version), (3, blue_collar_version))])
+        self.employee.write({'review_state': '1_reviewed'})
+        for payslip in payslips:
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+
+        worker_records = self._generate_dmfa_declaration(year='2026', quarter='1')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        self.assertEqual(
+            sorted((w['WorkerCode'], w['Occupation']['OccupationStartingDate'], w['Occupation'].get('OccupationEndingDate')) for w in worker_records),
+            sorted([
+                (white_collar_code.dmfa_code, self.contract.date_start.isoformat(), '2026-01-31'),
+                ('015', '2026-02-01', None),
+            ]))
+        states = self.env['l10n_be.dmfa.natural_person.state'].sudo().search([
+            ('employee_id', '=', self.employee.id), ('quarter_start', '=', date(2026, 1, 1))])
+        self.assertEqual(len(states), 1)
+        self.assertEqual(set(states.worker_record_data), {white_collar_code.dmfa_code, '015'})
+
+    @freeze_time("2027-01-15 10:00:00")
+    def test_starterjob_thirteen_month_remuneration(self):
+        """ The starter job deduction of a 13th month is part of the bonus remuneration (code 2), not
+        declared again as a negative remuneration """
+        employee = self.env['hr.employee'].create({
+            'name': 'StarterJob Employee',
+            'company_id': self.belgian_company.id,
+            'country_id': self.env.ref('base.be').id,
+            'address_id': self.partner_wallonia.id,
+            'niss': '07020118374',
+            'birthday': datetime(2007, 2, 1),
+            'contract_date_start': datetime(2025, 1, 1),
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'work_contact_id': self.work_contact.id,
+            'wage': 2500,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'l10n_be_is_starterjob': True,
+            'lang': 'fr_BE',
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip Dec 2026 {struct}',
+            'employee_id': employee.id,
+            'version_id': employee.version_id.id,
+            'date_from': date(2026, 12, 1),
+            'date_to': date(2026, 12, 31),
+            'struct_id': self.env.ref(f'l10n_be_hr_payroll.{struct}').id,
+            'company_id': self.belgian_company.id,
+        } for struct in ('hr_payroll_structure_cp200_employee_salary', 'hr_payroll_structure_cp200_thirteen_month')])
+        employee.write({'review_state': '1_reviewed'})
+        for payslip in payslips:
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+        line_values = payslips._get_line_values(['BONUS_SALARY', 'DED_STARTERJOB_BONUS_SALARY'], compute_sum=True)
+        self.assertTrue(line_values['DED_STARTERJOB_BONUS_SALARY']['sum']['total'])
+
+        dmfa = self._generate_dmfa_declaration(year='2026', quarter='4', return_declaration=True)
+        remunerations = [
+            (remun.findtext('RemunCode'), remun.findtext('RemunAmount'))
+            for remun in etree.fromstring(dmfa.xml_file.content).iter('Remun')
+        ]
+        self.assertFalse([amount for code, amount in remunerations if amount.startswith('-')])
+        self.assertEqual(
+            sum(int(amount) for code, amount in remunerations if code == '002'),
+            round(line_values['BONUS_SALARY']['sum']['total'] * 100))
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_other_contributions_computed_on_payslips(self):
+        """ The contributions computed on the payslips are declared: closing fund of the non commercial
+        employers (811), risk groups (852) """
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Apr 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 4, 1),
+            'date_to': date(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payroll_config = payslip.payroll_config_id
+        payroll_config.l10n_be_at_risk_groups_contribution = True
+        employer_class = payroll_config.l10n_be_employer_category_id.dmfa_code
+        code = f'l10n_be_onss_combinations_{employer_class}_495'
+        combinations = payslip._rule_parameter(code)
+        self.env['hr.rule.parameter.value'].sudo().create({
+            'rule_parameter_id': self.env['hr.rule.parameter'].sudo().search([('code', '=', code)]).id,
+            'parameter_value': str({**combinations, '811': ['0'], '852': ['0']}),
+            'date_from': date(2026, 4, 1),
+        })
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+        line_values = payslip._get_line_values(['ONSSEMPLOYER_811', 'ONSSEMPLOYER_852'])
+        self.assertTrue(line_values['ONSSEMPLOYER_811'][payslip.id]['total'])
+        self.assertTrue(line_values['ONSSEMPLOYER_852'][payslip.id]['total'])
+
+        worker_record = self._generate_dmfa_declaration(year='2026', quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        contributions = {c['ContributionWorkerCode']: c for c in worker_record['WorkerContribution']}
+        ffe_type = '0' if payslip._with_salary_moderation() else '2'
+        for worker_code, contribution_type in (('811', ffe_type), ('852', '0')):
+            contribution = contributions[worker_code]
+            self.assertEqual(contribution['ContributionType'], contribution_type)
+            rate = payslip._get_onss_rates(worker_code, contribution_type)['total_rate']
+            self.assertEqual(int(contribution['ContributionAmount']), round(int(contribution['ContributionCalculationBasis']) * rate / 100))
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_activation_contribution(self):
+        """ The activation contribution of a worker exempted from work during the whole quarter is declared, with the
+        exemption notion of the occupation and the activation block """
+        self.employee.birthday = date(1968, 3, 1)
+        self.contract.write({'l10n_be_work_exemption': '2', 'l10n_be_work_exemption_date': date(2026, 1, 1)})
+        payslips = self.env['hr.payslip'].create([{
+            'name': 'Payslip %s 2026' % month,
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, month, 1),
+            'date_to': date(2026, month, 1) + relativedelta(months=1, days=-1),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for month in (4, 5, 6)])
+        payslips.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslips.action_payslip_done()
+        self.assertTrue(payslips._get_line_values(['ONSSEMPLOYER_260'], compute_sum=True)['ONSSEMPLOYER_260']['sum']['total'])
+
+        worker_record = self._generate_dmfa_declaration(year='2026', quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        self.assertEqual(worker_record['Occupation']['OccupationInformations']['ServiceExemptionNotion'], '2')
+        activation = worker_record['ActivationInformation']
+        self.assertEqual(activation['ServiceExemptionStartDate'], '2026-01-01')
+        self.assertEqual(activation['TrainingSituationStartDate'], '2026-01-01')
+        self.assertEqual(activation['TrainingSituation'], '0')
+        contribution = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == '260')
+        # Aged 57 at the start of the exemption, increased when due for at least 10% of the workers
+        self.assertEqual(contribution['ContributionType'], '5' if activation['ActivationPercentageStatus'] == '1' else '0')
+        rate = payslips[0]._get_onss_rates('260', contribution['ContributionType'])['total_rate']
+        basis = int(contribution['ContributionCalculationBasis'])
+        self.assertEqual(int(contribution['ContributionAmount']), max(30000, round(basis * rate / 100)))
+        main_contribution = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == worker_record['WorkerCode'])
+        self.assertEqual(basis, int(main_contribution['ContributionCalculationBasis']))
+
+    def test_activation_contribution_former_workers(self):
+        """ The former workers of the company are not taken into account to determine if the
+        activation contribution is due for at least 10% of the workers """
+        self.employee.birthday = date(1968, 3, 1)
+        self.contract.write({'l10n_be_work_exemption': '2', 'l10n_be_work_exemption_date': date(2026, 1, 1)})
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip April 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 4, 1),
+            'date_to': date(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        _contribution_type, _minimum, increased = payslip._l10n_be_get_activation_contribution_type()
+        self.assertTrue(increased)
+        self.env['hr.employee'].create([{
+            'name': 'Former Worker %s' % i,
+            'company_id': self.belgian_company.id,
+            'date_version': date(2015, 1, 1),
+            'contract_date_start': date(2015, 1, 1),
+            'contract_date_end': date(2020, 12, 31),
+        } for i in range(20)])
+        _contribution_type, _minimum, increased = payslip._l10n_be_get_activation_contribution_type()
+        self.assertTrue(increased)
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_economic_unemployment_contribution(self):
+        """ The economic unemployment contribution computed on the payslips is declared without calculation basis """
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Apr 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 4, 1),
+            'date_to': date(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+        # 6 days of economic unemployment in the quarter, more than 130 days in the last 4 quarters: 40 € a day
+        self.env['hr.payslip.line'].create({
+            'slip_id': payslip.id,
+            'salary_rule_id': self.env.ref('l10n_be_hr_payroll.l10n_be_employees_salary_onss_employer_800').id,
+            'name': 'Economic Unemployment Contribution',
+            'code': 'ONSSEMPLOYER_800',
+            'amount': 240,
+            'quantity': 1,
+            'rate': 100,
+            'total': 240,
+        })
+
+        worker_record = self._generate_dmfa_declaration(year='2026', quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        contribution = next(c for c in worker_record['WorkerContribution'] if c['ContributionWorkerCode'] == '800')
+        self.assertEqual(contribution['ContributionType'], '0')
+        self.assertNotIn('ContributionCalculationBasis', contribution)
+        self.assertEqual(int(contribution['ContributionAmount']), 24000)
+
+    def _create_flexi_employee(self, worker_code='450'):
+        flexi = self.env['hr.employee'].create({
+            'name': 'Flexi Worker',
+            'company_id': self.belgian_company.id,
+            'country_id': self.env.ref('base.be').id,
+            'address_id': self.partner_wallonia.id,
+            'l10n_be_worker_code_id': self.env['l10n.be.worker.code'].search([('dmfa_code', '=', worker_code)]).id,
+            'niss': '85010100214',
+            'contract_date_start': datetime(2026, 4, 1),
+            'contract_date_end': datetime(2026, 6, 30),
+            'date_version': datetime(2026, 4, 1),
+            'structure_type_id': self.env.ref('hr.structure_type_employee_cp200').id,
+            'work_contact_id': self.work_contact.id,
+            'l10n_be_flexi_monthly_wage': 2500,
+            'l10n_be_joint_committee_id': self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
+            'lang': 'fr_BE',
+        })
+        flexi.version_id.l10n_be_dimona_category = 'flx'
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Apr 2026',
+            'employee_id': flexi.id,
+            'version_id': flexi.version_id.id,
+            'date_from': date(2026, 4, 1),
+            'date_to': date(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        return flexi, payslip
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_flexi_manual_worker_contribution_basis(self):
+        """ The holiday pay of a flexi-job is in its pay: the basis of a manual flexi worker isn't
+        raised to 108%, as on the payslip """
+        flexi, payslip = self._create_flexi_employee(worker_code='050')
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        self.assertTrue(flexi.version_id.is_worker())
+        self.assertEqual(payslip._l10n_be_get_onss_basis_uplift(), 1)
+        salary_codes = self.env['hr.payslip']._get_salary_wage_line_codes() - {'DH_SALARY'}
+        line_values = payslip._get_line_values(salary_codes)
+        basis = round(sum(line_values[code][payslip.id]['total'] for code in salary_codes), 2)
+        self.assertTrue(basis)
+
+        worker_record = self._generate_dmfa_declaration(year='2026', quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        contributions = worker_record['WorkerContribution']
+        contribution = next(c for c in (contributions if isinstance(contributions, list) else [contributions]) if c['ContributionWorkerCode'] == '050')
+        self.assertEqual(int(contribution['ContributionCalculationBasis']), round(basis * 100))
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_flexi_remuneration_code(self):
+        """ The pay of a flexi-job, its bonus and its flexi holiday pay included, is declared once under the code 22 """
+        _flexi, payslip = self._create_flexi_employee()
+        payslip._set_input_value('FLEXI_BONUS', 100)
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        line_values = payslip._get_line_values(['SALARY', 'FLEXI_BONUS', 'FLEXI_PECULE'])
+        self.assertEqual(line_values['FLEXI_BONUS'][payslip.id]['total'], 100)
+        self.assertTrue(line_values['FLEXI_PECULE'][payslip.id]['total'])
+        salary = line_values['SALARY'][payslip.id]['total']
+
+        occupation = self._generate_dmfa_declaration(year='2026', quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']
+        remunerations = occupation['Remun']
+        remunerations = remunerations if isinstance(remunerations, list) else [remunerations]
+        self.assertEqual([(r['RemunCode'], int(r['RemunAmount'])) for r in remunerations], [('022', round(salary * 100))])
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_student_contribution_rate(self):
+        """ The student solidarity contribution is computed with the rate of the payslips """
+        student, payslip = self._create_flexi_employee(worker_code='841')
+        student.version_id.write({'l10n_be_dimona_category': 'stu', 'wage': 1500})
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        rate = payslip._get_onss_global_rates()['total_rate']
+        self.assertEqual(rate, 8.14)
+
+        worker_record = self._generate_dmfa_declaration(year='2026', quarter='2')['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']
+        contribution = worker_record['StudentContribution']
+        basis = int(contribution['StudentRemunAmount'])
+        self.assertTrue(basis)
+        self.assertEqual(int(contribution['StudentContributionAmount']), round(basis * rate / 100))
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_flexi_notion(self):
+        """ The flexi notion is only declared for a flexi-job declared as an ordinary worker, as its
+        Dimona flexi was refused (late Dimona) """
+        flexi, payslip = self._create_flexi_employee()
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        dmfa = self._generate_dmfa_declaration(year='2026', quarter='2', return_declaration=True)
+        self.assertFalse(list(etree.fromstring(dmfa.xml_file.content).iter('FlexiNotion')))
+        # No special unemployment contribution for a flexi-job, as on its payslip
+        self.assertFalse(payslip._get_line_values(['ONSSEMPLOYER_855'])['ONSSEMPLOYER_855'][payslip.id]['total'])
+        contribution_codes = [c.text for c in etree.fromstring(dmfa.xml_file.content).iter('ContributionWorkerCode')]
+        self.assertTrue(contribution_codes)
+        self.assertNotIn('855', contribution_codes)
+
+        dmfa.unlink()
+        payslip.l10n_be_dmfa_id = False
+        flexi.version_id.l10n_be_refused_flexijob = True
+        dmfa = self._generate_dmfa_declaration(year='2026', quarter='2', return_declaration=True)
+        self.assertEqual([n.text for n in etree.fromstring(dmfa.xml_file.content).iter('FlexiNotion')], ['FL'])
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_dimona_notification_refused_flexijob(self):
+        """ A Dimona flexi refused by the ONSS (late Dimona) flags the flexi-job as refused """
+        flexi, _payslip = self._create_flexi_employee()
+        self.assertFalse(flexi.version_id.l10n_be_refused_flexijob)
+        self.env['l10n.be.onss.declaration']._analyse_notification_file({'NOTIFICATION': {'Form': {
+            'HandledOriginalForm': {'Identification': 'DIMONA'},
+            'NaturalPerson': {'INSS': flexi.niss},
+            'HandlingResult': {
+                'ResultCode': '1',
+                'AnomalyReport': {'ErrorID': '00911-510'},
+                'ImpactReport': {'DimonaImpactReport': {'DimonaPeriodAfter': {
+                    'StartingDate': '2026-04-01',
+                    'EndingDate': '2026-06-30',
+                }}},
+            },
+        }}})
+        self.assertTrue(flexi.version_id.l10n_be_refused_flexijob)
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_occupation_out_of_quarter(self):
+        """ The ONSS refuses the occupations ending before the declared quarter """
+        self.contract.contract_date_end = date(2026, 3, 31)
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Apr 2026',
+            'employee_id': self.employee.id,
+            'version_id': self.contract.id,
+            'date_from': date(2026, 4, 1),
+            'date_to': date(2026, 4, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.action_payslip_done()
+
+        with self.assertRaisesRegex(UserError, "The occupations of these employees aren't in the quarter.*%s" % self.employee.name):
+            self._generate_dmfa_declaration(year='2026', quarter='2')
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_no_hours_occupation_days_justification(self):
+        """
+        0 hours per week are only allowed for a complete career interruption, or with the days
+        justification 7: worker with no services to perform during the period.
+        """
+        calendar_0_hours = self.env['resource.calendar'].create({
+            'name': "Test Calendar: no hours",
+            'company_id': self.belgian_company.id,
+            'hours_per_day': 0,
+            'hours_per_week': 0,
+            'full_time_required_hours': 38,
+            'attendance_ids': [(5, 0, 0)],
+        })
+        version_0_hours = self.employee.create_version({
+            'date_version': date(2026, 6, 1),
+            'resource_calendar_id': calendar_0_hours.id,
+        })
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2026',
+            'employee_id': self.employee.id,
+            'version_id': version.id,
+            'date_from': date(2026, month, 1),
+            'date_to': date(2026, month, 1) + relativedelta(day=31),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        } for month, version in [(4, self.contract), (5, self.contract), (6, version_0_hours)]])
+        self.employee.write({'review_state': '1_reviewed'})
+        for payslip in payslips:
+            payslip.compute_sheet()
+            payslip.action_payslip_done()
+
+        dmfa = self._generate_dmfa_declaration(year=2026, quarter='2', return_declaration=True)
+        occupations = {
+            int(occupation.findtext('OccupationUserReference')): occupation
+            for occupation in etree.fromstring(dmfa.xml_file.content).iter('Occupation')
+        }
+        self.assertEqual(occupations[version_0_hours.id].findtext('MeanWorkingHours'), '0000')
+        self.assertEqual(occupations[version_0_hours.id].findtext('DaysJustification'), '7')
+        self.assertIsNone(occupations[self.contract.id].find('DaysJustification'))
+
+    @freeze_time("2026-07-01 10:00:00")
+    def test_no_hours_occupation_with_services_no_days_justification(self):
+        """ A worker with services had services to perform: no days justification 7, even if the
+        working schedule has no hours per week (e.g. not set on a variable schedule) """
+        calendar_no_hours_per_week = self.calendar_38h.copy({'name': "38h without hours per week"})
+        calendar_no_hours_per_week.hours_per_week = 0
+        version = self.employee.create_version({
+            'date_version': date(2026, 6, 1),
+            'resource_calendar_id': calendar_no_hours_per_week.id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Jun 2026',
+            'employee_id': self.employee.id,
+            'version_id': version.id,
+            'date_from': date(2026, 6, 1),
+            'date_to': date(2026, 6, 30),
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
+            'company_id': self.belgian_company.id,
+        })
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        self.assertTrue(payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id.count_as == 'working_time'))
+
+        dmfa = self._generate_dmfa_declaration(year='2026', quarter='2', return_declaration=True)
+        occupation = next(
+            o for o in etree.fromstring(dmfa.xml_file.content).iter('Occupation')
+            if o.findtext('OccupationUserReference') == str(version.id))
+        self.assertEqual(occupation.findtext('MeanWorkingHours'), '0000')
+        self.assertIsNone(occupation.find('DaysJustification'))
+
     def test_bik_remuneration_code_without_working_days(self):
 
         def create_payslips_first_quarter():
@@ -3831,10 +4804,10 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
         }])
 
         payslips = self.env['hr.payslip'].create([{
-            'name': 'Payslip Jan 2025 - StarterJob Employee',
+            'name': 'Payslip Feb 2026 - StarterJob Employee',
             'version_id': starterjob_employee.version_id.id,
-            'date_from': datetime(2025, 1, 1),
-            'date_to': datetime(2025, 1, 31),
+            'date_from': datetime(2026, 2, 1),
+            'date_to': datetime(2026, 2, 28),
             'employee_id': starterjob_employee.id,
             'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
             'company_id': self.belgian_company.id,
@@ -3855,10 +4828,10 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
             'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
             'company_id': self.belgian_company.id,
         }, {
-            'name': 'Payslip Jan 2025 - Regular Employee',
+            'name': 'Payslip Feb 2026 - Regular Employee',
             'version_id': regular_employee.version_id.id,
-            'date_from': datetime(2025, 1, 1),
-            'date_to': datetime(2025, 1, 31),
+            'date_from': datetime(2026, 2, 1),
+            'date_to': datetime(2026, 2, 28),
             'employee_id': regular_employee.id,
             'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
             'company_id': self.belgian_company.id,
@@ -3879,10 +4852,10 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
             'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
             'company_id': self.belgian_company.id,
         }, {
-            'name': 'Payslip Jan 2025 - Lower wage Employee',
+            'name': 'Payslip Feb 2026 - Lower wage Employee',
             'version_id': lower_wage_employee.version_id.id,
-            'date_from': datetime(2025, 1, 1),
-            'date_to': datetime(2025, 1, 31),
+            'date_from': datetime(2026, 2, 1),
+            'date_to': datetime(2026, 2, 28),
             'employee_id': lower_wage_employee.id,
             'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary').id,
             'company_id': self.belgian_company.id,
@@ -3910,7 +4883,7 @@ class TestDMFA(TestPayslipValidationCommon, TestBelgiumCommon):
         lower_wage_payslip = payslips.filtered(lambda p: p.employee_id == lower_wage_employee)
         starterjob_payslip = payslips - regular_payslip - lower_wage_payslip
         # This employee is 19 yo so with his starterjob status he will be pay 88% of his wage (2500 * 88% =) 2200
-        self.assertAlmostEqual(regular_payslip[0].line_ids.filtered(lambda l: l.code == 'NET').total - lower_wage_payslip[0].line_ids.filtered(lambda l: l.code == 'NET').total, 57.01, 2, "should be equal to the COMPSUPP's value of the starterjob's payslip")
+        self.assertAlmostEqual(regular_payslip[0].line_ids.filtered(lambda l: l.code == 'NET').total - lower_wage_payslip[0].line_ids.filtered(lambda l: l.code == 'NET').total, 64.03, 2, "should be equal to the COMPSUPP's value of the starterjob's payslip")
         self._validate_payslip(starterjob_payslip[0])
 
         self.assertAlmostEqual(regular_payslip[1].line_ids.filtered(lambda l: l.code == 'NET').total - lower_wage_payslip[1].line_ids.filtered(lambda l: l.code == 'NET').total, 51.61, 2, "should be equal to the COMPSUPP's value of the starterjob's payslip")

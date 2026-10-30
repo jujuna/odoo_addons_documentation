@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import MagicMock, patch
 
 from .common import TestMxEdiCommon
 from odoo import Command, fields
@@ -1109,6 +1110,30 @@ class TestCFDIInvoiceWorkflow(TestMxEdiCommon):
             invoice = self._create_invoice_mx(l10n_mx_edi_cfdi_to_public=True)
             with self.with_mocked_pac_sign_success():
                 self._create_invoices_global_invoice(invoice.with_user(self.simple_accountman))
+            self.assertRecordValues(invoice, [{
+                'l10n_mx_edi_cfdi_state': 'global_sent',
+            }])
+
+    def test_global_invoice_with_account_user_after_error(self):
+        """ Test the global invoice submission with a user that isn't in the group 'base.group_system'
+        when there first was a validation error."""
+        self.simple_accountman.email = 'simple_accountman@test.com'
+        with freeze_time('2017-01-01'):
+            invoice = self._create_invoice_mx(l10n_mx_edi_cfdi_to_public=True)
+            self.product.unspsc_code_id = False
+            document_date = fields.Date.to_date('2017-01-01')
+            invoice._l10n_mx_edi_cfdi_global_invoice_try_send(document_date)
+            self.assertRecordValues(invoice.l10n_mx_edi_invoice_document_ids, [
+                {
+                    'state': 'ginvoice_sent_failed',
+                    'message': "You need to define an 'UNSPSC Product Category' on the following products: [product_mx] product_mx",
+                },
+            ])
+
+            self.product.unspsc_code_id = self.env.ref('product_unspsc.unspsc_code_01010101').id
+            with self.with_mocked_pac_sign_success():
+                invoice.with_user(self.simple_accountman)._l10n_mx_edi_cfdi_global_invoice_try_send(document_date)
+
             self.assertRecordValues(invoice, [{
                 'l10n_mx_edi_cfdi_state': 'global_sent',
             }])
@@ -2294,3 +2319,22 @@ class TestCFDIInvoiceWorkflow(TestMxEdiCommon):
             doc.type, 'binary',
             "Document type should be 'binary', not the leaked 'sale' value from the accounting context",
         )
+
+    def test_fetch_sat_status_in_process_cancellation(self):
+        # A cancellation still 'En proceso' at the SAT reports Estado 'Vigente',
+        # but must stay 'not_defined' so the cron keeps polling it until the
+        # cancellation is accepted or rejected.
+        document = self.env['l10n_mx_edi.document']
+
+        def fetch_sat_status(estado, estatus_cancelacion):
+            response = MagicMock()
+            response.__getitem__.side_effect = {
+                'Estado': estado,
+                'EstatusCancelacion': estatus_cancelacion,
+            }.__getitem__
+            with patch('odoo.addons.l10n_mx_edi.models.l10n_mx_edi_document.Client') as client:
+                client.return_value.service.Consulta.return_value = response
+                return document._fetch_sat_status('rfc', 'rfc', 100.0, 'uuid')
+
+        self.assertEqual(fetch_sat_status('Vigente', 'En proceso'), {'value': 'not_defined'})
+        self.assertEqual(fetch_sat_status('Vigente', ''), {'value': 'valid'})

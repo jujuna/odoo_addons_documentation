@@ -63,9 +63,16 @@ class TestL10nBrEDIStock(TestL10nBREDICommon):
         self._post_nfe(invoice)
         return invoice
 
+    def _confirm_sale_order(self):
+        """Confirm the sale order with sudo
+
+        The test user lacks sale rights needed for confirmation (e.g. `loyalty.card` when `sale_loyalty` is installed)
+        """
+        self.sale_order.sudo().action_confirm()
+
     def _validate_packed_picking(self):
         """Confirm the sale order and validate its delivery with everything in one package."""
-        self.sale_order.action_confirm()
+        self._confirm_sale_order()
         picking = self.sale_order.order_line.move_ids.picking_id[0]
         picking.move_ids[0].quantity = picking.move_ids[0].product_uom_qty
         picking.action_put_in_pack()
@@ -73,7 +80,7 @@ class TestL10nBrEDIStock(TestL10nBREDICommon):
         return picking
 
     def test_nfe_with_transport_info(self):
-        self.sale_order.action_confirm()
+        self._confirm_sale_order()
         picking = self.sale_order.order_line.move_ids.picking_id[0]
         picking.move_ids[0].quantity = picking.move_ids[0].product_uom_qty
         picking.action_put_in_pack()

@@ -22,6 +22,10 @@ class BritishCISTaxReportCustomHandler(models.AbstractModel):
         # We need to test on base tags instead of tax tags because the gross tax does not create a line.
         options['forced_domain'] = [*options.get('forced_domain', []), ('move_id.line_ids.tax_ids.repartition_line_ids.tag_ids', 'in', tags.ids)]
 
+        # Once the cash basis is enabled, the deductions are always declared on payment.
+        if self.env['ir.config_parameter'].sudo().get_bool('l10n_uk_reports_cis.cash_basis'):
+            options['report_cash_basis'] = True
+
     def _report_engine_cis_materials_purchase(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         report = self.env['account.report'].browse(options['report_id'])
         purchase_base_tags = self.env.ref('l10n_uk_reports_cis.account_uk_cis_report_line_purchase_expr_base')._get_matching_tags()
@@ -52,6 +56,14 @@ class BritishCISTaxReportCustomHandler(models.AbstractModel):
         queries = []
         for column_group_index in all_column_groups_expression_totals:
             column_group_options = report._get_column_group_options(options, column_group_index)
+            if column_group_options.get('report_cash_basis'):
+                # Raise the warning on the period the bill is reported in, i.e. the one of its payments.
+                report._prepare_lines_for_cash_basis()
+                date_join = SQL("JOIN cash_basis_temp_account_move_line line ON line.move_id = move.id")
+                date_field = SQL("line.date")
+            else:
+                date_join = SQL()
+                date_field = SQL("move.date")
             queries.append(
                 SQL(
                     """
@@ -61,10 +73,13 @@ class BritishCISTaxReportCustomHandler(models.AbstractModel):
                         '{}'
                     ) AS unregistered_partners
                     FROM account_move move
+                    %(date_join)s
                     WHERE move.l10n_uk_cis_inactive_partner = TRUE
-                    AND move.date >= %(period_start)s
-                    AND move.date <= %(period_end)s
+                    AND %(date_field)s >= %(period_start)s
+                    AND %(date_field)s <= %(period_end)s
                     """,
+                    date_join=date_join,
+                    date_field=date_field,
                     period_start=column_group_options['date']['date_from'],
                     period_end=column_group_options['date']['date_to'],
                 )

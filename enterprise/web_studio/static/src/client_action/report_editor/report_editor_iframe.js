@@ -1,4 +1,4 @@
-import { Component, proxy, signal, t, useProps } from "@odoo/owl";
+import { Component, proxy, signal, t, useEffect, useProps } from "@odoo/owl";
 import { getCssFromPaperFormat } from "@web_studio/client_action/report_editor/utils";
 import { useThrottleForAnimation } from "@web/core/utils/timing";
 import { ErrorDisplay } from "@web_studio/client_action/report_editor/error_display";
@@ -9,12 +9,18 @@ export class ReportEditorIframe extends Component {
     props = useProps({
         iframeSource: t.string().optional(),
         onIframeLoaded: t.function().optional(),
+        onIframeRemoved: t.function().optional(),
     });
 
     iframeRef = signal.ref();
 
     setup() {
         this.reportEditorModel = proxy(this.env.reportEditorModel);
+        useEffect(() => {
+            if (this.iframeRef()) {
+                return () => this.props.onIframeRemoved?.();
+            }
+        });
         this.onContainerScroll = useThrottleForAnimation(() => {
             if (this.iframeRef()?.contentDocument) {
                 this.iframeRef().contentDocument.dispatchEvent(new Event("scroll"));

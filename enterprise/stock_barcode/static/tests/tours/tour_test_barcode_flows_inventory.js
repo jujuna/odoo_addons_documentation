@@ -318,6 +318,40 @@ registry.category("web_tour.tours").add("test_inventory_adjustment_multi_locatio
             trigger: ".o_barcode_client_action",
             run: "scan product1",
         },
+        {
+            trigger: "button.o_add_line",
+            content: "Click on Add Product",
+            run: "click",
+        },
+        {
+            trigger: ".o_field_widget[name='product_id'] input",
+            content: "Search for product1",
+            run: "edit product1",
+        },
+        {
+            trigger: ".ui-menu-item > a:contains('product1')",
+            content: "Select product1",
+            run: "click",
+        },
+        {
+            trigger: ".o_field_widget[name='location_id'] input",
+            content: "Search for the target location directly",
+            run: "edit Out of Hierarchy Location",
+        },
+        {
+            trigger: ".ui-menu-item > a:contains('Out of Hierarchy Location')",
+            content: "Select the location from the standard dropdown",
+            run: "click",
+        },
+        {
+            trigger: "button:contains('Confirm')",
+            content: "Confirm the Add Product dialog",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_location_line:contains('Out of Hierarchy Location')",
+            content: "Verify the location group header was added successfully without a traceback",
+        },
         ...stepUtils.validateBarcodeOperation(),
         {
             trigger: ".o_notification:has(.bg-success):text(The inventory count has been updated)",

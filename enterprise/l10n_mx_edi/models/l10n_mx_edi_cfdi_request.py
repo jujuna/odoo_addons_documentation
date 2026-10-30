@@ -29,11 +29,11 @@ STATE_RETRY_DELAY = {
 UNPACK_BATCH_SIZE = 1000
 DOC_MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB absolute max per file
 
-REQUEST_TYPE_SELECTION = frozenset([
+REQUEST_TYPE_SELECTION = (
     ("folio", "Folio"),
     ("batch_issued", "CFDI (Issued)"),
     ("batch_received", "CFDI (Received)"),
-])
+)
 REQUEST_TYPE_DESCRIPTION = (
     "Scope of the download request sent to the SAT.\n"
     "- Folio: a single CFDI, identified by its Fiscal Folio.\n"
@@ -41,10 +41,10 @@ REQUEST_TYPE_DESCRIPTION = (
     "- CFDI (Received): all CFDI issued to this company within a date range."
 )
 
-RECEIPT_TYPE_SELECTION = frozenset([
+RECEIPT_TYPE_SELECTION = (
     ("I", "I (Income)"),
     ("E", "E (Credit Note)"),
-])
+)
 RECEIPT_TYPE_DESCRIPTION = (
     "Kind of CFDI to download, and the document it becomes in Odoo.\n"
     "- I (Income): a customer invoice for an Issued request, a vendor bill for a Received request.\n"

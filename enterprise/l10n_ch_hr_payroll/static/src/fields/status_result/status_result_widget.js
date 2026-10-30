@@ -3,36 +3,36 @@
 import { registry } from "@web/core/registry";
 import { Component, useProps } from "@odoo/owl";
 import { SwissdecNotification } from "@l10n_ch_hr_payroll/components/swissdec_notification";
+import { swissdecFormat } from "@l10n_ch_hr_payroll/components/swissdec_format";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 class StatusResultWidget extends Component {
+    props = useProps(standardFieldProps);
     static template = "l10n_ch_hr_payroll.StatusResultWidgetTemplate";
     static components = {
         SwissdecNotification,
     };
 
-    props = useProps(standardFieldProps);
+    setup() {
+        this.format = swissdecFormat;
+    }
 
     get parsedData() {
         return this.props.record.data[this.props.name];
     }
 
-    get response_state() {
+    /** Notifications of an accepted declaration, or the general warnings of a declaration. */
+    get responseState() {
         const parsedData = this.parsedData;
-        if (parsedData.ResponseState) {
+        if (parsedData?.ResponseState) {
             return parsedData.ResponseState;
-        } else if (parsedData.Info || parsedData.Warning) {
-            return parsedData;
         }
-        return null;
+        return parsedData?.Info || parsedData?.Warning ? parsedData : null;
     }
 
-    get error() {
-        const parsedData = this.parsedData;
-        if (!parsedData.ResponseState && !parsedData.Info && !parsedData.Warning) {
-            return parsedData;
-        }
-        return null;
+    /** Anything else is an error response. */
+    get errorResponse() {
+        return this.parsedData && !this.responseState ? this.parsedData : null;
     }
 }
 

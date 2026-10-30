@@ -41,6 +41,16 @@ class TestSalaryAttachment(TestPayslipBase):
         payslip.action_payslip_paid()
         return payslip
 
+    def test_action_new_salary_attachment_forces_view(self):
+        # The action must explicitly pin the attachment form view, otherwise
+        # the client can fall back to a stale `form_view_ref` left in an
+        # unrelated context (e.g. after opening a contract template through
+        # an internal link) and try to render it against hr.salary.attachment.
+        version = self.toto.version_id
+        action = version.action_new_salary_attachment()
+        expected_view = self.env.ref('hr_payroll.hr_salary_attachment_view_form')
+        self.assertEqual(action['view_id'], expected_view.id)
+
     @freeze_time('2027-01-01')
     def test_attachment_inputs_with_same_code(self):
         # Per-structure code unicity on hr.salary.rule means two attachments targeting the

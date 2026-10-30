@@ -39,14 +39,13 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         helb_rule_id = self.env.ref('l10n_ke_hr_payroll.l10n_ke_employees_helb')
         fringe_benefit_rule_id = self.env.ref('l10n_ke_hr_payroll.l10n_ke_employees_fringe_benefit')
         non_cash_rule_id = self.env.ref('l10n_ke_hr_payroll.l10n_ke_employees_non_cash')
-        for code, value in {
+        payslip._set_input_values({
             fixed_bouns_rule_id.code: 2000.0,
             fixed_commission_rule_id.code: 10000.0,
             helb_rule_id.code: 3000.0,
             fringe_benefit_rule_id.code: 4000.0,
             non_cash_rule_id.code: 2500.0,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
 
         payslip_results = {'BASIC': 100000.0, 'BONUS': 2000.0, 'COMMISSION': 10000.0, 'GROSS': 112000.0, 'NSSF_EMPLOYEE_TIER_1': 360.0, 'NSSF_EMPLOYEE_TIER_2': 720.0, 'AHL_AMOUNT': 1500.0, 'NSSF_AMOUNT': 1080.0, 'NHIF_AMOUNT_HIDDEN': 1700.0, 'NHIF_AMOUNT': 1700.0, 'GROSS_TAXABLE': 110920.0, 'INCOME_TAX': 28059.35, 'NHIF_RELIEF': -255.0, 'INSURANCE_RELIEF': -255.0, 'PERS_RELIEF': -2400.0, 'PAYE': 25404.35, 'STATUTORY_DED': 29684.35, 'HELB': 3000.0, 'FRINGE_BENEFIT': 4000.0, 'OTHER_DED': 7000.0, 'TOTAL_DED': 36684.35, 'NITA': 50.0, 'NSSF_EMP': 1080.0, 'AHL_AMOUNT_EMP': 1500.0, 'NON_CASH_BENEFIT': 2500.0, 'NET': 77815.65}

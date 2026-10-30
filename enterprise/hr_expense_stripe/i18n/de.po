@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-17 22:52+0000\n"
+"PO-Revision-Date: 2026-10-16 13:33+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "hr_expense_stripe/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr "<span class=\"ps-2\">Karten</span>"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_view_form_inherits_stripe
 msgid "<span class=\"ps-2\">Dispute</span>"
-msgstr ""
+msgstr "<span class=\"ps-2\">Einspruch</span>"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_card_receive_wizard_form
@@ -210,6 +210,113 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Benachrichtigung über "
+"den Versand der Karte</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ihre "
+"Karte wurde zugewiesen</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Guten Tag <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Name des Empfängers]</t>,<br/><br/>\n"
+"                    Ihnen wurde eine Spesenkarte zugewiesen.\n"
+"                    Sie können diese jederzeit einsehen und verwalten, indem "
+"Sie zu „Mein Profil“ gehen und den Abschnitt „Karten“ auswählen.<br/><br/>\n"
+"                    Sollten Sie Fragen haben oder Unterstützung benötigen, "
+"steht Ihnen unser Team gerne zur Verfügung.<br/><br/>\n"
+"                    Mit freundlichen Grüßen<br/>\n"
+"                    <t t-out=\"object.ordered_by.name or ''\">"
+"[Spesenadministrator]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@ihrunternehmen.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.beispiel.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"        "
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_card_canceled
@@ -322,6 +429,114 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Benachrichtigung über "
+"den Versand der Karte</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ihre "
+"Karte wurde deaktiviert</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Guten Tag <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Karteninhaber]</t>,<br/><br/>\n"
+"                    Wir möchten Sie darüber informieren, dass der Versand "
+"Ihrer Karte abgebrochen wurde.<br/>\n"
+"                    Sollten Sie die Karte dennoch erhalten wollen, geben Sie "
+"eine neue Bestellung auf.<br/><br/>\n"
+"                    Sollten Sie Fragen haben oder Unterstützung benötigen, "
+"steht Ihnen unser Team gerne zur Verfügung..<br/><br/>\n"
+"                    Mit freundlichen Grüßen<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Name des Unternehmens]</"
+"t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@ihrunternehmen.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.beispiel.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"        "
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_card_ordered
@@ -430,6 +645,111 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Benachrichtigung über "
+"den Versand der Karte</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ihre "
+"Karte wurde bestellt</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Guten Tag <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Name des Empfängers]</t>,<br/><br/>\n"
+"                    Ihre Spesenkarte wurde bestellt.\n"
+"                    Wir werden Sie benachrichtigen, sobald sie versandt "
+"wurde.<br/><br/>\n"
+"                    Mit freundlichen Grüßen<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Name des Empfängers]</t>"
+"\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@ihrunternehmen.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.beispiel.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"        "
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_card_shipped
@@ -557,6 +877,129 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Benachrichtigung über "
+"den Versand der Karte</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ihre "
+"Karte wurde versandt</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Guten Tag <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Karteninhaber]</t>,<br/><br/>\n"
+"                    Ihre Spesenkarte ist unterwegs!<br/><br/>\n"
+"                    <t t-if=\"object.tracking_number\">\n"
+"                        <strong>Sendungsverfolgungsnummer:</strong> <t t-"
+"out=\"object.tracking_number\">TRACK123</t><br/>\n"
+"                    </t>\n"
+"                    <t t-if=\"object.tracking_url\">\n"
+"                        <strong>Sendung verfolgen:</strong>\n"
+"                        <a t-att-href=\"object.tracking_url\" style=\"color: "
+"#875A7B; text-decoration: underline;\"><t t-out=\"object.tracking_url\">"
+"[Link]</t></a><br/>\n"
+"                    </t>\n"
+"                    <t t-if=\"ctx.get('shipping_estimated_delivery', '')\">\n"
+"                        <strong>Voraussichtliche Ankunftszeit:</strong>\n"
+"                        <t t-out=\"ctx.get('shipping_estimated_delivery', '')"
+"\">[24-12-2025]</t><br/><br/>\n"
+"                    </t>\n"
+"                    Aktivieren Sie sie nach Erhalt:<br/><br/>\n"
+"                    1) Gehen Sie zu <a t-attf-href=\"{{ website_url }}/odoo/"
+"cards\">Karte</a><br/>\n"
+"                    2) Klicken Sie auf die Karte und befolgen Sie die "
+"Anweisungen.<br/><br/>\n"
+"                    Mit freundlichen Grüßen<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Name des Unternehmens]</"
+"t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@ihrunternehmen.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.beispiel.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"        "
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_dispute_lost
@@ -668,6 +1111,113 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">"
+"Einspruchsbenachrichtigung</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ihr "
+"Einspruch wurde abgelehnt</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Guten Tag <t t-out=\"ctx.get('submitted_by')\">"
+"[einreichende Person]</t>,<br/><br/>\n"
+"                    leider müssen wir Ihnen mitteilen, dass der Einspruch "
+"zur Transaktion <strong><t t-out=\"object.name\"/></strong> aus folgendem "
+"Grund abgelehnt wurde:<br/><br/>\n"
+"                    <t t-out=\"ctx.get('loss_reason', 'Kein Grund angegeben')"
+"\"/><br/><br/>\n"
+"                    Mit freundlichen Grüßen<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Name des Unternehmens]</"
+"t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@IhrUnternehmen.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.beispiel.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"        "
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
@@ -779,6 +1329,114 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">"
+"Einspruchsbenachrichtigung</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ihr "
+"Einspruch wurde eingereicht</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Guten Tag <t t-out=\"ctx.get('submitted_by')\">"
+"[einreichende Person]</t>,<br/><br/>\n"
+"                    hiermit bestätigen wir, dass Ihr Einspruch zur "
+"Transaktion <strong><t t-out=\"object.name\"/></strong> erfolgreich bei "
+"Stripe eingereicht wurde.<br/><br/>\n"
+"                    Wir halten Sie über den weiteren Verlauf auf dem "
+"Laufenden und benachrichtigen Sie, sobald dieser abgeschlossen ist "
+"(akzeptiert oder abgelehnt).<br/><br/>\n"
+"                    Best,<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Name des Unternehmens]</"
+"t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@IhrUnternehmen.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.beispiel.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"        "
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
@@ -889,6 +1547,112 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">"
+"Einspruchsbenachrichtigung</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ihr "
+"Einspruch wurde akzeptiert</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Guten Tag <t t-out=\"ctx.get('submitted_by', "
+"object.employee_id.user_id.name)\">[einreichende Person]</t>,<br/><br/>\n"
+"                    herzlichen Glückwunsch! Ihr Einspruch zur Transaktion "
+"<strong><t t-out=\"object.name\"/></strong> wurde akzeptiert.<br/><br/>\n"
+"                    Der beanstandete Betrag wird Ihrem Konto in Kürze wieder "
+"gutgeschrieben.<br/><br/>\n"
+"                    Mit freundlichen Grüßen<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Name des Unternehmens]</"
+"t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@IhrUnternehmen.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.beispiel.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"        "
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_restriction
@@ -1027,6 +1791,141 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"           <tbody>\n"
+"            <tr> \n"
+"               <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\"> \n"
+"                   <tr><td valign=\"middle\"> \n"
+"                   <t t-set=\"company\" t-value=\"object\"/>\n"
+"                    <span style=\"font-size: 10px;\"> Stripe-"
+"Kontobenachrichtigung</span><br/>\n"
+"                   <span style=\"font-size: 20px; font-weight: bold;\"> "
+"Erforderliche Maßnahme</span>\n"
+"                    </td></tr>\n"
+"                    <tr> <td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/> \n"
+"                   </td></tr> \n"
+"                   <tr><td colspan=\"2\" style=\"text-align:center;\"> \n"
+"                   <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td> </tr>\n"
+"                </table> \n"
+"               </td>\n"
+"            </tr> \n"
+"           <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\"> \n"
+"               <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr> <td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                        <p> Guten Tag <t t-out=\"ctx.get('user_name')\"/>,</"
+"p>\n"
+"                        <t t-if=\"ctx.get('due_date')\">\n"
+"                           <p> \n"
+"                                Stripe hat bei der Überprüfung Ihres "
+"verbundenen Kontos ein Problem festgestellt.\n"
+"                                Wenn dieses Problem nicht behoben wird, wird "
+"Ihr Konto in Kürze, und zwar am <t t-out=\"ctx.get('due_date')\"/>, "
+"eingeschränkt,\n"
+"                                und Sie können keine Spesenkarten mehr "
+"ausstellen.\n"
+"                           </p>\n"
+"                        </t> \n"
+"                       <t t-else=\"\">\n"
+"                            <p> \n"
+"                                Stripe hat bei der Überprüfung Ihres "
+"verbundenen Kontos ein Problem festgestellt.\n"
+"                                Wenn dieses Problem nicht behoben wird, wird "
+"Ihr Konto in Kürze eingeschränkt\n"
+"                                und Sie können keine Spesenkarten mehr "
+"ausstellen.\n"
+"                           </p>\n"
+"                        </t> \n"
+"                       <p> \n"
+"                            Um dies zu beheben, überprüfen und aktualisieren "
+"Sie bitte die erforderlichen Informationen unter\n"
+"                           <strong> Spesenabrechnung &gt; Konfiguration &gt; "
+"Spesenkarte &gt; Konfigurieren</strong> oder über den folgenden Link:\n"
+"                       </p>\n"
+"                        <p> \n"
+"                           <a t-attf-href=\"{{ object.get_base_url() }}/odoo/"
+"settings#hr_expense\" style=\"color: #875A7B; text-decoration: underline;\"> "
+"Informationen aktualisieren</a>\n"
+"                        </p>\n"
+"                       <p> \n"
+"                            Sobald die Aktualisierung abgeschlossen ist, "
+"wird Stripe die Informationen erneut überprüfen.\n"
+"                            Sollten Sie Hilfe benötigen, wenden Sie sich "
+"bitte jederzeit an unser Support-Team.\n"
+"                       </p>\n"
+"                        <p> Mit freundlichen Grüßen</p><br/>\n"
+"                       <p><t t-out=\"object.name\"/> </p>\n"
+"                    </td> </tr>\n"
+"                    <tr> <td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/> \n"
+"                   </td></tr> \n"
+"               </table>\n"
+"                </td> \n"
+"           </tr>\n"
+"            <tr> \n"
+"               <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\"> \n"
+"                   <tr><td valign=\"middle\" align=\"left\"> \n"
+"                       <t t-out=\"company.name or ''\"> IhrUnternehmen</t>\n"
+"                    </td></tr>\n"
+"                    <tr> <td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\"> \n"
+"                       <t t-out=\"company.phone or ''\"> +1 650-123-4567</t> "
+"|\n"
+"                   </t>\n"
+"                    <t t-if=\"company.email\"> \n"
+"                       <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\"> info@ihrunternehmen.com</a> |\n"
+"                   </t>\n"
+"                    <t t-if=\"company.website\"> \n"
+"                       <a t-attf-href=\"{{ company.website }}\" style=\"text-"
+"decoration:none; color: #454748;\" t-out=\"company.website or ''\">http://"
+"www.beispiel.com</a>\n"
+"                    </t>\n"
+"                   </td></tr> \n"
+"               </table>\n"
+"                </td> \n"
+"           </tr>\n"
+"            </tbody> \n"
+"           </table>\n"
+"            </td> </tr>\n"
+"            <tr> <td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\"> \n"
+"           <tr><td style=\"text-align: center; font-size: 13px;\"> \n"
+"                Unterstützt durch <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table> \n"
+"           </td></tr> \n"
+"           </table> \n"
+"        "
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1046,19 +1945,20 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "A dispute has been created."
-msgstr ""
+msgstr "Ein Einspruch wurde eingelegt."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "A dispute must be unsubmitted to be able to be updated."
 msgstr ""
+"Ein Einspruch muss zurückgezogen werden, damit er bearbeitet werden kann."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "A dispute that doesn't exist on the database was used"
-msgstr ""
+msgstr "Es wurde ein Einspruch verwendet, der nicht in der Datenbank existiert."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1066,12 +1966,16 @@ msgstr ""
 msgid ""
 "A proof of original payment must be provided for a duplicate payment dispute."
 msgstr ""
+"Bei Einsprüchen wegen doppelter Zahlungen muss ein Nachweis über die "
+"ursprüngliche Zahlung vorgelegt werden."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "A reason must be set to create or update a dispute."
 msgstr ""
+"Zum Erstellen oder Aktualisieren eines Einspruchs muss ein Grund angegeben "
+"werden."
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_hr_expense_stripe_card_block_wizard
@@ -1091,7 +1995,7 @@ msgstr "Reparatur der Klimaanlage"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__return_status__successful
 msgid "Accepted"
-msgstr ""
+msgstr "Angenommen"
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_account_chart_template
@@ -1140,12 +2044,12 @@ msgstr "Aktiv"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__additional_documentation
 msgid "Additional Documentation"
-msgstr ""
+msgstr "Zusätzliche Dokumente"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Additional documentation"
-msgstr ""
+msgstr "Zusätzliche Dokumente"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.advertising_services
@@ -1232,6 +2136,7 @@ msgstr ""
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "An expense that doesn't exist on the database was used"
 msgstr ""
+"Es wurde eine Ausgabe verwendet, die in der Datenbank nicht vorhanden ist"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1263,7 +2168,7 @@ msgstr "Architektonische Vermessungsdienstleistungen"
 #. odoo-javascript
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.js:0
 msgid "Are you sure you want to delete this attachment?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie diesen Anhang löschen möchten?"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.art_dealers_and_galleries
@@ -1365,7 +2270,7 @@ msgstr ""
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Banktransaktion"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_topup_wizard__statement_description
@@ -1487,7 +2392,7 @@ msgstr "Kamera- und Fotofachgeschäfte"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__can_submit
 msgid "Can Submit"
-msgstr ""
+msgstr "Kann einreichen"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__canceled
@@ -1497,7 +2402,7 @@ msgstr "Abgebrochen"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__canceled_at
 msgid "Cancellation Date"
-msgstr ""
+msgstr "Stornierungsdatum"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__cancellation_reason
@@ -1515,12 +2420,14 @@ msgstr "Süßwaren- und Konfektgeschäfte"
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Cannot modify the dispute details once it has been submitted."
 msgstr ""
+"Die Details eines Einspruches können nach deren Einreichung nicht mehr "
+"geändert werden."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/wizard/hr_expense_split.py:0
 msgid "Cannot split an expense that is already disputed."
-msgstr ""
+msgstr "Eine bereits beanstandete Ausgabe kann nicht aufgeteilt werden."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.car_rental_agencies
@@ -1596,7 +2503,7 @@ msgstr "Kartenerhalt"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__card_statement
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__card_statement
 msgid "Card Statement"
-msgstr ""
+msgstr "Kartenabrechnung"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card_block_wizard__card_id
@@ -1629,7 +2536,7 @@ msgstr "Kartenummer in Zwischenablage kopiert."
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Card statement"
-msgstr ""
+msgstr "Kartenabrechnung"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card_receive_wizard__card_id
@@ -1676,7 +2583,7 @@ msgstr "Karteninhaber aktualisiert"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__cancellation_reason
 msgid "Cardholder's rationale for canceling the purchase."
-msgstr ""
+msgstr "Begründung des Karteninhabers für die Stornierung des Einkaufs."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1711,12 +2618,12 @@ msgstr "Reinigung von Teppichen und Polstern"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__cash_receipt
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__cash_receipt
 msgid "Cash Receipt"
-msgstr ""
+msgstr "Barzahlungsbeleg"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Cash receipt"
-msgstr ""
+msgstr "Barzahlungsbeleg"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.view_hr_expense_stripe_card_form
@@ -1737,12 +2644,12 @@ msgstr "Spendenaktionen für gemeinnützige und soziale Organisationen"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__check_image
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__check_image
 msgid "Check Image"
-msgstr ""
+msgstr "Bild prüfen"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Check image"
-msgstr ""
+msgstr "Bild prüfen"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.chemicals_and_allied_products
@@ -1885,7 +2792,7 @@ msgstr "Compliance-Verpflichtung"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__policy_compliance__compliant
 msgid "Compliant with policy"
-msgstr ""
+msgstr "Entspricht den Richtlinien"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.computer_network_services
@@ -1931,7 +2838,7 @@ msgstr "Konfigurieren"
 #. odoo-javascript
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.js:0
 msgid "Confirm Deletion"
-msgstr ""
+msgstr "Löschung bestätigen"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -1965,11 +2872,14 @@ msgid ""
 "Copy of the card statement showing that the product had already been paid "
 "for."
 msgstr ""
+"Kopie der Kartenabrechnung, aus der hervorgeht, dass das Produkt bereits "
+"bezahlt wurde."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__cash_receipt
 msgid "Copy of the receipt showing that the product had been paid for in cash."
 msgstr ""
+"Kopie des Belegs, aus dem hervorgeht, dass das Produkt bar bezahlt wurde."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.correspondence_schools
@@ -2020,7 +2930,7 @@ msgstr "Gerichtskosten"
 #. module: hr_expense_stripe
 #: model:ir.module.module,summary:base.module_hr_expense_stripe
 msgid "Create and manage company expense cards via Stripe"
-msgstr ""
+msgstr "Erstellung und Verwaltung von Spesenkarten über Stripe"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.res_config_settings_view_form
@@ -2100,21 +3010,24 @@ msgid ""
 "Date the cardholder canceled the purchase. Cancellation is required to file "
 "a Dispute."
 msgstr ""
+"Datum, an dem der Karteninhaber den Einkauf storniert hat. Eine Stornierung "
+"ist erforderlich, um einen Einspruch einzureichen."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__expected_at
 msgid "Date the cardholder expected to receive the purchase."
-msgstr ""
+msgstr "Datum, an dem der Karteninhaber den Einkauf voraussichtlich erhält."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__returned_at
 msgid "Date the cardholder initiated return of the purchase."
 msgstr ""
+"Datum, an dem der Karteninhaber die Rückgabe des Einkaufs veranlasst hat."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__received_at
 msgid "Date the cardholder received the purchase."
-msgstr ""
+msgstr "Datum, an dem der Karteninhaber den Einkauf erhalten hat."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.dating_escort_services
@@ -2131,7 +3044,7 @@ msgstr "Tag"
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.js:0
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__delivered
@@ -2166,7 +3079,7 @@ msgstr "Design abgelehnt"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__return_description
 msgid "Details on how the merchandise was returned."
-msgstr ""
+msgstr "Details dazu, wie die Ware zurückgesandt wurde."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.detective_agencies
@@ -2287,36 +3200,38 @@ msgstr "Anzeigename"
 #: model:ir.actions.server,name:hr_expense_stripe.action_hr_expense_stripe_dispute
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense__dispute_id
 msgid "Dispute"
-msgstr ""
+msgstr "Einspruch einlegen"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense__dispute_currency_id
 msgid "Dispute Currency"
-msgstr ""
+msgstr "Währung des Einspruchs"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Dispute automatically created and submitted due to negative balance."
 msgstr ""
+"Einspruch aufgrund eines negativen Saldos automatisch erstellt und "
+"eingereicht."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Dispute automatically created due to negative journal balance."
-msgstr ""
+msgstr "Einspruch automatisch aufgrund eines negativen Kontostands erstellt."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Dispute funds %(movement_type)s"
-msgstr ""
+msgstr "Einspruch zu Geldbeträgen %(movement_type)s"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense__disputed_amount
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__amount
 msgid "Disputed Amount"
-msgstr ""
+msgstr "Beanstandeter Betrag"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.doctors
@@ -2338,6 +3253,7 @@ msgstr "Haustürgeschäft"
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "Downloading a file is only supported for single disputes."
 msgstr ""
+"Das Herunterladen einer Datei wird nur bei einzelnen Einsprüchen unterstützt."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__state__draft
@@ -2376,7 +3292,7 @@ msgstr "Reinigungen"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__duplicate
 msgid "Duplicate Charge"
-msgstr ""
+msgstr "Doppelte Abbuchung"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.durable_goods
@@ -2505,6 +3421,8 @@ msgstr "Fehler"
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Error when processing the dispute %(dispute_id)s, no moves were created"
 msgstr ""
+"Fehler bei der Bearbeitung des Einspruchs %(dispute_id)s. Es wurden keine "
+"Maßnahmen ergriffen."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__shipping_estimated_delivery
@@ -2514,7 +3432,7 @@ msgstr "Geschätzte Lieferung"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__expected_at
 msgid "Expected Date"
-msgstr ""
+msgstr "Erwartetes Datum"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -2560,7 +3478,7 @@ msgstr "Spesenaufteilung"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Expense Stripe Dispute"
-msgstr ""
+msgstr "Stripe-Einspruch bezüglich einer Ausgabe"
 
 #. module: hr_expense_stripe
 #: model:ir.actions.server,name:hr_expense_stripe.hr_expense_stripe_issuing_status_cron_ir_actions_server
@@ -2571,30 +3489,32 @@ msgstr "Spesen mit Stripe Issuing: Kontostatus aktualisieren"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically approved due to negative journal balance"
-msgstr ""
+msgstr "Ausgabe aufgrund eines negativen Journalsaldos automatisch genehmigt"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically posted due to negative balance"
-msgstr ""
+msgstr "Ausgabe aufgrund eines negativen Saldos automatisch verbucht"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically reset to draft due to negative journal balance"
 msgstr ""
+"Ausgabe aufgrund eines negativen Journalsaldos automatisch auf den Status "
+"des Entwurfs zurückgesetzt"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically submitted due to negative journal balance"
-msgstr ""
+msgstr "Ausgabe aufgrund eines negativen Journalsaldos automatisch eingereicht"
 
 #. module: hr_expense_stripe
 #: model:ir.module.module,shortdesc:base.module_hr_expense_stripe
 msgid "Expense cards"
-msgstr ""
+msgstr "Spesenkarten"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -2629,7 +3549,7 @@ msgstr "Stripe-Karte für Spesen"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Expenses must be paid to submit a dispute."
-msgstr ""
+msgstr "Ausgaben müssen bezahlt werden, um einen Einspruch einzureichen."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__expiration
@@ -2640,12 +3560,12 @@ msgstr "Ablaufdatum"
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__state__expired
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Expired"
-msgstr ""
+msgstr "Abgelaufen"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__explanation
 msgid "Explanation"
-msgstr ""
+msgstr "Erläuterung"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.exterminating_services
@@ -2664,6 +3584,8 @@ msgstr ""
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Failed to find the related expense for the dispute from Stripe."
 msgstr ""
+"Die zugehörige Ausgabe für den Einspruch konnte in Stripe nicht gefunden "
+"werden."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -2758,7 +3680,7 @@ msgstr "Der Zugriff auf den IAP-Proxy-Server ist nicht gestattet"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__fraudulent
 msgid "Fraudulent"
-msgstr ""
+msgstr "Betrügerisch"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.freezer_and_locker_meat_provisioners
@@ -2822,7 +3744,7 @@ msgstr "Geschäfte für Glas- und Kristallwaren"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Go to expenses"
-msgstr ""
+msgstr "Zu den Ausgaben"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.golf_courses_public
@@ -2895,22 +3817,22 @@ msgstr "Personalwesen: Stripe-Karte für Spesen versendet"
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_hr_expense_stripe_dispute
 msgid "HR Expense Stripe Dispute"
-msgstr ""
+msgstr "Personalwesen, Spesenabrechnung & Stripe-Einspruch"
 
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_dispute_lost
 msgid "HR Expense Stripe Dispute Lost"
-msgstr ""
+msgstr "Spesen: Stripe-Einspruch abgelehnt"
 
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
 msgid "HR Expense Stripe Dispute Submitted"
-msgstr ""
+msgstr "Spesen: Stripe-Einspruch eingereicht"
 
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
 msgid "HR Expense Stripe Dispute Won"
-msgstr ""
+msgstr "Spesen: Stripe-Einspruch akzeptiert"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.hardware_equipment_and_supplies
@@ -2936,7 +3858,7 @@ msgstr "Hat Nachricht"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__has_only_one_expense
 msgid "Has Only One Expense"
-msgstr ""
+msgstr "Hat nur eine Ausgabe"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.health_and_beauty_spas
@@ -3075,6 +3997,8 @@ msgid ""
 "Image of the front and back of the check that was used to pay for the "
 "product."
 msgstr ""
+"Bild der Vorder- und Rückseite des Schecks, mit dem das Produkt bezahlt "
+"wurde."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__state__inactive
@@ -3085,6 +4009,8 @@ msgstr "Inaktiv"
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__explanation
 msgid "Include timelines, cardholder rationale, and additional evidence."
 msgstr ""
+"Fügen Sie Zeitachsen, die Begründung des Karteninhabers und zusätzliche "
+"Belege bei."
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -3128,6 +4054,8 @@ msgstr "Ungültiger Mitarbeiter"
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Invalid email type must be one of 'submitted', 'won' or 'lost'."
 msgstr ""
+"Der ungültige E-Mail-Typ muss einer der folgenden sein: „eingereicht“, „"
+"akzeptiert“ oder „abgelehnt“."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3254,7 +4182,7 @@ msgstr "Wäscherei- und Reinigungsdienstleistungen"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Learn more about how your dispute is handled"
-msgstr ""
+msgstr "Erfahren Sie mehr darüber, wie Ihr Einspruch bearbeitet wird"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.legal_services_attorneys
@@ -3281,7 +4209,7 @@ msgstr "Haftungsbeschränkung"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Linked expenses"
-msgstr ""
+msgstr "Verbundene Ausgaben"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_topup_wizard__is_live_mode
@@ -3291,7 +4219,7 @@ msgstr "Live-Modus"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__loss_reason
 msgid "Loss Reason"
-msgstr ""
+msgstr "Ablehnungsgrund"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__cancellation_reason__lost
@@ -3409,7 +4337,7 @@ msgstr "Kleider- sowie Accessoiresgeschäfte für Herren und Damen"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__product_type__merchandise
 msgid "Merchandise"
-msgstr ""
+msgstr "Ware"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_product_product__stripe_mcc_ids
@@ -3561,6 +4489,7 @@ msgstr "Motorradgeschäfte und -händler"
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Multiple cards for one dispute is not possible."
 msgstr ""
+"Es ist nicht möglich, mehrere Karten für einen einzigen Einspruch anzugeben."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.music_stores_musical_instruments_pianos_and_sheet_music
@@ -3627,7 +4556,7 @@ msgstr "Kein MCC ist ordnungsgemäß eingerichtet"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__no_valid_authorization
 msgid "No Valid Authorization"
-msgstr ""
+msgstr "Keine gültige Autorisierung"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3639,18 +4568,18 @@ msgstr "Kein Land gefunden!"
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "No file provided for upload."
-msgstr ""
+msgstr "Es wurde keine Datei zum Hochladen bereitgestellt."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "No file was uploaded for this field."
-msgstr ""
+msgstr "Für dieses Feld wurde keine Datei hochgeladen."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__policy_compliance__no_policy
 msgid "No policy"
-msgstr ""
+msgstr "Keine Richtlinie"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3694,12 +4623,12 @@ msgstr "Kurzlebige Güter"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__not_received
 msgid "Not Received"
-msgstr ""
+msgstr "Nicht erhalten"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__not_as_described
 msgid "Not as Described"
-msgstr ""
+msgstr "Nicht wie beschrieben"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__message_needaction_counter
@@ -3797,18 +4726,20 @@ msgstr ""
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Only an expense manager can create or update a dispute."
 msgstr ""
+"Nur ein Spesenabrechnungsmanager kann einen Einspruch erstellen oder "
+"aktualisieren."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Only an expense manager can edit a dispute."
-msgstr ""
+msgstr "Nur ein Spesenabrechnungsmanager kann einen Einspruch bearbeiten."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Only an expense manager can submit a dispute."
-msgstr ""
+msgstr "Nur ein Spesenabrechnungsmanager kann einen Einspruch einreichen."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3823,6 +4754,9 @@ msgid ""
 "Only one bank statement can be created from a single stripe transaction (two "
 "are allowed for a dispute: reinstatement and rescindment)"
 msgstr ""
+"Aus einer einzelnen Stripe-Transaktion kann nur ein Kontoauszug erstellt "
+"werden (bei einem Einspruch sind zwei zulässig: Wiederherstellung und "
+"Rückabwicklung)"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.res_config_settings_view_form
@@ -3864,7 +4798,7 @@ msgstr "Ursprüngliche Telefonnummer"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__original_transaction
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__original_transaction
 msgid "Original Transaction ID"
-msgstr ""
+msgstr "Ursprüngliche Transaktions-ID"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.orthopedic_goods_prosthetic_devices
@@ -4018,6 +4952,8 @@ msgstr "Stück-, Kurz- und sonstige Trockenwaren"
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Please contact Odoo for more information about this dispute.\n"
 msgstr ""
+"Bitte wenden Sie sich an Odoo, um weitere Informationen zu diesem Einspruch "
+"zu erhalten.\n"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -4039,7 +4975,7 @@ msgstr "Sanitär- und Heizungsausrüstung und -zubehör"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__policy_compliance
 msgid "Policy Compliance"
-msgstr ""
+msgstr "Einhaltung der Richtlinien"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.political_organizations
@@ -4059,7 +4995,7 @@ msgstr "Edelstein. und Edelmetalluhren und -schmuck"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__canceled
 msgid "Previously Canceled"
-msgstr ""
+msgstr "Zuvor storniert"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4070,7 +5006,7 @@ msgstr "Privater Schlüssel für Stripe Issuing"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__product_description
 msgid "Product Description"
-msgstr ""
+msgstr "Produktbeschreibung"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_product_mcc_stripe_tag__product_name
@@ -4080,7 +5016,7 @@ msgstr "Produktname"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__product_type
 msgid "Product Type"
-msgstr ""
+msgstr "Produkttyp"
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_product_product
@@ -4100,7 +5036,7 @@ msgstr "Fachkundige Dienstleistungen und Mitgliedsorganisationen"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__proof_of_original_payment
 msgid "Proof Of Original Payment"
-msgstr ""
+msgstr "Nachweis der ursprünglichen Zahlung"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.public_warehousing_and_storage
@@ -4152,7 +5088,7 @@ msgstr "Grund"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__received_at
 msgid "Received Date"
-msgstr ""
+msgstr "Eingangsdatum"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.record_stores
@@ -4172,7 +5108,7 @@ msgstr "Aktualisieren"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__return_status__merchant_rejected
 msgid "Rejected"
-msgstr ""
+msgstr "Abgelehnt"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_card__user_id
@@ -4204,13 +5140,13 @@ msgstr "Die Anfrage ist nur für den Karteninhaber zulässig."
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Required"
-msgstr ""
+msgstr "Erforderlich"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Rescission of stripe transaction %(tr_id)s"
-msgstr ""
+msgstr "Stornierung einer Stripe-Transaktion %(tr_id)s"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -4236,17 +5172,17 @@ msgstr "Einzelhandelsdienstleistungen"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__returned_at
 msgid "Return Date"
-msgstr ""
+msgstr "Erstattungsdatum"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__return_description
 msgid "Return Description"
-msgstr ""
+msgstr "Beschreibung der Erstattung"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__return_status
 msgid "Return Status"
-msgstr ""
+msgstr "Erstattungsstatus"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__returned
@@ -4262,13 +5198,13 @@ msgstr "Zeigen"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Reversal of %(name)s"
-msgstr ""
+msgstr "Rückbuchung von %(name)s"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Reversal of stripe transaction %(tr_id)s"
-msgstr ""
+msgstr "Rückbuchung einer Stripe-Transaktion %(tr_id)s"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.roofing_siding_sheet_metal
@@ -4290,7 +5226,7 @@ msgstr "Speichern"
 #. odoo-javascript
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.xml:0
 msgid "Save for later"
-msgstr ""
+msgstr "Für später speichern"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4318,7 +5254,7 @@ msgstr "Wird an den Administrator gesendet, wenn Stripe das Konto einschränkt"
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
 msgid "Sent to the person that submitted the dispute"
-msgstr ""
+msgstr "Wird an die Person gesendet, die den Einspruch eingereicht hat"
 
 #. module: hr_expense_stripe
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_card_canceled
@@ -4340,7 +5276,7 @@ msgstr "Tankstellen"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__product_type__service
 msgid "Service or digital goods"
-msgstr ""
+msgstr "Dienstleistungen oder digitale Güter"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4349,6 +5285,8 @@ msgid ""
 "Several expenses sharing the same stripe transaction id use different "
 "currencies. Please verify the currencies of the expenses."
 msgstr ""
+"Mehrere Ausgaben mit derselben Transaktions-ID verwenden unterschiedliche "
+"Währungen. Bitte überprüfen Sie die Währungen der Ausgaben."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.sewing_needlework_fabric_and_piece_goods_stores
@@ -4542,7 +5480,7 @@ msgstr "Stripe-Währung"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__stripe_id
 msgid "Stripe Dispute ID"
-msgstr ""
+msgstr "Stripe-Einspruchs-ID"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_employee__private_stripe_id
@@ -4616,7 +5554,7 @@ msgstr ""
 #. module: hr_expense_stripe
 #: model:ir.module.module,description:base.module_hr_expense_stripe
 msgid "Stripe Issuing integration for expenses"
-msgstr ""
+msgstr "Integration von Stripe Issuing für Spesen"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4700,6 +5638,9 @@ msgid ""
 "Stripe has determined that this is an invalid use of the card network "
 "dispute process; no dispute conditions apply.\n"
 msgstr ""
+"Stripe hat festgestellt, dass das Einspruchsverfahren des Kartennetzwerks "
+"hier unzulässig angewandt wird, da keine der Voraussetzungen für einen "
+"Einspruch vorliegt."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4708,6 +5649,8 @@ msgid ""
 "Stripe has restricted your account. Please update your information by the %"
 "(due_date)s to avoid disruption."
 msgstr ""
+"Stripe hat Ihr Konto eingeschränkt. Bitte aktualisieren Sie Ihre Daten bis "
+"zum %(due_date)s, um Unterbrechungen zu vermeiden."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4739,7 +5682,7 @@ msgstr "Stripe-Transaktions-ID"
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.js:0
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.xml:0
 msgid "Submit"
-msgstr ""
+msgstr "Einreichen"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -4747,7 +5690,7 @@ msgstr ""
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.js:0
 msgid "Submit Dispute"
-msgstr ""
+msgstr "Einspruch einreichen"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__submitted
@@ -4759,7 +5702,7 @@ msgstr "Eingereicht"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__submitted_by
 msgid "Submitted By"
-msgstr ""
+msgstr "Eingereicht von"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__additional_documentation
@@ -4767,6 +5710,8 @@ msgid ""
 "Supporting files or images. Please combine them into a PDF or JPEG, and "
 "upload it here."
 msgstr ""
+"Begleitdateien oder Bilder. Bitte fassen Sie diese in einer PDF- oder JPEG-"
+"Datei zusammen und laden Sie sie hier hoch."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.swimming_pools_sales
@@ -4911,6 +5856,8 @@ msgstr "Die Adresse, an die die Karte zugestellt werden soll."
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The amount disputed should match the amount on the expenses."
 msgstr ""
+"Der beanstandete Betrag sollte mit dem Betrag auf der Spesenabrechnung "
+"übereinstimmen."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5022,6 +5969,11 @@ msgid ""
 "cardholder.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Der Karteninhaber gibt an, sein Abonnement bzw. seine Bestellung gekündigt "
+"zu haben, doch der Händler hat weder Aufzeichnungen über eine solche "
+"Kündigung noch einen entsprechenden Nachweis vom Karteninhaber erhalten.\n"
+"Stripe hat diese Beweise geprüft und festgestellt, dass sie überzeugend "
+"sind.\n"
 
 #. module: hr_expense_stripe
 #: model:mail.message.subtype,description:hr_expense_stripe.mt_stripe_cardholder_updated
@@ -5054,6 +6006,9 @@ msgid ""
 "on previous transactions.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Der Karteninhaber/Kartenaussteller hat die Karte nicht deaktiviert, nachdem "
+"er bei früheren Transaktionen Betrug gemeldet hatte.\n"
+"Der Einspruch wurde vom Kartennetzwerk automatisch abgelehnt.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5080,7 +6035,7 @@ msgstr "Der Code für den Zugriff auf Ihre Odoo-Spesenkarte lautet: %(code)s"
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The content type provided is not valid for the purpose '%(purpose)s'."
-msgstr ""
+msgstr "Der angegebene Inhaltstyp ist für den Zweck „%(purpose)s“ nicht gültig."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5142,18 +6097,20 @@ msgid ""
 "The dispute can only be submitted if the journal entries of all related "
 "expenses are posted."
 msgstr ""
+"Der Einspruch kann nur eingereicht werden, wenn die Journalbuchungen aller "
+"damit verbundenen Ausgaben verbucht sind."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The dispute has been %(status)s."
-msgstr ""
+msgstr "Ein Einspruch wurde %(status)s."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The dispute has been updated."
-msgstr ""
+msgstr "Der Einspruch wurde aktualisiert."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5164,6 +6121,10 @@ msgid ""
 "transaction amount.\n"
 "The dispute was automatically rejected due to this discrepancy.\n"
 msgstr ""
+"Der Einspruch ist ungültig, da bereits eine Rückerstattung für die "
+"Transaktion vorliegt, bei der die Summe aus Rückerstattungs- und "
+"Einspruchsbetrag den ursprünglichen Transaktionsbetrag übersteigt.\n"
+"Der Einspruch wurde aufgrund dieser Diskrepanz automatisch abgelehnt.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5172,6 +6133,8 @@ msgid ""
 "The dispute was submitted past the disputable deadline.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Der Einspruch wurde nach Ablauf der Einspruchsfrist eingereicht.\n"
+"Der Einspruch wurde vom Kartennetzwerk automatisch abgelehnt.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5181,18 +6144,21 @@ msgid ""
 "to the transaction being authorized as indicated in the Mastercard Core "
 "Rules and Mastercard Product and Service Rules.\n"
 msgstr ""
+"Der unter Bedingung 11.3: „Keine Autorisierung“ eingereichte Einspruch ist "
+"ungültig, da die Transaktion gemäß den Mastercard-Kernregeln und den "
+"Mastercard-Produkt- und Dienstleistungsregeln autorisiert wurde.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "The disputed amount cannot be greater than the expense amount."
-msgstr ""
+msgstr "Der beanstandete Betrag darf den Betrag der Ausgabe nicht übersteigen."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "The disputed amount cannot be negative."
-msgstr ""
+msgstr "Der beanstandete Betrag darf nicht negativ sein."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5209,12 +6175,16 @@ msgid ""
 "The file name provided is not valid. Only use alpha-numeric characters or '.-"
 "_'."
 msgstr ""
+"Der angegebene Dateiname ist ungültig. Verwenden Sie nur alphanumerische "
+"Zeichen oder „.-_“."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The file provided is too large. Maximum size is %(size)s MiB."
 msgstr ""
+"Die bereitgestellte Datei ist zu groß. Die maximale Größe beträgt %(size)s "
+"MiB."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_card_receive_wizard__last_4_challenge
@@ -5244,6 +6214,10 @@ msgid ""
 "present transaction was authorized with a chip-reading terminal.\n"
 "This dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Bei betrugsbedingten Einsprüchen geht die Haftung auf den Aussteller über, "
+"wenn die Transaktion mit physischer Kartenvorlage über ein Chip-Lesegerät "
+"autorisiert wurde.\n"
+"Dieser Einspruch wurde vom Kartennetzwerk automatisch abgelehnt.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5253,6 +6227,10 @@ msgid ""
 "authorized by the cardholder.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Der Händler hat Nachweise vorgelegt, die darauf hindeuten, dass die "
+"Transaktion vom Karteninhaber autorisiert wurde.\n"
+"Stripe hat diese Nachweise geprüft und festgestellt, dass sie überzeugend "
+"sind.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5262,6 +6240,10 @@ msgid ""
 "delivered.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Der Händler hat Nachweise vorgelegt, aus denen hervorgeht, dass die Ware "
+"versandt oder geliefert wurde.\n"
+"Stripe hat diese Nachweise geprüft und festgestellt, dass sie überzeugend "
+"sind.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5271,6 +6253,9 @@ msgid ""
 "matched the description.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Der Händler hat Informationen vorgelegt, aus denen hervorgeht, dass die "
+"gelieferte Ware bzw. erbrachte Dienstleistung der Beschreibung entsprach.\n"
+"Stripe hat diese Nachweise geprüft und als überzeugend eingestuft.\n"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_card__card_name
@@ -5298,19 +6283,19 @@ msgstr "Die Telefonnummer ist ungültig."
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The purpose '%(purpose)s' is not allowed to be used with this model."
-msgstr ""
+msgstr "Der Zweck „%(purpose)s“ darf mit diesem Modell nicht verwendet werden."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The purpose provided is not valid."
-msgstr ""
+msgstr "Der angegebene Zweck ist ungültig."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The record doesn't exist."
-msgstr ""
+msgstr "Der Datensatz existiert nicht."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5336,7 +6321,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The specified field doesn't support attachments."
-msgstr ""
+msgstr "Das angegebene Feld unterstützt keine Anhänge."
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.view_hr_expense_stripe_card_form
@@ -5415,6 +6400,8 @@ msgid ""
 "This dispute has not met the minimum amount threshold set by the card "
 "network based on the MCC.\n"
 msgstr ""
+"Dieser Einspruch erreicht nicht den vom Kartennetzwerk festgelegten "
+"Mindestbetrag für die entsprechende Händlerkategorie (MCC).\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5423,6 +6410,9 @@ msgid ""
 "This dispute is invalid as more than 35 total disputes have been submitted "
 "within 120 calendar days of this dispute.\n"
 msgstr ""
+"Dieser Einspruch ist ungültig, da innerhalb von 120 Kalendertagen seit der "
+"Einreichung dieses Einspruchs insgesamt mehr als 35 Einsprüche eingereicht "
+"wurden.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5434,6 +6424,12 @@ msgid ""
 "The liability is on the card provider for these types of transactions.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Dieser Einspruch ist ungültig, da es sich um eine unbeaufsichtigte, "
+"chipgesteuerte und online autorisierte Transaktion handelte (z. B. das "
+"Durchziehen einer Chipkarte an einer unbeaufsichtigten Tankstelle, einer "
+"Parkuhr oder einem Geldautomaten).\n"
+"Die Haftung für diese Art von Transaktionen liegt beim Kartenanbieter.\n"
+"Der Einspruch wurde vom Kartennetzwerk automatisch abgelehnt.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5444,6 +6440,10 @@ msgid ""
 "for the card.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Dieser Einspruch ist ungültig, da der Händler 3DS für eine Card-Not-Present-"
+"Transaktion (CNP) versucht hat, der Kartenaussteller jedoch 3DS für die "
+"Karte nicht freigeschaltet hatte.\n"
+"Der Einspruch wurde vom Kartennetzwerk automatisch abgelehnt.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5455,6 +6455,12 @@ msgid ""
 "With MEPS, the liability shifts onto the card provider.\n"
 "The dispute was automatically rejected by Mastercard.\n"
 msgstr ""
+"Dieser Einspruch ist ungültig, da es sich um eine Transaktion im Rahmen des "
+"Mastercard Easy Payment Service (MEPS) handelt, der es Unternehmen "
+"ermöglicht, Mastercard-Zahlungen anzunehmen, ohne dass Kunden anhalten "
+"müssen, um eine E-Signatur durchzuführen oder eine PIN einzugeben.\n"
+"Bei MEPS geht die Haftung auf den Kartenaussteller über.\n"
+"Der Einspruch wurde von Mastercard automatisch abgelehnt.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5463,6 +6469,9 @@ msgid ""
 "This dispute, created for Card-Not-Present fraud, is invalid because the "
 "card network has indicated the cardholder was securely authenticated.\n"
 msgstr ""
+"Dieser Einspruch, der im Zusammenhang mit Betrug ohne Vorlage der Karte "
+"(Card-Not-Present) erstellt wurde, ist ungültig, da das Kartennetzwerk "
+"angegeben hat, dass der Karteninhaber sicher authentifiziert wurde.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -6234,16 +7243,19 @@ msgstr "Sie müssen mit Stripe verbunden sein, um Ihr Konto zu konfigurieren."
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_dispute_lost
 msgid "Your Dispute for the transaction {{ object.name }} Has Been Lost"
 msgstr ""
+"Ihr Einspruch bezüglich der Transaktion {{ object.name }} wurde abgelehnt"
 
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
 msgid "Your Dispute for the transaction {{ object.name }} Has Been Submitted"
 msgstr ""
+"Ihr Einspruch bezüglich der Transaktion {{ object.name }} wurde eingereicht"
 
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
 msgid "Your Dispute for the transaction {{ object.name }} Has Been Won"
 msgstr ""
+"Ihr Einspruch bezüglich der Transaktion {{ object.name }} wurde akzeptiert"
 
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_card_canceled

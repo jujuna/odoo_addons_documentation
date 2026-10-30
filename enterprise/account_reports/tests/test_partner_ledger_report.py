@@ -897,6 +897,19 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             options,
         )
 
+        options['filter_search_bar'] = 'Unexpected'
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                    Debit           Credit          Balance
+            [   0,                                      6,              7,              9],
+            [
+                ('Partner Ledger',                      1000.0,          '',            1000.0),
+                ('Unexpected Customer',                 1000.0,          '',            1000.0),
+                ('Total Partner Ledger',                1000.0,          '',            1000.0),
+            ],
+            options,
+        )
+
     def test_no_amount_currency_col_in_single_currency(self):
         # In multi-currency, we get the amount_currency column
         self.assertGreater(len(self.env['res.currency'].search([])), 1)

@@ -274,6 +274,29 @@ class TestHeadcount(TransactionCase):
             self.versions_us[0] | self.versions_us[2] | self.versions_us[10]
         )
 
+    def test_headcount_population_without_employee(self):
+        """Test that versions without an employee are not included in the headcount."""
+        company = self.env['res.company'].create({
+            'name': 'Test Company',
+        })
+
+        self.env['hr.version'].create({
+            'name': False,
+            'employee_id': False,
+            'company_id': company.id,
+            'contract_date_start': date(2026, 3, 1),
+        })
+
+        headcount = self.env['hr.payroll.headcount'].create({
+            'company_id': company.id,
+            'date_from': date(2026, 3, 1),
+            'date_to': date(2026, 3, 31),
+        })
+
+        headcount.action_populate()
+        self.assertFalse(headcount.line_ids)
+        self.assertEqual(headcount.employee_count, 0)
+
     def test_headcount_repopulate(self):
         """Test that the headcount can be repopulated.
         And that the values are actually updated.
@@ -312,3 +335,33 @@ class TestHeadcount(TransactionCase):
                 set(headcount_lines_by_employee[employee_id].working_rate_ids.mapped('rate')),
                 {round(version.resource_calendar_id.hours_per_week, 2) for version in versions}
             )
+
+    def test_headcount_population_amended_contract(self):
+        """Test that only the version effective during the period is taken
+        into account when the contract has been amended.
+        """
+
+        employee = self.env['hr.employee'].create({
+            'name': 'Amended Employee',
+            'company_id': self.company_us.id,
+            'date_version': date(2020, 1, 1),
+            'contract_date_start': date(2020, 1, 1),
+            'wage': 1000,
+            'resource_calendar_id': self.resource_35h.id,
+        })
+        version_2021 = employee.create_version({
+            'date_version': date(2021, 1, 1),
+            'resource_calendar_id': self.resource_40h.id,
+        })
+        employee.create_version({
+            'date_version': date(2022, 1, 1),
+            'resource_calendar_id': self.resource_65h.id,
+        })
+        headcount = self.env['hr.payroll.headcount'].create({
+            'company_id': self.company_us.id,
+            'date_from': date(2021, 6, 1),
+        })
+        headcount.action_populate()
+        line = headcount.line_ids.filtered(lambda l: l.employee_id == employee)
+        self.assertEqual(line.version_id, version_2021)
+        self.assertEqual(line.working_rate_ids.mapped('rate'), [40.0])

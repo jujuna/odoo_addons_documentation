@@ -12,11 +12,14 @@
                 <field name="is_recurring"/>
                 <field name="date_start"/>
                 <field name="date_end" optional="hide"/>
+                <field name="date_estimated_end" optional="hide"/>
                 <field name="description"/>
                 <field name="salary_rule_id" options="{'no_open': True, 'no_create_edit': True, 'no_create': True}"/>
-                <field name="remaining_amount" string="Amount"/>
+                <!-- loads the unit (input suffix) of the rule for the amounts -->
+                <field name="salary_rule_id" widget="salary_rule_unit_tile" column_invisible="True"/>
+                <field name="remaining_amount" string="Amount" widget="amount_with_rule_unit"/>
                 <field name="state" nolabel="1" widget="badge" decoration-success="state == '1_open'" decoration-muted="state == '2_close'"/>
-                <field name="paid_amount" optional="hide" widget="monetary"/>
+                <field name="paid_amount" optional="hide" widget="amount_with_rule_unit"/>
             </list>
         </field>
     </record>
@@ -47,16 +50,35 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile" default_order="state, sequence">
+                <!-- the order fields must be loaded to sort the records added from the cards -->
+                <field name="state"/>
+                <field name="sequence"/>
+                <field name="is_recurring"/>
+                <field name="description"/>
+                <field name="date_estimated_end"/>
                 <templates>
-                    <t t-name="card">
-                        <div class="d-flex justify-content-between">
-                            <field name="salary_rule_id"/>
-                            <field name="state" nolabel="1" widget="badge" decoration-success="state == '1_open'" decoration-muted="state == '2_close'"/>
+                    <t t-name="card" class="o_hr_payroll_line_card flex-row">
+                        <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0"
+                             t-att-class="{'opacity-50': record.state.raw_value === '2_close'}">
+                            <!-- the unit of the adjustment, from the rule -->
+                            <field name="salary_rule_id" widget="salary_rule_unit_tile"/>
+                            <div class="flex-grow-1 min-w-0">
+                                <field name="salary_rule_id" class="fw-bold"/>
+                                <div class="d-flex align-items-center gap-1 text-muted">
+                                    <i t-if="record.is_recurring.raw_value" class="oi" data-icon="repeat" title="Every payslip"/>
+                                    <field name="date_start"/>
+                                    <t t-if="record.date_estimated_end.raw_value">
+                                        <i class="oi" data-icon="east" title="to"/>
+                                        <field name="date_estimated_end"/>
+                                    </t>
+                                </div>
+                                <div class="text-muted text-truncate" t-if="record.description.raw_value">
+                                    <field name="description"/>
+                                </div>
+                            </div>
+                            <field name="user_instructions" widget="explanation_tooltip" invisible="not user_instructions"/>
+                            <field name="remaining_amount" widget="amount_with_rule_unit" class="fw-bold text-nowrap"/>
                         </div>
-                        <field name="date_start"/>
-                        <field name="date_end"/>
-                        <field name="description"/>
-                        <field name="remaining_amount"/>
                     </t>
                 </templates>
             </kanban>
@@ -110,20 +132,22 @@
                     <field name="attachment_name" invisible="1"/>
                     <field name="has_done_payslip" invisible="1"/>
                     <field name="structure_type_id" invisible="1"/>
+                    <!-- loads the unit (input suffix) of the rule for the amounts -->
+                    <field name="salary_rule_id" widget="salary_rule_unit_tile" invisible="1" readonly="1"/>
                     <group col="2">
                         <group colspan="1">
                             <field name="employee_id" widget="many2one_avatar_employee" readonly="has_done_payslip or state == '2_close'" invisible="context.get('default_employee_id')"/>
                             <field name="salary_rule_id" readonly="has_done_payslip or state == '2_close'" context="{'default_input_usage_payslip': True}"/>
-                            <field class="o_hr_narrow_field" name="amount" readonly="state == '2_close'"/>
-                            <field class="o_hr_narrow_field" name="paid_amount" invisible="is_recurring or not paid_amount" readonly="1"/>
-                            <field class="o_hr_narrow_field" name="remaining_amount" invisible="is_recurring or not paid_amount" readonly="1"/>
+                            <field class="o_hr_narrow_field" name="amount" widget="amount_with_rule_unit" readonly="state == '2_close'"/>
+                            <field class="o_hr_narrow_field" name="paid_amount" widget="amount_with_rule_unit" invisible="is_recurring or not paid_amount" readonly="1"/>
+                            <field class="o_hr_narrow_field" name="remaining_amount" widget="amount_with_rule_unit" invisible="is_recurring or not paid_amount" readonly="1"/>
                             <field name="date_start" style="width: 10ch;" readonly="has_done_payslip or state == '2_close'"/>
                             <label name="is_recurring" for="is_recurring" string="Repeat"/>
                             <div name="is_recurring" class="o_row">
                                 <field name="is_recurring" readonly="state == '2_close'"/>
                                 <span invisible="not is_recurring" class="text-muted">Until</span>
                                 <field name="date_estimated_end" class="o_hr_narrow_field" placeholder="End of Contract" invisible="not is_recurring"/>
-                                <span invisible="not date_estimated_end" class="text-muted" name="remaining_time">
+                                <span invisible="not date_estimated_end or not is_recurring" class="text-muted" name="remaining_time">
                                 (<field name="remaining_time" class="w-auto" invisible="not date_estimated_end"/>)
                                 </span>
                             </div>

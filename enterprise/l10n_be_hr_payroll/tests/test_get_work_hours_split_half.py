@@ -105,3 +105,17 @@ class TestWorkHoursSplitHalf(TestPayrollCommon):
         self.assertEqual(self._split(emp, self.monday, 8.0)[wet_id], [1.0, 8.0])
         self.assertEqual(self._split(emp, self.monday, 4.0)[wet_id], [0.5, 4.0])
         self.assertEqual(self._split(emp, self.friday_later, 4.0)[wet_id], [1.0, 4.0])
+
+    def test_extra_hours_take_no_day(self):
+        public_holiday = self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday')
+        overtime = self.env.ref('hr_work_entry.l10n_be_work_entry_type_overtime_no_onss_horeca')
+        version = self.employee_fixed.version_id
+        # a public holiday with Horeca overtime keeps its full day, overtime alone counts hours only
+        work_data = version._get_work_hours_split_half(self.monday, self.monday + timedelta(days=1), [
+            {'version_id': version, 'date': self.monday, 'work_entry_type_id': public_holiday, 'duration': 8.0},
+            {'version_id': version, 'date': self.monday, 'work_entry_type_id': overtime, 'duration': 2.0},
+            {'version_id': version, 'date': self.monday + timedelta(days=1), 'work_entry_type_id': overtime, 'duration': 3.0},
+        ])
+        result = {work_entry_type_id: values for (work_entry_type_id, _options), values in work_data.items()}
+        self.assertEqual(result[public_holiday.id], [1.0, 8.0])
+        self.assertEqual(result[overtime.id], [0, 5.0])

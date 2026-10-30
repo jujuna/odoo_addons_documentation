@@ -309,7 +309,7 @@ result = - version.l10n_us_commuter_benefits
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-result = GROSS + categories['PRETAX']
+result = max(0, GROSS + categories['PRETAX'])
         </field>
         <field name="bold" eval="True"/>
         <field name="struct_ids" eval="[(6, 0, [ref('l10n_us_hr_payroll.hr_payroll_structure_us_employee_salary')])]"/>
@@ -809,6 +809,7 @@ if schedule_pay in ['semi-annually', 'bi-monthly']:
 
 withholding_allowance_amount = payslip._rule_parameter('l10n_us_vt_withholding_allowances_table')[schedule_pay]
 gross -= employee.l10n_us_w4_allowances_count * withholding_allowance_amount
+gross = max(0, gross)
 
 tax_rate_tables = payslip._rule_parameter('l10n_us_vt_tax_rate_tables')
 if employee.l10n_us_state_filing_status in ['vt_status_1', 'vt_status_3', 'vt_status_4']:
@@ -932,7 +933,7 @@ allowances = employee.l10n_us_w4_allowances_count * payslip._rule_parameter('l10
 total_exemption = standard_deduction + allowances
 
 # Step 7
-annual_taxable = annual_gross - total_exemption
+annual_taxable = max(0, annual_gross - total_exemption)
 
 # Step 8
 annual_tax_to_be_withheld = annual_taxable * payslip._rule_parameter('l10n_us_nc_tax_rate') / 100
@@ -962,7 +963,7 @@ standard_deduction = payslip._rule_parameter('l10n_us_va_standard_deduction')
 line_1_allowances = employee.l10n_us_w4_allowances_count * payslip._rule_parameter('l10n_us_va_line_1_allowances')
 line_2_allowances = employee.l10n_us_w4_withholding_deduction_allowances * payslip._rule_parameter('l10n_us_va_line_2_allowances')
 total_exemptions = standard_deduction + line_1_allowances + line_2_allowances
-annual_gross = categories['TAXABLE'] * version._get_salary_costs_factor() - total_exemptions
+annual_gross = max(0, categories['TAXABLE'] * version._get_salary_costs_factor() - total_exemptions)
 
 # Step 2
 tax_rates = payslip._rule_parameter('l10n_us_va_tax_rates_table')
@@ -1056,7 +1057,7 @@ else:
 federal_tax = abs(result_rules['FIT']['total']) * version._get_salary_costs_factor()
 
 # Step 5
-base = annual_gross - min(federal_tax, federal_cap) - standard_deduction
+base = max(0, annual_gross - min(federal_tax, federal_cap) - standard_deduction)
 
 # Step 6
 def find_rates(x, rates):
@@ -1484,7 +1485,7 @@ result_qty = payslip.sum_worked_hours
 gross = categories['TAXABLE'] - result_rules['401K']['total']
 rate = payslip._rule_parameter('l10n_us_or_fmli_employee_portion') / 100
 result = gross * rate
-result_rate = payslip._rule_parameter('l10n_us_or_fmli_rate')
+result_rate = - payslip._rule_parameter('l10n_us_or_fmli_rate')
         </field>
         <field name="struct_ids" eval="[(6, 0, [ref('l10n_us_hr_payroll.hr_payroll_structure_us_employee_salary')])]"/>
         <field name="partner_id" ref="res_partner_employment_or"/>

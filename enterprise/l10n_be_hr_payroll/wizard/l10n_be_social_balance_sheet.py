@@ -111,7 +111,7 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
         for employee_payslips in mapped_payslips.values():
             if len(employee_payslips) > 1:
                 # What matters is the occupation at the end of the month. Take the most recent contract
-                payslip = employee_payslips.sorted(lambda p: p.version_id.date_start, reverse=True)[-1]
+                payslip = employee_payslips.sorted(lambda p: p.version_id.date_start, reverse=True)[0]
             else:
                 payslip = employee_payslips
             version = payslip.version_id
@@ -200,7 +200,7 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
             sex = payslip.version_id.sex
             if sex not in ['male', 'female']:
                 raise UserError(self.env._('Please configure a sex (either male or female) for the following employee: %s', payslip.employee_id.name))
-            contract_type = 'full' if version.work_time_rate >= 1 else 'part'
+            contract_type = 'full' if payslip.version_id.work_time_rate >= 1 else 'part'
             gross = round(sum(line_values[code][payslip.id]['total'] for code in gross_codes), 2) - round(line_values['IP.PART'][payslip.id]['total'], 2)
             private_car = round(line_values['CAR.PRIV'][payslip.id]['total'], 2)
             public_transport = round(line_values['PUB.TRANS'][payslip.id]['total'], 2)
@@ -222,8 +222,15 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
         # SECTION 105-113, 120, 121, 130-134: At the end of the exercice
         workers_data = collections.defaultdict(lambda: dict(full=0, part=0, fte=0))
 
-        end_contracts = self.env['hr.employee']._get_all_versions_with_contract_overlap_with_period(self.date_to, self.date_to)
-        end_contracts = end_contracts.filtered(lambda c: c.l10n_be_worker_code_id.dmfa_code not in ['848', '849'] and any(s.state in ['validated', 'paid'] for s in c.employee_id.slip_ids))
+        end_contracts = self.env['hr.employee'].search([
+            ('company_id', 'in', self.branch_ids.ids),
+        ])._get_versions_with_contract_overlap_with_period(self.date_to, self.date_to)
+        end_contracts = end_contracts.filtered(lambda c: c.company_id in self.branch_ids)
+        paid_employees = {employee for [employee] in self.env['hr.payslip']._read_group(
+            [('employee_id', 'in', end_contracts.employee_id.ids), ('state', 'in', ['validated', 'paid'])],
+            ['employee_id'],
+        )}
+        end_contracts = end_contracts.filtered(lambda c: c.l10n_be_worker_code_id.dmfa_code not in ['848', '849'] and c.employee_id in paid_employees)
         end_contracts_by_employees = collections.defaultdict(lambda: self.env['hr.version'])
         last_end_contracts = self.env['hr.version']
         for end_contract in end_contracts:
@@ -233,7 +240,8 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
         end_contracts = last_end_contracts
 
         replacement = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_replacement')
-        defined_work = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_clearly_defined_work')
+        # not created anymore, only exists on older databases
+        defined_work = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_clearly_defined_work', raise_if_not_found=False)
 
         mapped_certificates = {
             ('male', 'graduate'): '1202',
@@ -271,7 +279,7 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                 continue
 
             sex = contract.employee_id.sex
-            work_time_rate = version.work_time_rate
+            work_time_rate = contract.work_time_rate
 
             contract_time = 'full' if work_time_rate >= 1 else 'part'
 
@@ -309,7 +317,7 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
         for employee_payslips in mapped_payslips.values():
             if len(employee_payslips) > 1:
                 # What matters is the occupation at the end of the month. Take the most recent contract
-                payslip = employee_payslips.sorted(lambda p: p.version_id.date_start, reverse=True)[-1]
+                payslip = employee_payslips.sorted(lambda p: p.version_id.date_start, reverse=True)[0]
             else:
                 payslip = employee_payslips
             employee = payslip.employee_id
@@ -319,9 +327,9 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                 _logger.info(self.env._("The contract %(contract_name)s for %(employee)s is not of one the following types: CDI, CDD. Replacement, For a clearly defined work", contract_name=contract.name, employee=contract.employee_id.name))
                 continue
 
-            work_time_rate = version.work_time_rate
+            work_time_rate = contract.work_time_rate
             contract_time = 'full' if work_time_rate >= 1 else 'part'
-            if employee not in in_employees and employee.contract_date_start and (self.date_from <= employee.contract_date_start <= self.date_to):
+            if employee not in in_employees and contract.contract_date_start and (self.date_from <= contract.contract_date_start <= self.date_to):
                 in_employees |= employee
 
                 workers_data['205'][contract_time] += 1

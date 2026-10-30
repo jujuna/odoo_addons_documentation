@@ -60,7 +60,7 @@ class ProjectTask(models.Model):
     @api.model
     def default_get(self, fields):
         result = super().default_get(fields)
-        if self.env.context.get('scale', False) not in ("month", "year"):
+        if not self.env.context.get('use_working_schedule'):
             return result
 
         planned_date_begin = result.get('planned_date_begin', self.env.context.get('planned_date_begin', False))
@@ -1127,6 +1127,7 @@ class ProjectTask(models.Model):
             old_vals_per_task_id[task.id] = {
                 'planned_date_begin': task.planned_date_begin,
                 'date_deadline': task.date_deadline,
+                'allocated_hours': task.allocated_hours,
             }
             task_vals = {
                 'planned_date_begin': tasks_to_write[task]['start'],
@@ -1470,15 +1471,13 @@ class ProjectTask(models.Model):
         search_forward,
         base_date,
         candidate_duration,
-        move_in_conflicts_users=None
+        move_in_conflicts_users=None  # TODO: remove in master
     ):
         """ this method is used for 2 goals:
             - compute the new dates for a task to plan, users_ids is the task users
             - compute the start and date dates of the buffer for maintain buffer strategy, users_ids is False
             if the 2 tasks have differents users (we follow the company calendar) else the assigned users
         """
-        if move_in_conflicts_users is None:
-            move_in_conflicts_users = set()
 
         base_date = base_date.astimezone(UTC)
         intervals = valid_intervals_per_user[users_ids]._items
@@ -1487,7 +1486,7 @@ class ProjectTask(models.Model):
         index = 0 if search_forward else len(intervals) - 1
         used_intervals = []
         compute_start_date, compute_end_date = False, False
-        while users_ids not in move_in_conflicts_users and ((search_forward and index < len(intervals)) or (not search_forward and index >= 0)) and candidate_duration > intervals_durations:
+        while ((search_forward and index < len(intervals)) or (not search_forward and index >= 0)) and candidate_duration > intervals_durations:
             start, end, _dummy = intervals[index]
             index += step
 
@@ -1640,7 +1639,6 @@ class ProjectTask(models.Model):
         valid_intervals_per_user, _dummy, _dummy = candidates._web_gantt_get_valid_intervals(start_date, end_date, users, candidates.ids)
         initial_valid_intervals_per_user = dict(valid_intervals_per_user.items())
 
-        move_in_conflicts_users = set()
         first_possible_start_date_per_candidate, last_possible_end_date_per_candidate = candidates._web_gantt_get_first_and_last_possible_dates(dependency_field_name, dependency_inverted_field_name, search_forward, stop_date_field_name, start_date_field_name)
 
         candidates_moved_with_conflicts = False
@@ -1681,9 +1679,9 @@ class ProjectTask(models.Model):
                     gap = (candidate.planned_date_begin - old_vals_per_pill_id[self.id][stop_date_field_name]).total_seconds() / 3600
                     last_possible_end_date_per_candidate[candidate.id] = (self[stop_date_field_name] + relativedelta(hours=gap) + relativedelta(seconds=candidate_duration)).astimezone(ZoneInfo(tz_info))
             base_date = (first_possible_start_date_per_candidate if search_forward else last_possible_end_date_per_candidate).get(candidate.id)
-            used_intervals, intervals_durations, compute_start_date, compute_end_date = candidate._get_new_dates(valid_intervals_per_user, users_ids, search_forward, base_date, candidate_duration, move_in_conflicts_users)
+            used_intervals, intervals_durations, compute_start_date, compute_end_date = candidate._get_new_dates(valid_intervals_per_user, users_ids, search_forward, base_date, candidate_duration)
 
-            if users_ids not in move_in_conflicts_users and candidate_duration == intervals_durations and compute_start_date and compute_end_date:
+            if candidate_duration == intervals_durations and compute_start_date and compute_end_date:
                 candidates_passed_initial_deadline = candidates_passed_initial_deadline or (not candidate[start_date_field_name] and compute_end_date > candidate[stop_date_field_name].astimezone(UTC))
                 old_planned_date_begin, old_date_deadline = candidate[start_date_field_name], candidate[stop_date_field_name]
                 if candidate._web_gantt_reschedule_write_new_dates(compute_start_date, compute_end_date, start_date_field_name, stop_date_field_name):
@@ -1704,7 +1702,7 @@ class ProjectTask(models.Model):
                     return result, {}
 
                 candidates_moved_with_conflicts = True
-                move_in_conflicts_users.add(users_ids)
+                used_intervals = []
                 final_interval_index = -1 if search_forward else 0
                 ranges = initial_valid_intervals_per_user[users_ids]._items
                 compute_start_date = ranges[final_interval_index][0]
@@ -1995,13 +1993,14 @@ class ProjectTask(models.Model):
                 ('deadline', '>=', date_start),
                 ('deadline', '<=', date_end),
                 ('project_allow_milestones', '=', True),
+                ('project_id.active', '=', True),
             ],
         }
 
     @api.model
     @api.readonly
     def get_all_deadlines(self, date_start, date_end):
-        """ Get all deadlines (milestones and projects) between date_start and date_end.
+        """ Get all active deadlines (milestones and projects) between date_start and date_end.
 
             :param date_start: The start date.
             :param date_end: The end date.

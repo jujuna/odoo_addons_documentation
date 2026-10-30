@@ -267,3 +267,22 @@ test("collaborative: Parallel insertion of comments", async () => {
         [{ sheetId, col: 4, row: 4, threadId: 1, isResolved: false }]
     );
 });
+
+test("collaborative: undo thread creation after another user resolved it", async () => {
+    const { alice, bob, charlie } = await setupCollaborativeEnv(getBasicServerData());
+    const sheetId = alice.getters.getActiveSheetId();
+    const position = { sheetId, col: 1, row: 1 };
+    alice.dispatch("ADD_COMMENT_THREAD", { ...position, threadId: 1 });
+    bob.dispatch("EDIT_COMMENT_THREAD", { ...position, threadId: 1, isResolved: true });
+    spExpect([alice, bob, charlie]).toHaveSynchronizedValue(
+        (user) => user.getters.getThreadInfo(1)?.isResolved,
+        true
+    );
+    undo(alice);
+    spExpect([alice, bob, charlie]).toHaveSynchronizedValue(
+        (user) => user.getters.getSpreadsheetThreads([sheetId]),
+        []
+    );
+    // the history must still be replayable
+    expect(() => new Model(alice.exportData())).not.toThrow();
+});

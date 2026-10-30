@@ -4,16 +4,16 @@
 #
 # Translators:
 # Martin Trigaux, 2022
-# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2022
+# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2022, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 03:08+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-05 10:33+0000\n"
+"Last-Translator: Alina Lisnenko <alina.lisnenko@erp.co.ua>\n"
+"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-20/"
 "account_bank_statement_import/uk/>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "%d transactions had a zero amount and were ignored."
-msgstr ""
+msgstr "%d транзакції мали нульову суму, тому їх було проігноровано."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -41,13 +41,13 @@ msgstr "%d транзакцій вже було імпортовано рані�
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "1 transaction had a zero amount and was ignored."
-msgstr ""
+msgstr "Одна транзакція мала нульову суму, тому її було проігноровано."
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "1 transaction had already been imported and was ignored."
-msgstr "1 транзакцію вже було імпортовано раніше тому вона пропущена"
+msgstr "1 транзакцію вже було імпортовано раніше тому вона пропущена."
 
 #. module: account_bank_statement_import
 #: model:ir.model.constraint,message:account_bank_statement_import.constraint_account_bank_statement_line_unique_import_id
@@ -57,13 +57,13 @@ msgstr "Операції з банківського рахунку можна �
 #. module: account_bank_statement_import
 #: model:ir.module.module,shortdesc:base.module_account_bank_statement_import
 msgid "Account Bank Statement Import"
-msgstr ""
+msgstr "Імпорт банківських виписок"
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "All or part of the following file(s) could not be imported:\n"
-msgstr ""
+msgstr "Не вдалося імпортувати всі або деякі з наведених нижче файлів:\n"
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -72,11 +72,13 @@ msgid ""
 "All transactions in this file either have a zero amount or have already been "
 "imported. There is nothing to import."
 msgstr ""
+"Усі транзакції в цьому файлі мають нульову суму або вже були імпортовані. "
+"Імпортувати нічого."
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Банківська транзакція"
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_setup_bank_manual_config
@@ -90,6 +92,8 @@ msgid ""
 "Cannot find in which journal to import the statement for account %s. Please "
 "configure the journal first."
 msgstr ""
+"Не вдалося знайти журнал для імпорту виписки за рахунком %s. Будь ласка, "
+"спочатку налаштуйте журнал."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -98,6 +102,8 @@ msgid ""
 "Cannot find in which journal to import this statement. Please manually "
 "select a journal."
 msgstr ""
+"Не вдається знайти журнал для імпорту цього запису. Будь ласка, виберіть "
+"журнал вручну."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -131,6 +137,11 @@ msgid ""
 "\n"
 "OFX and QIF imports are available in Enterprise version."
 msgstr ""
+"Універсальний майстер імпорту банківських виписок.\n"
+"\n"
+"(Цей модуль не містить жодних форматів імпорту.)\n"
+"\n"
+"Функції імпорту у форматах OFX та QIF доступні у версії Enterprise."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -199,7 +210,7 @@ msgstr "Тут немає що робити!"
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
-msgid "Template for Bank Statement Lines"
+msgid "Template for Bank Transactions"
 msgstr ""
 
 #. module: account_bank_statement_import
@@ -251,13 +262,13 @@ msgstr ""
 msgid ""
 "This file only contains transactions with a zero amount. There is nothing to "
 "import."
-msgstr ""
+msgstr "Цей файл містить лише транзакції з нульовою сумою. Імпортувати нічого."
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "View successfully imported statements"
-msgstr "Перелянути успішно імпортовані виписки"
+msgstr "Переглянути успішно імпортовані виписки"
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -276,6 +287,9 @@ msgstr "Ви повинні встановити Типовий рахунок �
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "You uploaded an invalid or empty file."
 msgstr "Ви завантажили недійсний або порожній файл."
+
+#~ msgid "Template for Bank Statement Lines"
+#~ msgstr "Рядки шаблону банківських виписок"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Рядок банківської виписки"

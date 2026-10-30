@@ -586,7 +586,13 @@ result = EXPNET - categories['OTHERDED'] + categories['OTHERALW']
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-result = version.l10n_tr_food_allowance
+result = 0
+theoritical_number_of_days = payslip._l10n_tr_get_theoretical_work_days()
+result = sum(
+    line.number_of_days * line.version_id.l10n_tr_food_allowance
+    * line.work_entry_type_id.amount_rate / theoritical_number_of_days
+    for line in payslip.worked_days_line_ids
+)
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_tr_hr_payroll.hr_payroll_structure_tr_employee_salary'),

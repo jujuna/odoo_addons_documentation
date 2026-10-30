@@ -11,7 +11,7 @@ from odoo.exceptions import AccessError, MissingError, UserError
 from odoo.tools import hmac, str2bool
 
 from ..utils.ai_utils import ODOO_AI_COMPLETION_CALLBACK_PATH, UserInputResponse
-from ..utils.types import CompletionFailure, CompletionSuccess, PendingInteractionResponse, SessionResponse
+from ..utils.types import PendingInteractionResponse, SessionResponse
 
 
 _logger = logging.getLogger(__name__)
@@ -41,18 +41,6 @@ class AIThreadController(ThreadController):
 
     def _get_channel_ai_session(self, channel):
         return self.env["ai.session"].sudo().search([("channel_id", "=", channel.id), ("parent_session_id", "=", False)])
-
-    @staticmethod
-    def _validate_session_request_company_access(env, context_snapshot):
-        accessible_company_ids = frozenset(env.user.company_ids.ids)
-        for key in ("allowed_company_ids", "active_company_ids"):
-            if any(
-                company_id not in accessible_company_ids
-                for company_id in context_snapshot.get(key, ())
-            ):
-                raise AccessError(env._(
-                    "Your company access changed while this AI response was running."
-                ))
 
     @http.route(
         ["/ai/start_session_advance"],
@@ -153,25 +141,9 @@ class AIThreadController(ThreadController):
         ), secret=session.request_webhook_secret)
         if not signature or not secrets.compare_digest(signature, expected_signature):
             return None
-        completion_result: CompletionSuccess | CompletionFailure
-        if llm_result is False:
-            completion_result = {'kind': 'failure', 'code': 'request_failed'}
-        else:
-            completion_result = {'kind': 'success', 'message': llm_result['result']}
-        context = session.request_context or {}
-        guest_id = session.request_guest_id.id
-        http.request.update_env(user=session.request_user_id.id, context=context, su=False)
-        if guest_id:
-            http.request.update_context(guest=self.env['mail.guest'].browse(guest_id))
-        # Rebuild the conversation recordset, which cannot be saved in the JSON context.
-        http.request.update_context(discuss_channel=self.env['discuss.channel'].browse(session.channel_id.id))
-        session = session.with_env(self.env).sudo()
-        self._validate_session_request_company_access(session.env, session.request_context or {})
-        match session.state['callback_type']:
-            case 'agent_loop':
-                session._continue_agent_loop(completion_result)
-            case 'channel_name':
-                session._continue_channel_name(completion_result)
+        env = session._get_completion_env()
+        http.request.update_env(user=env.uid, context=env.context, su=False)
+        session.with_env(self.env)._process_completion_result(llm_result)
 
     @http.route(
         "/ai/resume_pending_interaction",

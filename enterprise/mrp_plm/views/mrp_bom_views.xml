@@ -6,6 +6,9 @@
         <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
         <field name="priority" eval="1000"/>
         <field name="arch" type="xml">
+            <div name="button_box" position="attributes">
+                <attribute name="invisible" add="context.get('from_eco') and not active" separator="or"/>
+            </div>
             <div name="button_box" position="inside">
                 <button groups="mrp_plm.group_plm_user" class="oe_stat_button" name="button_mrp_eco" type="object" icon="published_with_changes">
                     <field string="ECO(s)" name="eco_count" widget="statinfo" />

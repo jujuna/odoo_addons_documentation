@@ -1133,3 +1133,40 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
             self._run_post_processing()
             payment_vals = self.subscription._get_default_payment_link_values()
             self.assertAlmostEqual(payment_vals['amount'], 23.1, msg="invoiced recurring SO have different behavior")
+
+    def test_payment_failure_before_subscription_confirmed(self):
+        self.assertEqual(self.subscription.state, 'draft')
+        self.assertFalse(self.subscription.next_invoice_date)
+
+        self.subscription.end_date = datetime.date(2026, 5, 2)
+        self.env['payment.transaction'].create({
+            **self._get_payment_values(self.subscription, invoice_ids=[]),
+            'state': 'error',
+        })
+
+        self._run_post_processing()
+
+        self.assertEqual(self.subscription.state, 'draft', "The unconfirmed order should be left untouched")
+        self.assertFalse(self.subscription.pending_transaction)
+
+    def test_payment_failure_before_subscription_confirmed_on_renewal(self):
+        self.subscription.action_confirm()
+        self.subscription._create_recurring_invoice()
+        action = self.subscription.prepare_renewal_order()
+        renew_so = self.env['sale.order'].browse(action['res_id'])
+
+        self.assertEqual(renew_so.subscription_state, "2_renewal")
+        self.env['payment.transaction'].create({
+            **self._get_payment_values(renew_so, invoice_ids=[]),
+            'state': 'error',
+        })
+
+        plan = renew_so.plan_id
+        renew_so.plan_id = False  # This Will cause the next_invoice_date to become False
+        self.assertEqual(renew_so.next_invoice_date, False)
+        renew_so.plan_id = plan
+
+        self._run_post_processing()
+
+        self.assertEqual(renew_so.state, 'draft', "The unconfirmed order should be left untouched")
+        self.assertFalse(renew_so.pending_transaction)

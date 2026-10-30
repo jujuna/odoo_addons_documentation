@@ -178,12 +178,12 @@ for employee_type in employee_types_with_closing_date:
             <field name="warning_type">python</field>
             <field name="evaluation_code">
 base_domain = [
-    ('country_id', '=', self.env.company.country_id.id),
+    ('country_id', 'in', [self.env.company.country_id.id, False]),
     '|', ('view_ids', '!=', False), ('salary_rule_ids', '!=', False)
 ]
 configurable_benefits = self.env['hr.contract.salary.benefit'].with_context(active_test=False).search(base_domain)
 
-if not configurable_benefits.filtered(lambda b: b.active):
+if configurable_benefits and not configurable_benefits.filtered(lambda b: b.active):
     warning_records = self.env.company
     warning_count = 0
             </field>
@@ -240,9 +240,7 @@ if self.env.company.is_company_details_empty:
                 ('employee_type_id.code', '=', 'Employee'),
                 '|',
                     ('version_id.contract_date_start', '=', False),
-                    '&amp;',
-                        ('version_id.contract_date_end', '!=', False),
-                        ('version_id.contract_date_end', '&lt;', 'today')
+                    ('version_id.contract_date_end', '&lt;', 'today'),
             ]</field>
             <field name="visible_to">assistant</field>
         </record>
@@ -365,7 +363,7 @@ for employee in consumed_leaves:
             leave_id = to_recheck_leaves_per_work_entry_type[work_entry_type_id]['excess_days'][end_dates]['leave_id']
             leaves_no_allocation_ids.append(leave_id)
 if leaves_no_allocation_ids:
-    today = fields.Date.today()
+    today = date.today()
     date_from = today - relativedelta(months=6)
     date_to = today + relativedelta(months=6)
 

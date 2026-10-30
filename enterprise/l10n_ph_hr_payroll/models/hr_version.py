@@ -371,7 +371,7 @@ class HrVersion(models.Model):
         else:
             # Find the amount of day when the employee is working.
             # Only count each day of the week once, as long as there are any worked time configured on them
-            days_per_week = calendar.days_per_week
+            days_per_week = calendar.days_per_week or 5.0
             if days_per_week == 5:
                 days_per_year = 261.0
             elif days_per_week == 6:

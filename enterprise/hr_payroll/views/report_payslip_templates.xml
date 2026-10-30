@@ -99,7 +99,7 @@
                                 </div>
                                 <div id="working_schedule">
                                     <strong class="me-2">Working Schedule:</strong>
-                                    <span t-field="o.version_id.resource_calendar_id.hours_per_week"/> Hours / Week
+                                    <span t-out="('%.2f' % o.version_id.resource_calendar_id.hours_per_week).rstrip('0').rstrip('.')"/> Hours / Week
                                 </div>
                             </td>
                         </tr>
@@ -109,13 +109,14 @@
             <div id="worked_days_table" t-if="not o.ignore_worked_day_lines and not o.is_company_executive">
                 <table class="table table-sm table-borderless">
                 <t t-set="worked_days_lines" t-value="o.worked_days_line_ids.filtered(lambda worked_days: worked_days.code != '000.00')"/>
-                <t t-set="show_days" t-value="bool(set(worked_days_lines.mapped('work_entry_type_id.request_unit')) &amp; {'half_day', 'day'})"/>
-                <t t-set="show_hours" t-value="any(worked_days_lines.mapped('work_entry_type_id.display_hours')) or 'hour' in worked_days_lines.mapped('work_entry_type_id.request_unit')"/>
+                <!-- TODO master: remove show_days and show_hours, kept for inheriting templates -->
+                <t t-set="show_days" t-value="True"/>
+                <t t-set="show_hours" t-value="True"/>
                     <thead class="o_black_border">
                         <tr>
                             <th id="work_days_header_name">Earnings</th>
-                            <th id="work_days_header_hours" t-if="show_hours" class="text-end">Hours</th>
-                            <th id="work_days_header_days" t-if="show_days" class="text-end">Days</th>
+                            <th id="work_days_header_hours" class="text-end">Hours</th>
+                            <th id="work_days_header_days" class="text-end">Days</th>
                             <th id="work_days_header_amount" class="text-end">Amount</th>
                             <th id="work_days_header_ytd" t-if="o.ytd_computation and not is_correction" class="text-end">YTD</th>
                         </tr>
@@ -135,10 +136,10 @@
                             </t>
                             <tr style="color:none">
                                 <td id="worked_days_name"><span t-field="worked_days.name"/></td>
-                                <td id="worked_days_hours" t-if="show_hours" class="text-end">
+                                <td id="worked_days_hours" class="text-end">
                                     <span t-out="round(disp_hours, 2)" t-options="{'widget': 'float_time'}"/>
                                 </td>
-                                <td id="worked_days_days" t-if="show_days" class="text-end">
+                                <td id="worked_days_days" class="text-end">
                                     <span t-out="round(disp_days, 2)"/>
                                 </td>
                                 <td id="worked_days_amount" class="text-end"><span t-out="disp_amount" digits="[42, 2]"
@@ -165,10 +166,10 @@
                                 <td t-att-class="line_class">
                                     <span>Total</span>
                                 </td>
-                                <td id="worked_days_total_hours" t-if="show_hours" t-attf-class="#{line_class} text-end">
+                                <td id="worked_days_total_hours" t-attf-class="#{line_class} text-end">
                                     <span t-out="round(total_wd_hours, 2)" t-options="{'widget': 'float_time'}"/>
                                 </td>
-                                <td id="worked_days_total_days" t-if="show_days" t-attf-class="#{line_class} text-end">
+                                <td id="worked_days_total_days" t-attf-class="#{line_class} text-end">
                                     <span t-out="round(total_wd_days, 2)"/>
                                 </td>
                                 <td id="worked_days_total_amount" t-attf-class="#{line_class} text-end">

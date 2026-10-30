@@ -1223,6 +1223,23 @@ class TestRentalPicking(TestRentalCommon):
         rental_order_1.with_user(public_user).sudo().action_confirm()
         self.assertTrue(rental_order_1.picking_ids)
 
+    def test_rental_location_not_overwritten_on_partner_change(self):
+        """Changing the partner on a rental outgoing picking should not reset its destination location."""
+        other_partner = self.env['res.partner'].create({
+            'name': 'The other one',
+            'email': 'other@one.example.com',
+        })
+        rental_order = self.sale_order_id.copy()
+        rental_order.order_line.write({'product_uom_qty': 3, 'is_rental': True})
+        rental_order.action_confirm()
+        outgoing_picking = rental_order.picking_ids.filtered(lambda p: p.picking_type_code == 'outgoing')
+        self.assertEqual(outgoing_picking.state, 'assigned')
+        self.assertEqual(outgoing_picking.location_dest_id, self.env.company.rental_loc_id)
+
+        outgoing_picking.partner_id = other_partner
+        self.assertEqual(outgoing_picking.state, 'assigned')
+        self.assertEqual(outgoing_picking.location_dest_id, self.env.company.rental_loc_id)
+
     def test_reordering_rule_forecast(self):
         """Test the rental orders will only consider outgoing rental move in the forecast
         computation."""
@@ -1652,4 +1669,43 @@ class TestRentalPicking(TestRentalCommon):
                     'location_dest_id': stock,
                 },
             ],
+        )
+
+    def test_virtual_available_at_date_current_window(self):
+        """
+        Test that virtual_available_at_date is correct on rental lines with reservation
+        periods where the reservation window starts immediately or in the past
+        """
+        self.product_id.stock_quant_ids.sudo().unlink()
+        self.env['stock.quant'].sudo().create({
+            'product_id': self.product_id.id,
+            'inventory_quantity': 2,
+            'location_id': self.warehouse_id.lot_stock_id.id,
+        }).action_apply_inventory()
+
+        now = Datetime.now()
+
+        # Order 1: picked up, still ongoing (covers "now")
+        rental_order_1 = self.sale_order_id.copy()
+        rental_order_1.order_line.write({'product_uom_qty': 1, 'is_rental': True})
+        rental_order_1.rental_start_date = now - timedelta(days=1)
+        rental_order_1.rental_return_date = now + timedelta(days=1)
+        rental_order_1.action_confirm()
+        outgoing_picking_1 = rental_order_1.picking_ids.filtered(lambda p: p.picking_type_code == 'outgoing')
+        outgoing_picking_1.button_validate()
+        self.assertEqual(rental_order_1.rental_status, 'return')
+        # Sanity check: physical stock has been decremented by the pickup
+        self.assertEqual(self.product_id.qty_available, 1)
+
+        # Order 2: not yet confirmed, starts earlier today
+        rental_order_2 = self.sale_order_id.copy()
+        rental_order_2.order_line.write({'product_uom_qty': 1, 'is_rental': True})
+        rental_order_2.rental_start_date = now - timedelta(hours=1)
+        rental_order_2.rental_return_date = now + timedelta(days=1)
+        rental_order_2.order_line._compute_qty_at_date()
+
+        self.assertEqual(
+            rental_order_2.order_line.virtual_available_at_date, 1,
+            "The unit already picked up on order 1 should not be double-counted "
+            "against order 2's availability."
         )

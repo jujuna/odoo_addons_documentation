@@ -677,8 +677,8 @@ class L10nCHEmployeeMonthlySnapshot(models.Model):
             valid_source_tax_snapshot = mapped_snapshots[snapshot.employee_id][snapshot.year - year_sub][(snapshot.month - 2) % 12 + 1]
 
             if valid_source_tax_snapshot and snapshot.employee_meta_data:
-                current_st_canton = snapshot.employee_meta_data.get('st-canton', False)
-                current_st_municipality = snapshot.employee_meta_data.get('st-municipality', False)
+                current_st_canton = snapshot.employee_meta_data.get('st-canton') or False
+                current_st_municipality = snapshot.employee_meta_data.get('st-municipality') or False
 
                 correction_mutations = mapped_corrections[snapshot.employee_id][snapshot.year][snapshot.month]
                 confirmed_st_mutations = {
@@ -835,6 +835,48 @@ class L10nCHEmployeeMonthlySnapshot(models.Model):
             for index, item in enumerate(d):
                 self._find_structured_missing(item, result)
         return result
+
+    def _complete_missing(self, previous, current):
+        """ Return ``previous`` where each missing value is replaced by the one ``current`` holds at the
+        same place, if any. The items of a list are completed by the only item of ``current`` holding
+        their known values. """
+        if isinstance(previous, dict) and previous.get("_missing_"):
+            return previous if current is None else current
+        if isinstance(previous, dict):
+            current = current if isinstance(current, dict) else {}
+            return {key: self._complete_missing(value, current.get(key)) for key, value in previous.items()}
+        if isinstance(previous, list):
+            current = current if isinstance(current, list) else []
+            completed = []
+            for item in previous:
+                matching_items = [current_item for current_item in current if self._match_known_values(item, current_item)]
+                completed.append(self._complete_missing(item, matching_items[0] if len(matching_items) == 1 else None))
+            return completed
+        return previous
+
+    def _match_known_values(self, previous, current):
+        """ Whether ``current`` holds all the values of ``previous`` that are not missing. """
+        if isinstance(previous, dict) and previous.get("_missing_"):
+            return True
+        if isinstance(previous, dict):
+            return isinstance(current, dict) and all(self._match_known_values(value, current.get(key)) for key, value in previous.items())
+        if isinstance(previous, list):
+            return isinstance(current, list) and len(previous) == len(current) and all(map(self._match_known_values, previous, current))
+        return previous == current
+
+    def _complete_missing_values(self):
+        """ Complete the values missing from the snapshots with the current employee data, including the
+        snapshots of closed pay periods: all their other values are kept as they were when closed. """
+        fnames = ['person', 'additional_particular', 'employee_meta_data', 'monthly_statistics']
+        self.env.flush_all()
+        snapshots = self.filtered(lambda snapshot: any(self._find_structured_missing(snapshot[fname] or {}) for fname in fnames))
+        previous_values = {snapshot: {fname: snapshot[fname] for fname in fnames} for snapshot in snapshots}
+        # in this order, as the meta data embeds the person and additional particulars
+        for fname in fnames:
+            self.env.add_to_compute(self._fields[fname], snapshots)
+            snapshots._recompute_recordset([fname])
+        for snapshot, values in previous_values.items():
+            snapshot.write({fname: self._complete_missing(value, snapshot[fname]) for fname, value in values.items()})
 
     @api.depends('employee_meta_data')
     def _compute_validation_errors(self):

@@ -21,6 +21,7 @@ import {
 import { Popover } from "@web/core/popover/popover";
 import { user } from "@web/core/user";
 import { useBackButton } from "@web/core/utils/hooks";
+import { session } from "@web/session";
 import { accountMethodsForMobile } from "@web_mobile/js/core/mixins";
 import { methods as mobileNativeMethods } from "@web_mobile/js/services/core";
 
@@ -217,17 +218,20 @@ test("popover is closable with backbutton event", async () => {
 test("controller should call native updateAccount method with SVG avatar when saving record", async () => {
     patchWithCleanup(mobileNativeMethods, {
         updateAccount(options) {
-            const { avatar, name, username } = options;
+            const { avatar, name, username, uid, db } = options;
             expect.step("should call updateAccount");
             expect(avatar.startsWith(BASE64_PNG_HEADER)).toBe(true, {
                 message: "should have a PNG base64 encoded avatar",
             });
             expect(name).toBe("Marc Demo");
             expect(username).toBe("demo");
+            expect(uid).toBe(42);
+            expect(db).toBe("prod");
         },
     });
 
-    patchWithCleanup(user, { login: "demo", name: "Marc Demo" });
+    patchWithCleanup(user, { login: "demo", name: "Marc Demo", userId: 42 });
+    patchWithCleanup(session, { db: "prod" });
 
     patchWithCleanup(accountMethodsForMobile, {
         url(path) {
@@ -256,16 +260,19 @@ test("controller should call native updateAccount method with SVG avatar when sa
 test("controller should call native updateAccount method when saving record", async () => {
     patchWithCleanup(mobileNativeMethods, {
         async updateAccount(options) {
-            const { avatar, name, username } = options;
+            const { avatar, name, username, uid, db } = options;
             expect.step("should call updateAccount");
             expect(avatar.startsWith(BASE64_PNG_HEADER)).toBe(true, {
                 message: "should have a PNG base64 encoded avatar",
             });
             expect(name).toBe("Marc Demo");
             expect(username).toBe("demo");
+            expect(uid).toBe(42);
+            expect(db).toBe("prod");
         },
     });
-    patchWithCleanup(user, { login: "demo", name: "Marc Demo" });
+    patchWithCleanup(user, { login: "demo", name: "Marc Demo", userId: 42 });
+    patchWithCleanup(session, { db: "prod" });
     patchWithCleanup(accountMethodsForMobile, {
         url(path) {
             if (path === "/web/image") {

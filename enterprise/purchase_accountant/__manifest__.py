@@ -10,9 +10,15 @@ Add accrued menus and specific filters on purchase order lines for an easier clo
     'depends': ['purchase', 'account_accountant'],
     'data': [
         'views/purchase_order_line_views.xml',
+        'views/purchase_order_views.xml',
         'views/res_config_settings_views.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'assets': {
+        'web.assets_backend': [
+            'purchase_accountant/static/src/**/*',
+        ],
+    },
 }

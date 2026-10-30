@@ -337,8 +337,9 @@ export default class BarcodePickingBatchModel extends BarcodePickingModel {
     }
 
     _defaultDestLocation() {
+        const picking = this.selectedLine?.picking_id || this.picking;
         return (
-            this.picking && this.cache.getRecord("stock.location", this.picking.location_dest_id)
+            picking && this.cache.getRecord("stock.location", picking.location_dest_id)
         );
     }
 

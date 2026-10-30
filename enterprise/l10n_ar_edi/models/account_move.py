@@ -724,8 +724,7 @@ class AccountMove(models.Model):
         partner_number = partner._get_id_number_sanitize()
         if partner.l10n_ar_afip_responsibility_type_id == final_consumer and not partner_number:
             return AR_SIGD_AFIP_CODE
-        if partner_id_code:
-            return partner_id_code
+        return partner_id_code
 
     def _prepare_return_msg(self, afip_ws, errors, obs, events, return_codes):
         self.ensure_one()

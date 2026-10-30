@@ -13,7 +13,7 @@ from odoo.tools import OrderedSet
 from odoo.tools.mail import html_to_inner_content
 from odoo.tools.misc import formatLang
 
-AI_SUPPORTED_IMG_TYPES = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+from odoo.addons.ai.utils.ai_image_tools import AI_SUPPORTED_IMG_TYPES
 
 
 class Model(models.AbstractModel):

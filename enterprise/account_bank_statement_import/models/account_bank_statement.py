@@ -22,7 +22,7 @@ class AccountBankStatementLine(models.Model):
     @api.model
     def get_import_templates(self):
         return [{
-            'label': _('Template for Bank Statement Lines'),
+            'label': self.env._("Template for Bank Transactions"),
             'template': '/account_bank_statement_import/static/xls/bank_statement_line_import_template.xlsx'
         }]
 

@@ -1,7 +1,7 @@
 import { expect } from "@odoo/hoot";
 import { queryText } from "@odoo/hoot-dom";
 
-export async function checkKpiHeader(showLeaderboard = true) {
+export async function checkKpiHeader(showLeaderboard = true, { fetched = true } = {}) {
     expect("div[name=timesheet_kpi_leaderboard_header]").toHaveCount(1, {
         message: "The KPI header should be visible",
     });
@@ -53,8 +53,10 @@ export async function checkKpiHeader(showLeaderboard = true) {
         });
     }
 
-    expect.verifySteps(["get_kpi_data", "get_timesheet_ranking_data"], {
+    expect.verifySteps(fetched ? ["get_kpi_data", "get_timesheet_ranking_data"] : [], {
         ignoreOrder: true,
-        message: "The services should be called only once",
+        message: fetched
+            ? "The services should be called only once"
+            : "The services should not be called again for a period they already hold",
     });
 }

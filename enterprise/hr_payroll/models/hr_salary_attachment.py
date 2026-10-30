@@ -55,10 +55,11 @@ class HrSalaryAttachment(models.Model):
     user_instructions = fields.Html(compute='_compute_user_instructions')
     salary_rule_warning = fields.Char(compute='_compute_salary_rule_warning')
     is_recurring = fields.Boolean('Repeat', help='Define if the amount must be repeated on every payslip until a specific date.')
-    amount = fields.Monetary('Amount', required=True, tracking=True, help='Amount to pay each payslip.')
-    paid_amount = fields.Monetary('Paid Amount', tracking=True, copy=False)
-    remaining_amount = fields.Monetary(
-        'Remaining Amount', compute='_compute_remaining_amount', store=True,
+    # in the unit of the salary rule (its input suffix: days, %, ...); digits=False keeps a numeric column
+    amount = fields.Float('Amount', digits=False, required=True, tracking=True, help='Amount to pay each payslip.')
+    paid_amount = fields.Float('Paid Amount', digits=False, tracking=True, copy=False)
+    remaining_amount = fields.Float(
+        'Remaining Amount', digits=False, compute='_compute_remaining_amount', store=True,
         help='Remaining amount to be paid.',
     )
     remaining_time = fields.Char(
@@ -105,6 +106,18 @@ class HrSalaryAttachment(models.Model):
     country_id = fields.Many2one('res.country', string='Country', related='company_id.country_id')
     country_code = fields.Char(related='country_id.code', depends=['country_id'], readonly=True)
 
+    @api.constrains('date_start', 'date_estimated_end')
+    def _check_start_estimated_end_dates(self):
+        for attachment in self:
+            if attachment.date_estimated_end and attachment.date_start > attachment.date_estimated_end:
+                raise UserError(self.env._("The starting date cannot be after the estimated end date."))
+
+    @api.onchange('salary_rule_id')
+    def _onchange_salary_rule_id(self):
+        # as an input line on the payslip, start from the default value of the rule
+        if not self.amount:
+            self.amount = self.salary_rule_id.input_default_value
+
     @api.depends('salary_rule_id')
     def _compute_is_seized(self):
         seized_categories = self.env['hr.salary.rule.category']._get_seized_categories()
@@ -126,19 +139,25 @@ class HrSalaryAttachment(models.Model):
     def _compute_remaining_time(self):
         for attachment in self:
             date_end = attachment.date_estimated_end or attachment.date_end
-            if not attachment.is_recurring or not date_end:
+            if not attachment.is_recurring or not date_end or not attachment.date_start:
                 attachment.remaining_time = False
-            else:
-                delta = relativedelta((date_end + relativedelta(months=1)).replace(day=1), attachment.date_start)
-                if delta:
-                    duration = []
-                    if delta.years:
-                        duration.append(self.env._("%(years)s years", years=delta.years))
-                    if delta.months:
-                        duration.append(self.env._("%(months)s months", months=delta.months))
-                    attachment.remaining_time = ' & '.join(duration)
-                else:
-                    attachment.remaining_time = False
+                continue
+
+            delta = relativedelta(date_end + relativedelta(days=1), attachment.date_start)
+
+            if not (delta.years > 0 or delta.months > 0 or delta.days > 0):
+                attachment.remaining_time = False
+                continue
+
+            duration = []
+            if delta.years:
+                duration.append(self.env._("%(years)s years", years=delta.years))
+            if delta.months:
+                duration.append(self.env._("%(months)s months", months=delta.months))
+            if delta.days:
+                duration.append(self.env._("%(days)s days", days=delta.days))
+
+            attachment.remaining_time = ' & '.join(duration)
 
     @api.depends('paid_amount', 'amount', 'is_recurring')
     def _compute_remaining_amount(self):
@@ -216,6 +235,11 @@ class HrSalaryAttachment(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        # Clear estimated end date if the attachment is not recurring
+        for vals in vals_list:
+            if not vals.get('is_recurring'):
+                vals['date_estimated_end'] = False
+
         records = super().create(vals_list)
         if self.env.context.get('install_mode'):
             # Module/demo data loads must not recompute payslips: rules of sibling
@@ -245,6 +269,10 @@ class HrSalaryAttachment(models.Model):
         return records
 
     def write(self, vals):
+        # Clear estimated end date if is_recurring is set to False
+        if 'is_recurring' in vals and not vals['is_recurring']:
+            vals['date_estimated_end'] = False
+
         res = super().write(vals)
         if self.env.context.get('install_mode'):
             # Module/demo data loads must not recompute payslips: rules of sibling
@@ -306,6 +334,12 @@ class HrSalaryAttachment(models.Model):
         if any(attachment.payslip_ids for attachment in self):
             raise UserError(self.env._('You cannot delete a payslip adjustment that is linked to a payslip!'))
 
+    def _format_amount(self, amount):
+        self.ensure_one()
+        if suffix := self.salary_rule_id.input_suffix:
+            return f"{formatLang(self.env, amount)} {suffix}"
+        return formatLang(self.env, amount, currency_obj=self.currency_id)
+
     def _get_payment_amount(self, total_amount):
         res = {}
         remaining = total_amount
@@ -338,7 +372,7 @@ class HrSalaryAttachment(models.Model):
                 body=self.env._('Recorded a new payment of %(amount)s in this %(payslip)s.',
                     payslip=Markup("<a href='#' data-oe-model='hr.payslip' data-oe-id='{payslip_id}'>Payslip</a>")
                     .format(payslip_id=payslip.id),
-                    amount=formatLang(self.env, amount, currency_obj=attachment.currency_id)),
+                    amount=attachment._format_amount(amount)),
             )
             attachment.paid_amount += amount
             if attachment.remaining_amount == 0:

@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 18:25+0000\n"
+"POT-Creation-Date: 2026-10-23 18:24+0000\n"
 "PO-Revision-Date: 2026-09-24 12:17+0000\n"
 "Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
 "Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
@@ -372,6 +372,20 @@ msgstr "%(count)s pris"
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_employee.py:0
+msgid "%(count)s employees have been updated"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"%(count)s payslips of the quarter aren't validated, they won't be declared: %"
+"(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
 #: code:addons/l10n_be_hr_payroll/wizard/l10n_be_social_security_certificate.py:0
 msgid "%(date_from)s to %(date_to)s"
 msgstr "Du %(date_from)s au %(date_to)s"
@@ -393,6 +407,12 @@ msgid ""
 "The employee was sick during all this year and couldn't take the paid time "
 "off postponed from the previous year. You can decide to postpone them again "
 "to next year."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_leave.py:0
+msgid "%(duration)s %(dates)s"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -500,6 +520,12 @@ msgstr "%(months)s mois"
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/wizard/hr_leave_allocation_generate_multi_wizard.py:0
 msgid "%(name)s (%(duration)s %(unit_of_measure)s(s))"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_leave.py:0
+msgid "%(name)s: %(duration)s %(dates)s"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -1626,6 +1652,11 @@ msgstr ""
 "niveau"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_dashboard_warning_274_report_not_updated
+msgid "274.XX report is not up to date due to changes in payslips"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_281_xx__l10n_be_281_10_line_ids
 msgid "281.10 Declarations"
 msgstr "Déclarations 281.10"
@@ -2158,6 +2189,28 @@ msgid ""
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_departure_view_form
+msgid ""
+"<i class=\"oi oi-filled text-info\" data-icon=\"info\" role=\"img\" "
+"invisible=\"not l10n_be_special_outplacement_warning\" aria-label=\"Since "
+"work rate of this employee is less than 50%, outplacement (Special Scheme) "
+"is not mandatory, unless requested directly from the employee.\" "
+"title=\"Since work rate of this employee is less than 50%, outplacement "
+"(Special Scheme) is not mandatory, unless requested directly from the "
+"employee.\" data-tooltip=\"Since work rate of this employee is less than "
+"50%, outplacement (Special Scheme) is not mandatory, unless requested "
+"directly from the employee.\"/>"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_leave_gantt_multi_create_view
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_leave_view_form
+msgid ""
+"<i class=\"oi oi-lg align-self-center\" data-icon=\"rotate_right\" "
+"title=\"Sickness Relapse\"/>"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.view_l10n_be_holiday_attest_form
 msgid ""
 "<i class=\"oi text-warning\" invisible=\"is_worker or has_contract_wage\" "
@@ -2191,6 +2244,11 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_dmfa_view_form
 msgid "<i class=\"oi text-warning\" title=\"Warning\" data-icon=\"warning\"/>"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
+msgid "<i class=\"oi\" data-icon=\"east\"/> Search Online"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -2311,11 +2369,6 @@ msgstr ""
 msgid ""
 "<span class=\"o_form_label\" style=\"margin-right: 7.2rem !important;"
 "\">Type</span>"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
-msgid "<span class=\"o_form_label\">Not sure what is your code?</span>"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -3044,6 +3097,17 @@ msgid "<span>/ month</span>"
 msgstr "<span>/ mois</span>"
 
 #. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form_company_car
+msgid ""
+"<span>/ month</span>\n"
+"                    <span class=\"text-warning oi ms-1\" data-"
+"icon=\"warning\" style=\"cursor: default;\" title=\"The value of the Fuel "
+"Card - Personal Use should be more than 0 and less than the value of Fuel "
+"Card. It will be forced between those limits when used.\" invisible=\"0 "
+"&lt;= fuel_card_personal_use and fuel_card_personal_use &lt;= fuel_card\"/>"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form_meal_vouchers
 msgid "<span>/ voucher</span>"
@@ -3283,6 +3347,11 @@ msgid "<span>Positive balances to declare</span>"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_transport_mode_train
+msgid "<span>Subscription</span>"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_payrun_payslip_kanban_card_view
 msgid "<span>Withholding Taxes</span>"
 msgstr ""
@@ -3443,6 +3512,11 @@ msgstr "<strong class=\"me-2\">Budget Mobilité (mensuel) :</strong>"
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_belgium_payslip
 msgid "<strong class=\"me-2\">Person in Charge:</strong>"
 msgstr "<strong class=\"me-2\">Personnes à charge</strong>"
+
+#. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_belgium_payslip
+msgid "<strong class=\"me-2\">Salary Scale:</strong>"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_belgium_payslip
@@ -3670,6 +3744,11 @@ msgid "=== System Correction ==="
 msgstr "=== Correction système ==="
 
 #. module: l10n_be_hr_payroll
+#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_a
+msgid "A"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:ir.model.constraint,message:l10n_be_hr_payroll.constraint_l10n_be_flexi_at_work_payslip_uniq
 msgid "A Flexi@Work declaration already exists for this payslip."
 msgstr ""
@@ -3738,6 +3817,19 @@ msgstr ""
 "avec le même RFH2 a déjà été envoyé précédemment."
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_flexi_already_employed
+msgid ""
+"A flexi-job can't be held at the employer already employing the worker in "
+"the quarter."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_refused_flexi_worker_code
+msgid ""
+"A flexi-job whose Dimona flexi was refused is declared as an ordinary worker."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_281_mapping.py:0
 msgid "A mapping must end on December 31."
@@ -3764,6 +3856,21 @@ msgid ""
 msgstr ""
 "Une notification a déjà été enregistrée pour la déclaration avec ce numéro "
 "de ticket"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_percentage_paid
+msgid ""
+"A reduction of the working time with an increased hourly pay and an unpaid "
+"compensatory rest (service code 20) needs the percentage of the increase of "
+"the pay."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_termination_previous_quarter
+msgid ""
+"A termination indemnity is declared in the quarter of the end of the "
+"contract."
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -4736,6 +4843,11 @@ msgid "Add"
 msgstr "Ajouter"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_missing_accident_insurance
+msgid "Add information"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_termination_holidays_n1
 msgid "Additional (European) holidays"
 msgstr "Congés (européens) supplémentaires"
@@ -4943,8 +5055,6 @@ msgid "Airport Management"
 msgstr "Gestion aéroportuaire"
 
 #. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_benefit_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_benefit_view_tree
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_salary_rule_form
 msgid "All"
 msgstr "Tous"
@@ -6232,6 +6342,7 @@ msgstr "Nombre moyen de personnes occupées"
 #. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/hr_version.py:0
+#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_b
 msgid "B"
 msgstr "B"
 
@@ -6391,6 +6502,11 @@ msgstr "Base du pécule de vacances"
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_termination_holidays_n1
 msgid "Base of the holiday pay for leaving"
 msgstr "Base du pécule de vacances de départ"
+
+#. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
+msgid "Based on number of employees"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_termination_holidays_n
@@ -7045,6 +7161,11 @@ msgstr "Par département"
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__l10n_be_social_security_certificate__aggregation_level__employee
 msgid "By Employee"
 msgstr "Par employé"
+
+#. module: l10n_be_hr_payroll
+#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_c
+msgid "C"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__payroll_config_settings__l10n_be_ffe_employer_type__c
@@ -8819,11 +8940,6 @@ msgid "Check Dimona"
 msgstr "Vérifier Dimona"
 
 #. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
-msgid "Check official DMFA codes"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__l10n_be_onss_file__declaration_type__bewl
 msgid "Checklist of Sent Corrective Notices (BEWA)"
 msgstr "Liste des avis correctifs envoyés (BEWA)"
@@ -9204,6 +9320,7 @@ msgstr "Coût amorti du vélo de société"
 
 #. module: l10n_be_hr_payroll
 #: model:hr.contract.salary.benefit,fold_label:l10n_be_hr_payroll.l10n_be_transport_company_car
+#: model:hr.contract.salary.benefit,name:l10n_be_hr_payroll.l10n_be_transport_company_car
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee__car_id
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_payslip__vehicle_id
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_version__car_id
@@ -9429,6 +9546,11 @@ msgstr ""
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_double_holiday_double_holiday_variable_revenues_no_onss
 msgid "Complementary Double Holiday on Variable Salary"
 msgstr "Pécule de vacances double complémentaire sur salaire variable"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_complementary_indemnity_worker_code
+msgid "Complementary indemnities worker codes (RCC/RCIC)"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:l10n.be.reorganisation.measure,name:l10n_be_hr_payroll.l10n_be_reorganisation_measure_009_3
@@ -9879,6 +10001,7 @@ msgid "Correct bank accounts"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_dashboard_warning_274_report_not_updated
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_273_xx_correction_needed
 msgid "Correct reports"
 msgstr "Corriger les rapports"
@@ -10195,11 +10318,6 @@ msgid "Credit time"
 msgstr "Crédit-temps"
 
 #. module: l10n_be_hr_payroll
-#: model:hr.employee.type,name:l10n_be_hr_payroll.l10n_be_contract_type_crew
-msgid "Crew"
-msgstr "Équipe"
-
-#. module: l10n_be_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__l10n_be_resident_situation__cross_border
 msgid "Cross-border worker"
 msgstr "Travailleur frontalier"
@@ -10327,6 +10445,7 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/hr_version.py:0
+#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_d
 msgid "D"
 msgstr "D"
 
@@ -10549,11 +10668,43 @@ msgid "DMFA employees missing DIMONA %(names)s"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_quarter_not_ended
+msgid "DMFA quarter not ended"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_draft_payslips
+msgid "DMFA quarter payslips not validated"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_dashboard_warning_dmfa_report_not_updated
 msgid "DMFA report is not up to date due to changes in payslips"
 msgstr ""
 "Le rapport DMFA n'est pas à jour en raison de modifications apportées aux "
 "fiches de paie"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_unit_invalid_code
+msgid "DMFA units with an invalid establishment unit code"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid "DMFA units with an invalid establishment unit code %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_unit_without_code
+msgid "DMFA units without establishment unit code"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid "DMFA units without establishment unit code %(names)s"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_invalid_lang
@@ -10871,7 +11022,11 @@ msgstr "Agences matrimoniales et services similaires"
 #. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_n_additional_leave_count
 #: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_n_allocation
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_n_postponed_paid_time_off_n1
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_n_postponed_paid_time_off_n2
 #: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_n_time_off_taken
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_total_postponed_paid_time_off_n1
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_total_postponed_paid_time_off_n2
 msgid "Days"
 msgstr ""
 
@@ -11542,7 +11697,6 @@ msgstr "Différence avec les données déclarées dans la DmfA(PPL)"
 #: code:addons/l10n_be_hr_payroll/wizard/l10n_be_dimona_wizard.py:0
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee__l10n_be_dimona_next_action
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_version__l10n_be_dimona_next_action
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
 msgid "Dimona"
 msgstr "Dimona"
 
@@ -11594,7 +11748,6 @@ msgstr "Environnement Dimona"
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__l10n_be_dimona_declaration__declaration_type__dimona_in
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
 msgid "Dimona In"
 msgstr "Dimona IN"
 
@@ -11785,6 +11938,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_version__disabled_spouse_bool
 msgid "Disabled Spouse"
 msgstr "Conjoint handicapé"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_prp_disabled_worker_deduction
+msgid "Disabled worker deduction"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-javascript
@@ -13034,6 +13192,11 @@ msgid "Employee gender (m/f)"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_employer_credit_time
+msgid "Employee is 100% credit-time, you can't have Remuneration Code 1"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/controllers/main.py:0
 msgid "Employee language (nl/fr/en)"
@@ -13163,11 +13326,6 @@ msgid "Employees With Certificates"
 msgstr "Employés avec certificats"
 
 #. module: l10n_be_hr_payroll
-#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_wrong_work_code
-msgid "Employees With Wrong Work Code"
-msgstr "Employés avec un code de travail incorrect"
-
-#. module: l10n_be_hr_payroll
 #: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_employees_worker_codes
 msgid "Employees Worker Codes"
 msgstr "Codes travailleur des employés"
@@ -13191,6 +13349,11 @@ msgstr ""
 "travailleurs, quelle que soit leur activité, qui ne sont pas soumis à la "
 "législation belge du travail, à déclarer par des employeurs de catégorie "
 "d'employeur 212."
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_wrong_work_code
+msgid "Employees are too old for their sub-types"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -13355,6 +13518,11 @@ msgstr ""
 "Employés effectuant un travail en Belgique dans le cadre d'un programme de "
 "formation à l'emploi rémunéré, mais qui ne sont pas soumis au système de "
 "sécurité sociale belge."
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_invalid_niss_checksum
+msgid "Employees with an invalid NISS"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_non_matching_birthday
@@ -13546,11 +13714,6 @@ msgstr "L’employeur n’a pas encore opté pour Dimona New"
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_declaration.py:0
 msgid "Employer incompatibility"
 msgstr "Incompatibilité employeur"
-
-#. module: l10n_be_hr_payroll
-#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_employer_credit_time
-msgid "Employer is 100% credit-time, you can't have Remuneration Code 1"
-msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -16034,6 +16197,11 @@ msgstr ""
 "occupation à temps plein et formation d'un coût ≥ 20 % du salaire brut annuel"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_work_exemption_date
+msgid "Exemptions from work without start date"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.view_l10n_be_holiday_attest_form
 msgid ""
 "Existing Allocations\n"
@@ -16311,18 +16479,6 @@ msgid "Factoring activities"
 msgstr "Affacturage"
 
 #. module: l10n_be_hr_payroll
-#. odoo-python
-#: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_batch_declaration.py:0
-msgid ""
-"Failed to fetch validation schema of %(type)s report for quarter %"
-"(year_quarter)s: \n"
-"%(error)s"
-msgstr ""
-"Échec de la récupération du schéma de validation du rapport %(type)s pour le "
-"trimestre %(year_quarter)s : \n"
-"%(error)s"
-
-#. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_fleet_vehicle_model__is_false_hybrid
 msgid "False Hybrid"
 msgstr "Faux hybride"
@@ -16497,6 +16653,13 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee__l10n_be_fictive_hire_date
 msgid "Fictive Hire Date"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_version.py:0
+#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__mail_activity__technical_usage__l10n_be_hr_payroll_fictive_hiring_date_verification
+msgid "Fictive Hiring Date Verification"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -16955,6 +17118,11 @@ msgid "Flexi-job Annual Cap (Standard)"
 msgstr "Plafond annuel flexi-jobs (Standard)"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_flexi_already_employed
+msgid "Flexi-job at an employer already employing the worker"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:l10n.be.worker.code,name:l10n_be_hr_payroll.l10n_be_worker_code_00450
 msgid "Flexi-job employee"
 msgstr ""
@@ -16962,6 +17130,14 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #: model:l10n.be.worker.code,name:l10n_be_hr_payroll.l10n_be_worker_code_00050
 msgid "Flexi-job manual worker"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"Flexi-jobs at the employer already employing the worker in the quarter, to "
+"declare as an ordinary employment: %(names)s"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -17177,11 +17353,6 @@ msgid ""
 msgstr ""
 "Pour toutes les personnes assurées, indiquez le nom / prénom / date de "
 "naissance / lien de parenté / Indiquez si handicapé"
-
-#. module: l10n_be_hr_payroll
-#: model:hr.employee.type,name:l10n_be_hr_payroll.l10n_be_contract_type_clearly_defined_work
-msgid "For clearly defined work"
-msgstr "Pour travail clairement défini"
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,help:l10n_be_hr_payroll.field_hr_employee__l10n_be_withholding_tax_amount
@@ -18147,6 +18318,11 @@ msgid "Group Insurance Sacrifice Rate"
 msgstr "Taux de sacrifice assurance groupe"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_group_insurance_employee_deduction
+msgid "Group Insurance: Personal Contributions"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_individual_account
 msgid "Group insurance name"
 msgstr ""
@@ -18620,6 +18796,11 @@ msgid "Holiday pay supplement"
 msgstr "Double pécule de sortie"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_holiday_starting_date
+msgid "Holiday starting date of the manual workers"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_holiday_attest__days_to_allocate
 msgid "Holiday(s) to allocate"
 msgstr ""
@@ -18683,6 +18864,26 @@ msgstr "Indemnité de télétravail"
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.dmfa_pdf_report
 msgid "Horeca Extra:"
 msgstr "Horeca Extra :"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_horeca_occasional_days
+msgid "Horeca Occasional Workers: Days per Year (Worker Contingent)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_horeca_occasional_hourly_wage
+msgid "Horeca Occasional Workers: Flat Hourly Wage"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_horeca_occasional_flat_wage
+msgid "Horeca Occasional Workers: Flat Wage"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_horeca_occasional_withholding_tax_rate
+msgid "Horeca Occasional Workers: Withholding Tax Rate"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:l10n.be.joint.committee,name:l10n_be_hr_payroll.l10n_be_joint_committee_145
@@ -19988,15 +20189,15 @@ msgid "Incorrect processing type for an ACR"
 msgstr "Type de traitement incorrect pour un ACR"
 
 #. module: l10n_be_hr_payroll
-#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_wrong_work_code
-msgid "Incorrect work code (worker too old)."
-msgstr ""
-
-#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_declaration.py:0
 msgid "Incorrect working time reorganization measure"
 msgstr "Mesure de réorganisation du temps de travail incorrecte"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_percentage_paid
+msgid "Increased hourly pay of the reductions of the working time"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_hr_payroll_schedule_change_wizard_view_form
@@ -20467,6 +20668,12 @@ msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid "Invalid NISS for employees %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_drs.py:0
 msgid "Invalid NISS number for %s"
 msgstr ""
@@ -20761,7 +20968,6 @@ msgstr "Juin"
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_dmfa__correction_reason
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_dmfa_natural_person_state__modification_justification
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.dmfa_modification_xml_report
 msgid "Justification"
 msgstr "Justificatif"
 
@@ -21321,6 +21527,11 @@ msgid "L10N Be Sixth Hire Reductions Used Outside Odoo"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee_departure__l10n_be_special_outplacement_warning
+msgid "L10N Be Special Outplacement Warning"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_payslip__l10n_be_sum_additional_hours
 msgid "L10N Be Sum Additional Hours"
 msgstr ""
@@ -21366,6 +21577,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_payslip_run__l10n_be_withholding_taxes
 msgid "L10N Be Withholding Taxes"
 msgstr "Précompte professionnel"
+
+#. module: l10n_be_hr_payroll
+#: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee_departure__l10n_be_work_time_rate
+msgid "L10N Be Work Time Rate"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee__l10n_be_worker_code_is_single
@@ -21829,11 +22045,6 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_leave_allocation__linked_drs_ids
 msgid "Linked Drs"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:ir.model.fields,help:l10n_be_hr_payroll.field_hr_contract_salary_benefit__l10n_be_joint_committee_ids
-msgid "List all joint committees where the benefit rule should be applied"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -23555,6 +23766,8 @@ msgid "Mark as Done"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_273_xx_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_281_xx_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_dmfa_view_form
@@ -23665,6 +23878,11 @@ msgstr ""
 #: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_prp_max_spouse_income
 msgid "Maximal imputed amount to the employee's spouse"
 msgstr "Montant maximal imputé au conjoint de l'employé"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_prp_max_spouse_income_seniors
+msgid "Maximal imputed amount to the employee's spouse (both spouses aged)"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_max_co2_prc
@@ -24079,6 +24297,11 @@ msgid "Misc."
 msgstr "Divers"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_missing_accident_insurance
+msgid "Missing Accident insurance information"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_be_hr_payroll.MISSING_CERTIFICATE
 msgid "Missing Certificate"
 msgstr ""
@@ -24091,6 +24314,11 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_missing_worker_code
 msgid "Missing DMFA worker code"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_missing_dimona_in
+msgid "Missing Dimona In"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -24422,10 +24650,7 @@ msgid "Month"
 msgstr "Mois"
 
 #. module: l10n_be_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__bus_transport_periodicity__monthly
-#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__metro_transport_periodicity__monthly
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__train_transport_periodicity__monthly
-#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__tram_transport_periodicity__monthly
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__l10n_be_274_xx__declaration_frequency__monthly
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__payroll_config_settings__l10n_be_declaration_frequency__monthly
 msgid "Monthly"
@@ -25020,26 +25245,6 @@ msgstr "Code de nature"
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_281_20
 msgid "Nature:"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
-msgid "Needs Dimona Cancel"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
-msgid "Needs Dimona In"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
-msgid "Needs Dimona Out"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
-msgid "Needs Dimona Update"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -25818,8 +26023,6 @@ msgstr "Enseignement supérieur non universitaire"
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_281_18.py:0
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_281_mixin.py:0
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_benefit_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_benefit_view_tree
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_departure_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form_company_car
@@ -25941,11 +26144,6 @@ msgstr "Non déclaré dans la DMFA"
 #: model:l10n.be.worker.code,name:l10n_be_hr_payroll.l10n_be_worker_code_00000
 msgid "Not subject to ONSS"
 msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
-msgid "Not submitted to Salary Grid"
-msgstr "Non soumis à la grille salariale"
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -26708,6 +26906,11 @@ msgid "Obsolete request"
 msgstr "Demande obsolète"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule.category,name:l10n_be_hr_payroll.OCCASIONAL_WITHHOLDING_BASE
+msgid "Occasional Workers Withholding Tax Base"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:l10n.be.worker.code,name:l10n_be_hr_payroll.l10n_be_worker_code_00022
 msgid "Occasional apprentice under 18"
 msgstr ""
@@ -26816,6 +27019,17 @@ msgstr "# Occupations"
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__l10n_be_meal_vouchers_report__month__10
 msgid "October"
 msgstr "Octobre"
+
+#. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_274_XX_view_form
+msgid "Off-Cycle"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/__init__.py:0
+msgid "Office"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_template_view_office_fees
@@ -26963,6 +27177,11 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_be_hr_payroll.field_l10n_be_274_xx_line__extra_exempted_rate
 msgid ""
 "Only set for 274.44 and 274.55 lines: the exempted rate for extra hours."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_draft_payslips
+msgid "Only the validated and paid payslips are declared."
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -27638,8 +27857,18 @@ msgstr "Outplacement"
 
 #. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_termination_fees_termination_outplacement
-msgid "Outplacement (if more than 30 weeks notice duration)"
-msgstr "Externalisation (si le préavis est supérieur à 30 semaines)"
+msgid "Outplacement - 4 weeks deduction"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_termination_fees_outplacement_days_taken
+msgid "Outplacement - Days already taken"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_termination_fees_outplacement_amount
+msgid "Outplacement Amount"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,help:l10n_be_hr_payroll.field_hr_employee__l10n_be_professional_reclassification
@@ -28183,6 +28412,11 @@ msgid "Payslips modified after 273.XX generation."
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_dashboard_warning_274_report_not_updated
+msgid "Payslips modified after 274.XX generation."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:ir.model.fields,help:l10n_be_hr_payroll.field_l10n_be_274_xx__is_correction_needed
 msgid "Payslips of this period changed after the declaration was filed."
 msgstr ""
@@ -28313,6 +28547,7 @@ msgstr "Spectacle"
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_dimona_declaration__period_id
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_dimona_relation__period_ids
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_meal_vouchers_report__year
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_274_XX_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_meal_vouchers_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_social_balance_sheet_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_social_security_certificate_view_form
@@ -29212,6 +29447,11 @@ msgstr ""
 #: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_private_car_taxable_threshold
 msgid "Private Car: Taxable Threshold"
 msgstr "Voiture privée : seuil imposable"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_private_car_withholding_monthly_exemption
+msgid "Private Car: Withholding Tax Monthly Exemption"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_template_view_pc
@@ -30272,15 +30512,6 @@ msgid "Rate (%)"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
-#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_worker_onss_calculation_basis_uplift
-msgid ""
-"Rate to apply on the base salary for the social contribution computation for "
-"workers"
-msgstr ""
-"Taux à appliquer sur le salaire de base pour le calcul de la cotisation "
-"sociale des ouvriers"
-
-#. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_273_xx__rating_ids
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_dmfa__rating_ids
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_drs__rating_ids
@@ -30641,6 +30872,19 @@ msgstr "Refusée"
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee__l10n_be_refused_flexijob
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_version__l10n_be_refused_flexijob
 msgid "Refused Flexi-job"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"Refused flexi-jobs are declared as ordinary workers: set the worker code 015 "
+"or 495 on their contract and recompute their payslips: %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_refused_flexi_worker_code
+msgid "Refused flexi-jobs with a flexi worker code"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -31923,6 +32167,7 @@ msgstr "Retenue de versement : précompte professionnel (salaires)"
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee__l10n_be_is_retired
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_version__l10n_be_is_retired
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.dmfa_pdf_report
 msgid "Retired"
 msgstr "Pensionné"
 
@@ -31975,6 +32220,7 @@ msgstr "Vérifier les déclarations Dimona"
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_invalid_category_sales_rep
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_invalid_niss
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_invalid_sex
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_missing_dimona_in
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_payslips_outside_dimona_declaration
 msgid "Review Employees"
 msgstr "Vérifier les employés"
@@ -32000,7 +32246,21 @@ msgstr "Vérifier les fiches de paie"
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_company_executive_meal_vouchers
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_cp200_economic_unemployment_compensation
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dimona_periods_version_mismatch
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_complementary_indemnity_worker_code
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_draft_payslips
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_flexi_already_employed
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_holiday_starting_date
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_invalid_niss_checksum
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_percentage_paid
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_quarter_not_ended
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_refused_flexi_worker_code
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_report
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_student_hours
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_student_worker_code
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_termination_previous_quarter
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_unit_invalid_code
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_unit_without_code
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_work_exemption_date
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_draft_payslips_by_departure
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_employee_mobility_budget_less_than_min_parameter
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_employee_mobility_budget_more_than_20_percents_wage
@@ -32041,7 +32301,6 @@ msgstr "Vérifier les fiches de paie"
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_working_schedule_incompatibility
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_wrong_additional_hours_work_time
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_wrong_type_additional_hours
-#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_wrong_work_code
 #: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.l10n_be_hr_payroll_warning_unrecovered_net
 msgid "Review Records"
 msgstr "Vérifier les enregistrements"
@@ -32324,326 +32583,6 @@ msgid "Salary Scale"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_1
-msgid "Salary Scale 1"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_10
-msgid "Salary Scale 10"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_11
-msgid "Salary Scale 11"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_12
-msgid "Salary Scale 12"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_13
-msgid "Salary Scale 13"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_14
-msgid "Salary Scale 14"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_15
-msgid "Salary Scale 15"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_16
-msgid "Salary Scale 16"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_17
-msgid "Salary Scale 17"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_18
-msgid "Salary Scale 18"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_19
-msgid "Salary Scale 19"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_2
-msgid "Salary Scale 2"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_22
-msgid "Salary Scale 22"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_23
-msgid "Salary Scale 23"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_24
-msgid "Salary Scale 24"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_25
-msgid "Salary Scale 25"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_26
-msgid "Salary Scale 26"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_27
-msgid "Salary Scale 27"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_28
-msgid "Salary Scale 28"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_3
-msgid "Salary Scale 3"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_4
-msgid "Salary Scale 4"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_5
-msgid "Salary Scale 5"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_53
-msgid "Salary Scale 53"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_55
-msgid "Salary Scale 55"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_57
-msgid "Salary Scale 57"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_58
-msgid "Salary Scale 58"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_59
-msgid "Salary Scale 59"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_6
-msgid "Salary Scale 6"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_61
-msgid "Salary Scale 61"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_62
-msgid "Salary Scale 62"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_63
-msgid "Salary Scale 63"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_64
-msgid "Salary Scale 64"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_65
-msgid "Salary Scale 65"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_66
-msgid "Salary Scale 66"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_67
-msgid "Salary Scale 67"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_7
-msgid "Salary Scale 7"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_70
-msgid "Salary Scale 70"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_71
-msgid "Salary Scale 71"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_72
-msgid "Salary Scale 72"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_73
-msgid "Salary Scale 73"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_75
-msgid "Salary Scale 75"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_77
-msgid "Salary Scale 77"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_8
-msgid "Salary Scale 8"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_81
-msgid "Salary Scale 81"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_82
-msgid "Salary Scale 82"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_85_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_85_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_85_3
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_85_4
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_85_5
-msgid "Salary Scale 85"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_88_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_88_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_88_3
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_88_4
-msgid "Salary Scale 88"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_89_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_89_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_89_3
-msgid "Salary Scale 89"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_9
-msgid "Salary Scale 9"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_91_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_91_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_91_3
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_91_4
-msgid "Salary Scale 91"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_92_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_92_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_92_3
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_92_4
-msgid "Salary Scale 92"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_93_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_93_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_93_3
-msgid "Salary Scale 93"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_94
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_94_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_94_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_94_3
-msgid "Salary Scale 94"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp302_cat_95
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_95_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_95_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_95_3
-msgid "Salary Scale 95"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_99_1
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_99_2
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.salary_scale_99_3
-msgid "Salary Scale 99"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_a
-msgid "Salary Scale A"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_b
-msgid "Salary Scale B"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_c
-msgid "Salary Scale C"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model:l10n_be.salary.scale,name:l10n_be_hr_payroll.cp200_d
-msgid "Salary Scale D"
-msgstr ""
-
-#. module: l10n_be_hr_payroll
 #: model:ir.actions.act_window,name:l10n_be_hr_payroll.l10n_be_salary_scale_action
 #: model:ir.ui.menu,name:l10n_be_hr_payroll.menu_l10n_be_salary_scale
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.view_l10n_be_salary_scale_list
@@ -32921,6 +32860,12 @@ msgid "Security activities n.e.c."
 msgstr "Activités de sécurité privée n.c.a."
 
 #. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid "See DMFA units"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.res_config_settings_view_form
 msgid "See Documentation"
 msgstr ""
@@ -33019,9 +32964,12 @@ msgid "Select Employees"
 msgstr "Sélectionner des employés"
 
 #. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
-msgid "Select number of employees"
-msgstr "Sélectionnez le nombre d'employés"
+#: model:ir.model.fields,help:l10n_be_hr_payroll.field_hr_employee__l10n_be_is_retired
+#: model:ir.model.fields,help:l10n_be_hr_payroll.field_hr_version__l10n_be_is_retired
+msgid ""
+"Select this when the employee works while receiving a legal retirement "
+"pension or a legal survivor's pension."
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_joint_committee__selectable
@@ -33073,6 +33021,11 @@ msgstr "Congé seniors et jeunes : jours pris (2)"
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
 msgid "Seniority"
 msgstr "Ancienneté"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_seniority_lost_period
+msgid "Seniority Lost Period"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_employee__l10n_be_scale_seniority
@@ -33277,7 +33230,7 @@ msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_hr_leave__l10n_be_sickness_relapse_origin_leave_id
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_leave_gantt_multi_create_view
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_leave_view_form
 msgid "Sickness Relapse"
 msgstr "Rechute"
 
@@ -33661,6 +33614,13 @@ msgstr ""
 "remettre le rapport en brouillon et le régénérer.</span>\n"
 "                        <span invisible=\"state != 'done'\">Veuillez générer "
 "un rapport de correction.</span>"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_wrong_work_code
+msgid ""
+"Some sub-types are specific for young employees that can be used only until "
+"December 31 of the year they turn 18."
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:l10n.be.nace.code,name:l10n_be_hr_payroll.l10n_be_nace_code_59202
@@ -34063,10 +34023,11 @@ msgid "State Xlsx"
 msgstr "Statut Xlsx"
 
 #. module: l10n_be_hr_payroll
-#. odoo-python
-#: code:addons/l10n_be_hr_payroll/models/hr_employee.py:0
-msgid "State the Dimona at %(link)s to declare the arrival of %(employee)s."
-msgstr "Déclarer la Dimona à %(link)s pour déclarer l'arrivée de %(employee)s."
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_missing_dimona_in
+msgid ""
+"State the Dimona at https://www.socialsecurity.be/site_fr/employer/applics/"
+"dimona/index.htm to declare the arrival of your employees."
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_274_XX_view_form
@@ -34229,6 +34190,24 @@ msgstr ""
 "d'employeur 212."
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_student_hours
+msgid "Students above 650 hours in the quarter"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"Students with more than 650 hours in the quarter: the hours above the yearly "
+"650 hours are declared with the ordinary contributions: %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_student_worker_code
+msgid "Students without a student worker code"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/wizard/l10n_be_social_security_certificate.py:0
 msgid "Sub-Total Gross"
@@ -34271,6 +34250,8 @@ msgstr "Délai de soumission non respecté"
 
 #. module: l10n_be_hr_payroll
 #. odoo-javascript
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
 #: code:addons/l10n_be_hr_payroll/static/src/components/report_dmfa_warning_action/report_dmfa_warning_action.xml:0
 msgid "Submit"
 msgstr "Soumettre"
@@ -34785,6 +34766,11 @@ msgid "Taxable Salary (Holiday Termination)"
 msgstr "Salaire imposable (Pécule de vacances de départ)"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_horeca_occasional_taxable
+msgid "Taxable Salary (Horeca Occasional Workers)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.l10n_be_hr_payroll_structure_cp200_employee_yearly_salary_gross_salary_rule
 msgid "Taxable Salary (Non periodic)"
 msgstr ""
@@ -34805,6 +34791,11 @@ msgid "Taxable Salary Exemption"
 msgstr "Exonération du salaire imposable"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_horeca_occasional_taxable_out
+msgid "Taxable Salary Taxed at the Flat Rate (Horeca Occasional Workers)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_be_hr_payroll.TRANSPORTATION_BASE
 msgid "Taxable Transportation Base"
 msgstr ""
@@ -34818,6 +34809,11 @@ msgstr "Rémunération imposable"
 #. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_termination_fees_taxable_reference_salary
 msgid "Taxable reference salary (Termination Fees)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.view_hr_payslip_tree
+msgid "Taxes"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -35114,6 +35110,19 @@ msgstr "Fiches de paie de départ"
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_social_security_certificate
 msgid "Termination fees"
 msgstr "Indemnités de rupture"
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"Termination indemnities to declare with a modification of the DMFA of the "
+"quarter of the end of the contract: %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_dmfa_termination_previous_quarter
+msgid "Termination indemnity of a previous quarter"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -35593,6 +35602,13 @@ msgstr ""
 "Vous pouvez utiliser ce champ pour une recherche rapide."
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_missing_accident_insurance
+msgid ""
+"The Insurance company name and contract number must appear on employee's "
+"payslips."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_declaration.py:0
 msgid "The Isabel signature hash is not correct"
@@ -35692,6 +35708,11 @@ msgid "The ONSS Registration Number is a 9-digit code given by ONSS."
 msgstr ""
 "Le numéro d'immatriculation ONSS est un code à 9 chiffres attribué par "
 "l'ONSS."
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_quarter_not_ended
+msgid "The ONSS only accepts the declarations of the ended quarters."
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -35817,6 +35838,13 @@ msgid "The beneficiary is not indicated"
 msgstr "Le bénéficiaire n’est pas indiqué"
 
 #. module: l10n_be_hr_payroll
+#: model:ir.model.fields,help:l10n_be_hr_payroll.field_hr_contract_salary_benefit__l10n_be_joint_committee_ids
+msgid ""
+"The benefit is activated with the first of these joint committees, and "
+"archived with the last one."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
 msgid ""
 "The change of marital status will only be applied for the next fiscal year"
@@ -35900,6 +35928,22 @@ msgstr ""
 "déclarations de paie belges."
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_complementary_indemnity_worker_code
+msgid ""
+"The complementary indemnities (RCC, RCIC) can't be declared in the DMFA by "
+"Odoo."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"The complementary indemnities (RCC, RCIC: worker codes 879, 883, 885) can't "
+"be declared by Odoo: declare them through the ONSS portal or your social "
+"secretariat: %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_declaration.py:0
 msgid "The completed occupancy is not found"
@@ -35977,6 +36021,22 @@ msgstr ""
 msgid "The data used to route the message is missing or invalid"
 msgstr ""
 "Les données utilisées pour acheminer le message sont manquantes ou invalides"
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"The date of the start of the holidays of the manual workers "
+"(HolidayStartingDate) is mandatory in the declaration of the fourth quarter: "
+"add it to the declaration file before sending it."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_holiday_starting_date
+msgid ""
+"The date of the start of the holidays of the manual workers is mandatory in "
+"the DMFA of the fourth quarter."
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -36298,6 +36358,19 @@ msgstr ""
 "T, R et S"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_unit_without_code
+msgid ""
+"The establishment unit code of the work address is declared on each "
+"occupation."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid "The exemption from work of these employees has no start date: %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_declaration.py:0
 msgid "The expected sequence number was not entered or is invalid"
@@ -36568,6 +36641,16 @@ msgstr ""
 "La clé est chiffrée mais aucune phrase secrète (passphrase) n’a été fournie."
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_invalid_niss_checksum
+msgid "The last 2 digits of the NISS must be its check number."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_unit_invalid_code
+msgid "The last 2 digits of the establishment unit code are its check number."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_dimona_manual_wizard_view_form
 msgid ""
 "The last declaration sent for this employee was refused by the ONSS because "
@@ -36747,6 +36830,14 @@ msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_dmfa.py:0
+msgid ""
+"The occupations of these employees aren't in the quarter, check their "
+"contract dates and the dates of their payslips: %(names)s"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_273_XX.py:0
 msgid ""
 "The original report must be specified for a correction and be in the Done "
@@ -36784,6 +36875,16 @@ msgid ""
 msgstr ""
 "Les fiches de paie doivent couvrir la même période : \n"
 "%s"
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"The percentage of the increased hourly pay (PercentagePaid) of the "
+"reductions of the working time with an unpaid compensatory rest is "
+"mandatory: add it to the remuneration code 1 in the declaration file of %"
+"(names)s"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -36850,6 +36951,12 @@ msgstr "Le format de publication n’a pas été spécifié ou est incorrect"
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_declaration.py:0
 msgid "The qualification does not meet the criteria"
 msgstr "La qualification ne répond pas aux critères"
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid "The quarter isn't ended yet: it can only be declared from %(date)s."
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -36961,6 +37068,12 @@ msgid "The signature file is missing. Please generate the declaration first."
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_student_hours
+msgid ""
+"The solidarity contribution of the students only applies to 650 hours a year."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_onss_declaration.py:0
 msgid "The specified encoding is not supported"
@@ -36976,6 +37089,13 @@ msgstr "La norme de schéma spécifiée n’est pas prise en charge ou est incon
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/l10n_be_holiday_attest.py:0
 msgid "The start date must be before or equal to the end date."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_work_exemption_date
+msgid ""
+"The start date of the exemption from work is mandatory in the DMFA block of "
+"the activation contribution."
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -36997,6 +37117,21 @@ msgstr "La structure du nom d’un fichier GO est incorrecte"
 #: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
 #: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_less_than_15_student
 msgid "The student is under the legal minimum working age (15 years old)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,description:l10n_be_hr_payroll.hr_payroll_warning_dmfa_student_worker_code
+msgid ""
+"The students (Dimona STU) are declared with the worker codes 840 and 841, "
+"which are only for them."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"The students (Dimona STU) must have the worker code 840 or 841, used only "
+"for them: %(names)s"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -37243,10 +37378,8 @@ msgstr ""
 #: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
 msgid ""
 "There are %(count)s public holiday(s) in the 30/14th days following the end "
-"of the contract, it should be paid if the employee didn't"
+"of the contract, it should be paid if the employee didn't find a new job."
 msgstr ""
-"Il y a %(count)s jour(s) férié(s) dans les 30/14 jours suivant la fin du "
-"contrat ; il(s) doit(doivent) être payé(s) si l'employé ne l'a pas"
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -37659,6 +37792,14 @@ msgstr ""
 msgid ""
 "This rule is based on a quarterly calculation. Therefore, the standard Base "
 "amount is not relevant and is intentionally ignored in the computation."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid ""
+"This sub-type can only be used until December 31 of the year the employee "
+"turns 18."
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -38085,6 +38226,7 @@ msgstr "Coût employeur total"
 
 #. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_gross_with_ip
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_274_XX_view_form
 msgid "Total Gross"
 msgstr "Brut total"
 
@@ -38421,6 +38563,11 @@ msgid "Train reimbursement"
 msgstr "Remboursement du train"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_train_reimbursement_71_8
+msgid "Train reimbursement (71.8%)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_274_xx__training_employee_ids
 msgid "Trained Employees"
 msgstr ""
@@ -38529,7 +38676,6 @@ msgid "Transport by pipeline"
 msgstr "Transport par conduites"
 
 #. module: l10n_be_hr_payroll
-#: model:hr.contract.salary.benefit,name:l10n_be_hr_payroll.l10n_be_transport_company_car
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
 msgid "Transportation"
@@ -38995,6 +39141,18 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/wizard/l10n_be_dimona_manual_wizard.py:0
 msgid "Update Employee Declaration"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.payroll.warning,button_name:l10n_be_hr_payroll.hr_payroll_warning_wrong_work_code
+#: model:ir.actions.server,name:l10n_be_hr_payroll.l10n_be_hr_payroll_action_update_too_old_worker_codes
+msgid "Update Employees"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payroll_warning.py:0
+msgid "Update Sub-type"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -40087,6 +40245,12 @@ msgstr ""
 "Intermédiaires du commerce de gros en bois et matériaux de construction"
 
 #. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_dmfa.py:0
+msgid "Wijninckx Contribution"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_wijninckx_not_q4
 msgid "Wijninckx Cotisation Only in Q4"
 msgstr "Cotisation Wijninckx uniquement au T4"
@@ -40183,6 +40347,11 @@ msgid "Withholding Tax (Holiday Termination)"
 msgstr "Précompte professionnel (Pécule de vacances de départ)"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_horeca_occasional_withholding_taxes
+msgid "Withholding Tax (Horeca Occasional Workers)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_profit_sharing_bonus_high_PP
 msgid "Withholding Tax (Profit Sharing Bonus High)"
 msgstr ""
@@ -40253,6 +40422,21 @@ msgid "Withholding Tax Exemption 274.34 (Bachelors)"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_274_44
+msgid "Withholding Tax Exemption 274.44 (Extra Hours CP200)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_274_55
+msgid "Withholding Tax Exemption 274.55 (Extra Hours CP302)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_274_62
+msgid "Withholding Tax Exemption 274.62 (Starterjob)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_274_74
 msgid "Withholding Tax Exemption 274.74 (Team work)"
 msgstr ""
@@ -40260,6 +40444,11 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_274_75
 msgid "Withholding Tax Exemption 274.75 (Night work)"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_274_81
+msgid "Withholding Tax Exemption 274.81 (Aid Zone)"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -40430,6 +40619,16 @@ msgstr "Commerce du bois"
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__l10n_be_onss_file__declaration_type__publ
 msgid "Work Accident Declaration (Public Sector)"
 msgstr "Déclaration d’accident du travail (Secteur public)"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,name:l10n_be_hr_payroll.cp200_employees_salary_work_accident
+msgid "Work Accident Guaranteed Salary"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:hr.salary.rule.category,name:l10n_be_hr_payroll.WORK_ACCIDENT_BASE
+msgid "Work Accident Guaranteed Salary Base"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:hr.payroll.warning,name:l10n_be_hr_payroll.hr_payroll_warning_work_accident_leave_eligibility
@@ -40638,6 +40837,11 @@ msgstr "Code Travailleur :"
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_worker_code_view_tree
 msgid "Worker Codes"
 msgstr "Codes travailleur"
+
+#. module: l10n_be_hr_payroll
+#: model:hr.rule.parameter,name:l10n_be_hr_payroll.rule_parameter_worker_onss_calculation_basis_uplift
+msgid "Worker ONSS uplift"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model:ir.model.fields,field_description:l10n_be_hr_payroll.field_l10n_be_dmfa_natural_person_state__worker_record_data
@@ -41078,10 +41282,7 @@ msgid "Year-end bonus"
 msgstr "Bonus de fin d'année"
 
 #. module: l10n_be_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__bus_transport_periodicity__yearly
-#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__metro_transport_periodicity__yearly
 #: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__train_transport_periodicity__yearly
-#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__tram_transport_periodicity__yearly
 msgid "Yearly"
 msgstr "Annuel"
 
@@ -41178,11 +41379,6 @@ msgid ""
 "You are not allowed to delete a DRS Risk nomenclature record.If this "
 "scenario is no longer valid according to the NSSO, please adjust the 'Valid "
 "Until' field to expire it instead."
-msgstr ""
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
-msgid "You can find most of these information on the"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -41294,6 +41490,16 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #. odoo-python
 #: code:addons/l10n_be_hr_payroll/models/hr_version.py:0
+msgid ""
+"You created a new contract after more than %(count)d %(period_name)s(s) of "
+"interruption, verify that the fictive hiring date is correct. The fictive "
+"hiring date will be used to compute seniority and the duration of the notice "
+"period."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_version.py:0
 msgid "You don't have the right to call this action"
 msgstr "Vous n'avez pas le droit d'appeler cette action"
 
@@ -41352,6 +41558,12 @@ msgid ""
 "                        working day following the end of the employment. "
 "Failure to do so can lead to fines,<br/>\n"
 "                        or scrutiny from the social-security inspectorates."
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#. odoo-python
+#: code:addons/l10n_be_hr_payroll/models/hr_payslip_run.py:0
+msgid "You must have employee records in the payrun to generate payslip(s)."
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -43005,6 +43217,7 @@ msgstr ""
 #. module: l10n_be_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_be_hr_payroll/static/src/leave_stats/leave_stats_patch.xml:0
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_fees_notice_duration_day
 #: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.employees_salary_service_travel_abroad
 #: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.employees_salary_travel_cost_loc
 #: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.employees_salary_travel_cost_meal
@@ -43115,12 +43328,12 @@ msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
-msgid "e.g. 058"
-msgstr "ex. 058"
+msgid "e.g. 083012308"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
-msgid "e.g. 083012308"
+msgid "e.g. 1230"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
@@ -43134,9 +43347,13 @@ msgid "e.g. 1900123-45"
 msgstr ""
 
 #. module: l10n_be_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
+msgid "e.g. 200, 302"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
 msgid "e.g. CP200, CP302"
 msgstr "ex. CP200, CP302"
 
@@ -43190,11 +43407,6 @@ msgstr "Code eGov3"
 #: code:addons/l10n_be_hr_payroll/models/hr_employee.py:0
 msgid "employee_id"
 msgstr "employee_id"
-
-#. module: l10n_be_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.payroll_config_settings_view_form
-msgid "employer directory"
-msgstr ""
 
 #. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.l10n_be_meal_vouchers_view_form
@@ -43465,6 +43677,12 @@ msgid "month"
 msgstr "mois"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_fees_notice_duration_month
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.l10n_be_hr_payroll_structure_cp200_double_holiday_n_month
+msgid "months"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.report_281_30
 msgid ""
 "n) Compensation Derived from the Exploitation of a Scientific Discovery:"
@@ -43524,6 +43742,20 @@ msgid ""
 msgstr ""
 "partie du budget de la carte carburant destinée à l'usage personnel de "
 "l'employé"
+
+#. module: l10n_be_hr_payroll
+#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__bus_transport_periodicity__monthly
+#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__metro_transport_periodicity__monthly
+#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__tram_transport_periodicity__monthly
+msgid "per month"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
+#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__bus_transport_periodicity__yearly
+#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__metro_transport_periodicity__yearly
+#: model:ir.model.fields.selection,name:l10n_be_hr_payroll.selection__hr_version__tram_transport_periodicity__yearly
+msgid "per year"
+msgstr ""
 
 #. module: l10n_be_hr_payroll
 #. odoo-python
@@ -43652,6 +43884,13 @@ msgid "tri"
 msgstr "tri"
 
 #. module: l10n_be_hr_payroll
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_fees_notice_duration_week
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_fees_termination_non_respect_motivation
+#: model:hr.salary.rule,input_suffix:l10n_be_hr_payroll.cp200_employees_termination_fees_termination_unreasonable_dismissal
+msgid "weeks"
+msgstr ""
+
+#. module: l10n_be_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_be_hr_payroll.hr_employee_view_form
 msgid "with disability"
 msgstr ""
@@ -43701,6 +43940,54 @@ msgid ""
 msgstr ""
 "€<span class=\"me-2\"/>\n"
 "            (="
+
+#~ msgid "Outplacement (if more than 30 weeks notice duration)"
+#~ msgstr "Externalisation (si le préavis est supérieur à 30 semaines)"
+
+#~ msgid "Crew"
+#~ msgstr "Équipe"
+
+#~ msgid "For clearly defined work"
+#~ msgstr "Pour travail clairement défini"
+
+#~ msgid "Select number of employees"
+#~ msgstr "Sélectionnez le nombre d'employés"
+
+#~ msgid "e.g. 058"
+#~ msgstr "ex. 058"
+
+#~ msgid ""
+#~ "Failed to fetch validation schema of %(type)s report for quarter %"
+#~ "(year_quarter)s: \n"
+#~ "%(error)s"
+#~ msgstr ""
+#~ "Échec de la récupération du schéma de validation du rapport %(type)s pour "
+#~ "le trimestre %(year_quarter)s : \n"
+#~ "%(error)s"
+
+#~ msgid "Not submitted to Salary Grid"
+#~ msgstr "Non soumis à la grille salariale"
+
+#~ msgid ""
+#~ "Rate to apply on the base salary for the social contribution computation "
+#~ "for workers"
+#~ msgstr ""
+#~ "Taux à appliquer sur le salaire de base pour le calcul de la cotisation "
+#~ "sociale des ouvriers"
+
+#~ msgid "Employees With Wrong Work Code"
+#~ msgstr "Employés avec un code de travail incorrect"
+
+#~ msgid "State the Dimona at %(link)s to declare the arrival of %(employee)s."
+#~ msgstr ""
+#~ "Déclarer la Dimona à %(link)s pour déclarer l'arrivée de %(employee)s."
+
+#~ msgid ""
+#~ "There are %(count)s public holiday(s) in the 30/14th days following the "
+#~ "end of the contract, it should be paid if the employee didn't"
+#~ msgstr ""
+#~ "Il y a %(count)s jour(s) férié(s) dans les 30/14 jours suivant la fin du "
+#~ "contrat ; il(s) doit(doivent) être payé(s) si l'employé ne l'a pas"
 
 #~ msgid "Dmfa code, e.g. 015"
 #~ msgstr "Code Dmfa, p. ex. 015"

@@ -1,5 +1,5 @@
 import { useSubEnv } from "@web/owl2/utils";
-import { asyncComputed, Component, onWillStart, t, useProps } from "@odoo/owl";
+import { Component, computed, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Thread } from "@mail/core/common/thread";
 import { Composer } from "@mail/core/common/composer";
@@ -23,15 +23,11 @@ export class CellThread extends Component {
         });
         /** @type {import("models").Store} */
         this.mailStore = useService("mail.store");
-        this.thread = asyncComputed(async () => {
-            const thread = this.mailStore["mail.thread"].insert({
+        this.thread = computed(() =>
+            this.mailStore["mail.thread"].insert({
                 model: CellThread.threadModel,
                 id: this.props.threadId,
-            });
-            thread.fetchNewMessages();
-            return thread;
-        });
-
-        onWillStart(() => this.thread.currentPromise());
+            })
+        );
     }
 }

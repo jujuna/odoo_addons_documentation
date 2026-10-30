@@ -6,12 +6,13 @@
 # "Abe Manyo (abem)" <abem@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-23 04:33+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-12 07:29+0000\n"
 "Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-20/"
 "appointment/id/>\n"
@@ -28,6 +29,8 @@ msgid ""
 "\n"
 "Allow clients to Schedule Appointments through the Portal\n"
 msgstr ""
+"\n"
+"Izinkan klien untuk Menjadwalkan Appointment melalui Portal\n"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -76,7 +79,7 @@ msgstr "# Cuti"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_count
 msgid "# Ratings"
-msgstr ""
+msgstr "# Rating"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__suggested_resource_count
@@ -87,7 +90,7 @@ msgstr "# Sumber Daya"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_count
 msgid "# Slots"
-msgstr ""
+msgstr "# Slot"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__suggested_staff_user_count
@@ -132,7 +135,7 @@ msgstr "%s - Ayo bertemu"
 #. odoo-python
 #: code:addons/appointment/models/appointment_leave.py:0
 msgid "%s closing"
-msgstr ""
+msgstr "%s tutup"
 
 #. module: appointment
 #. odoo-javascript
@@ -149,7 +152,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
-msgstr ""
+msgstr "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
 
 #. module: appointment
 #. odoo-javascript
@@ -294,6 +297,129 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 13px; color: #374151;  background-color: white;\">\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
+"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
+"ctx.get('mail_tz')\"/>\n"
+"    <t t-set=\"customer\" t-value=\"object.appointment_booker_id or "
+"object.find_partner_customer() or object.partner_id\"/>\n"
+"    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151; margin-"
+"bottom: 28px;\">\n"
+"        Appointment dibatalkan\n"
+"        <img src=\"/calendar/static/src/img/times-circle.png\" "
+"style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
+"decoration:none; vertical-align: bottom;\"/>\n"
+"    </h1>\n"
+"    <p style=\"margin: 0;\">\n"
+"        <t t-if=\"customer\">\n"
+"            Halo <t t-out=\"customer.display_name or ''\">John Booker</t>,\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            Halo,\n"
+"        </t>\n"
+"        <br/>\n"
+"        <span style=\"display: block; margin-top: 8px;\">Appointment Anda "
+"untuk <t t-out=\"object.appointment_type_id.name or ''\">Demo Teknis</t> <t "
+"t-if=\"object.appointment_type_id.category not in ['custom', 'anytime'] and "
+"object.appointment_type_id.schedule_based_on == 'users' and "
+"object.partner_id\"> dengan <t t-out=\"object.partner_id.name or "
+"''\">Brandon Freeman</t></t> telah dibatalkan.</span>\n"
+"    </p>\n"
+"    <div style=\"margin: 32px 0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Detail</h2>\n"
+"        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
+"size: 13px; color: #374151;\">\n"
+"            <tr>\n"
+"                <td style=\"width: 100px; color: #676F7B;\">Tanggal &amp; "
+"Waktu</td>\n"
+"                <td style=\"font-weight: bold;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='EEEE', lang_code=object.env.lang) "
+"or ''\">Rabu</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='d', lang_code=object.env.lang) or "
+"''\">1</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='MMMM y', "
+"lang_code=object.env.lang) or ''\">Januari 2020</t>\n"
+"                    <t t-if=\"not object.allday\">\n"
+"                        <t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''\">08.00</"
+"t>\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <span style=\"font-size: 11px; font-weight: "
+"normal;\">\n"
+"                                (<t t-out=\"mail_tz\">Eropa/Brussels</t>)\n"
+"                            </span>\n"
+"                        </t>\n"
+"                    </t>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr t-if=\"recurrent\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">Kapan</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-"
+"out=\"object.recurrence_id.name or ''\">Setiap 1 Minggu, untuk 3 acara</t></"
+"td>\n"
+"            </tr>\n"
+"            <tr t-if=\"not object.appointment_type_id.hide_duration and not "
+"object.allday and object.duration\" style=\"padding-top: 6px;\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">Durasi</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-out=\"('%dH%02d' % "
+"(object.duration,round(object.duration*60)%60)) or ''\">0J30</t></td>\n"
+"            </tr>\n"
+"            <tr t-if=\"object.location\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B; "
+"vertical-align: top;\">Location</td>\n"
+"                <td style=\"padding-top: 6px;\">\n"
+"                    <t t-out=\"object.location or ''\">Bruxelles</t>\n"
+"                    <a target=\"_blank\" t-if=\"object.location != "
+"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\" style=\"margin-"
+"left: 12px; font-size: 12px; color: #008f8c; text-decoration: underline;"
+"\">Lihat Peta</a>\n"
+"                </td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    <div style=\"margin: 32px 0 0;\">\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Peserta</h2>\n"
+"        <div t-foreach=\"object.attendee_ids[:max_shown_attendees]\" t-"
+"as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
+"            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
+"img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
+"15px; vertical-align: text-bottom;\"/>\n"
+"            <t t-if=\"attendee.common_name\">\n"
+"                <span style=\"margin-left: 5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                <span style=\"margin-left:5px\">Anda</span>\n"
+"            </t>\n"
+"        </div>\n"
+"        <div t-if=\"len(object.attendee_ids) &gt; max_shown_attendees\" "
+"style=\"margin-bottom: 5px;\">\n"
+"            ... dan <t t-out=\"len(object.attendee_ids) - "
+"max_shown_attendees\">2</t> lainnya\n"
+"        </div>\n"
+"    </div>\n"
+"    <div t-if=\"not is_html_empty(object.description)\" style=\"margin: 32px "
+"0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Deskripsi acara</h2>\n"
+"        <div t-out=\"object.description\">Showcase produk internal.</div>\n"
+"    </div>\n"
+"</div>\n"
+"            "
 
 #. module: appointment
 #: model:mail.template,body_html:appointment.appointment_feedback_mail_template
@@ -397,6 +523,104 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
+"    <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
+"size: 13px; color: #374151; width: 100%;\">\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px;\">\n"
+"                Halo <t t-out=\"object.appointment_booker_id.name or "
+"''\">John Doe</t>,\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px;\">\n"
+"                Terima kasih sudah booking bersama kami.<br/>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 24px;\">\n"
+"                Mohon bantuannya untuk meluangkan waktu sebentar dan menilai "
+"pengalaman Anda. Masukan ini akan sangat membantu kami meningkatkan kualitas "
+"layanan kami ke depannya.\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td>\n"
+"                <h2 t-attf-style=\"margin: 0 0 8px 0; font-size: 14px; font-"
+"weight: bold; font-style: italic; color: "
+"{{ object.user_id.company_id.email_secondary_color or '#875A7B' }};\">\n"
+"                    Sampaikan kesan tentang kunjungan Anda\n"
+"                </h2>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px; color: #676F7B; font-style: "
+"italic;\">\n"
+"                Klik salah satu opsi di bawah ini:\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 24px;\">\n"
+"                <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" "
+"style=\"font-size: 13px; color: #374151;\">\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_5.png\" "
+"alt=\"Puas\" style=\"width: 20px; height: 20px; border: 0; vertical-align: "
+"middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/5\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                Sangat berkesan\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_3.png\" "
+"alt=\"Biasa\" style=\"width: 20px; height: 20px; border: 0; vertical-align: "
+"middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/3\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                Biasa saja\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_1.png\" "
+"alt=\"Tidak Puas\" style=\"width: 20px; height: 20px; border: 0; vertical-"
+"align: middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/1\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                Tidak memuaskan\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"color: #676F7B; font-style: italic;\">\n"
+"                Terima kasih atas masukannya dan sampai jumpa lagi.\n"
+"            </td>\n"
+"        </tr>\n"
+"    </table>\n"
+"</div>\n"
+"            "
 
 #. module: appointment
 #: model:mail.template,body_html:appointment.attendee_invitation_mail_template
@@ -1364,17 +1588,17 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
 msgid "<i class=\"oi me-1 fs-4\" data-icon=\"schedule\" title=\"Duration\"/>"
-msgstr ""
+msgstr "<i class=\"oi me-1 fs-4\" data-icon=\"schedule\" title=\"Durasi\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
 msgid "<i class=\"oi me-1\" data-icon=\"add\"/>Add"
-msgstr ""
+msgstr "<i class=\"oi me-1\" data-icon=\"add\"/>Tambahkan"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "<i class=\"oi me-1\" data-icon=\"add\"/>Add Guests"
-msgstr ""
+msgstr "<i class=\"oi me-1\" data-icon=\"add\"/>Tambahkan Tamu"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -1382,6 +1606,8 @@ msgid ""
 "<i class=\"oi me-1\" data-icon=\"calendar_add_on\"/>\n"
 "                                    Book another appointment"
 msgstr ""
+"<i class=\"oi me-1\" data-icon=\"calendar_add_on\"/>\n"
+"                                    Jadwalkan appointment lain"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
@@ -1392,6 +1618,11 @@ msgid ""
 "                        Exact timings might differ depending on the "
 "appointment timezone."
 msgstr ""
+"<i class=\"oi me-2\" data-icon=\"warning\"/>\n"
+"                        Zona waktu saat ini akan digunakan sebagai acuan "
+"untuk hari penutupan appointment yang dipilih.\n"
+"                        Detail waktu mungkin berbeda tergantung zona waktu "
+"appointment."
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -1439,6 +1670,10 @@ msgid ""
 "                                    <span "
 "class=\"o_appointment_kanban_button_name\">Preview</span>"
 msgstr ""
+"<i class=\"oi o_appointment_kanban_button_icon d-none\" data-icon=\"public\"/"
+">\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Pratinjau</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
@@ -1448,6 +1683,10 @@ msgid ""
 "                                    <span "
 "class=\"o_appointment_kanban_button_name\">Configure</span>"
 msgstr ""
+"<i class=\"oi oi-filled o_appointment_kanban_button_icon d-none\" data-"
+"icon=\"settings\"/>\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Konfigurasi</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1462,6 +1701,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"location_on\" aria-"
 "label=\"Location\"/>"
 msgstr ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"location_on\" aria-"
+"label=\"Lokasi\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1469,6 +1710,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"person\" aria-"
 "label=\"Users\"/>"
 msgstr ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"person\" aria-"
+"label=\"User\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1476,6 +1719,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"repeat\" aria-"
 "label=\"Schedule\"/>"
 msgstr ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"repeat\" aria-"
+"label=\"Jadwalkan\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1483,6 +1728,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"schedule\" aria-"
 "label=\"Duration\"/>"
 msgstr ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"schedule\" aria-"
+"label=\"Durasi\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1490,6 +1737,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"tag\" aria-"
 "label=\"Appointment\"/>"
 msgstr ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"tag\" aria-"
+"label=\"Appointment\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1497,6 +1746,8 @@ msgid ""
 "<i class=\"oi oi-filled text-muted\" data-icon=\"videocam\" aria-"
 "label=\"Video Call Source\"/>"
 msgstr ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"videocam\" aria-"
+"label=\"Sumber Panggilan Video\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
@@ -1504,11 +1755,13 @@ msgid ""
 "<i class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Appointment "
 "Type\"/>"
 msgstr ""
+"<i class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Jenis "
+"Appointment\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi oi-filled\" data-icon=\"circle\" title=\"Status\"/>"
-msgstr ""
+msgstr "<i class=\"oi oi-filled\" data-icon=\"circle\" title=\"Status\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
@@ -1516,6 +1769,8 @@ msgid ""
 "<i class=\"oi oi-filled\" data-icon=\"person_add\" title=\"Reserved "
 "Capacity\"/>"
 msgstr ""
+"<i class=\"oi oi-filled\" data-icon=\"person_add\" title=\"Kapasitas "
+"Direservasi\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_list_item
@@ -1523,6 +1778,59 @@ msgid ""
 "<i class=\"oi oi-fw oi-filled lh-base\" data-icon=\"videocam\" "
 "role=\"presentation\"/>\n"
 "                    <span class=\"o_not_editable\">Online</span>"
+msgstr ""
+"<i class=\"oi oi-fw oi-filled lh-base\" data-icon=\"videocam\" "
+"role=\"presentation\"/>\n"
+"                    <span class=\"o_not_editable\">Online</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"calendar_today\" aria-label=\"Booked\" "
+"title=\"Booked\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Booked</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"check\" aria-label=\"Attended\" "
+"title=\"Attended\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Attended</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"close\" aria-label=\"Cancelled\" "
+"title=\"Cancelled\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Cancelled</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<i class=\"oi oi-fw\" data-icon=\"map\" title=\"Google Reserve\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"schedule\" aria-label=\"Request\" "
+"title=\"Request\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"Request</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
+msgid ""
+"<i class=\"oi oi-fw\" data-icon=\"visibility_off\" aria-label=\"No Show\" "
+"title=\"No Show\" role=\"img\"/>\n"
+"                                        <span class=\"d-none d-md-inline\"> "
+"No Show</span>"
 msgstr ""
 
 #. module: appointment
@@ -1532,12 +1840,16 @@ msgid ""
 "center\" data-icon=\"videocam\" role=\"img\"/>\n"
 "                    <span class=\"o_not_editable mb-0\">Online</span>"
 msgstr ""
+"<i class=\"oi oi-stack oi-filled flex-shrink-0 rounded-1 text-muted text-"
+"center\" data-icon=\"videocam\" role=\"img\"/>\n"
+"                    <span class=\"o_not_editable mb-0\">Online</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid ""
 "<i class=\"oi text-muted\" data-icon=\"schedule\" aria-label=\"Duration\"/>"
 msgstr ""
+"<i class=\"oi text-muted\" data-icon=\"schedule\" aria-label=\"Durasi\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1552,12 +1864,12 @@ msgstr "<i class=\"oi\" data-icon=\"info\" title=\"Info\"/>"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Resources\"/>"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Sumber daya\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Staff Member\"/>"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Staf\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
@@ -1625,6 +1937,9 @@ msgid ""
 "                                    Rating\n"
 "                                </span>"
 msgstr ""
+"<span class=\"o_stat_text\">\n"
+"                                    Rating\n"
+"                                </span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
@@ -1632,6 +1947,8 @@ msgid ""
 "<span class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Upcoming\"/"
 ">"
 msgstr ""
+"<span class=\"oi oi-filled\" data-icon=\"calendar_today\" "
+"title=\"Mendatang\"/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -1647,6 +1964,11 @@ msgstr "<span>berdasarkan pengunjung</span>"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 msgid "<span>people</span>"
 msgstr "<span>orang</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<span>to get restaurant bookings through Google Maps and Search.</span>"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -1733,18 +2055,18 @@ msgstr "Tambahkan Tamu"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Add Slot"
-msgstr ""
+msgstr "Tambahkan Slot"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Add Video"
-msgstr ""
+msgstr "Tambahkan Video"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Add Weekday"
-msgstr ""
+msgstr "Tambahkan Hari Kerja"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_entity_card_selection
@@ -1822,17 +2144,17 @@ msgstr "Izinkan Booking"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__allow_guests
 msgid "Allow guests"
-msgstr ""
+msgstr "Izinkan tamu"
 
 #. module: appointment
 #: model:ir.module.module,summary:base.module_appointment
 msgid "Allow people to book meetings in your agenda"
-msgstr ""
+msgstr "Izinkan orang lain untuk menjadwalkan meeting di agenda Anda"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Allow up to"
-msgstr ""
+msgstr "Izinkan hingga"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__country_ids
@@ -1969,7 +2291,7 @@ msgstr "Durasi Appointment harus lebih dari 0.00."
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_fields_can_edit
 msgid "Appointment Fields Can Edit"
-msgstr ""
+msgstr "Field Appointment Dapat Diedit"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_invite_id
@@ -2010,14 +2332,14 @@ msgstr "Pertanyaan-Pertanyaan Appointment"
 #. module: appointment
 #: model:ir.actions.act_window,name:appointment.rating_rating_action_appointment
 msgid "Appointment Ratings"
-msgstr ""
+msgstr "Rating Appointment"
 
 #. module: appointment
 #: model:mail.message.subtype,description:appointment.mt_calendar_event_requested
 #: model:mail.message.subtype,name:appointment.mt_appointment_type_requested
 #: model:mail.message.subtype,name:appointment.mt_calendar_event_requested
 msgid "Appointment Requested"
-msgstr ""
+msgstr "Appointment Diajukan"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_appointment_resource
@@ -2113,13 +2435,13 @@ msgstr "Appointment dibook ulang"
 #. odoo-python
 #: code:addons/appointment/controllers/appointment.py:0
 msgid "Appointment rescheduled"
-msgstr ""
+msgstr "Appointment dijadwalkan ulang"
 
 #. module: appointment
 #. odoo-python
 #: code:addons/appointment/controllers/appointment.py:0
 msgid "Appointment rescheduled by: %(name)s"
-msgstr ""
+msgstr "Appointment dijadwalkan ulang oleh: %(name)s"
 
 #. module: appointment
 #: model:mail.template,subject:appointment.appointment_booking_mail_template
@@ -2127,11 +2449,13 @@ msgid ""
 "Appointment {{ 'Booked' if object.appointment_status == 'booked' else "
 "'Reserved' }}: {{ object.appointment_type_id.name }}"
 msgstr ""
+"Appointment {{ 'Dibooking' if object.appointment_status == 'booked' else "
+"'Direservasi' }}: {{ object.appointment_type_id.name }}"
 
 #. module: appointment
 #: model:mail.template,name:appointment.appointment_booking_mail_template
 msgid "Appointment: Appointment Booking"
-msgstr ""
+msgstr "Appointment: Booking Appointment"
 
 #. module: appointment
 #: model:mail.template,name:appointment.appointment_canceled_mail_template
@@ -2146,12 +2470,12 @@ msgstr "Appointment: Undangan Peserta"
 #. module: appointment
 #: model:mail.template,name:appointment.appointment_feedback_mail_template
 msgid "Appointment: Feedback Request"
-msgstr ""
+msgstr "Appointment: Permintaan Masukan"
 
 #. module: appointment
 #: model:ir.actions.server,name:appointment.ir_cron_appointment_send_feedback_emails_ir_actions_server
 msgid "Appointment: Send Feedback Emails"
-msgstr ""
+msgstr "Appointment: Kirim Email Masukan"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_appointment_slot
@@ -2314,12 +2638,12 @@ msgstr "Avatar 512"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_avg
 msgid "Average Rating"
-msgstr ""
+msgstr "Rating Rerata"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_avg_percentage
 msgid "Average Rating (%)"
-msgstr ""
+msgstr "Rating Rerata (%)"
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__slot_interval_capacity
@@ -2329,6 +2653,10 @@ msgid ""
 "        Any booking starting between the beginning of a slot and the next "
 "will count towards that limit. Set to 0 to disable."
 msgstr ""
+"Hindari kepadatan dengan mengatur kapasitas maksimum yang dapat dibooking "
+"pada slot waktu mana pun yang dihitung berdasarkan ketersediaan.\n"
+"        Setiap booking yang dimulai antara awal suatu slot dan slot "
+"berikutnya akan dihitung dalam batas tersebut. Atur ke 0 untuk menonaktifkan."
 
 #. module: appointment
 #: model_terms:web_tour.tour,rainbow_man_message:appointment.appointment_tour
@@ -2368,7 +2696,7 @@ msgstr ""
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_list_item
 msgid "Book {{0}}"
-msgstr ""
+msgstr "Book {{0}}"
 
 #. module: appointment
 #. odoo-javascript
@@ -2393,7 +2721,7 @@ msgstr "Kapasitas Dipesan"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
 msgid "Booked User"
-msgstr ""
+msgstr "User yang Dibooking"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_tree_booking
@@ -2403,13 +2731,13 @@ msgstr "Dibook oleh"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
 msgid "Booked resource"
-msgstr ""
+msgstr "Sumber daya dibooking"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 msgid "Booker"
-msgstr ""
+msgstr "Pemesan"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__calendar_event_id
@@ -2435,7 +2763,7 @@ msgstr "Baris Booking"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Booking Pages"
-msgstr ""
+msgstr "Halaman Booking"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__event_start
@@ -2527,7 +2855,7 @@ msgstr "Pembatalan"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__canceled_mail_template_id
 msgid "Cancellation Email"
-msgstr "Email Pembatala"
+msgstr "Email Pembatalan"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__calendar_event__appointment_status__cancelled
@@ -2542,6 +2870,8 @@ msgid ""
 "Cancelled. <i class=\"oi text-danger d-none d-sm-inline me-3\" data-"
 "icon=\"close\"/>"
 msgstr ""
+"Dibatalkan. <i class=\"oi text-danger d-none d-sm-inline me-3\" data-"
+"icon=\"close\"/>"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__capacity
@@ -2668,7 +2998,7 @@ msgstr "Klik appointment di jadwal Anda untuk melihat ringkasan detailnya."
 #. odoo-python
 #: code:addons/appointment/models/appointment_type.py:0
 msgid "Cloning recurrent slots is not implemented."
-msgstr ""
+msgstr "Penyalinan slot berulang tidak diterapkan."
 
 #. module: appointment
 #. odoo-javascript
@@ -2702,7 +3032,7 @@ msgstr "Hari libur untuk appointment dan user / sumber dayanya"
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 msgid "Comment"
-msgstr ""
+msgstr "Komentar"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2732,12 +3062,12 @@ msgstr "Konfigurasi"
 #. module: appointment
 #: model:ir.actions.act_window,name:appointment.appointment_edit_slots_action
 msgid "Configure Appointment"
-msgstr ""
+msgstr "Konfigurasi Appointment"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Configure Resources"
-msgstr ""
+msgstr "Konfigurasi Sumber Daya"
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.appointment_invite_action
@@ -2782,6 +3112,8 @@ msgid ""
 "Confirmed! <i class=\"oi oi-filled text-success d-none d-sm-inline me-3\" "
 "data-icon=\"check_circle\"/>"
 msgstr ""
+"Dikonfirmasi! <i class=\"oi oi-filled text-success d-none d-sm-inline me-3\" "
+"data-icon=\"check_circle\"/>"
 
 #. module: appointment
 #. odoo-javascript
@@ -2837,7 +3169,7 @@ msgstr "Salin link Meeting"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Copy invite url to clipboard"
-msgstr ""
+msgstr "Salin url undangan ke clipboard"
 
 #. module: appointment
 #. odoo-javascript
@@ -2848,7 +3180,7 @@ msgstr "Salin link ke clipboard Anda."
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Create Slots"
-msgstr ""
+msgstr "Buat Slot"
 
 #. module: appointment
 #: model:ir.model,website_form_label:appointment.model_res_partner
@@ -2878,7 +3210,7 @@ msgstr "Buat Sumber Daya Appointment"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Create every"
-msgstr ""
+msgstr "Buat setiap"
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.appointment_question_action
@@ -2920,7 +3252,7 @@ msgstr "Dibuat pada"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Current reservation:"
-msgstr ""
+msgstr "Reservasi saat ini:"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__partner_id
@@ -3139,13 +3471,7 @@ msgstr "Tidak dapat bergabung"
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_slot_scheduling__flexible
 msgid "Does not repeat"
-msgstr ""
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
-msgid "Done"
-msgstr ""
+msgstr "Tidak diulang"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
@@ -3201,7 +3527,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Edit Appointment"
-msgstr ""
+msgstr "Edit Appointment"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
@@ -3214,9 +3540,14 @@ msgid "Emails & SMS"
 msgstr "Email & SMS"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Enable Google Reserve"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "End"
-msgstr ""
+msgstr "Akhir"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_leave__date_to
@@ -3248,7 +3579,7 @@ msgstr "Masukkan nama seseorang yang ingin diundang ke meeting pertama Anda."
 #. module: appointment
 #: model:ir.model,name:appointment.model_calendar_alarm
 msgid "Event Alarm"
-msgstr ""
+msgstr "Alarm Acara"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3278,7 +3609,7 @@ msgstr "Informasi tambahan disediakan setelah appointment dibooking."
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__feedback_mail_template_id
 msgid "Feedback Email"
-msgstr ""
+msgstr "Email Masuk"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__custom
@@ -3290,7 +3621,7 @@ msgstr "Jadwal Fleksibel"
 #. odoo-javascript
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Focus on today to see your new meeting."
-msgstr ""
+msgstr "Fokus pada hari ini untuk melihat meeting baru."
 
 #. module: appointment
 #: model:portal.entry,description:appointment.portal_appointment_entry
@@ -3336,7 +3667,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Give your meeting a title."
-msgstr ""
+msgstr "Beri judul pada meeting."
 
 #. module: appointment
 #. odoo-javascript
@@ -3355,6 +3686,11 @@ msgstr "Kembali ke layar beranda Appointment."
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Go back to the previous screen."
 msgstr "Kembali ke layar sebelumnya."
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Google Bookings"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -3389,7 +3725,7 @@ msgstr "HTTP routing"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Happy"
-msgstr ""
+msgstr "Senang"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_leave__has_appointment_type_tz_mismatch
@@ -3423,7 +3759,7 @@ msgstr ""
 #. module: appointment
 #: model:mail.template,subject:appointment.appointment_feedback_mail_template
 msgid "How was your experience? ({{ object.name }})"
-msgstr ""
+msgstr "Bagaimana pengalaman Anda? ({{ object.name }})"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__id
@@ -3478,7 +3814,7 @@ msgstr "Jika dicentang, beberapa pesan mempunyai kesalahan dalam pengiriman."
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "If empty, Odoo will not ask feedback"
-msgstr ""
+msgstr "Jika kosong, Odoo tidak akan meminta masukan"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3533,6 +3869,8 @@ msgid ""
 "If set, an email will be sent to the customer after the appointment to "
 "request some feedback."
 msgstr ""
+"Jika diaktifkan, email akan dikirimkan kepada pelanggan setelah appointment "
+"untuk meminta masukan."
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_resource__active
@@ -3830,6 +4168,10 @@ msgid ""
 "             In the case of resource appointments, they will be notified on "
 "new bookings."
 msgstr ""
+"Manajer Jenis Appointment ini. Dapat mengedit jadwal, sumber daya atau user "
+"yang ditetapkan, dan pengaturan lainnya.\n"
+"             Untuk appointment sumber daya, orang ini akan diberi tahu jika "
+"ada booking baru."
 
 #. module: appointment
 #. odoo-javascript
@@ -3856,12 +4198,12 @@ msgstr "Wajib penggunaan template."
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Ikon Material Symbols, misalnya checklist"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_interval_capacity
 msgid "Max slot capacity"
-msgstr ""
+msgstr "Kapasitas slot maksimum"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_invite__resources_choice__current_user
@@ -3916,7 +4258,7 @@ msgstr "Senin"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "More Options"
-msgstr ""
+msgstr "Opsi Lainnya"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__text
@@ -3976,7 +4318,7 @@ msgstr "Ingin menjadwalkan ulang?"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Neutral"
-msgstr ""
+msgstr "Netral"
 
 #. module: appointment
 #. odoo-javascript
@@ -3988,7 +4330,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
 msgid "New Booking"
-msgstr ""
+msgstr "Booking Baru"
 
 #. module: appointment
 #. odoo-javascript
@@ -3996,7 +4338,7 @@ msgstr ""
 #: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
 #: code:addons/appointment/static/src/views/list/list_controller.js:0
 msgid "New Closing Day"
-msgstr ""
+msgstr "Hari Penutupan Baru"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__activity_calendar_event_id
@@ -4021,7 +4363,7 @@ msgstr "Tipe Aktivitas Berikutnya"
 #. module: appointment
 #: model:res.groups.privilege,placeholder:appointment.res_groups_privilege_appointment
 msgid "No"
-msgstr ""
+msgstr "Tidak"
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.appointment_answer_input_action
@@ -4068,7 +4410,7 @@ msgstr "Belum ada data!"
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.rating_rating_action_appointment
 msgid "No ratings yet!"
-msgstr ""
+msgstr "Belum ada rating!"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
@@ -4194,7 +4536,7 @@ msgstr "Oops! Appointment Anda dijadwalkan kurang dari"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
 msgid "Open"
-msgstr ""
+msgstr "Buka"
 
 #. module: appointment
 #. odoo-javascript
@@ -4257,7 +4599,7 @@ msgstr "Masa lalu"
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__rating_percentage_satisfaction
 msgid "Percentage of happy ratings"
-msgstr ""
+msgstr "Persentase rating senang"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_booker_id
@@ -4339,17 +4681,17 @@ msgstr "Radio (satu jawaban)"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 msgid "Rated User"
-msgstr ""
+msgstr "User Sudah Rating"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_rating_rating
 msgid "Rating"
-msgstr ""
+msgstr "Rating"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_percentage_satisfaction
 msgid "Rating Satisfaction"
-msgstr ""
+msgstr "Rating Kepuasan"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_ids
@@ -4361,6 +4703,8 @@ msgstr "Rating"
 #: model_terms:ir.actions.act_window,help:appointment.rating_rating_action_appointment
 msgid "Ratings given by bookers after their appointments will appear here."
 msgstr ""
+"Rating yang diberikan oleh pemesan setelah appointment selesai akan "
+"ditampilkan di sini."
 
 #. module: appointment
 #. odoo-javascript
@@ -4392,12 +4736,12 @@ msgstr "Pengingat"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Repeat Slot"
-msgstr ""
+msgstr "Slot Berulang"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_slot_scheduling__weekly
 msgid "Repeats Weekly"
-msgstr ""
+msgstr "Diulang Mingguan"
 
 #. module: appointment
 #: model:ir.ui.menu,name:appointment.menu_appointment_reporting
@@ -4419,7 +4763,7 @@ msgstr "Permintaan"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__require_appointment_feedback_mail
 msgid "Require feedback mail"
-msgstr ""
+msgstr "Minta email masukan"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
@@ -4430,7 +4774,7 @@ msgstr "Jadwalkan Ulang"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Reschedule your appointment"
-msgstr ""
+msgstr "Jadwalkan ulang appointment"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -4438,6 +4782,8 @@ msgid ""
 "Reserved! <i class=\"oi oi-filled text-info d-none d-sm-inline me-3\" data-"
 "icon=\"thumb_up\"/>"
 msgstr ""
+"Direservasi! <i class=\"oi oi-filled text-info d-none d-sm-inline me-3\" "
+"data-icon=\"thumb_up\"/>"
 
 #. module: appointment
 #. odoo-javascript
@@ -4550,6 +4896,12 @@ msgid "Saturday"
 msgstr "Sabtu"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Save & copy URL"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Save &amp; Pick Slots"
 msgstr ""
@@ -4653,7 +5005,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
 msgid "Select this attendee."
-msgstr ""
+msgstr "Pilih peserta ini."
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__value_answer_id
@@ -4678,12 +5030,12 @@ msgstr "Kirim ke semua peserta saat appointment dibatalkan"
 #. module: appointment
 #: model:mail.template,description:appointment.appointment_feedback_mail_template
 msgid "Sent to booker to request feedback after their visit"
-msgstr ""
+msgstr "Dikirim ke pemesan untuk meminta masukan setelah kunjungan"
 
 #. module: appointment
 #: model:mail.template,description:appointment.appointment_booking_mail_template
 msgid "Sent to followers of an appointment type when a meeting is created"
-msgstr ""
+msgstr "Dikirim ke follower jenis appointment saat meeting dibuat"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__sequence
@@ -4717,7 +5069,7 @@ msgstr "Bagikan Link"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Share Time Slots"
-msgstr ""
+msgstr "Bagikan Slot Waktu"
 
 #. module: appointment
 #. odoo-javascript
@@ -4774,7 +5126,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_duration
 msgid "Slot Duration"
-msgstr ""
+msgstr "Durasi Slot"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__slot_type
@@ -4791,7 +5143,7 @@ msgstr "Slot-Slot"
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 msgid "Slots displayed in your timezone ("
-msgstr ""
+msgstr "Slot yang ditampilkan dalam zona waktu Anda ("
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__message_intro
@@ -4868,14 +5220,14 @@ msgstr "Booking Staff"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
 msgid "Staff Member"
-msgstr ""
+msgstr "Staf"
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/views/popover/popover.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 msgid "Start"
-msgstr ""
+msgstr "Mulai"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_leave__date_from
@@ -4924,9 +5276,12 @@ msgid "Starts with"
 msgstr "Dimulai dengan"
 
 #. module: appointment
+#. odoo-python
+#: code:addons/appointment/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_tree_booking
+#: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 msgid "Status"
 msgstr "Status"
 
@@ -5236,7 +5591,7 @@ msgstr "Ini adalah pratinjau formulir appointment pelanggan."
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointments_selection
 msgid "This is a preview of the customer appointment selection."
-msgstr ""
+msgstr "Ini adalah pratinjau pemilihan appointment pelanggan."
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_question_view_form
@@ -5258,7 +5613,7 @@ msgstr "Kamis"
 #: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Time Slots"
-msgstr ""
+msgstr "Slot Waktu"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__tz
@@ -5365,7 +5720,7 @@ msgstr "Tidak pasti"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Unhappy"
-msgstr ""
+msgstr "Tidak puas"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -5402,6 +5757,8 @@ msgid ""
 "Use <b>Upcoming Meetings</b> to jump straight back into your schedule at the "
 "date of the next meeting."
 msgstr ""
+"Gunakan <b>Meeting Mendatang</b> untuk langsung kembali ke jadwal Anda pada "
+"tanggal meeting berikutnya."
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.calendar_event_action_appointment_reporting
@@ -5460,7 +5817,7 @@ msgstr "User / Sumber Daya"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__user_can_manage_slots
 msgid "User Can Manage Slots"
-msgstr ""
+msgstr "User Dapat Mengelola Slot"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__user_capacity
@@ -5764,7 +6121,7 @@ msgstr "tamu-tamu"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "guests per slot"
-msgstr ""
+msgstr "tamu per slot"
 
 #. module: appointment
 #. odoo-javascript
@@ -5781,7 +6138,7 @@ msgstr "tidak memiliki slot lagi yang tersedia untuk bulan ini."
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "hour(s) and cannot be rescheduled or cancelled at this time.<br/>"
-msgstr ""
+msgstr "jam dan tidak dapat dijadwalkan ulang atau dibatalkan saat ini.<br/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
@@ -5802,7 +6159,7 @@ msgstr "dari total kapasitas"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "on"
-msgstr ""
+msgstr "pada"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated

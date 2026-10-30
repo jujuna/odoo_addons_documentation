@@ -8,11 +8,6 @@
         'data/whatsapp_template.xml',
         'views/pos_prep_display_view.xml',
     ],
-    'assets': {
-        'pos_self_order.assets_tests': [
-            "pos_enterprise_sms_whatsapp/static/src/tests/tours/pos_self_order_tour.js",
-        ],
-    },
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

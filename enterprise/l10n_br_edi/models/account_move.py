@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import contextlib
 import logging
+import re
 
 from markupsafe import Markup
 from stdnum.br.cnpj import format as format_cnpj
@@ -562,12 +563,22 @@ class AccountMove(models.Model):
         else:
             return 1, "Normal"
 
+    def _l10n_br_edi_references_original_per_line(self):
+        """Returns whether Avalara expects the original NF-e on each line rather than in the header."""
+        return self.move_type == "out_refund" and not self.l10n_br_is_service_transaction
+
+    @api.model
+    def _l10n_br_edi_normalize_access_key(self, access_key):
+        """Removes non-numeric characters from the access key."""
+        return re.sub(r'\D', '', access_key or '') or None
+
     def _get_l10n_br_avatax_service_params(self):
         """ EXTENDS 'account.move'
         For credit and debit notes this returns the appropriate reference to the original invoice. For tax
         calculation we send these references as documentCode, which are Odoo references (e.g. account.move_31).
         For EDI the government requires these references as refNFe instead. They should contain the access key
-        assigned when the original invoice was e-invoiced. """
+        assigned when the original invoice was e-invoiced. Goods returns are the exception: Avalara wants them
+        referenced per line, so _l10n_br_prepare_invoice_payload drops this from the header again. """
         params = super()._get_l10n_br_avatax_service_params()
 
         params['invoice_refs_edi'] = {}
@@ -577,12 +588,27 @@ class AccountMove(models.Model):
                 'invoicesRefs': [
                     {
                         'type': 'refNFe',
-                        'refNFe': origin.l10n_br_access_key,
+                        'refNFe': self._l10n_br_edi_normalize_access_key(origin.l10n_br_access_key),
                     }
                 ]
             }
 
         return params
+
+    def _l10n_br_edi_add_referenced_access_key(self, tax_calculation_response):
+        """Sets the access key SEFAZ requires on each referenced line, replacing the calculate-time code."""
+        if not self._l10n_br_edi_references_original_per_line():
+            return
+
+        access_key = self._l10n_br_edi_normalize_access_key(self.reversed_entry_id.l10n_br_access_key)
+        if not access_key:
+            return
+
+        for line in tax_calculation_response.get("lines", []):
+            # Lines the response did not reference are left alone: there is nothing to key them to.
+            if referenced_item := line.get("referencedItem"):
+                referenced_item.pop("documentCode", None)
+                referenced_item["invoiceAccessKey"] = access_key
 
     def _l10n_br_edi_get_tax_data(self):
         """Due to Avalara bugs they're unable to resolve we have to change their tax calculation response before
@@ -597,6 +623,8 @@ class AccountMove(models.Model):
                 for key in keys_to_remove_when_null:
                     if key in detail and detail[key] is None:
                         del detail[key]
+
+        self._l10n_br_edi_add_referenced_access_key(tax_calculation_response)
 
         return tax_calculation_response, tax_calculation_response.pop("header")
 
@@ -751,6 +779,10 @@ class AccountMove(models.Model):
         # Avatax return various errors: e.g. "Falha na estrutura enviada". This is to avoid having lots of if
         # statements.
         self._l10n_br_deep_update_dict(payload, self._l10n_br_deep_clean_dict(extra_payload))
+
+        if self._l10n_br_edi_references_original_per_line():
+            # The reference goes on the lines instead, see _l10n_br_edi_add_referenced_access_key.
+            payload.get("header", {}).pop("invoicesRefs", None)
 
         # This adds the "lines" and "summary" dicts received during tax calculation.
         payload.update(tax_data_to_include)
@@ -983,7 +1015,7 @@ class AccountMove(models.Model):
             'name': get_xml_text(tree, './/nfe:nNF'),
             'invoice_date': get_xml_text(tree, './/nfe:dhEmi'),  # ignore timezone offset, because this is a date field
             'delivery_date': get_xml_text(tree, './/nfe:dhSaiEnt'),  # ignore timezone offset, because this is a date field
-            'l10n_br_access_key': get_xml_attribute('.//nfe:infNFe', 'Id'),
+            'l10n_br_access_key': self._l10n_br_edi_normalize_access_key(get_xml_attribute('.//nfe:infNFe', 'Id')),
             'invoice_line_ids': [Command.create(line) for line in get_lines_vals(vendor)],
             'l10n_br_edi_payment_method': get_payment_method(),
             'l10n_br_edi_transporter_id': get_partner_id('.//nfe:transporta'),

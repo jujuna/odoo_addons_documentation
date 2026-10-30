@@ -46,11 +46,29 @@ class TestHrEmployeeBelgiumForm(TransactionCase):
                         employee_form.employee_type_id = self.env.ref('hr.contract_type_student')
                         employee_form.contract_date_start = start
                         employee_form.l10n_be_joint_committee_id = committee
+                        employee_form.l10n_be_salary_scale_id = self.env.ref('l10n_be_hr_payroll.cp200_b')
                     employee = employee_form.record
                     self.assertEqual(employee.l10n_be_joint_committee_id, committee)
                     with Form(employee) as employee_form:
                         employee_form.contract_date_start = '2026-09-01'
                     self.assertEqual(employee.l10n_be_joint_committee_id, committee)
+
+    def test_joint_committee_activated_when_used(self):
+        committee = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_207')
+        committee.active = False
+        employee = self.env['hr.employee'].with_company(self.be_company).create({'name': 'Chemist'})
+        employee.l10n_be_joint_committee_id = committee
+        self.assertTrue(committee.active)
+
+    def test_joint_committee_activates_its_benefits(self):
+        committee = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_207')
+        committee.active = False
+        benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_withholding_tax_benefit')
+        benefit.write({'l10n_be_joint_committee_ids': committee.ids, 'active': False})
+        committee.active = True
+        self.assertTrue(benefit.active)
+        committee.active = False
+        self.assertFalse(benefit.active)
 
     def test_correct_niss_parsing(self):
         self.employee_nana = self.env['hr.employee'].create({
@@ -113,6 +131,18 @@ class TestHrEmployeeBelgiumForm(TransactionCase):
         self.assertEqual(employee_2.lang, 'fr_BE', "The employee's payslip's language should be 'fr_BE' by default.")
         self.assertEqual(employee_3.lang, 'nl_BE', "The employee's payslip's language should be 'nl_BE' by default.")
         self.assertEqual(employee_4.lang, 'de_DE', "The employee's payslip's language should be 'de_DE' by default.")
+
+    def test_payslip_language_installed_on_employee_creation(self):
+        lang_fr_be = self.env.ref('base.lang_fr_BE')
+        lang_fr_be.active = False
+
+        employee = self.env['hr.employee'].create({
+            'name': 'Faruk',
+            'lang': 'fr_BE',
+        })
+        # In the creation of the employee, if the payslip language is missing, install it.
+        self.assertTrue(lang_fr_be.active, "The employee's payslip's language should be installed.")
+        self.assertEqual(employee.with_context(lang=employee.lang).env.lang, 'fr_BE')
 
     @freeze_time('2026-08-01')
     def test_create_public_holiday_allocation(self):

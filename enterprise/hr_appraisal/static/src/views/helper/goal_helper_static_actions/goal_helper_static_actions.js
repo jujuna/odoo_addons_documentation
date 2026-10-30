@@ -20,7 +20,7 @@ export function useGoalStaticAction(model) {
             description: _t("Mark as Done"),
             icon: "check",
             callback: async () => {
-                await model.orm.call('hr.appraisal.goal', 'action_confirm', records.map((r) => r.resId));
+                await model.orm.call('hr.appraisal.goal', 'action_confirm', [records.map((r) => r.resId)]);
                 await model.load();
             },
             groupNumber: 2,

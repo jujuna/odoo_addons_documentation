@@ -82,3 +82,36 @@ class TestITReportAccountReturn(TestAccountReportsCommon):
 
         self.assertEqual(vat_may_return.total_amount_to_pay, -66.0, msg="VAT amount to pay should correctly net sales and purchases.")
         self.assertEqual(withh_may_return.total_amount_to_pay, 80.0, msg="Withholding amount to pay must strictly exclude sales withholding assets.")
+
+    def test_withholding_return_submit_on_quarter_month(self):
+        """ Ensures submitting the withholding return of a quarter month should not open the LIPE export wizard,
+        it should open the Payment wizard to register the withholding tax payment. """
+        withh_may_return = self.env['account.return'].search([
+            ('company_id', '=', self.company.id),
+            ('date_from', '=', '2026-05-01'),
+            ('date_to', '=', '2026-05-31'),
+            ('type_id', '=', self.it_withh_return_type.id),
+        ], limit=1)
+        withh_june_return = self.env['account.return'].search([
+            ('company_id', '=', self.company.id),
+            ('date_from', '=', '2026-06-01'),
+            ('date_to', '=', '2026-06-30'),
+            ('type_id', '=', self.it_withh_return_type.id),
+        ], limit=1)
+
+        bill = self.init_invoice(
+            'in_invoice', partner=self.partner_a, invoice_date='2026-06-05',
+            amounts=[400.0], taxes=self.env['account.chart.template'].ref('20awi'), post=True
+        )
+
+        # Register payments to trigger the cash-basis withholding tax lines
+        self.env['account.payment.register'].with_context(active_model='account.move', active_ids=bill.ids).create({
+            'payment_date': '2026-06-05',
+        })._create_payments()
+
+        with self.allow_pdf_render():
+            withh_may_return.action_submit()
+            action = withh_june_return.action_submit()
+
+        self.assertEqual(action['res_model'], 'account.return.payment.wizard')
+        self.assertRecordValues(withh_june_return, [{'state': 'submitted', 'period_amount_to_pay': 80.0}])

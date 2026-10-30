@@ -15,6 +15,9 @@ _logger = logging.getLogger(__name__)
 # Wire contract with the signer; see phone_service/utils/webhook.py.
 WEBHOOK_TOKEN_SCOPE = "phone_service_webhook"
 TENANT_RECOVERY_TOKEN_SCOPE = "phone_service_tenant_recovery"
+# Wire contract with the signer; see
+# phone_service/models/phone_service_pbx_tenant_migration.py.
+TENANT_MIGRATION_MAPPING_TOKEN_SCOPE = "phone_service_tenant_migration_mapping"
 
 
 def _decode_phone_service_token(env, scope, token, client_secret):
@@ -54,6 +57,46 @@ class PhoneServiceApiController(http.Controller):
             _logger.warning("Rejected phone_service tenant recovery request: invalid or expired token")
             raise Forbidden()
         return request.env["voip.pbx.service"]._get_tenant_recovery_payload()
+
+    @http.route("/voip/api/phone_service/tenant_migration_mapping", type="json2", auth="public",
+                methods=["POST"], save_session=False)
+    def apply_tenant_migration_mapping(self, token=None):
+        if not isinstance(token, str):
+            _logger.warning("Rejected phone_service tenant migration mapping request: missing or malformed token")
+            raise Forbidden()
+
+        parameters = request.env["ir.config_parameter"].sudo()
+        client_secret = parameters.get_str(CLIENT_SECRET_PARAM)
+        client_uuid = parameters.get_str(CLIENT_UUID_PARAM)
+        if not client_secret or not client_uuid:
+            _logger.warning("Rejected phone_service tenant migration mapping request: client credentials are not configured")
+            raise Forbidden()
+
+        envelope = _decode_phone_service_token(
+            request.env, TENANT_MIGRATION_MAPPING_TOKEN_SCOPE, token, client_secret,
+        )
+        if not isinstance(envelope, dict) or envelope.get("client_uuid") != client_uuid:
+            _logger.warning("Rejected phone_service tenant migration mapping request: invalid or expired token")
+            raise Forbidden()
+        migration_id = envelope.get("migration_id")
+        resources = envelope.get("resources")
+        if (
+            not isinstance(migration_id, int)
+            or isinstance(migration_id, bool)
+            or migration_id <= 0
+            or not isinstance(resources, dict)
+        ):
+            _logger.warning("Rejected phone_service tenant migration mapping request: malformed envelope")
+            raise Forbidden()
+        # Any failure below must surface as a non-2xx response: phone_service
+        # only ever switches PBXes once this route answers success, so a
+        # swallowed error here would let a tenant migrate with a client left
+        # pointing at PBX ids that are about to be deleted.
+        request.env["voip.pbx.service"]._apply_tenant_migration_mapping(
+            migration_id,
+            resources,
+        )
+        return {}
 
     @http.route("/voip/api/phone_service/event", type="json2", auth="public",
                 methods=["POST"], save_session=False)

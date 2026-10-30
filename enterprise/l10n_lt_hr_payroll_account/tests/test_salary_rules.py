@@ -32,10 +32,9 @@ class TestPayslipValidation(TestPayslipValidationCommon):
 
     def test_payslip_2(self):
         payslip = self._generate_payslip(date(2024, 1, 1), date(2024, 1, 31))
-        for code, value in {
+        payslip._set_input_values({
             self.env.ref('l10n_lt_hr_payroll.l10n_lt_employees_salary_pit_last_year').code: 200.0,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'BASIC': 1600.0, 'GROSS': 1600.0, 'TAXABLEAMOUNT': 1372.44, 'SICKAMOUNT': 0.0, 'PIT': -274.49, 'PITSICK': 0.0, 'PITLAST': -64.0, 'SSC': -267.63, 'NET': 993.89, 'SSCEMP.2': 24.29, 'SSCEMP': 24.29}
         self._validate_payslip(payslip, payslip_results)

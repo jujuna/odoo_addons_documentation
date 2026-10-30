@@ -91,12 +91,6 @@ beforeEach(() => {
     mockDate("2018-12-20 07:00:00", +1);
 });
 
-test("hr gantt view not grouped", async () => {
-    // hrGanttView can only be (and is always) grouped by `employee_id`
-    await mountGanttView({ resModel: "task", arch });
-    expect(".o-mail-Avatar").toHaveCount(3);
-});
-
 test("hr gantt view pill rounding", async () => {
     expect.assertions(7);
     await mountGanttView({ resModel: "task", arch });

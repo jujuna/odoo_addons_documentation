@@ -2,6 +2,7 @@ import { _t } from "@web/core/l10n/translation";
 import { useActiveActions, useOpenMany2XRecord } from "@web/views/fields/relational_utils";
 import { useService } from "@web/core/utils/hooks";
 import { formatFloat } from "@web/core/utils/numbers";
+import { parseFloat } from "@web/views/fields/parsers";
 import { QualityCheck } from "./quality_check";
 import { MrpQuantityDialog } from "../dialog/mrp_quantity_dialog";
 import { MrpSelectQuantDialog } from "../dialog/mrp_select_quant_dialog";

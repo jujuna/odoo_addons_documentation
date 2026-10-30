@@ -16,11 +16,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-18 04:49+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/sign/"
-"it/>\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-21 16:08+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/sign/it/"
+">\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -375,15 +375,6 @@ msgstr "<small class=\"text-muted\">Mittente</small>"
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
 msgstr "<small class=\"text-muted\">Firmatari</small>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<small>SMS Verification: The signatory has confirmed their control of the "
-"phone number using a unique code sent by SMS</small>"
-msgstr ""
-"<small>Verifica SMS: il firmatario ha confermato di essere il titolare del "
-"numero di telefono tramite un codice univoco inviato tramite SMS</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -2027,20 +2018,6 @@ msgid "Email Subject"
 msgstr "Oggetto e-mail"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Email Verification"
-msgstr "Verifica e-mail"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"Email Verification: The signatory has confirmed control of their email inbox "
-"by clicking on a unique link"
-msgstr ""
-"Verifica e-mail: il firmatario ha confermato di avere il controllo della "
-"propria casella di posta elettronica facendo clic su un link univoco"
-
-#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
 msgid "Email saved successfully!"
@@ -2861,7 +2838,7 @@ msgstr ""
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Icona Material Symbols, ad es. elenco di controllo"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template__message
@@ -3746,11 +3723,6 @@ msgid "SMS Token"
 msgstr "Token SMS"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "SMS Verification"
-msgstr "Verifica tramite SMS"
-
-#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "Vendite"
@@ -3836,6 +3808,11 @@ msgstr ""
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Ricerca <span class=\"nolabel\"> (nei documenti)</span>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Secure Link"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4825,6 +4802,11 @@ msgid "Subject"
 msgstr "Oggetto"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "System Account"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
 msgid "Tag Name"
 msgstr "Nome etichetta"
@@ -5496,8 +5478,14 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Codice unico via SMS"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Unique Link via Email"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5656,6 +5644,11 @@ msgstr "Valore"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "Il valore esiste già!"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Verification method"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6317,6 +6310,27 @@ msgstr "te"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{0}} Summary"
 msgstr "{{0}} Riassunto"
+
+#~ msgid ""
+#~ "<small>SMS Verification: The signatory has confirmed their control of the "
+#~ "phone number using a unique code sent by SMS</small>"
+#~ msgstr ""
+#~ "<small>Verifica SMS: il firmatario ha confermato di essere il titolare "
+#~ "del numero di telefono tramite un codice univoco inviato tramite SMS</"
+#~ "small>"
+
+#~ msgid "Email Verification"
+#~ msgstr "Verifica e-mail"
+
+#~ msgid ""
+#~ "Email Verification: The signatory has confirmed control of their email "
+#~ "inbox by clicking on a unique link"
+#~ msgstr ""
+#~ "Verifica e-mail: il firmatario ha confermato di avere il controllo della "
+#~ "propria casella di posta elettronica facendo clic su un link univoco"
+
+#~ msgid "SMS Verification"
+#~ msgstr "Verifica tramite SMS"
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr "Permetti ai firmatari di identificarsi usando itsme®"

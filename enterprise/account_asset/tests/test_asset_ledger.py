@@ -206,7 +206,7 @@ class TestAssetLedger(TestAccountAssetCommon, TestAccountReportsCommon):
         self.assertEqual((asset.variant_ids - asset.main_variant_id).model_id, self.ledger_model)
 
         # If the asset account doesn't have a depreciation model set (for main variant)
-        # then no asset is created
+        # then a "No depreciation" asset is created
         asset_account_no_depr = self.company_data['default_account_assets'].copy({
             'name': 'No Asset Account',
             'depreciation_model_id': False,
@@ -225,7 +225,58 @@ class TestAssetLedger(TestAccountAssetCommon, TestAccountReportsCommon):
             })],
         })
         bill.action_post()
-        self.assertFalse(bill.invoice_line_ids.asset_ids)
+        asset = bill.invoice_line_ids.asset_ids
+        self.assertRecordValues(asset, [{
+            'account_asset_id': asset_account_no_depr.id,
+            'model_id': self.env.ref('account_asset.asset_no_depreciation').id,
+            'state': 'open',
+        }])
+
+    def test_auto_create_asset_from_bill_with_ledgers_unconfigured_account(self):
+        """The model and accounts of a ledger variant are not saved on an unconfigured fixed asset account."""
+        asset_account = self.company_data['default_account_assets'].copy({
+            'name': 'Unconfigured Asset Account',
+            'depreciation_model_id': False,
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        })
+        asset_account.ledger_depreciation_model_ids = self.ledger_model
+        main_model = self.test_asset.model_id
+
+        def post_bill(**line_vals):
+            bill = self.env['account.move'].create({
+                'move_type': 'in_invoice',
+                'partner_id': self.partner_a.id,
+                'invoice_date': '2026-01-01',
+                'invoice_line_ids': [Command.create({
+                    'quantity': 1.0,
+                    'account_id': asset_account.id,
+                    'tax_ids': [Command.clear()],
+                    **line_vals,
+                })],
+            })
+            bill.action_post()
+            return bill.invoice_line_ids.asset_ids
+
+        # Ledger variants mirror the depreciation of the main variant: there is none without depreciation
+        land = post_bill(name='Land', price_unit=12000.0)
+        self.assertRecordValues(land, [{
+            'model_id': self.env.ref('account_asset.asset_no_depreciation').id,
+            'state': 'open',
+        }])
+        self.assertEqual(land.variant_ids, land.main_variant_id)
+
+        # The model of the main variant is saved on the account, not the ledger's accounts:
+        # the asset stays in draft until the accounts are set
+        truck = post_bill(name='Truck', price_unit=6000.0, depreciation_model_id=main_model.id)
+        self.assertEqual(truck.main_variant_id.model_id, main_model)
+        self.assertEqual((truck.variant_ids - truck.main_variant_id).model_id, self.ledger_model)
+        self.assertEqual(truck.state, 'draft')
+        self.assertRecordValues(asset_account, [{
+            'depreciation_model_id': main_model.id,
+            'asset_depreciation_account_id': False,
+            'asset_expense_account_id': False,
+        }])
 
     def test_duplicate_asset(self):
         """ Test that duplicating an asset while having a 'variant_id' in context (from the old asset)

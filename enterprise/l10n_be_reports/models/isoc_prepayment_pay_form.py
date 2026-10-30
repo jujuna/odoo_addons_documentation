@@ -9,7 +9,7 @@ class L10n_Be_ReportsISOCPrepaymentPayForm(models.Model):
     _name = 'l10n_be_reports.isoc.prepayment.pay.form'
     _description = "Payment instructions for ISOC prepayment"
 
-    return_id = fields.Many2one(comodel_name='account.return', required=True)
+    return_id = fields.Many2one(comodel_name='account.return', required=True, ondelete='cascade')
     company_id = fields.Many2one(comodel_name='res.company', string="Company")
     currency_id = fields.Many2one(comodel_name='res.currency', related='return_id.amount_to_pay_currency_id')
     partner_id = fields.Many2one(comodel_name='res.partner', related='partner_bank_id.partner_id')

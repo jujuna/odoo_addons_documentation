@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.fields import Domain
@@ -138,6 +140,9 @@ class AccountPayment(models.Model):
 
     def _get_payment_data(self):
         country_code = self.partner_bank_id.sanitized_account_number[:2]
+        if not self.transaction_uuid:
+            self.transaction_uuid = uuid4().hex
+
         payment_data = {
             'amount': self.amount,
             'account_number': self.partner_bank_id.sanitized_account_number,

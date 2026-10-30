@@ -45,6 +45,10 @@ class DocumentsDocument(models.Model):
     _parent_name = 'folder_id'
     _parent_store = True
     _systray_view = 'activity'
+    # Merging documents would discard attachments, so no deduplication,
+    # and no contextual merge actions.
+    _prevent_merge = True
+    _disable_data_merge = True
 
     # Attachment: attachment_id is indexed via the _attachment_unique constraint.
     attachment_id = fields.Many2one('ir.attachment', bypass_search_access=True, copy=False)

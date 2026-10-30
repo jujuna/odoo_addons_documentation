@@ -45,43 +45,32 @@
                     <div class="oe_structure"></div>
                     <h5>Participants</h5>
                     <table class="table table-borderless o_main_table small mb-1">
-                        <t t-set="has_sms_validation" t-value="o.sudo().request_item_ids.filtered(lambda i: i.sms_token)"/>
                         <t t-set="has_mail_validation" t-value="o.send_channel == 'email' and (o.sudo().request_item_ids.filtered(lambda i: i.is_mail_sent) or o.sudo().write_uid._is_public())"/>
+                        <t t-set="authenticated_items" t-value="o.sudo().request_item_ids.filtered(lambda i: i.state == 'completed' and i.auth_method and not i.signed_without_extra_auth)"/>
                         <thead>
                             <tr>
                                 <th id="participants_signatory" class="text-start">Signatory</th>
                                 <th id="participants_email" class="text-start">Email</th>
-                                <th id="participants_email_verification" t-if="has_mail_validation" class="text-start">
-                                    Email Verification
-                                </th>
-                                <th id="participants_shared_link_verification" t-if="o.send_channel == 'shared'" class="text-start">
-                                    Shared Link
-                                </th>
-                                <th id="participants_phone" class="text-start" t-if="has_sms_validation">
-                                    SMS Verification
-                                </th>
+                                <th id="participants_authentication" class="text-start">Verification method</th>
                             </tr>
                             <tbody>
                                 <t t-foreach="o.sudo().request_item_ids" t-as="sri">
                                     <tr>
                                         <td><span t-field="sri.partner_id.name">John Smith</span></td>
                                         <td><span t-field="sri.partner_id.email">john@example.com</span></td>
-                                        <td class="text-center" t-if="has_mail_validation">
-                                            <t t-if="sri.access_via_link">
-                                                <i class="oi" data-icon="check_box"/>
+                                        <td class="participant_authentication">
+                                            <t t-set="signing_user" t-value="o.sudo().sign_log_ids.filtered(lambda l: l.action == 'sign' and l.sign_request_item_id == sri)[-1:].user_id"/>
+                                            <t t-if="sri in authenticated_items" name="participant_extra_authentication">
+                                                <span t-field="sri.auth_method">Unique Code via SMS</span>
+                                                <div t-if="sri.sms_token" t-out="''.join(['******', sri.sms_number[-4:]])">******1234</div>
                                             </t>
-                                            <t t-else="">
-                                                <i class="oi" data-icon="square"/>
+                                            <t t-elif="o.send_channel == 'shared'">Shared Link</t>
+                                            <t t-elif="o.send_channel == 'email' and sri.access_via_link" name="participant_email_authentication">Unique Link via Email</t>
+                                            <t t-elif="signing_user" name="participant_account_authentication">
+                                                System Account
+                                                <div t-out="signing_user.name"/>
                                             </t>
-                                        </td>
-                                        <td class="text-center participant_shared_link_validation" t-if="o.send_channel == 'shared'">
-                                            <i class="oi" data-icon="link"/>
-                                        </td>
-                                        <td class="participant_sms_validation" t-if="has_sms_validation">
-                                            <t t-if="sri.sms_token">
-                                                <t t-set="number" t-value="''.join(['******', sri.sms_number[-4:]])"/>
-                                                <span t-out="number">******1234</span>
-                                            </t>
+                                            <t t-elif="sri.state == 'completed'">Secure Link</t>
                                         </td>
                                     </tr>
                                     <tr t-if="sri.frame_hash">
@@ -96,11 +85,7 @@
                     <section class="mb-4">
                         <div class="text-muted signer_verification_footnote">
                             <small t-if="o.send_channel == 'shared'">Shared Link Verification: the signature request was shared as a link. Anyone with access to the link can sign.</small>
-                            <small t-elif="has_mail_validation">Email Verification: The signatory has confirmed control of their email inbox by clicking on a unique link</small>
-                            <small t-else="">Document was signed locally for all signers using <t t-out="user.display_name"/>'s account</small>
-                        </div>
-                        <div class="text-muted sms_footnote" t-if="has_sms_validation">
-                            <small>SMS Verification: The signatory has confirmed their control of the phone number using a unique code sent by SMS</small>
+                            <small t-elif="o.send_channel == 'email' and not has_mail_validation">Document was signed locally for all signers using <t t-out="o.create_uid.name"/>'s account</small>
                         </div>
                         <div class="oe_structure"></div>
                     </section>
@@ -124,9 +109,9 @@
                                     </td>
                                     <td>
                                         <span t-field="log.partner_id">Unknown Partner</span>
-                                        <span t-if="log.partner_id.email" t-field="log.partner_id.email">demo@email.com</span>
+                                        <span t-if="log.sign_request_item_id.signer_email" t-field="log.sign_request_item_id.signer_email">demo@email.com</span>
                                         <!-- When signed using "Sign Now" on behalf of another user, display the connected user -->
-                                        <div t-if="log.sign_request_item_id.signer_email and not log.write_uid._is_public() and log.sign_request_item_id.signer_email != log.user_id.email">Connected as <t t-out="log.user_id.partner_id.name"/></div>
+                                        <div t-if="log.sign_request_item_id.signer_email and log.user_id and log.sign_request_item_id.signer_email != log.user_id.email">Connected as <t t-out="log.user_id.partner_id.name"/></div>
                                     </td>
                                     <td> <span t-out="o._get_user_formatted_datetime(log.log_date)">20-03-2000</span> </td>
                                     <td groups="sign.group_sign_manager">
@@ -160,7 +145,7 @@
                         <p><i class="oi" data-icon="error"/> The document's integrity could not be verified.</p>
                     </div>
                     <div class="small" t-if="o.state == 'signed'">
-                        <p>The final document and this completion history have been sent by email on&amp;nbsp; <span t-field="o.completion_date">20-03-2000</span> to: <t t-out="', '.join(o.sudo()._get_final_recipients())"/>.</p>
+                        <p>The final document and this completion history have been sent by email on&amp;nbsp;<span t-field="o.completion_date">20-03-2000</span> to: <t t-out="', '.join(o.sudo()._get_final_recipients())"/>.</p>
                     </div>
                     <h5>Access Logs</h5>
                     <table class="table table-borderless o_main_table small mb-4">
@@ -177,7 +162,7 @@
                             <tr t-foreach="view_logs" t-as="log">
                                 <td>
                                     <span t-field="log.partner_id">Demo Partner</span>
-                                    <span t-field="log.partner_id.email">demo@email.com</span>
+                                    <span t-if="log.sign_request_item_id.signer_email" t-field="log.sign_request_item_id.signer_email">demo@email.com</span>
                                 </td>
                                 <td> <span t-out="o._get_user_formatted_datetime(log.log_date)">20-03-2000</span> </td>
                                 <td> <span t-field="log.request_state">Antwrep</span> </td>

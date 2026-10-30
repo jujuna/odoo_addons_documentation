@@ -82,7 +82,7 @@ class WhatsappAccount(models.Model):
 
     def _compute_callback_url(self):
         for account in self:
-            account.callback_url = self.get_base_url() + '/whatsapp/webhook'
+            account.callback_url = account.get_base_url() + '/whatsapp/webhook'
 
     @api.depends('is_oauth_onboarded', 'is_phone_registered', 'is_webhook_subscribed')
     def _compute_state(self):

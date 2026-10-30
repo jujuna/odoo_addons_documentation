@@ -28,6 +28,7 @@ Keeps track of depreciations, and creates corresponding journal entries.
         'data/account.depreciation.model.csv',
         'data/asset_export_template.xml',
         'data/depreciation_model_export_template.xml',
+        'data/cash_flow_indirect_report.xml',
         'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',

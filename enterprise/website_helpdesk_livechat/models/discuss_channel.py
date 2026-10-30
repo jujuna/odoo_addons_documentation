@@ -65,7 +65,10 @@ class DiscussChannel(models.Model):
                 })
                 msg = Markup(
                     '<div class="o_mail_notification" data-oe-type="create-ticket">%s</div>',
-                ) % self.env._("created a new ticket: %s", helpdesk_ticket._get_html_link())
+                ) % self.env._(
+                    "created a new ticket: %s",
+                    helpdesk_ticket._get_html_link_with_href(),
+                )
                 self.message_post(body=msg, subtype_xmlid="mail.mt_comment")
                 return
         self.env.user._bus_send_transient_message(self, msg)

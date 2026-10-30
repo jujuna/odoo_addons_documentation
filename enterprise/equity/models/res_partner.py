@@ -120,9 +120,8 @@ class ResPartner(models.Model):
         self.ensure_one()
         return self.equity_valuation_ids._get_records_action(
             display_name=self.env._("%(partner_name)s's Valuations", partner_name=self.display_name),
-            context={
-                'default_partner_id': self.id,
-            },
+            views=[(False, 'list')],
+            domain=[('id', 'in', self.equity_valuation_ids.ids)],
         )
 
     def action_open_transaction_list(self):
@@ -137,32 +136,33 @@ class ResPartner(models.Model):
     # misc methods
     def _equity_ensure_token(self):
         """ Get the current record equity access token """
-        if not self.equity_access_token:
-            # we use a `write` to force the cache clearing otherwise `return self.access_token` will return False
-            self.sudo().write({'equity_access_token': str(uuid.uuid4())})
-        return f"{self.id}${self.equity_access_token}"
+        if not self.env.user.has_group('equity.group_equity_manager'):
+            return False
+
+        self_sudo = self.sudo()
+        if not self_sudo.equity_access_token:
+            self_sudo.write({'equity_access_token': str(uuid.uuid4())})
+        return f"{self_sudo.id}${self_sudo.equity_access_token}"
 
     def _get_equity_url_params(self):
         self.ensure_one()
         return url_encode({
-            'access_token': self.sudo()._equity_ensure_token(),
-            'user_id': self.env.user.id,
+            'access_token': self._equity_ensure_token(),
         })
 
     def _ubo_portal_form_filled(self, rep_name, rep_position):
         self.ensure_one()
-        sudo_self = self.sudo()
-        if ubo_activities := sudo_self.activity_search(['equity.equity_ubo_form_mail_activity']):
+        if ubo_activities := self.activity_search(['equity.equity_ubo_form_mail_activity']):
             last_ubo_activity = ubo_activities[-1]
         else:
             return
 
-        pdf_content, _ = sudo_self.env['ir.actions.report']._render_qweb_pdf(
+        pdf_content, _ = self.env['ir.actions.report']._render_qweb_pdf(
             'equity.equity_ubo_report',
             res_ids=[self.id],
             data={'rep_name': rep_name, 'rep_position': rep_position, 'rep_sig_date': fields.Date.context_today(self)},
         )
-        attachment = sudo_self.env['ir.attachment'].create({
+        attachment = self.env['ir.attachment'].create({
             'name': 'UBO_report.pdf',
             'type': 'binary',
             'raw': pdf_content,
@@ -172,9 +172,21 @@ class ResPartner(models.Model):
         })
         last_ubo_activity.with_user(self.env.ref('base.user_root')).action_feedback(feedback=self.env._("(Completed through portal Form)"), attachment_ids=[attachment.id])
 
+    def _get_ubo_contact_details(self):
+        self.ensure_one()
+        ubo_activity = self.env['mail.activity'].with_context(active_test=False).search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('activity_type_id', '=', self.env['ir.model.data']._xmlid_to_res_id('equity.equity_ubo_form_mail_activity', raise_if_not_found=False)),
+            ('automated', '=', True),
+        ], order='active DESC, id DESC', limit=1)
+        if ubo_activity.user_id:
+            return ubo_activity.user_id.read(['name', 'email', 'phone'])[0]
+        return {}
+
     def _can_fill_ubo_portal_form(self):
         self.ensure_one()
-        ubo_activities = self.sudo().activity_search(['equity.equity_ubo_form_mail_activity'])
+        ubo_activities = self.activity_search(['equity.equity_ubo_form_mail_activity'])
         return bool(ubo_activities)
 
     def _message_post_after_hook(self, message):
@@ -198,6 +210,9 @@ class ResPartner(models.Model):
         return "%s_ubo.pdf" % self.display_name.replace(' ', '_')
 
     def action_partner_equity_send(self, linked_transaction=None):
+        if linked_transaction and not (self & (linked_transaction.subscriber_id + linked_transaction.seller_id)):
+            return {'type': 'ir.actions.act_window_close'}
+
         linked_transaction = linked_transaction or self.env['equity.transaction'].search([
             ('date', '<=', fields.Date.context_today(self)),
             '|', ('subscriber_id', '=', self.id), ('seller_id', '=', self.id),

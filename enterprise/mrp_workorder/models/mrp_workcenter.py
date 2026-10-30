@@ -14,6 +14,7 @@ class MrpWorkcenter(models.Model):
     employee_ids = fields.Many2many(
         'hr.employee', string="employees with access",
         help='if left empty, all employees can log in to the workcenter', store=True,
+        bypass_search_access=True,
         readonly=False)
     currency_id = fields.Many2one(related='company_id.currency_id')
     employee_costs_hour = fields.Monetary(string='Employee Hourly Cost', currency_field='currency_id', default=0.0)

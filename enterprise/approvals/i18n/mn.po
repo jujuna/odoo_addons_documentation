@@ -14,7 +14,7 @@
 # tumenjargal hadbaatar <tumenjargal7903@gmail.com>, 2022
 # Батболд <batbold.ts@gmail.com>, 2022
 # Martin Trigaux, 2022
-# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2022
+# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2022, 2026.
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Bayarkhuu Bataa <bbayarkhuu@gmail.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
@@ -22,10 +22,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 03:19+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-14 15:33+0000\n"
+"Last-Translator: Lodoikhuu <baskhuujacara@gmail.com>\n"
+"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-20/"
 "approvals/mn/>\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
@@ -48,36 +48,41 @@ msgid ""
 "According to the approval type configuration, a request\n"
 "creates next activities for the related approvers.\n"
 msgstr ""
+"\n"
+"Энэ модуль зөвшөөрлийн ажлын урсгалыг удирдана\n"
+"======================================\n"
+"\n"
+"Энэ модуль албан томилолт, ажлаас гадуур байх, илүү цаг,\n"
+"эд зүйл зээлэх, ерөнхий зөвшөөрөл, худалдан авалт,\n"
+"гэрээний зөвшөөрөл зэрэг зөвшөөрлийн хүсэлтүүдийг удирдана.\n"
+"\n"
+"Зөвшөөрлийн төрлийн тохиргооны дагуу хүсэлт нь\n"
+"холбогдох зөвшөөрөгчдөд дараагийн ажилбаруудыг үүсгэнэ.\n"
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
 msgid "'Approval - %s' % object.name"
-msgstr ""
+msgstr "'Зөвшөөрөл - %s' % object.name"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
-msgstr ""
+msgstr "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Түдгэлзүүлэх"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "<span class=\"col-2 fw-bold\">Description:</span>"
-msgstr ""
+msgstr "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Зөвшөөрөх"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"fw-bold\">To</span>"
-msgstr ""
+msgstr "<span class=\"fw-bold\">Хүртэл</span>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<span class=\"mx-1\">-</span>"
-msgstr ""
+msgstr "<span class=\"mx-1\">-</span>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
@@ -85,6 +90,8 @@ msgid ""
 "<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
 ">"
 msgstr ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Хамгийн бага зөвшөөрлийн "
+"тоо буруу\"/>"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -115,7 +122,7 @@ msgstr "Ажилбарын тайлбар"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Ажилбарын төлөвлөгөө"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -169,7 +176,7 @@ msgstr "Хүсэлтэнд нэмэлт лавлагаа нь байх хэрэ�
 #. module: approvals
 #: model:ir.model.constraint,message:approvals.constraint_approval_approver_unique_request_user
 msgid "An approver with the same user already exists for this request."
-msgstr ""
+msgstr "Энэ хүсэлтэд ижил хэрэглэгчтэй зөвшөөрөгч аль хэдийн байна."
 
 #. module: approvals
 #. odoo-python
@@ -187,7 +194,7 @@ msgstr "Зөвшөөрөл"
 #: model:ir.actions.act_window,name:approvals.approval_category_action
 #: model:ir.ui.menu,name:approvals.approvals_category_menu_config
 msgid "Approval Categories"
-msgstr ""
+msgstr "Зөвшөөрлийн ангиллууд"
 
 #. module: approvals
 #: model:ir.model,name:approvals.model_approval_category
@@ -199,12 +206,12 @@ msgstr "Зөвшөөрлийн ангилал"
 #. module: approvals
 #: model:ir.model,name:approvals.model_approval_category_approver
 msgid "Approval Category Approver"
-msgstr ""
+msgstr "Зөвшөөрлийн ангиллын зөвшөөрөгч"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__approval_properties_definition
 msgid "Approval Properties"
-msgstr ""
+msgstr "Зөвшөөрлийн шинж чанарууд"
 
 #. module: approvals
 #: model:ir.actions.report,name:approvals.action_report_approval_request
@@ -218,7 +225,7 @@ msgstr "Зөвшөөрөх хүсэлт"
 #: model:mail.message.subtype,description:approvals.mt_approval_request_status
 #: model:mail.message.subtype,name:approvals.mt_approval_request_status
 msgid "Approval Status Change"
-msgstr ""
+msgstr "Зөвшөөрлийн төлөв өөрчлөгдсөн"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__name
@@ -287,7 +294,7 @@ msgstr "Зөвшөөрөгчид"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Approvers:"
-msgstr ""
+msgstr "Зөвшөөрөгчид:"
 
 #. module: approvals
 #. odoo-javascript
@@ -309,7 +316,7 @@ msgstr "Архивласан"
 #. odoo-javascript
 #: code:addons/approvals/static/src/views/kanban/approvals_category_kanban_controller.js:0
 msgid "Are you sure that you want to archive this record?"
-msgstr ""
+msgstr "Энэ бичлэгийг архивлахдаа итгэлтэй байна уу?"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -335,7 +342,7 @@ msgstr "Хавсралтууд"
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
 msgid "Automated Sequence"
-msgstr ""
+msgstr "Автомат дугаарлалт"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -350,7 +357,7 @@ msgstr "Зээлэх зүйлс"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Brussels"
-msgstr ""
+msgstr "Brussels"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_business_trip
@@ -370,7 +377,7 @@ msgstr "Засах"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__can_edit_user_id
 msgid "Can Edit User"
-msgstr ""
+msgstr "Хэрэглэгчийг засах боломжтой"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__cancel
@@ -388,7 +395,7 @@ msgstr "Цуцлагдсан"
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_car_rental_application
 msgid "Car Rental Application"
-msgstr "Автомашин түрээсийн модуль"
+msgstr "Автомашин түрээслэх хүсэлт"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__category_id
@@ -399,7 +406,7 @@ msgstr "Ангилал"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__category_approver
 msgid "Category Approver"
-msgstr ""
+msgstr "Ангиллын зөвшөөрөгч"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
@@ -425,17 +432,17 @@ msgstr "Харилцах хаяг"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Contact:"
-msgstr ""
+msgstr "Харилцах хаяг:"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_contract_approval
 msgid "Contract Approval"
-msgstr "Зөвшөөрлийн гэрээ"
+msgstr "Гэрээний зөвшөөрөл"
 
 #. module: approvals
 #: model:ir.module.module,summary:base.module_approvals
 msgid "Create and validate approvals requests"
-msgstr ""
+msgstr "Зөвшөөрлийн хүсэлт үүсгэж батлах"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -494,6 +501,8 @@ msgid ""
 "Define the components and finished products you wish to use in\n"
 "            bill of materials and manufacturing orders."
 msgstr ""
+"Орц болон үйлдвэрлэлийн захиалгад ашиглахыг хүсэж буй\n"
+"            түүхий эд, бэлэн бүтээгдэхүүнээ тодорхойлно уу."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__description
@@ -502,6 +511,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Description"
 msgstr "Тайлбар"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Description:"
+msgstr "Тайлбар:"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__display_name
@@ -530,7 +544,7 @@ msgstr "Баримтууд"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Documents:"
-msgstr ""
+msgstr "Баримтууд:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -550,12 +564,12 @@ msgstr "Ажилтны менежер"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__existing_request_user_ids
 msgid "Existing Request User"
-msgstr ""
+msgstr "Хүсэлтийн одоо байгаа хэрэглэгч"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__existing_user_ids
 msgid "Existing User"
-msgstr ""
+msgstr "Одоо байгаа хэрэглэгч"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
@@ -570,12 +584,12 @@ msgstr "Дагагчид (Харилцагчид)"
 #. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 msgid "Force Approval"
-msgstr ""
+msgstr "Албадан зөвшөөрөх"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Future Activities"
-msgstr ""
+msgstr "Ирээдүйн ажилбарууд"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_general_approval
@@ -597,7 +611,7 @@ msgstr "Мөнгөн дүн-тэй"
 #: model:ir.model.fields,field_description:approvals.field_approval_category__has_partner
 #: model:ir.model.fields,field_description:approvals.field_approval_request__has_partner
 msgid "Has Contact"
-msgstr "Гэрээ-тэй"
+msgstr "Харилцах хаягтай"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__has_date
@@ -655,6 +669,11 @@ msgid ""
 "request, along with the selected users\n"
 "    "
 msgstr ""
+"Ажилтны менежер энэ төрлийн зөвшөөрөлд хэрхэн оролцохыг заана.\n"
+"\n"
+"        Сонгосон бол ажилтны менежер сонгосон хэрэглэгчдийн хамт хүсэлтийн "
+"заавал байх зөвшөөрөгч болно\n"
+"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -696,6 +715,8 @@ msgid ""
 "If enabled, the approval request subject will be generated automatically "
 "using the given prefix code."
 msgstr ""
+"Идэвхжүүлсэн бол зөвшөөрлийн хүсэлтийн гарчиг өгөгдсөн угтвар кодыг ашиглан "
+"автоматаар үүснэ."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -706,12 +727,12 @@ msgstr "Зураг"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__invalid_minimum
 msgid "Invalid Minimum"
-msgstr ""
+msgstr "Хамгийн бага тоо буруу"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__invalid_minimum_warning
 msgid "Invalid Minimum Warning"
-msgstr ""
+msgstr "Хамгийн бага тооны буруу анхааруулга"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
@@ -744,13 +765,13 @@ msgstr "Сүүлд зассан огноо"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Late Activities"
-msgstr ""
+msgstr "Хоцорсон ажилбарууд"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
 msgid "Let's go to the"
-msgstr ""
+msgstr "Дараах руу очъё:"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__location
@@ -770,6 +791,8 @@ msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
 "tempor incididunt ut labore et dolore magna aliqua."
 msgstr ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
+"tempor incididunt ut labore et dolore magna aliqua."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_main_attachment_id
@@ -784,12 +807,12 @@ msgstr "Удирдлага"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Marc Demo"
-msgstr ""
+msgstr "Marc Demo"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols дүрс, жишээ нь checklist"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
@@ -811,7 +834,7 @@ msgstr "Хамгийн бага зөвшөөрөл"
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Minimum Approval must be at least 1."
-msgstr ""
+msgstr "Хамгийн бага зөвшөөрөл дор хаяж 1 байх ёстой."
 
 #. module: approvals
 #. odoo-python
@@ -819,11 +842,13 @@ msgstr ""
 msgid ""
 "Minimum Approval must be equal or superior to the sum of required Approvers."
 msgstr ""
+"Хамгийн бага зөвшөөрөл заавал байх зөвшөөрөгчдийн тооноос их буюу тэнцүү "
+"байх ёстой."
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Mitchell Admin"
-msgstr ""
+msgstr "Mitchell Admin"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__my_activity_date_deadline
@@ -849,7 +874,7 @@ msgstr "Миний хүсэлтүүд"
 #: model:ir.actions.act_window,name:approvals.approval_request_action
 #: model:ir.ui.menu,name:approvals.approvals_request_menu_my
 msgid "My Requests"
-msgstr "Миний чөлөөний хүсэлт"
+msgstr "Миний хүсэлтүүд"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__name
@@ -894,17 +919,17 @@ msgstr "Дараагийн ажилбарын төрөл"
 #. module: approvals
 #: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
 msgid "No"
-msgstr ""
+msgstr "Үгүй"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
 msgid "No Approvals"
-msgstr ""
+msgstr "Зөвшөөрөл алга"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
 msgid "No Approvals Requests"
-msgstr ""
+msgstr "Зөвшөөрлийн хүсэлт алга"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_to_review
@@ -963,12 +988,12 @@ msgstr "Батлах хүсэлтийн тоо"
 #. module: approvals
 #: model:res.groups,name:approvals.group_approval_user
 msgid "Officer: Approve all requests"
-msgstr ""
+msgstr "Ажилтан: Бүх хүсэлтийг зөвшөөрөх"
 
 #. module: approvals
 #: model:ir.actions.server,name:approvals.action_open_approval_category
 msgid "Open Approval Category"
-msgstr ""
+msgstr "Зөвшөөрлийн ангилал нээх"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__optional
@@ -997,7 +1022,7 @@ msgstr "Төлбөр"
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_payment_application
 msgid "Payment Application"
-msgstr "Төлбөрийн модуль"
+msgstr "Төлбөрийн хүсэлт"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
@@ -1008,17 +1033,17 @@ msgstr "Үргэлжлэх хугацаа"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Period:"
-msgstr ""
+msgstr "Хугацаа:"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
 msgid "Prefix Code"
-msgstr ""
+msgstr "Угтвар код"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
 msgid "Procurement"
-msgstr "Нөөц хангалтын түр байрлал"
+msgstr "Худалдан авалт"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
@@ -1034,7 +1059,7 @@ msgstr "Барааны тайлбар"
 #: model:ir.model,name:approvals.model_approval_product_line
 #: model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
 msgid "Product Line"
-msgstr ""
+msgstr "Барааны мөр"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1107,7 +1132,7 @@ msgstr "Хүсэлт"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Request By:"
-msgstr ""
+msgstr "Хүсэлт гаргасан:"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__request_owner_id
@@ -1118,7 +1143,7 @@ msgstr "Хүсэлт гаргагч"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Request Start"
-msgstr ""
+msgstr "Хүсэлтийн эхлэл"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__request_status
@@ -1129,7 +1154,7 @@ msgstr "Хүсэлтийн төлөв"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Request To"
-msgstr ""
+msgstr "Хүсэлтийн төгсгөл"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__required
@@ -1166,7 +1191,7 @@ msgstr "Дугаарлалт"
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Sequence %(code)s"
-msgstr ""
+msgstr "Дугаарлалт %(code)s"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_approver__can_edit_user_id
@@ -1174,12 +1199,14 @@ msgid ""
 "Simple users should not be able to remove themselves as approvers because "
 "they will lose access to the record if they misclick."
 msgstr ""
+"Энгийн хэрэглэгчид андуурч дарвал бичлэгт хандах эрхээ алдах тул өөрсдийгөө "
+"зөвшөөрөгчөөс хасах боломжгүй байх ёстой."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "Start date should precede the end date."
-msgstr ""
+msgstr "Эхлэх огноо дуусах огнооноос өмнө байх ёстой."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__status
@@ -1202,7 +1229,7 @@ msgstr ""
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Status:"
-msgstr ""
+msgstr "Төлөв:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -1219,39 +1246,39 @@ msgstr "Илгээгдсэн"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Submitted Date"
-msgstr ""
+msgstr "Илгээсэн огноо"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Category"
-msgstr ""
+msgstr "Туршилтын ангилал"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Document"
-msgstr ""
+msgstr "Туршилтын баримт"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Product"
-msgstr ""
+msgstr "Туршилтын бараа"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Reference"
-msgstr ""
+msgstr "Туршилтын дугаар"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request %(request_name)s for %(request_owner)s has been approved"
-msgstr ""
+msgstr "%(request_owner)s-ийн %(request_name)s хүсэлт зөвшөөрөгдлөө"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request %(request_name)s for %(request_owner)s has been refused"
-msgstr ""
+msgstr "%(request_owner)s-ийн %(request_name)s хүсэлт түдгэлзүүлэгдлээ"
 
 #. module: approvals
 #. odoo-python
@@ -1259,7 +1286,7 @@ msgstr ""
 msgid ""
 "The request created on %(create_date)s by %(request_owner)s has been "
 "approved."
-msgstr ""
+msgstr "%(request_owner)s-ийн %(create_date)s-нд үүсгэсэн хүсэлт зөвшөөрөгдлөө."
 
 #. module: approvals
 #. odoo-python
@@ -1267,17 +1294,18 @@ msgstr ""
 msgid ""
 "The request created on %(create_date)s by %(request_owner)s has been refused."
 msgstr ""
+"%(request_owner)s-ийн %(create_date)s-нд үүсгэсэн хүсэлт түдгэлзүүлэгдлээ."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request has been approved by an Approval Officer"
-msgstr ""
+msgstr "Хүсэлтийг зөвшөөрлийн ажилтан зөвшөөрсөн"
 
 #. module: approvals
 #: model:res.groups,comment:approvals.group_approval_user
 msgid "The user will be able to access all requests and approve/refuse them."
-msgstr ""
+msgstr "Хэрэглэгч бүх хүсэлтэд хандаж, зөвшөөрөх/түдгэлзүүлэх боломжтой болно."
 
 #. module: approvals
 #: model:res.groups,comment:approvals.group_approval_manager
@@ -1301,8 +1329,8 @@ msgid ""
 "This request needs to be approved by your manager. There is no user linked "
 "to your manager."
 msgstr ""
-"Энэ хүсэлтийг таны менежер зөвшөөрөх шаардлагатай. Таны ажилтны профайлтай "
-"холбогдсон менежер байхгүй байна."
+"Энэ хүсэлтийг таны менежер зөвшөөрөх шаардлагатай. Таны менежертэй "
+"холбогдсон хэрэглэгч байхгүй байна."
 
 #. module: approvals
 #. odoo-python
@@ -1311,8 +1339,8 @@ msgid ""
 "This request needs to be approved by your manager. Your manager is not in "
 "the approvers list."
 msgstr ""
-"Энэ хүсэлтийг таны менежер зөвшөөрөх шаардлагатай. Таны ажилтны профайлтай "
-"холбогдсон менежер байхгүй байна."
+"Энэ хүсэлтийг таны менежер зөвшөөрөх шаардлагатай. Таны менежер "
+"зөвшөөрөгчдийн жагсаалтад байхгүй байна."
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__pending
@@ -1332,7 +1360,7 @@ msgstr "Илгээх"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Today Activities"
-msgstr ""
+msgstr "Өнөөдрийн ажилбарууд"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_decoration
@@ -1380,19 +1408,19 @@ msgstr "Эргэн татах"
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You are not allowed to approved or refused your own approval."
-msgstr ""
+msgstr "Та өөрийн зөвшөөрлийг зөвшөөрөх эсвэл түдгэлзүүлэх эрхгүй."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You can't delete an approved request. Archive it instead."
-msgstr ""
+msgstr "Зөвшөөрөгдсөн хүсэлтийг устгах боломжгүй. Оронд нь архивлана уу."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_approver.py:0
 msgid "You cannot change approval request."
-msgstr ""
+msgstr "Зөвшөөрлийн хүсэлтийг өөрчлөх боломжгүй."
 
 #. module: approvals
 #. odoo-python
@@ -1401,12 +1429,14 @@ msgid ""
 "You cannot unlink an attachment which is linked to a validated, refused or "
 "cancelled approval request."
 msgstr ""
+"Батлагдсан, түдгэлзүүлсэн эсвэл цуцлагдсан зөвшөөрлийн хүсэлттэй холбогдсон "
+"хавсралтыг салгах боломжгүй."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You do not have the rights to execute that action."
-msgstr ""
+msgstr "Танд энэ үйлдлийг гүйцэтгэх эрх байхгүй."
 
 #. module: approvals
 #. odoo-python
@@ -1418,29 +1448,30 @@ msgstr "Та хүсэлтээ батлахын тулд дор хаяж %s зө�
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You have to attach at least one document."
-msgstr ""
+msgstr "Дор хаяж нэг баримт хавсаргах шаардлагатай."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You must cancel and then back to draft the approval first."
-msgstr ""
+msgstr "Эхлээд зөвшөөрлийг цуцлаад, дараа нь ноорог болгох шаардлагатай."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Your minimum approval exceeds the total of default approvers."
 msgstr ""
+"Хамгийн бага зөвшөөрлийн тоо үндсэн зөвшөөрөгчдийн нийт тооноос хэтэрч байна."
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "e.g. Brussels"
-msgstr ""
+msgstr "жишээ нь Улаанбаатар"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "e.g. Procurement"
-msgstr ""
+msgstr "жишээ нь Худалдан авалт"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
@@ -1452,7 +1483,7 @@ msgstr "цэс"
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
 msgid "new request"
-msgstr ""
+msgstr "шинэ хүсэлт"
 
 #~ msgid ""
 #~ "Approver Sequence can only be activated with at least 1 minimum approver."

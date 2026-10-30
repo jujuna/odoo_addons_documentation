@@ -151,7 +151,7 @@ class AccountEdiXmlUbl_Pe_Withholding(models.AbstractModel):
             bill = entry['bill']
             reference = {
                 'cbc:ID': {
-                    '_text': bill.name.replace(' ', ''),
+                    '_text': bill.l10n_latam_document_number,
                     'schemeID': bill.l10n_latam_document_type_id.code or '01',
                 },
                 'cbc:IssueDate': {'_text': bill.invoice_date},

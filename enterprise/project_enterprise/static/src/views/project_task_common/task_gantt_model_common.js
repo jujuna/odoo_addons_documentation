@@ -83,9 +83,6 @@ export class TaskGanttModelCommon extends ProjectTaskModelMixin(GanttModel) {
         const result = super._getFields(...arguments);
         // Field data required for muted gantt dependencies
         result.push("is_closed");
-        if (metaData.fields.allocated_hours && !result.includes("allocated_hours")) {
-            result.push("allocated_hours");
-        }
         return result;
     }
 }

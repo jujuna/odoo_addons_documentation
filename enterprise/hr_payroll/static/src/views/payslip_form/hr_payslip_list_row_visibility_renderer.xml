@@ -5,4 +5,10 @@
             <attribute name="t-foreach">this.VisibleRows</attribute>
         </xpath>
     </t>
+
+    <t t-name="hr_payroll.PayslipListRecordRow" t-inherit="web.ListRenderer.RecordRow" t-inherit-mode="primary">
+        <xpath expr="//tr[hasclass('o_data_row')]" position="attributes">
+            <attribute name="t-att-style">this.getRowStyle(record)</attribute>
+        </xpath>
+    </t>
 </odoo>

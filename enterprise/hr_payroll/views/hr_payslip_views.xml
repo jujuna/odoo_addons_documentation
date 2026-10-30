@@ -14,6 +14,8 @@
                     <button string="Compute" name="compute_sheet" type="object" class="oe_highlight"/>
                     <button string="Mark as Paid" name="action_payslip_paid" type="object" class="oe_highlight"/>
                     <button string="Print" name="action_print_payslip" type="object"/>
+                    <button string="Correct" name="action_adjust_payslip" type="object"
+                        context="{'default_is_button_action': True, 'correct_paid_payslips': True}"/>
                 </header>
                 <field name="company_id" column_invisible="True"/>
                 <field name="currency_id" column_invisible="True"/>
@@ -22,6 +24,9 @@
                 <field name="date_to" invisible="1" column_invisible="1" readonly="1"/>
                 <field name="payslip_run_id" optional='show' widget="many2one" readonly="state != 'draft'" options="{'payrun_optional': 'hide', 'no_open': 0}" placeholder="Off-Cycle"/>
                 <field name="struct_id" optional="hide" readonly="state in ['cancel', 'validated', 'paid']"/>
+                <field name="struct_use_worked_day_lines" column_invisible="True"/>
+                <field name="ignore_worked_day_lines" string="No Worked Days" widget="boolean_toggle" optional="hide"
+                    readonly="state in ['cancel', 'validated', 'paid']" invisible="not struct_use_worked_day_lines"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" optional="hide"/>
                 <field name="sum_worked_paid_days" optional="show"/>
                 <field name="sum_worked_paid_hours" optional="hide"/>
@@ -76,41 +81,28 @@
                     </button>
                 </div>
                 <div class="d-flex flex-column-reverse flex-sm-row align-items-sm-start gap-3 gap-md-5 mb-3 mb-lg-0">
-                    <div name="employee_structure_widget" class="oe_title flex-grow-1">
+                    <div name="employee_structure_widget" class="oe_title flex-grow-1 o_payslip_employee_title mb-2">
                         <h1 class="d-flex flex-row align-items-center mb-1">
                             <field name="employee_id" widget="many2one_avatar_employee_payroll" placeholder="Employee"
                                 readonly="state != 'draft'" options="{'no_create': True}" context="{'form_view_ref': 'hr_payroll.hr_employee_payroll_focused_form_view'}"/>
                         </h1>
-                        <div class="d-block mb-2" style="padding-left: 66px;">
-                            <field name="struct_id" class="w-100 d-block" required="1" readonly="state in ['cancel', 'validated', 'paid']"
-                                options="{'no_open': True, 'no_create': True, 'no_create_edit': True}"
-                                placeholder="Select the pay structure"/>
+                        <div name="period" class="d-flex align-items-center">
+                            <field name="date_from" class="oe_inline" readonly="state in ['cancel', 'validated', 'paid']"/>
+                            <i class="oi px-2" data-icon="east" title="arrow"></i>
+                            <field name="date_to" class="oe_inline" readonly="state in ['cancel', 'validated', 'paid']"/>
                         </div>
                     </div>
-                    <div name="payslip_summary_widget" class="d-flex flex-grow-1 gap-2 justify-content-end">
-                        <div class="flex-basis-50 flex-basis-sm-auto min-w-0 bg-100 p-2 px-lg-4 border rounded text-center"
-                            invisible="ignore_worked_day_lines or is_company_executive">
-                            <div class="mb-2 fw-bold">Worked days</div>
-                            <div class="fs-2 lh-1">
-                                <field name="sum_worked_paid_days" nolabel="1" class="mb-1 me-1"/>days
-                            </div>
-                            <div class="text-muted">
-                                <field name="sum_worked_paid_hours" widget="float_time" nolabel="1"/>
-                            </div>
+                    <div name="payslip_summary_widget" class="o_payslip_summary d-flex flex-grow-1 gap-4 gap-lg-5 justify-content-sm-end">
+                        <div class="min-w-0">
+                            <field name="net_wage" widget="payslip_summary_figure" nolabel="1"/>
+                            <div class="text-muted">Net Salary</div>
                         </div>
-                        <div class="flex-basis-50 flex-basis-sm-auto min-w-0 bg-100 p-2 px-lg-4 border rounded text-center">
-                            <div class="mb-2 fw-bold">Wage</div>
-                            <div invisible="ignore_worked_day_lines">
-                                <field name="basic_wage" nolabel="1" class="justify-content-center mb-1 fs-2 lh-1 text-break"/>
+                        <div class="min-w-0" invisible="ignore_worked_day_lines or is_company_executive">
+                            <div class="text-nowrap">
+                                <field name="sum_worked_paid_days" widget="payslip_summary_figure" nolabel="1"/>
+                                <span class="o_payslip_summary_unit ms-2">Days</span>
                             </div>
-                            <div class="text-muted" invisible="ignore_worked_day_lines">
-                                <field name="net_wage" nolabel="1"/>
-                                <span class="text-muted ms-1">Net</span>
-                            </div>
-                            <div class="text-muted" invisible="not ignore_worked_day_lines">
-                                <field name="net_wage" nolabel="1" class="justify-content-center mb-1 fs-2 lh-1 text-break"/>
-                                <span class="text-muted ms-1">Net</span>
-                            </div>
+                            <field name="sum_worked_paid_hours" widget="float_time" nolabel="1" class="text-muted"/>
                         </div>
                     </div>
                 </div>
@@ -127,7 +119,6 @@
                         />
                         <field name="country_id" invisible="1"/>
                         <field name="country_code" invisible="1"/>
-                        <field name="payslip_run_id" string="Pay Run" placeholder="Off-Cycle" context="{'default_date_start': date_from, 'default_date_end': date_to}" options="{'no_create': True, 'no_create_edit': True}"/>
                         <field name="salary_attachment_ids" invisible="1" force_save="1"/>
                         <field name="wage_type" invisible="1"/>
                         <field name="sum_worked_hours" invisible="1"/>
@@ -136,64 +127,92 @@
                         <field name="ignore_worked_day_lines" invisible="1"/>
                         <field name="payment_report_filename" invisible="1"/>
                         <field name="payment_report" filename="payment_report_filename" invisible="not payment_report"/>
-                        <label for="date_from" string="Period"/>
-                        <div name="period">
-                            <field name="date_from" class="oe_inline" readonly="state in ['cancel', 'validated', 'paid']"/>
-                            <i class="oi px-2" data-icon="east" title="arrow"></i>
-                            <field name="date_to" class="oe_inline" readonly="state in ['cancel', 'validated', 'paid']"/>
-                        </div>
                     </group>
                 </group>
-                <notebook class="o_payslip_notebook">
-                    <field name="country_code" invisible="1"/>
-                    <page string="Worked Days" name="worked_days" class="o_hr_payroll_worked_days" invisible="ignore_worked_day_lines or is_company_executive">
-                        <field name="worked_days_line_ids" readonly="state in ['cancel', 'validated', 'paid']">
-                            <list string="Worked Days" editable="bottom" create="0" delete="0">
-                                <field name="work_entry_type_id" readonly="1" force_save="1" optional="hide"/>
-                                <field name="code" readonly="1" force_save="1"/>
-                                <field name="version_id" groups="base.group_no_one" readonly="1" force_save="1"/>
+                <div name="worked_days" class="o_hr_payroll_worked_days" invisible="ignore_worked_day_lines or is_company_executive">
+                    <field name="worked_days_line_ids" mode="kanban" class="o_hr_payroll_line_cards" readonly="state in ['cancel', 'validated', 'paid']">
+                        <kanban create="0" delete="0" can_open="0">
+                            <field name="currency_id"/>
+                            <templates>
+                                <t t-name="card" class="o_hr_payroll_line_card flex-row align-items-center gap-3">
+                                    <field name="work_entry_type_id" widget="work_entry_type_tile"/>
+                                    <div class="flex-grow-1 min-w-0">
+                                        <div class="d-flex align-items-baseline gap-2">
+                                            <field name="name" class="flex-grow-1 min-w-0 fw-bold"/>
+                                            <field name="amount" widget="monetary" class="fw-bold text-nowrap" invisible="parent.country_code in ['AE', 'SA']"/>
+                                        </div>
+                                        <div class="d-flex flex-wrap column-gap-1 text-muted">
+                                            <div class="d-flex gap-1 text-nowrap" t-if="record.number_of_days.raw_value">
+                                                <field name="number_of_days" options="{'hide_trailing_zeros': True}"/>
+                                                <span t-if="record.number_of_days.raw_value === 1">day</span>
+                                                <span t-else="">days</span>
+                                            </div>
+                                            <span t-if="record.number_of_days.raw_value and record.number_of_hours.raw_value">·</span>
+                                            <field name="number_of_hours" widget="float_time" class="text-nowrap" invisible="not number_of_hours"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        <form>
+                            <group>
                                 <field name="name"/>
-                                <field name="period_start_date" optional="hide"/>
-                                <field name="period_end_date" optional="hide"/>
-                                <field name="resource_calendar_id" optional="hide"/>
-                                <field name="reference_calendar_id" optional="hide"/>
-                                <field name="category_ids" widget="many2many_tags" readonly="1" optional="hide"/>
-                                <field name="category_options_ids" widget="many2many_tags" readonly="1" optional="hide"/>
-                                <field name="number_of_days" sum="Total Working Days" force_save="1" string="Days"/>
-                                <field name="number_of_hours"  widget="float_time" sum="Total Working Hours" force_save="1" string="Hours"/>
-                                <field name="amount" sum="Total Amount" force_save="1" column_invisible="parent.country_code in ['AE', 'SA']"/>
-                                <field name="ytd" readonly="1" force_save="1"
-                                    column_invisible="not parent.ytd_computation"
-                                    optional="show"/>
-                                <field name="is_paid" readonly="1" column_invisible="True" force_save="1"/>
-                                <field name="sequence" readonly="1" column_invisible="True" force_save="1"/>
-                                <field name="currency_id" column_invisible="True"/>
-                            </list>
-                        </field>
-                    </page>
-                    <page string="Salary Inputs" class="o_hr_payroll_worked_days" name="salary_inputs">
-                        <field name="input_line_ids" colspan="4" nolabel="1" readonly="state in ['cancel', 'validated', 'paid']">
-                            <list string="Input Data" editable="bottom">
+                                <field name="work_entry_type_id" readonly="1" force_save="1"/>
+                                <field name="version_id" groups="base.group_no_one" readonly="1" force_save="1"/>
+                                <field name="number_of_days" force_save="1" string="Days"/>
+                                <field name="number_of_hours" widget="float_time" force_save="1" string="Hours"/>
+                                <field name="amount" force_save="1" invisible="parent.country_code in ['AE', 'SA']"/>
+                                <field name="ytd" readonly="1" force_save="1" invisible="not parent.ytd_computation"/>
+                                <field name="is_paid" invisible="1" force_save="1"/>
+                                <field name="sequence" invisible="1" force_save="1"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                        </form>
+                    </field>
+                </div>
+                <div name="salary_inputs" class="mb-3">
+                    <field name="input_line_ids" mode="kanban" class="o_hr_payroll_line_cards" add-label="Add Inputs" readonly="state in ['cancel', 'validated', 'paid']">
+                        <kanban>
+                            <field name="name"/>
+                            <templates>
+                                <t t-name="card" class="o_hr_payroll_line_card flex-row align-items-center gap-3">
+                                    <field name="input_suffix" widget="input_unit_tile"/>
+                                    <div class="flex-grow-1 min-w-0">
+                                        <div class="d-flex align-items-baseline gap-2">
+                                            <field name="salary_rule_id" class="flex-grow-1 min-w-0 fw-bold"/>
+                                            <field name="user_instructions" widget="explanation_tooltip" invisible="not user_instructions"/>
+                                            <span class="fw-bold text-nowrap" t-att-class="{'text-danger': record.amount.raw_value &lt; 0}">
+                                                <field name="amount" widget="float_with_suffix"/>
+                                            </span>
+                                        </div>
+                                        <div class="text-muted" t-if="record.name.raw_value and record.name.raw_value !== record.salary_rule_id.value">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        <form>
+                            <group>
                                 <!--
                                     Required 0 to force client to send on change request even when not defined,
                                     so the salary_rule_id domain (parent.struct_id) is evaluated properly.
                                 -->
-                                <field name="payslip_id" required="0" column_invisible="True"/>
+                                <field name="payslip_id" required="0" invisible="1"/>
                                 <field name="salary_rule_id"/>
-                                <field name="user_instructions" widget="explanation_tooltip" string=" " width="30px"/>
-                                <field name="name"/>
+                                <field name="user_instructions" nolabel="1" colspan="2" class="text-muted" invisible="not user_instructions"/>
+                                <field name="name" placeholder="Optional"/>
                                 <field name="amount" widget="float_with_suffix"/>
-                                <field name="version_id" column_invisible="True"/>
-                                <field name="sequence" column_invisible="True"/>
-                            </list>
-                        </field>
-                        <field name="currency_id" invisible="1"/>
-                    </page>
+                                <field name="version_id" invisible="1"/>
+                                <field name="sequence" invisible="1"/>
+                            </group>
+                        </form>
+                    </field>
+                    <field name="currency_id" invisible="1"/>
+                </div>
+                <notebook class="o_payslip_notebook">
+                    <field name="country_code" invisible="1"/>
                     <page string="Salary Computation" name="salary_computation" class="o_hr_payroll_salary_computation">
-                        <div class="o_payslip_show_all_toggle d-flex gap-2">
-                            <span class="mb-0 fw-normal text-muted">Show all</span>
-                            <widget name="payslip_show_all_toggle"/>
-                        </div>
                         <field name="line_ids" colspan="4" nolabel="1" readonly="state != 'draft'" widget="payslip_lines_2many">
                             <list string="Salary Structure" editable="bottom" decoration-bf="manually_modified" decoration-muted="total == 0" create="0" delete="0" limit="200">
                                 <field name="name"/>
@@ -203,6 +222,8 @@
                                 <field name="quantity" force_save="1" optional="show" is_default_value="quantity == 1.0"/>
                                 <field name="rate" options="{'hide_trailing_zeros': True}" force_save="1" optional="show" is_default_value="rate == 100.0"/>
                                 <field name="salary_rule_id" groups="base.group_no_one" readonly="1" force_save="1" optional="hide"/>
+                                <!-- the style of the rule (bold, italic...) applies on the row -->
+                                <field name="salary_rule_id" widget="salary_rule_style" column_invisible="True" readonly="1"/>
                                 <field name="hide_amount" column_invisible="True"/>
                                 <field name="amount" force_save="1" optional="show" is_default_value="amount == total" invisible="hide_amount"/>
                                 <field name="total" readonly="not(amount == total and rate == 100.0 and quantity == 1.0)" force_save="1"/>
@@ -214,18 +235,20 @@
                                 <field name="explanation" widget="explanation_tooltip" string=" " width="30px"/>
                             </list>
                         </field>
+                        <div class="o_payslip_show_all_toggle d-flex justify-content-end gap-2 mt-2 mt-md-0">
+                            <span class="mb-0 fw-normal text-muted">Show all</span>
+                            <widget name="payslip_show_all_toggle"/>
+                        </div>
                     </page>
                     <page string="Other Info" name="account_info">
                         <group>
                             <group>
                                 <field name="name" invisible="1"/>
-                                <field name="title" placeholder="Default" readonly="state in ['cancel', 'validated', 'paid']"/>
-                                <field name="ignore_worked_day_lines" readonly="state in ['cancel', 'validated', 'paid']"
-                                    string="No Worked Days" invisible="not struct_use_worked_day_lines"/>
-                                <div colspan="2">
-                                    <label for="note" string="Note"/>
-                                    <field name="note" class="oe_inline" placeholder="Add a note on the printed payslip." readonly="state != 'draft'"/>
-                                </div>
+                                <field name="payslip_run_id" string="Pay Run" placeholder="Off-Cycle" context="{'default_date_start': date_from, 'default_date_end': date_to}" options="{'no_create': True, 'no_create_edit': True}"/>
+                                <field name="struct_id" required="1" readonly="state in ['cancel', 'validated', 'paid']"
+                                    options="{'no_open': True, 'no_create': True, 'no_create_edit': True}"
+                                    placeholder="Select the pay structure"/>
+                                <field name="note" colspan="2" nolabel="1" placeholder="Add a note on the printed payslip." readonly="state != 'draft'"/>
                             </group>
                             <group name="accounting">
                                 <field name="paid_date"/>

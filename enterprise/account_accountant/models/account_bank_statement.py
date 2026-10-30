@@ -54,6 +54,22 @@ class AccountBankStatement(models.Model):
             },
         }
 
+    def action_open_review_statements(self):
+        self.ensure_one()
+
+        statement_ids = self.ids
+        if not self.is_valid and (previous_statement := self._get_previous_statement()):
+            statement_ids += previous_statement.ids
+
+        return self.env['account.bank.statement.line']._action_open_bank_reconciliation_widget(
+            default_context={
+                'search_default_statement_to_review': True,
+                'search_default_journal_id': self.journal_id.id,
+                'review_statement_ids': statement_ids,
+            },
+            name=self.env._("Review Statements"),
+        )
+
     def action_generate_attachment(self):
         ir_actions_report_sudo = self.env['ir.actions.report'].sudo()
         statement_report_action = self.env.ref('account.action_report_account_statement')
@@ -708,10 +724,11 @@ class AccountBankStatementLine(models.Model):
         for key, to_process_list in to_process.items():
             st_line_id, matching_word = key
             st_line = self.browse(st_line_id).with_prefetch(self._prefetch_ids)  # guarantees batch prefetching if needed
+            sign = -1 if st_line.amount < 0 else 1
             for aml_id, aml_amount_residual in to_process_list:
                 # Exclude move lines to prevent reconciliation when the total residual exceeds the statement line amount
                 if st_line_id in ref_amls_sum:
-                    if ref_amls_sum[st_line_id] <= 0:
+                    if (sign * ref_amls_sum[st_line_id]) <= 0:
                         continue
                     ref_amls_sum[st_line_id] -= sum(aml_amount_residual)
                 else:
@@ -918,7 +935,7 @@ class AccountBankStatementLine(models.Model):
                          OR st_line_company.parent_path LIKE CONCAT(aml_company.id, '/%%')
                      )
                      JOIN %(query_from_clause)s ON (%(query_where_clause)s)
-                     LEFT JOIN account_move move ON (move.id = account_move_line.move_id AND move.payment_reference != move.name)
+                     LEFT JOIN account_move move ON (move.id = account_move_line.move_id AND (move.payment_reference != move.name OR move.ref != move.name))
                      LEFT JOIN account_payment payment ON move.origin_payment_id = payment.id,
                        LATERAL regexp_split_to_table(
                                   COALESCE(account_move_line.ref, '') || ' - ' ||
@@ -1055,7 +1072,9 @@ class AccountBankStatementLine(models.Model):
                 # Fourth match if partner name partially match and company doesn't
                 st_line.partner_id = partner[0]
 
-        if not (lines_with_partner_name := lines_with_partner_name.filtered(lambda stl: not stl.partner_id)):
+        # Partner name could have been emptied by changing the `partner_id` in the loop above
+        lines_with_partner_name = lines_with_partner_name.filtered(lambda stl: not stl.partner_id and stl.partner_name)
+        if not lines_with_partner_name:
             return
 
         # In case we don't find the partner with the above conditions, we will retrieve it
@@ -1747,14 +1766,15 @@ class AccountBankStatementLine(models.Model):
 
         new_lines = []
         has_exchange_diff = False
+        highest_exchange_diff_line = {}
         stop_reco_at_first_partial = self.env.context.get('stop_reco_at_first_partial')
         partial_applied = False
         for move_line in move_lines:
             exchange_diff_balance = self._lines_get_account_balance_exchange_diff(move_line.currency_id, move_line.amount_residual, move_line.amount_residual_currency)
             current_balance = -(move_line.amount_residual + exchange_diff_balance)
-            current_amount_currency = self._convert_amount_to_transaction_currency(move_line.currency_id, move_line.amount_residual_currency, move_line.amount_residual)
+            current_amount_currency = self._convert_amount_to_transaction_currency(move_line.currency_id, move_line.amount_residual_currency, current_balance)
 
-            has_exchange_diff = has_exchange_diff or not move_line.currency_id.is_zero(exchange_diff_balance)
+            has_exchange_diff = has_exchange_diff or not self.company_currency_id.is_zero(exchange_diff_balance)
             open_balance += current_balance
             open_amount_currency -= current_amount_currency
 
@@ -1780,6 +1800,11 @@ class AccountBankStatementLine(models.Model):
                 reconcile_model_id=False,
                 reconciled_lines_ids=[Command.set(move_line.ids)],
             )]
+            if (
+                not company_currency.is_zero(exchange_diff_balance)
+                and abs(new_line_balance) > abs(highest_exchange_diff_line.get('balance', 0))
+            ):
+                highest_exchange_diff_line = new_lines_to_add[0]
 
             lines_with_epd, total_amount, total_amount_currency = self._apply_early_payment_discount(
                 move_line,
@@ -1794,6 +1819,15 @@ class AccountBankStatementLine(models.Model):
             new_lines.extend(lines_with_epd or new_lines_to_add)
             if stop_reco_at_first_partial and (partial_applied or company_currency.is_zero(open_balance)):
                 break
+
+            # Individual currency conversions can leave a company currency rounding difference.
+            # Apply it to the highest line with an exchange difference instead of suspense.
+            if (
+                highest_exchange_diff_line
+                and transaction_currency.is_zero(open_amount_currency)
+                and not company_currency.is_zero(open_balance)
+            ):
+                highest_exchange_diff_line['balance'] -= open_balance
 
         self.with_context(
             no_exchange_difference_no_recursive=not has_exchange_diff,
@@ -1830,9 +1864,12 @@ class AccountBankStatementLine(models.Model):
                 'partial_balance': balance_after_partial,
                 'partial_amount_currency': new_amount_currency,
             }
-        elif has_enough_comp_debit or has_enough_comp_credit:
+        elif move_line.currency_id != transaction_currency and (
+            has_enough_comp_debit or has_enough_comp_credit
+        ):
             if (self.foreign_currency_id or self.currency_id) != move_line.currency_id:
                 tolerance = max(tolerance, self._get_exchange_currency_tolerance())
+
             # Compute the new value for balance.
             balance_after_partial = (
                 current_balance
@@ -1842,7 +1879,6 @@ class AccountBankStatementLine(models.Model):
             )
             # Get the rate of the original journal item.
             rate = move_line.currency_rate
-
             # Compute the amounts to make a partial.
             new_line_balance = move_line.company_currency_id.round(balance_after_partial * abs(move_line.amount_residual) / abs(current_balance))
             new_amount_currency = move_line.currency_id.round(new_line_balance * rate)
@@ -1883,12 +1919,6 @@ class AccountBankStatementLine(models.Model):
         elif currency_id != self.company_currency_id and transaction_currency_id == self.company_currency_id:
             # The reconciliation will be expressed using the foreign currency of the aml to cover the Mexican case.
             origin_balance = currency_id._convert(amount_currency, transaction_currency_id, self.company_id, self.date)
-
-        # Compute the exchange difference balance.
-        # Useful for example when the currency has a rounding of 1 and that we have a exchange diff of 0.01, we don't want
-        # the exchange diff to be created.
-        if currency_id.is_zero(origin_balance - amount):
-            return 0.0
 
         return self.company_currency_id.round(origin_balance - amount)
 
@@ -2263,18 +2293,24 @@ class AccountBankStatementLine(models.Model):
             }
         )
 
-        # process automatically the new lines in case we pass some context key (i.e coming from the bank reconciliation widget)
-        if self.env.context.get('auto_statement_processing', False) and statement_lines:
-            if len(statement_lines) <= AUTO_STATEMENT_PROCESSING_NUMBER:
-                statement_lines._try_auto_reconcile_statement_lines()
-            else:
-                statement_lines._cron_try_auto_reconcile_statement_lines(batch_size=AUTO_STATEMENT_PROCESSING_BATCH_SIZE)
-
+        # In the quick create of the bank rec widget, we can now put a reconcile model, we set the reconcile model that was
+        # set on the line in priority
+        statement_line_to_process = statement_lines
         for line in statement_lines:
             if not line.reconcile_model_id:
                 continue
 
             line.reconcile_model_id._trigger_reconciliation_model(line)
+            if line.is_reconciled:
+                statement_line_to_process -= line
+
+        # process automatically the new lines in case we pass some context key (i.e coming from the bank reconciliation widget)
+        if self.env.context.get('auto_statement_processing', False) and statement_line_to_process:
+            if len(statement_line_to_process) <= AUTO_STATEMENT_PROCESSING_NUMBER:
+                statement_line_to_process._try_auto_reconcile_statement_lines()
+            else:
+                statement_line_to_process._cron_try_auto_reconcile_statement_lines(batch_size=AUTO_STATEMENT_PROCESSING_BATCH_SIZE)
+
         return statement_lines
 
     def format_transaction_details(self):

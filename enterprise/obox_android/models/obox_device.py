@@ -8,6 +8,12 @@ class OboxDevice(models.Model):
     local_ip = fields.Char(string="Local IP", related="obox_id.local_address")
     local_port = fields.Integer(related="obox_id.local_port")
     local_address = fields.Char(related="obox_id.local_address")
+    supports_printer_status = fields.Boolean(related="obox_id.supports_printer_status")
+
+    def action_printer_status(self):
+        self.ensure_one()
+        self.obox_id._queue_action("printer_status", "/usb/v1/printer/status", {"identifier": self.identifier})
+        return self.obox_id._command_sent_notification()
 
     def write(self, vals):
         res = super().write(vals)

@@ -1,9 +1,15 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, edit, keyDown, keyUp } from "@odoo/hoot-dom";
-import { animationFrame, disableAnimations, mockDate, mockTimeZone } from "@odoo/hoot-mock";
+import { click, edit, keyDown, keyUp, queryAll } from "@odoo/hoot-dom";
+import {
+    advanceFrame,
+    animationFrame,
+    disableAnimations,
+    mockDate,
+    mockTimeZone,
+} from "@odoo/hoot-mock";
 
 import { contains, defineParams, onRpc } from "@web/../tests/web_test_helpers";
-import { Tasks, defineGanttModels } from "./gantt_mock_models";
+import { Stage, Tasks, defineGanttModels } from "./gantt_mock_models";
 import {
     dragPill,
     getCell,
@@ -1202,4 +1208,71 @@ test("multi_create: select column header then ctrl+click on folded column keeps 
     expect(".o_cell_ghost").toHaveCount(6);
     expect(".o_selection_box").toHaveText("0 selected", { inline: true });
     expect(".o_gantt_header_folded").toHaveCount(0);
+});
+
+test("multi_create: renders newly visible rows and columns on multi-selection", async () => {
+    for (let id = 5; id <= 30; id++) {
+        Stage._records.push({
+            id,
+            name: `Stage ${id}`,
+            sequence: id,
+        });
+        Tasks._records.push({
+            id: 100 + id,
+            name: `Task ${id}`,
+            start: "2018-12-20 00:00:00",
+            stop: "2018-12-20 23:00:00",
+            stage_id: id,
+        });
+    }
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                precision="{'day':'hour:full', 'week':'day:full', 'month':'day:full'}"
+                multi_create_view="multi_create_form"
+            >
+                <field name="progress"/>
+            </gantt>
+        `,
+        groupBy: ["stage_id"],
+        context: {
+            default_range: "custom",
+            default_start_date: "2018-12-17",
+            default_stop_date: "2019-02-18",
+        },
+    });
+    const getVisibleColumns = () =>
+        new Set(
+            queryAll(".o_gantt_cell")
+                .map((cell) => cell.dataset.col)
+                .filter((col) => col !== undefined && col !== "")
+                .map(Number)
+                .filter(Number.isFinite)
+        );
+    const getVisibleRows = () =>
+        new Set(
+            queryAll(".o_gantt_row_header")
+                .map((row) => row.dataset.rowId)
+                .filter(Boolean)
+        );
+    const visibleColumnsBefore = getVisibleColumns();
+    const visibleRowsBefore = getVisibleRows();
+    const sourceCell = getCell("17", "December 2018", "done");
+    const { drop, moveTo } = await contains(sourceCell).drag();
+    await moveTo(".o_gantt_scroll_container", {
+        position: { x: window.innerWidth, y: window.innerHeight },
+        relative: true,
+    });
+    await advanceFrame(50);
+    const targetCell = getCell("07", "February 2019", "Stage 26");
+    await moveTo(targetCell);
+    await animationFrame();
+    const visibleColumnsAfter = getVisibleColumns();
+    const visibleRowsAfter = getVisibleRows();
+    expect(Math.max(...visibleColumnsAfter)).toBeGreaterThan(Math.max(...visibleColumnsBefore));
+    expect([...visibleRowsAfter].some((rowId) => !visibleRowsBefore.has(rowId))).toBe(true);
+    await drop();
 });

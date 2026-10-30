@@ -754,8 +754,18 @@ class AccountEdiXmlUbl_Pe(models.AbstractModel):
                 return None
             return tax_data['tax'] and tax_data['tax'].tax_group_id == withholding_group_id
 
-        base_lines_aggregated_tax_details = self.env['account.tax']._aggregate_base_lines_tax_details(vals['base_lines'], grouping_function_wh)
-        aggregated_tax_details = self.env['account.tax']._aggregate_base_lines_aggregated_values(base_lines_aggregated_tax_details)
+        AccountTax = self.env['account.tax']
+        company = vals['invoice'].company_id
+        # Read by l10n_account_withholding_tax only, sales need it without l10n_pe_edi_withholding
+        base_lines = [
+            {**base_line, 'calculate_withholding_taxes': True, 'filter_tax_function': None}
+            for base_line in vals['base_lines']
+        ]
+        AccountTax._add_tax_details_in_base_lines(base_lines, company)
+        AccountTax._round_base_lines_tax_details(base_lines, company)
+
+        base_lines_aggregated_tax_details = AccountTax._aggregate_base_lines_tax_details(base_lines, grouping_function_wh)
+        aggregated_tax_details = AccountTax._aggregate_base_lines_aggregated_values(base_lines_aggregated_tax_details)
         base_amount = min(aggregated_tax_details.get(True, {}).get('base_amount_currency', 0.0), vals['tax_inclusive_amount_currency'])
         allowance_amount = aggregated_tax_details.get(True, {}).get('tax_amount_currency', 0.0)
 

@@ -1,7 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import math
+
 from odoo import api, fields, models
 
+from datetime import timedelta
 from dateutil.relativedelta import relativedelta, MO, SU
 from odoo.tools import float_round
 
@@ -41,7 +44,7 @@ class ResourceCalendar(models.Model):
         credit_time_attendance_intervals = self.sudo()._attendance_intervals_batch(
             start_dt, end_dt, resources_per_tz=resources_per_tz, domain=[('work_entry_type_id.l10n_be_is_time_credit', '=', True)])
         return {
-            r.id: (work_intervals[r.id] - credit_time_attendance_intervals[r.id]) if r and not r._is_flexible() else (work_intervals[r.id])
+            r.id: (work_intervals[r.id] - credit_time_attendance_intervals[r.id]) if not (r and r._is_flexible()) else (work_intervals[r.id])
             for r in all_resources
         }
 
@@ -163,6 +166,11 @@ class ResourceCalendar(models.Model):
         if self.calendar_type == 'fixed':
             period_start = date_from + relativedelta(weekday=MO(-1))
             period_end = date_to + relativedelta(weekday=SU(1))
+        elif cycle_weeks := self._l10n_be_get_cycle_weeks():
+            # a cycle repeated every few weeks: one whole cycle, as a fixed week is taken whole, so that a monthly
+            # wage does not follow the days the cycle puts in each month
+            period_start = date_from + relativedelta(weekday=MO(-1))
+            period_end = period_start + timedelta(weeks=cycle_weeks, days=-1)
         else:
             period_start = date_from
             period_end = date_to
@@ -183,7 +191,31 @@ class ResourceCalendar(models.Model):
 
         return actual_working_hours / total_calendar_hours
 
+    def _l10n_be_get_cycle_weeks(self):
+        """Weeks of the cycle of a variable calendar whose attendances all repeat by weeks, 0 otherwise."""
+        self.ensure_one()
+        attendances = self.attendance_ids
+        if not attendances or not all(a.recurrency and a.recurrency_type == 'weeks' for a in attendances):
+            return 0
+        return math.lcm(*attendances.mapped('recurrency_interval'))
+
     def _l10n_be_get_short_attendance_resource_calendar(self):
         self.ensure_one()
         attendances_by_day = self.attendance_ids.grouped('dayofweek')
         return any(sum(attendance.mapped('duration_hours')) < 2 for attendance in attendances_by_day.values())
+
+    def _get_working_days_gap(self, date_from, date_to):
+        """
+        Returns the number of working days strictly between `date_from`
+        (exclusive) and `date_to` (exclusive), based on the working schedule.
+
+        Used to measure how many working days separate two consecutive
+        contracts, so that gap can be compared against a configurable
+        tolerance (e.g. l10n_be_seniority_lost_period).
+        """
+        if not date_from or not date_to or date_to - date_from <= timedelta(days=1):
+            return 0
+
+        gap_start, gap_end = date_from + timedelta(days=1), date_to - timedelta(days=1)
+        attendances_by_date = self._get_attendances_by_date(gap_start, gap_end)
+        return sum(1 for attendances in attendances_by_date.values() if attendances)

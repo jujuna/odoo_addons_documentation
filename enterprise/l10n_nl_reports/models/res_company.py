@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import requests
+from cryptography.hazmat.primitives import serialization
 from requests import HTTPError
 
 from odoo import fields, models, _
@@ -56,9 +57,19 @@ class ResCompany(models.Model):
                 self.env.ref('account.action_account_config').id,
                 _("Go to the Accounting Settings"),
             )
+        # The certificate.key stores the PEM key encrypted whenever it has a password,
+        # while the TLS handshake and the WSSE signature require it without a passphrase.
+        private_key = serialization.load_pem_private_key(
+            certificate.private_key_id.pem_key.content,
+            certificate.private_key_id.password.encode() if certificate.private_key_id.password else None,
+        ).private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption(),
+        )
         return (
             certificate.pem_certificate.content,
-            certificate.private_key_id.pem_key.content,
+            private_key,
         )
 
     def _l10n_nl_get_server_root_certificate_bytes(self):

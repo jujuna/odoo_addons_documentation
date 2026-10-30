@@ -9,12 +9,28 @@ class PosPrepOrder(models.Model):
     @api.model
     def fire_course(self, order_id, course_id):
         order = self.env['pos.order'].browse(order_id)
-        course = self.env['restaurant.order.course'].browse(course_id)
+        course = self.env['restaurant.order.course'].browse(course_id).exists()
+
+        if not course:
+            return
+
         course.write({
             "fired": True,
         })
         for display in course.line_ids.prep_line_ids.prep_display_ids:
             display._send_load_orders_message(True, _("%s Fired", course.name), order.id)
+
+    @api.model
+    def _notify_pdis(self, pos_order_ids):
+        for pos_order_id in pos_order_ids:
+            pos_order = self.env['pos.order'].browse(pos_order_id)
+            prep_order = self.search([('pos_order_id', '=', pos_order_id)], limit=1)
+            if not prep_order:
+                continue
+            category_ids = set(pos_order.lines.mapped('product_id.pos_categ_ids.id'))
+            for p_dis in self.env['pos.prep.display']._get_preparation_displays(pos_order, category_ids):
+                p_dis._send_load_orders_message(True, False, pos_order_id)
+        return True
 
 
 class PosOrderLine(models.Model):

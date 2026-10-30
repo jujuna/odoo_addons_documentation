@@ -657,11 +657,11 @@ class IrUiView(models.Model):
             ], limit=1)
             if website_specific_view:
                 view = website_specific_view
-        if self.env.context.get('delay_translations'):
-            disable_delay_translations = self.env['ir.config_parameter'].sudo().get_bool(
+        if view.env.context.get('delay_translations'):
+            disable_delay_translations = view.env['ir.config_parameter'].sudo().get_bool(
                 'website.disable_delay_translations'
             )
-            self.env = self.with_context(delay_translations=not disable_delay_translations).env
+            view = view.with_context(delay_translations=not disable_delay_translations)
         arch_section = html.fromstring(value)
 
         if xpath is None:
@@ -689,6 +689,9 @@ class IrUiView(models.Model):
         if not view._are_archs_equal(old_arch, new_arch):
             view._set_noupdate()
             view.write({'arch': etree.tostring(new_arch, encoding='unicode')})
+            # TODO: on master, use `_get_template_view` instead (and add the
+            # website in the context where we call `save`)
+            view = view if view.website_id or 'website_id' not in view.env.context else view.env['website'].viewref(view.key)
             view._copy_custom_snippet_translations(view, 'arch_db')
 
     @api.model

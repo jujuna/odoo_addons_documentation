@@ -48,11 +48,11 @@ class HrLeaveAllocationGenerateMultiWizard(models.TransientModel):
         result = []
         for employee in employees:
             days = 0
-            for version in employee.version_ids:
-                overlap_start = max(leave.date_from.date(), version.contract_date_start)
+            for version in employee.version_ids.filtered('contract_date_start'):
+                overlap_start = max(leave.date_from.date(), version.date_start)
                 overlap_end = min(
                     leave.date_to.date(),
-                    version.contract_date_end or leave.date_to.date(),
+                    version.date_end or leave.date_to.date(),
                 )
                 if overlap_end < overlap_start:
                     continue

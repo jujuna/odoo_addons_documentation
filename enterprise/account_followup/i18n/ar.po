@@ -15,9 +15,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:14+0000\n"
+"PO-Revision-Date: 2026-10-22 12:01+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "account_followup/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -53,11 +53,31 @@ msgid ""
 "reminders\n"
 "        to multiple customers at once using the 'Send Reminders' action.\n"
 msgstr ""
+"\n"
+"تطبيق لإدارة الفواتير غير المسددة آليًا، مع نظام تذكير متعدد المستويات.\n"
+"=========================================================================\n"
+"\n"
+"يمكنك تحديد مستويات التذكير المتعددة من خلال إعدادات الفوترة:\n"
+"-----------------------------------------------------------------------------"
+"\n"
+"    التهيئة / الإعدادات / فواتير العملاء / تذكيرات الفواتير التلقائية\n"
+"\n"
+"الميزات:\n"
+"---------\n"
+"    - تذكيرات تلقائية متعددة المستويات بناءً على مدة التأخير.\n"
+"    - تكامل «إرسال وطباعة»:\n"
+"        إذا تم تنفيذ «إرسال وطباعة» مرة أخرى على فاتورة متأخرة السداد، فإن "
+"النظام\n"
+"        يتحول تلقائيًا إلى نموذج التذكير المناسب ويرفق\n"
+"        تقرير المتابعة.\n"
+"    - تذكيرات مجمعة:\n"
+"        يمكن للمستخدمين تحديد فواتير متعددة من عرض القائمة وإرسال تذكيرات\n"
+"        إلى عدة عملاء في وقت واحد باستخدام إجراء «إرسال تذكيرات».\n"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "\"Automatic Invoice Reminders\" is currently disabled."
-msgstr ""
+msgstr "\"تذكيرات الفواتير التلقائية\" معطلة حاليًا."
 
 #. module: account_followup
 #. odoo-python
@@ -74,7 +94,7 @@ msgstr "%(display_delay)s أيام %(reminder_timing)s"
 #. module: account_followup
 #: model:ir.actions.report,print_report_name:account_followup.action_report_followup
 msgid "'Reminder ' + object.display_name"
-msgstr ""
+msgstr "'تذكير' + object.display_name"
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_invoice_payment_kind_reminder
@@ -1070,11 +1090,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
 msgid "<span class=\"o_stat_text\">Open Items</span>"
 msgstr ""
+"<span class=\"o_stat_text\">البنود والمعاملات غير المسواة المتبقية</span>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "<strong class=\"text-muted\">To: </strong>"
-msgstr ""
+msgstr "<strong class=\"text-muted\">إلى: </strong>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -1136,7 +1157,7 @@ msgstr "تنبيهات "
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__automatic
 msgid "Automatic"
-msgstr ""
+msgstr "تلقائي"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_company__automatic_invoice_reminder
@@ -1475,7 +1496,7 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Invoice Follow-ups"
-msgstr ""
+msgstr "المتابعة بشأن الفواتير"
 
 #. module: account_followup
 #: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
@@ -1562,7 +1583,7 @@ msgstr ""
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__manual
 msgid "Manual"
-msgstr ""
+msgstr "يدوي"
 
 #. module: account_followup
 #. odoo-python
@@ -1688,7 +1709,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_reminder_type
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_reminder_type
 msgid "Reminders"
-msgstr ""
+msgstr "التذكيرات"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__render_model
@@ -1927,7 +1948,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_overdue_followup
 msgid "Total Overdue Followup"
-msgstr ""
+msgstr "متابعة إجمالي المهام المتأخرة"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__unreconciled_aml_ids
@@ -1999,7 +2020,7 @@ msgstr ""
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__after
 msgid "after"
-msgstr ""
+msgstr "بعد"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__before
@@ -2009,7 +2030,7 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "days"
-msgstr ""
+msgstr "أيام"
 
 #. module: account_followup
 #. odoo-python

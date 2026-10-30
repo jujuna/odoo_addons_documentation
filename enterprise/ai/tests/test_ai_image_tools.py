@@ -116,6 +116,14 @@ class TestImageTools(TransactionCase):
             self.assertEqual(parts[0]['data'], base64.b64encode(PNG_RAW).decode())
             self.assertEqual(parts[0]['metadata']['image_path'], "/ai/static/src/img/test.png")
 
+    def test_retrieve_image_parts_from_file_unsupported_format(self):
+        with patch('odoo.addons.ai.utils.ai_image_tools.file_open', mock_open(read_data=b"<svg></svg>")), \
+             patch('mimetypes.guess_type', return_value=('image/svg+xml', None)):
+            parts = _retrieve_image_parts_from_file("/ai/static/src/img/test.svg")
+            self.assertEqual(len(parts), 1)
+            self.assertEqual(parts[0]['type'], 'text')
+            self.assertIn("/ai/static/src/img/test.svg", parts[0]['text'])
+
     def test_retrieve_image_data_from_attachment(self):
         attachment = self.env['ir.attachment'].create({
             'name': 'test.png',
@@ -126,6 +134,23 @@ class TestImageTools(TransactionCase):
         data = retrieve_image_data_from_record(attachment, 'raw')
         self.assertEqual(data['content'], PNG_RAW)
         self.assertEqual(data['mimetype'], 'image/png')
+
+    def test_retrieve_image_data_from_attachment_unsupported_format(self):
+        attachment = self.env['ir.attachment'].create({
+            'name': 'test.svg',
+            'raw': b"<svg></svg>",
+            'mimetype': 'image/svg+xml',
+            'store_fname': False,
+        })
+        data = retrieve_image_data_from_record(attachment, 'raw')
+        self.assertEqual(data['content'], b"<svg></svg>")
+        self.assertEqual(data['mimetype'], 'image/svg+xml')
+
+        image_path = f"/web/image/ir.attachment/{attachment.id}/raw"
+        parts = retrieve_image_parts_from_path(self.env, image_path)
+        self.assertEqual(len(parts), 1)
+        self.assertEqual(parts[0]['type'], 'text')
+        self.assertIn(image_path, parts[0]['text'])
 
     def test_retrieve_image_data_from_attachment_external_url(self):
         """Test retrieval of data from an attachment withURL. The retrieved data is actually an image."""

@@ -1,14 +1,20 @@
 # pylint: disable=C0326
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import base64
 import os
-from freezegun import freeze_time
+from contextlib import nullcontext
 from unittest import skipIf
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
+
+import requests
+from freezegun import freeze_time
+from lxml import etree
 
 from odoo import Command, fields
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
-from odoo.exceptions import RedirectWarning
+from odoo.exceptions import RedirectWarning, UserError
 from odoo.tests import tagged
+from odoo.tools import mute_logger
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
@@ -44,6 +50,78 @@ class TestNlTaxReportSBR(TestAccountReportsCommon):
             ],
             **move_data,
         }
+
+    def test_personal_certificate_status_payload(self):
+        status_service = self.env['l10n_nl_reports.sbr.status.service'].new({
+            'company_id': self.env.company.id,
+        })
+        company_model = self.env.registry['res.company']
+        signed_envelope = etree.fromstring(b'<Envelope><SignedStatusRequest/></Envelope>')
+        delivery_client = MagicMock()
+        raw_delivery_service = MagicMock()
+        raw_delivery_service._binding._create.return_value = signed_envelope, {'SOAPAction': 'status-action'}
+        with (
+            patch.object(
+                company_model,
+                '_l10n_nl_get_certificate_and_key_bytes',
+                return_value=(b'certificate', b'private-key'),
+            ) as get_certificate,
+            patch.object(
+                company_model,
+                '_l10n_nl_get_server_root_certificate_bytes',
+                return_value=b'root',
+            ),
+            patch(
+                'odoo.addons.l10n_nl_reports.tools.digipoort_envelope.temporary_certificate_files',
+                return_value=nullcontext(('root.pem', 'certificate.pem', 'private-key.pem')),
+            ),
+            patch(
+                'odoo.addons.l10n_nl_reports.tools.digipoort_envelope.create_soap_client_logius',
+                return_value=(delivery_client, MagicMock(), raw_delivery_service),
+            ),
+        ):
+            payload = status_service._get_iap_status_payload('submission-reference', 'access-token')
+
+        self.assertEqual(payload, {
+            'kenmerk': 'submission-reference',
+            'access_token': 'access-token',
+            'soap_envelope': base64.b64encode(etree.tostring(signed_envelope)).decode(),
+            'soap_action': 'status-action',
+        })
+        self.assertEqual(
+            raw_delivery_service._binding._create.call_args.args[:3],
+            ('getStatussenProces', (), {
+                'kenmerk': 'submission-reference',
+                'autorisatieAdres': 'http://geenausp.nl',
+            }),
+        )
+        get_certificate.assert_called_once_with()
+
+    @mute_logger('odoo.addons.l10n_nl_reports.models.l10n_nl_reports_sbr_status_service')
+    def test_permanent_status_payload_error_stops_polling(self):
+        status_service = self.env['l10n_nl_reports.sbr.status.service'].create({
+            'kenmerk': 'submission-reference',
+            'access_token': 'access-token',
+            'company_id': self.env.company.id,
+            'report_name': 'Tax Report',
+        })
+        status_service_model = self.env.registry['l10n_nl_reports.sbr.status.service']
+
+        for error in (UserError('The certificate cannot be loaded.'), requests.exceptions.SSLError('Certificate rejected')):
+            status_service.is_done = False
+            with patch.object(status_service_model, '_get_iap_status_payload', side_effect=error):
+                status_service._cron_process_submission_status()
+            self.assertTrue(status_service.is_done)
+
+        status_service.is_done = False
+        iap_response = MagicMock()
+        iap_response.json.return_value = {'error': 'personal_certificate_required'}
+        with (
+            patch.object(status_service_model, '_get_iap_status_payload', return_value={}),
+            patch('odoo.addons.l10n_nl_reports.models.l10n_nl_reports_sbr_status_service.requests.post', return_value=iap_response),
+        ):
+            status_service._cron_process_submission_status()
+        self.assertTrue(status_service.is_done)
 
     @freeze_time('2026-02-23 18:45')
     def test_xbrl_export(self):

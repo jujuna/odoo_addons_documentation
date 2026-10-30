@@ -1,9 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
-from odoo.addons.hr_payroll.tests.common import TestPayslipBase
+
+from dateutil.relativedelta import relativedelta
+
+from odoo.fields import Command
 from odoo.tests import Form
 from odoo.tests.common import freeze_time
+
+from odoo.addons.hr_payroll.tests.common import TestPayslipBase
 
 
 class TestEmployeePayrunIssues(TestPayslipBase):
@@ -16,11 +21,12 @@ class TestEmployeePayrunIssues(TestPayslipBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, hr_payroll_force_compute_issue=True))
 
         # --- Use data from TestPayslipBase ---
         # We'll use 'richard_emp' as our primary test employee.
         # His contract_date_start is set to 2018-01-01 in the base class.
-        cls.employee = cls.richard_emp
+        cls.employee = cls.richard_emp.with_env(cls.env)
         # --- Define Dates ---
         # We set our test period to be *within* richard_emp's contract
         cls.start_of_month = date(2018, 2, 1)
@@ -356,3 +362,45 @@ class TestEmployeePayrunIssues(TestPayslipBase):
                 any(issue.get('message') == "The pay run %s is missing this employee" % payslip_run.name for issue in self.employee.issues.values()),
                 "The related 'missing employee in payrun' issue was generated",
             )
+
+    def test_11_no_issue_missing_correction_payrun(self):
+        """
+        Test Case 11:
+        - Employee is missing from a correction payrun.
+        - Verify no 'issues' are generated.
+        """
+        # 1. Create and validate a payslip for another employee
+        employee2 = self.env['hr.employee'].create({
+            'name': 'Employee 2',
+            'sex': 'male',
+            'country_id': self.env.ref('base.us').id,
+            'department_id': self.dep_rd.id,
+            'date_version': date(2018, 1, 1),
+            'contract_date_start': date(2018, 1, 1),
+            'contract_date_end': date.today() + relativedelta(years=2),
+            'wage': 6500.33,
+            'structure_type_id': self.structure_type.id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': employee2.id,
+            'date_from': self.start_of_month,
+            'date_to': self.end_of_month,
+            'struct_id': self.developer_pay_structure.id,
+        })
+        payslip.action_payslip_done()
+        # 2. Mark the payslip as paid
+        payslip.action_payslip_paid()
+        # 3. Correct the payslip -> the system will create a correction payrun to handle it
+        wizard = self.env['hr.payslip.correction.wizard'].create({
+            'employee_ids': [Command.set([employee2.id])],
+            'payslip_ids': [Command.set([payslip.id])],
+            'correction_choice': 'single',
+        })
+        wizard.action_correct_payslips()
+        runs = self.env['hr.payslip.run'].search([
+            ('name', 'ilike', 'Correction%'),
+            ('slip_ids.employee_id', '=', employee2.id),
+        ])
+        self.assertEqual(len(runs), 1)
+        # 4. Verify that the correction payrun does not generate any 'missing employee' issues for our primary test employee 'richard_emp'
+        self.assertFalse(self.employee.issues, "No issue should be generated for missing employee in correction payruns")

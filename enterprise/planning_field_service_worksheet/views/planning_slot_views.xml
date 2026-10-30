@@ -67,7 +67,7 @@
                     groups="planning.group_planning_manager"
                 />
             </xpath>
-            <xpath expr="//button[@name='action_complete']" position="after">
+            <xpath expr="//header/t[button[@name='action_complete']]" position="after">
                 <field name="photo_ids" invisible="1"/>  <!-- Needed to get the number of photos in the widget below -->
                 <widget
                     name="planning_slot_photos_widget"
@@ -77,7 +77,7 @@
                     invisible="state in ['1_draft', '2_published'] or not worksheet_template_id and not can_edit"
                 />
             </xpath>
-            <xpath expr="//page[@name='internal_note']" position="after">
+            <xpath expr="//page[@name='internal_note']" position="before">
                 <page name="worksheet" string="Worksheet" invisible="not worksheet_template_id">
                     <group col="1">
                         <group>

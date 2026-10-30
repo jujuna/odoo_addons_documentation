@@ -124,8 +124,7 @@ class HrContractSalaryBenefit(models.Model):
             if record.view_ids:
                 # sudo needed for payroll admins to write on `ir.ui.view`
                 record.view_ids.sudo().write({'active': record.active})
-            if record.salary_rule_ids:
-                record.salary_rule_ids.write({'active': record.active})
+        records._sync_salary_rules_active()
         return records
 
     # Override write to handle the toggle logic
@@ -134,8 +133,21 @@ class HrContractSalaryBenefit(models.Model):
         if 'active' in vals:
             #  sudo needed for payroll admins to write on `ir.ui.view`
             self.view_ids.sudo().write({'active': vals['active']})
-            self.salary_rule_ids.write({'active': vals['active']})
+            self._sync_salary_rules_active()
         return res
+
+    def _sync_salary_rules_active(self):
+        rules = self.salary_rule_ids
+        if not rules:
+            return
+        rules_to_activate = self.filtered('active').salary_rule_ids
+        rules_to_activate.active = True
+        # a benefit being archived may still share its rules with other, still active, benefits.
+        rules_to_check = rules - rules_to_activate
+        if rules_to_check:
+            benefits = self.sudo().with_context(active_test=False).search([('salary_rule_ids', 'in', rules_to_check.ids)])
+            for rule in rules_to_check:
+                rule.active = any(benefits.filtered(lambda b: rule in b.salary_rule_ids).mapped('active'))
 
     @api.depends('structure_type_id.country_id')
     def _compute_allowed_field(self):

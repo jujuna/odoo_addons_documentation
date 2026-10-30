@@ -8,15 +8,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-17 23:00+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-10-11 12:34+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/quality/zh_Hans/>\n"
+"projects/odoo-20/quality/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,6 +38,13 @@ msgid ""
 "tolerance\n"
 "* Define your stages for the quality alerts\n"
 msgstr ""
+"\n"
+"质量基础\n"
+"===============\n"
+"* 定义质量点，用于在拣货、制造订单或工单（quality_mrp）上生成质量检查\n"
+"* 质量警报可独立创建，也可关联到质量检查\n"
+"* 可为质量检查添加带最小/最大偏差的测量值\n"
+"* 为质量警报定义阶段\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -59,7 +67,7 @@ msgstr "为该别名创建新记录时，将对其进行评估以提供默认值
 #. module: quality
 #: model:ir.model,name:quality.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "访问组"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -187,17 +195,17 @@ msgstr "模型别名"
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "All Categories"
-msgstr ""
+msgstr "所有类别"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "All Products"
-msgstr ""
+msgstr "所有产品"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__apply_to
 msgid "Apply to"
-msgstr ""
+msgstr "适用于"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
@@ -215,23 +223,23 @@ msgstr "附件数量"
 #. module: quality
 #: model:ir.module.module,summary:base.module_quality
 msgid "Basic Feature for Quality"
-msgstr ""
+msgstr "质量基础功能"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__batch_id
 msgid "Batch Transfer"
-msgstr ""
+msgstr "批次调拨"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_check__batch_id
 msgid "Batch associated to this transfer"
-msgstr ""
+msgstr "与此调拨关联的批次"
 
 #. module: quality
 #: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__categories
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Categories"
-msgstr ""
+msgstr "类别"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__reason
@@ -578,7 +586,7 @@ msgstr "低"
 #: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
 #: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols 图标，例如 checklist"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_error
@@ -655,7 +663,7 @@ msgstr "下一活动类型"
 #. module: quality
 #: model:res.groups.privilege,placeholder:quality.res_groups_privilege_quality
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #. module: quality
 #. odoo-python
@@ -852,7 +860,7 @@ msgstr "质量警报团队"
 #. module: quality
 #: model:ir.module.module,shortdesc:base.module_quality
 msgid "Quality Base"
-msgstr ""
+msgstr "质量基础"
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_check
@@ -1022,7 +1030,7 @@ msgstr "团队"
 msgid ""
 "Technical field holding the tracking method. False on a storable product "
 "means it's tracked by quantity only."
-msgstr ""
+msgstr "保存跟踪方法的技术字段。可库存产品上为 False 表示仅按数量跟踪。"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__test_type
@@ -1085,7 +1093,7 @@ msgstr "今日活动"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__product_tracking
 msgid "Tracking Method"
-msgstr ""
+msgstr "跟踪方法"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
@@ -1137,12 +1145,12 @@ msgstr "有效"
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "e.g. Check Dimensions"
-msgstr ""
+msgstr "例如：检查尺寸"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "e.g. Quarantine, Second Inspection"
-msgstr ""
+msgstr "例如：隔离、二次检验"
 
 #~ msgid "Lot"
 #~ msgstr "批次"

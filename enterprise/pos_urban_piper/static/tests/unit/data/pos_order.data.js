@@ -5,4 +5,8 @@ patch(PosOrder.prototype, {
     order_status_update() {
         return { is_success: true, message: "test message" };
     },
+
+    mark_urbanpiper_prep_order_as_printed() {
+        return true;
+    },
 });

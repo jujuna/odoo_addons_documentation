@@ -1,12 +1,15 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from odoo import http
 from odoo.http import request
 
+from odoo.addons.ai.utils.ai_utils import (
+    call_odoo_ai,
+    get_text_from_parts,
+    markdown_format,
+)
 from odoo.addons.iap import InsufficientCreditError
-
-from ..utils.ai_utils import call_odoo_ai, get_text_from_parts, markdown_format
 
 
 class AIController(http.Controller):
@@ -27,6 +30,8 @@ class AIController(http.Controller):
 
     @http.route(["/ai/transcription/summary"], type="jsonrpc", auth="user")
     def get_transcription_summary(self, composer_id: int, summarization_instructions: str, text_to_summarize: str, ai_prompt_button_context: dict | None = None):
+        if not request.env.user._is_internal():
+            raise Forbidden("Only internal users can summarize transcriptions.")
         transcription_composer = self.env['ai.composer'].search([
             ('id', '=', composer_id),
             ('interface_key', '=', 'voice_transcription_component'),
@@ -54,6 +59,8 @@ class AIController(http.Controller):
 
     @http.route(["/ai/transcription/session"], methods=["POST"], type="jsonrpc", auth="user", readonly=True)
     def get_session_token(self, language: str, prompt: str):
+        if not request.env.user._is_internal():
+            raise Forbidden("Only internal users can create transcription sessions.")
         params = {
             'language': language,
             'prompt': prompt,
@@ -72,6 +79,8 @@ class AIController(http.Controller):
 
     @http.route("/ai/transcription/report_realtime_session_usage", type="jsonrpc", auth="user", methods=["POST"])
     def report_usage(self, iap_transaction_token, usage):
+        if not request.env.user._is_internal():
+            raise Forbidden("Only internal users can transcribe audio.")
         params = {
             'iap_transaction_token': iap_transaction_token,
             'usage': usage,
@@ -80,6 +89,8 @@ class AIController(http.Controller):
 
     @http.route("/ai/transcription", type="jsonrpc", auth="user")
     def transcribe(self, audio_base64, language=None):
+        if not request.env.user._is_internal():
+            raise Forbidden("Only internal users can transcribe audio.")
         if not audio_base64:
             raise BadRequest("No audio data provided")
 

@@ -153,3 +153,47 @@ class TestVariableSchedule(TestPayrollCommon):
 
         self.assertEqual(sum(payslip.worked_days_line_ids.mapped('number_of_days')), 13)
         self.assertAlmostEqual(sum(payslip.worked_days_line_ids.mapped('number_of_hours')), 98.8, places=2)
+
+    def test_time_credit_cycle_same_wage_each_month(self):
+        """A half-time credit on a two-week cycle (Monday and Friday, plus Thursday every other week; the other days
+        are time credit) puts 12, 11 and 10 working days in July, August and September 2026: the monthly wage is half
+        the full-time wage in each month, as on a fixed week."""
+        work = self.env.ref('hr_work_entry.be_work_entry_type_attendance')
+        credit = self.env.ref('hr_work_entry.l10n_be_work_entry_type_credit_time')
+        cycle = {0: [work, credit, credit, credit, work], 1: [work, credit, credit, work, work]}
+        calendar = self.env['resource.calendar'].create({
+            'name': 'Half-time credit, two-week cycle',
+            'calendar_type': 'variable',
+            'days_per_week': 2.5,
+            'hours_per_week': 19.0,
+            'full_time_required_hours': 38,
+            'attendance_ids': [(0, 0, {
+                'date': date(2025, 1, 6) + timedelta(weeks=week, days=day),
+                'hour_from': 8,
+                'hour_to': 15.6,
+                'work_entry_type_id': entry_type.id,
+                'recurrency': True,
+                'recurrency_interval': 2,
+                'recurrency_type': 'weeks',
+            }) for week, days in cycle.items() for day, entry_type in enumerate(days)],
+        })
+        employee = self.create_employee({
+            'name': 'Cycle Time Credit Employee',
+            'date_version': date(2026, 1, 1),
+            'contract_date_start': date(2026, 1, 1),
+            'resource_calendar_id': calendar.id,
+            'wage': 3000,
+        })
+        self.assertTrue(employee.version_id.l10n_be_time_credit)
+        for month, days in ((7, 12), (8, 11), (9, 10)):
+            payslip = self.env['hr.payslip'].create({
+                'name': f'Payslip {month}/2026',
+                'employee_id': employee.id,
+                'version_id': employee.version_id.id,
+                'date_from': date(2026, month, 1),
+                'date_to': date(2026, month + 1, 1) - timedelta(days=1),
+            })
+            payslip.compute_sheet()
+            work_line = payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id == work)
+            self.assertEqual(work_line.number_of_days, days)
+            self.assertAlmostEqual(payslip._get_line_values(['BASIC'])['BASIC'][payslip.id]['total'], 1500, places=2)

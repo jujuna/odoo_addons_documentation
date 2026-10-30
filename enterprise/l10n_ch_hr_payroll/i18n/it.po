@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 18:26+0000\n"
-"PO-Revision-Date: 2026-09-18 05:02+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 18:27+0000\n"
+"PO-Revision-Date: 2026-10-22 16:38+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "l10n_ch_hr_payroll/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -210,6 +210,18 @@ msgid ""
 "    * Integrated with Leaves Management\n"
 "    * Compute payslips according to ELM 5 standard\n"
 msgstr ""
+"\n"
+"Regole di retribuzione Svizzera.\n"
+"=========================\n"
+"\n"
+"    * Dettagli dipendente\n"
+"    * Contratti dipendente\n"
+"    * Contratto basato sul passaporto\n"
+"    * indennità/deduzioni\n"
+"    * Configurazione stipendio di base/lordo/netto\n"
+"    * Busta paga dipendente\n"
+"    * Integrazione con gestione permessi\n"
+"    * Calcolo buste paga secondo lo standard ELM 5\n"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,help:l10n_ch_hr_payroll.field_l10n_ch_source_tax_institution__dpi_number
@@ -373,17 +385,20 @@ msgstr ""
 "deduzioni"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__1
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "1. Salary"
 msgstr "1. Retribuzione"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__10_1
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "10.1 Regular contributions"
 msgstr "10.1 Contributi ordinari"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__10_2
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "10.2 Purchasing contribution"
 msgstr "10.2 Contributi per il riscatto"
 
@@ -393,42 +408,50 @@ msgid "11 - Unknown"
 msgstr "11 - Sconosciuto"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__11
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "11. Net salary / Pension"
 msgstr "11. Salario netto/pensione"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__12
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "12. Withholding tax deduction"
 msgstr "12. Ritenuta d'imposta alla fonte"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__13_1_1
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "13.1.1. Actual expenses - Trip, room and board"
 msgstr "13.1.1. Spese effettive - Viaggio, vitto, alloggio"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__13_1_2
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "13.1.2. Actual expenses - Others"
 msgstr "13.1.2. Altre spese effettive"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__13_2_1
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "13.2.1. Overall expenses - Representation"
 msgstr "13.2.1. Spese forfetarie di rappresentanza"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__13_2_2
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "13.2.2. Overall expenses - Car"
 msgstr "13.2.2. Spese d'automobile forfetarie"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__13_2_3
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "13.2.3. Overall expenses - Other"
 msgstr "13.2.3. Altre spese forfetarie"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__13_3
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "13.3. Contributions to further education"
 msgstr "13.3. Contributi per il perfezionamento"
 
@@ -460,7 +483,8 @@ msgid "13th Month Included"
 msgstr "13a inclusa"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__14
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "14. Further fringe benefits"
 msgstr "14. Altre prestazioni accessorie al salario"
 
@@ -473,6 +497,12 @@ msgid "14th Month"
 msgstr "14esima"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
+msgid "15. Remarks"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_payslip__laa_solution_number__2
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__laa_solution_number__2
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_accident_insurance_line__solution_number__2
@@ -482,19 +512,22 @@ msgstr ""
 "deduzioni"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__2_1
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "2.1 Room and board"
 msgstr "2.1 Vitto e alloggio"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__2_2
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "2.2 Personal use of the company car"
 msgstr "2.2 Quota privata automobile di servizio"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__2_3
-msgid "2.3 Personal use of the company car"
-msgstr "2.3 Uso personale auto aziendale"
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
+msgid "2.3 Additional salary benefits - Other"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_no_nationality__22
@@ -515,7 +548,8 @@ msgstr ""
 "ore settimanali)"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__3
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "3. Irregular Benefits"
 msgstr "3. Prestazioni aperiodiche"
 
@@ -547,7 +581,8 @@ msgid "3rd pillar B paid by employer"
 msgstr "3º pilastro B pagato dal datore di lavoro"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__4
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "4. Capital Benefits"
 msgstr "4. Prestazioni in capitale"
 
@@ -557,27 +592,32 @@ msgid "5 cents rounding"
 msgstr "Arrotondamento 5 centesimi"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__5
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "5. Ownership right in accordance with supplement"
 msgstr "5. Diritti di partecipazione"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__6
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "6. Board of directors’ compensation"
 msgstr "6. Indennità dei membri di consigli d'amministrazione"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__7
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "7. Other benefits"
 msgstr "7. Altre prestazioni"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__8
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "8. Gross Salary Total / Pension"
 msgstr "8. Salario lordo totale/Rendita"
 
 #. module: l10n_ch_hr_payroll
-#: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_salary_rule__l10n_ch_salary_certificate__9
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/hr_salary_rule.py:0
 msgid "9. Contributions OASI/DI/IC/UI/NBUV"
 msgstr "9. Contributi OASI/DI/IC/UI/NBUV"
 
@@ -1062,8 +1102,8 @@ msgstr "Tariffa datore di lavoro AC"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "AC Exempt:"
-msgstr "Esenzione AC:"
+msgid "AC Exempt"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_ac_open
@@ -1071,6 +1111,8 @@ msgid "AC OPEN"
 msgstr "AC APERTO"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_9021
 msgid "AC Salary"
 msgstr "Retribuzione AC"
@@ -1079,12 +1121,6 @@ msgstr "Retribuzione AC"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_ac_max
 msgid "AC Salary Threshold"
 msgstr "Soglia retribuzione AC"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "AC Salary:"
-msgstr "Retribuzione AC:"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_social_insurance_view_form
@@ -1184,6 +1220,8 @@ msgid "AS Days"
 msgstr "Giorni AS"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__ahv-avs
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_ema_declaration_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
@@ -1202,15 +1240,15 @@ msgid "AVS Base"
 msgstr "Base AVS"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "AVS Exempt"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 msgid "AVS Exempt Report"
 msgstr "Resoconto esenzioni AVS"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "AVS Exempt:"
-msgstr "Esenzione AVS:"
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_avs_exoneration
@@ -1251,20 +1289,9 @@ msgstr "Rendiconto AVS"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "AVS Salaries"
-msgstr "Retribuzioni AVS"
-
-#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_9011
 msgid "AVS Salary"
 msgstr "Retribuzione AVS"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "AVS Salary:"
-msgstr "Retribuzione AVS:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_avs_status
@@ -1363,8 +1390,8 @@ msgstr "Soluzioni assicurative infortuni"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Accounting Period:"
-msgstr "Periodo contabile:"
+msgid "Accounting Period"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_ch_yearly_report__message_needaction
@@ -1620,6 +1647,12 @@ msgid "Annual (Cat. B)"
 msgstr "Annuale (Cat. B)"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Annual Basis"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_dialog_message_field__field_type__answer
 msgid "Answer"
 msgstr "Risposta"
@@ -1870,8 +1903,8 @@ msgstr "BS"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "BU-AP-Total:"
-msgstr "BU-AP-Total:"
+msgid "BU-AP-Total"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_location_unit__bur_ree_number
@@ -1944,8 +1977,8 @@ msgstr "Riferimento"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Base Salary:"
-msgstr "Salario di base:"
+msgid "Base Salary"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_payslip_view_form_inherit
@@ -2028,9 +2061,8 @@ msgstr "Booleano"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#, fuzzy
-msgid "Branch Identifier:"
-msgstr "Identificativo filiale:"
+msgid "Branch"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_employee_monthly_values__bvg_lpp_annual_basis
@@ -2091,18 +2123,13 @@ msgid "C - Scale for married couples with two incomes"
 msgstr "C - Scala per coppie sposate con due stipendi"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__fak-caf
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_ema_declaration_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 msgid "CAF"
 msgstr "CAF"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "CAF Entry :"
-msgstr "Voce CAF:"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.report_company_master_data_document
@@ -2115,23 +2142,9 @@ msgid "CAF Report"
 msgstr "Resoconto CAF"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "CAF Salaries"
-msgstr "Salari CAF"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_salary_rule__l10n_ch_caf_statement
 msgid "CAF Statement"
 msgstr "Dichiarazione CAF"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "CAF Withdrawal:"
-msgstr "Ritiro CAF:"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_wage_type_search_view
@@ -2152,7 +2165,6 @@ msgstr "Resoconto annuale CH"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/dialog_messages/dialog_message.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_hr_contract_wage__uom__currency
 msgid "CHF"
 msgstr "CHF"
@@ -2179,6 +2191,9 @@ msgid "Cancel"
 msgstr "Annulla"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_canton
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__l10n_ch_canton
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_is_mutation__qst_canton
@@ -2190,12 +2205,6 @@ msgstr "Annulla"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_salary_certificate_profile_form
 msgid "Canton"
 msgstr "Cantone"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Canton :"
-msgstr "Cantone:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_tax_rate_import_wizard__canton_mode
@@ -2210,13 +2219,6 @@ msgid ""
 msgstr ""
 "Cantone per il quale scaricare il file fiscale ufficiale (rilevante solo se "
 "si seleziona “Importa un cantone”)."
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Canton:"
-msgstr "Cantone:"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
@@ -2242,14 +2244,8 @@ msgstr "Vantaggio monetario"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Category Code:"
-msgstr "Codice categoria:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Category Totals"
-msgstr "Totali per categoria"
+msgid "Category Code"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.swissdec_wage_types_form
@@ -2582,6 +2578,7 @@ msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
 #: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_notification.xml:0
 #, fuzzy
 msgid "Code:"
@@ -2599,15 +2596,11 @@ msgstr ""
 "Contratto collettivo lavoro di un'azienda o di un'amministrazione pubblica"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_1218
 msgid "Commission"
 msgstr "Provvigione"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Commission:"
-msgstr "Commissione:"
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_1072
@@ -2811,6 +2804,14 @@ msgid "Complete Name"
 msgstr "Nome completo"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid ""
+"Complete the missing values with the current employee data, without "
+"reopening the payslips"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_swissdec_declaration_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_swissdec_job_result_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_swissdec_job_result_tree
@@ -2895,18 +2896,14 @@ msgid "Contract"
 msgstr "Contratto"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_accident_insurance__contract_number
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_additional_accident_insurance__contract_number
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_lpp_insurance__contract_number
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_sickness_insurance__contract_number
 msgid "Contract Number"
 msgstr "Numero del contratto"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Contract Number:"
-msgstr "Numero contratto:"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
@@ -2939,15 +2936,14 @@ msgstr "Contributi"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Contributory Salary:"
-msgstr "Retribuzione contributiva:"
+msgid "Contributory Salary"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#, fuzzy
-msgid "Correct Code:"
-msgstr "Codice corretto:"
+msgid "Correct Code"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_payslip_is_log_line__corrected_slip_id
@@ -2960,21 +2956,9 @@ msgid "Correction"
 msgstr "Correzione"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Correction Details"
-msgstr "Dettagli correzione"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee_is_line__correction_method
 msgid "Correction Method"
 msgstr "Metodo di correzione"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Correction Month:"
-msgstr "Metodo di correzione:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee_is_line_correction__tax_code
@@ -3030,6 +3014,12 @@ msgstr "Impossibile scaricare il file dall'URL"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_salary_certificate_profile_form
 msgid "Country"
 msgstr "Nazione"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Country of Residence"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
@@ -3210,12 +3200,6 @@ msgid "Currency"
 msgstr "Valuta"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Current Month:"
-msgstr "Mese corrente:"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_current_occupation_rate
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__l10n_ch_current_occupation_rate
 msgid "Current Occupation rate"
@@ -3224,22 +3208,12 @@ msgstr "Tasso d'occupazione attuale"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Customer Indentity:"
-msgstr "Identità cliente:"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_accident_insurance__customer_number
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_additional_accident_insurance__customer_number
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_lpp_insurance__customer_number
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_sickness_insurance__customer_number
 msgid "Customer Number"
 msgstr "Numero cliente"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Customer Number:"
-msgstr "Numero cliente:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_accident_group__group_unit__d
@@ -3347,8 +3321,8 @@ msgstr "Alla data"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Date of Birth:"
-msgstr "Data di nascita:"
+msgid "Date of Birth"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,help:l10n_ch_hr_payroll.field_l10n_ch_avs_splits__additional_delivery_date
@@ -3376,9 +3350,12 @@ msgid "December"
 msgstr "Dicembre"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
 #. odoo-python
 #: code:addons/l10n_ch_hr_payroll/models/l10n_ch_swissdec_declaration_result.py:0
 #: code:addons/l10n_ch_hr_payroll/models/l10n_ch_transmission_mixin.py:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_swissdec_job_result__declaration_id
 msgid "Declaration"
 msgstr "Dichiarazione"
@@ -3431,13 +3408,6 @@ msgstr ""
 "I dati della dichiarazione non sono validi, alcune buste paga sono state "
 "convalidate con informazioni mancanti, ricalcolale con informazioni valide "
 "sui dipendenti"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Declaration:"
-msgstr "Dichiarazione:"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-python
@@ -3609,8 +3579,7 @@ msgstr "Descrizione"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/status_result/status_result.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_swissdec_declaration_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_swissdec_job_result_tree
 msgid "Details"
@@ -3869,6 +3838,9 @@ msgid "Email"
 msgstr "E-mail"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model,name:l10n_ch_hr_payroll.model_hr_employee
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee_is_line__employee_id
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee_is_line_correction__employee_id
@@ -3887,11 +3859,10 @@ msgid "Employee"
 msgstr "Dipendente"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Employee #:"
-msgstr "Dipendente #:"
+#. odoo-python
+#: code:addons/l10n_ch_hr_payroll/models/l10n_ch_transmission_mixin.py:0
+msgid "Employee %s is not part of this declaration."
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_social_insurance_ac_line__employee_additional_rate
@@ -3911,13 +3882,19 @@ msgstr "Contratto dipendente"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Employee Contributions:"
-msgstr "Contributi dipendente:"
+msgid "Employee Contributions"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.ui.menu,name:l10n_ch_hr_payroll.menu_l10n_ch_employee_yearly_values
 msgid "Employee History"
 msgstr "Cronologia dipendente"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Employee Number"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.actions.act_window,name:l10n_ch_hr_payroll.action_l10n_ch_occupation
@@ -4010,8 +3987,7 @@ msgstr "Il dipendente sarà escluso dalle elaborazioni"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-python
-#: code:addons/l10n_ch_hr_payroll/models/l10n_ch_declaration_salary_certificate.py:0
-#: code:addons/l10n_ch_hr_payroll/models/l10n_ch_insurance_report.py:0
+#: code:addons/l10n_ch_hr_payroll/models/l10n_ch_transmission_mixin.py:0
 msgid ""
 "Employee with number %s was either archived or deleted. Wage statement will "
 "not be sent automatically."
@@ -4160,8 +4136,8 @@ msgstr "Parte AANP del datore di lavoro"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Employer Contributions:"
-msgstr "Contributi datore di lavoro:"
+msgid "Employer Contributions"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_additional_accident_insurance_line_rate__employer_part
@@ -4205,6 +4181,12 @@ msgstr ""
 "inizio"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
+msgid "Entry"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model,name:l10n_ch_hr_payroll.model_l10n_ch_ema_declaration
 msgid "Entry / Withdrawal / Mutation Declaration for AVS / CAF / LPP"
 msgstr "Dichiarazione di ingresso/uscita/mutazione per AVS/CAF/LPP"
@@ -4213,14 +4195,6 @@ msgstr "Dichiarazione di ingresso/uscita/mutazione per AVS/CAF/LPP"
 #: model:ir.ui.menu,name:l10n_ch_hr_payroll.menu_l10n_ch_ema_declaration
 msgid "Entry / Withdrawal / Mutations"
 msgstr "Ingressi/uscite/mutazioni"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#, fuzzy
-msgid "Entry :"
-msgstr "Ingresso:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_is_mutation__reason__entrycompany
@@ -4261,8 +4235,7 @@ msgstr "Ingresso: altro"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/status_result/status_result.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__general_state__error
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__result_state__error
 msgid "Error"
@@ -4358,12 +4331,6 @@ msgid "FAK-CAF Quittance"
 msgstr "Quietanza FAK.-CAF"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "FAK-CAF-ContributorySalary:"
-msgstr "FAK-CAF- Retribuzione contributiva:"
-
-#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_5070
 msgid "FCF Contribution"
 msgstr "Contributo FCF"
@@ -4404,16 +4371,12 @@ msgid "Family Allowance (CAF)"
 msgstr "Indennità familiare (CAF)"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_compensation_fund_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_compensation_fund_view_tree
 msgid "Family Allowances"
 msgstr "Indennità familiari"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Family Allowances:"
-msgstr "Indennità familiari:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_compensation_fund_id
@@ -4444,8 +4407,7 @@ msgstr "Indennità familiare di carovita"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/status_result/status_result.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
 #, fuzzy
 msgid "Fault Information"
 msgstr "Indicazione di guasto"
@@ -4490,8 +4452,8 @@ msgstr "Tasso femminile (%)"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Female Total:"
-msgstr "Totale femminile:"
+msgid "Female Total"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
@@ -4505,6 +4467,8 @@ msgid "Field Type"
 msgstr "Tipo campo"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_dialog_message__status__finished
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_declaration__state__finished
 msgid "Finished"
@@ -4830,6 +4794,12 @@ msgid "Generate Proof Of Insurance"
 msgstr "Genera prova d'assicurazione"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Generate the wage statement of this employee"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_monthly_summary_view_form
 msgid "Generation Complete"
 msgstr "Generazione completata"
@@ -4947,15 +4917,17 @@ msgid "Gross Included"
 msgstr "Lordo incluso"
 
 #. module: l10n_ch_hr_payroll
-#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_5000
-msgid "Gross Salary"
-msgstr "Retribuzione lorda"
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Gross Income"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Gross Salary:"
-msgstr "Retribuzione lorda:"
+#: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_5000
+msgid "Gross Salary"
+msgstr "Retribuzione lorda"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_accident_insurance_line_rate__group_id
@@ -5198,6 +5170,8 @@ msgid "ID"
 msgstr "ID"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__ktg-amc
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.report_wage_types_document
@@ -5215,12 +5189,6 @@ msgstr "IGM (assicurazione malattia)"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_ijm_base
 msgid "IJM Base"
 msgstr "Base IGM"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "IJM Code:"
-msgstr "Codice IGM:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_salary_rule__l10n_ch_ijm_included
@@ -5244,13 +5212,6 @@ msgstr "Assicurazioni IJM"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 msgid "IJM Report"
 msgstr "Resoconto IGM"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "IJM Salaries"
-msgstr "Salari IGM"
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_ijm_salary_1
@@ -5604,6 +5565,8 @@ msgid "Input Data"
 msgstr "Dati apporti"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_lpp_insurance_line__institution_id
 msgid "Institution"
 msgstr "Istituzione"
@@ -5617,8 +5580,8 @@ msgstr "Completamento istituzione"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Institution ID:"
-msgstr "ID istituzione:"
+msgid "Institution ID"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_swissdec_job_result__institution_id_ref
@@ -5628,8 +5591,8 @@ msgstr "Rif ID istituzione"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Institution Name:"
-msgstr "Nome istituzione:"
+msgid "Institution Name"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-python
@@ -5650,19 +5613,6 @@ msgstr "Risultati istituzione"
 #: code:addons/l10n_ch_hr_payroll/models/l10n_ch_swissdec_declaration_result.py:0
 msgid "Institution Status"
 msgstr "Stato istituzione"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Institution:"
-msgstr "Istituzione:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/status_result/status_result.xml:0
-msgid "InstitutionName:"
-msgstr "Nome istituzione:"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_ema_declaration_view_form
@@ -6293,6 +6243,8 @@ msgid "L10N Ch Work Location"
 msgstr "L10N Ch Luogo di lavoro"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__uvg-laa
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.report_wage_types_document
@@ -6311,12 +6263,6 @@ msgstr "Base LAA"
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__l10n_ch_laa_group
 msgid "LAA Code"
 msgstr "Codice LAA"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "LAA Code:"
-msgstr "Codice LAA:"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_contract_template_form_view
@@ -6363,13 +6309,6 @@ msgid "LAA Report"
 msgstr "Resoconto LAA"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "LAA Salaries"
-msgstr "Retribuzioni LAA"
-
-#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_9031
 msgid "LAA Salary"
 msgstr "Salario LAA"
@@ -6391,6 +6330,8 @@ msgid "LAA: Valid as of"
 msgstr "LAA: valida a partire dal"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__uvgz-laac
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.report_wage_types_document
@@ -6403,12 +6344,6 @@ msgstr "LAAC"
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_laac_base
 msgid "LAAC Base"
 msgstr "Base LAAC"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "LAAC Code:"
-msgstr "Codice LAAC:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_salary_rule__l10n_ch_laac_included
@@ -6432,13 +6367,6 @@ msgstr "Assicurazione LAAC"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 msgid "LAAC Report"
 msgstr "Resoconto LAAC"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "LAAC Salaries"
-msgstr "Retribuzioni LAAC"
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_laac_salary_1
@@ -6481,18 +6409,14 @@ msgid "LAAC Solutions"
 msgstr "Soluzioni LAAC"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__bvg-lpp
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_contract_template_form_view
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_ema_declaration_view_form
 msgid "LPP"
 msgstr "LPP"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "LPP Annual Basis :"
-msgstr "Base annuale LPP:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model,name:l10n_ch_hr_payroll.model_l10n_ch_lpp_basis_report_line
@@ -6524,6 +6448,7 @@ msgstr "Contributi azienda LPP"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 msgid "LPP Contributions"
 msgstr "Contributi LPP"
 
@@ -6548,13 +6473,6 @@ msgstr "Dominio LPP"
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__lpp_employee_amount
 msgid "LPP Employee Contributions"
 msgstr "Contributi dipendente LPP"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "LPP Entry -"
-msgstr "Registrazione LPP -"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.swissdec_wage_types_form
@@ -6600,24 +6518,10 @@ msgid "LPP Insurances"
 msgstr "Assicurazione cassa pensione (LPP)"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "LPP Mutation -"
-msgstr "Mutazione LPP -"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_salary_rule__l10n_ch_lpp_retroactive
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.report_wage_types_document
 msgid "LPP Retroactive"
 msgstr "LPP retroattivo"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "LPP Salaries"
-msgstr "Retribuzioni LPP"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_lpp_insurance_view_form
@@ -6634,13 +6538,6 @@ msgstr "Soluzioni LPP"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
 msgid "LPP Status"
 msgstr "Stato LPP"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "LPP Withdrawal -"
-msgstr "Ritiro LPP -"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_employee_yearly_values__yearly_prospective
@@ -7005,8 +6902,8 @@ msgstr "Tariffa maschile (%)"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Male Total:"
-msgstr "Totale maschile:"
+msgid "Male Total"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
@@ -7020,6 +6917,8 @@ msgid "Manage the splitting of negative AVS salaries for employees."
 msgstr "Gestisci la divisione di retribuzioni AVS negative per i dipendenti."
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_employee_is_line__correction_method__manual
 msgid "Manual"
 msgstr "Manuale"
@@ -7079,6 +6978,12 @@ msgstr "Anagrafiche"
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_master_data_report__master_report_pdf_file
 msgid "Master Report"
 msgstr "Resoconto principale"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Master Total"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2040
@@ -7209,13 +7114,24 @@ msgid "Minimum Contributing Age"
 msgstr "Età minima di contribuzione"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
 #. odoo-python
 #: code:addons/l10n_ch_hr_payroll/models/l10n_ch_employee_monthly_values.py:0
-#: code:addons/l10n_ch_hr_payroll/models/l10n_ch_transmission_mixin.py:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 msgid "Missing"
 msgstr "Mancante"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Missing Data"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_ch_yearly_report__month
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_ema_declaration__month
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_employee_monthly_values__month
@@ -7230,13 +7146,6 @@ msgstr "Mancante"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_swissdec_transmitter_form
 msgid "Month"
 msgstr "Mese"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Month:"
-msgstr "Mese:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_payslip__l10n_ch_is_model__monthly
@@ -7347,6 +7256,8 @@ msgid "Municipality"
 msgstr "Comune"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_municipality
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__l10n_ch_municipality
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_location_unit__municipality
@@ -7355,10 +7266,9 @@ msgstr "ID comune"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Municipality ID:"
-msgstr "ID comune:"
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
+msgid "Mutation"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_is_mutation__reason__childrendeduction
@@ -7419,8 +7329,8 @@ msgstr ""
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "NBU-BU-ANP-AP-Total:"
-msgstr "Totale NBU-BU-ANP-AP:"
+msgid "NBU-BU-ANP-AP-Total"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_tax_rate_import_wizard__canton__ne
@@ -7471,16 +7381,16 @@ msgid "Name"
 msgstr "Nome"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Nationality"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_country_id_code
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__l10n_ch_country_id_code
 msgid "Nationality Country Code"
 msgstr "Codice Paese nazionalità"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Nationality:"
-msgstr "Nazionalità:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_residence_category__needforprotection-s
@@ -7494,6 +7404,12 @@ msgstr "Bisogno di protezione (Cat. S)"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_avs_splits_tree
 msgid "Negative AVS Salary Splitting"
 msgstr "Divisione retribuzione AVS negativa"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Net Income"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_rule_6600
@@ -7812,12 +7728,6 @@ msgid "November"
 msgstr "Novembre"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Number Of Onwership Right Detail Tags:"
-msgstr "Numero di tag relativi ai diritti di proprietà:"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_ch_yearly_report__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_ema_declaration__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_is_report__message_needaction_counter
@@ -7833,38 +7743,32 @@ msgstr "Numero di azioni"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Number of Female Persons:"
-msgstr "Numero di persone di sesso femminile:"
+msgid "Number of Female Persons"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Number of Male Persons:"
-msgstr "Numero di persone di sesso maschile:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Number of Pension Statements:"
-msgstr "Numero estratti conto pensionistici:"
+msgid "Number of Male Persons"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Number of TaxAnnuity Tags:"
-msgstr "Numero di tag per imposte annuali:"
+msgid "Number of Ownership Right Details"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Number of TaxSalary Tags:"
-msgstr "Numero di tag per retribuzioni fiscali:"
+msgid "Number of Pension Statements"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Number of Wage Statements:"
-msgstr "Numero di buste paga:"
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Number of Wage Statements"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_ch_yearly_report__message_has_error_counter
@@ -8419,15 +8323,11 @@ msgid "Payroll Month Closed"
 msgstr "Mese di paga chiuso"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_lpp_insurance_view_form
 msgid "Payroll Unit"
 msgstr "Unità paga"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Payroll Unit:"
-msgstr "Unità paga:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,help:l10n_ch_hr_payroll.field_l10n_ch_lpp_insurance__fund_number
@@ -8497,6 +8397,12 @@ msgid "Pending Correction"
 msgstr "Correzione in sospeso"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Pension"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_salary_certificate_profile__l10n_ch_certificate_type__taxannuity
 msgid "Pension Statement"
 msgstr "Estratto conto pensionistico"
@@ -8507,16 +8413,12 @@ msgid "Performance bonus"
 msgstr "Bonus prestazione"
 
 #. module: l10n_ch_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
-msgid "Period"
-msgstr "Periodo"
-
-#. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Period:"
-msgstr "Periodo:"
+#: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
+msgid "Period"
+msgstr "Periodo"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_payslip_is_log_line__code__isdtsalaryperiodic
@@ -8738,6 +8640,12 @@ msgid "Provision of Salary"
 msgstr "Pagamento stipendio"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Provisional"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_residence_category__provisionallyadmittedforeigners-f
 msgid "Provisionally Admitted Foreigners (Cat. F)"
 msgstr "Ammissione provvisoria (Cat. F)"
@@ -8770,6 +8678,7 @@ msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
 #: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_notification.xml:0
 #, fuzzy
 msgid "Quality Level:"
@@ -8847,8 +8756,8 @@ msgstr "Pagamento ricorrente"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Reference AVS Salary:"
-msgstr "Retribuzione AVS di riferimento:"
+msgid "Reference AVS Salary"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_monthly_summary_view_form
@@ -8859,6 +8768,12 @@ msgstr "Periodo di riferimento"
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_religious_denomination__reformedevangelical
 msgid "Reformed Evangelical"
 msgstr "Evangelico riformato"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
+msgid "Refresh Data"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-python
@@ -8877,6 +8792,12 @@ msgstr ""
 #: code:addons/l10n_ch_hr_payroll/models/hr_version.py:0
 msgid "Registered Partnership"
 msgstr "Unione domestica registrata"
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Rejected"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_payslip_is_log_line__is_correction_id
@@ -8922,10 +8843,9 @@ msgstr "Resoconto"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/status_result/status_result.xml:0
-msgid "RequestID:"
-msgstr "ID richiesta:"
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
+msgid "Request ID"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_rule_parameter_view_form_l10n_ch
@@ -8971,16 +8891,15 @@ msgid "Residency Type"
 msgstr "Tipo di residenza"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
+msgid "Response ID"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_swissdec_job_result__success_state
 msgid "Response Status"
 msgstr "Stato risposta"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/status_result/status_result.xml:0
-msgid "ResponseID:"
-msgstr "RispostaID:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_job_type__lowestcadre
@@ -9048,13 +8967,6 @@ msgstr "Età pensionabile (uomo)"
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 msgid "Reversal Details"
 msgstr "Dettagli storno"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Reversed Month:"
-msgstr "Mese stornato:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_salary_certificate_profile__l10n_ch_cs_employee_participation_taxable_income_reversional
@@ -9227,6 +9139,7 @@ msgstr "Modifica salario"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 msgid "Salary Data"
 msgstr "Dati salario"
 
@@ -9329,17 +9242,16 @@ msgid "Second Additional Accident Insurance (LAAC)"
 msgstr "Assicurazione infortunio complementare secondaria (LAAC)"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/client_action/interoperability_client.xml:0
+msgid "Second Operand"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #. odoo-python
 #: code:addons/l10n_ch_hr_payroll/models/res_company.py:0
 msgid "Second Operand does not match the right pattern"
 msgstr "Il secondo operando non corrisponde al formato giusto"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/client_action/interoperability_client.xml:0
-#, fuzzy
-msgid "Second Operand:"
-msgstr "Secondo operando:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_dialog_message_field__field_type__section
@@ -9423,15 +9335,11 @@ msgid "Severance pay (subject to AHV)"
 msgstr "Indennità di partenza (soggetta a AVS)"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_hr_employee_children__sex
 msgid "Sex"
 msgstr "Sesso"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Sex:"
-msgstr "Sesso:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_residence_category__shortterm-l
@@ -9481,13 +9389,6 @@ msgstr "Contributi sociali"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
 msgid "Social Insurance"
 msgstr "Assicurazione sociale"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Social Insurance #:"
-msgstr "N. di assicurazioni sociali:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_sv_as_number
@@ -9556,6 +9457,8 @@ msgid "Some mandatory answers were not filled"
 msgstr "Alcune risposte obbligatorie non sono state completate"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__taxatsource
 msgid "Source Tax"
 msgstr "Imposta alla fonte"
@@ -9937,6 +9840,8 @@ msgid "State"
 msgstr "Stato o regione"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__statistic
 #: model:ir.ui.menu,name:l10n_ch_hr_payroll.menu_l10n_ch_statistic_report
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.res_config_settings_view_form
@@ -9962,13 +9867,6 @@ msgstr "Dichiarazione statistica"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_statistic_report_view_form
 msgid "Statistic Report"
 msgstr "Resoconto statistica"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "Statistic Salaries"
-msgstr "Statistiche sugli stipendi"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
@@ -10000,6 +9898,8 @@ msgid "Statistique mois"
 msgstr "Statistique mois"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_dialog_message__status
 msgid "Status"
 msgstr "Stato"
@@ -10499,7 +10399,7 @@ msgstr "Svizzera"
 #. module: l10n_ch_hr_payroll
 #: model:ir.module.module,shortdesc:base.module_l10n_ch_hr_payroll
 msgid "Switzerland - Swissdec Certified ELM 5.0 - Payroll"
-msgstr ""
+msgstr "Svizzera – Libro paga conforme Swissdec ELM 5.0"
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.payroll.structure,name:l10n_ch_hr_payroll.hr_payroll_structure_ch_elm
@@ -10591,20 +10491,6 @@ msgid "Tax At Source Quittance"
 msgstr "Quietanza imposta alla fonte"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#, fuzzy
-msgid "Tax At Source Salaries"
-msgstr "Salari soggetti a imposta alla fonte"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Tax At Source:"
-msgstr "Imposta alla fonte:"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_ch_yearly_report__tax_certificates
 msgid "Tax Certificates"
 msgstr "Certificati fiscali"
@@ -10615,6 +10501,8 @@ msgid "Tax Cross Border Institutions"
 msgstr "Istituzioni fiscali transfrontaliere"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_swissdec_job_result__domain__taxcrossborder
 msgid "Tax Crossborder"
 msgstr "Imposta transfrontaliera"
@@ -10625,6 +10513,12 @@ msgid "Tax Files"
 msgstr "File imposte"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Tax Quittance"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_salary_certificate__tax_rectificate_employee_ids
 msgid "Tax Rectificate Employee"
 msgstr "Rettifica fiscale dipendente"
@@ -10633,13 +10527,6 @@ msgstr "Rettifica fiscale dipendente"
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_salary_certificate__tax_rectificate_type
 msgid "Tax Rectificate Type"
 msgstr "Tipo rettifica fiscale"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#, fuzzy
-msgid "Tax Salaries"
-msgstr "Salari imponibili"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.actions.act_window,name:l10n_ch_hr_payroll.action_l10n_ch_certificate
@@ -10689,21 +10576,9 @@ msgstr "Imposta transfrontaliera (%s)"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-msgid "Taxable"
-msgstr "Imponibile"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 msgid "Taxable Earning"
 msgstr "Ricavi imponibili"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Taxable Earning:"
-msgstr "Ricavi imponibili:"
 
 #. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_1960
@@ -10894,6 +10769,12 @@ msgid "There is no paid or validated payslips over the selected period."
 msgstr "Nel periodo selezionato non ci sono buste paga pagate o convalidate."
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Third Party Contributions"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:hr.salary.rule,name:l10n_ch_hr_payroll.l10n_ch_elm_2050
 msgid "Third Party Correction"
 msgstr "Correzione terze parti"
@@ -11052,6 +10933,36 @@ msgid "Total"
 msgstr "Totale"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Total AC Exempt"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Total AC Incomes"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Total ACS Incomes"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Total AVS Exempt"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Total AVS Incomes"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_payslip_view_form_inherit
 msgid "Total Amount"
 msgstr "Importo totale"
@@ -11059,20 +10970,14 @@ msgstr "Importo totale"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total Commission:"
-msgstr "Totale commissione:"
+msgid "Total Contributory Salary"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total Contributory Salary:"
-msgstr "Retribuzione contributiva totale:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total Family Income Supplement:"
-msgstr "Supplemento al reddito familiare totale:"
+msgid "Total Family Income Supplement"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_total_activity_type__gross
@@ -11086,6 +10991,18 @@ msgid "Total Income"
 msgstr "Reddito totale"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Total LFA Family Income Supplement"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
+msgid "Total LFA Incomes"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_other_activity_percentage
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__l10n_ch_other_activity_percentage
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__hr_version__l10n_ch_total_activity_type__percentage
@@ -11095,56 +11012,14 @@ msgstr "Percentuale totale"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total Tax At Source:"
-msgstr "Totale imposta alla fonte:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total Taxable Earning:"
-msgstr "Totale ricavi imponibili:"
+msgid "Total Taxable Earning"
+msgstr ""
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_employee__l10n_ch_total_occupation_rate
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_hr_version__l10n_ch_total_occupation_rate
 msgid "Total occupation rate"
 msgstr "Tasso di occupazione totale"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total-AHV-AVS-Incomes:"
-msgstr "Totale redditi AHV-AVS:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total-ALV-AC-Incomes:"
-msgstr "Totale - ALV - AC - Redditi:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total-ALV-AC-Open:"
-msgstr "Totale-ALV-AC-Aperto:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total-ALVZ-ACS-Incomes:"
-msgstr "Totale-ALVZ-ACS-Redditi:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total-FLG-LFA-FamilyIncome-Supplement:"
-msgstr "Totale-FLG-LFA-Integrazione al reddito familiare:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Total-FLG-LFA-Incomes:"
-msgstr "Totale FLG-LFA-Redditi:"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
@@ -11168,29 +11043,18 @@ msgid "Transmission"
 msgstr "Trasmissione"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_swissdec_declaration__transmission_date
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_swissdec_job_result__transmission_date
 msgid "Transmission Date"
 msgstr "Data di trasmissione"
 
 #. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Transmission Date:"
-msgstr "Data trasmissione:"
-
-#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_res_config_settings__l10n_ch_transmission_language
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.res_config_settings_view_form
 msgid "Transmission Language"
 msgstr "Lingua trasmissione"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/status_result/status_result.xml:0
-msgid "TransmissionDate:"
-msgstr "Data trasmissione:"
 
 #. module: l10n_ch_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_salary_certificate_profile_form
@@ -11240,21 +11104,9 @@ msgstr "UR"
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
 #: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "UVG-LAA Master Total:"
-msgstr "Totale globale UVG-LAA:"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #, fuzzy
 msgid "UVG-LAA Quittance"
 msgstr "Quietanza UVG-LAA"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "UVGZ-LAAC Master Total:"
-msgstr "Totale globale UVGZ-LAAC:"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-javascript
@@ -11459,16 +11311,12 @@ msgid "Valais"
 msgstr "Valais"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_is_mutation__valid_as_of
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_lpp_mutation__valid_as_of
 msgid "Valid As Of"
 msgstr "Valido a partire dal"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-msgid "Valid As Of:"
-msgstr "Valido a partire dal:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_salary_certificate_profile__valid_from
@@ -11551,6 +11399,8 @@ msgid "Wage From"
 msgstr "Salario a partire dal"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_salary_certificate_profile_form
 msgid "Wage Statement"
@@ -11573,6 +11423,8 @@ msgid "Wage Statement Profile"
 msgstr "Profilo certificato di salario"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.js:0
 #: model:ir.ui.menu,name:l10n_ch_hr_payroll.menu_l10n_ch_cs_profiles
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.l10n_ch_insurance_report_view_transmission_form
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_certificate_report_form
@@ -11621,7 +11473,7 @@ msgstr "Accordo salariale al di fuori di un contratto collettivo"
 
 #. module: l10n_ch_hr_payroll
 #. odoo-python
-#: code:addons/l10n_ch_hr_payroll/models/l10n_ch_insurance_report.py:0
+#: code:addons/l10n_ch_hr_payroll/models/l10n_ch_transmission_mixin.py:0
 #, fuzzy
 msgid "Wage_statement_%(year)s_%(name)s_%(timestamp)s"
 msgstr "Wage_statement_%(year)s_%(name)s_%(timestamp)s"
@@ -11798,6 +11650,12 @@ msgid "Wife of the owner"
 msgstr "Moglie del proprietario"
 
 #. module: l10n_ch_hr_payroll
+#. odoo-javascript
+#: code:addons/l10n_ch_hr_payroll/static/src/components/swissdec_common.xml:0
+msgid "Withdrawal"
+msgstr ""
+
+#. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_is_mutation__reason__withdrawalnat
 msgid "Withdrawal : Naturalisation"
 msgstr "Revoca: naturalizzazione"
@@ -11823,14 +11681,6 @@ msgstr "Ritiro valido a partire dal"
 #: model:ir.model.fields,field_description:l10n_ch_hr_payroll.field_l10n_ch_occupation__date_end
 msgid "Withdrawal from Company"
 msgstr "Uscita dalla società"
-
-#. module: l10n_ch_hr_payroll
-#. odoo-javascript
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_declaration/declare_salary_renderer.xml:0
-#: code:addons/l10n_ch_hr_payroll/static/src/fields/salary_result/salary_result.xml:0
-#, fuzzy
-msgid "Withdrawal:"
-msgstr "Ritiro:"
 
 #. module: l10n_ch_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ch_hr_payroll.selection__l10n_ch_is_mutation__reason__withdrawalsettled
@@ -12373,6 +12223,310 @@ msgstr "Formazione professionale aggiuntiva"
 #: model_terms:ir.ui.view,arch_db:l10n_ch_hr_payroll.view_l10n_ch_avs_splits_form
 msgid "µ"
 msgstr "µ"
+
+#~ msgid "2.3 Personal use of the company car"
+#~ msgstr "2.3 Uso personale auto aziendale"
+
+#~ msgid "AC Exempt:"
+#~ msgstr "Esenzione AC:"
+
+#~ msgid "AC Salary:"
+#~ msgstr "Retribuzione AC:"
+
+#~ msgid "AVS Exempt:"
+#~ msgstr "Esenzione AVS:"
+
+#, fuzzy
+#~ msgid "AVS Salaries"
+#~ msgstr "Retribuzioni AVS"
+
+#~ msgid "AVS Salary:"
+#~ msgstr "Retribuzione AVS:"
+
+#~ msgid "Accounting Period:"
+#~ msgstr "Periodo contabile:"
+
+#~ msgid "BU-AP-Total:"
+#~ msgstr "BU-AP-Total:"
+
+#~ msgid "Base Salary:"
+#~ msgstr "Salario di base:"
+
+#, fuzzy
+#~ msgid "Branch Identifier:"
+#~ msgstr "Identificativo filiale:"
+
+#, fuzzy
+#~ msgid "CAF Entry :"
+#~ msgstr "Voce CAF:"
+
+#, fuzzy
+#~ msgid "CAF Salaries"
+#~ msgstr "Salari CAF"
+
+#, fuzzy
+#~ msgid "CAF Withdrawal:"
+#~ msgstr "Ritiro CAF:"
+
+#~ msgid "Canton :"
+#~ msgstr "Cantone:"
+
+#~ msgid "Canton:"
+#~ msgstr "Cantone:"
+
+#~ msgid "Category Code:"
+#~ msgstr "Codice categoria:"
+
+#~ msgid "Category Totals"
+#~ msgstr "Totali per categoria"
+
+#~ msgid "Commission:"
+#~ msgstr "Commissione:"
+
+#~ msgid "Contract Number:"
+#~ msgstr "Numero contratto:"
+
+#~ msgid "Contributory Salary:"
+#~ msgstr "Retribuzione contributiva:"
+
+#, fuzzy
+#~ msgid "Correct Code:"
+#~ msgstr "Codice corretto:"
+
+#~ msgid "Correction Details"
+#~ msgstr "Dettagli correzione"
+
+#~ msgid "Correction Month:"
+#~ msgstr "Metodo di correzione:"
+
+#~ msgid "Current Month:"
+#~ msgstr "Mese corrente:"
+
+#~ msgid "Customer Indentity:"
+#~ msgstr "Identità cliente:"
+
+#~ msgid "Customer Number:"
+#~ msgstr "Numero cliente:"
+
+#~ msgid "Date of Birth:"
+#~ msgstr "Data di nascita:"
+
+#~ msgid "Declaration:"
+#~ msgstr "Dichiarazione:"
+
+#~ msgid "Employee #:"
+#~ msgstr "Dipendente #:"
+
+#~ msgid "Employee Contributions:"
+#~ msgstr "Contributi dipendente:"
+
+#~ msgid "Employer Contributions:"
+#~ msgstr "Contributi datore di lavoro:"
+
+#, fuzzy
+#~ msgid "Entry :"
+#~ msgstr "Ingresso:"
+
+#~ msgid "FAK-CAF-ContributorySalary:"
+#~ msgstr "FAK-CAF- Retribuzione contributiva:"
+
+#~ msgid "Family Allowances:"
+#~ msgstr "Indennità familiari:"
+
+#~ msgid "Female Total:"
+#~ msgstr "Totale femminile:"
+
+#~ msgid "Gross Salary:"
+#~ msgstr "Retribuzione lorda:"
+
+#~ msgid "IJM Code:"
+#~ msgstr "Codice IGM:"
+
+#, fuzzy
+#~ msgid "IJM Salaries"
+#~ msgstr "Salari IGM"
+
+#~ msgid "Institution ID:"
+#~ msgstr "ID istituzione:"
+
+#~ msgid "Institution Name:"
+#~ msgstr "Nome istituzione:"
+
+#~ msgid "Institution:"
+#~ msgstr "Istituzione:"
+
+#~ msgid "InstitutionName:"
+#~ msgstr "Nome istituzione:"
+
+#~ msgid "LAA Code:"
+#~ msgstr "Codice LAA:"
+
+#, fuzzy
+#~ msgid "LAA Salaries"
+#~ msgstr "Retribuzioni LAA"
+
+#~ msgid "LAAC Code:"
+#~ msgstr "Codice LAAC:"
+
+#, fuzzy
+#~ msgid "LAAC Salaries"
+#~ msgstr "Retribuzioni LAAC"
+
+#~ msgid "LPP Annual Basis :"
+#~ msgstr "Base annuale LPP:"
+
+#, fuzzy
+#~ msgid "LPP Entry -"
+#~ msgstr "Registrazione LPP -"
+
+#, fuzzy
+#~ msgid "LPP Mutation -"
+#~ msgstr "Mutazione LPP -"
+
+#, fuzzy
+#~ msgid "LPP Salaries"
+#~ msgstr "Retribuzioni LPP"
+
+#, fuzzy
+#~ msgid "LPP Withdrawal -"
+#~ msgstr "Ritiro LPP -"
+
+#~ msgid "Male Total:"
+#~ msgstr "Totale maschile:"
+
+#~ msgid "Month:"
+#~ msgstr "Mese:"
+
+#~ msgid "Municipality ID:"
+#~ msgstr "ID comune:"
+
+#~ msgid "NBU-BU-ANP-AP-Total:"
+#~ msgstr "Totale NBU-BU-ANP-AP:"
+
+#~ msgid "Nationality:"
+#~ msgstr "Nazionalità:"
+
+#~ msgid "Number Of Onwership Right Detail Tags:"
+#~ msgstr "Numero di tag relativi ai diritti di proprietà:"
+
+#~ msgid "Number of Female Persons:"
+#~ msgstr "Numero di persone di sesso femminile:"
+
+#~ msgid "Number of Male Persons:"
+#~ msgstr "Numero di persone di sesso maschile:"
+
+#~ msgid "Number of Pension Statements:"
+#~ msgstr "Numero estratti conto pensionistici:"
+
+#~ msgid "Number of TaxAnnuity Tags:"
+#~ msgstr "Numero di tag per imposte annuali:"
+
+#~ msgid "Number of TaxSalary Tags:"
+#~ msgstr "Numero di tag per retribuzioni fiscali:"
+
+#~ msgid "Number of Wage Statements:"
+#~ msgstr "Numero di buste paga:"
+
+#~ msgid "Payroll Unit:"
+#~ msgstr "Unità paga:"
+
+#~ msgid "Period:"
+#~ msgstr "Periodo:"
+
+#~ msgid "Reference AVS Salary:"
+#~ msgstr "Retribuzione AVS di riferimento:"
+
+#~ msgid "RequestID:"
+#~ msgstr "ID richiesta:"
+
+#~ msgid "ResponseID:"
+#~ msgstr "RispostaID:"
+
+#~ msgid "Reversed Month:"
+#~ msgstr "Mese stornato:"
+
+#, fuzzy
+#~ msgid "Second Operand:"
+#~ msgstr "Secondo operando:"
+
+#~ msgid "Sex:"
+#~ msgstr "Sesso:"
+
+#~ msgid "Social Insurance #:"
+#~ msgstr "N. di assicurazioni sociali:"
+
+#, fuzzy
+#~ msgid "Statistic Salaries"
+#~ msgstr "Statistiche sugli stipendi"
+
+#, fuzzy
+#~ msgid "Tax At Source Salaries"
+#~ msgstr "Salari soggetti a imposta alla fonte"
+
+#~ msgid "Tax At Source:"
+#~ msgstr "Imposta alla fonte:"
+
+#, fuzzy
+#~ msgid "Tax Salaries"
+#~ msgstr "Salari imponibili"
+
+#~ msgid "Taxable"
+#~ msgstr "Imponibile"
+
+#~ msgid "Taxable Earning:"
+#~ msgstr "Ricavi imponibili:"
+
+#~ msgid "Total Commission:"
+#~ msgstr "Totale commissione:"
+
+#~ msgid "Total Contributory Salary:"
+#~ msgstr "Retribuzione contributiva totale:"
+
+#~ msgid "Total Family Income Supplement:"
+#~ msgstr "Supplemento al reddito familiare totale:"
+
+#~ msgid "Total Tax At Source:"
+#~ msgstr "Totale imposta alla fonte:"
+
+#~ msgid "Total Taxable Earning:"
+#~ msgstr "Totale ricavi imponibili:"
+
+#~ msgid "Total-AHV-AVS-Incomes:"
+#~ msgstr "Totale redditi AHV-AVS:"
+
+#~ msgid "Total-ALV-AC-Incomes:"
+#~ msgstr "Totale - ALV - AC - Redditi:"
+
+#~ msgid "Total-ALV-AC-Open:"
+#~ msgstr "Totale-ALV-AC-Aperto:"
+
+#~ msgid "Total-ALVZ-ACS-Incomes:"
+#~ msgstr "Totale-ALVZ-ACS-Redditi:"
+
+#~ msgid "Total-FLG-LFA-FamilyIncome-Supplement:"
+#~ msgstr "Totale-FLG-LFA-Integrazione al reddito familiare:"
+
+#~ msgid "Total-FLG-LFA-Incomes:"
+#~ msgstr "Totale FLG-LFA-Redditi:"
+
+#~ msgid "Transmission Date:"
+#~ msgstr "Data trasmissione:"
+
+#~ msgid "TransmissionDate:"
+#~ msgstr "Data trasmissione:"
+
+#~ msgid "UVG-LAA Master Total:"
+#~ msgstr "Totale globale UVG-LAA:"
+
+#~ msgid "UVGZ-LAAC Master Total:"
+#~ msgstr "Totale globale UVGZ-LAAC:"
+
+#~ msgid "Valid As Of:"
+#~ msgstr "Valido a partire dal:"
+
+#, fuzzy
+#~ msgid "Withdrawal:"
+#~ msgstr "Ritiro:"
 
 #~ msgid "Master Report Pdf Filename"
 #~ msgstr "Nome file PDF resoconto principale"

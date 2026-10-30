@@ -179,8 +179,7 @@ class TestIrdReports(TestL10NHkHrPayrollAccountCommon):
             payrun._generate_payslips()
             if i == 0:
                 chan_slip = payrun.slip_ids.filtered(lambda s: s.employee_id == self.employee)
-                for code, amount in extra_properties_amounts.items():
-                    chan_slip._set_input_value(code, amount)
+                chan_slip._set_input_values(extra_properties_amounts)
                 chan_slip.compute_sheet()
         payruns.action_validate()
 
@@ -495,12 +494,14 @@ class TestIrdReports(TestL10NHkHrPayrollAccountCommon):
             date(2026, 1, 1),
             date(2026, 1, 31),
         )
-        payslip._set_input_value('GLOBAL_REIMBURSEMENT', 1000.0)
-        payslip._set_input_value('GLOBAL_DEDUCTION', 500.0)
+        payslip._set_input_values({
+            'GLOBAL_REIMBURSEMENT': 1000.0,
+            'GLOBAL_DEDUCTION': 500.0,
+        })
         payslip.compute_sheet()
         self._validate_payslip(payslip, {
             'BASIC': 20000.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             'GLOBAL_REIMBURSEMENT': 1000.0,
             'GLOBAL_DEDUCTION': -500.0,
             '713_GROSS': 20700.0,
@@ -666,8 +667,7 @@ class TestIrdReports(TestL10NHkHrPayrollAccountCommon):
             'OTHER': 8000,
             'WITHHELD': 49350,
         }
-        for code, amount in inputs.items():
-            payslip_ne._set_input_value(code, amount)
+        payslip_ne._set_input_values(inputs)
         payslip_ne.compute_sheet()
         payslip_ne.action_payslip_done()
 

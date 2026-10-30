@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_ask_stakeholder_review" string="Stakeholder Review" type="object" class="btn-primary" groups="esg.esg_group_manager,survey.group_survey_user"/>
+                    <button name="action_ask_stakeholder_review" string="Stakeholder Review" type="object" class="btn-primary" groups="survey.group_survey_user"/>
                 </header>
                 <div
                     class="alert alert-warning d-flex align-items-center" role="alert"
@@ -17,7 +17,7 @@
                 </div>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" name="action_open_metric_survey_input_lines" icon="edit_square" type="object" invisible="not survey_ids" groups="esg.esg_group_manager,survey.group_survey_user">
+                        <button class="oe_stat_button" name="action_open_metric_survey_input_lines" icon="edit_square" type="object" invisible="not survey_ids" groups="survey.group_survey_user">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value">
                                     <field name="survey_answer_done_count"/>
@@ -96,6 +96,7 @@
                                             icon="refresh"
                                             title="Apply Stakeholder Review Impact Score"
                                             invisible="not is_stakeholder_impact_score_manually_edited"
+                                            groups="survey.group_survey_user"
                                         />
                                     </div>
                                     <field name="is_stakeholder_financial_score_manually_edited" invisible="1"/>  <!-- Needed for stakeholder_score_selection widget -->
@@ -109,6 +110,7 @@
                                             icon="refresh"
                                             title="Apply Stakeholder Review Financial Score"
                                             invisible="not is_stakeholder_financial_score_manually_edited"
+                                            groups="survey.group_survey_user"
                                         />
                                     </div>
                                 </group>
@@ -134,7 +136,7 @@
         <field name="arch" type="xml">
             <list multi_edit="1">
                 <header>
-                    <button name="action_ask_stakeholder_review" string="Stakeholder Review" type="object" display="always" class="btn-primary" groups="esg.esg_group_manager,survey.group_survey_user"/>
+                    <button name="action_ask_stakeholder_review" string="Stakeholder Review" type="object" display="always" class="btn-primary" groups="survey.group_survey_user"/>
                 </header>
                 <field name="priority" widget="priority"/>
                 <field name="name"/>

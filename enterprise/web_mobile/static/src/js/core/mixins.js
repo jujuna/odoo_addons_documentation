@@ -1,4 +1,5 @@
 import { user } from "@web/core/user";
+import { session } from "@web/session";
 import mobile from "@web_mobile/js/services/core";
 import { isIosApp } from "@web/core/browser/feature_detection";
 import { url } from "@web/core/utils/urls";
@@ -21,6 +22,8 @@ export const accountMethodsForMobile = {
             avatar: base64Avatar.substring(base64Avatar.indexOf(',') + 1),
             name: user.name,
             username: user.login,
+            uid: user.userId,
+            db: session.db,
         });
     },
     /**

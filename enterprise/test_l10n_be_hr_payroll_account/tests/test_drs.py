@@ -1,245 +1,355 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import date, datetime
-from unittest.mock import MagicMock, patch
+from datetime import date
+from unittest.mock import patch
 
-from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
-from odoo.addons.l10n_be_hr_payroll.models.certificate import CertificateCertificate
-from odoo.addons.l10n_be_hr_payroll.models.utils import xml_str_to_dict
-from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import freeze_time, tagged
+
+from .common_drs import TestDRSCommon
 
 
 @tagged('post_install', '-at_install', 'drs')
-@patch.object(CertificateCertificate, '_decode_certificate_for_be_onss_xml', lambda contract, xml_str: b'dummy\r\nsignature\r\n')
-class TestDRS(TestPayslipValidationCommon, TestBelgiumCommon):
+class TestDRS(TestDRSCommon):
 
     @classmethod
-    @TestPayslipValidationCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
-
-        cls.belgian_company = cls.company_data['company']
-
-        cls.belgian_company.write({
-            'vat': 'BE0897223670',
-            'phone': '0471098765',
-            'street': 'Test street',
-            'city': 'Test city',
-            'zip': '8292',
-            'onss_expeditor_number': '123456',
-            'country_id': cls.env.ref('base.be').id,
-        })
-        cls.belgian_company.current_payroll_config_id.write({
-            'l10n_be_company_number': '0123456749',
-            'l10n_be_revenue_code': '1234',
-            'onss_registration_number': '125482497',
-            'onss_importance_code': '4',
-            'l10n_be_employer_category_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010').id,
-        })
-
-        cls.calendar_38h = cls.env['resource.calendar'].create({
-            'name': 'Standard 38 hours/week',
-            'company_id': cls.belgian_company.id,
-            'hours_per_day': 7.6,
-            'attendance_ids': [(5, 0, 0),
-                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
-                (0, 0, {'dayofweek': '0', 'hour_from': 13, 'hour_to': 16.6}),
-                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 12}),
-                (0, 0, {'dayofweek': '1', 'hour_from': 13, 'hour_to': 16.6}),
-                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
-                (0, 0, {'dayofweek': '2', 'hour_from': 13, 'hour_to': 16.6}),
-                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
-                (0, 0, {'dayofweek': '3', 'hour_from': 13, 'hour_to': 16.6}),
-                (0, 0, {'dayofweek': '4', 'hour_from': 8, 'hour_to': 12}),
-                (0, 0, {'dayofweek': '4', 'hour_from': 13, 'hour_to': 16.6})
-            ],
-        })
-
         # Youth: age at Dec 31, 2025 = 22 (< 25 → youth risk, code 001)
         # Senior: age at Dec 31, 2025 = 60 (>= 50 → senior risk, code 002)
-        cp_200 = cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
-        cls.employee_youth, cls.employee_senior = cls.env['hr.employee'].create([
-            {
-                'name': 'Youth Worker',
-                'company_id': cls.belgian_company.id,
-                'birthday': date(2003, 6, 1),
-                'contract_date_start': date(2025, 1, 1),
-                'date_version': date(2025, 1, 1),
-                'resource_calendar_id': cls.calendar_38h.id,
-                'niss': '/',
-                'lang': 'fr_BE',
-                'l10n_be_joint_committee_id': cp_200.id,
-            },
-            {
-                'name': 'Senior Worker',
-                'company_id': cls.belgian_company.id,
-                'birthday': date(1965, 6, 1),
-                'contract_date_start': date(2025, 1, 1),
-                'date_version': date(2025, 1, 1),
-                'resource_calendar_id': cls.calendar_38h.id,
-                'niss': '/',
-                'lang': 'nl_NL',
-                'l10n_be_joint_committee_id': cp_200.id,
-            },
+        cls.employee_youth = cls._create_drs_employee('Youth Worker', birthday=date(2003, 6, 1), wage=2000.0)
+        cls.employee_senior = cls._create_drs_employee('Senior Worker', birthday=date(1965, 6, 1), wage=2000.0, lang='nl_NL')
+        cls.employee_impulsion_12mo = cls._create_drs_employee('Impulsion 12mo Worker', l10n_be_impulsion_plan='12mo')
+        cls.employee_impulsion_25yo_young = cls._create_drs_employee(
+            'Impulsion 25yo Young Worker', birthday=date(2003, 6, 1), l10n_be_impulsion_plan='25yo')
+        cls.employee_impulsion_25yo_old = cls._create_drs_employee('Impulsion 25yo Old Worker', l10n_be_impulsion_plan='25yo')
+
+    @freeze_time('2026-10-20 10:00:00')
+    def test_drs_invalid_file_not_sent(self):
+        self._create_validated_leave(self.employee_senior, 'l10n_be_work_entry_type_senior_time_off', date(2026, 9, 14), date(2026, 9, 14))
+        drs = self._get_declarations(self.employee_senior, 'WECH009')
+        self._get_drs_dict(drs)
+        # The validation of the file against the schema of the ONSS failed
+        drs.error_message = "Error upon generating the declaration: Element 'HolidayHours': [facet 'maxInclusive']"
+        self.assertEqual(drs.state, 'error')
+        self.assertIn(drs.error_message, drs.with_context(onss_skip_signature=True)._pre_submit_checks())
+
+    @freeze_time('2026-10-20 10:00:00')
+    def test_drs_common_errors(self):
+        self._create_validated_leave(self.employee_senior, 'l10n_be_work_entry_type_senior_time_off', date(2026, 9, 14), date(2026, 9, 14))
+        drs = self._get_declarations(self.employee_senior, 'WECH009')
+        version = self.employee_senior.version_id
+        # The workers not subject to the social security aren't declared
+        version.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00000')
+        with self.assertRaisesRegex(ValidationError, "The worker code 000 can't be declared to the unemployment sector"):
+            self._get_drs_dict(drs)
+        version.l10n_be_worker_code_id = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00495')
+        # The weekly hours of the worker can't exceed the ones of the full-time reference worker
+        calendar_40h = self.calendar_38h.copy({'name': 'Standard 40 hours/week', 'reference_calendar_id': self.calendar_38h.id})
+        calendar_40h.attendance_ids.filtered(lambda attendance: attendance.hour_to > 12).hour_to = 17
+        version.resource_calendar_id = calendar_40h
+        with self.assertRaisesRegex(ValidationError, 'more hours per week than the full-time reference schedule'):
+            self._get_drs_dict(drs)
+        version.resource_calendar_id = self.calendar_38h
+        # The third-party payers can't declare the social risks
+        payroll_config = self.belgian_company.current_payroll_config_id
+        employer_category = payroll_config.l10n_be_employer_category_id
+        payroll_config.l10n_be_employer_category_id = self.env['l10n.be.employer.category'].search([('dmfa_code', '=', '099')], limit=1)
+        with self.assertRaisesRegex(ValidationError, 'third-party payers'):
+            self._get_drs_dict(drs)
+        payroll_config.l10n_be_employer_category_id = employer_category
+        self.assertTrue(self._get_drs_dict(drs))
+
+        # An expired risk can't be declared anymore
+        expired = self._create_drs(self.employee_senior, 'drs_risk_wech008_002', 2026, 9)
+        with self.assertRaisesRegex(ValidationError, "can't be declared for that month anymore"):
+            self._get_drs_dict(expired)
+
+    @freeze_time('2026-10-20 10:00:00')
+    def test_drs_form(self):
+        self._create_validated_leave(self.employee_senior, 'l10n_be_work_entry_type_senior_time_off', date(2026, 9, 14), date(2026, 9, 14))
+        drs = self._get_declarations(self.employee_senior, 'WECH009')
+        drs_dict = self._get_drs_dict(drs)
+        # The type of the file is the type of the batch declarations, the identification is in the form
+        self.assertEqual(drs.xml_filename.split('.')[1], 'WECH')
+        root = drs_dict['WECH009']
+        self.assertEqual(root['@{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation'], 'WECH009_20263.xsd')
+        form = root['Form']
+        self.assertEqual(form['FormCreationDate'], '2026-10-20')
+        self.assertEqual(form['FormCreationHour'], '12:00:00.000', "Belgian time")
+        self.assertEqual(form['AttestationStatus'], '0')
+        self.assertEqual(form['DclInformation']['LanguageCodePdf'], '1')
+        self.assertEqual(form['Reference'], {'ReferenceType': '1', 'ReferenceOrigin': '1', 'ReferenceNbr': drs.name})
+        natural_person = form['EmployerDeclarationLink']['NaturalPerson']
+        self.assertEqual(natural_person['INSS'], self.employee_senior.niss)
+        self.assertNotIn('CoordinatesContactPerson', form, "The contact person is only declared to the INAMI")
+
+    @freeze_time('2026-10-20 10:00:00')
+    def test_drs_modification_cancellation(self):
+        self._create_validated_leave(self.employee_senior, 'l10n_be_work_entry_type_senior_time_off', date(2026, 9, 14), date(2026, 9, 14))
+        original = self._get_declarations(self.employee_senior, 'WECH009')
+        self.assertFalse(original._get_ticket_number())
+        with self.assertRaises(UserError):
+            original.action_modify_declaration()
+
+        # A refused declaration is sent again as an original one
+        self._notify_drs(original, '3400048ENN00A', accepted=False)
+        self.assertFalse(original._get_ticket_number())
+        retry = self._create_drs(self.employee_senior, 'drs_risk_wech009_002', 2026, 9)
+        self.assertEqual(self._get_drs_dict(retry)['WECH009']['Form']['AttestationStatus'], '0')
+
+        # The modification of an accepted declaration refers to its ticket
+        self._notify_drs(retry, '3400048ENN00C')
+        self.assertEqual(retry._get_ticket_number(), '3400048ENN00C')
+        modification = self.env['l10n.be.drs'].browse(retry.action_modify_declaration()['res_id'])
+        self.assertFalse(modification.xml_file)
+        form = self._get_drs_dict(modification)['WECH009']['Form']
+        self.assertEqual(form['AttestationStatus'], '1')
+        self.assertEqual(form['Reference'], [
+            {'ReferenceType': '1', 'ReferenceOrigin': '1', 'ReferenceNbr': modification.name},
+            {'ReferenceType': '3', 'ReferenceOrigin': '2', 'ReferenceNbr': '3400048ENN00C'},
         ])
+        self.assertIn('WorkerRecordLink', form['EmployerDeclarationLink']['NaturalPerson'])
 
-    def _set_create_date(self, records, new_date):
-        # The ORM discards create_date from create()/write() vals, so it must be forced through SQL update + cache invalidation
-        self.env.cr.execute(
-            f"UPDATE {records._table} SET create_date = %s WHERE id IN %s",
-            (new_date, tuple(records.ids)),
-        )
-        records.invalidate_recordset(['create_date'])
-        records._compute_name()
+        # The cancellation refers to the last accepted declaration, and only identifies the worker
+        self._notify_drs(modification, '3400048ENN00D')
+        cancellation = self.env['l10n.be.drs'].browse(modification.action_cancel_declaration()['res_id'])
+        self.assertTrue(cancellation.xml_file)
+        form = self._get_drs_dict(cancellation)['WECH009']['Form']
+        self.assertEqual(form['AttestationStatus'], '3', "A cancellation stays a cancellation when generated again")
+        self.assertEqual(form['Reference'][1]['ReferenceNbr'], '3400048ENN00D')
+        self.assertNotIn('WorkerRecordLink', form['EmployerDeclarationLink']['NaturalPerson'])
 
-    def _get_drs_dict(self, drs, skip_signature=True):
-        drs.with_context(onss_skip_signature=skip_signature).generate_declaration_xml_report()
-        self.assertFalse(drs.error_message)
-        self.assertEqual(drs.state, 'ready')
-        return xml_str_to_dict(drs.xml_file.content)
+        # After the cancellation, a new declaration is an original one
+        self._notify_drs(cancellation, '3400048ENN00E')
+        new_declaration = self._create_drs(self.employee_senior, 'drs_risk_wech009_002', 2026, 9)
+        self.assertEqual(self._get_drs_dict(new_declaration)['WECH009']['Form']['AttestationStatus'], '0')
+
+    def test_drs_allowed_risks(self):
+        drs = self._create_drs(self.employee_senior, 'drs_risk_wech008_001', 2026, 9)
+        self.assertIn(self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_001'), drs.allowed_risk_ids)
+        self.assertNotIn(self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_002'), drs.allowed_risk_ids, "Expired since 2010")
+        self.assertNotIn(self.env.ref('l10n_be_hr_payroll.drs_risk_zima005_001'), drs.allowed_risk_ids)
+        self.assertTrue(self.env.ref('l10n_be_hr_payroll.drs_risk_wech001_001', raise_if_not_found=False))
+
+    def test_drs_create_missing_declarations(self):
+        risk = self.env.ref('l10n_be_hr_payroll.drs_risk_wech010_002')
+        values = {'employee_id': self.employee_senior.id, 'risk_id': risk.id, 'sector': 'unemployment', 'year': 2026}
+        declarations = self.env['l10n.be.drs']._create_missing_declarations([
+            dict(values, month=3),
+            dict(values, month='3'),
+            dict(values, month=4),
+        ])
+        self.assertEqual(declarations.mapped('month'), ['3', '4'])
+        self.assertTrue(all(declarations.mapped('is_automatically_created')))
+        self.assertFalse(self.env['l10n.be.drs']._create_missing_declarations([dict(values, month=4), dict(values, month='3')]))
+
+    def test_drs_module_update_required(self):
+        drs = self._create_drs(self.employee_senior, 'drs_risk_wech009_002', 2026, 9)
+        self.env.ref('l10n_be_hr_payroll.drs_xml_form').unlink()
+        with self.assertRaises(UserError):
+            drs.with_context(onss_skip_signature=True).generate_declaration_xml_report()
 
     @freeze_time('2026-06-26 10:00:00')
     def test_wech009_wech010_automation(self):
-        youth_time_off_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_youth_time_off')
-        allocation_youth, allocation_senior = self.env['hr.leave.allocation'].create([
-            {
-                'employee_id': self.employee_youth.id,
-                'work_entry_type_id': youth_time_off_type.id,
-                'number_of_days': 20,
-                'date_from': date(2025, 1, 1),
-            },
-            {
-                'employee_id': self.employee_senior.id,
-                'work_entry_type_id': youth_time_off_type.id,
-                'number_of_days': 20,
-                'date_from': date(2025, 1, 1),
-            },
+        # Legal holidays in February, then youth holidays in March and from March to April
+        self._create_validated_leave(self.employee_youth, 'be_work_entry_type_legal_leave', date(2026, 2, 2), date(2026, 2, 3))
+        self._create_validated_leave(self.employee_youth, 'l10n_be_work_entry_type_youth_time_off', date(2026, 3, 10), date(2026, 3, 12))
+        self._create_validated_leave(self.employee_youth, 'l10n_be_work_entry_type_youth_time_off', date(2026, 3, 30), date(2026, 4, 1))
+        self._create_validated_leave(self.employee_senior, 'l10n_be_work_entry_type_senior_time_off', date(2026, 5, 4), date(2026, 5, 5))
+
+        # The first month of youth holidays is declared once, the hours of each month
+        wech009_youth = self._get_declarations(self.employee_youth, 'WECH009')
+        self.assertRecordValues(wech009_youth, [{'code': '001', 'year': 2026, 'month': '3', 'holiday_hours': 15.2, 'is_automatically_created': True}])
+        wech010_youth = self._get_declarations(self.employee_youth, 'WECH010')
+        self.assertRecordValues(wech010_youth, [
+            {'code': '001', 'year': 2026, 'month': '3'},
+            {'code': '001', 'year': 2026, 'month': '4'},
         ])
-        (allocation_youth + allocation_senior).action_approve()
-        # Validating a youth time off allocation for an employee under 25 creates a WECH009 (code 001)
-        wech009_youth = allocation_youth.linked_drs_ids
-        wech009_youth.write({'environment': 'T'})
-        # force the value of create_date to ensure expected date/name values in the declaration file
-        self._set_create_date(wech009_youth, datetime(2026, 6, 26, 10, 0, 0))
-        self.assertEqual(len(wech009_youth), 1)
-        self.assertEqual(wech009_youth.identification, 'WECH009')
-        self.assertEqual(wech009_youth.code, '001')
-        # Validating a youth time off allocation for an employee under 25 creates a WECH009 (code 001)
-        wech009_senior = allocation_senior.linked_drs_ids
-        wech009_senior.write({'environment': 'T'})
-        self._set_create_date(wech009_senior, datetime(2026, 6, 26, 10, 0, 0))
-        self.assertEqual(len(wech009_senior), 1)
-        self.assertEqual(wech009_senior.identification, 'WECH009')
-        self.assertEqual(wech009_senior.code, '002')
-
-        self.env['hr.leave'].create([
-            {
-                'employee_id': self.employee_youth.id,
-                'work_entry_type_id': youth_time_off_type.id,
-                'request_date_from': date(2025, 3, 10),
-                'request_date_to': date(2025, 3, 12),
-            },
-            {
-                'employee_id': self.employee_senior.id,
-                'work_entry_type_id': youth_time_off_type.id,
-                'request_date_from': date(2025, 3, 10),
-                'request_date_to': date(2025, 3, 12),
-            },
+        self.assertRecordValues(self._get_declarations(self.employee_senior, 'WECH009') | self._get_declarations(self.employee_senior, 'WECH010'), [
+            {'identification': 'WECH009', 'code': '002', 'month': '5', 'holiday_hours': 0},
+            {'identification': 'WECH010', 'code': '002', 'month': '5', 'holiday_hours': 0},
         ])
-        wech010_per_emp = dict(self.env['l10n.be.drs']._read_group([
-            ('employee_id', 'in', (self.employee_youth + self.employee_senior).ids),
-            ('identification', '=', 'WECH010'),
-        ], groupby=['employee_id'], aggregates=['id:recordset']))
-        wech010_youth = wech010_per_emp.get(self.employee_youth)
-        self.assertEqual(len(wech010_youth), 1)
-        self.assertEqual(wech010_youth.code, '001')
-        wech010_senior = wech010_per_emp.get(self.employee_senior)
-        self.assertEqual(len(wech010_senior), 1)
-        self.assertEqual(wech010_senior.code, '002')
 
-        # Check wech009_youth validity
-        wech009_youth.environment = 'T'
-        self.belgian_company.onss_certificate_id = self.env['certificate.certificate'].create({})
-        wech009_youth_dict = self._get_drs_dict(wech009_youth, skip_signature=False)
-        self.cr.flush()
-        self.assertDictEqual(wech009_youth_dict, {'WECH009': {'@{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation': 'drs/WECH009_20261.xsd', 'Form': {'Identification': 'WECH009', 'FormCreationDate': '2026-06-26', 'FormCreationHour': '10:00:00.000', 'AttestationStatus': '0', 'TypeForm': 'SU', 'DclInformation': {'LanguageCodePdf': '2'}, 'RiskIdentification': {'IdentificationOfRisk': '001'}, 'Reference': {'ReferenceType': '1', 'ReferenceOrigin': '1', 'ReferenceNbr': '20260626100000000000'}, 'EmployerDeclarationLink': {'NOSSRegistrationNbr': '125482497', 'Trusteeship': '0', 'CompanyID': '0123456749', 'NaturalPerson': {'NaturalPersonSequenceNbr': '1', 'INSS': '00000000000', 'WorkerRecordLink': {'EmployerClass': '010', 'WorkerCode': '495', 'OccupationLink': {'OccupationStartingDate': '2025-01-01', 'JointCommissionNbr': '200', 'WorkingDaysSystem': '500', 'MeanWorkingHours': '3800', 'RefMeanWorkingHours': '3800', 'AnnualDclYoungHolidays': {'MonthOfYoungAnnualHolidays': '2026-06', 'CalculationBaseAllowance': {'RemunerationTimeUnit': '4', 'RemunerationBasisAmount': '0'}, 'HolidaysSector': {'HolidaySectorIndicator': '1', 'HoursHolidayDetail': {'HolidayCode': '7', 'HolidayHoursNumber': '15200'}}}}}}}}}})
+        self._assertDRSEqual(self._get_drs_dict(wech009_youth), label='wech009_youth')
+        self._assertDRSEqual(self._get_drs_dict(wech010_youth[0]), label='wech010_youth_march')
+        self._assertDRSEqual(self._get_drs_dict(wech010_youth[1]), label='wech010_youth_april')
 
-        wech009_youth.create_onss_declaration()
-        declaration = wech009_youth.onss_declaration_ids
-        self.assertEqual(len(declaration), 1)
-        self.assertEqual(declaration.onss_file_count, 3)
+        # Youth holidays approved later in an earlier month move the first month, without duplicates
+        leave = self._create_validated_leave(self.employee_youth, 'l10n_be_work_entry_type_youth_time_off', date(2026, 2, 16), date(2026, 2, 16))
+        leave.action_refuse()
+        leave.action_back_to_approval()
+        leave.action_approve()
+        # Only the legal holidays taken in the previous months are declared
+        self.assertRecordValues(self._get_declarations(self.employee_youth, 'WECH009'), [{'month': '2', 'holiday_hours': 0, 'state': 'draft'}])
+        self.assertEqual(self._get_declarations(self.employee_youth, 'WECH010').mapped('month'), ['2', '3', '4'])
 
-        with patch('odoo.addons.l10n_be_hr_payroll.models.l10n_be_onss_declaration.open_sftp_connection') as mock_open_conn:
-            fake_sftp = MagicMock()
-            fake_sftp.putfo = MagicMock()
-            # This mock needs to simulate the context manager behavior, specifically the __enter__ and __exit__ methods
-            mock_open_conn.return_value.__enter__.return_value = fake_sftp
-            mock_open_conn.return_value.__exit__.return_value = None
-            declaration.action_post()
-            mock_open_conn.assert_called_once()
-            fake_sftp.putfo.assert_called()
+    @freeze_time('2026-06-26 10:00:00')
+    def test_wech009_wech010_errors(self):
+        # Legal holidays after youth holidays in the same month
+        self._create_validated_leave(self.employee_youth, 'l10n_be_work_entry_type_youth_time_off', date(2026, 3, 10), date(2026, 3, 10))
+        self._create_validated_leave(self.employee_youth, 'be_work_entry_type_legal_leave', date(2026, 3, 11), date(2026, 3, 11))
+        with self.assertRaisesRegex(ValidationError, 'the legal holidays must be taken first'):
+            self._get_drs_dict(self._get_declarations(self.employee_youth, 'WECH010'))
 
-        self.assertEqual(declaration.state, 'posted')
+        # The age is checked at the end of the holiday year
+        self._create_validated_leave(self.employee_senior, 'l10n_be_work_entry_type_youth_time_off', date(2026, 3, 10), date(2026, 3, 10))
+        with self.assertRaisesRegex(ValidationError, 'not entitled to youth holidays'):
+            self._get_drs_dict(self._get_declarations(self.employee_senior, 'WECH009'))
 
-        # Receive ACRF, signaling an invalid signature
-        def mock_listdir_declaration_1(folder):
-            if folder in ('OUT', 'OUTTEST-S'):
-                return []
-            elif folder == 'OUTTEST':
-                return [
-                    'FO.ACRF.999999.20250410.99999.T',
-                    'FS.ACRF.999999.20250410.99999.T',
-                    'GO.ACRF.999999.20250410.99999.T',
-                ]
+        # A month without youth or senior holidays
+        wech010 = self._create_drs(self.employee_youth, 'drs_risk_wech010_001', 2026, 1)
+        with self.assertRaisesRegex(ValidationError, 'thus a declaration for that month is unnecessary'):
+            self._get_drs_dict(wech010)
 
-        def make_file_mock(return_bytes):
-            mock_file = MagicMock()
-            mock_file.__enter__.return_value.read.return_value = return_bytes
-            return mock_file
+    @freeze_time('2026-06-26 10:00:00')
+    def test_wech008(self):
+        risk_010 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_010')
+        risk_011 = self.env.ref('l10n_be_hr_payroll.drs_risk_wech008_011')
+        # The fixed-term contract of the old worker ends after the month of the declaration
+        self.employee_impulsion_25yo_old.version_id.contract_date_end = date(2026, 4, 30)
 
-        def file_side_effect_declaration_1(remote_path, mode='rb'):
-            if remote_path.endswith('FO.ACRF.999999.20250410.99999.T'):
-                xml_str = f"""<?xml version="1.0" encoding="UTF-8"?>
-<ACRF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ACRF_20262.xsd">
-	<Form>
-		<Identification>ACRF001</Identification>
-		<FormCreationDate>2026-01-16</FormCreationDate>
-		<FormCreationHour>15:29:46.495</FormCreationHour>
-		<AttestationStatus>0</AttestationStatus>
-		<TypeForm>PA</TypeForm>
-		<FileReference>
-			<FileName>{wech009_youth.go_filename}</FileName>
-			<ReferenceOrigin>2</ReferenceOrigin>
-			<ReferenceNbr>3400001Y1P01G</ReferenceNbr>
-		</FileReference>
-		<ReceptionResult>
-			<ResultCode>0</ResultCode>
-			<ErrorID>ACRF-088</ErrorID>
-			<ErrorID>ACRF-172</ErrorID>
-		</ReceptionResult>
-	</Form>
-</ACRF>"""
-                return make_file_mock(xml_str.encode('utf-8'))
-            if remote_path.endswith('FS.ACRF.999999.20250410.99999.T'):
-                return make_file_mock(b"dummy\r\nsignature\r\n")
-            if remote_path.endswith('GO.ACRF.999999.20250410.99999.T'):
-                return make_file_mock(b"")
-            raise FileNotFoundError(f"No mock for file: {remote_path}")
+        employees = (
+            self.employee_impulsion_12mo,
+            self.employee_impulsion_25yo_young,
+            self.employee_impulsion_25yo_old,
+        )
+        payslips = self.env['hr.payslip'].create([
+            {
+                'name': f'Payslip 03/2026 {employee.name}',
+                'version_id': employee.version_id.id,
+                'date_from': date(2026, 3, 1),
+                'date_to': date(2026, 3, 31),
+                'employee_id': employee.id,
+                'company_id': self.belgian_company.id,
+            }
+            for employee in employees
+        ])
+        payslips.compute_sheet()
+        payslips.action_payslip_done()
+        # Validating the payslips again doesn't duplicate the declarations
+        payslips._check_create_wech008()
 
-        with patch('odoo.addons.l10n_be_hr_payroll.models.l10n_be_onss_declaration.open_sftp_connection') as mock_open_conn:
-            fake_sftp = MagicMock()
-            fake_sftp.listdir.side_effect = mock_listdir_declaration_1
-            fake_sftp.file.side_effect = file_side_effect_declaration_1
+        declarations = self.env['l10n.be.drs'].search([('identification', '=', 'WECH008'), ('employee_id', 'in', [employee.id for employee in employees])])
+        self.assertEqual(len(declarations), 3)
+        self.assertTrue(all(declarations.mapped('is_automatically_created')))
+        drs_12mo, drs_25_young, drs_25_old = (
+            declarations.filtered(lambda declaration, employee=employee: declaration.employee_id == employee)
+            for employee in employees
+        )
+        self.assertRecordValues(drs_12mo + drs_25_young + drs_25_old, [
+            {'risk_id': risk_010.id, 'month': '3', 'year': 2026, 'payslip_id': payslips[0].id, 'work_accident_indicator': False},
+            {'risk_id': risk_011.id, 'month': '3', 'year': 2026, 'payslip_id': payslips[1].id, 'work_accident_indicator': False},
+            {'risk_id': risk_011.id, 'month': '3', 'year': 2026, 'payslip_id': payslips[2].id, 'work_accident_indicator': False},
+        ])
 
-            mock_open_conn.return_value.__enter__.return_value = fake_sftp
+        # The allowance isn't limited, it's the monthly amount prorated on the hours with a salary due:
+        # 4 weeks of a full time worker (38 hours * 4), rounded to the 4th decimal
+        monthly_amount = payslips[0]._get_impulsion_plan_amount()[0]
+        self.assertTrue(monthly_amount)
+        self.assertEqual(drs_12mo.paid_hours, 167.2)
+        self.assertAlmostEqual(drs_12mo.work_allowance, round(monthly_amount * 167.2 / 152, 4), places=4)
+        self.assertGreater(drs_12mo.work_allowance, monthly_amount)
+        drs_12mo_dict = self._get_drs_dict(drs_12mo, skip_signature=False)
+        self._assertDRSEqual(drs_12mo_dict)
+        activation = drs_12mo_dict['WECH008']['Form']['EmployerDeclarationLink']['NaturalPerson']['WorkerRecordLink']['OccupationLink']
+        self.assertEqual(
+            activation['MonthlyDeclarationOfWorkInProgramActivationOfUnemploymentAllowance']['WorkAllowance']['WorkAllowanceAmount'],
+            str(round(drs_12mo.work_allowance * 10000)), "In hundredths of cent")
+        self.assertNotIn('OccupationEndingDate', activation)
 
-            declaration._fetch_files()
+        self.assertGreater(drs_25_young.work_allowance, 0)
+        self.assertTrue(self._get_drs_dict(drs_25_young))
 
-            assert fake_sftp.file.call_count == 3
-            fake_sftp.file.assert_any_call('OUTTEST/FO.ACRF.999999.20250410.99999.T', mode='rb')
-            fake_sftp.file.assert_any_call('OUTTEST/FS.ACRF.999999.20250410.99999.T', mode='rb')
-            fake_sftp.file.assert_any_call('OUTTEST/GO.ACRF.999999.20250410.99999.T', mode='rb')
+        # No allowance after 25 years old: the social security refuses an allowance of 0 when a salary is due
+        self.assertEqual(drs_25_old.work_allowance, 0)
+        with self.assertRaisesRegex(ValidationError, 'no right to a work allowance'):
+            self._get_drs_dict(drs_25_old)
 
-        self.assertEqual(declaration.state, 'error')
-        self.assertEqual(declaration.onss_file_count, 6)
+    @freeze_time('2026-06-26 10:00:00')
+    def test_wech008_errors(self):
+        # Without validated payslip, and for a risk of an other activation program
+        drs = self._create_drs(self.employee_impulsion_12mo, 'drs_risk_wech008_003', 2026, 3)
+        with self.assertRaisesRegex(ValidationError, 'A validated payslip'):
+            self._get_drs_dict(drs)
+        with self.assertRaisesRegex(ValidationError, 'Only the work allowance of the Impulsion plans'):
+            self._get_drs_dict(drs)
+
+    def test_drs_validation_warnings(self):
+        # 1. Test "Start Date prior to CBE registration"
+        self.belgian_company.l10n_be_cbe_inscription = date(2026, 1, 1)  # CBE in 2026, contract in 2025
+        drs_cbe = self._create_drs(self.employee_youth, 'drs_risk_wech002_001', 2026, 9)
+        drs_cbe._compute_issues()
+        self.assertTrue(drs_cbe.issues)
+        issues_values_cbe = list(drs_cbe.issues.values())
+        self.assertTrue(any("prior to the employer's registration date" in issue['message'] for issue in issues_values_cbe))
+        with self.assertRaises(UserError):
+            drs_cbe.generate_declaration_xml_report()
+        self.belgian_company.l10n_be_cbe_inscription = date(2000, 1, 1)
+
+        # 2. Test "Missing Dimona for DRS"
+        # Dimona period cancelled at the ONSS
+        youth_period = self.env['l10n.be.dimona.period'].search([('employee_id', '=', self.employee_youth.id)])
+        youth_period.content = dict(youth_period.content, isCanceled=True, lastDimonaType='cancel')
+        drs_dimona = self._create_drs(self.employee_youth, 'drs_risk_wech002_001', 2026, 9)
+        drs_dimona._compute_issues()
+        self.assertTrue(drs_dimona.issues)
+        issues_values_dimona = list(drs_dimona.issues.values())
+        self.assertTrue(any("does not have a DIMONA covering the period" in issue['message'] for issue in issues_values_dimona))
+        with self.assertRaises(UserError):
+            drs_dimona.generate_declaration_xml_report()
+        youth_period.content = dict(youth_period.content, isCanceled=False, lastDimonaType='in')
+
+        # Dimona period (starting 2025-01-01) not covering the declaration period
+        drs_dimona_period = self._create_drs(self.employee_youth, 'drs_risk_wech002_001', 2024, 5)
+        drs_dimona_period._compute_issues()
+        issues_values_dimona_period = list((drs_dimona_period.issues or {}).values())
+        self.assertTrue(any("does not have a DIMONA covering the period" in issue['message'] for issue in issues_values_dimona_period))
+
+        # 3. Test "Invalid Remuneration Basis for DRS" (Wage = 0)
+        self.employee_youth.version_ids.write({'wage': 0.0})
+        drs_wage = self._create_drs(self.employee_youth, 'drs_risk_wech002_001', 2026, 9)
+        drs_wage._compute_issues()
+        self.assertTrue(drs_wage.issues)
+        issues_values_wage = list(drs_wage.issues.values())
+        self.assertTrue(any("Basic Remuneration is equal to 0" in issue['message'] for issue in issues_values_wage))
+        with self.assertRaises(UserError):
+            drs_wage.generate_declaration_xml_report()
+
+        # Negative wage and wage rounded to 0 cent in the XML :
+        for wage in (-100.0, 0.004):
+            self.employee_youth.version_ids.write({'wage': wage})
+            drs_wage = self._create_drs(self.employee_youth, 'drs_risk_wech002_001', 2026, 9)
+            issues_values_wage = list((drs_wage.issues or {}).values())
+            self.assertTrue(any("Basic Remuneration is equal to 0" in issue['message'] for issue in issues_values_wage))
+        self.employee_youth.version_ids.write({'wage': 2000.0})
+
+    def test_drs_period_version(self):
+        # Contract until 31/01, then a new contract starting 04/02: a DRS for February uses the February version
+        employee = self._create_drs_employee(
+            'Rehired Worker', contract_date_start=date(2026, 1, 1), contract_date_end=date(2026, 1, 31),
+            date_version=date(2026, 1, 1), wage=2000.0)
+        with patch.object(self.env.registry['hr.version'], '_l10n_be_dimona_autodeclare'):
+            february_version = employee.create_version({
+                'date_version': date(2026, 2, 4),
+                'contract_date_start': date(2026, 2, 4),
+                'contract_date_end': False,
+                'wage': 2500.0,
+            })
+        drs = self._create_drs(employee, 'drs_risk_wech002_001', 2026, 2)
+        self.assertEqual(drs._get_period_version(), february_version)
+
+    def test_drs_risk_deletion(self):
+        risk = self.env['l10n.be.drs.risk'].create({
+            'name': 'Removed Risk',
+            'sector': 'unemployment',
+            'identification': 'WECH999',
+            'code': '001',
+            'scenario': 'Scenario 999',
+            'date_start': date(2026, 1, 1),
+        })
+        with self.assertRaisesRegex(UserError, 'not allowed to delete a DRS Risk'):
+            risk.unlink()
+        # The risks removed from the data of the module are deleted at its update
+        risk.with_context(force_delete=True).unlink()
+        self.assertFalse(risk.exists())

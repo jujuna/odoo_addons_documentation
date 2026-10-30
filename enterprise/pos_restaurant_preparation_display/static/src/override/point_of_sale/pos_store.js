@@ -9,6 +9,10 @@ patch(PosStore.prototype, {
         }
     },
     async fireCourse(course) {
+        const order = course.order_id;
+        if (typeof course.id !== "number" || order.isDirty()) {
+            await this.syncAllOrders({ orders: [order] });
+        }
         await super.fireCourse(course);
         await this.data.call("pos.prep.order", "fire_course", [course.order_id.id, course.id]);
     },

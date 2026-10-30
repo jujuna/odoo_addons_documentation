@@ -9,14 +9,15 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:29+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-15 13:35+0000\n"
+"Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "account_batch_payment/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +41,17 @@ msgid ""
 "When you reconcile, simply select the corresponding batch payment to "
 "reconcile all the payments in the batch.\n"
 msgstr ""
+"\n"
+"Sammelzahlungen\n"
+"=======================================\n"
+"Sammelzahlungen ermöglichen die Gruppierung von Zahlungen.\n"
+"\n"
+"Sie werden insbesondere, aber nicht nur, verwendet, um mehrere Schecks "
+"zusammenzufassen, um sie gemeinsam bei der Bank einzureichen.\n"
+"Der gesamte eingezahlte Betrag wird dann als eine einzige Transaktion auf "
+"Ihrem Kontoauszug erscheinen.\n"
+"Bei der Kontenabstimmung wählen Sie einfach die entsprechende Sammelzahlung "
+"aus, um alle Zahlungen im Stapel abzustimmen.\n"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -135,7 +147,7 @@ msgstr "Alle Zahlungen müssen entweder eine Buchung oder gar keine haben."
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "All payments must have the same payment method."
-msgstr ""
+msgstr "Alle Zahlungen müssen über dieselbe Zahlungsmethode erfolgen."
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount
@@ -176,7 +188,7 @@ msgstr "Bankjournal"
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Banktransaktion"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -463,7 +475,7 @@ msgstr "Follower (Partner)"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
 msgid "Generate File"
-msgstr ""
+msgstr "Datei generieren"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_create_date
@@ -581,7 +593,7 @@ msgstr "Leer lassen, um automatisch zu generieren ..."
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material-Symbols-Icon, z. B. Checkliste"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -680,12 +692,6 @@ msgid "Only %s payments can be added to a batch. Invalid ones will be ignored."
 msgstr ""
 "Es können nur Zahlungen im Status „%s“ zu einer Sammelzahlung hinzugefügt "
 "werden. Ungültige Zahlungen werden ignoriert."
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_payment.py:0
-msgid "Only outbound payments can be exported."
-msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
@@ -821,6 +827,8 @@ msgstr "Suche: Sammelzahlung"
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "Selected payments include methods that cannot generate a file."
 msgstr ""
+"Die ausgewählten Zahlungen enthalten Methoden, die keine Dateien erstellen "
+"können."
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__sent
@@ -841,7 +849,7 @@ msgstr "Zeigen"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__show_download_xml_button
 msgid "Show Download Xml Button"
-msgstr ""
+msgstr "Schaltfläche „XML herunterladen“ anzeigen"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__show_remove_button
@@ -1045,6 +1053,8 @@ msgstr ""
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You can't generate a file for payments from more than one journal."
 msgstr ""
+"Es ist nicht möglich, eine Datei für Zahlungen aus mehr als einem Journal zu "
+"erstellen."
 
 #. module: account_batch_payment
 #. odoo-python
@@ -1083,11 +1093,15 @@ msgstr ""
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You must select at least one payment to generate a file."
 msgstr ""
+"Sie müssen mindestens eine Zahlung auswählen, um eine Datei zu erstellen."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 msgid "payments"
 msgstr "Zahlungen"
+
+#~ msgid "Only outbound payments can be exported."
+#~ msgstr "Es können nur ausgehende Zahlungen exportiert werden."
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Kontoauszugszeile"

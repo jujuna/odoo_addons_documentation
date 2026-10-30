@@ -6,3 +6,4 @@ from . import test_contract_template_whitelist
 from . import test_seculine_returns
 from . import test_sick_leave_requests
 from . import test_leave_warning
+from . import test_lu_payroll_indexation

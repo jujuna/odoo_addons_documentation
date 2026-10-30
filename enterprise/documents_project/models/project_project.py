@@ -130,6 +130,11 @@ class ProjectProject(models.Model):
         if 'documents_folder_id' in vals:
             project_root_documents = self.documents_folder_id.children_ids
 
+        if 'allowed_internal_user_ids' in vals:
+            members_before = {
+                project: project.allowed_internal_user_ids for project in self
+            }
+
         res = super().write(vals)
         if 'company_id' in vals:
             for project in self:
@@ -143,6 +148,20 @@ class ProjectProject(models.Model):
                     folder.company_id = False
                 elif len(linked_companies) == 1 and all(p.company_id for p in linked_projects):
                     folder.company_id = linked_companies
+
+        if 'allowed_internal_user_ids' in vals:
+            for project in self.filtered(lambda p: p.privacy_visibility in ('invited_users', 'followers')):
+                current_accesses = project.documents_folder_id.access_ids
+                project_members = project.allowed_internal_user_ids.partner_id
+                to_grant_users = project_members - current_accesses.partner_id
+                to_revoke_users = members_before[project].partner_id - project_members
+                updated_accesses = {}
+                for partner in to_grant_users:
+                    updated_accesses[partner] = ('edit', False)
+                for partner in to_revoke_users:
+                    updated_accesses[partner] = (False, False)
+                project.documents_folder_id.action_update_access_rights(partners=updated_accesses)
+
         if not self.env.context.get('no_create_folder'):
             self._create_missing_folders()
         if project_root_documents:
@@ -151,12 +170,12 @@ class ProjectProject(models.Model):
         return res
 
     def _change_privacy_visibility(self, new_visibility):
-        """ Override to Add/remove access rights of the internal followers of the project
+        """ Override to Add/remove access rights of the team members of the project
             to the documents folder and its documents based on the new privacy visibility. """
         super()._change_privacy_visibility(new_visibility)
         for project in self.filtered(lambda p: p.privacy_visibility != new_visibility):
             project_documents = project.documents_folder_id | project.document_ids
-            internal_partners = project.message_partner_ids.filtered(lambda p: not p.partner_share)
+            internal_partners = project.allowed_internal_user_ids.partner_id
             access_internal = 'edit' if new_visibility in ('employees', 'portal') else 'none'
             new_permission = False if new_visibility in ('employees', 'portal') else 'edit'
 
@@ -196,35 +215,6 @@ class ProjectProject(models.Model):
         if self.documents_folder_id and callbacks.get("unarchive_project"):
             self.documents_folder_id.action_archive()
         return callbacks
-
-    def message_subscribe(self, partner_ids=None, subtype_ids=None):
-        res = super().message_subscribe(partner_ids=partner_ids, subtype_ids=subtype_ids)
-        if (
-            self.privacy_visibility in ['invited_users', 'followers']
-            and partner_ids
-        ):
-            internal_partners = self.env['res.partner'].search([
-                ('id', 'in', partner_ids),
-                ('user_ids.share', '=', False),
-            ]).ids
-            self.documents_folder_id.action_update_access_rights(
-                partners={
-                    partner: ('edit', False) for partner in internal_partners
-                },
-            )
-        return res
-
-    def message_unsubscribe(self, partner_ids=None):
-        if (
-            self.privacy_visibility in ['invited_users', 'followers']
-            and partner_ids
-        ):
-            self.documents_folder_id.action_update_access_rights(
-                partners={
-                    partner: (False, False) for partner in partner_ids
-                },
-            )
-        super().message_unsubscribe(partner_ids=partner_ids)
 
     def _get_document_partner(self):
         return self.partner_id

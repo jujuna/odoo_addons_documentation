@@ -526,12 +526,14 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             self.env['account.report.expression'], # Arbitrary, just used to get the date_scope
             {'calling_line_dict_id': params['line_id']}
         )
+        excluded_tax_ids = self._get_excluded_taxes().ids
 
         domain = [
             *line_domain,
             ('move_id.move_type', 'in', self.env['account.move'].get_sale_types(include_receipts=True)),
             ('move_id.partner_id.vat', '=ilike', 'BE%'),
             ('tax_tag_ids', 'in', options['partner_vat_listing_operations_tag_ids'] + options['partner_vat_listing_taxes_tag_ids']),
+            ('tax_ids', 'not in', excluded_tax_ids),
         ]
 
         return {

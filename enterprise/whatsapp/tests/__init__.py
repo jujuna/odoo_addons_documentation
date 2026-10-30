@@ -5,6 +5,7 @@ from . import test_discuss_channel
 from . import test_phone_format
 from . import test_security
 from . import test_text_formatting
+from . import test_whatsapp_account
 from . import test_whatsapp_api
 from . import test_whatsapp_blocklist
 from . import test_whatsapp_composer

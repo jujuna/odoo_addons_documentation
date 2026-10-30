@@ -477,8 +477,10 @@ class MrpProductionSchedule(models.Model):
         require a need for a component in another schedule. e.g. 2 product A in
         order to create 1 product B. If the replenish quantity for product B is
         10, it will need 20 product A.
-        - safety_stock_qty:
-        starting_inventory_qty - forecast_qty - indirect_demand_qty + replenish_qty
+        - safety_stock_qty: Starting inventory minus demand plus the greater of
+        incoming and replenishment quantities. In the first period, direct and
+        indirect demand each include at least the corresponding completed demand
+        added back when reconstructing starting inventory.
         """
         company_id = self.env.company
         date_range = company_id._get_date_range(force_period=period_scale)
@@ -561,17 +563,24 @@ class MrpProductionSchedule(models.Model):
                 forecast_values['replenish_qty_updated'] = any(existing_forecasts.mapped('replenish_qty_updated'))  # will be False if no existing forecast
                 forecast_values['incoming_qty'] = mps_uom.round(incoming_qty.get(key, 0.0) + incoming_qty_done.get(key, 0.0))
 
+                demand_qty = forecast_values['forecast_qty']
+                indirect_demand_qty = forecast_values['indirect_demand_qty']
+                if index == 0:
+                    # done moves of the first period were added back to the starting inventory
+                    demand_qty = max(demand_qty, outgoing_qty_done.get(key, 0.0))
+                    indirect_demand_qty = max(indirect_demand_qty, indirect_outgoing_qty_done.get(key, 0.0))
+
                 if forecast_values['replenish_qty_updated']:
                     forecast_values['replenish_qty'] = mps_uom.round(sum(existing_forecasts.mapped('replenish_qty')))
                 else:
-                    after_forecast_qty = starting_inventory_qty - forecast_values['forecast_qty'] - forecast_values['indirect_demand_qty']
+                    after_forecast_qty = starting_inventory_qty - demand_qty - indirect_demand_qty
                     replenish_qty = production_schedule._get_replenish_qty(after_forecast_qty=after_forecast_qty)
                     forecast_values['replenish_qty'] = mps_uom.round(replenish_qty)
                     for forecast in existing_forecasts:
                         demand_qty_dict[key][forecast.date] += forecast.forecast_qty
 
                 forecast_values['starting_inventory_qty'] = mps_uom.round(starting_inventory_qty)
-                forecast_values['safety_stock_qty'] = mps_uom.round(starting_inventory_qty - forecast_values['forecast_qty'] - forecast_values['indirect_demand_qty'] + max(forecast_values['incoming_qty'], forecast_values['replenish_qty']))
+                forecast_values['safety_stock_qty'] = mps_uom.round(starting_inventory_qty - demand_qty - indirect_demand_qty + max(forecast_values['incoming_qty'], forecast_values['replenish_qty']))
 
                 if production_schedule in self:
                     production_schedule_state['forecast_ids'].append(forecast_values)

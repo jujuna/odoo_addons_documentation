@@ -55,7 +55,7 @@ test("Timesheet Assistant take a suggestion linked to a helpdesk ticket", async 
         {
             id: 1,
             regex: "https://test.com/(.)",
-            type: "code",
+            type: "development",
             template: "Task $1",
             always_active: false,
             threshold: 0,

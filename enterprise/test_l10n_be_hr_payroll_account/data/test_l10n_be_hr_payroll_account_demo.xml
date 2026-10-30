@@ -74,11 +74,11 @@
     <record id="l10n_be_dmfa_location_unit" model="hr.work.location">
         <field name="company_id" ref="base.demo_company_be"/>
         <field name="address_id" ref="l10n_be_hr_contract_salary.res_partner_laurie_poiret_work_address"/>
-        <field name="bce_code">8999999895</field>
+        <field name="bce_code">8888888968</field>
         <field name="location_type">dmfa_unit</field>
     </record>
 
-    <record id="l10n_be_dmfa" model="l10n_be.dmfa">
+    <record id="l10n_be_dmfa" model="l10n_be.dmfa" context="{'allowed_company_ids': [ref('base.demo_company_be')]}">
         <field name="name">DMFA001</field>
         <field name="year" eval="(DateTime.today() + relativedelta(years=-1, month=5, day=1)).year"/>
         <field name="quarter" eval="str((DateTime.today() + relativedelta(years=-1, month=5, day=1)).month // 4 + 1)"/>
@@ -525,7 +525,7 @@
     <record id="be_demo_dmfa_location_unit_antwerp" model="hr.work.location">
         <field name="company_id" ref="base.demo_company_be"/>
         <field name="address_id" ref="be_demo_res_partner_work_address_antwerp"/>
-        <field name="bce_code">8999999896</field>
+        <field name="bce_code">8888889067</field>
     </record>
 
     <record id="be_demo_res_partner_work_address_restaurant" model="res.partner">
@@ -540,13 +540,14 @@
     <record id="be_demo_dmfa_location_unit_restaurant" model="hr.work.location">
         <field name="company_id" ref="test_l10n_be_hr_payroll_account.demo_company_be_restaurant"/>
         <field name="address_id" ref="be_demo_res_partner_work_address_restaurant"/>
-        <field name="bce_code">5805487963</field>
+        <field name="bce_code">5805487909</field>
         <field name="location_type">dmfa_unit</field>
     </record>
 
     <!--Employees-->
     <record id="l10n_be_hr_contract_salary.employee_max" model="hr.employee">
         <field name="external_code">0000023</field>
+        <field name="resource_calendar_id" model="resource.calendar" eval="obj().env.ref('test_l10n_be_hr_payroll_account.demo_company_be_restaurant').resource_calendar_id"/>
         <field name="company_id" ref="test_l10n_be_hr_payroll_account.demo_company_be_restaurant"/>
         <field name="job_title">Commis</field>
         <field name="l10n_be_joint_committee_id" ref="l10n_be_hr_payroll.l10n_be_joint_committee_302"/>
@@ -786,7 +787,7 @@
         <field name="contract_template_id" ref="l10n_be_hr_payroll.contract_template_be_cdi_experienced_developer"/>
         <field name="sign_template_id" ref="hr_contract_salary.sign_template_cdi_developer"/>
         <field name="contract_update_template_id" ref="hr_contract_salary.sign_template_cdi_developer"/>
-        <field name="resource_calendar_id" model="resource.calendar" eval="obj().env.ref('base.demo_company_be').resource_calendar_id"/>
+        <field name="resource_calendar_id" model="resource.calendar" eval="obj().env.ref('test_l10n_be_hr_payroll_account.demo_company_be_restaurant').resource_calendar_id"/>
         <field name="rd_percentage">1.0</field>
         <field name="l10n_be_joint_committee_id" ref="l10n_be_hr_payroll.l10n_be_joint_committee_200"/>
         <field name="employee_type_id" ref="hr.contract_type_employee"/>
@@ -808,7 +809,7 @@
         <field name="allow_out_payment">True</field>
     </record>
 
-    <record id="employee_han" model="hr.employee">
+    <record id="employee_han" model="hr.employee" context="{'allowed_company_ids': [ref('test_l10n_be_hr_payroll_account.demo_company_be_restaurant'), ref('base.demo_company_be')]}">
         <field name="name">Eduardo Kelley</field>
         <field name="department_id" ref="hr_department_2"/>
         <field name="job_id" ref="hr_job_4"/>
@@ -837,7 +838,7 @@
         <field name="contract_template_id" ref="l10n_be_hr_payroll.contract_template_be_cdi_experienced_developer"/>
         <field name="sign_template_id" ref="hr_contract_salary.sign_template_cdi_developer"/>
         <field name="contract_update_template_id" ref="hr_contract_salary.sign_template_cdi_developer"/>
-        <field name="resource_calendar_id" model="resource.calendar" eval="obj().env.ref('base.demo_company_be').resource_calendar_id"/>
+        <field name="resource_calendar_id" model="resource.calendar" eval="obj().env.ref('test_l10n_be_hr_payroll_account.demo_company_be_restaurant').resource_calendar_id"/>
         <field name="reference_calendar_id" ref="test_l10n_be_hr_payroll_account.resource_calendar_4_5_wednesday_off"/>
         <field name="work_time_rate">0.8</field>
         <field name="rd_percentage">1.0</field>

@@ -4,15 +4,16 @@
 #
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:50+0000\n"
-"PO-Revision-Date: 2026-09-18 00:16+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"PO-Revision-Date: 2026-10-11 06:34+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/sale_lazada/zh_Hans/>\n"
+"projects/odoo-20/sale_lazada/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,6 +39,17 @@ msgid ""
 "* FBM: Delivery information is fetched from Lazada, track and synchronize "
 "the stock level to Lazada.\n"
 msgstr ""
+"\n"
+"在 Odoo 中导入 Lazada 订单并同步送货\n"
+"============================================================\n"
+"\n"
+"主要功能\n"
+"------------\n"
+"* 从多个店铺导入订单\n"
+"* 订单根据产品内部参考号（Lazada 中的 SKU）与 Odoo 产品匹配\n"
+"* 同时支持 Lazada 配送（FBL）与商家配送（FBM）：\n"
+"* FBL：导入已完成的订单\n"
+"* FBM：从 Lazada 获取送货信息，跟踪库存水平并同步至 Lazada。\n"
 
 #. module: sale_lazada
 #: model:mail.template,body_html:sale_lazada.order_sync_failure
@@ -257,7 +269,7 @@ msgstr "访问令牌"
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__access_token_expiration_date
 msgid "Access Token Expiration Date"
-msgstr ""
+msgstr "访问令牌过期日期"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
@@ -268,7 +280,7 @@ msgstr "访问令牌"
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__active
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_search
 msgid "Active"
-msgstr ""
+msgstr "有效"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__synchronize_inventory
@@ -291,7 +303,7 @@ msgstr "应用密钥"
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "App Key and App Secret are required for authorization."
-msgstr ""
+msgstr "授权需要提供 App Key 和 App Secret。"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__app_secret
@@ -313,41 +325,41 @@ msgstr "已取消"
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__canceled
 msgid "Canceled on Lazada"
-msgstr ""
+msgstr "在 Lazada 上已取消"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/utils.py:0
 msgid "Cannot determine the API endpoint for the operation."
-msgstr ""
+msgstr "无法确定该操作的 API 端点。"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__company_id
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__company_id
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__company_id
 msgid "Company"
-msgstr ""
+msgstr "公司"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__confirmed
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__confirmed
 msgid "Confirmed"
-msgstr ""
+msgstr "已确认"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_list
 msgid "Connect New Shop"
-msgstr ""
+msgstr "连接新店铺"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_create_wizard_form
 msgid "Connect Shop"
-msgstr ""
+msgstr "连接店铺"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "联系人"
 
 #. module: sale_lazada
 #. odoo-python
@@ -359,22 +371,22 @@ msgstr "无法分配商店标识符"
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Could not find country with code %(code)s"
-msgstr ""
+msgstr "找不到代码为 %(code)s 的国家/地区"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_shop_create_wizard
 msgid "Create Lazada Shop"
-msgstr ""
+msgstr "创建 Lazada 店铺"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_create_wizard_form
 msgid "Create New Lazada Shop"
-msgstr ""
+msgstr "创建新的 Lazada 店铺"
 
 #. module: sale_lazada
 #: model:ir.model,website_form_label:sale_lazada.model_res_partner
 msgid "Create a Customer"
-msgstr ""
+msgstr "创建客户"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__create_uid
@@ -395,23 +407,23 @@ msgstr "创建于"
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__team_id
 msgid "Default Sales Team"
-msgstr ""
+msgstr "默认销售团队"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__user_id
 msgid "Default Salesperson"
-msgstr ""
+msgstr "默认销售员"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__delivered
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__delivered
 msgid "Delivered"
-msgstr ""
+msgstr "已发货"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__delivered
 msgid "Delivered on Lazada"
-msgstr ""
+msgstr "已在 Lazada 上送达"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__display_name
@@ -425,25 +437,25 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "显示名称"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.stock_picking_form
 msgid "Download Shipping Label (Lazada)"
-msgstr ""
+msgstr "下载配送标签（Lazada）"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__draft
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__draft
 msgid "Draft"
-msgstr ""
+msgstr "草稿"
 
 #. module: sale_lazada
 #: model:ir.model.fields,help:sale_lazada.field_lazada_item__sync_lazada_inventory
 msgid ""
 "Enable this to allow pushing the product inventory quantities from Odoo to "
 "Lazada."
-msgstr ""
+msgstr "启用后，可将产品库存数量从 Odoo 推送至 Lazada。"
 
 #. module: sale_lazada
 #: model:ir.model.fields,help:sale_lazada.field_lazada_shop__synchronize_inventory
@@ -453,6 +465,9 @@ msgid ""
 "(Fulfilled by Merchant) items. This ensures your Lazada listings show "
 "accurate stock availability."
 msgstr ""
+"启用后，可将 Odoo 库存数量自动同步至 Lazada。启用后，Odoo 中的产品库存水平会"
+"推送至 Lazada，用于 FBM（商家配送）商品。这可确保您在 Lazada 上的商品列表显示"
+"准确的可用库存。"
 
 #. module: sale_lazada
 #: model:ir.model.fields,help:sale_lazada.field_lazada_shop__manage_fbl_inventory
@@ -462,16 +477,18 @@ msgid ""
 "FBM stock. The FBL location is automatically created when you set up the "
 "shop."
 msgstr ""
+"启用后，可在 Odoo 中跟踪 FBL（Lazada 配送）商品的库存。启用后，FBL 库位中的库"
+"存将从可用的 FBM 库存中扣减。设置店铺时会自动创建 FBL 库位。"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__fbl_location_id
 msgid "FBL Stock Location"
-msgstr ""
+msgstr "FBL 库存库位"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__fbm_warehouse_id
 msgid "FBM Warehouse"
-msgstr ""
+msgstr "FBM 仓库"
 
 #. module: sale_lazada
 #. odoo-python
@@ -479,26 +496,26 @@ msgstr ""
 msgid ""
 "Failed to download shipping label for picking %(picking_id)s: HTTP Status "
 "Code %(error_code)s"
-msgstr ""
+msgstr "为调拨单 %(picking_id)s 下载配送标签失败：HTTP 状态码 %(error_code)s"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid ""
 "Failed to get shipment provider for order: %(order_id)s. Error: %(error_msg)s"
-msgstr ""
+msgstr "获取订单 %(order_id)s 的物流服务商失败。错误：%(error_msg)s"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "Failed to get shipment provider."
-msgstr ""
+msgstr "获取物流服务商失败。"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Failed to get token from Lazada."
-msgstr ""
+msgstr "从 Lazada 获取令牌失败。"
 
 #. module: sale_lazada
 #. odoo-python
@@ -507,6 +524,8 @@ msgid ""
 "Failed to set Ready to Ship status for pickings:\n"
 "%(error_msg)s"
 msgstr ""
+"设置调拨单的“待发货”状态失败：\n"
+"%(error_msg)s"
 
 #. module: sale_lazada
 #. odoo-python
@@ -516,29 +535,31 @@ msgid ""
 "The total number of products in Lazada changed during synchronization. "
 "Please re-run the synchronization."
 msgstr ""
+"同步店铺 %(shop)d 的 Lazada 产品目录失败。\n"
+"同步过程中 Lazada 中的产品总数发生变化。请重新运行同步。"
 
 #. module: sale_lazada
 #: model:ir.actions.server,name:sale_lazada.action_fetch_shipping_label
 msgid "Fetch Shipping Label (Lazada)"
-msgstr ""
+msgstr "获取配送标签（Lazada）"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__fulfillment_type
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_item_search
 msgid "Fulfillment Type"
-msgstr ""
+msgstr "配送方式"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_item__fulfillment_type__fbl
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_fulfillment_type__fbl
 msgid "Fulfillment by Lazada"
-msgstr ""
+msgstr "Lazada 配送"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_item__fulfillment_type__fbm
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_fulfillment_type__fbm
 msgid "Fulfillment by Merchant"
-msgstr ""
+msgstr "商家配送"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__id
@@ -559,12 +580,12 @@ msgstr ""
 msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
-msgstr ""
+msgstr "如果销售订单已锁定，您将无法再修改它。但您仍然可以开票或送货。"
 
 #. module: sale_lazada
 #: model:ir.module.module,summary:base.module_sale_lazada
 msgid "Import Lazada orders and sync deliveries"
-msgstr ""
+msgstr "导入 Lazada 订单并同步送货"
 
 #. module: sale_lazada
 #. odoo-python
@@ -574,63 +595,66 @@ msgid ""
 "Lazada API operation '%(operation)s' with request ID '%(request_id)s':\n"
 "%(error_message)s"
 msgstr ""
+"在 Lazada 店铺“%(shop_name)s”中，执行 Lazada API 操作“%(operation)s”（请求 ID"
+"“%(request_id)s”）时发生错误 %(error_code)s：\n"
+"%(error_message)s"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_search
 msgid "Inactive"
-msgstr ""
+msgstr "未激活"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "Invalid Lazada document URL"
-msgstr ""
+msgstr "无效的 Lazada 文档 URL"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/controllers/onboarding.py:0
 msgid "Invalid OAuth state"
-msgstr ""
+msgstr "无效的 OAuth 状态"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Inventory Synchronization"
-msgstr ""
+msgstr "库存同步"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__lazada_item_count
 msgid "Item Count"
-msgstr ""
+msgstr "商品数"
 
 #. module: sale_lazada
 #: model:ir.model.constraint,message:sale_lazada.constraint_lazada_item_unique_lazada_item_extern_id
 msgid "Item External IDs must be unique for a given shop."
-msgstr ""
+msgstr "同一店铺内，商品的外部 ID 必须唯一。"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Items"
-msgstr ""
+msgstr "项目"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__last_product_catalog_sync_date
 msgid "Last Catalog Synchronization"
-msgstr ""
+msgstr "上次目录同步"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__last_inventory_sync_date
 msgid "Last Inventory Sync Date"
-msgstr ""
+msgstr "上次库存同步日期"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__last_lazada_picking_sync_date
 msgid "Last Lazada Picking Sync Date"
-msgstr ""
+msgstr "上次 Lazada 调拨单同步日期"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__last_orders_sync_date
 msgid "Last Order Synchronization Date"
-msgstr ""
+msgstr "最后订单同步日期"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__write_uid
@@ -646,7 +670,7 @@ msgstr "最后更新者"
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__write_date
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop_create_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "上次更新日期"
 
 #. module: sale_lazada
 #: model:ir.ui.menu,name:sale_lazada.root_menu
@@ -662,25 +686,25 @@ msgstr "Lazada API 凭据"
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "Lazada API rate limit reached. Please try again later."
-msgstr ""
+msgstr "已达 Lazada API 速率限制。请稍后再试。"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 #: model:product.template,name:sale_lazada.default_adjustment_product_product_template
 msgid "Lazada Amount Adjustment"
-msgstr ""
+msgstr "Lazada 金额调整"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_res_partner__lazada_buyer_extern_id
 #: model:ir.model.fields,field_description:sale_lazada.field_res_users__lazada_buyer_extern_id
 msgid "Lazada Buyer ID"
-msgstr ""
+msgstr "Lazada 买家 ID"
 
 #. module: sale_lazada
 #: model:ir.module.module,shortdesc:base.module_sale_lazada
 msgid "Lazada Connector"
-msgstr ""
+msgstr "Lazada 连接器"
 
 #. module: sale_lazada
 #. odoo-python
@@ -691,17 +715,17 @@ msgstr "Lazada FBL 库存 -%(shop)s"
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order__lazada_fulfillment_type
 msgid "Lazada Fulfillment Type"
-msgstr ""
+msgstr "Lazada 配送方式"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_item
 msgid "Lazada Item"
-msgstr ""
+msgstr "Lazada 商品"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__lazada_item_extern_id
 msgid "Lazada Item ID"
-msgstr ""
+msgstr "Lazada 商品 ID"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_item_list
@@ -714,7 +738,7 @@ msgstr "Lazada 商品"
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "Lazada Label"
-msgstr ""
+msgstr "Lazada 标签"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_label_attachment_ids
@@ -730,19 +754,19 @@ msgstr "Lazada OAuth 状态"
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Lazada Order %(lazada_order_ref)s at %(name)s"
-msgstr ""
+msgstr "%(name)s 的 Lazada 订单 %(lazada_order_ref)s"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 #: model:product.template,name:sale_lazada.default_discount_product_product_template
 msgid "Lazada Order Discount"
-msgstr ""
+msgstr "Lazada 订单折扣"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_order_item
 msgid "Lazada Order Item"
-msgstr ""
+msgstr "Lazada 订单项目"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__order_item_extern_id
@@ -753,23 +777,23 @@ msgstr "Lazada 订单项目 ID"
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order_line__lazada_order_item_ids
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_move__lazada_order_item_ids
 msgid "Lazada Order Items"
-msgstr ""
+msgstr "Lazada 订单项目"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__package_extern_id
 msgid "Lazada Package ID"
-msgstr ""
+msgstr "Lazada 包裹 ID"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_package_status
 msgid "Lazada Package Status"
-msgstr ""
+msgstr "Lazada 包裹状态"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order__lazada_order_ref
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_order_ref
 msgid "Lazada Reference"
-msgstr ""
+msgstr "Lazada 编号"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__lazada_sku
@@ -779,24 +803,24 @@ msgstr ""
 #. module: sale_lazada
 #: model:product.template,name:sale_lazada.default_sale_product_product_template
 msgid "Lazada Sale"
-msgstr ""
+msgstr "Lazada 销售"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__shop_extern_id
 msgid "Lazada Seller ID"
-msgstr ""
+msgstr "Lazada 卖家 ID"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 #: model:product.template,name:sale_lazada.default_shipping_product_product_template
 msgid "Lazada Shipping"
-msgstr ""
+msgstr "Lazada 配送费"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_stock_picking__lazada_shipping_allocate_type
 msgid "Lazada Shipping Allocate Type"
-msgstr ""
+msgstr "Lazada 配送分配类型"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_shop
@@ -804,49 +828,49 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_item_search
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Lazada Shop"
-msgstr ""
+msgstr "Lazada 店铺"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/controllers/onboarding.py:0
 msgid "Lazada Shop - %(name)s"
-msgstr ""
+msgstr "Lazada 店铺 - %(name)s"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_shop_authorization_error
 msgid "Lazada Shop Authorization Error"
-msgstr ""
+msgstr "Lazada 店铺授权错误"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_shop_create_wizard
 msgid "Lazada Shop Creation Wizard"
-msgstr ""
+msgstr "Lazada 店铺创建向导"
 
 #. module: sale_lazada
 #: model:ir.actions.act_window,name:sale_lazada.action_lazada_shop_list
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_list
 msgid "Lazada Shops"
-msgstr ""
+msgstr "Lazada 店铺"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_sale_order__lazada_order_status
 msgid "Lazada Status"
-msgstr ""
+msgstr "Lazada 状态"
 
 #. module: sale_lazada
 #: model:mail.template,name:sale_lazada.inventory_sync_failure
 msgid "Lazada: Inventory Synchronization Failure"
-msgstr ""
+msgstr "Lazada：库存同步失败"
 
 #. module: sale_lazada
 #: model:mail.template,name:sale_lazada.order_sync_failure
 msgid "Lazada: Order Synchronization Failure"
-msgstr ""
+msgstr "Lazada：订单同步失败"
 
 #. module: sale_lazada
 #: model:ir.actions.server,name:sale_lazada.ir_cron_sync_lazada_inventory_ir_actions_server
 msgid "Lazada: sync inventory"
-msgstr ""
+msgstr "Lazada：同步库存"
 
 #. module: sale_lazada
 #: model:ir.actions.server,name:sale_lazada.ir_cron_sync_lazada_orders_ir_actions_server
@@ -856,7 +880,7 @@ msgstr "Lazada：同步订单"
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.view_order_form
 msgid "Lock"
-msgstr ""
+msgstr "锁定"
 
 #. module: sale_lazada
 #: model:ir.model.fields,help:sale_lazada.field_lazada_shop__refresh_token
@@ -865,34 +889,36 @@ msgid ""
 "token expires after 30 days. If it expires, you'll need to re-authorize the "
 "connection by clicking the authorization button in the Lazada shop view."
 msgstr ""
+"用于自动获取新访问令牌的长期刷新令牌。该令牌 30 天后过期。若已过期，您需要点"
+"击 Lazada 店铺视图中的授权按钮重新授权连接。"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__manual
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__manual
 msgid "Manual"
-msgstr ""
+msgstr "手动"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__manual
 msgid "Manual handling required"
-msgstr ""
+msgstr "需要手动处理"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__name
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/wizard/lazada_shop_create_wizard.py:0
 msgid "New Lazada Shop"
-msgstr ""
+msgstr "新建 Lazada 店铺"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/stock_picking.py:0
 msgid "No Lazada order item found to pack."
-msgstr ""
+msgstr "未找到可打包的 Lazada 订单项目。"
 
 #. module: sale_lazada
 #. odoo-python
@@ -916,18 +942,18 @@ msgstr "仅 FBM 商品可同步至 Lazada。"
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_item.py:0
 msgid "Only goods are supported with Lazada."
-msgstr ""
+msgstr "Lazada 仅支持商品。"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__order_count
 msgid "Order Count"
-msgstr ""
+msgstr "订单数"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Order Discount"
-msgstr ""
+msgstr "订单折扣"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
@@ -943,12 +969,12 @@ msgstr "订单"
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.stock_picking_form
 msgid "Pack Lazada Package"
-msgstr ""
+msgstr "打包 Lazada 包裹"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__confirmed
 msgid "Package Confirmed on Lazada"
-msgstr ""
+msgstr "包裹已在 Lazada 上确认"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__draft
@@ -959,13 +985,13 @@ msgstr "Lazada 待发货包裹"
 #: model:ir.model.fields.selection,name:sale_lazada.selection__lazada_order_item__status__processing
 #: model:ir.model.fields.selection,name:sale_lazada.selection__sale_order__lazada_order_status__processing
 msgid "Processing"
-msgstr ""
+msgstr "处理中"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__product_id
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_item_search
 msgid "Product"
-msgstr ""
+msgstr "产品"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__product_tmpl_id
@@ -975,85 +1001,85 @@ msgstr "产品模板"
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "产品变体"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Re-authorize Shop"
-msgstr ""
+msgstr "重新授权店铺"
 
 #. module: sale_lazada
 #: model:ir.model.fields.selection,name:sale_lazada.selection__stock_picking__lazada_package_status__processing
 msgid "Ready to Ship on Lazada"
-msgstr ""
+msgstr "在 Lazada 上待发货"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__refresh_token
 msgid "Refresh Token"
-msgstr ""
+msgstr "刷新令牌"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__refresh_token_expiration_date
 msgid "Refresh Token Expiration Date"
-msgstr ""
+msgstr "刷新令牌过期日期"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_order_item__sale_order_line_id
 msgid "Sale Order Line"
-msgstr ""
+msgstr "销售订单明细"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_sale_order
 msgid "Sales Order"
-msgstr ""
+msgstr "销售订单"
 
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_sale_order_line
 msgid "Sales Order Line"
-msgstr ""
+msgstr "销售订单明细"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Shipping"
-msgstr ""
+msgstr "配送费"
 
 #. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid "Shipping: %(carrier)s"
-msgstr ""
+msgstr "配送费：%(carrier)s"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_item__shop_id
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_search
 msgid "Shop"
-msgstr ""
+msgstr "店铺"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Shop Information"
-msgstr ""
+msgstr "店铺信息"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Shop Name"
-msgstr ""
+msgstr "店铺名称"
 
 #. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__country_id
 msgid "Shop Region"
-msgstr ""
+msgstr "店铺地区"
 
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Shop Settings"
-msgstr ""
+msgstr "店铺设置"
 
 #. module: sale_lazada
 #: model:ir.ui.menu,name:sale_lazada.shops_menu
 msgid "Shops"
-msgstr ""
+msgstr "店铺"
 
 #. module: sale_lazada
 #: model:ir.model.fields,help:sale_lazada.field_lazada_shop__last_orders_sync_date
@@ -1329,7 +1355,7 @@ msgstr "追踪 FBL 库存"
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "调拨"
 
 #. module: sale_lazada
 #. odoo-python

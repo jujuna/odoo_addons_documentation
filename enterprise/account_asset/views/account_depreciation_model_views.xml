@@ -60,11 +60,11 @@
                                 readonly="has_locking_assets and not company_id"
                                 placeholder="All companies"/>
                             <field name="journal_id"
-                                invisible="method == 'no_depreciation' or context.get('ledger_journal_only')"
+                                invisible="context.get('ledger_journal_only')"
                                 domain="[('type', '=', 'general'), ('journal_group_id', '=', False)] if context.get('exclude_ledger_journals') else [('type', '=', 'general')]"/>
                             <field name="journal_id"
                                 required="1"
-                                invisible="method == 'no_depreciation' or not context.get('ledger_journal_only')"
+                                invisible="not context.get('ledger_journal_only')"
                                 string="Ledger Journal"
                                 options="{'no_create': True}"
                                 domain="[('type', '=', 'general'), ('journal_group_id', '!=', False), ('journal_group_id', 'not in', context.get('excluded_ledger_group_ids', []))]"/>

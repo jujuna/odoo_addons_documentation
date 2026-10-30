@@ -8,8 +8,15 @@ export class HrHolidaysGanttModel extends hrGanttView.Model {
         return false;
     }
 
-    _getGroupedBy() {
-        return ["employee_id"];
+    /**
+     * Requests are read on the clock the grid is drawn on, not on the reader's profile.
+     * @override
+     */
+    async load(searchParams) {
+        return super.load({
+            ...searchParams,
+            context: { ...searchParams.context, tz: luxon.Settings.defaultZone.name },
+        });
     }
 
     getRange() {

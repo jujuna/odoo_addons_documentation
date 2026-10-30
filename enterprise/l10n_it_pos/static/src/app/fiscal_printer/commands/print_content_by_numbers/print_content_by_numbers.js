@@ -8,7 +8,7 @@ export class PrintContentByNumbers extends Component {
     });
 
     setup() {
-        this.receiptNumber = this.props.order.it_fiscal_receipt_number;
+        this.receiptNumber = this.props.order.fiscal_it_receipt_number;
         if (!this.props.order.it_fiscal_receipt_date) {
             return;
         }

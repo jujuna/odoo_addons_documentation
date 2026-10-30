@@ -81,6 +81,7 @@ class AppointmentCalendarView(http.Controller):
                 'category',
                 'category_slot_scheduling',
                 'end_datetime',
+                'name',
                 'slot_creation_interval',
                 'start_datetime',
                 'user_can_manage_slots'

@@ -148,6 +148,9 @@ class SaleOrder(models.Model):
         price = so_line.price_unit or 0.0
         quantity = so_line.product_id and so_line.product_uom_id._compute_quantity(so_line.product_uom_qty, so_line.product_id.uom_id) or so_line.product_uom_qty
         price = so_line.product_id and so_line.product_uom_id._compute_price(price, so_line.product_id.uom_id) or price
+        display_type = so_line.display_type
+        if display_type and display_type not in self.env['purchase.order.line']._fields['display_type'].get_values(self.env):
+            display_type = 'line_note'
         return {
             'name': so_line.name,
             'product_qty': quantity,
@@ -157,7 +160,7 @@ class SaleOrder(models.Model):
             'discount': so_line.discount or 0.0,
             'company_id': company.id,
             'date_planned': so_line.order_id.commitment_date or so_line.order_id.expected_date or date_order,
-            'display_type': so_line.display_type,
+            'display_type': display_type,
             'sequence': so_line.sequence,
             'auto_sale_order_line_id': so_line.id,
         }

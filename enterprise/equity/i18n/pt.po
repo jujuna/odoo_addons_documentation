@@ -3,14 +3,15 @@
 # * equity
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Cristina Paniagua Ramiro <crpan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-17 22:51+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Portuguese <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-06 10:33+0000\n"
+"Last-Translator: Cristina Paniagua Ramiro <crpan@odoo.com>\n"
+"Language-Team: Portuguese <https://translate.odoo.com/projects/odoo-20/"
 "equity/pt/>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
@@ -127,6 +128,23 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p> Olá:<br/>\n"
+"                        Para cumprir as nossas obrigações legais de "
+"identificação dos clientes, temos de declarar as pessoas singulares que, "
+"direta ou indiretamente,\n"
+"                        detenham ou controlem pelo menos 25 % do capital ou "
+"dos direitos de voto de <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> "
+"<br/>\n"
+"                        Preencha o pedido de identificação do beneficiário "
+"efetivo (UBO) através da ligação acima.<br/> <br/>\n"
+"                        Obrigado,\n"
+"                        <t t-if=\"user_id.signature\">\n"
+"                            <br/>--<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>"
 
 #. module: equity
 #: model:mail.template,body_html:equity.equity_shareholder_email_template
@@ -144,6 +162,17 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p> Olá:<br/>\n"
+"                        Na ligação acima, encontrará as transações e as "
+"avaliações mais recentes. <br/> <br/>\n"
+"                        Com os melhores cumprimentos,\n"
+"                        <t t-if=\"user_id.signature\">\n"
+"                            <br/>--<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
@@ -407,6 +436,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/equity_security_class.py:0
 msgid "Cannot change security class type because it has linked transactions"
+msgstr ""
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Cannot create new UBO for an existing holder"
 msgstr ""
 
 #. module: equity
@@ -1382,6 +1417,12 @@ msgid "Partner Ids All Have Email"
 msgstr ""
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Partner is not allowed to fill UBO form"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model:ir.model.fields,help:equity.field_res_partner__ubo_pep
@@ -2114,8 +2155,8 @@ msgstr "ano"
 msgid "years"
 msgstr "anos"
 
-msgid "Website Messages"
-msgstr "Mensagens do site"
+#~ msgid "Website Messages"
+#~ msgstr "Mensagens do site"
 
-msgid "Website communication history"
-msgstr "Histórico de comunicação do site"
+#~ msgid "Website communication history"
+#~ msgstr "Histórico de comunicação do site"

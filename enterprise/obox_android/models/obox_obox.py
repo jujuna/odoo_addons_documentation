@@ -26,6 +26,7 @@ class OboxObox(models.Model):
     is_android = fields.Boolean(compute="_compute_is_android")
     supports_sync = fields.Boolean(store=True, compute="_compute_supports_sync")
     supports_kiosk = fields.Boolean(store=True, compute="_compute_supports_kiosk")
+    supports_printer_status = fields.Boolean(compute="_compute_supports_printer_status")
     device_state = fields.Json(string="Device State", default=dict, readonly=True)
     device_state_date = fields.Datetime(string="Last State Update", readonly=True)
     screenshot = fields.Binary(string="Screenshot", readonly=True)
@@ -85,6 +86,12 @@ class OboxObox(models.Model):
         for record in self:
             record.supports_kiosk = 'kiosk' in (record.services or [])
 
+    @api.depends("services")
+    def _compute_supports_printer_status(self):
+        for record in self:
+            record.supports_printer_status = "printer_status" in (record.services or [])
+
+    @api.depends("local_ip", "local_port")
     def _compute_local_address(self):
         for record in self:
             if not record.local_ip:
@@ -237,6 +244,11 @@ class OboxObox(models.Model):
     def action_kiosk_reload(self):
         self.ensure_one()
         self._queue_action("kiosk_reload", "/odoo/kiosk_reload")
+        return self._command_sent_notification()
+
+    def action_kiosk_update(self):
+        self.ensure_one()
+        self._queue_action("kiosk_update", "/odoo/kiosk_update")
         return self._command_sent_notification()
 
     def action_kiosk_lock_screen(self):

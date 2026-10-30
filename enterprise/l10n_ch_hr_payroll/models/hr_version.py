@@ -234,10 +234,10 @@ class HrVersion(models.Model):
     l10n_ch_lpp_mutations = fields.One2many('l10n.ch.lpp.mutation', 'version_id', copy=True, groups="hr_payroll.group_hr_payroll_user")
     lpp_employee_amount = fields.Float(string="LPP Employee Contributions", groups="hr.group_hr_user", tracking=1)
     lpp_company_amount = fields.Float(string="LPP Company Contributions", groups="hr.group_hr_user", tracking=1)
-    l10n_ch_14th_month = fields.Boolean(string="14th Month", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_14th_month = fields.Boolean(string="14th Month", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     irregular_working_time = fields.Boolean(string="Irregular Working Time", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_weekly_hours = fields.Float(string="Weekly Hours", compute="_compute_l10n_ch_weekly_hours", store=True, readonly=False, groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_weekly_lessons = fields.Float(string="Weekly Lessons", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_weekly_lessons = fields.Float(string="Weekly Lessons", groups="hr_payroll.group_hr_payroll_user", tracking=1)
 
     l10n_ch_thirteen_month = fields.Boolean(
         string="Has 13th Month", groups="hr_payroll.group_hr_payroll_user", tracking=1)

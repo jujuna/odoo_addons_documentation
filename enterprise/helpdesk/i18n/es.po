@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:49+0000\n"
-"PO-Revision-Date: 2026-09-21 11:34+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-14 13:35+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-20/helpdesk/"
 "es/>\n"
@@ -56,6 +56,31 @@ msgid ""
 "    - Install additional features easily using your team form view.\n"
 "\n"
 msgstr ""
+"\n"
+"Aplicación Servicio de asistencia - Gestión de tickets\n"
+"================================\n"
+"\n"
+"Funcionalidades:\n"
+"\n"
+"    - Gestiona los tickets a través de diferentes etapas para resolverlos.\n"
+"    - Añade prioridades, tipos, descripciones y etiquetas para definir tus "
+"tickets.\n"
+"    - Utiliza el chatter para comunicar información adicional y etiquetar a "
+"los compañeros de trabajo en los tickets.\n"
+"    - Disfruta del uso de un tablero adaptado y una vista kanban fácil de "
+"usar para gestionar tus tickets.\n"
+"    - Realiza un análisis exhaustivo de los tickets a través de la vista "
+"dinámica en el menú de informes.\n"
+"    - Crea un equipo y define a sus miembros; utiliza un método de "
+"asignación automática, si quieres.\n"
+"    - Utiliza un alias de correo para crear tickets automáticamente y "
+"comunicarte con tus clientes.\n"
+"    - Añade fechas límite del Acuerdo de nivel de servicio automáticamente a "
+"los tickets.\n"
+"    - Obtén feedback de los clientes mediante el uso de valoraciones.\n"
+"    - Instala funcionalidades adicionales con facilidad desde la vista de "
+"formulario de tu equipo.\n"
+"\n"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__answered_customer_message_count
@@ -65,7 +90,7 @@ msgstr "N.° de correspondencias"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__open_ticket_count
 msgid "# Open Tickets"
-msgstr "N.° de tickets abiertos"
+msgstr "N.º de tickets abiertos"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__rating_count
@@ -116,7 +141,8 @@ msgstr "8 horas para terminar"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 msgid "<b>Drag &amp; drop</b> the card to change the stage of your ticket."
-msgstr "<b>Arrastre y suelte</b> la tarjeta para cambiar la etapa de su ticket."
+msgstr ""
+"<b>Arrastre y suelte</b> la tarjeta para cambiar la etapa de su ticket."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -131,26 +157,27 @@ msgstr ""
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
 msgid "<b>Tip: Create tickets from incoming emails</b>"
 msgstr ""
+"<b>Consejo: crea tickets a partir de los correos electrónicos recibidos</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_4
 msgid "<b>Tip: Don't let stalled tickets slip under the radar</b>"
-msgstr ""
+msgstr "<b>Consejo: no dejes que los tickets inactivos queden en el olvido</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
 msgid "<b>Tip: Filter your tickets with one click</b>"
-msgstr ""
+msgstr "<b>Consejo: filtra tus tickets con un solo clic</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_1
 msgid "<b>Tip: Identify bottlenecks at a glance</b>"
-msgstr ""
+msgstr "<b>Consejo: identifica los cuellos de botella de un vistazo</b>"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_2
 msgid "<b>Tip: Team-Specific Fields</b>"
-msgstr ""
+msgstr "<b>Consejo: campos específicos por equipo</b>"
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.auto_close_reminder_email_template
@@ -179,8 +206,8 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"                Hola, <t t-out=\"object.sudo().partner_id.name\"/>:<br/><br/>"
-"\n"
+"                Hola, <t t-out=\"object.sudo().partner_id.name\"/>:<br/><br/"
+">\n"
 "                Hemos detectado que no ha habido actividad alguna en su "
 "ticket de soporte\n"
 "               <t t-if=\"object.team_id.privacy_visibility == 'portal'\">\n"
@@ -224,8 +251,8 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"        Estimado/a <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">"
-"señor/a</t>:<br/><br/>\n"
+"        Estimado/a <t t-out=\"object.sudo().partner_id.name or 'Madam/"
+"Sir'\">señor/a</t>:<br/><br/>\n"
 "        Te informamos de que hemos cerrado tu ticket (referencia <t t-"
 "out=\"object.ticket_ref or ''\">15</t>).\n"
 "        Esperamos que los servicios prestados hayan cumplido con tus "
@@ -325,8 +352,8 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>"
-"\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
 "    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
@@ -343,8 +370,9 @@ msgstr ""
 "relacionado con el ticket «<strong t-out=\"object.name or ''\">Las patas de "
 "la mesa no están balanceadas</strong>»\n"
 "            <t t-if=\"object._rating_get_operator().name\">\n"
-"                asignado a <strong t-out=\"object._rating_get_operator()"
-".name or ''\">Mitchell Admin</strong>.<br/>\n"
+"                asignado a <strong t-"
+"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.<br/"
+">\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
 "                .<br/><br/>\n"
@@ -486,26 +514,26 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    Estimado/a <t t-out=\"object.sudo().partner_id.name or object.sudo()"
-".partner_name or 'Madam/Sir'\">cliente</t>:<br/><br/>\n"
+"    Estimado/a <t t-out=\"object.sudo().partner_id.name or "
+"object.sudo().partner_name or 'Madam/Sir'\">cliente</t>:<br/><br/>\n"
 "    Se ha recibido tu solicitud\n"
-"    <t t-if=\"hasattr(object.team_id, 'website_id') and object.get_portal_url"
-"()\">\n"
-"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ "
-"object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Las "
+"    <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.get_portal_url()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
+"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Las "
 "patas de la mesa no están balanceadas</a>\n"
 "    </t>\n"
 "    y el equipo de <t t-out=\"object.team_id.name or ''\">soporte VIP</t> la "
 "está revisando.<br/><br/>\n"
-"    La referencia del ticket es <strong><t t-out=\"object.ticket_ref or ''\">"
-"15</t></strong>.<br/><br/>\n"
+"    La referencia del ticket es <strong><t t-out=\"object.ticket_ref or "
+"''\">15</t></strong>.<br/><br/>\n"
 "\n"
 "    Si deseas proporcionar información adicional, te pedimos que respondas a "
 "este correo electrónico.<br/><br/>\n"
 "    <t t-if=\"object.team_id.show_knowledge_base\">\n"
-"        No dudes en visitar nuestro <a t-attf-href=\"{{ "
-"object.team_id.get_knowledge_base_url() }}\">centro de ayuda</a>; es posible "
-"que encuentres la respuesta a tu pregunta.\n"
+"        No dudes en visitar nuestro <a t-attf-"
+"href=\"{{ object.team_id.get_knowledge_base_url() }}\">centro de ayuda</a>; "
+"es posible que encuentres la respuesta a tu pregunta.\n"
 "        <br/><br/>\n"
 "    </t>\n"
 "    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
@@ -518,25 +546,25 @@ msgstr ""
 "object.team_id.use_website_helpdesk_form\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain "
 "or '', object.get_portal_url())\" target=\"_blank\">Ver el ticket</a>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
-"font-size: 14px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">"
-"Ver el ticket</a>\n"
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"object.get_portal_url()\" "
+"target=\"_blank\">Ver el ticket</a>\n"
 "        </t>\n"
 "        <t t-if=\"hasattr(object.team_id, 'website_id') and "
 "object.team_id.allow_portal_ticket_closing\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
 "(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
 "target=\"_blank\">Cerrar el ticket</a>\n"
@@ -544,8 +572,8 @@ msgstr ""
 "        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, "
 "object.access_token)\" target=\"_blank\">Cerrar el ticket</a>\n"
 "        </t>\n"
@@ -554,8 +582,8 @@ msgstr ""
 "object.team_id.use_website_helpdesk_slides\">\n"
 "            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
 "color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
-"padding: 5px 10px; text-decoration: none; color: {"
-"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
 "font-size: 14px;\" t-att-href=\"object.team_id.feature_form_url\" "
 "target=\"_blank\">Visitar el centro de ayuda</a>\n"
 "        </t><br/><br/>\n"
@@ -569,7 +597,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi me-2\" data-icon=\"east\"/> Set an Alias Domain"
-msgstr ""
+msgstr "<i class=\"oi me-2\" data-icon=\"east\"/> Definir un dominio de alias"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -634,9 +662,10 @@ msgid ""
 "Alias Domain. You can achieve this by navigating to the General Settings and "
 "configuring the corresponding field.</span>"
 msgstr ""
-"<i class=\"oi\" data-icon=\"lightbulb\" role=\"img\"/><span class=\"ms-2\">"
-"Para usar un alias de correo electrónico, el primer paso es configurarlo. "
-"Vaya a Ajustes generales y configure el campo correspondiente.</span>"
+"<i class=\"oi\" data-icon=\"lightbulb\" role=\"img\"/><span "
+"class=\"ms-2\">Para usar un alias de correo electrónico, el primer paso es "
+"configurarlo. Vaya a Ajustes generales y configure el campo correspondiente."
+"</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -646,6 +675,11 @@ msgid ""
 "will be automatically sent to customers by email when their ticket reaches a "
 "stage where ratings are enabled.</span>"
 msgstr ""
+"<i class=\"oi\" data-icon=\"lightbulb\"/>\n"
+"                                    <span class=\"ms-2\">Se enviará "
+"automáticamente una solicitud de valoración a los clientes por correo "
+"electrónico cuando su ticket alcance una etapa en la que las valoraciones "
+"estén habilitadas.</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -669,7 +703,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi\" data-icon=\"lightbulb\"/>&amp;nbsp;"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"lightbulb\"/>&amp;nbsp;"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -683,7 +717,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi\" data-icon=\"warning\"/>&amp;nbsp;"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"warning\"/>&amp;nbsp;"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -786,7 +820,7 @@ msgstr "<span><b>Seguidores</b></span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<span>@</span>"
-msgstr ""
+msgstr "<span>@</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -824,7 +858,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<span>days before closure</span>"
-msgstr ""
+msgstr "<span>días antes del cierre</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -834,7 +868,7 @@ msgstr "<span>días de inactividad</span>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "<span>days</span>"
-msgstr ""
+msgstr "<span>días</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -862,7 +896,7 @@ msgstr "<strong>Alias </strong>"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<strong>Send</strong>"
-msgstr ""
+msgstr "<strong>Enviar</strong>"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_defaults
@@ -922,7 +956,7 @@ msgstr "Decoración de Actividad de Excepción"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_plans_ids
 msgid "Activity Plans"
-msgstr ""
+msgstr "Planes de actividad"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_state
@@ -947,8 +981,8 @@ msgid ""
 "Adapt your <b>pipeline</b> to your workflow by adding <b>stages</b> <i>(e.g. "
 "Awaiting Customer Feedback, etc.).</i>"
 msgstr ""
-"Adapte su <b>flujo</b> a su proceso de trabajo añadiendo <b>etapas</b> <i>"
-"(p. ej. esperando comentarios del cliente. etc.).</i>"
+"Adapte su <b>flujo</b> a su proceso de trabajo añadiendo <b>etapas</b> "
+"<i>(p. ej. esperando comentarios del cliente. etc.).</i>"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
@@ -970,6 +1004,8 @@ msgid ""
 "Add team-specific property fields to tickets to better customize your "
 "helpdesk management process."
 msgstr ""
+"Añade campos de propiedades específicos por equipo a los tickets para "
+"personalizar mejor tu proceso de gestión del Servicio de asistencia."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -1104,7 +1140,7 @@ msgstr "¿Está seguro de que quiere eliminar estas etapas?"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_active
 msgid "Ask for Ratings"
-msgstr ""
+msgstr "Solicitar valoraciones"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.action_helpdesk_tag_assignment
@@ -1173,12 +1209,12 @@ msgstr "Número de archivos adjuntos"
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_auto_assignment
 msgid "Auto Assignment"
-msgstr ""
+msgstr "Autoasignación"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_ticket_reminder
 msgid "Auto-Close Reminder"
-msgstr ""
+msgstr "Recordatorio de cierre automático"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -1303,11 +1339,15 @@ msgid ""
 "Can manage helpdesk teams and stages, with access to reporting and "
 "configuration."
 msgstr ""
+"Puede gestionar equipos y etapas del Servicio de asistencia, con acceso a "
+"informes y configuración."
 
 #. module: helpdesk
 #: model:res.groups,comment:helpdesk.group_helpdesk_user
 msgid "Can manage tickets in helpdesk teams they have access to."
 msgstr ""
+"Puede gestionar los tickets de los equipos de Servicio de asistencia a los "
+"que tiene acceso."
 
 #. module: helpdesk
 #: model:helpdesk.stage,name:helpdesk.stage_cancelled
@@ -1340,6 +1380,8 @@ msgid ""
 "Check the stage tracker on tickets to quickly spot bottlenecks in your "
 "helpdesk workflow."
 msgstr ""
+"Consulta la etapa en la que se encuentra un ticket para detectar rápidamente "
+"los cuellos de botella en tu flujo de trabajo."
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
@@ -1347,6 +1389,8 @@ msgid ""
 "Click the Kanban progress bar to quickly filter tickets by status within the "
 "current stage."
 msgstr ""
+"Haz clic en la barra de progreso de Kanban para filtrar rápidamente los "
+"tickets por estado dentro de la etapa actual."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -1782,17 +1826,19 @@ msgstr "Nombre para mostrar"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Domain"
-msgstr ""
+msgstr "Dominio"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__criteria_domain
 msgid "Domain to filter the tickets to which this SLA policy will be applied."
 msgstr ""
+"Dominio para filtrar los tickets a los que se aplicará esta política de "
+"acuerdo de nivel de servicio."
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__duration_stage_tracking
 msgid "Duration Stage Tracking"
-msgstr ""
+msgstr "Seguimiento del tiempo por etapa"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__assign_method__balanced
@@ -1845,11 +1891,15 @@ msgstr ""
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__reminder_email_template_id
 msgid "Email template used for the auto-close reminder."
 msgstr ""
+"Plantilla de correo electrónico utilizada para el recordatorio de cierre "
+"automático."
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__rating_template_id
 msgid "Email template used to send rating requests for helpdesk tickets."
 msgstr ""
+"Plantilla de correo electrónico utilizada para enviar solicitudes de "
+"valoración de los tickets de Servicio de asistencia."
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
@@ -1857,6 +1907,9 @@ msgid ""
 "Emails sent to your Helpdesk Team's email address automatically create "
 "tickets in your pipeline."
 msgstr ""
+"Los correos electrónicos enviados a la dirección de correo electrónico del "
+"equipo de Servicio de asistencia crean automáticamente tickets en tu "
+"pipeline."
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.rating_ticket_request_email_template
@@ -1932,7 +1985,7 @@ msgstr "Primera fecha de asignación"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "Fold by Default"
-msgstr ""
+msgstr "Plegar por defecto"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__fold
@@ -2106,7 +2159,7 @@ msgstr "Información general del servicio de asistencia"
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_sla
 msgid "Helpdesk SLA Policy"
-msgstr ""
+msgstr "Política de SLA de soporte al cliente"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_stage
@@ -2121,7 +2174,7 @@ msgstr "Asistente para eliminar la etapa del servicio de asistencia"
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_tag
 msgid "Helpdesk Tag"
-msgstr ""
+msgstr "Etiqueta de soporte"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_tag_assignment
@@ -2180,7 +2233,7 @@ msgstr "Tickets de servicio de asistencia"
 #. module: helpdesk
 #: model:mail.template,name:helpdesk.auto_close_reminder_email_template
 msgid "Helpdesk: Auto-Close Reminder"
-msgstr ""
+msgstr "Soporte: recordatorio de cierre automático"
 
 #. module: helpdesk
 #: model:mail.template,name:helpdesk.solved_ticket_request_email_template
@@ -2200,7 +2253,7 @@ msgstr "Servicio de asistencia: ticket recibido"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "High"
-msgstr ""
+msgstr "Alta"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -2340,7 +2393,7 @@ msgstr "Periodos (días) inactivos"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_reminder_delay
 msgid "Inactive delay period(days)"
-msgstr ""
+msgstr "Período de inactividad (días)"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__privacy_visibility__invited_internal
@@ -2507,7 +2560,7 @@ msgstr "Detección de entradas basada en partes locales"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Low"
-msgstr ""
+msgstr "Baja"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__0
@@ -2533,13 +2586,13 @@ msgstr "Asegúrese de que los tickets se gestionan a tiempo"
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_sla_action_main
 msgid "Make sure tickets are handled on time by using SLA Policies.<br>"
 msgstr ""
-"Utilice políticas SLA y asegúrese de que los tickets se gestionan a "
-"tiempo.<br>"
+"Utilice políticas SLA y asegúrese de que los tickets se gestionan a tiempo."
+"<br>"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Icono de Material Symbols, por ejemplo, checklist"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__time
@@ -2711,7 +2764,7 @@ msgstr "Tipo de la siguiente actividad"
 #. module: helpdesk
 #: model:res.groups.privilege,placeholder:helpdesk.res_groups_privilege_helpdesk
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
@@ -2748,7 +2801,7 @@ msgstr "¡Todavía no hay información!"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "No email"
-msgstr ""
+msgstr "Sin correo electrónico"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
@@ -2833,7 +2886,7 @@ msgstr "Número de mensajes con error de envío"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
 msgid "Number of open tickets with at least one SLA failed."
-msgstr "Número de tickets abiertos con al menos un SLA fallido"
+msgstr "Número de tickets abiertos con al menos un SLA vencido."
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__partner_open_ticket_count
@@ -3018,7 +3071,7 @@ msgstr ""
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__auto_close_reminder_delay
 msgid "Period of inactivity before the reminder is sent."
-msgstr ""
+msgstr "Período de inactividad antes de que se envíe el recordatorio."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -3112,6 +3165,8 @@ msgid ""
 "Quickly identify tickets that have been stuck in the same stage for too long "
 "instead of progressing."
 msgstr ""
+"Identifica rápidamente los tickets que llevan demasiado tiempo estancados en "
+"la misma etapa."
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_rating_rating
@@ -3138,7 +3193,7 @@ msgstr "Texto de calificación promedio"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_template_id
 msgid "Rating Email"
-msgstr ""
+msgstr "Correo electrónico de valoración"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__rating_last_feedback
@@ -3212,8 +3267,8 @@ msgid ""
 "Receive notifications whenever tickets are created, rated or discussed on in "
 "this team"
 msgstr ""
-"Reciba notificaciones cada que se creen, califiquen o se hable de tickets en "
-"este equipo."
+"Recibe notificaciones cada vez que se creen, valoren o comenten tickets en "
+"este equipo"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__alias_force_thread_id
@@ -3252,6 +3307,8 @@ msgstr ""
 msgid ""
 "Reminder sent to customers before their ticket is closed due to inactivity"
 msgstr ""
+"Recordatorio que se envía a los clientes antes de cerrar su ticket por "
+"inactividad"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_repair
@@ -3317,7 +3374,7 @@ msgstr "En espera/estancado"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "Rotting in"
-msgstr ""
+msgstr "Se marca como inactivo en"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__sla_id
@@ -3462,13 +3519,13 @@ msgstr "Buscar en Asignado a"
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
 msgid "Search in Description"
-msgstr ""
+msgstr "Buscar en la descripción"
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
 msgid "Search in Messages"
-msgstr ""
+msgstr "Buscar en los mensajes"
 
 #. module: helpdesk
 #. odoo-python
@@ -3488,12 +3545,6 @@ msgid "Security Token"
 msgstr "Token de seguridad"
 
 #. module: helpdesk
-#. odoo-javascript
-#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
-msgid "Select the <b>customer</b> of your ticket."
-msgstr "Seleccione el <b>cliente</b> de su ticket."
-
-#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Self-Service"
 msgstr "Autoservicio"
@@ -3509,6 +3560,8 @@ msgid ""
 "Send an automatic reminder email to customers before their ticket is closed "
 "due to inactivity"
 msgstr ""
+"Enviar un correo electrónico de recordatorio automático a los clientes antes "
+"de que se cierre su ticket por inactividad"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -3544,7 +3597,7 @@ msgstr "Servicio"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Set Up Ratings on Stages"
-msgstr ""
+msgstr "Configurar valoraciones por etapas"
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.solved_ticket_request_email_template
@@ -3585,7 +3638,8 @@ msgstr "Mostrar políticas SLA"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis_closed
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Show all records whose next activity date is past"
-msgstr "Mostrar todos los registros cuya próxima fecha de actividad haya pasado"
+msgstr ""
+"Mostrar todos los registros cuya próxima fecha de actividad haya pasado"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_status__sla_id
@@ -3623,7 +3677,7 @@ msgstr "Etapa cambiada"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__name
 msgid "Stage Name"
-msgstr ""
+msgstr "Nombre de la etapa"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
@@ -3689,7 +3743,7 @@ msgstr "Asunto"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Success"
-msgstr ""
+msgstr "Resuelto"
 
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_ticket_action_7days_success
@@ -3771,6 +3825,9 @@ msgid ""
 "The auto-close period must be longer than the reminder email delay. Please "
 "set a higher inactivity period or a shorter reminder delay."
 msgstr ""
+"El período de cierre automático debe ser superior al intervalo del correo de "
+"recordatorio. Configura un período de inactividad más largo o un intervalo "
+"de recordatorio más corto."
 
 #. module: helpdesk
 #. odoo-python
@@ -3796,8 +3853,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"El nombre de este alias de correo electrónico. Por ejemplo, \"trabajos\",  "
-"si lo que quiere es obtener los correos para <trabajos@example.odoo.com>"
+"El nombre del alias de correo electrónico, por ejemplo, «puestos», si "
+"quieres recibir correos de <puestos@example.odoo.com>"
 
 #. module: helpdesk
 #. odoo-python
@@ -3817,7 +3874,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
 msgid "There are currently no Tickets for your account."
-msgstr ""
+msgstr "No hay tickets en tu cuenta."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_creation
@@ -4075,22 +4132,22 @@ msgstr "Consejo: cree tickets desde sus correos electrónicos"
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_4
 msgid "Tip: Don't let stalled tickets slip under the radar"
-msgstr ""
+msgstr "Consejo: no dejes que los tickets inactivos queden en el olvido"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_3
 msgid "Tip: Filter your tickets with one click"
-msgstr ""
+msgstr "Consejo: filtra tus tickets con un solo clic"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_1
 msgid "Tip: Identify bottlenecks at a glance"
-msgstr ""
+msgstr "Consejo: identifica los cuellos de botella de un vistazo"
 
 #. module: helpdesk
 #: model:digest.tip,name:helpdesk.digest_tip_helpdesk_2
 msgid "Tip: Team-Specific Fields"
-msgstr ""
+msgstr "Consejo: campos específicos por equipo"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_my_ticket_action_no_create
@@ -4160,7 +4217,7 @@ msgstr "Rastree el tiempo dedicado a tickets"
 #. module: helpdesk
 #: model:ir.module.module,summary:base.module_helpdesk
 msgid "Track, prioritize, and solve customer tickets"
-msgstr ""
+msgstr "Haz seguimiento, prioriza y resuelve tickets de clientes"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -4176,12 +4233,12 @@ msgstr "Tipo de actividad de excepción en el registro."
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__utm_reference
 msgid "UTM Reference"
-msgstr ""
+msgstr "Referencia UTM"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Unanswered"
-msgstr ""
+msgstr "Sin respuesta"
 
 #. module: helpdesk
 #. odoo-python
@@ -4297,8 +4354,9 @@ msgid ""
 "Want to use the website form? Just adjust your team's visibility to "
 "\"Invited portal users and all internal users\" and watch the magic happen!"
 msgstr ""
-"¿Desea utilizar el formulario del sitio web? Cambie la visibilidad de su "
-"equipo a “Usuarios del portal invitados y todos los usuarios internos”."
+"¿Quieres utilizar el formulario del sitio web? Solo tienes que ajustar la "
+"visibilidad de tu equipo a «Usuarios invitados del portal y todos los "
+"usuarios internos»."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -4320,8 +4378,8 @@ msgid ""
 "Spanish, French, and Dutch."
 msgstr ""
 "Ofrecemos asistencia 24 horas al día, 7 días a la semana, de lunes a "
-"viernes. Los tickets se responden normalmente dentro de 2 días "
-"laborables.<br>\n"
+"viernes. Los tickets se responden normalmente dentro de 2 días laborables."
+"<br>\n"
 "            Principalmente ofrecemos asistencia en inglés, pero también le "
 "podemos ayudar en español, francés y neerlandés."
 
@@ -4382,8 +4440,7 @@ msgstr ""
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__resource_calendar_id
 msgid "Working hours used to determine the deadline of SLA Policies."
 msgstr ""
-"Horas de trabajo que se usan para determinar le fecha límite de las "
-"políticas SLA"
+"Horario laboral utilizado para determinar el plazo de las políticas del SLA."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_unarchive_wizard
@@ -4435,7 +4492,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_sla
 msgid "You completed all your tickets on time."
-msgstr "Completó todos sus tickets a tiempo"
+msgstr "Has completado todos tus tickets a tiempo."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_invitation_follower
@@ -4445,7 +4502,7 @@ msgstr "Ha sido invitado a seguir este documento del ticket:"
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.auto_close_reminder_email_template
 msgid "Your support ticket will be closed soon"
-msgstr ""
+msgstr "Tu ticket de soporte se cerrará pronto"
 
 #. module: helpdesk
 #. odoo-python
@@ -4477,7 +4534,7 @@ msgstr "p. ej. El producto llegó dañado"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 msgid "e.g. Qualification"
-msgstr ""
+msgstr "p. ej., valoración"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -4487,7 +4544,7 @@ msgstr "p. ej. micompañía.com"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "e.g. support"
-msgstr ""
+msgstr "p. ej., soporte"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_website_helpdesk_slides
@@ -4528,8 +4585,8 @@ msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name or "
 "'Helpdesk' }}: Service Rating Request"
 msgstr ""
-"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' }}"
-": Petición para calificar el servicio"
+"{{ object.company_id.name or object.user_id.company_id.name or "
+"'Helpdesk' }}: Petición para calificar el servicio"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.new_ticket_request_email_template
@@ -4541,6 +4598,9 @@ msgstr "{{ object.name }}"
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "👤 Unassigned"
 msgstr "👤 Sin asignar"
+
+#~ msgid "Select the <b>customer</b> of your ticket."
+#~ msgstr "Seleccione el <b>cliente</b> de su ticket."
 
 #~ msgid "Auto Assigment"
 #~ msgstr "Asignación automática"

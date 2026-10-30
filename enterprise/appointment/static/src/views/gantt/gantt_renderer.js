@@ -25,6 +25,21 @@ export class AppointmentBookingGanttRenderer extends GanttRenderer {
         });
     }
 
+    get hasDefaultAppointmentType() {
+        return Boolean(this.model.searchParams.context.default_appointment_type_id);
+    }
+
+    /**
+     * @override
+     * Only displaying the total row when considering a single appointment type.
+     * This is to avoid a mix of definitions on total: When the appointment type manage_capacity is true,
+     * it is the total reserved resource_capacity. When false, it is always 1 to count as an "occurence"
+     * (see max_bookings field).
+     */
+    getTotalRow() {
+        return this.hasDefaultAppointmentType ? super.getTotalRow(...arguments) : null;
+    }
+
     /**
      * @override
      * If multiple columns have been selected, remove the default duration from the context so that
@@ -154,14 +169,9 @@ export class AppointmentBookingGanttRenderer extends GanttRenderer {
 
     /**
      * @override
-     * Only compute total row(s) when considering a single appointment type.
-     * This is to avoid a mix of definitions on total_capacity_reserved:
-     * When manage_capacity is true on the appointment type, it is the total
-     * reserved resource_capacity. When false, it is always 1 to count as
-     * an "occurence", see max_bookings field. This enables the total when
-     * coming from an appointment.type, which is the default use case.
+     * Only computing the total row when considering a single appointment type (see getTotalRow).
      */
     shouldComputeAggregateValues(row) {
-        return this.props.context.default_appointment_type_id;
+        return this.hasDefaultAppointmentType;
     }
 }

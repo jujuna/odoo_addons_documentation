@@ -8,14 +8,15 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:14+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-23 11:39+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "account_iso20022/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -31,6 +32,8 @@ msgid ""
 "\n"
 "Generate XML payment orders as recommended by the SEPA and ISO20022 norms.\n"
 msgstr ""
+"\n"
+"Generate XML payment orders as recommended by the SEPA and ISO20022 norms.\n"
 
 #. module: account_iso20022
 #. odoo-python
@@ -42,19 +45,23 @@ msgstr "لم يتم تحديد حساب البنك"
 #: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__is_third_party
 #: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__is_third_party
 msgid "Account owned by someone else than the employee"
-msgstr ""
+msgstr "الحساب البنكي يخص شخصًا آخر ولا يخص الموظف المعني"
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "All payments in the batch must share the same SEPA pain version."
 msgstr ""
+"تأكد من أن جميع عمليات الدفع المجمعة تستخدم نفس إصدار صيغة SEPA pain لضمان "
+"معالجتها بنجاح."
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "All payments in the batch must share the same payment method line."
 msgstr ""
+"تأكد من اختيار بند طريقة الدفع نفسه لجميع المعاملات داخل الدفعة لضمان إتمام "
+"العملية بنجاح."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_batch_payment__iso20022_batch_booking
@@ -73,13 +80,13 @@ msgstr "نمساوي"
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__available_iso20022_priority
 msgid "Available Iso20022 Priority"
-msgstr ""
+msgstr "أولوية Iso20022 المتاحة"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_partner_bank
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__bank_account_id
 msgid "Bank Account"
-msgstr ""
+msgstr "الحساب البنكي"
 
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
@@ -99,7 +106,7 @@ msgstr "الشخص الذي يتحمل الرسوم"
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "الشركة "
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_config_settings
@@ -167,7 +174,7 @@ msgstr "ليس للموظف %s دولة محددة في عنوانه."
 #: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
 #: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
 msgid "Entity managing the third-party account"
-msgstr ""
+msgstr "الجهة التي تدير حساب الطرف الثالث"
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -180,7 +187,7 @@ msgstr ""
 #. module: account_iso20022
 #: model:ir.module.module,summary:base.module_account_iso20022
 msgid "Export payments as SEPA Credit Transfer or ISO20022 files"
-msgstr ""
+msgstr "تصدير المدفوعات كملفات تحويل بطاقة ائتمانية SEPA أو ملفات ISO20022"
 
 #. module: account_iso20022
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_de
@@ -265,7 +272,7 @@ msgstr "Is Iso20022"
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__is_sepa_ct_payment_method
 msgid "Is Sepa Ct Payment Method"
-msgstr ""
+msgstr "هل طريقة الدفع Sepa Ct"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -302,7 +309,7 @@ msgstr "NORM - أولوية متوسطة"
 #: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__partner_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__partner_name
 msgid "Name"
-msgstr ""
+msgstr "الاسم"
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
@@ -332,7 +339,7 @@ msgstr "ليس للشريك %s حساب بنك محدد."
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "الدفع"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_account_payment_method
@@ -363,7 +370,7 @@ msgstr "الحجز على دفعات SCT"
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.view_account_payment_search_inherit_account_sepa_pain_09
 msgid "SEPA / ISO20022"
-msgstr ""
+msgstr "SEPA / ISO20022"
 
 #. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_sepa_ct
@@ -552,7 +559,7 @@ msgstr "الكثير من المعاملات لملف واحد."
 #. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_iso20022_us
 msgid "U.S. ISO20022"
-msgstr ""
+msgstr "المعيار الأمريكي ISO20022"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__iso20022_uetr
@@ -596,7 +603,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__sepa_pain_version
 msgid "XML Version"
-msgstr ""
+msgstr "إصدار XML"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_initiating_party_name

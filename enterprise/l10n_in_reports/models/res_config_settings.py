@@ -48,6 +48,7 @@ class ResConfigSettings(models.TransientModel):
             elif self.l10n_in_gst_registration_type == 'composition':
                 self.account_return_periodicity = 'trimester'
                 self.account_return_reminder_day = 12
+            self.company_id._l10n_in_toggle_iff_return()
 
     def l10n_in_gstr_logout_gst(self):
         self.ensure_one()

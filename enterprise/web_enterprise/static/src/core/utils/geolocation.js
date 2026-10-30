@@ -184,7 +184,6 @@ export class Geolocation {
      */
     stopFetchingCoordinates() {
         this._osmQueue = [];
-        this._isProcessingQueue = false;
     }
 
     //----------------------------------------------------------------------
@@ -200,11 +199,14 @@ export class Geolocation {
             return;
         }
         this._isProcessingQueue = true;
-        let request;
-        while ((request = this._osmQueue.shift())) {
+        while (this._osmQueue.length) {
             await this._waitProm;
-            this._waitProm = delay(this.constructor.OSM_COORDINATE_FETCH_DELAY);
-            request();
+            // dequeue after waiting, as the queue may have been cleared in the meantime
+            const request = this._osmQueue.shift();
+            if (request) {
+                this._waitProm = delay(this.constructor.OSM_COORDINATE_FETCH_DELAY);
+                request();
+            }
         }
         this._isProcessingQueue = false;
     }

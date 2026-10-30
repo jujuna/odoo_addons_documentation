@@ -13,7 +13,7 @@ class OboxObox(models.Model):
 
     def _get_obox_features(self):
         features = super()._get_obox_features()
-        if self.env["pos.config"].search_count([("self_ordering_mode", "=", "kiosk")], limit=1):
+        if self._search_obox_pos_configs([("self_ordering_mode", "=", "kiosk")], limit=1):
             features.append("kiosk")
         return features
 
@@ -23,9 +23,7 @@ class OboxObox(models.Model):
         if name != "kiosk":
             return feature_detail
 
-        kiosk_configs = self.env["pos.config"].search([
-            ("self_ordering_mode", "=", "kiosk"),
-        ])
+        kiosk_configs = self._search_obox_pos_configs([("self_ordering_mode", "=", "kiosk")])
         feature_detail["kiosk"] = [
             {
                 "id": config.id,
@@ -33,6 +31,7 @@ class OboxObox(models.Model):
                 "url": config.get_kiosk_url(),
                 "timezone": config.company_id.tz,
                 "app": "point_of_sale",
+                "linked_printers": None if config.receipt_printer_ids else config.preparation_printer_ids.obox_device_id.mapped("identifier"),
             }
             for config in kiosk_configs
         ]

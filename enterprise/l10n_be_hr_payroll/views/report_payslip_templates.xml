@@ -87,6 +87,12 @@
     <xpath expr="//div[@id='working_schedule']" position="attributes">
         <attribute name="t-if">o.version_id.l10n_be_egov3_code != '999'</attribute>
     </xpath>
+    <div id="working_schedule" position="after">
+        <div id="employee_salary_scale" t-if="o.version_id.l10n_be_salary_scale_id">
+            <strong class="me-2">Salary Scale:</strong>
+            <span t-out="o.version_id.l10n_be_salary_scale_id.name"/>
+        </div>
+    </div>
     <div id="wage" position="after">
         <t t-set="ecovouchers" t-value="o._get_eco_vouchers_amount()"/>
         <div id="employee_eco_vouchers" t-if="ecovouchers">

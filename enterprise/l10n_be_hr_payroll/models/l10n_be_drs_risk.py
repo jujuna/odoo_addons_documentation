@@ -31,6 +31,9 @@ class L10nBeDrsRisk(models.Model):
 
     @api.ondelete(at_uninstall=False)
     def _unlink_prevent_deletion(self):
+        # The risks removed from the data of the module are deleted at its update
+        if self.env.context.get('force_delete'):
+            return
         raise UserError(self.env._(
             "You are not allowed to delete a DRS Risk nomenclature record."
             "If this scenario is no longer valid according to the NSSO, please adjust the 'Valid Until' field to expire it instead."

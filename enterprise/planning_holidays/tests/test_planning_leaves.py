@@ -229,7 +229,7 @@ class TestPlanningLeaves(TestCommon):
     def test_half_day_off_leave_of_flexible_resource(self):
         """
         Test half-day off leave for a flexible resource.
-        The leave intervals should be set to 00:00:00 - 12:00:00 for AM half-day off
+        The leave intervals should be set to 00:00:00 - 11:59:59 for AM half-day off
         and 12:00:00 - 23:59:59 for PM half-day off in the planning_gantt view.
         """
         employee = self.employee_bert
@@ -251,7 +251,7 @@ class TestPlanningLeaves(TestCommon):
         })
 
         start_dt_am = datetime.datetime(2025, 3, 5, 8, 0, 0, tzinfo=datetime.UTC)
-        end_dt_am = datetime.datetime(2025, 3, 5, 12, 0, 0, tzinfo=datetime.UTC)
+        end_dt_am = datetime.datetime(2025, 3, 5, 11, 59, 59, 999999, tzinfo=datetime.UTC)
 
         resources_per_tz = employee.resource_id._get_resources_per_tz()
         intervals_am = self.env['resource.calendar']._leave_intervals_batch(start_dt_am, end_dt_am, resources_per_tz)
@@ -350,9 +350,9 @@ class TestPlanningLeaves(TestCommon):
         end_dt = datetime.datetime(2025, 4, 30, 23, 59, 59, 999999, tzinfo=datetime.UTC)
         resources_per_tz = self.employee_bert.resource_id._get_resources_per_tz()
         intervals = self.env['resource.calendar']._leave_intervals_batch(start_dt, end_dt, resources_per_tz)
-        interval = next(iter(intervals[self.employee_bert.resource_id.id]))
-        self.assertEqual(interval[0], datetime.datetime(2025, 4, 30, 0, 0, 0, tzinfo=datetime.UTC), "As the employee is flexible, The start of the interval should be midnight.")
-        self.assertEqual(interval[1], datetime.datetime(2025, 4, 30, 23, 59, 59, 999999, tzinfo=datetime.UTC), "As the employee is flexible, The start of the interval should be 23:59:59.")
+        interval_iter = iter(intervals[self.employee_bert.resource_id.id])
+        self.assertEqual(next(interval_iter)[0], datetime.datetime(2025, 4, 30, 0, 0, 0, tzinfo=datetime.UTC), "As the employee is flexible, the start of the first interval should be 00:00:00")
+        self.assertEqual(next(interval_iter)[1], datetime.datetime(2025, 4, 30, 23, 59, 59, 999999, tzinfo=datetime.UTC), "As the employee is flexible, the end of the second interval should be 23:59:59")
 
     def test_batch_creation_from_calendar_with_time_off(self):
         """

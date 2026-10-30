@@ -117,6 +117,7 @@ class StockQuant(models.Model):
         return data
 
     def get_stock_barcode_data_records(self):
+        locations = self.location_id
         products = self.product_id
         companies = self.company_id or self.env.company
         lots = self.lot_id
@@ -130,6 +131,7 @@ class StockQuant(models.Model):
 
         data = {
             "records": {
+                "stock.location": locations.read(locations._get_fields_stock_barcode(), load=False),
                 "stock.quant": self.read(self._get_fields_stock_barcode(), load=False),
                 "product.product": products.read(products._get_fields_stock_barcode(), load=False),
                 "stock.package": packages.read(packages._get_fields_stock_barcode(), load=False),

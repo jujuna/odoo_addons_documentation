@@ -221,6 +221,8 @@ class TestEcEdiCommon(AccountEdiTestCommon):
                             f"Operation {idx} called `{endpoint}` but should have called `{expected_endpoint}`"
                         )
                         test_case.assertEqual(kwargs, expected_kwargs, f"Operation {idx}: request did not match expected")
+                        if isinstance(response, Exception):
+                            raise response
                         return MockedReturnValue(**response)
 
                     return call_endpoint

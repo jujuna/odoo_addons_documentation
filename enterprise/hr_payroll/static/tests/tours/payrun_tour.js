@@ -5,22 +5,6 @@ registry.category("web_tour.tours").add('payroll_payrun_tour', {
     steps: () => [
     stepUtils.showAppsMenuItem(),
     {
-        content: "Log into US Company",
-        trigger: ".o_menu_systray .o_switch_company_menu",
-        run: "click",
-    },
-    {
-        content: "Log into US Company",
-        trigger:
-            ".o-dropdown--menu .dropdown-item div span:contains('Company US')",
-        run: "click",
-        expectUnloadPage: true,
-    },
-    {
-        trigger:
-            ".o_menu_systray .o_switch_company_menu span:contains('Company US')",
-    },
-    {
         content: "Open payroll app",
         trigger: '.o_app[data-menu-xmlid="hr_payroll.menu_hr_payroll_root"]',
         run: "click",
@@ -36,11 +20,6 @@ registry.category("web_tour.tours").add('payroll_payrun_tour', {
         run: "click",
     },
     {
-        content: "Open the Pay Run",
-        trigger: '.o_kanban_record',
-        run: "click",
-    },
-    {
         content: "Check that the payrun cost is correctly displayed",
         trigger: '.o_payrun_metrics .o_payrun_metric_value:not(:contains("$0.00"))',
     },
@@ -49,8 +28,17 @@ registry.category("web_tour.tours").add('payroll_payrun_tour', {
         trigger: '.o_payrun_metrics .o_payrun_metric_value:not(:contains("$0.00"))',
     },
     {
+        content: "Open the Pay Run",
+        trigger: '.o_kanban_record',
+        run: "click",
+    },
+    {
+        content: "Wait for the payslips list of the pay run",
+        trigger: ".o_list_view .o_data_row",
+    },
+    {
         content: "confirm the payrun",
-        trigger: ".btn[name='action_validate']",
+        trigger: ".o_control_panel .btn[name='action_validate']",
         run: "click",
     },
     {
@@ -59,12 +47,36 @@ registry.category("web_tour.tours").add('payroll_payrun_tour', {
         run: "click",
     },
     {
-        content: "Mark the payrun as paid",
-        trigger: ".btn[name='action_paid']",
+        content: "Open the payment wizard",
+        trigger: ".btn[name='action_payment_report']",
+        run: "click",
+    },
+
+    /*
+    needed because the runbot runs this test with all modules installed,
+    and some modules may change the default export mode
+    */
+    {
+        content: "Open the 'Mode' dropdown menu",
+        trigger: "#export_format_0",
         run: "click",
     },
     {
-        id: "submit_end",
+        content: "Choose the CSV export mode",
+        trigger: ".dropdown-item:contains('CSV')",
+        run: "click",
+    },
+
+    {
+        content: "Mark the payrun as paid through the payment wizard",
+        trigger: ".modal-footer button[name='mark_as_paid']",
+        run: "click",
+    },
+    {
+        content: "Wait for modal to close",
+        trigger: "body:not(:has(.modal))",
+    },
+    {
         content: "Go back to Pay Runs",
         trigger: ".o_back_button",
         run: "click",
@@ -84,8 +96,8 @@ registry.category("web_tour.tours").add('payroll_payrun_tour', {
         run: "click",
     },
     {
-        content: "Select the Salary Structure for Software Developer",
-        trigger: '.o_field_many2one_selection .dropdown-item:contains("Salary Structure for Software Developer")',
+        content: "Select the Salary Structure made for test employees",
+        trigger: '.o_field_many2one_selection .dropdown-item:contains("Sealand Salary Structure")',
         run: "click",
     },
     {
@@ -94,12 +106,12 @@ registry.category("web_tour.tours").add('payroll_payrun_tour', {
         run: "click",
     },
     {
-        content: "Employee Richard should be in the list",
-        trigger: 'tbody tr:contains("Richard")',
+        content: "Employee Paddy Roy should be in the list",
+        trigger: 'tbody tr:contains("Paddy Roy Bates")',
     },
     {
-        content: "Employee test amah should be in the list",
-        trigger: 'tbody tr:contains("test amah")',
+        content: "Employee Michael Bates should be in the list",
+        trigger: 'tbody tr:contains("Michael Bates")',
     },
     {
         content: "Select all employees",
@@ -170,19 +182,25 @@ registry.category("web_tour.tours").add('payroll_payrun_tour', {
     },
     {
         content: "Wait for payslips to be confirmed",
-        trigger: ".btn[name='action_payment_report'], .btn[name='action_paid']",
+        trigger: ".btn[name='action_payment_report']",
     },
     {
         content: "Chatter Update Status",
         trigger: ".o-mail-Message-textContent:contains('Done')",
     },
     {
-        trigger: ".btn[name='action_paid']",
+        content: "Open the payment wizard",
+        trigger: ".btn[name='action_payment_report']",
         run: "click",
     },
     {
-        content: "Wait for payrun to be marked as paid",
-        trigger: ".btn[name='action_unpaid']",
+        content: "Wait for the payment wizard",
+        trigger: ".modal-footer button[name='mark_as_paid']",
+    },
+    {
+        content: "Mark the payrun as paid through the payment wizard",
+        trigger: ".modal-footer button[name='mark_as_paid']",
+        run: "click",
     },
     {
         content: "Chatter Update Status",

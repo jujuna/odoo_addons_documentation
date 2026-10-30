@@ -31,8 +31,9 @@ class HrJob(models.Model):
         return self.company_id.documents_recruitment_settings and super()._check_create_documents()
 
     def _get_documents_domain(self):
+        accessible_applicants = self._get_accessible_applicants()
         return super()._get_documents_domain() | Domain(
-            [('type', '!=', 'folder'), ('res_model', '=', 'hr.applicant'), ('res_id', 'in', self.application_ids.ids)]
+            [('type', '!=', 'folder'), ('res_model', '=', 'hr.applicant'), ('res_id', 'in', accessible_applicants.ids)]
         )
 
     def action_open_attachments(self):

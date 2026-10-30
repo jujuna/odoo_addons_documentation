@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import uuid
-from datetime import date, datetime, timedelta, time
+from datetime import date, datetime, timedelta, time, UTC
+from zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
@@ -194,6 +195,91 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         self.assertEqual(public_holiday_date_work_entry_vals['work_entry_type_id'], sick_work_entry_type_without_salary)
         self.assertEqual(public_holiday_date_work_entry_vals['leave_ids'], january_leave)
 
+    def test_work_accident_time_off_public_holiday(self):
+        """
+        The validation splits a work accident into 30 paid days (012.00) and unpaid days (110.00).
+        A public holiday more than 30 days into the absence is not paid: it takes the unpaid work accident type.
+        A public holiday within the first 30 days stays paid.
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Employee',
+            'date_version': '2026-01-01',
+            'contract_date_start': '2026-01-01',
+            'wage': 3000,
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00495').id,
+        })
+        public_holiday_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday')
+        unpaid_work_accident_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid')
+        self.env['hr.leave'].create({
+            'name': 'Work accident',
+            'employee_id': employee.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_first_week').id,
+            'request_date_from': date(2026, 3, 2),
+            'request_date_to': date(2026, 4, 30),
+        })
+        unpaid_leave = self.env['hr.leave'].search([
+            ('employee_id', '=', employee.id),
+            ('work_entry_type_id', '=', unpaid_work_accident_type.id),
+        ])
+        self.assertEqual(unpaid_leave.request_date_from, date(2026, 4, 1))
+
+        # day 18 of the absence, and Easter Monday on day 36: the 30 days before it span both parts of the split
+        # The public holidays cover the whole local day, so that they include both attendances of the day.
+        tz = ZoneInfo(employee.tz)
+        for day in (date(2026, 3, 19), date(2026, 4, 6)):
+            self.env['resource.calendar.leaves'].create({
+                'name': 'Public Holiday',
+                'date_from': datetime.combine(day, time.min, tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+                'date_to': datetime.combine(day, time(23, 59, 59), tzinfo=tz).astimezone(UTC).replace(tzinfo=None),
+                'calendar_id': employee.resource_calendar_id.id,
+                'work_entry_type_id': public_holiday_type.id,
+                'count_as': 'absence',
+            })
+
+        work_entries_vals = employee.generate_work_entries(date(2026, 3, 2), date(2026, 4, 30))
+        within_30_days = next(vals for vals in work_entries_vals if vals['date'] == date(2026, 3, 19))
+        after_30_days = next(vals for vals in work_entries_vals if vals['date'] == date(2026, 4, 6))
+        self.assertEqual(within_30_days['work_entry_type_id'], public_holiday_type)
+        self.assertEqual(after_30_days['work_entry_type_id'], unpaid_work_accident_type)
+        self.assertEqual(after_30_days['leave_ids'], unpaid_leave)
+
+    def test_worker_sick_time_off_public_holiday(self):
+        """
+        The validation splits a worker's sickness into 010.00, 082.00, 072.00 (up to day 30) and 122.00.
+        A public holiday after 30 days of absence is not paid, whichever part covers the days before it.
+        """
+        worker = self.env['hr.employee'].create({
+            'name': 'Worker',
+            'date_version': '2026-01-01',
+            'contract_date_start': '2026-01-01',
+            'wage': 2000,
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00015').id,
+        })
+        unpaid_sick_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_common_law_illness_after_legal_period')
+        self.env['hr.leave'].create({
+            'name': 'Sick leave',
+            'employee_id': worker.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': date(2026, 3, 2),
+            'request_date_to': date(2026, 4, 30),
+        })
+        leaves = self.env['hr.leave'].search([('employee_id', '=', worker.id)]).sorted('request_date_from')
+        self.assertEqual(leaves.work_entry_type_id.mapped('code'), ['010.00', '082.00', '072.00', '122.00'])
+
+        # Easter Monday, day 36 of the sickness: the days before it are covered by 082.00, 072.00 and 122.00
+        self.env['resource.calendar.leaves'].create({
+            'name': 'Easter Monday',
+            'date_from': datetime(2026, 4, 6, 8),
+            'date_to': datetime(2026, 4, 6, 16),
+            'calendar_id': worker.resource_calendar_id.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+            'count_as': 'absence',
+        })
+        work_entries_vals = worker.generate_work_entries(date(2026, 3, 2), date(2026, 4, 30))
+        public_holiday_vals = next(vals for vals in work_entries_vals if vals['date'] == date(2026, 4, 6))
+        self.assertEqual(public_holiday_vals['work_entry_type_id'], unpaid_sick_type)
+        self.assertEqual(public_holiday_vals['leave_ids'], leaves[-1])
+
     def test_unpaid_leave_with_public_holiday_ignored(self):
         self.calendar_38h = self.env['resource.calendar'].create({
             'name': 'Standard 38 hours/week',
@@ -240,6 +326,31 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         self.assertEqual(unpaid_leave.number_of_days, 5.0)
 
     def test_progressive_resumption_140_days_boundary(self):
+        progressive_resumption_start = date(2025, 8, 1)
+        day_139 = progressive_resumption_start + timedelta(days=139)
+        day_140 = progressive_resumption_start + timedelta(days=140)
+        sick_leave_139, sick_leave_140 = self.env['hr.leave'].create([
+            {
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+                'employee_id': self.progressive_employee.id,
+                'request_date_from': day_139,
+                'request_date_to': day_139,
+            }, {
+                'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+                'employee_id': self.progressive_employee.id,
+                'request_date_from': day_140,
+                'request_date_to': day_140,
+            }])
+        (sick_leave_139 + sick_leave_140).action_approve()
+        self.assertEqual(sick_leave_139.work_entry_type_id.code, '122.00')
+        self.assertEqual(sick_leave_140.work_entry_type_id.code, '013.00')
+
+    def test_progressive_resumption_140_days_boundary_with_amendment(self):
+        """ An amendment during the progressive resumption doesn't restart the 140 days window """
+        self.progressive_employee.create_version({
+            'date_version': date(2025, 11, 1),
+            'wage': 3000,
+        })
         progressive_resumption_start = date(2025, 8, 1)
         day_139 = progressive_resumption_start + timedelta(days=139)
         day_140 = progressive_resumption_start + timedelta(days=140)
@@ -667,12 +778,13 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         if name is None:
             name = f'Calendar leave {uuid.uuid4().hex}'
         if date_to is None:
-            date_to = datetime.combine(date_from, time.max)
+            date_to = date_from
 
-        if isinstance(date_from, date):
-            date_from = datetime.combine(date_from, time.min)
-        if isinstance(date_to, date):
-            date_to = datetime.combine(date_to, time.max)
+        leave_tz = ZoneInfo(self.env.user.tz or 'UTC')
+        if not isinstance(date_from, datetime):
+            date_from = datetime.combine(date_from, time.min, tzinfo=leave_tz).astimezone(UTC).replace(tzinfo=None)
+        if not isinstance(date_to, datetime):
+            date_to = datetime.combine(date_to, time.max, tzinfo=leave_tz).astimezone(UTC).replace(tzinfo=None)
 
         ctx = context or {}
         return self.env['resource.calendar.leaves'].with_context(**ctx).create({
@@ -686,6 +798,7 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
     def test_no_warning_for_sick_leave_within_guaranteed_salary(self):
         """ Georges is a regular employee (not a "worker"): a sick leave staying within the 30-day guaranteed
         salary period keeps the original 013.00 work entry type, so no warning should be raised. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         leave = self.env['hr.leave'].with_context(leave_fast_create=True).create({
             'employee_id': self.employee_georges.id,
             'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
@@ -698,6 +811,7 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
     def test_warning_for_sick_leave_after_guaranteed_salary(self):
         """ A sick leave crossing the 30-day guaranteed salary threshold should warn that it will be split
         between 013.00 (paid) and the unpaid sick work entry type once validated. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         unpaid_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_common_law_illness_after_legal_period')
         leave = self.env['hr.leave'].with_context(leave_fast_create=True).create({
             'employee_id': self.employee_georges.id,
@@ -718,9 +832,27 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         self.assertEqual(all_leaves[0].work_entry_type_id.code, '013.00')
         self.assertEqual(all_leaves[1].work_entry_type_id, unpaid_type)
 
+    def test_warning_for_sick_leave_not_saved_yet(self):
+        """
+        Ensure that the split warning is already shown on a time off request that is not saved yet.
+        """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
+        leave = self.env['hr.leave'].new({
+            'employee_id': self.employee_georges.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_sick_leave').id,
+            'request_date_from': date(2026, 2, 2),
+            'request_date_to': date(2026, 3, 20),
+        })
+        messages = [val['message'] for val in (leave.issues or {}).values()]
+        self.assertTrue(
+            any('This time off will be split into' in message for message in messages),
+            "The split warning should be shown before the request is saved",
+        )
+
     def test_warning_entirely_replaced_for_worker_short_sick_leave(self):
         """ For a "worker" employee, sick leave paid during the first week uses a different work entry type
         (010.00) than the requested 013.00, so the warning announces a full replacement. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         worker_worker_code = self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00012')
         worker = self.create_employee({
             'name': 'Warning Worker',
@@ -742,6 +874,7 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
     def test_no_warning_for_non_eligible_work_entry_type(self):
         """ The warning only applies to specific work entry types (sick leave, work accident,
         economic unemployment); other leave types never raise it. """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         other_work_entry_type = self.env['hr.work.entry.type'].create({
             'name': 'Other Leave',
             'code': 'OTHERBE',

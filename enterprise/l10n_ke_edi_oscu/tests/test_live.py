@@ -87,6 +87,7 @@ class TestKeEdi(TestKeEdiCommon):
         """ Test that the invoice JSON generation correctly handles an invoice with:
             - a currency (EUR) different from KSh
             - an UoM on the invoice line that differs from the UoM on the product
+            - a 10% discount
             - a round_globally tax setting
             - an excise tax included in price, that applies before the VAT, and a withholding tax.
 
@@ -94,6 +95,8 @@ class TestKeEdi(TestKeEdiCommon):
         be reported.
         """
         wh_tax = self.env['account.chart.template'].ref('SWT10')
+        # ensure that the excise tax affects the base of the sales tax
+        (self.standard_rate_sales_tax | wh_tax).sequence = 2
 
         invoice = self.env['account.move'].create({
             'move_type': 'out_invoice',
@@ -107,6 +110,7 @@ class TestKeEdi(TestKeEdiCommon):
                     'price_unit': 1300.00,  # 1000 base + 300 excise = 1300 EUR.
                     'quantity': 2,
                     'tax_ids': [Command.set((self.excise_tax | self.standard_rate_sales_tax | wh_tax).ids)],
+                    'discount': 10,
                 })
             ],
         })

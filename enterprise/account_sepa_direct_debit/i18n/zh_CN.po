@@ -9,15 +9,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-11 17:51+0000\n"
-"PO-Revision-Date: 2026-09-18 01:44+0000\n"
+"PO-Revision-Date: 2026-10-22 02:33+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/account_sepa_direct_debit/zh_Hans/>\n"
+"projects/odoo-20/account_sepa_direct_debit/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -72,12 +73,33 @@ msgid ""
 "Payment' wizard. An error message will appear if no valid mandate is\n"
 "available for generating a payment on the selected invoice.\n"
 msgstr ""
+"\n"
+"本模块可生成符合 SEPA 直接借记（SDD）规范的 XML 文件（符合\n"
+"pain.008.001.02 规范），以便发送给您的银行，\n"
+"收取一组付款。\n"
+"\n"
+"要使用此付款方式，客户必须首先\n"
+"向公司返还一份授权书，表示同意使用直接借记。\n"
+"该同意必须已在 Odoo 中登记为“客户授权书”。\n"
+"\n"
+"要正确生成 SDD 文件，您还需满足以下要求：\n"
+"- 您的公司账户必须设置为有效的 IBAN 号码\n"
+"- 您的公司必须已获得债权人标识符（可在“设置 - 常规设置 - 会计”部分完成）\n"
+"- 您的公司必须已定义用于接收 SDD 付款的日记账（同样在会计模块的“设置”中）\n"
+"- 您为其生成付款的每位客户都必须拥有有效的 IBAN 账号。\n"
+"\n"
+"如果上述任一要求未满足，Odoo 会通知您。\n"
+"\n"
+"要为未结发票登记付款，您可以在“登记\n"
+"付款”向导中选择一个银行账户，使用专用的\n"
+"“SEPA 直接借记”选项。如果所选发票没有可用于生成付款的\n"
+"有效授权书，将显示一条错误信息。\n"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_direct_debit_mandate.py:0
 msgid "%(partner_name)s_mandate_form_%(mandate_name)s"
-msgstr ""
+msgstr "%(partner_name)s_mandate_form_%(mandate_name)s"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -575,6 +597,108 @@ msgid ""
 "                </table>\n"
 "            "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\">\n"
+"                    <tr>\n"
+"                        <td align=\"center\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
+"#FFFFFF; color: #454748; border-collapse:separate;\">\n"
+"                                <tbody>\n"
+"                                    <!-- CONTENT -->\n"
+"                                    <tr>\n"
+"                                        <td align=\"center\" style=\"min-"
+"width: 590px;\">\n"
+"                                            <table border=\"0\" "
+"cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; "
+"background-color: white; padding: 0px 8px 0px 8px; border-"
+"collapse:separate;\">\n"
+"                                                <tr>\n"
+"                                                    <td valign=\"top\" "
+"style=\"font-size: 13px;\">\n"
+"                                                        <div>\n"
+"                                                            您好，<br/><br/>"
+"\n"
+"                                                            一份 SEPA 直接借"
+"记授权书将于以下日期自动到期：<span t-out=\"format_date"
+"(object._get_expiry_date_per_mandate()[object])\">2020-04-18</span><br/>\n"
+"                                                            这可能由以下原因"
+"之一导致：\n"
+"                                                            <ul>\n"
+"                                                                <li>\n"
+"                                                                    该日期为"
+"签署时约定的授权结束日期。\n"
+"                                                                </li>\n"
+"                                                                <li>\n"
+"                                                                    也可能是"
+"自上次使用该授权以来已超过 36 个月。\n"
+"                                                                </li>\n"
+"                                                            </ul>\n"
+"                                                            <div "
+"style=\"margin: 16px 0px 16px 0px;\">\n"
+"                                                                <a t-attf-"
+"href=\"{{ website_url }}/odoo/direct-debit-mandates/{{ object.id }}\" "
+"style=\"background-color: #4caf50; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                                                                    前往授权"
+"书\n"
+"                                                                </a>\n"
+"                                                            </div>\n"
+"                                                            安全提示：请检查"
+"您被重定向到的域名为：<b><a t-att-href=\"object.get_base_url()\" t-"
+"out=\"object.get_base_url() or ''\">\n"
+"                                                            https://"
+"yourcompany.odoo.com</a></b>\n"
+"                                                        </div>\n"
+"                                                    </td>\n"
+"                                                </tr>\n"
+"                                                <tr>\n"
+"                                                    <td style=\"text-"
+"align:center;\">\n"
+"                                                        <hr width=\"100%\" "
+"style=\"background-color:rgb(204,204,204);border:medium "
+"none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
+"margin: 16px 0px 16px 0px;\"/>\n"
+"                                                    </td>\n"
+"                                                </tr>\n"
+"                                            </table>\n"
+"                                        </td>\n"
+"                                    </tr>\n"
+"                                </tbody>\n"
+"                            </table>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                    <!-- POWERED BY -->\n"
+"                    <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                                <tr>\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 13px;\">\n"
+"                                        由 <a target=\"_blank\" "
+"href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" "
+"style=\"color: #875A7B;\">Odoo</a>\n"
+"                                    </td>\n"
+"                                </tr>\n"
+"                            </table>\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
+"padding: 8px; border-collapse:separate;\">\n"
+"                                <tr>\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 11px;\">\n"
+"                                        附注：本邮件由 Odoo 会计自动发送，用"
+"于通知您一份 SEPA 直接借记授权书即将自动关闭。\n"
+"                                    </td>\n"
+"                                </tr>\n"
+"                            </table>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"            "
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -675,7 +799,7 @@ msgstr "CREDIT-1234"
 #. module: account_sepa_direct_debit
 #: model:ir.module.module,summary:base.module_account_sepa_direct_debit
 msgid "Collect payments from your customers through SEPA direct debit."
-msgstr ""
+msgstr "通过 SEPA 直接借记向客户收取款项。"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model,name:account_sepa_direct_debit.model_res_company
@@ -732,7 +856,7 @@ msgstr "Demo@email.com"
 #. module: account_sepa_direct_debit
 #: model:ir.model,name:account_sepa_direct_debit.model_account_direct_debit_mandate
 msgid "Direct Debit Mandate"
-msgstr ""
+msgstr "直接借记授权书"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_account_journal_dashboard_kanban_view
@@ -830,7 +954,7 @@ msgstr "日记账"
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_account_direct_debit_mandate__mandate_type
 msgid "Mandate Type"
-msgstr ""
+msgstr "授权类型"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -924,7 +1048,7 @@ msgstr "单一欧元支付区直接借记（SDD）方案根据客户授权而设
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields.selection,name:account_sepa_direct_debit.selection__account_direct_debit_mandate__mandate_type__sepa
 msgid "SEPA"
-msgstr ""
+msgstr "SEPA"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -934,7 +1058,7 @@ msgstr "SEPA 企业对企业直接扣账授权"
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_account_direct_debit_mandate__sdd_debtor_id_code
 msgid "SEPA Debtor Identifier"
-msgstr ""
+msgstr "SEPA 债务人标识符"
 
 #. module: account_sepa_direct_debit
 #: model:account.payment.method,name:account_sepa_direct_debit.payment_method_sdd
@@ -978,7 +1102,7 @@ msgstr "SEPA 直接扣账授权到期警告"
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_direct_debit_mandate.py:0
 msgid "SEPA Direct Debit scheme only accepts IBAN account numbers."
-msgstr ""
+msgstr "SEPA 直接借记方案仅接受 IBAN 账号。"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.view_account_journal_form

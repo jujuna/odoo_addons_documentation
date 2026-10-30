@@ -24,8 +24,13 @@ patch(Navbar.prototype, {
                 /** @type {Display[]} */
                 const displays = result.data;
                 const customerDisplayId = cookie.get("pos_customer_display_id");
+                // Open the customer display by default if there is only one secondary display
+                const customerDisplay =
+                    displays.find(
+                        (display) => display.displayId.toString() === customerDisplayId
+                    ) || (displays.length === 1 ? displays[0] : undefined);
                 displays.forEach((display) => {
-                    if (customerDisplayId && display.displayId.toString() === customerDisplayId) {
+                    if (display === customerDisplay) {
                         this._showDisplayAndGoToUrl({ displayId: display.displayId });
                     } else {
                         mobile.methods

@@ -1,6 +1,7 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { markup } from "@odoo/owl";
+import { searchOrCreateMany2X } from "@web_tour/tour_scenarios";
 
 registry.category("web_tour.tours").add("planning_field_service_tour", {
     steps: () => [
@@ -20,26 +21,12 @@ registry.category("web_tour.tours").add("planning_field_service_tour", {
             tooltipPosition: "bottom",
             run: "click",
         },
-        {
+        ...searchOrCreateMany2X({
             trigger: ".o_field_widget[name='resource_ids'] input",
-            content: markup(
-                _t(
-                    "<b>Assign a resource</b><br/><i>Add multiple technicians or reserve equipment if needed.</i>"
-                )
-            ),
-            tooltipPosition: "right",
-            run: "click",
-        },
-        {
-            isActive: ["auto"],
-            trigger: ".o_field_widget[name='resource_ids'] input",
-            run: "edit Worker",
-        },
-        {
-            isActive: ["auto"],
-            trigger: ".o-autocomplete--dropdown-item > a:contains('Worker')",
-            run: "click",
-        },
+            label: "resource",
+            searchText: "Worker",
+            selectExisting: true,
+        }),
         {
             isActive: ["auto"],
             trigger: ".modal button.o_form_button_save",

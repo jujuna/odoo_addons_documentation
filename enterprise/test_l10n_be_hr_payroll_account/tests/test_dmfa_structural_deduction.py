@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 
 from odoo.addons.test_l10n_be_hr_payroll_account.tests.test_dmfa import TestDMFA
 from odoo.fields import Command
@@ -346,6 +347,97 @@ class TestDMFAStructuralDeduction(TestDMFA):
         self._validate_dmfa_structural_deduction(year=2025, quarter=1, payslips=payslips)
 
     @freeze_time("2025-04-10 10:00:00")
+    def test_full_time_schedule_change_other_reference(self):
+        """
+        Full-time employee moving in the middle of the quarter to another full-time schedule (38h on other weekdays)
+        that is its own reference calendar. Same work time rate, so both versions are one occupation, with two
+        reference calendars of the same weekly hours: the structural deduction is computed with U = 38.
+        """
+        calendar_38h_tue_sat = self.env['resource.calendar'].create({
+            'name': '38h Tuesday-Saturday',
+            'company_id': self.belgian_company.id,
+            'hours_per_day': 7.6,
+            'attendance_ids': [(5, 0, 0)] + [
+                (0, 0, {'dayofweek': str(i), 'hour_from': hour_from, 'hour_to': hour_to})
+                for i in range(1, 6)
+                for hour_from, hour_to in [(8, 12), (13, 16.6)]
+            ],
+        })
+        calendar_38h_tue_sat.reference_calendar_id = calendar_38h_tue_sat
+        tue_sat_version = self.employee.create_version({
+            'date_version': date(2025, 2, 1),
+            'resource_calendar_id': calendar_38h_tue_sat.id,
+        })
+        self.assertEqual(len(self.employee.version_ids.sorted('date_start', reverse=True)._get_occupation_dates()), 1)
+
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2025',
+            'version_id': (self.contract if month == 1 else tue_sat_version).id,
+            'date_from': date(2025, month, 1),
+            'date_to': date(2025, month, 1) + relativedelta(day=31),
+            'employee_id': self.employee.id,
+            'struct_id': self.belgium_monthly_payslip_structure.id,
+            'company_id': self.belgian_company.id,
+        } for month in (1, 2, 3)])
+        for slip in payslips:
+            slip.compute_sheet()
+            slip.action_payslip_done()
+
+        self.assertEqual(payslips.mapped('state'), ['validated'] * 3)
+        quarter_deduction = payslips._get_line_values(['ONSS_STRUCTURAL'], compute_sum=True)['ONSS_STRUCTURAL']['sum']['total']
+        # U = 38, W = 3 x 3,009, H = 64 days x 7.6h = 486.4 (as many days as Monday-Friday in the quarter),
+        # S = 9,027 x round(13 x 38 / 486.4, 2) = 9,207.54, R = 0.14 x (11,013.62 - 9,207.54), mu x beta = 1
+        self.assertAlmostEqual(quarter_deduction, -252.85, 2)
+
+        self._validate_dmfa_structural_deduction(year=2025, quarter=1, payslips=payslips)
+
+    @freeze_time("2026-04-10 10:00:00")
+    def test_full_time_counted_in_days(self):
+        """
+        A full-time occupation is declared in days only: its reference wage is S = W x 13 x D / J, whatever the hours of
+        its days. A 38-hour week of 8-hour days with a 6-hour Wednesday works 488 hours over the 64 days of the first
+        quarter of 2026: 13 x 38 / 488 = 1.01, while 13 x 5 / 64 = 1.02.
+        """
+        calendar_38h_short_wednesday = self.env['resource.calendar'].create({
+            'name': '38h, short Wednesday',
+            'company_id': self.belgian_company.id,
+            'hours_per_day': 7.6,
+            'full_time_required_hours': 38.0,
+            'attendance_ids': [(5, 0, 0)] + [
+                (0, 0, {'dayofweek': str(i), 'hour_from': hour_from, 'hour_to': hour_to})
+                for i in range(5)
+                for hour_from, hour_to in ([(8, 12), (13, 15)] if i == 2 else [(8, 12), (13, 17)])
+            ],
+        })
+        calendar_38h_short_wednesday.reference_calendar_id = self.calendar_38h
+        version = self.employee.create_version({
+            'date_version': date(2026, 1, 1),
+            'resource_calendar_id': calendar_38h_short_wednesday.id,
+        })
+        self.assertEqual(version.work_time_rate, 1.0)
+
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Payslip {month}/2026',
+            'version_id': version.id,
+            'date_from': date(2026, month, 1),
+            'date_to': date(2026, month, 1) + relativedelta(day=31),
+            'employee_id': self.employee.id,
+            'struct_id': self.belgium_monthly_payslip_structure.id,
+            'company_id': self.belgian_company.id,
+        } for month in (1, 2, 3)])
+        for slip in payslips:
+            slip.compute_sheet()
+            slip.action_payslip_done()
+
+        self.assertEqual(sum(payslips.worked_days_line_ids.mapped('number_of_hours')), 488)
+        quarter_deduction = payslips._get_line_values(['ONSS_STRUCTURAL'], compute_sum=True)['ONSS_STRUCTURAL']['sum']['total']
+        # W = 3 x 3,009, S = 9,027 x round(13 x 5 / 64, 2) = 9,207.54 (with the hours: 9,027 x 1.01 = 9,117.27),
+        # R = 0.14 x (11,458.57 - 9,207.54) + 0.15 x (9,547.20 - 9,207.54), mu x beta = 1
+        self.assertAlmostEqual(quarter_deduction, -366.09, 2)
+
+        self._validate_dmfa_structural_deduction(year=2026, quarter=1, payslips=payslips)
+
+    @freeze_time("2025-04-10 10:00:00")
     def test_out_of_order_validation(self):
         """
         Q1 payslips computed in reverse order (i.e. March -> February -> January). February and March should add
@@ -463,3 +555,106 @@ class TestDMFAStructuralDeduction(TestDMFA):
             lambda p: p.date_from >= date(2025, 1, 1) and p.date_to <= date(2025, 3, 31)
         )
         self._validate_dmfa_structural_deduction(year=2025, quarter=1, payslips=q1_payslips)
+
+    def test_manual_payslip_line_change_computes_correct_deduction(self):
+        jan_payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip Jan 2025',
+            'version_id': self.contract.id,
+            'date_from': date(2025, 1, 1),
+            'date_to': date(2025, 1, 31),
+            'employee_id': self.employee.id,
+            'struct_id': self.belgium_monthly_payslip_structure.id,
+            'company_id': self.belgian_company.id,
+        })
+        jan_payslip.compute_sheet()
+        structural_deduction_amount_before = jan_payslip.line_ids.filtered(lambda line: line.code == 'ONSS_STRUCTURAL').total
+
+        meal_voucher_lines = jan_payslip.line_ids.filtered(lambda line: line.code in ['MEAL_V_EMP', 'MEAL_VOUCHER_EMPLOYER'])
+        jan_payslip.write({
+            'line_ids': [Command.update(line.id, {'quantity': line.quantity + 1}) for line in meal_voucher_lines]
+        })
+
+        structural_deduction_amount_after = jan_payslip.line_ids.filtered(lambda line: line.code == 'ONSS_STRUCTURAL').total
+
+        self.assertEqual(structural_deduction_amount_before, structural_deduction_amount_after, "Structural deduction amount should remain the same when changing meal voucher quantity by a small amount.")
+
+    @freeze_time("2025-04-10 10:00:00")
+    def test_no_reduction_below_minimum_occupation(self):
+        """
+        No structural reduction below 27.5% of a full time (mu glob), except for a worker at least half-time.
+        """
+        def _create_payslip(hours_per_day):
+            self.contract.resource_calendar_id = self.env['resource.calendar'].create({
+                'name': f'Part-time {hours_per_day * 5} hours',
+                'company_id': self.belgian_company.id,
+                'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                    'dayofweek': dayofweek,
+                    'hour_from': 8.0,
+                    'hour_to': 8.0 + hours_per_day,
+                }) for dayofweek in ['0', '1', '2', '3', '4']],
+            })
+            self.contract.write({'reference_calendar_id': self.calendar_38h.id, 'wage': 1000})
+            payslip = self.env['hr.payslip'].create({
+                'version_id': self.contract.id,
+                'date_from': date(2025, 1, 1),
+                'date_to': date(2025, 1, 31),
+                'employee_id': self.employee.id,
+                'struct_id': self.belgium_monthly_payslip_structure.id,
+                'company_id': self.belgian_company.id,
+            })
+            payslip.compute_sheet()
+            return payslip
+
+        Dmfa = self.env['l10n_be.dmfa']
+        less_than_half_time = _create_payslip(2.0)  # 10 hours a week
+        self.assertEqual(Dmfa._get_l10n_be_structural_deduction_3000(less_than_half_time, mu_global=0.26), 0)
+        less_than_half_time.action_payslip_cancel()
+        less_than_half_time.unlink()
+        half_time = _create_payslip(3.8)  # 19 hours a week
+        self.assertGreater(Dmfa._get_l10n_be_structural_deduction_3000(half_time, mu_global=0.26), 0)
+        half_time.action_payslip_cancel()
+        half_time.unlink()
+        # no minimum for an artist (with the rates of an ordinary white collar)
+        rates_parameter = self.env['hr.rule.parameter'].sudo().create({
+            'name': 'ONSS Rates: 010_046_0',
+            'code': 'l10n_be_onss_rates_010_046_0',
+            'country_id': self.env.ref('base.be').id,
+        })
+        self.env['hr.rule.parameter.value'].sudo().create({
+            'rule_parameter_id': rates_parameter.id,
+            'parameter_value': str(self.env['hr.rule.parameter']._get_parameter_from_code('l10n_be_onss_rates_010_495_0', date(2025, 1, 1))),
+            'date_from': date(2000, 1, 1),
+        })
+        self.contract.l10n_be_worker_code_id = self.env['l10n.be.worker.code'].search([('dmfa_code', '=', '046')])
+        artist = _create_payslip(2.0)
+        self.assertGreater(Dmfa._get_l10n_be_structural_deduction_3000(artist, mu_global=0.26), 0)
+
+    @freeze_time("2025-04-10 10:00:00")
+    def test_carried_over_leave_in_fraction_of_performance(self):
+        """
+        The carried over leave days (service codes 16 and 17) are part of the fraction of performance μ.
+        """
+        self.contract.wage = 2000
+        payslip = self.env['hr.payslip'].create({
+            'version_id': self.contract.id,
+            'date_from': date(2025, 1, 1),
+            'date_to': date(2025, 1, 31),
+            'employee_id': self.employee.id,
+            'struct_id': self.belgium_monthly_payslip_structure.id,
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        attendance = payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id.dmfa_code == '1')
+        carried_over_leave = attendance.copy({
+            'payslip_id': payslip.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_postponed_paid_time_off_n1').id,
+            'number_of_days': 5,
+            'number_of_hours': 38,
+        })
+        attendance.write({'number_of_days': attendance.number_of_days - 5, 'number_of_hours': attendance.number_of_hours - 38})
+        Dmfa = self.env['l10n_be.dmfa']
+        with_carried_over_leave = Dmfa._get_l10n_be_structural_deduction_3000(payslip, mu_global=1)
+        # the same days as a sickness (service code 50): out of the fraction of performance
+        carried_over_leave.work_entry_type_id = self.env.ref('hr_work_entry.l10n_be_work_entry_type_long_sick')
+        with_sickness = Dmfa._get_l10n_be_structural_deduction_3000(payslip, mu_global=1)
+        self.assertGreater(with_carried_over_leave, with_sickness)

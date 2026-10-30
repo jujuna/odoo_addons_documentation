@@ -5,7 +5,7 @@
         <field name="model">hr.payslip.run</field>
         <field name="inherit_id" ref="hr_payroll.hr_payrun_payslip_kanban_card_view"/>
         <field name="arch" type="xml">
-            <t t-name='payrun_menu' position="inside">
+            <t t-name='menu' position="inside">
                 <button class="oe_stat_button" type="object" name="action_open_payment_batch"
                         options="{'is_smart_button': true}"
                         icon="attach_money" invisible="not l10n_au_payment_batch_id">
@@ -34,7 +34,7 @@
                     </div>
                 </button>
             </t>
-            <button name="action_paid" position="before">
+            <button name="action_payment_report" position="before">
                 <button name="action_open_stp"
                     string="Submit to ATO" type="object" class="btn-primary"
                     options="{'is_priority': True}"
@@ -48,9 +48,6 @@
                         invisible="state != '02_close' or l10n_au_stp_status != 'sent' or country_code != 'AU'"
                         class="oe_highlight"
                         context="{'dont_redirect_to_payments': True, 'hr_payroll_payment_register': True, 'hr_payroll_payment_register_batch': id}"/>
-            </button>
-            <button name="action_paid" position="attributes">
-                <attribute name="invisible" separator=" or " add="(l10n_au_stp_status != 'sent' and country_code == 'AU')"/>
             </button>
             <button name="action_payment_report" position="attributes">
                 <attribute name="invisible" separator=" or " add="(l10n_au_stp_status != 'sent' and state != '03_paid' and country_code == 'AU')"/>

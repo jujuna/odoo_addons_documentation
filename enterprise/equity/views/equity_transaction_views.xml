@@ -91,6 +91,7 @@
                     <button name="action_transaction_send"
                         type="object"
                         string="Send"
+                        groups="equity.group_equity_manager"
                         class="oe_highlight"
                         data-hotkey="u"/>
                     <widget name="attach_document" string="Upload Files" action="message_post"/>
@@ -98,9 +99,10 @@
                         name="equity.action_equity_valuation_form"
                         type="action"
                         string="New Valuation"
+                        groups="equity.group_equity_manager"
                         context="{'default_partner_id': partner_id, 'default_date': date, 'default_share_price': security_price}"/>
                 </header>
-                <div class="alert alert-warning w-100 d-flex align-items-center gap-1" invisible="attachment_ids" role="alert">
+                <div class="alert alert-warning w-100 d-flex align-items-center gap-1" invisible="attachment_ids" role="alert" groups="equity.group_equity_manager">
                     <span>Missing supporting documents! Attach them in the chatter.</span>
                 </div>
                 <sheet>

@@ -24,7 +24,7 @@ class CalendarEvent(models.Model):
     def default_get(self, fields):
         res = super().default_get(fields)
         # If the event has an apt type, set the event stop datetime to match the apt type duration
-        if res.get('appointment_type_id') and res.get('duration') and res.get('start') and 'stop' in fields and "default_stop" not in self.env.context:
+        if res.get('appointment_type_id') and res.get('duration') and res.get('start') and 'stop' in fields:
             res['stop'] = res['start'] + timedelta(hours=res['duration'])
         if not self.env.context.get('booking_gantt_create_record', False):
             return res

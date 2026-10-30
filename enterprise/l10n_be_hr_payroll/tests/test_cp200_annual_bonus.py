@@ -340,7 +340,24 @@ class TestCP200AnnualBonus(TestPayrollCommon):
         })
         self.assertFalse(payslip_pre2016._is_cp200_annual_sectorial_bonus_eligible())
 
-        # 3. Excluded employer category (dmfa_code 024 — construction sector)
+        # 3. Flexi-job contract: the Annual Sectorial Bonus is not computed
+        self.a_contracts.write({
+            'employee_type_id': self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_flexi_employee').id,
+            'contract_date_start': date(2026, 8, 1),
+            'contract_date_end': date(2026, 8, 31),
+        })
+        payslip_flexi = self.env['hr.payslip'].create({
+            'name': 'Bonus - Flexi',
+            'employee_id': self.employee_a.id,
+            'version_id': self.a_contracts.id,
+            'struct_id': self.salary_struct.id,
+            'date_from': date(2026, 8, 1),
+            'date_to': date(2026, 8, 31),
+            'company_id': self.belgian_company.id,
+        })
+        self.assertFalse(payslip_flexi._is_cp200_annual_sectorial_bonus_eligible())
+
+        # 4. Excluded employer category (dmfa_code 024 — construction sector)
         employee_construction = self.create_employee({
             'name': 'Construction Worker',
             'l10n_be_joint_committee_id': self.cp200.id,
@@ -362,6 +379,32 @@ class TestCP200AnnualBonus(TestPayrollCommon):
             'company_id': construction_company.id,
         })
         self.assertFalse(payslip_construction._is_cp200_annual_sectorial_bonus_eligible())
+
+    def test_sectorial_bonus_student(self):
+        """ The last payslip of a student contract does not pay the Annual Sectorial Bonus """
+        student = self.create_employee({
+            'name': 'Student',
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'date_version': date(2026, 7, 1),
+            'contract_date_start': date(2026, 7, 1),
+            'contract_date_end': date(2026, 8, 31),
+            'fixed_term': True,
+            'l10n_be_dimona_category': 'stu',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00841').id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Bonus - Student',
+            'employee_id': student.id,
+            'version_id': student.version_id.id,
+            'struct_id': self.salary_struct.id,
+            'date_from': date(2026, 8, 1),
+            'date_to': date(2026, 8, 31),
+            'company_id': self.belgian_company.id,
+        })
+        self.assertFalse(payslip._is_cp200_annual_sectorial_bonus_eligible())
+        # the same contract outside the student scheme pays it on its last payslip
+        student.version_id.l10n_be_dimona_category = 'oth'
+        self.assertTrue(payslip._is_cp200_annual_sectorial_bonus_eligible())
 
     def test_sectorial_bonus_eligible_mid_year_departure(self):
         """

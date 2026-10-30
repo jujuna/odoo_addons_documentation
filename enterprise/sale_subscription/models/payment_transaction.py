@@ -3,6 +3,7 @@
 from datetime import datetime, time, timedelta
 
 from odoo import api, fields, models
+from odoo.addons.sale_subscription.models.sale_order import SUBSCRIPTION_PROGRESS_STATE
 
 
 class PaymentTransaction(models.Model):
@@ -171,6 +172,8 @@ class PaymentTransaction(models.Model):
                 ).set_open()
             elif tx.state in ('error', 'cancel'):
                 for subscription in subscriptions:
+                    if subscription.subscription_state not in SUBSCRIPTION_PROGRESS_STATE:
+                        continue
                     subscription._handle_subscription_payment_failure(tx)
                 tx._handle_unsuccessful_transaction()
         if any_paid_subscription:

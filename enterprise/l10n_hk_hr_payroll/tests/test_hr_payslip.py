@@ -29,6 +29,7 @@ class TestHrPayslip(TransactionCase):
         Test creating a payslip for an employee whose version
         has no contract start date.
         """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         self.assertFalse(self.employee_hk.version_id.contract_date_start)
 
         payslip = self.env['hr.payslip'].create({

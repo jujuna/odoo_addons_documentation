@@ -132,7 +132,7 @@ describe("appointment slot splitting", () => {
         const { env: pyEnv } = await makeMockServer();
         pyEnv["appointment.type"].create({
             name,
-            category: "website",
+            category: "recurring",
             staff_user_ids: [userId],
             ...extraVals,
         });
@@ -238,14 +238,14 @@ describe("appointment slot splitting", () => {
         await animationFrame();
         expect(created).toHaveLength(2);
         expect(created.every((slot) => slot.slot_type === "recurring")).toBe(true);
-        expect(created.map((slot) => slot.weekday)).toEqual([2, 3]);
+        expect(created.map((slot) => slot.weekday)).toEqual(["2", "3"]);
 
         // crosses midnight in user tz yet it is not split
         created.length = 0;
         await selectTimeRange("2022-01-05 13:00:00", "2022-01-05 15:00:00");
         await animationFrame();
         expect(created).toHaveLength(1);
-        expect(created[0].weekday).toBe(3);
+        expect(created[0].weekday).toBe("3");
     });
 });
 
@@ -346,7 +346,7 @@ describe("recurring slot rendering", () => {
         const { env: pyEnv } = await makeMockServer();
         const appointmentTypeId = pyEnv["appointment.type"].create({
             name: "Recurring Meeting",
-            category: "website",
+            category: "recurring",
             staff_user_ids: [userId],
             ...aptVals,
         });
@@ -399,7 +399,7 @@ describe("recurring slot rendering", () => {
 
 describe("slot editing", () => {
     test("create slots for custom appointment type", async () => {
-        expect.assertions(4);
+        expect.assertions(5);
         patchWithCleanup(navigator, {
             clipboard: {
                 writeText: (value) => {
@@ -421,7 +421,9 @@ describe("slot editing", () => {
         expect(".o_calendar_slot").toHaveCount(1);
         expect.verifySteps(["create slot"]);
 
-        await contains('button[title="Done"]').click();
+        // "Save & copy URL" both leaves edition mode and copies the url again (2nd clipboard assertion)
+        await contains('button[title="Save & copy URL"]').click();
+        await animationFrame();
         expect(MockServer.env["appointment.slot"]).toHaveLength(1);
     });
 
@@ -434,7 +436,7 @@ describe("slot editing", () => {
                 name: "Punctual Meeting",
                 staff_user_ids: [userId],
                 schedule_based_on: "users",
-                category: "website",
+                category: "punctual",
                 start_datetime: "2022-01-06 10:00:00",
                 end_datetime: "2022-01-07 15:00:00",
             },

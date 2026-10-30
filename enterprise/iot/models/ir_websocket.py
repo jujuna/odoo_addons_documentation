@@ -10,7 +10,7 @@ class IrWebsocket(models.AbstractModel):
     def _subscribe(self, data: dict[str, Any]):
         token = data.get("iot_token")
         if token and self.env["iot.box"]._get_by_token(token):
-            data["channels"].append(self.env["iot.channel"].get_iot_channel())
+            data["channels"].append(self.env["iot.channel"].sudo().get_iot_channel())
             if not data["last"]:
                 data["last"] = self.env["bus.bus"].sudo()._bus_last_id()
         return super()._subscribe(data)

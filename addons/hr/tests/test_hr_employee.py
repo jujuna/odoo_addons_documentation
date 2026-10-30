@@ -527,24 +527,21 @@ class TestHrEmployee(TestHrCommon):
         self.assertEqual(self.employee_without_image.image_1920.content, self.user_without_image.image_1920.content)
 
     def test_badge_validation(self):
-        # check employee's barcode should be a sequence of digits and alphabets
+        # check employee's barcode should be printable ASCII characters except spaces
         employee = self.env['hr.employee'].create({
             'name': 'Badge Employee',
         })
 
         employee_form = Form(employee)
-        employee_form.barcode = 'Test@badge1'
-        with self.assertRaises(ValidationError):
-            employee_form.save()
-
-        employee_form.barcode = 'Testàë@badge'
-        with self.assertRaises(ValidationError):
-            employee_form.save()
-
-        employee_form.barcode = 'Testbadge2'
+        employee_form.barcode = 'Test@badge_1'
         employee_form.save()
 
-        self.assertEqual(employee_form.barcode, 'Testbadge2')
+        self.assertEqual(employee_form.barcode, 'Test@badge_1')
+
+        for invalid_barcode in ('Testàë@badge', 'Test badge', ' Testbadge', 'Testbadge ', 'Testbadge\n', 'A' * 19):
+            with self.subTest(barcode=invalid_barcode), self.assertRaises(ValidationError):
+                employee_form.barcode = invalid_barcode
+                employee_form.save()
 
     def test_search_hr_employee_no_access(self):
         new_user = new_test_user(self.env, 'employee')
@@ -661,6 +658,20 @@ class TestHrEmployee(TestHrCommon):
         self.assertTrue(days)
         self.assertFalse(days['2025-01-04'])
 
+    def test_unusual_days_before_contract_start(self):
+        """
+        The days of a version before the start of its contract are unusual days.
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Employee',
+            'date_version': datetime(2025, 1, 1),
+        })
+        employee.version_id.with_context(sync_contract_dates=True).contract_date_start = datetime(2025, 1, 15)
+        days = employee._get_unusual_days(str(datetime(2025, 1, 1)), str(datetime(2025, 1, 31)))
+        # Monday 06/01/2025 is before the contract start, Monday 20/01/2025 is in contract
+        self.assertTrue(days['2025-01-06'])
+        self.assertFalse(days['2025-01-20'])
+
     def test_user_creation_from_employee_with_invalid_email(self):
         employee = self.env['hr.employee'].create({
             'name': 'Test Employee',
@@ -706,6 +717,26 @@ class TestHrEmployee(TestHrCommon):
         no_email_emp = self.env['hr.employee'].create({'name': 'No Email'})
         with self.assertRaises(ValidationError):
             no_email_emp.user_id = no_email_emp._get_or_create_light_user()
+
+    def test_employee_form_links_user_of_work_email(self):
+        user = self.env['res.users'].create({'name': 'Free', 'login': 'free_login', 'email': 'free@example.com'})
+        portal_user = self.env['res.users'].create({
+            'name': 'Portal', 'login': 'portal@example.com', 'group_ids': [Command.set(self.env.ref('base.group_portal').ids)]})
+
+        employee_form = Form(self.env['hr.employee'])
+        employee_form.name = 'Portal'
+        employee_form.work_email = portal_user.login
+        self.assertFalse(employee_form.user_id)
+        employee_form.work_email = 'Free <free@example.com>'
+        self.assertEqual(employee_form.user_id, user)
+        employee = employee_form.save()
+
+        # the user already is an employee of the company
+        employee_form = Form(self.env['hr.employee'])
+        employee_form.name = 'Other'
+        employee_form.work_email = 'free@example.com'
+        self.assertFalse(employee_form.user_id)
+        self.assertEqual(employee.user_id, user)
 
     def test_user_contact_phone_sync(self):
         partner = self.env['res.partner'].create({'name': 'Partner Test'})

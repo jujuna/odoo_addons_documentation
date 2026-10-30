@@ -215,12 +215,12 @@ class AIAgentSource(models.Model):
                 else:
                     source.status = 'indexed'
             else:
-                if source.status == "skipped":
-                    continue
                 records = source._get_target_records()
                 if not records:
                     continue
                 embeddings = records.embedding_ids
+                if source.status == "skipped" and not embeddings:
+                    continue
                 if embeddings and any(e.has_embedding_generation_failed for e in embeddings):
                     source.status = "failed"
                 elif not embeddings or not all(e.embedding_vector for e in embeddings):

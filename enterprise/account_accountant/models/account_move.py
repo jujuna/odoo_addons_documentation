@@ -331,6 +331,8 @@ class AccountMove(models.Model):
                 if not deferred_account:
                     raise UserError(_("Please set a deferred account on the related account or in the accounting settings."))
 
+                deferred_account = self.fiscal_position_id.map_account(deferred_account)
+
                 moves_vals_to_create.append({
                     'move_type': 'entry',
                     'deferred_original_move_ids': [Command.set(line.move_id.ids)],
@@ -366,6 +368,8 @@ class AccountMove(models.Model):
             # Create the deferred entries for the periods [deferred_start_date, deferred_end_date]
             for (line, periods), move_vals in zip(lines_periods, moves_vals_to_create):
                 deferred_account = line.account_id.deferred_account_id or company_deferred_account
+                if deferred_account and self.fiscal_position_id:
+                    deferred_account = self.fiscal_position_id.map_account(deferred_account)
                 remaining_balance = line.balance
                 for period_index, period in enumerate(periods):
                     # For the last deferral move the balance is forced to remaining balance to avoid rounding errors
@@ -933,6 +937,7 @@ class AccountMoveLine(models.Model):
             ('move_type', '=', move.move_type),
             ('partner_id', '=', move.partner_id.id),
             ('company_id', '=', move.journal_id.company_id.id or self.env.company.id),
+            ('invoice_date', '!=', False),
         ]
 
     @api.model

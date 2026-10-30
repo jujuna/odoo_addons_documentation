@@ -78,8 +78,8 @@ class L10nUsForm941(models.Model):
         date_from, date_to = self._get_date_range()
         return [
             ('state', 'in', ['validated', 'paid']),
-            ('date_from', '>=', date_from),
-            ('date_to', '<=', date_to),
+            ('paid_date', '>=', date_from),
+            ('paid_date', '<=', date_to),
             ('company_id', '=', self.company_id.id),
         ]
 
@@ -91,7 +91,7 @@ class L10nUsForm941(models.Model):
 
     def _get_month_to_tax_liability(self):
         month_from = self._get_date_range()[0].month
-        month_to_payslips = self.payslip_ids.grouped(lambda payslip: payslip.date_from.month)
+        month_to_payslips = self.payslip_ids.grouped(lambda payslip: payslip.paid_date.month)
         tax_liability_codes = ["FIT", "SST", "COMPANYSOCIAL", "MEDICARE", "COMPANYMEDICARE", "MEDICAREADD"]
         month_to_tax_liability = {}
 

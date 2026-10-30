@@ -853,7 +853,7 @@ class HelpdeskTeam(models.Model):
                 'res_id': ratings.id
             })
         else:
-            action['context'] = {'search_default_filter_create_date': 'custom_create_date_last_30_days'}
+            action['context'] = {'search_default_filter_rated_on': 'custom_rated_on_last_30_days'}
         return action
 
     def action_view_open_ticket_view(self):

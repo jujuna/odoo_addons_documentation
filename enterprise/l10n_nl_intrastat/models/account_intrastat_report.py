@@ -156,7 +156,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
             #  5.2 => 5; -5.2 => -5; 0.2 => 1; -0.2 => -1
             # If the mass is zero, we leave it like this: it means the user forgot to set the weight
             # of the products, so it should be corrected.
-            mass = res['product_id'] and res['quantity'] * float((res['weight'] or '0.0').replace(',', '.')) or 0
+            mass = res['product_id'] and float((res['weight'] or '0.0').replace(',', '.')) or 0
             if mass:
                 mass = copysign(round(mass) or 1.0, mass)
             supp_unit = str(round(float((res['supplementary_units'] or '0.0').replace(',', '.')))).zfill(10) if res['supplementary_units'] else '0000000000'

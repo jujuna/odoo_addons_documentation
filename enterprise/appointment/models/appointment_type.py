@@ -679,6 +679,15 @@ class AppointmentType(models.Model):
             'target': 'self',
         }
 
+    def action_install_google_reserve(self):
+        module = self.env['ir.module.module'].search(
+            [('name', '=', 'appointment_google_reserve'), ('state', '=', 'uninstalled')], limit=1
+        )
+        if not module:
+            return False
+        module.button_immediate_install()
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
+
     def action_open_form(self):
         self.ensure_one()
         return {
@@ -1988,18 +1997,13 @@ class AppointmentType(models.Model):
         capacity_needed = asked_capacity - first_resource_selected_capacity
         if capacity_needed > 0:
             # Get the best resources combination based on the capacity we need and the resources available.
-            resource_possible_combinations = available_resources._get_filtered_possible_capacity_combinations(
+            resource_possible_combinations = available_resources._get_best_combination_per_capacity(
                 asked_capacity,
                 capacity_info,
             )
             if not resource_possible_combinations:
                 return self.env['appointment.resource']
-            if asked_capacity <= first_resource_selected_capacity_info['total_remaining_capacity'] - first_resource_selected_capacity:
-                r_ids = first_resource_selected.ids + first_resource_selected.linked_resource_ids.ids
-                resource_possible_combinations = list(filter(lambda cap: any(r_id in r_ids for r_id in cap[0]), resource_possible_combinations))
-            resources_combinations_exact_capacity = list(filter(lambda cap: cap[1] == asked_capacity, resource_possible_combinations))
-            resources_combination_selected = resources_combinations_exact_capacity[0] if resources_combinations_exact_capacity else resource_possible_combinations[0]
-            return available_resources.filtered(lambda resource: resource.id in resources_combination_selected[0])
+            return available_resources.filtered(lambda resource: resource.id in resource_possible_combinations[0][0])
 
         if self.is_date_first and not self.is_auto_assign:
             return available_resources

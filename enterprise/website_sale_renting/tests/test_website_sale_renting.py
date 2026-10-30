@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import datetime
+from unittest.mock import patch
 
 from dateutil.relativedelta import FR, SA, SU, relativedelta
 from freezegun import freeze_time
@@ -171,3 +172,28 @@ class TestWebsiteSaleRenting(WebsiteSaleRentingCommon):
 
             # Shouldn't raise on second call
             cart._cart_add(day_product.id, 1, start_date=start_date, end_date=end_date)
+
+    def test_cart_add_rental_minimum_qty_with_limited_stock(self):
+        """The stock check must use the minimum quantity spread over the rental periods."""
+        bike = self._create_product(
+            name="Bike",
+            rent_periodicity="days",
+            is_published=True,
+            is_storable=True,
+            allow_out_of_stock_order=False,
+            minimum_quantity=10,
+        )
+        start_date = datetime(2025, 1, 15, 9, 0, 0)
+        end_date = datetime(2025, 1, 17, 9, 0, 0)  # 2 days -> 5 units are enough
+
+        SaleOrder = self.env.registry["sale.order"]
+        with (
+            freeze_time("2025-01-10"),
+            self.mock_request(website=self.website) as request,
+            patch.object(SaleOrder, "_get_free_qty", return_value=6),
+        ):
+            cart = request.env.website._create_cart()
+            values = cart._cart_add(bike.id, 1, start_date=start_date, end_date=end_date)
+
+            self.assertFalse(values["warning"])
+            self.assertEqual(cart.order_line.product_uom_qty, 5)

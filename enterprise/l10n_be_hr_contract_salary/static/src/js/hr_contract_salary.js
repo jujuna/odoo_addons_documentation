@@ -97,8 +97,10 @@ patch(SalaryPackage.prototype, {
         }
         const companyCarCost = this.el.querySelector("input[name='company_car_total_depreciated_cost']")?.parentElement
         const temporaryCarCost = this.el.querySelector("input[name='temporary_car_total_depreciated_cost']")?.parentElement
-        companyCarCost?.insertAdjacentElement('afterend', temporaryCarCost);
-        temporaryCarCost?.classList.add('d-none');
+        if (companyCarCost && temporaryCarCost) {
+            companyCarCost.insertAdjacentElement('afterend', temporaryCarCost);
+            temporaryCarCost.classList.add('d-none');
+        }
         const fuelCardSlider = this.el.querySelector("input[name='fuel_card_slider']");
         if (fuelCardSlider) {
             const mandatoryBenefits = fuelCardSlider.dataset.benefit_idsMandatory;

@@ -54,7 +54,7 @@ class TestAccountReportsModelo390(TestAccountReportsCommon):
         account_return = self.env['account.return'].create({
             'name': 'Tax Return',
             'type_id': self.env.ref('l10n_es_reports.es_mod390_tax_return_type').id,
-            'company_id': self.company.id,
+            'company_id': self.es_company.id,
             'date_from': f'{year}-01-01',
             'date_to': f'{year}-12-31',
         })

@@ -120,6 +120,7 @@ class IrActionsServer(models.Model):
             'allowed_company_ids': self.env.companies.ids,
             'active_company_ids': self.env.companies.ids,
             'ai_automation_run': True,
+            'ai_show_tool_status': True,
         }
         for key in ('lang', 'tz', 'cron_id'):
             if self.env.context.get(key):

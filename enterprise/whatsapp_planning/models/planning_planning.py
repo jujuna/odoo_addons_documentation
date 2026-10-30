@@ -27,6 +27,7 @@ class PlanningPlanning(models.Model):
         ## /!\ For security reason, we only make message models for public employees
         first_start_date = {}
         last_end_date = {}
+        partner_to_employee = {}
         for slot in slots:
             if not slot.employee_ids:
                 continue
@@ -42,24 +43,23 @@ class PlanningPlanning(models.Model):
             if employee.id not in first_start_date:
                 first_start_date[employee.id] = self.date_start
                 last_end_date[employee.id] = self.date_end
+            for partner in employee._get_related_partners():
+                partner_to_employee[partner.id] = employee.id
         public_employees = self.env['hr.employee.public'].browse(employees.ids)
         comp = self.env['whatsapp.composer'].create({
             'res_model': 'res.partner',
-            'free_text_1': format_date(self.env, datetime(first_start_date[employee.id].year, first_start_date[employee.id].month, first_start_date[employee.id].day)),
-            'free_text_2': format_date(self.env, datetime(last_end_date[employee.id].year, last_end_date[employee.id].month, last_end_date[employee.id].day)),
-            'res_ids': public_employees._get_related_partners().ids,
-            'batch_mode': len(public_employees._get_related_partners().ids) > 1,
+            'res_ids': public_employees.employee_id._get_related_partners().ids,
+            'batch_mode': len(public_employees.employee_id._get_related_partners().ids) > 1,
             'wa_template_id': template.id
         })
         messages = self.env['whatsapp.message'].create(comp._create_whatsapp_messages_values())
         for message in messages:
-            employee_id = message.mail_message_id.res_id
+            employee_id = partner_to_employee[message.mail_message_id.res_id]
             message.free_text_json = {
-                **message.free_text_json,
                 'free_text_1': format_date(self.env, datetime(first_start_date[employee_id].year, first_start_date[employee_id].month, first_start_date[employee_id].day)),
-                'free_text_2': format_date(self.env, datetime(last_end_date[employee.id].year, last_end_date[employee.id].month, last_end_date[employee.id].day)),
-                'free_text_4': employee_url_map.get(employee.id, "/"),
-                'button_dynamic_url_1': ics_url_per_employee_id[employee.id],
+                'free_text_2': format_date(self.env, datetime(last_end_date[employee_id].year, last_end_date[employee_id].month, last_end_date[employee_id].day)),
+                'free_text_4': employee_url_map.get(employee_id, "/"),
+                'button_dynamic_url_1': ics_url_per_employee_id[employee_id],
             }
             message._send()
 

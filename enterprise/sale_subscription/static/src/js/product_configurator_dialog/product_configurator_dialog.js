@@ -76,4 +76,12 @@ patch(ProductConfiguratorDialog.prototype, {
             );
         }
     },
+
+    _getAdditionalDialogProps() {
+        const props = super._getAdditionalDialogProps();
+        if (this.saleSubscriptionProps.plan_id) {
+            props.plan_id = this.saleSubscriptionProps.plan_id;
+        }
+        return props;
+    },
 });

@@ -5,45 +5,44 @@
         <field name="model">payroll.config.settings</field>
         <field name="inherit_id" ref="hr_payroll.payroll_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <sheet position="before">
-                <div role="alert" class="alert alert-info" invisible="country_code != 'BE'">
-                    <p class="m-0 p-0">
-                        You can find most of these information on the <a href="https://employer-identification-consult.socialsecurity.be/" target="_blank">employer directory</a>
-                    </p>
+            <xpath expr="//div[hasclass('oe_title')]" position="inside">
+                <div class="d-flex align-items-baseline gap-2" invisible="country_code != 'BE'" groups="hr_payroll.group_hr_payroll_user">
+                    <label for="l10n_be_company_number" class="text-nowrap"/>
+                    <field name="l10n_be_company_number" placeholder="e.g. 0412345614"
+                        required="1"
+                        readonly="parent_id"/>
                 </div>
-            </sheet>
+            </xpath>
+            <field name="date_version" position="attributes">
+                <attribute name="invisible">country_code == 'BE'</attribute>
+            </field>
             <group name="payroll_settings" position="after">
                 <group name="l10n_be_hr_payroll" invisible="country_code != 'BE'" groups="hr_payroll.group_hr_payroll_user">
                     <group string="Payroll Data">
                         <field name="parent_id" invisible="1"/>
-                        <field name="onss_registration_number" placeholder="e.g. 083012308" 
-                            required="l10n_be_has_employees" 
-                            readonly="parent_id"
-                            help="The ONSS Registration Number is a 9-digit code given by ONSS."/>
+                        <label for="onss_registration_number"/>
+                        <div class="o_row">
+                            <field name="onss_registration_number" placeholder="e.g. 083012308"
+                                required="l10n_be_has_employees"
+                                readonly="parent_id"
+                                help="The ONSS Registration Number is a 9-digit code given by ONSS."/>
+                            <a href="https://employer-identification-consult.socialsecurity.be/" target="_blank" class="text-nowrap">
+                                <i class="oi" data-icon="east"/> Search Online
+                            </a>
+                        </div>
                         <field name="l10n_be_employer_category_id" placeholder="e.g. 010" required="l10n_be_has_employees" help="The 3-digit code that defines your employer category in DMFA filings."/>
-                        <field name="l10n_be_revenue_code" placeholder="e.g. 058" 
+                        <field name="l10n_be_revenue_code" placeholder="e.g. 1230" 
                             required="l10n_be_has_employees" 
                             readonly="parent_id"
                             help="The company's official revenue (ONSS/RSZ) code used for Belgian payroll declarations."/>
-                        <field name="l10n_be_main_joint_committee" placeholder="e.g. CP200, CP302" domain="[('id', 'in', allowed_joint_committee_ids)]" required="1"/>
-                        <div class="d-flex align-items-center gap-2" colspan="2">
-                            <span class="o_form_label">Not sure what is your code?</span>
-                            <button name="%(l10n_be_hr_payroll.l10n_be_dmfa_work_locations_action)d" 
-                                    icon="east" 
-                                    type="action" 
-                                    string="Check official DMFA codes" 
-                                    class="btn-link"/>
-                        </div>
+                        <field name="l10n_be_main_joint_committee" placeholder="e.g. 200, 302" domain="[('id', 'in', allowed_joint_committee_ids)]" required="1"/>
                     </group>
 
                     <group name="company_information" string="Company Information">
-                        <field name="l10n_be_company_number" placeholder="e.g. 0412345614" 
-                            required="1" 
-                            readonly="parent_id"/>
                         <label for="onss_importance_code"/>
                         <div class="o_row">
                             <field name="onss_importance_code" 
-                                placeholder="Select number of employees" 
+                                placeholder="Based on number of employees" 
                                 required="l10n_be_has_employees"
                                 readonly="parent_id"
                                 help="Determined by the ONSS directly based on the average of employees your company had. Contact the ONSS or your social secretariat to get to correct information."/>
@@ -52,9 +51,11 @@
                             <field name="exemption_sme_status" invisible="onss_importance_code not in ('7', '8', '9')" readonly="parent_id"/>
                         </div>   
                         <field name="l10n_be_in_difficulty" 
+                            invisible="context.get('l10n_be_company_setup')"
                             readonly="parent_id"
                             help="The Federal Minister of Labour may grant companies recognition as a company in difficulty"/>
                         <field name="l10n_be_at_risk_groups_contribution" 
+                            invisible="context.get('l10n_be_company_setup')"
                             readonly="parent_id"
                             help="The contribution for 'at-risk groups' is a specific employer contribution paid to the ONSS (National Social Security Office) in Belgium, intended to finance training and professional integration initiatives for certain categories of workers."/>
                         <field name="l10n_be_ffe_employer_type" 
@@ -62,39 +63,45 @@
                             readonly="parent_id"
                             help="Determined by the ONSS. Contact the ONSS or your social secretariat to get to correct information."/>
                         <field name="l10n_be_nace_code_id" placeholder="e.g. 010" 
+                            invisible="context.get('l10n_be_company_setup')"
                             readonly="parent_id"
                             help="The NACE code is the official statistical classification system used by the European Union to categorize businesses and economic activities by industry sector."/>
-                        <field name="l10n_be_employee_retirement_fund" placeholder="e.g. 0001" help="Supplementary pension fund code for employees."/>
-                        <field name="l10n_be_worker_retirement_fund" placeholder="e.g. 0001" help="Supplementary pension fund code for workers."/>
+                        <field name="l10n_be_employee_retirement_fund" placeholder="e.g. 0001" help="Supplementary pension fund code for employees." invisible="context.get('l10n_be_company_setup')"/>
+                        <field name="l10n_be_worker_retirement_fund" placeholder="e.g. 0001" help="Supplementary pension fund code for workers." invisible="context.get('l10n_be_company_setup')"/>
                         <field name="l10n_be_sector" readonly="parent_id" required="1"/>
                         <field name="l10n_be_ipa_reduction" 
+                            invisible="context.get('l10n_be_company_setup')"
                             readonly="parent_id"
                             help="The AIP reduction is a tax exemption allowing SMEs to keep part of the payroll withholding tax instead of remitting it to the government. Contact your social secretaria to know if you are entitled or not to it."/>
                         <field name="l10n_be_holiday_pay_fund_name"
+                            invisible="context.get('l10n_be_company_setup') and not l10n_be_has_workers"
                             required="l10n_be_has_workers"
                             placeholder="Name of the holiday pay fund"/>
                         <field name="l10n_be_holiday_pay_fund_number"
+                            invisible="context.get('l10n_be_company_setup') and not l10n_be_has_workers"
                             required="l10n_be_has_workers"
                             placeholder="e.g. 1900123-45" help="Registration number for your holiday pay fund for your workers."/>
                         <field name="l10n_be_SEPPT_name"
+                            invisible="context.get('l10n_be_company_setup')"
                             placeholder="e.g. Securex, Liantis, Cohezio"/>
                         <field name="l10n_be_SEPPT_number"
+                            invisible="context.get('l10n_be_company_setup')"
                             required="l10n_be_SEPPT_name"
                             placeholder="e.g. POL1234567"/>
                     </group>
 
-                    <group string="Insurances">
+                    <group string="Insurances" invisible="context.get('l10n_be_company_setup')">
                         <field name="employee_accident_insurance_name"
-                            required="l10n_be_has_employees"
+                            required="context.get('l10n_be_fix_accident_insurance') and l10n_be_has_employees"
                             placeholder="e.g. Ethias, AG Insurance" help="Name of the insurance company providing the employee accident coverage."/>
                         <field name="employee_accident_insurance_number"
-                            required="l10n_be_has_employees"
+                            required="context.get('l10n_be_fix_accident_insurance') and l10n_be_has_employees"
                             placeholder="e.g. POL1234567" help="The policy or contract number of your employee accident insurance."/>
                         <field name="worker_accident_insurance_name"
-                            required="l10n_be_has_workers"
+                            required="context.get('l10n_be_fix_accident_insurance') and l10n_be_has_workers"
                             placeholder="e.g. Ethias, AG Insurance" help="Name of the insurance company providing the worker accident coverage."/>
                         <field name="worker_accident_insurance_number"
-                            required="l10n_be_has_workers"
+                            required="context.get('l10n_be_fix_accident_insurance') and l10n_be_has_workers"
                             placeholder="e.g. POL1234567" help="The policy or contract number of your worker accident insurance."/>
                         <field name="group_insurance_name"
                             placeholder="e.g. OVMB, C.G.E.R., AG Insurance"/>
@@ -133,12 +140,12 @@
                         </div>
                     </group>
 
-                    <group name="" string="Withholding Taxes">
+                    <group name="" string="Withholding Taxes" invisible="context.get('l10n_be_company_setup')">
                         <field name="l10n_be_declaration_frequency" widget="radio" options="{'horizontal': True}"
                             readonly="parent_id"
                             help="Configure the frequency at which you must submit your declarations"/>
                     </group>
-                    <group string="First Hires" colspan="2">
+                    <group string="First Hires" colspan="2" invisible="context.get('l10n_be_company_setup')">
                         <field name="l10n_be_reduction_for_first_hires"
                             readonly="parent_id"
                             help="Enables RSZ/ONSS reductions for the 1st, 2nd, and 3rd employees. Requires valid 'New Employer' status (no employees subject to social security in the previous 4 quarters). Note: Reductions for 6th hires are abolished for contracts starting after Dec 31, 2023, and reductions for 4th and 5th were abolished between Jan 01, 2024 and Jun 30, 2026"/>
@@ -203,6 +210,10 @@ if env.company.country_code != 'BE':
 
 config = env.company.current_payroll_config_id
 action = config.action_open_hr_payroll_localization_form()
+action['context'] = {
+    'l10n_be_fix_accident_insurance': env.context.get('l10n_be_fix_accident_insurance', False),
+    'l10n_be_company_setup': env.context.get('l10n_be_company_setup', False),
+}
         </field>
     </record>
 

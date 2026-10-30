@@ -7,4 +7,7 @@ patch(DiscussChannel.prototype, {
         super.setup(...arguments);
         this.from_ai_automation = false;
     },
+    get importantCounter() {
+        return this.from_ai_automation ? 0 : super.importantCounter;
+    },
 });

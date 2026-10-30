@@ -1,5 +1,14 @@
 import { useSubEnv } from "@web/owl2/utils";
-import { Component, onWillStart, proxy, t, useOnChange, useListener, useProps } from "@odoo/owl";
+import {
+    Component,
+    onWillStart,
+    proxy,
+    t,
+    untrack,
+    useOnChange,
+    useListener,
+    useProps,
+} from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
@@ -29,6 +38,10 @@ export class TimesheetSystrayContent extends Component {
         return this.cacheState.timesheets.reduce((sum, ts) => sum + ts.unit_amount, 0);
     }
 
+    get employee() {
+        return this.cacheState.employee;
+    }
+
     setup() {
         this.action = useService("action");
         this.orm = useService("orm");
@@ -37,7 +50,6 @@ export class TimesheetSystrayContent extends Component {
         this.cacheState = this.cache.state;
         this.menu = useService("menu");
         this.lazySession = useService("lazy_session");
-        this.employee = false;
 
         this.state = proxy({
             selectedTimesheet: {},
@@ -49,9 +61,6 @@ export class TimesheetSystrayContent extends Component {
             this.cache.fetchPreFilledForm();
             this.lazySession.getValue("display_timesheets_assistant", (value) => {
                 this.state.showAssistant = value;
-            });
-            this.lazySession.getValue("timesheet_systray_employee_data", (value) => {
-                this.employee = value;
             });
 
             this.restoreActiveTimesheet();
@@ -193,7 +202,7 @@ export class TimesheetSystrayContent extends Component {
     }
 
     onDiscard() {
-        this.cacheState.pre_filled_form = {};
+        this.cache.clearPreFilledForm();
         this.state.selectedTimesheet = {};
         this.staticTimerService.clearActiveTimesheetId();
         this.staticTimerService.clearManualChange();
@@ -226,7 +235,11 @@ export class TimesheetSystrayContent extends Component {
             context[`default_${fieldName}`] = resId;
             // Since values won't be given to the record in this case (see
             // savedTimesheetData), the elapsed time has to be passed here too.
-            context.default_unit_amount = this.staticTimerService.getCurrentFloatValue(false);
+            // untrack: reading it live would subscribe this component to the
+            // ticking timer, and rebuild the whole form every second.
+            context.default_unit_amount = untrack(() =>
+                this.staticTimerService.getCurrentFloatValue(false)
+            );
         }
         return context;
     }

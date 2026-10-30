@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from freezegun import freeze_time
 
+from odoo.exceptions import UserError
 from odoo.tests.common import tagged
 from odoo.addons.hr_payroll.tests.common import TestPayrollHolidaysBase
 
@@ -54,3 +55,65 @@ class TestLeaveStateChange(TestPayrollHolidaysBase):
             "validate",
             "Approved leave can't be moved back to confirm state if included in done/paid payslip",
         )
+
+    def test_category_options_validation_on_work_entry_type_change(self):
+        category = self.env['hr.salary.rule.category'].create({
+            'name': 'Test Category',
+            'code': 'TEST_CAT',
+        })
+        wet_allowed = self.env['hr.work.entry.type'].create({
+            'name': 'Work Entry Type Allowed',
+            'code': 'WET_ALLOW',
+            'requires_allocation': False,
+            'optional_category_ids': [(6, 0, category.ids)],
+            'leave_validation_type': 'hr'
+        })
+        wet_disallowed = self.env['hr.work.entry.type'].create({
+            'name': 'Work Entry Type Disallowed',
+            'code': 'WET_DISALLOW',
+            'requires_allocation': False,
+            'leave_validation_type': 'hr'
+        })
+
+        leave = self.env['hr.leave'].with_user(self.emp.user_id).create({
+            'name': 'Test Leave',
+            'employee_id': self.emp.id,
+            'work_entry_type_id': wet_allowed.id,
+            'request_date_from': '2018-02-23',
+            'request_date_to': '2018-02-23',
+        }).sudo()
+
+        leave.write({'category_options_ids': [(6, 0, category.ids)]})
+
+        with self.assertRaises(UserError, msg="You cannot select the option(s) 'Test Category' for the time off type 'Work Entry Type Disallowed'."):
+            leave.write({'work_entry_type_id': wet_disallowed.id})
+
+        leave.write({
+            'work_entry_type_id': wet_disallowed.id,
+            'category_options_ids': [(5, 0, 0)]
+        })
+        self.assertEqual(leave.work_entry_type_id, wet_disallowed)
+        self.assertFalse(leave.category_options_ids)
+
+    @freeze_time('2026-03-01')
+    def test_leave_version_fields_on_archived_version(self):
+        """ The version fields of a time off follow the version in effect at its date,
+        archived versions excluded. """
+        other_structure_type = self.env['hr.payroll.structure.type'].create({
+            'name': 'Test - Other',
+        })
+        version = self.emp.create_version({
+            'date_version': '2026-03-01',
+            'structure_type_id': other_structure_type.id,
+        })
+        leave = self.env['hr.leave'].create({
+            'name': 'Golf time',
+            'work_entry_type_id': self.work_entry_type.id,
+            'employee_id': self.emp.id,
+            'request_date_from': '2026-03-10',
+            'request_date_to': '2026-03-11',
+        })
+        self.assertEqual(leave.structure_type_id, other_structure_type)
+
+        version.action_archive()
+        self.assertEqual(leave.structure_type_id, self.structure_type)

@@ -7,9 +7,9 @@ import secrets
 import uuid
 from markupsafe import Markup
 from textwrap import dedent
-from typing import Unpack
+from typing import Literal, Unpack
 
-from odoo import api, Command, fields, models
+from odoo import _, api, Command, fields, models
 from odoo.exceptions import AccessError, ConcurrencyError, MissingError, UserError, ValidationError
 from odoo.modules.registry import Registry
 from odoo.sql_db import PG_CONCURRENCY_EXCEPTIONS_TO_RETRY
@@ -277,14 +277,19 @@ class AiSession(models.Model):
             for xmlid in DEFAULT_SESSION_SCOPED_TOOLS:
                 if tool := self.env.ref(xmlid, raise_if_not_found=False):
                     tools |= tool
-        if self.agent_id.allowed_agent_ids:
-            ancestor, depth = self, 1
-            while ancestor.parent_session_id:
-                ancestor, depth = ancestor.parent_session_id, depth + bool(ancestor.agent_id)
-            if depth < 4:
-                for xmlid in SUBAGENT_TOOL_XMLIDS:
-                    tools |= self.env.ref(xmlid)
+        if self.agent_id.allowed_agent_ids and self._can_start_subsession():
+            for xmlid in SUBAGENT_TOOL_XMLIDS:
+                tools |= self.env.ref(xmlid)
         return tools
+
+    def _can_start_subsession(self) -> bool:
+        self.ensure_one()
+        max_depth = max(1, self.env['ir.config_parameter'].sudo().get_int('ai.max_subsession_depth', 4))
+        # Count agent levels, with the root agent at level one.
+        ancestor, depth = self, 1
+        while ancestor.parent_session_id:
+            ancestor, depth = ancestor.parent_session_id, depth + bool(ancestor.agent_id)
+        return depth < max_depth
 
     def _initialize_tool_state(self, state):
         skills = self.env['ai.skill'].sudo().browse(state.get('loaded_skills', []))
@@ -467,6 +472,41 @@ class AiSession(models.Model):
                 snapshot[key] = [company_id for company_id in snapshot[key] if company_id in accessible_company_ids]
         return snapshot
 
+    def _get_completion_env(self) -> api.Environment:
+        """Restore the requesting user's environment for a completion."""
+        self.ensure_one()
+        env = self.env(user=self.request_user_id.id, context=self.request_context or {}, su=False)
+        if self.request_guest_id:
+            env = env(context={**env.context, 'guest': env['mail.guest'].browse(self.request_guest_id.id)})
+        return env(context={**env.context, 'discuss_channel': env['discuss.channel'].browse(self.channel_id.id)})
+
+    def _process_completion_result(
+        self, llm_result: CompletionResponse | Literal[False],
+    ) -> None:
+        """Continue a waiting session with its completion result.
+
+        The caller must restore the requesting user's environment, including
+        guest and channel context, and set it as the transaction default.
+        """
+        self.ensure_one()
+        self_sudo = self.sudo()
+        accessible_company_ids = frozenset(self.env.user.company_ids.ids)
+        for key in ('allowed_company_ids', 'active_company_ids'):
+            if any(company_id not in accessible_company_ids for company_id in self.env.context.get(key, ())):
+                raise AccessError(self.env._(
+                    "Your company access changed while this AI response was running."
+                ))
+        completion_result: CompletionSuccess | CompletionFailure
+        if llm_result is False:
+            completion_result = {'kind': 'failure', 'code': 'request_failed'}
+        else:
+            completion_result = {'kind': 'success', 'message': llm_result['result']}
+        match self_sudo.state['callback_type']:
+            case 'agent_loop':
+                self_sudo._continue_agent_loop(completion_result)
+            case 'channel_name':
+                self_sudo._continue_channel_name(completion_result)
+
     def _save_and_submit_request(
         self, payload, *, callback_type,
         request_round, request_round_limit,
@@ -493,16 +533,26 @@ class AiSession(models.Model):
         self.write(vals)
         self._publish_response_state()
         connection = get_odoo_ai_connection_data(self.env)
-        params = {
-            **copy.deepcopy(payload),
-            'request_uuid': vals["request_uuid"],
-            'webhook_url': url_join(
-                self.get_base_url(), ODOO_AI_COMPLETION_CALLBACK_PATH,
-            ),
-            'webhook_secret': vals["request_webhook_secret"],
-            'webhook_dbname': self.env.cr.dbname,
-            'llm_retry': False,
-        }
+        use_webhook = self.env['ir.config_parameter'].sudo().get_bool('ai.use_webhook', True)
+        request_uuid = vals['request_uuid']
+        params = copy.deepcopy(payload)
+        if use_webhook:
+            route = '1/get_completions'
+            timeout = IAP_TRANSPORT_TIMEOUT
+            params.update({
+                'request_uuid': request_uuid,
+                'webhook_url': url_join(
+                    self.env['ir.config_parameter'].sudo().get_str('ai.webhook_url', self.get_base_url()),
+                    ODOO_AI_COMPLETION_CALLBACK_PATH,
+                ),
+                'webhook_secret': vals['request_webhook_secret'],
+                'webhook_dbname': self.env.cr.dbname,
+                'llm_retry': False,
+            })
+        else:
+            route = '1/get_completions_sync'
+            # timeout can be overridden in _get_model_round_options
+            timeout = params.pop('timeout', 120)
         dbname = self.env.cr.dbname
         user_id = self.env.uid
         guest_id = vals["request_guest_id"]
@@ -510,41 +560,56 @@ class AiSession(models.Model):
 
         @self.env.cr.postcommit.add
         def submit():
-            def rescue_session(error_msg, send_credit_notif=False):
+            def rescue_session(send_credit_notif=False):
                 try:
                     with Registry(dbname).cursor() as cr:
                         env = api.Environment(cr, user_id, context)
                         if guest_id:
                             env = env(context={**env.context, 'guest': env['mail.guest'].browse(guest_id)})
-                        session = env['ai.session'].sudo().search([('request_uuid', '=', params['request_uuid'])])
+                        session = env['ai.session'].sudo().search([('request_uuid', '=', request_uuid)])
                         if session:
                             if callback_type == 'channel_name':
                                 session.unlink()
                                 return
+                            if send_credit_notif:
+                                error_msg = env._("Not enough credits to use Odoo AI")
+                            else:
+                                error_msg = env._("Odoo AI is currently unreachable. Please try again later.")
+
                             if send_credit_notif and not env.context.get('cron_id'):
                                 env['iap.account']._send_no_credit_notification(
                                     service_name='odoo_ai', title=error_msg,
                                 )
                             session._finish_exchange('failed', content=error_msg if session.parent_session_id else None)
                 except Exception:  # noqa: BLE001
-                    _logger.exception("Failed to clean up failed AI session submission %s", params['request_uuid'])
+                    _logger.exception("Failed to clean up failed AI session submission %s", request_uuid)
 
             try:
-                call_odoo_ai_transport(
-                    connection, '1/get_completions', params,
-                    timeout=IAP_TRANSPORT_TIMEOUT, raise_user_error=False,
+                result = call_odoo_ai_transport(
+                    connection, route, params,
+                    timeout=timeout, raise_user_error=False,
                 )
             except InsufficientCreditError:
                 _logger.info("Insufficient credit for Odoo AI")
-                rescue_session(
-                    self.env._("Not enough credits to use Odoo AI"),
-                    send_credit_notif=True,
-                )
+                rescue_session(send_credit_notif=True)
+                return
             except Exception:  # noqa: BLE001
-                _logger.exception("Failed to submit AI request %s", params['request_uuid'])
-                rescue_session(
-                    self.env._("Odoo AI is currently unreachable. Please try again later."),
-                )
+                _logger.exception("Failed to submit AI request %s", request_uuid)
+                rescue_session()
+                return
+
+            if not use_webhook:
+                with Registry(dbname).cursor() as cr:
+                    env = api.Environment(cr, user_id, context)
+                    session = env['ai.session'].sudo().search([
+                        ('request_uuid', '=', request_uuid),
+                        ('loop_state', '=', 'waiting_model'),
+                    ], limit=1)
+                    if session:
+                        env = session._get_completion_env()
+                        # Match request.update_env(): transaction-wide work needs the restored context too.
+                        env.transaction.default_env = env
+                        session.with_env(env)._process_completion_result(result)
 
     def _submit_agent_request(self, message=None) -> None:
         """If no message, it's for the succeeding round."""
@@ -577,9 +642,13 @@ class AiSession(models.Model):
                 if text and self.agent_id.sources_ids:
                     rag_context = self.agent_id._build_rag_context(text)
                 state['rag_context'] = rag_context
+
+            if is_first_round or 'context_date' not in state:
+                state['context_date'] = fields.Datetime.to_string(fields.Datetime.now())
+
             last_user_message['content'].append({
                 'type': 'text',
-                'text': self._get_context_input(rag_context),
+                'text': self.with_context(ai_context_date=state['context_date'])._get_context_input(rag_context),
             })
 
         updated_instructions = self._append_loaded_skills(
@@ -613,6 +682,10 @@ class AiSession(models.Model):
             })
         else:
             tools = self.env["ir.actions.server"].sudo().browse(state.get("available_tools")).exists()
+            if not self._can_start_subsession():
+                for xmlid in SUBAGENT_TOOL_XMLIDS:
+                    tools -= self.env.ref(xmlid)
+                state['available_tools'] = tools.ids
         if tools and completion_options.get('web_grounding'):
             raise UserError(self.env._(
                 "The web grounding option is not supported with tools. Use the web search skill instead."
@@ -639,6 +712,18 @@ class AiSession(models.Model):
         while session.parent_session_id:
             session = session.parent_session_id
         return session
+
+    def _check_active_session_limit(self) -> None:
+        self.ensure_one()
+        root = self._root_session()
+        active_sessions = self.with_context(active_test=False).search_count([
+            ('parent_session_id', 'child_of', root.id),
+            ('agent_id', '!=', False),
+            ('loop_state', '!=', 'ready'),
+        ])
+        limit = self.env['ir.config_parameter'].sudo().get_int('ai.max_active_sessions', 20)
+        if active_sessions >= limit:
+            raise UserError(self.env._("The session tree has reached its active-session limit."))
 
     def _merge_child_result(self, child, result):
         """Replace a child marker and advance the parent when its loop can continue."""
@@ -927,7 +1012,7 @@ class AiSession(models.Model):
         context = "<odoo_current_context>\n"
         if rag_context:
             context += f"## RAG\n{rag_context}\n"
-        context += f"## Date\n{fields.Datetime.now()} (UTC)"
+        context += f"## Date\n{self.env.context['ai_context_date']} (UTC)"
         if self.env.user._is_internal():
             user_info = {k: v for k, v in self.env.user._ai_read(['name', 'function', 'partner_id'])[0][0].items() if v}
             user_info['user_id'] = user_info.pop('id')
@@ -1141,7 +1226,8 @@ class AiSession(models.Model):
     @api.model
     def _get_direct_response(
         self, instructions: str, message: AIMessageParts, tools=None,
-        record=None, agent_id=None, on_item_callback=None, **completion_options: Unpack[CompletionOptions]
+        record=None, agent_id=None, on_item_callback=None, timeout=60,
+        **completion_options: Unpack[CompletionOptions],
     ) -> AIMessageParts:
         """Gets a response from the LLM without managing conversation history/session state.
 
@@ -1155,6 +1241,7 @@ class AiSession(models.Model):
         :param record: The current Odoo record related to the request, if any.
         :param agent_id: The agent ID, if any.
         :param on_item_callback: A function to call for each item produced by the agentic loop
+        :param timeout: HTTP timeout of each LLM request
         :return: formatted response from the LLM, typically a list of message parts
         """
         tools_context = {
@@ -1176,7 +1263,8 @@ class AiSession(models.Model):
             message=message,
             tools_context=tools_context,
             record=record,
-            **completion_options
+            timeout=timeout,
+            **completion_options,
         )
         for item in response_generator:
             if on_item_callback is not None:
@@ -1189,9 +1277,9 @@ class AiSession(models.Model):
                             continue
                         part['text'] = apply_web_citations(part['text'], sources)
                 return response
-        return None
+        raise UserError(_("Something went wrong. Please rephrase your prompt and try again."))
 
-    def _run_agentic_loop(self, instructions, message, tools_context, record=None, **completion_options):
+    def _run_agentic_loop(self, instructions, message, tools_context, record=None, timeout=60, **completion_options):
         """Internal: runs the LLM completion loop, handling tool calls until done.
 
         Not meant to be called directly. Use `_get_direct_response` for one-shot
@@ -1216,6 +1304,7 @@ class AiSession(models.Model):
                     messages[:],
                     updated_instructions,
                     formatted_tools,
+                    timeout=timeout,
                     **completion_options,
                 )
             except InsufficientCreditError:
@@ -1254,6 +1343,7 @@ class AiSession(models.Model):
         messages: list[Message],
         instructions: str,
         tools: list[Tool] | None = None,
+        timeout: int = 60,
         **options: Unpack[CompletionOptions],
     ) -> CompletionResponse:
         params = {
@@ -1262,7 +1352,7 @@ class AiSession(models.Model):
             'tools': tools,
             **options,
         }
-        return call_odoo_ai(self.env, "1/get_completions_sync", params)
+        return call_odoo_ai(self.env, "1/get_completions_sync", params, timeout=timeout)
 
     @api.model
     def _get_last_user_message(self, messages: list[Message]):

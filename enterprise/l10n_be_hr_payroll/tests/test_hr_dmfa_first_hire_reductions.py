@@ -104,12 +104,16 @@ class TestDmfaFirstHiresReductions(TestPayrollCommon):
         natural_persons = rendered_data['natural_persons']
         emp_c_np = next(np for np in natural_persons if np.employee.id == emp_c.id)
 
+        # A target group reduction, declared on the occupation line
         reduction_nodes = [
-            d for worker in emp_c_np.worker_records for d in worker.deductions
-            if d.code == '3324'
+            worker.first_hire_reduction for worker in emp_c_np.worker_records
+            if worker.first_hire_reduction and worker.first_hire_reduction.deduction_code == '3324'
         ]
         self.assertTrue(reduction_nodes, "Employee C should receive the second hire reduction deduction.")
         self.assertEqual(reduction_nodes[0].reduction_cap, 1550)
+        self.assertIn(reduction_nodes[0], [d for worker in emp_c_np.worker_records for o in worker.occupations for d in o.occupation_deductions])
+        # The right started with the hire of the 2nd worker who opened it, employee B
+        self.assertEqual(reduction_nodes[0].deduction_right_starting_date, '2024-01-01')
 
     def test_versioned_payroll_config_old_vs_new_regime(self):
         """
@@ -165,8 +169,8 @@ class TestDmfaFirstHiresReductions(TestPayrollCommon):
         data_2025 = dmfa_2025._get_rendering_data()
         emp_2025_np = next(np for np in data_2025['natural_persons'] if np.employee.id == emp_2025.id)
         reduction_2025 = next(
-            d for worker in emp_2025_np.worker_records for d in worker.deductions
-            if d.code == '3315'
+            worker.first_hire_reduction for worker in emp_2025_np.worker_records
+            if worker.first_hire_reduction and worker.first_hire_reduction.deduction_code == '3315'
         )
         # In 2025 (pre-2026 reform), 1st hire cap is €3,100
         self.assertEqual(reduction_2025.reduction_cap, 3100, "1st hire reduction in 2025 must be capped at €3,100.")
@@ -192,8 +196,8 @@ class TestDmfaFirstHiresReductions(TestPayrollCommon):
         data_2026 = dmfa_2026._get_rendering_data()
         emp_2026_np = next(np for np in data_2026['natural_persons'] if np.employee.id == emp_2026.id)
         reduction_2026 = next(
-            d for worker in emp_2026_np.worker_records for d in worker.deductions
-            if d.code == '3315'
+            worker.first_hire_reduction for worker in emp_2026_np.worker_records
+            if worker.first_hire_reduction and worker.first_hire_reduction.deduction_code == '3315'
         )
         # From 01/07/2026 onwards, 1st hire cap is €2,000
         self.assertEqual(reduction_2026.reduction_cap, 2000, "1st hire reduction from July 2026 must be capped at €2,000.")

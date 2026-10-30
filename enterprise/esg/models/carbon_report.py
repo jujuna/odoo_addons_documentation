@@ -12,6 +12,10 @@ class CarbonReportHandler(models.AbstractModel):
 
         options['float_rounding'] = 2
 
+        if not report.filter_journals:
+            for key in ('journals', 'journal_groups', 'name_journal_group'):
+                options.pop(key, None)
+
         selected_gas = {
             gas_option.get('code') for gas_option in previous_options.get('carbon_report_selected_gas', [])
             if gas_option.get('selected') and gas_option.get('code')

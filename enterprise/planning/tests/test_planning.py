@@ -532,7 +532,7 @@ class TestPlanning(HttpCase, TestCommonPlanning, MockEmail):
         slot.template_id = template_b.id
         self.assertEqual(slot.role_id.id, slot.template_autocomplete_ids.mapped('role_id').id, "Role of the slot and shift template should be same.")
 
-    def test_manage_archived_resources(self):
+    def test_manage_archived_employees(self):
         with self.mock_datetime_and_now("2020-04-22"):
             self.env.user.tz = 'UTC'
             slot_1, slot_2, slot_3 = self.env['planning.slot'].create([
@@ -565,6 +565,37 @@ class TestPlanning(HttpCase, TestCommonPlanning, MockEmail):
             departure.action_register()
 
             self.assertEqual(slot_1.end_datetime, datetime.combine(fields.Date.today()+ timedelta(days=1), time.min), 'End date of the splited shift should be today')
+            self.assertNotEqual(slot_1.end_datetime, slot1_initial_end_date, 'End date should be updated')
+            self.assertEqual(slot_2.end_datetime, slot2_initial_end_date, 'End date should be the same')
+            self.assertFalse(slot_3.resource_ids, 'Resource should be the False for archeived resource shifts')
+
+    def test_manage_archived_resources(self):
+        with freeze_time("2020-04-22"):
+            self.env.user.tz = 'UTC'
+            slot_1, slot_2, slot_3 = self.env['planning.slot'].create([
+                {
+                    'resource_ids': self.resource_bert.ids,
+                    'start_datetime': datetime(2020, 4, 20, 8, 0),
+                    'end_datetime': datetime(2020, 4, 24, 17, 0),
+                },
+                {
+                    'resource_ids': self.resource_bert.ids,
+                    'start_datetime': datetime(2020, 4, 20, 8, 0),
+                    'end_datetime': datetime(2020, 4, 21, 17, 0),
+                },
+                {
+                    'resource_ids': self.resource_bert.ids,
+                    'start_datetime': datetime(2020, 4, 23, 8, 0),
+                    'end_datetime': datetime(2020, 4, 24, 17, 0),
+                },
+            ])
+
+            slot1_initial_end_date = slot_1.end_datetime
+            slot2_initial_end_date = slot_2.end_datetime
+
+            self.resource_bert.action_archive()
+
+            self.assertEqual(slot_1.end_datetime, datetime.combine(fields.Date.today() + timedelta(days=1), time.min), 'End date of the splited shift should be today')
             self.assertNotEqual(slot_1.end_datetime, slot1_initial_end_date, 'End date should be updated')
             self.assertEqual(slot_2.end_datetime, slot2_initial_end_date, 'End date should be the same')
             self.assertFalse(slot_3.resource_ids, 'Resource should be the False for archeived resource shifts')
@@ -839,6 +870,24 @@ class TestPlanning(HttpCase, TestCommonPlanning, MockEmail):
         # Changing the allocated time percentage should be reflected in the allocated hours
         slot.allocated_percentage = 50
         self.assertEqual(slot.allocated_hours, 7.0, 'The allocated hours should be 5.0 after changing the allocated percentage to 50%%')
+
+    def test_flexible_contract_slot_ending_next_day_in_resource_tz(self):
+        """
+            A slot ending on the next day in the resource's timezone but on the same day in UTC
+            should count the hours worked on that next day.
+        """
+        self.employee_bert.write({
+            'resource_calendar_id': self.flexible_calendar_40_8.id,
+        })
+        self.resource_bert.tz = 'Europe/Brussels'
+        # 16:30 -> 00:30 in Brussels (UTC+1 in winter)
+        slot = self.env['planning.slot'].create({
+            'resource_ids': self.resource_bert.ids,
+            'start_datetime': datetime(2022, 1, 11, 15, 30),
+            'end_datetime': datetime(2022, 1, 11, 23, 30),
+            'state': '2_published',
+        })
+        self.assertEqual(slot.allocated_hours, 8.0, '7.5 hours on day 11 and 0.5 hour on day 12 in the resource timezone')
 
     def test_fully_flexible_contract_slot(self):
         """

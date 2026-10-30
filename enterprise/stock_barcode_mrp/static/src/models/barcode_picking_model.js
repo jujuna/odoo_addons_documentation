@@ -22,10 +22,13 @@ patch(BarcodePickingModel.prototype, {
         }
     },
     groupKey(line) {
-        let line_bom_id = false
-        if (line.move_id in this.cache.dbIdCache['stock.move']){
-            line_bom_id = this.cache.getRecord("stock.move",line.move_id).bom_line_id
+        let bomLineId = false;
+        if (line.move_id in this.cache.dbIdCache["stock.move"]) {
+            const move = this.cache.getRecord("stock.move", line.move_id);
+            if (move.is_kit_component) {
+                bomLineId = move.bom_line_id;
+            }
         }
-        return super.groupKey(...arguments) + (line_bom_id && `_${line_bom_id}` || '');
+        return super.groupKey(...arguments) + (bomLineId ? `_${bomLineId}` : "");
     },
 });

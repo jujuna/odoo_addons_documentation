@@ -15,16 +15,17 @@ class AccountFollowupCustomHandler(models.AbstractModel):
             'action': 'action_send_follow_up',
             'sequence': 100,
             'always_show': True,
+            'branch_allowed': True,
         })
 
         options['custom_display_config'].setdefault('components', {})['AccountReportLineCell'] = 'PartnerLedgerFollowupLineCell'
 
         if self.env.ref('account_reports.pdf_export_main_customer_report', raise_if_not_found=False):
             options['custom_display_config'].setdefault('pdf_export', {})['pdf_export_main'] = 'account_reports.pdf_export_main_customer_report'
+            options['custom_display_config']['css_custom_class'] += ' customer_report'
 
-        if len(options['partner_ids']) == 1:
+        if len(options['partner_ids']) == 1 and not (options.get('export_mode') == 'print' and options.get('export_format') == 'pdf'):
             options['ignore_totals_below_sections'] = True
-            options['hide_partner_totals'] = True
 
         if options['report_id'] != previous_options.get('report_id') and options['export_mode'] != 'print':
             options['unreconciled'] = True
@@ -34,26 +35,16 @@ class AccountFollowupCustomHandler(models.AbstractModel):
             options['forced_domain'] = options.get('forced_domain', []) + [('no_followup', '=', False)]
             options['columns'] = [col for col in options['columns'] if col['expression_label'] != 'no_followup']
 
+            if options.get('export_format') == 'pdf':
+                options['column_headers'] = []  # date will already be included in the PDF header
+                options['unfold_all'] = True  # lines are computed once for all the partners, then split into one document per partner
+
         if (not previous_options or not previous_options.get('account_type')):
             for opt in options['account_type']:
                 if opt['id'] in ('trade_receivable', 'trade_payable'):
                     opt['selected'] = True
                 else:
                     opt['selected'] = False
-
-    def _custom_line_postprocessor(self, report, options, lines):
-        lines = super()._custom_line_postprocessor(report, options, lines)
-
-        # When exporting the Open Items Report to a specific customer, we don't want to display
-        # the Open Items Report line which only duplicates the customer's totals (redundant and confusing).
-        followup_report_line_id = report._get_line_from_xml_id(lines, 'account_reports.followup_report_line').id
-        single_partner_print = options.get('export_mode') == 'print' and len(options.get('selected_partner_ids', [])) == 1
-        if single_partner_print and followup_report_line_id:
-            index = next((i for i, line in enumerate(lines) if line.id == followup_report_line_id), None)
-            if index is not None:
-                lines.pop(index)
-
-        return lines
 
     def _get_partner_ledger_query(self, options, date_scope, match_partner_on_partials=True):
         query = super()._get_partner_ledger_query(options, date_scope, match_partner_on_partials=False)
@@ -75,6 +66,9 @@ class AccountFollowupCustomHandler(models.AbstractModel):
             SQL('%s ASC NULLS LAST', self._get_agg_expr('date_maturity', query, groupbys, date_from)),
             *super()._get_date_order_clause(query, groupbys, date_from),
         ]
+
+    def _get_documents_to_print(self, report, options, lines):
+        return self._get_documents_to_print_per_partner(report, options, lines, 'amount_residual')
 
     def action_send_follow_up(self, options):
         template = self.env.ref('account_reports.email_template_customer_follow_up_report', False)

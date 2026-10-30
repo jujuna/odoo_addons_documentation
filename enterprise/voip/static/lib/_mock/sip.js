@@ -37,6 +37,9 @@ export class MockSipSession {
     state = SessionState.Initial;
     stateChange = new EmitterImpl();
     sessionDescriptionHandler = {
+        sendDtmf() {
+            return true;
+        },
         peerConnection: {
             getReceivers: () => [],
             getSenders: () => {

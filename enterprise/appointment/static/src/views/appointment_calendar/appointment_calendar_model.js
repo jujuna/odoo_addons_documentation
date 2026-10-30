@@ -90,6 +90,9 @@ patch(AttendeeCalendarModel.prototype, {
         // reactive attribute to represent which appointment type is highlighted.
         // if any, should be kept in sync with the context default for consistency.
         this.selectedAppointmentTypeId = signal(context.default_appointment_type_id);
+        // selection overridden when entering edition, to be restored once edition ends.
+        // `false` means there is nothing to restore.
+        this.selectedAppointmentTypeIdBeforeEdition = false;
         // Relevant data of the appointment being edited in view, such as: id, duration and invite url
         // See `_updateSlotsAppointment` for the exact structure
         this.slotsAppointmentData = signal(undefined);
@@ -100,17 +103,6 @@ patch(AttendeeCalendarModel.prototype, {
         // keep the original default so we know to keep it in the sidebar list data
         // this implies that only the "edit appointment" button should be shown instead of the list
         this.originalDefaultAppointmentTypeId = context.default_appointment_type_id;
-    },
-
-    /**
-     * @override
-     */
-    makecontextdefaults() {
-        const context = super.makeContextDefaults(...arguments) || {};
-        if (this.selectedAppointmentTypeId()) {
-            context.default_appointment_type_id = this.selectedAppointmentTypeId()
-        }
-        return context;
     },
 
     async _updateSlotsAppointment(appointmentTypeId) {
@@ -325,9 +317,14 @@ patch(AttendeeCalendarModel.prototype, {
         const params = appointmentTypeId && (!this.meta || this.meta.scale !== "week")
             ? { scale: "week" }
             : {};
-        // editing slots = selecting it as default
         if (appointmentTypeId && appointmentTypeId !== this.selectedAppointmentTypeId()) {
+            // editing slots = selecting it as default
+            this.selectedAppointmentTypeIdBeforeEdition = this.selectedAppointmentTypeId();
             this.setSelectedAppointmentTypeId(appointmentTypeId);
+        } else if (!appointmentTypeId && this.selectedAppointmentTypeIdBeforeEdition !== false) {
+            // restoring pre-edition selection after edition
+            this.setSelectedAppointmentTypeId(this.selectedAppointmentTypeIdBeforeEdition);
+            this.selectedAppointmentTypeIdBeforeEdition = false;
         }
         // reload even if unchanged, as it might have changed since; a full load
         // is required as entering/leaving edition changes the events domain
@@ -351,14 +348,17 @@ patch(AttendeeCalendarModel.prototype, {
 
     /**
      * @override
-     * Properly take into account the duration from the context.
-     * Only when the user makes a click on the calendar (when there's no end) or when the end is invalid.
+     * This method uses the value of "default_duration" in the context to set the end if it is not yet
+     * defined, as it is the case when users click on the calendar. At the opposite, when the end is
+     * already set, as it is the case when users drew slots in the calendar, "default_duration" is removed
+     * from the context to avoid computing again the value of the end using the appointment type duration.
      */
     buildRawRecord(partialRecord, options) {
-        if ('default_duration' in this.meta.context) {
-            const defaultDuration = this.meta.context.default_duration;
-            if (partialRecord.start && (!partialRecord.end || !partialRecord.end.isValid) && !partialRecord.isAllDay) {
-                partialRecord.end = partialRecord.start.plus({ hours: defaultDuration });
+        if ("default_duration" in this.meta.context && "default_appointment_type_id" in this.meta.context) {
+            if (partialRecord.end && partialRecord.end.isValid) {
+                delete this.meta.context["default_duration"];
+            } else if (partialRecord.start && !partialRecord.isAllDay) {
+                partialRecord.end = partialRecord.start.plus({ hours: this.meta.context.default_duration });
             }
         }
         return super.buildRawRecord(...arguments);
@@ -411,7 +411,7 @@ patch(AttendeeCalendarModel.prototype, {
         }
         return {
             appointment_type_id: appointment.id,
-            weekday: start.weekday,
+            weekday: String(start.weekday),
             start_hour: start.hour + start.minute / 60,
             end_hour: end.hour + end.minute / 60,
             slot_type: "recurring",
@@ -442,7 +442,7 @@ patch(AttendeeCalendarModel.prototype, {
             const start = eventRecord.start.setZone(appointmentData.appointment_tz);
             const end = eventRecord.end.setZone(appointmentData.appointment_tz);
             vals = {
-                weekday: start.weekday,
+                weekday: String(start.weekday),
                 start_hour: start.hour + start.minute / 60,
                 end_hour: end.hour + end.minute / 60,
             };

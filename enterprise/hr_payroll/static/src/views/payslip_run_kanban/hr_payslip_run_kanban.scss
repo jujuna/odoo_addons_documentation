@@ -1,8 +1,38 @@
 .o_payrun_kanban {
-    padding: 0 4%;
+    // make each card take the whole screen to get one card per line
+    --KanbanRecord-width: 100%;
+    --KanbanRecord--small-width: 100%;
 
-    @media (max-width: 768px) {
-        padding: 0;
+    // to have more space between the screen edges and the cards
+    padding-left: map-get($spacers, 2);
+    padding-right: map-get($spacers, 2);
+    @include media-breakpoint-up(md) {
+        padding-left: map-get($spacers, 5);
+        padding-right: map-get($spacers, 5);
+    }
+
+    // make the kanban group still look like a list instead of a kanban view
+    &.o_kanban_grouped {
+        flex-direction: column;
+        flex-wrap: nowrap;
+
+        // original value is a formula that makes the card overflow to the right
+        --KanbanGroup-width: 100%;
+
+        .o_kanban_group {
+            // makes the vertical spacing between groups consistent
+            &:not(.o_column_folded) {
+                flex: 0 0 auto;
+            }
+
+            &.o_column_folded {
+                // disable the rotation of the label when group is folded
+                .o_column_title {
+                    position: static;
+                    transform: none;
+                }
+            }
+        }
     }
 
     .o_payrun_chatter_icon:hover i {

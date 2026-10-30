@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import ast
 import base64
+import contextlib
 import json
 import logging
 from collections import defaultdict
@@ -63,6 +64,7 @@ class AITool(models.AbstractModel):
         agent = self.env['ai.agent'].sudo().browse(agent_id).exists()
         if not agent or agent not in parent.agent_id.allowed_agent_ids:
             raise UserError(self.env._("Use an allowed agent or an idle direct child session."))
+        parent._check_active_session_limit()
         child = parent.create({'agent_id': agent.id, 'parent_session_id': parent.id, 'channel_id': parent.channel_id.id,
                                'ai_composer_id': parent.ai_composer_id.id, 'res_model': parent.res_model, 'res_id': parent.res_id})
         return self._send_subagent_message(parent, child, message, attachment_ids or [])
@@ -74,6 +76,7 @@ class AITool(models.AbstractModel):
         if (not child or child.parent_session_id != parent or child.loop_state != 'ready'
                 or child.agent_id not in parent.agent_id.allowed_agent_ids):
             raise UserError(self.env._("Use an allowed agent or an idle direct child session."))
+        parent._check_active_session_limit()
         return self._send_subagent_message(parent, child, message, attachment_ids or [])
 
     def _send_subagent_message(self, parent, child, message, attachment_ids):
@@ -167,11 +170,17 @@ class AITool(models.AbstractModel):
             records = record_by_model.get(key)
 
             if len(records) == 1:
-                link = records[0]._get_html_link()
+                record = records[0]
+                link = record._get_html_link(title=record.display_name or f"{record._description} #{record.id}")
             else:
-                if not action_by_model:
-                    continue
-                action_id = action_by_model[key].get("actionID")
+                action_id = False
+                Action = self.env['ir.actions.act_window'].sudo()
+                preferred = Action.browse((action_by_model or {}).get(key, {}).get("actionID")).exists()
+                for action in preferred | Action.search([('res_model', '=', key), ('view_mode', 'like', 'list')]):
+                    with contextlib.suppress(ValueError, SyntaxError):
+                        if records.filtered_domain(ast.literal_eval(action.domain or '[]')) == records:
+                            action_id = action.id
+                            break
                 if not action_id:
                     continue
 

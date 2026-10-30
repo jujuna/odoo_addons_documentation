@@ -156,27 +156,30 @@ class TestDocumentsBridgeProject(TestProjectCommon, TransactionCaseDocuments):
         })
         folder = project.documents_folder_id
         self.assertEqual(folder.access_internal, 'none', "The folder should not have internal access for 'followers' visibility.")
-        # No followers at this point
-        self.assertFalse(project.message_partner_ids)
+        # No member at this point
+        self.assertFalse(project.allowed_internal_user_ids)
         self.assertFalse(folder.access_ids.partner_id, "Nobody should have access to the folder as no followers of the project exist.")
         project.privacy_visibility = 'employees'
         self.assertEqual(folder.access_internal, 'edit', "The folder should be editable for 'employees' visibility.")
         self.assertFalse(folder.access_ids.partner_id, "Nobody should have access to the folder as no followers of the project exist.")
         project.privacy_visibility = 'invited_users'
         self.assertEqual(folder.access_internal, 'none', "The folder should not be accessible for 'invited_users' visibility.")
+
+        # Add a member to the project
+        project.allowed_internal_user_ids |= self.user_projectuser
+        self.assertTrue(folder.access_ids.partner_id)
         self.assertEqual(
             folder.access_ids.partner_id,
-            project.message_partner_ids.filtered(lambda p: not p.partner_share),
-            "Followers are not synced properly with the documents folder for the project with the visibility 'invited_users'."
+            project.allowed_internal_user_ids.partner_id,
+            "Team members are not synced properly with the documents folder for the project with the visibility 'invited_users'."
         )
+        self.assertEqual(folder.access_ids.role, 'edit')
         project.privacy_visibility = 'portal'
         self.assertEqual(folder.access_internal, 'edit', "The folder should have internal access for 'portal' visibility.")
         # Portal users are never added to folder access; internal users access via access_internal='edit'
         self.assertFalse(folder.access_ids.partner_id, "No partner should have explicit access in 'portal' visibility.")
-        extra_member = self.user_projectuser.partner_id
-        project.message_subscribe(partner_ids=extra_member.ids)
 
-        # Test that the followers sync logic is only executed when privacy visibility is changed.
+        # Test that the member sync logic is only executed when privacy visibility is changed.
         folder.access_internal = 'view'  # force other value than synced value
         project.privacy_visibility = 'portal'
         self.assertEqual(
@@ -426,28 +429,36 @@ class TestDocumentsBridgeProject(TestProjectCommon, TransactionCaseDocuments):
             "Workspace should receive the project company when it is the only linked project.",
         )
 
-    def test_project_folder_access_on_followers_change(self):
+    def test_project_folder_access_on_invited_users_change(self):
         """
         Ensures that subscribing a partner grants 'edit' access to the project's
         document folder, and unsubscribing removes that access.
         """
         project = self.env["project.project"].create({"name": "Test Project"})
-        partner = self.pro_admin.partner_id
+        user = self.user_projectuser
+        user_partner = user.partner_id
         folder = project.documents_folder_id
 
         for visibility in ["invited_users", "followers"]:
             project.privacy_visibility = visibility
+            project.invalidate_recordset()
 
-            # Subscribe: should grant edit access
-            project.message_subscribe(partner_ids=partner.ids)
-            access = folder.access_ids.filtered(lambda a: a.partner_id == partner)
-            self.assertTrue(access, "Access record should be created when subscribing a partner")
-            self.assertEqual(access.role, "edit", "Subscribed partner should have 'edit' access")
+            self.assertFalse(folder.access_ids.filtered(lambda a: a.partner_id == user_partner))
+            self.assertFalse(project.with_user(self.user_projectuser).has_access('read'))
+            # grant access
+            project.allowed_internal_user_ids |= user
+            self.assertTrue(project.with_user(self.user_projectuser).has_access('read'))
+            access = folder.access_ids.filtered(lambda a: a.partner_id == user_partner)
+            self.assertTrue(access, "Access record should be created")
+            self.assertEqual(access.role, "edit", "User should have 'edit' access")
 
-            # Unsubscribe: should remove access
-            project.message_unsubscribe(partner_ids=partner.ids)
-            access = folder.access_ids.filtered(lambda a: a.partner_id == partner)
+            # revoke access
+            project.allowed_internal_user_ids -= user
+            folder.invalidate_recordset()
+            project.invalidate_recordset()
+            self.assertFalse(project.with_user(self.user_projectuser).has_access('read'))
+            access = folder.access_ids.filtered(lambda a: a.partner_id == user_partner)
             self.assertFalse(
                 access,
-                "Access record should be removed when unsubscribing a partner",
+                "Access record should be removed when project access is revoked",
             )

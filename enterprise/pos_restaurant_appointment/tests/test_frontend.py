@@ -79,3 +79,11 @@ class TestUi(TestFrontend):
     @freeze_time('2025-08-27 12:18:56')
     def test_appointment_kanban_view(self):
         self.start_pos_tour("test_appointment_kanban_view", login="pos_admin")
+
+    def test_table_without_ressources(self):
+        """ This test make sure that appointment ressource can be recreated if missing during opening"""
+        self.pos_config.floor_ids.table_ids.appointment_resource_id.unlink()
+        self.assertFalse(self.pos_config.floor_ids.table_ids.appointment_resource_id)
+        self.pos_config.with_user(self.pos_admin).open_ui()
+        self.start_pos_tour("test_table_without_ressources", login="pos_admin")
+        self.assertEqual(len(self.pos_config.floor_ids.table_ids.appointment_resource_id.ids), 5)

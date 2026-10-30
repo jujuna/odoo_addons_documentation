@@ -57,7 +57,7 @@
                 <KnowledgeSidebarPrivateSection rootIds="this.state.privateIds" unfoldedIds="this.unfoldedArticlesIds" record="this.props.record"/>
                 <!-- Trash is a "o_section" so that one can drop articles in the trash -->
                 <div t-ref="this.sidebarTrashRef" t-if="this.isInternalUser" class="o_section o_knowledge_sidebar_trash position-sticky bottom-0 w-100 bg-100 rounded py-2 mb-2 mt-auto">
-                    <a t-if="!this.state.dragging" href="#" role="button" t-on-click="this.browseTemplates"
+                    <a t-if="!this.state.dragging and this.canCreateArticle" href="#" role="button" t-on-click="this.browseTemplates"
                         class="o_knowledge_load_template_btn btn d-flex align-items-center gap-2 px-2 py-1 rounded text-start text-truncate">
                         <i class="oi oi-fw" data-icon="design_services"/>
                         Templates

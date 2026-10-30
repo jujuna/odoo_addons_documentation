@@ -1,6 +1,5 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { expect, test } from "@odoo/hoot";
-import { advanceTime } from "@odoo/hoot-dom";
+import { advanceTime, expect, test } from "@odoo/hoot";
 import {
     contains,
     defineModels,
@@ -14,7 +13,7 @@ import {
 class KnowledgeArticle extends models.ServerModel {
     _name = "knowledge.article";
 
-    category = fields.Generic({ default: "private" });
+    category = fields.Selection({ default: "private" });
 
     get_sidebar_articles() {
         return {

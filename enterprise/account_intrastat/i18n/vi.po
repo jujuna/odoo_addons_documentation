@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
 "PO-Revision-Date: 2026-09-17 23:35+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
@@ -47,6 +47,7 @@ msgid "1 000 kWh"
 msgstr "1000 kWh"
 
 #. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__1_000_m3
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__1_000_m3
 msgid "1 000 m3"
 msgstr "1000 m3"
@@ -137,7 +138,6 @@ msgstr "Check the premature"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_commodity_code
-#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__commodity
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Commodity"
 msgstr "Hàng hoá"
@@ -182,6 +182,12 @@ msgstr "Quốc gia"
 #: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_origin_country_id
 msgid "Country of Origin"
 msgstr "Quốc gia xuất xứ"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_return.py:0
+msgid "Customers without a VAT number"
+msgstr ""
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_company__intrastat_default_invoice_transaction_code_id
@@ -548,6 +554,7 @@ msgstr "Biến thể sản phẩm"
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_region_code
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_services_region_code
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__region
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Region"
 msgstr "Khu vực"
@@ -802,7 +809,6 @@ msgid "journals items with no product"
 msgstr "hạng mục bút toán không có sản phẩm"
 
 #. module: account_intrastat
-#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_90_%_sdt
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_90_%_sdt
 msgid "kg 90 % sdt"
 msgstr "kg 90 % sdt"

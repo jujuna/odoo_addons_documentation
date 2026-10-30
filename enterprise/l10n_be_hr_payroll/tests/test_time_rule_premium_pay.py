@@ -122,6 +122,9 @@ class TestTimeRulePremiumPay(TransactionCase):
         """Two consecutive excess slices with the same output type but different premium
         pay sets must NOT be merged into one output leave."""
         self.time_rule.active = False
+        self.overtime_type.write({
+        'optional_category_ids': [Command.link(self.night_cat.id), Command.link(self.sunday_cat.id)],
+        })
         self.env['hr.time.rule'].create({
             'name': 'Morning OT',
             'working_hours_mode': 'day',
@@ -194,6 +197,13 @@ class TestTimeRulePremiumPay(TransactionCase):
 
     def test_sequential_night_window_splits_sunday_ot_into_two_leaves(self):
         # R2: no threshold, night window 00:00-06:00, targets OT, adds night PP
+        self.overtime_type.write({
+        'optional_category_ids': [
+            Command.link(self.night_cat.id),
+            Command.link(self.sunday_cat.id),
+        ],
+        })
+
         self.env['hr.time.rule'].create({
             'name': 'Night Window',
             'sequence': self.time_rule.sequence + 10,

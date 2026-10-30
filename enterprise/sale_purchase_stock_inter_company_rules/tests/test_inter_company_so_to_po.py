@@ -102,6 +102,7 @@ class TestInterCompanySaleToPurchaseWithStock(TestInterCompanyRulesCommonStock):
         self.assertEqual(len(purchase_from_a.picking_ids), 1)
         self.assertEqual(len(purchase_from_a.order_line), 2)
         self.assertEqual(len(purchase_from_a.picking_ids.move_ids), 2)
+        self.assertEqual(purchase_from_a.picking_ids.state, 'waiting')
 
         # Do the delivery of Company A
         for move in sale_to_b.picking_ids.move_ids:

@@ -139,28 +139,10 @@ class L10nInHrContractSalary(HrContractSalary):
             if generic_wage_record.impacts_monthly_total:
                 wage_amount_to_remove = generic_wage_line[1]
 
-        offer = request.env['hr.contract.salary.offer']
-        dependents_selected, additional_cover_amount = offer._l10n_in_get_medical_insurance_dependents(new_version)
-        difference = float_round(additional_cover_amount - dependents_selected, precision_digits=2) if dependents_selected else 0.0
-        total_adjustment = float_round(difference - wage_amount_to_remove, precision_digits=2)
-        if float_is_zero(difference, precision_digits=2) and float_is_zero(wage_amount_to_remove, precision_digits=2):
+        if float_is_zero(wage_amount_to_remove, precision_digits=2):
             return result
 
-        # Adjust the Monthly Benefits resume line so dependent coverage reflects its real cost.
-        for category, lines in result['resume_lines_mapped'].items():
-            if 'monthly_benefits' in lines:
-                name, current_value, symbol, explanation, currency_position, uom_code = lines['monthly_benefits']
-                lines['monthly_benefits'] = (
-                    name,
-                    float_round(current_value + difference, precision_digits=2),
-                    symbol,
-                    explanation,
-                    currency_position,
-                    uom_code,
-                )
-                break
-
-        # Keep monthly total lines aligned with the adjusted benefits value.
+        # Keep monthly total lines aligned with the removed generic wage value.
         monthly_total_lines = request.env['hr.contract.salary.resume'].sudo().with_company(new_version.company_id).search([
             ('value_type', '=', 'monthly_total'),
             '|',
@@ -177,13 +159,12 @@ class L10nInHrContractSalary(HrContractSalary):
             name, current_value, symbol, explanation, currency_position, uom_code = category_lines[key]
             category_lines[key] = (
                 name,
-                float_round(current_value + total_adjustment, precision_digits=2),
+                float_round(current_value - wage_amount_to_remove, precision_digits=2),
                 symbol,
                 explanation,
                 currency_position,
                 uom_code,
             )
-
         return result
 
     def _compute_update_salary(self, version, offer, benefits, **kw):

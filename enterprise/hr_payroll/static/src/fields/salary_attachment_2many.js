@@ -12,6 +12,9 @@ export class SalaryAttachment2ManyField extends X2ManyField {
     }
 
     async onDelete(record) {
+        if (!record.resId) {
+            return this.list.delete(record);
+        }
         await this.orm.call("hr.salary.attachment", "action_close", [record.resId], {
             context: this.props.context,
         });
@@ -23,10 +26,8 @@ export class SalaryAttachment2ManyField extends X2ManyField {
 
     get rendererProps() {
         const props = super.rendererProps;
-        if (this.props.viewMode === "kanban") {
-            return props;
-        }
-        props.activeActions.onDelete = this.onDelete.bind(this);
+        // a running adjustment cannot be deleted, close it first (the dialog of a card deletes through it too)
+        this.activeActions.onDelete = this.onDelete.bind(this);
         return props;
     }
 }

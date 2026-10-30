@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 00:37+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-09 17:48+0000\n"
+"PO-Revision-Date: 2026-10-19 09:33+0000\n"
+"Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "hr_appraisal_survey/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -28,6 +28,9 @@ msgid ""
 "This module adds an integration with Survey to ask feedbacks to any "
 "employee, based on a survey to fill.\n"
 msgstr ""
+"\n"
+"Dieses Modul fügt eine Integration mit Odoo Umfragen hinzu, um jedem "
+"Mitarbeiter Feedback zu geben, basierend auf einer auszufüllenden Umfrage.\n"
 
 #. module: hr_appraisal_survey
 #: model:ir.actions.act_window,name:hr_appraisal_survey.survey_survey_action_appraisal
@@ -86,11 +89,40 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "
+"20px;\">\n"
+"                    Guten Tag <t t-out=\"object.partner_id.name or 'lieber "
+"Teilnehmer/liebe Teilnehmerin'\">[Teilnehmer]</t>, <br/>im Rahmen unseres 360"
+"°-Feedback-Prozesses würde <t t-out=\"ctx.get('logged_user')\">[aktueller "
+"Benutzer]</t> gerne\n"
+"Ihre Meinung zur Leistung von <t t-out=\"ctx.get('employee')\">"
+"[Mitarbeiter]</t> einholen. <br/>Ihr Feedback ist für uns sehr wertvoll, um "
+"Stärken zu erkennen und Wachstumspotenziale zu identifizieren.\n"
+"                   <br/> \n"
+"                    Es dauert nur wenige Minuten! Klicken Sie einfach auf "
+"den folgenden Link und geben Sie Ihr Feedback ab: <br/>\n"
+"                    <div style=\"text-align: center; margin: 24px 0;\"> <a t-"
+"att-href=\"object.get_start_url()\" t-attf-style=\"background-color: {"
+"{user.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: {{user.company_id.email_primary_color or "
+"'#FFFFFF'}}; border-radius: 5px; font-size:13px;\"> Geben Sie Ihr Feedback "
+"ab </a>\n"
+"                    </div>Bitte füllen Sie die Umfrage vor <t t-out=\"ctx.get"
+"('deadline')\">[der angegebenen Frist]</t> aus. <br/>Vielen Dank für Ihre "
+"Zeit und Ehrlichkeit! <br/>\n"
+"                    <t t-if=\"ctx.get('user_body')\">\n"
+"                         <div class=\"my-3 py-2 px-3 bg-300\">\n"
+"                            <t t-out=\"ctx.get('user_body')\"> [Optionaler "
+"Kommentar]</t>\n"
+"                        </div>\n"
+"                   </t>\n"
+"                </div> \n"
+"            "
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "<i class=\"oi me-2\" data-icon=\"east\"/>Go to Appraisal"
-msgstr ""
+msgstr "<i class=\"oi me-2\" data-icon=\"east\"/>Zur Mitarbeiterbeurteilung"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
@@ -178,16 +210,6 @@ msgid "Almost always"
 msgstr "Fast immer"
 
 #. module: hr_appraisal_survey
-#. odoo-python
-#: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
-msgid ""
-"An appraisal feedback was requested. Please take time to fill the <a "
-"href=\"%s\" target=\"_blank\">survey</a>"
-msgstr ""
-"Es wurde um ein Bewertungsfeedback gebeten. Bitte nehmen Sie sich etwas "
-"Zeit, die <a href=\"%s\" target=\"_blank\">Umfrage </a> auszufüllen."
-
-#. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_11
 msgid "Analytical and synthetic mind"
 msgstr "Analytische Fähigkeiten"
@@ -207,7 +229,7 @@ msgstr "Mitarbeiterbeurteilung"
 #. module: hr_appraisal_survey
 #: model:ir.module.module,shortdesc:base.module_hr_appraisal_survey
 msgid "Appraisal - Survey"
-msgstr ""
+msgstr "Mitarbeiterbeurteilung - Umfrage"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_id
@@ -802,7 +824,7 @@ msgstr "Versand an Mitarbeiter, um Beurteilungsfeedback zu erhalten"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_survey_view_form
 msgid "Shared with everybody"
-msgstr ""
+msgstr "Mit allen geteilt"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_4
@@ -1133,6 +1155,13 @@ msgstr "oder"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "to a selection of colleagues you work with."
 msgstr "von einer Auswahl Kollegen, mit denen Sie arbeiten."
+
+#~ msgid ""
+#~ "An appraisal feedback was requested. Please take time to fill the <a "
+#~ "href=\"%s\" target=\"_blank\">survey</a>"
+#~ msgstr ""
+#~ "Es wurde um ein Bewertungsfeedback gebeten. Bitte nehmen Sie sich etwas "
+#~ "Zeit, die <a href=\"%s\" target=\"_blank\">Umfrage </a> auszufüllen."
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "

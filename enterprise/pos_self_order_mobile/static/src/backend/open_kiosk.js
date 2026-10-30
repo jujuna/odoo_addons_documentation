@@ -1,16 +1,26 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { hasMobileNative, mobileNative } from "@pos_mobile_android/app/utils/native";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
 
 async function openKiosk(env, action) {
     const { kiosk_url, timezone } = action.params;
     const openNormally = () =>
         env.services.action.doAction({ type: "ir.actions.act_url", url: kiosk_url });
 
-    if (!hasMobileNative("openKiosk")) {
+    if (!mobileNative.openKiosk) {
         return openNormally();
     }
+
+    if (await mobileNative.isKioskModeEnabled?.().catch(() => false)) {
+        // If the kiosk mode is already enabled, we just open the kiosk URL in the same window.
+        return env.services.action.doAction({
+            type: "ir.actions.act_url",
+            url: kiosk_url,
+            target: "self",
+        });
+    }
+
     const kioskMode = await new Promise((resolve) => {
         env.services.dialog.add(ConfirmationDialog, {
             title: _t("Enter kiosk mode?"),

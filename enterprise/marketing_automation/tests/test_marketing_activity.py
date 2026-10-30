@@ -414,6 +414,47 @@ class TestMarketingActivityBuilder(MarketingActivityCommon):
             'flag': {'x': 1750, 'y': 100},
         })
 
+    def test_action_delete_step_cascading_triggering_activity(self):
+        """ Check that deleting a mail activity also deletes the related
+            mail interactions defined on the other activities. """
+
+        # delay - mail - mail interaction - log note
+
+        campaign = self.campaign.with_env(self.env)
+        mail_activity = self.activity.with_env(self.env)
+        mail_activity.write({
+            'interval_number': 1,
+            'view_coordinates': {
+                'delay': {'x': 350, 'y': 0},
+                'activity': {'x': 700, 'y': 0},
+            },
+        })
+        log_note_activity = self._create_activity_log_note(campaign,
+            log_note_body='Hi there!',
+            act_values={
+                'parent_id': mail_activity.id,
+                # Add a trigger node on the activity (i.e: a mail interaction):
+                'trigger_type': 'mail_open',
+                'triggering_activity_id': mail_activity.id,
+                'view_coordinates': {
+                    'trigger': {'x': 1050, 'y': 0},
+                    'activity': {'x': 1400, 'y': 0},
+                },
+            })
+
+        mail_activity._delete_marketing_activity()
+        self.assertEqual(mail_activity.activity_type, 'structure')
+        self.assertEqual(mail_activity.interval_number, 1)
+        self.assertEqual(mail_activity.view_coordinates, {
+            'delay': {'x': 350, 'y': 0},
+        })
+        self.assertEqual(log_note_activity.parent_id.id, mail_activity.id)
+        self.assertFalse(log_note_activity.triggering_activity_id)
+        self.assertEqual(log_note_activity.trigger_type, 'activity')
+        self.assertEqual(log_note_activity.view_coordinates, {
+            'activity': {'x': 1400, 'y': 0},
+        })
+
 
 @tagged('ma_activity')
 class TestMarketingActivityIntegrity(MarketingActivityCommon):

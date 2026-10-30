@@ -8,15 +8,15 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Bren Driesen <brdri@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# Odoo Translation Bot <c3p@odoo.com>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
-"PO-Revision-Date: 2026-09-18 03:36+0000\n"
+"POT-Creation-Date: 2026-10-02 17:49+0000\n"
+"PO-Revision-Date: 2026-10-21 09:15+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/"
 "hr_payroll_account/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -36,6 +36,13 @@ msgid ""
 "    * Payment Encoding\n"
 "    * Company Contribution Management\n"
 msgstr ""
+"\n"
+"Generiek salarissysteem Geïntegreerd met boekhouding.\n"
+"=================================================\n"
+"\n"
+"    * Kostencodering\n"
+"    * Betalingscodering\n"
+"    * Beheer van bedrijfsbijdragen\n"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_count
@@ -68,12 +75,12 @@ msgid ""
 "                        <span class=\"o_stat_text\" invisible=\"move_state !"
 "= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Boeking <br/>"
-"(Concept)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state "
-"!= 'posted'\">Boeking <br/>(Geboekt)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state "
-"!= 'cancel'\">Boeking <br/>(Geannuleerd)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Boeking <br/"
+">(Concept)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Boeking <br/>(Geboekt)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Boeking <br/>(Geannuleerd)</span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
@@ -294,9 +301,9 @@ msgid ""
 "disables the pay button on individual payslips."
 msgstr ""
 "Schakel deze optie in om boekingen samen te voegen bij het verwerken van een "
-"betaalronde, zodat individuele bedragen per werknemer niet te onderscheiden "
-"zijn in de boekhouding. Dit schakelt ook de betaalknop op individuele "
-"loonstroken uit."
+"loonrun, zodat individuele bedragen per werknemer niet te onderscheiden zijn "
+"in de boekhouding. Dit schakelt ook de betaalknop op individuele loonstroken "
+"uit."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__employee_move_line
@@ -421,7 +428,8 @@ msgstr "Boekingsregels"
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip__date
 msgid "Keep empty to use the period of the validation(Payslip) date."
-msgstr "Laat leeg om de periode van de controledatum (loonstrook) te gebruiken."
+msgstr ""
+"Laat leeg om de periode van de controledatum (loonstrook) te gebruiken."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__label
@@ -490,7 +498,7 @@ msgstr "Betaal"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip_run
 msgid "Pay Run"
-msgstr "Betaalronde"
+msgstr "Loonrun"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip
@@ -630,6 +638,15 @@ msgid ""
 msgstr "Bij de kostenrekening \"%s\" is geen correcte rekening ingesteld!"
 
 #. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid ""
+"The following payslips are linked to a posted journal entry, only a user "
+"with accounting rights can cancel them:\n"
+"%s"
+msgstr ""
+
+#. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "Total Credit"
 msgstr "Totaal credit"
@@ -647,8 +664,7 @@ msgstr "Valideren"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_wizard
 msgid "Wizard to show previews of account moves related to pay runs."
-msgstr ""
-"Wizard om voorbeelden te tonen van boekingen in verband met betaalrondes."
+msgstr "Wizard om voorbeelden te tonen van boekingen in verband met loonruns."
 
 #. module: hr_payroll_account
 #. odoo-python

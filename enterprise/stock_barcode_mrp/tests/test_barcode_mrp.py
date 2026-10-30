@@ -252,3 +252,37 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         productions = self.env['mrp.production'].search(action['domain'])
         self.assertEqual(productions.ids, [mo_1.id])
         self.assertNotIn(mo_2.id, productions.ids)
+
+    def test_batch_group_lines_by_product_except_kits(self):
+        self.env.user.write({'group_ids': [Command.link(self.env.ref('stock.group_stock_picking_batch').id)]})
+        self.warehouse.manufacture_steps = 'pbm'
+        self.warehouse.pbm_type_id.group_lines_by_product = True
+        product_3 = self.env['product.product'].create({'name': 'product3', 'is_storable': True})
+
+        boms = self.env['mrp.bom'].create([{
+            'product_tmpl_id': product.product_tmpl_id.id,
+            'bom_line_ids': [Command.create({
+                'product_id': bom_component.id,
+                'product_qty': 1,
+            })],
+        } for product, bom_component, bom_type in [
+            (self.product1, self.component01, 'normal'),
+            (self.product2, self.component01, 'normal'),
+            (product_3, self.simple_kit, 'normal'),
+            (self.simple_kit, self.component01, 'phantom'),
+        ]])
+        self.env['stock.quant']._update_available_quantity(self.component01, self.stock_location, 3)
+
+        productions = self.env['mrp.production'].create([{
+            'bom_id': bom.id,
+            'location_src_id': self.warehouse.pbm_loc_id.id,
+        } for bom in boms[:3]])
+        productions.action_confirm()
+
+        batch = self.env['stock.picking.batch'].create({
+            'picking_ids': productions.picking_ids.ids,
+        })
+        batch.action_confirm()
+
+        url = self._get_client_action_url(batch)
+        self.start_tour(url, 'test_batch_group_lines_by_product_except_kits', login='admin')

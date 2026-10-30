@@ -137,6 +137,7 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             'amount_paid': 10.0,
             'amount_return': 10.0,
         })
+        self.make_payment(self.pos_order, self.main_pos_config.payment_method_ids[0], 10.0)
         self.main_pos_config.current_session_id.close_session_from_ui()
         self.url_open(f'/pos/ticket/validate?access_token={self.pos_order.access_token}')
         self.assertEqual(self.env['res.partner'].sudo().search_count([('name', '=', 'AAA Partner')]), 1)
@@ -176,6 +177,7 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             'amount_paid': 10.0,
             'amount_return': 10.0,
         })
+        self.make_payment(self.pos_order, self.main_pos_config.payment_method_ids[0], 10.0)
         self.main_pos_config.current_session_id.close_session_from_ui()
         get_invoice_data = {
             'access_token': self.pos_order.access_token,
@@ -328,7 +330,7 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
         gift_card_program.coupon_ids.code = '043123456'
 
         self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, 'test_refund_with_gift_card_mx', login="pos_user")
-        self.assertEqual(gift_card_program.coupon_ids.points, 4.2)
+        self.assertEqual(gift_card_program.coupon_ids.points, 1)
 
     def test_usage_mx_pos_partner(self):
         """This test makes sure that if usage is set on the partner, it is taken into account instead of the default one."""

@@ -413,7 +413,8 @@ class Account_Edi_Proxy_ClientUser(models.Model):
             'domain': {
                 'direction': 'incoming',
                 'errors': False,
-            }
+            },
+            'limit': job_count,
         }
         for edi_user in self:
             edi_user = edi_user.with_company(edi_user.company_id)
@@ -436,6 +437,7 @@ class Account_Edi_Proxy_ClientUser(models.Model):
                     'Error while receiving the document from Peppol Proxy: %s', e.message)
                 continue
 
+            has_more = messages.get('has_more', False)
             message_uuids = [
                 message['uuid']
                 for message in messages.get('messages', [])
@@ -456,8 +458,7 @@ class Account_Edi_Proxy_ClientUser(models.Model):
             if not message_uuids:
                 continue
 
-            need_retrigger = need_retrigger or len(message_uuids) > job_count
-            message_uuids = message_uuids[:job_count]
+            need_retrigger = need_retrigger or has_more
 
             # retrieve attachments for filtered messages
             all_messages = edi_user._call_peppol_proxy(
@@ -686,13 +687,14 @@ class Account_Edi_Proxy_ClientUser(models.Model):
                 bodies={move.id: log_message for move in reference_moves},
             )
         else:
+            response_info = dict(zip(reference_moves, response.get('messages')))
             responses = self.env['account.peppol.response'].create([{
                     'peppol_message_uuid': message['message_uuid'],
                     'response_code': status,
                     'peppol_state': 'processing',
                     'move_id': move.id,
                 }
-                for message, move in zip(response.get('messages'), reference_moves)
+                for move, message in response_info.items()
                 if message.get('message_uuid')
             ])
 
@@ -714,7 +716,7 @@ class Account_Edi_Proxy_ClientUser(models.Model):
             )
             message_bodies = {
                 **{move.id: sent_message for move in sent_moves},
-                **{move.id: unsent_message for move in unsent_moves},
+                **{move.id: unsent_message + (Markup('<br/>') + error if (error := response_info.get(move, {}).get('error', {}).get('message')) else "") for move in unsent_moves},
             }
             reference_moves._message_log_batch(bodies=message_bodies)
 

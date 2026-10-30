@@ -15,6 +15,7 @@ import { KnowledgeTableOfContent } from "@knowledge/editor/embedded_components/p
 import { InsertPendingElementPlugin } from "@knowledge/editor/plugins/insert_pending_element_plugin/insert_pending_element_plugin";
 import { HeadingLinkPlugin } from "@knowledge/editor/plugins/heading_link_plugin/heading_link_plugin";
 import { KnowledgeMoveNodePlugin } from "@knowledge/editor/plugins/movenode_plugin/movenode_plugin";
+import { KnowledgeTopEmbeddedViewPlugin } from "@knowledge/editor/plugins/top_embedded_view_plugin/top_embedded_view_plugin";
 
 MAIN_PLUGINS.push(KnowledgeArticlePlugin);
 
@@ -28,6 +29,7 @@ export const KNOWLEDGE_PLUGINS = [
     KnowledgePlaceholderPlugin,
     KnowledgeMoveNodePlugin,
     SignaturePlugin,
+    KnowledgeTopEmbeddedViewPlugin,
 ];
 
 export const KNOWLEDGE_EMBEDDED_COMPONENT_PLUGINS = [

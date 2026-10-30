@@ -1,6 +1,8 @@
-from unittest.mock import call, MagicMock, patch
+from requests.models import Response
+from requests.exceptions import RequestException
 from socket import gaierror
-import urllib.parse
+from unittest.mock import call, MagicMock, patch
+from urllib3.util import parse_url
 
 from .common import TestDatabasesCommon
 
@@ -899,7 +901,7 @@ class TestSynchronization(TestDatabasesCommon):
         self.env['project.project'].action_synchronize_all_databases()
 
         # ensure second sync will sync this one
-        self.assertTrue(db_second_sync.database_last_synchro, "The second synchronization should have synchronize this db first")
+        self.assertTrue(db_second_sync.database_last_synchro, "The second synchronization should have synchronized this db first")
 
         # reset sync date, add a user and ensure it impacts the sync order
         dbs = (db_first_sync + db_second_sync)
@@ -935,7 +937,7 @@ class TestXmlRpcSynchronization(TestDatabasesCommon):
 
         # Simulate a server where /json/2 is not implemented, but let calls to odoo.com pass through
         def mock_requests_request(method, uri, *args, **kwargs):
-            if urllib.parse.urlparse(uri).hostname == 'www.odoo.com':
+            if parse_url(uri).host == 'www.odoo.com':
                 return prev_mock_requests_request(method, uri, *args, **kwargs)
             return MagicMock(status_code=303)
 
@@ -1179,3 +1181,418 @@ class TestXmlRpcSynchronization(TestDatabasesCommon):
         ])
 
         self.assertFalse(remove_wizard.error_message)
+
+
+@tagged('-at_install', 'post_install')
+class TestSQLSynchronization(TestSynchronization):
+
+    def setUp(self):
+        super().setUp()
+
+        self.db_odoo_sa = self.env['project.project'].with_user(self.user_db_manager).create({
+            'name': 'odoo-sa',
+            'database_name': 'odoo-sa',
+            'database_hosting': 'premise',
+            'database_url': 'http://odoo-sa.my.odoo.test:8080/subpath',
+            'database_api_login': 'some_user@odoo.com',
+            'database_api_key': 'secret_key1',
+            'database_version': '16.0',
+            'database_user_ids': [Command.create({
+                'login': self.user_db_user.login,
+                'name': self.user_db_user.name,
+            })],
+        })
+        self.db_company = self.env['project.project'].with_user(self.user_db_manager).create({
+            'name': 'company',
+            'database_name': 'company',
+            'database_hosting': 'premise',
+            'database_url': 'http://company.my.odoo.test:8000/prefix/',
+            'database_api_login': 'some_user@odoo.com',
+            'database_api_key': 'secret_key2',
+            'database_version': '16.0',
+            'database_user_ids': [Command.create({
+                'login': self.user_db_user.login,
+                'name': self.user_db_user.name,
+            })],
+        })
+        self.db_azure_interior = self.env['project.project'].with_user(self.user_db_manager).create({
+            'name': 'Azure Interior',
+            'database_name': 'azure-interior',
+            'database_hosting': 'premise',
+            'database_url': 'http://azure-interior.my.odoo.test:8069/',
+            'database_api_login': 'some_user@odoo.com',
+            'database_api_key': 'secret_key3',
+            'database_version': '16.0',
+            'database_user_ids': [Command.create({
+                'login': self.user_db_user.login,
+                'name': self.user_db_user.name,
+            })],
+        })
+
+        self.mock_json2_calls_for_db('odoo-sa.my.odoo.test', users=[{
+            'login': self.user_db_user.login,
+            'name': self.user_db_user.name,
+            'login_date': False,
+        }])
+        self.mock_json2_calls_for_db('company.my.odoo.test', users=[{
+            'login': self.user_db_user.login,
+            'name': self.user_db_user.name,
+            'login_date': False,
+        }])
+        self.mock_json2_calls_for_db('azure-interior.my.odoo.test', users=[{
+            'login': self.user_db_user.login,
+            'name': self.user_db_user.name,
+            'login_date': False,
+        }])
+
+        self.kpi_summary_return_value = {
+            'result': {
+                'odoo-sa': {
+                    'database_version': 'saas~17.2+e',
+                    'kpi_summary': [],
+                    'users': [{
+                        'login': self.user_db_user.login,
+                        'name': self.user_db_user.name,
+                        'login_date': False,
+                    }],
+                },
+                'company': {
+                    'database_version': '18.0',
+                    'kpi_summary': [],
+                    'users': [{
+                        'login': self.user_db_user.login,
+                        'name': self.user_db_user.name,
+                        'login_date': False,
+                    }],
+                },
+                'azure-interior': {
+                    'database_version': '19.0',
+                    'kpi_summary': [],
+                    'users': [{
+                        'login': self.user_db_user.login,
+                        'name': self.user_db_user.name,
+                        'login_date': False,
+                    }],
+                },
+            },
+        }
+
+        self.env['ir.config_parameter'].sudo().set_str('databases.trusted_saas_suffixes', '.my.odoo.test')
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases(self):
+        self.env['project.project'].action_synchronize_all_databases()
+
+        self.assertCountEqual(self.mock_requests_request.mock_calls, [
+            call('post', 'http://azure-interior.my.odoo.test:8069/kpi/summary', data=None, json={'params': {'credentials': [
+                ['odoo-sa', 'secret_key1'],
+                ['company', 'secret_key2'],
+                ['azure-interior', 'secret_key3'],
+            ]}}, allow_redirects=False, timeout=15),
+        ], "Only one call should have been done for both databases")
+
+        new_projects = self.env['project.project'].search([])
+        self.assertRecordValues(new_projects, [{
+            'name': 'Azure Interior',
+            'database_name': 'azure-interior',
+            'database_hosting': 'premise',
+            'database_url': 'http://azure-interior.my.odoo.test:8069/',
+            'database_api_login': 'some_user@odoo.com',
+            'database_version': '19.0',
+        }, {
+            'name': 'company',
+            'database_name': 'company',
+            'database_hosting': 'premise',
+            'database_url': 'http://company.my.odoo.test:8000/prefix/',
+            'database_api_login': 'some_user@odoo.com',
+            'database_version': '18.0',
+        }, {
+            'name': 'odoo-sa',
+            'database_name': 'odoo-sa',
+            'database_hosting': 'premise',
+            'database_url': 'http://odoo-sa.my.odoo.test:8080/subpath',
+            'database_api_login': 'some_user@odoo.com',
+            'database_version': 'saas~17.2',
+        }])
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_without_trusted_saas_host(self):
+        self.env['ir.config_parameter'].sudo().set_str('databases.trusted_saas_suffixes', '.trusted.example.com')
+
+        self.env['project.project'].action_synchronize_all_databases()
+
+        self.assertCountEqual([call_args.args for call_args in self.mock_requests_request.mock_calls], [
+            ('get', 'http://odoo-sa.my.odoo.test:8080/subpath/json/version'),
+            ('post', 'http://odoo-sa.my.odoo.test:8080/subpath/json/2/res.users/search_read'),
+            ('post', 'http://odoo-sa.my.odoo.test:8080/subpath/json/2/kpi.provider/get_kpi_summary'),
+            ('get', 'http://company.my.odoo.test:8000/prefix/json/version'),
+            ('post', 'http://company.my.odoo.test:8000/prefix/json/2/res.users/search_read'),
+            ('post', 'http://company.my.odoo.test:8000/prefix/json/2/kpi.provider/get_kpi_summary'),
+            ('get', 'http://azure-interior.my.odoo.test:8069/json/version'),
+            ('post', 'http://azure-interior.my.odoo.test:8069/json/2/res.users/search_read'),
+            ('post', 'http://azure-interior.my.odoo.test:8069/json/2/kpi.provider/get_kpi_summary'),
+        ])
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_prefers_trusted_saas_suffix(self):
+        self.env['project.project'].action_synchronize_all_databases()
+
+        # Check expected call would be made: azure-interior doesn't have a path
+        self.assertCountEqual([call_args.args for call_args in self.mock_requests_request.mock_calls], [
+            ('post', 'http://azure-interior.my.odoo.test:8069/kpi/summary'),
+        ])
+
+        self.db_odoo_sa.database_url = 'http://odoo-sa.my.odoo.test:8080/'  # removed the path
+        self.mock_requests_request.reset_mock()
+        self.env['project.project'].action_synchronize_all_databases()
+
+        # Now odoo-sa is used
+        self.assertCountEqual([call_args.args for call_args in self.mock_requests_request.mock_calls], [
+            ('post', 'http://odoo-sa.my.odoo.test:8080/kpi/summary'),
+        ])
+
+        self.db_odoo_sa.database_url = 'http://odoo-sa.my.odoo.untrusted:8080/'  # changed the domain suffix
+        self.mock_requests_request.reset_mock()
+        self.env['project.project'].action_synchronize_all_databases()
+
+        # Back to azure-interior
+        self.assertCountEqual([call_args.args for call_args in self.mock_requests_request.mock_calls], [
+            ('post', 'http://azure-interior.my.odoo.test:8069/kpi/summary'),
+        ])
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_with_fallback_to_rpc(self):
+        self.kpi_summary_return_value['result'].pop('company')
+
+        self.env['project.project'].action_synchronize_all_databases()
+
+        json2_headers = {'Authorization': 'Bearer secret_key2', 'X-Odoo-Database': 'company'}
+        self.assertCountEqual(self.mock_requests_request.mock_calls, [
+            # This call asks for information for both databases
+            call('post', 'http://azure-interior.my.odoo.test:8069/kpi/summary', data=None, json={'params': {'credentials': [
+                ['odoo-sa', 'secret_key1'],
+                ['company', 'secret_key2'],
+                ['azure-interior', 'secret_key3'],
+            ]}}, allow_redirects=False, timeout=15),
+            # `company` is missing from the batch result, so it falls back to json2 RPC calls
+            call('get', 'http://company.my.odoo.test:8000/prefix/json/version', params=None, allow_redirects=False, timeout=15),
+            call('post', 'http://company.my.odoo.test:8000/prefix/json/2/res.users/search_read', data=None,
+                 json={'domain': [('share', '=', False)], 'fields': ['name', 'login', 'login_date']},
+                 headers=json2_headers, allow_redirects=False, timeout=15),
+            call('post', 'http://company.my.odoo.test:8000/prefix/json/2/kpi.provider/get_kpi_summary', data=None,
+                 json={},
+                 headers=json2_headers, allow_redirects=False, timeout=15),
+        ], "One call should have been done for both databases, then calls for the missing db")
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_with_error(self):
+        self.kpi_summary_return_value = {
+            'result': {
+                'odoo-sa': {
+                    'error': 'Some error string',
+                },
+                'company': {
+                    'error': 'Some other error',
+                },
+                'azure-interior': {
+                    'error': 'Yet another error',
+                },
+            },
+        }
+
+        self.env['project.project'].action_synchronize_all_databases()
+
+        self.assertCountEqual(self.mock_requests_request.mock_calls, [
+            # This call asks for information for both databases
+            call('post', 'http://azure-interior.my.odoo.test:8069/kpi/summary', data=None, json={'params': {'credentials': [
+                ['odoo-sa', 'secret_key1'],
+                ['company', 'secret_key2'],
+                ['azure-interior', 'secret_key3'],
+            ]}}, allow_redirects=False, timeout=15),
+        ], "Only one call should have been done for both databases")
+
+        tag_db_unreachable = self.env.ref('databases.project_tag_db_unreachable')
+        self.assertIn(tag_db_unreachable, self.db_odoo_sa.tag_ids)
+        self.assertIn(tag_db_unreachable, self.db_company.tag_ids)
+        self.assertRecordValues(self.db_odoo_sa.message_ids, [
+            {'preview': 'Some error string'},
+            {'preview': 'Project created'},
+        ])
+        self.assertRecordValues(self.db_company.message_ids, [
+            {'preview': 'Some other error'},
+            {'preview': 'Project created'},
+        ])
+        self.assertRecordValues(self.db_azure_interior.message_ids, [
+            {'preview': 'Yet another error'},
+            {'preview': 'Project created'},
+        ])
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_invalid_data_warnings(self):
+        batch_route = 'http://azure-interior.my.odoo.test:8069/kpi/summary'
+
+        def assertLog(expected_warning, loglevel='WARNING'):
+            with self.assertLogs('odoo.addons.databases.wizard.databases_synchronization_wizard', loglevel) as catcher:
+                self.env['project.project'].action_synchronize_all_databases()
+            self.assertEqual(len(catcher.output), 1, f"Exactly one {loglevel.lower()} should be logged")
+            self.assertIn(expected_warning, catcher.output[0])
+
+        self.kpi_summary_return_value = "not a dict"
+        assertLog(f"Batch route {batch_route!r} returned JSON which is not a dict")
+
+        self.kpi_summary_return_value = {'error': "not a dict"}
+        assertLog(f"Batch route {batch_route!r} returned JSON error which is not a dict")
+
+        self.kpi_summary_return_value = {'result': "not a dict"}
+        assertLog(f"Batch route {batch_route!r} returned JSON result which is not a dict")
+
+        self.kpi_summary_return_value = {'result': {'unknown_db': {}}}
+        assertLog(f"Ignoring dbname='unknown_db' which was returned by {batch_route!r} but not asked for.")
+
+        with patch('odoo.addons.databases.wizard.databases_synchronization_wizard.requests.post') as mock_post:
+            mock_post.return_value = Response()
+            mock_post.return_value.status_code = 418
+            assertLog(f"Batch route {batch_route!r} returned code 418", 'INFO')
+
+            mock_post.return_value.status_code = 200
+            mock_post.return_value._content = b'not json'
+            assertLog(f"Batch route {batch_route!r} returned invalid JSON")
+
+            mock_post.side_effect = RequestException("Host unreachable")
+            assertLog(f"Batch route {batch_route!r} could not be requested: Host unreachable", 'INFO')
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_with_global_error(self):
+        self.kpi_summary_return_value = {
+            'error': {'data': {
+                'name': 'SomeException',
+                'message': 'An exception happened before we even opened the databases',
+                'debug': 'Traceback (most recent call last):\n  File toto.py, line 1, in odoo.addons.databases',
+            }},
+        }
+
+        with self.assertLogs('odoo.addons.databases.wizard.databases_synchronization_wizard', 'WARNING') as log_catcher:
+            self.env['project.project'].action_synchronize_all_databases()
+
+        self.assertEqual(len(log_catcher.output), 1, "Exactly one warning should be logged")
+        self.assertIn("Batch route 'http://azure-interior.my.odoo.test:8069/kpi/summary' resulted in an error: "
+                      "SomeException: An exception happened before we even opened the databases\n"
+                      "Traceback (most recent call last):\n"
+                      "  File toto.py, line 1, in odoo.addons.databases",
+                      log_catcher.output[0])
+
+        calls = self.mock_requests_request.mock_calls
+        self.assertEqual(len(calls), 10, "The count of web requests was not the expected one")
+
+        # This call asks for information for all three databases
+        # The third URL is used because the first two are invalid (they have a path)
+        self.assertEqual(calls[0], call(
+            'post', 'http://azure-interior.my.odoo.test:8069/kpi/summary',
+            data=None, allow_redirects=False, timeout=15,
+            json={'params': {'credentials': [['odoo-sa', 'secret_key1'], ['company', 'secret_key2'], ['azure-interior', 'secret_key3']]}},
+        ))
+
+        # Both databases fallback to json2 RPC calls
+        # - odoo-sa
+        #   * getting the version
+        self.assertEqual(calls[1], call(
+            'get', 'http://odoo-sa.my.odoo.test:8080/subpath/json/version',
+            params=None, allow_redirects=False, timeout=15,
+        ))
+        #   * getting the users
+        self.assertEqual(calls[2], call(
+            'post', 'http://odoo-sa.my.odoo.test:8080/subpath/json/2/res.users/search_read',
+            data=None, allow_redirects=False, timeout=15,
+            headers={'Authorization': 'Bearer secret_key1', 'X-Odoo-Database': 'odoo-sa'},
+            json={
+                'domain': [('share', '=', False)],
+                'fields': ['name', 'login', 'login_date'],
+            },
+        ))
+        #   * getting the KPI summary
+        self.assertEqual(calls[3], call(
+            'post', 'http://odoo-sa.my.odoo.test:8080/subpath/json/2/kpi.provider/get_kpi_summary',
+            data=None, allow_redirects=False, timeout=15,
+            headers={'Authorization': 'Bearer secret_key1', 'X-Odoo-Database': 'odoo-sa'},
+            json={},
+        ))
+
+        # - company
+        #   * getting the version
+        self.assertEqual(calls[4], call(
+            'get', 'http://company.my.odoo.test:8000/prefix/json/version',
+            params=None, allow_redirects=False, timeout=15,
+        ))
+        #   * getting the users
+        self.assertEqual(calls[5], call(
+            'post', 'http://company.my.odoo.test:8000/prefix/json/2/res.users/search_read',
+            data=None, allow_redirects=False, timeout=15,
+            headers={'Authorization': 'Bearer secret_key2', 'X-Odoo-Database': 'company'},
+            json={
+                'domain': [('share', '=', False)],
+                'fields': ['name', 'login', 'login_date'],
+            },
+        ))
+        #   * getting the KPI summary
+        self.assertEqual(calls[6], call(
+            'post', 'http://company.my.odoo.test:8000/prefix/json/2/kpi.provider/get_kpi_summary',
+            data=None, allow_redirects=False, timeout=15,
+            headers={'Authorization': 'Bearer secret_key2', 'X-Odoo-Database': 'company'},
+            json={},
+        ))
+
+        # - azure-interior
+        #   * getting the version
+        self.assertEqual(calls[7], call(
+            'get', 'http://azure-interior.my.odoo.test:8069/json/version',
+            params=None, allow_redirects=False, timeout=15,
+        ))
+        #   * getting the users
+        self.assertEqual(calls[8], call(
+            'post', 'http://azure-interior.my.odoo.test:8069/json/2/res.users/search_read',
+            data=None, allow_redirects=False, timeout=15,
+            headers={'Authorization': 'Bearer secret_key3', 'X-Odoo-Database': 'azure-interior'},
+            json={
+                'domain': [('share', '=', False)],
+                'fields': ['name', 'login', 'login_date'],
+            },
+        ))
+        #   * getting the KPI summary
+        self.assertEqual(calls[9], call(
+            'post', 'http://azure-interior.my.odoo.test:8069/json/2/kpi.provider/get_kpi_summary',
+            data=None, allow_redirects=False, timeout=15,
+            headers={'Authorization': 'Bearer secret_key3', 'X-Odoo-Database': 'azure-interior'},
+            json={},
+        ))
+
+        tag_db_unreachable = self.env.ref('databases.project_tag_db_unreachable')
+        self.assertNotIn(tag_db_unreachable, self.db_odoo_sa.tag_ids)
+        self.assertNotIn(tag_db_unreachable, self.db_company.tag_ids)
+        self.assertRecordValues(self.db_odoo_sa.message_ids, [
+            {'preview': 'Project created'},
+        ])
+        self.assertRecordValues(self.db_company.message_ids, [
+            {'preview': 'Project created'},
+        ])
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_with_invalid_url(self):
+        self.db_azure_interior.database_url = 'http://[invalid'
+
+        self.env['project.project'].action_synchronize_all_databases()
+
+        self.assertRecordValues(self.db_azure_interior.message_ids, [
+            {'preview': "Unable to parse URL http://[invalid: Failed to parse: http://[invalid"},
+            {'preview': 'Project created'},
+        ])
+
+    @users('db_user@company.tld')
+    def test_synchronize_databases_with_url_without_hostname(self):
+        self.db_azure_interior.database_url = 'http:///kpi'
+
+        self.env['project.project'].action_synchronize_all_databases()
+
+        self.assertRecordValues(self.db_azure_interior.message_ids, [
+            {'preview': 'Unable to parse URL http:///kpi: no hostname'},
+            {'preview': 'Project created'},
+        ])

@@ -101,8 +101,7 @@ class TestMxEdiHrPayrollCommon(TestMxEdiCommon):
             'date_to': date_to or '2026-05-15',
             'struct_id': self.env.ref('l10n_mx_hr_payroll.l10n_mx_regular_pay').id,
         })
-        for code, value in property_inputs.items():
-            payslip._set_input_value(code, value)
+        payslip._set_input_values(property_inputs)
         payslip.compute_sheet()
 
         payslip.action_payslip_done()
@@ -163,6 +162,12 @@ class TestMxEdiHrPayrollCommon(TestMxEdiCommon):
         })
         payslip = self._generate_payslip_with_cfdi(date(2026, 6, 1), date(2026, 6, 7))
         self._assert_payslip_cfdi(payslip, 'test_cfdi_nomina_con_septimo_dia')
+
+    def test_cfdi_nomina_antiguedad_menor_a_una_semana(self):
+        self.employee.contract_date_start = '2026-05-13'  # 3 days of seniority (date_to = 2026-05-15)
+        self.employee.write({'review_state': '1_reviewed'})
+        payslip = self._generate_payslip_with_cfdi()
+        self._assert_payslip_cfdi(payslip, 'test_cfdi_nomina_antiguedad_menor_a_una_semana')
 
     def test_cfdi_primary_false_for_non_mx_payrun(self):
         """

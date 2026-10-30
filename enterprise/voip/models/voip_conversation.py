@@ -3,6 +3,8 @@ from psycopg2.errors import UniqueViolation
 from odoo import api, fields, models
 from odoo.exceptions import ConcurrencyError
 
+from odoo.addons.voip.tools.concurrency import expected_unique_violation
+
 
 class VoipConversation(models.Model):
     _name = "voip.conversation"
@@ -36,6 +38,7 @@ class VoipConversation(models.Model):
         if conversation:
             return conversation
         try:
-            return self.sudo().create({"conversation_identifier": conversation_identifier})
+            with expected_unique_violation():
+                return self.sudo().create({"conversation_identifier": conversation_identifier})
         except UniqueViolation as e:
             raise ConcurrencyError() from e

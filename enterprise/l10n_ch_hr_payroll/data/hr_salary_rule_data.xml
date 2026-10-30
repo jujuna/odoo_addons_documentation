@@ -7649,7 +7649,7 @@ if payslip.l10n_ch_is_code and not payslip.l10n_ch_after_departure_payment == 'N
             is_amount = code_is_salary * rate / 100 - code_total_is
             if is_amount >= 0:
                 is_amount = max(min_is, is_amount)
-            total_is -= is_amount
+            total_is -= float_round(is_amount, precision_rounding=0.05, rounding_method="HALF-UP")
             payslip._log_is_line(is_canton=canton, municipality=municipality, is_code=st_code, code='IS', amount=is_amount)
         result = total_is
 else:

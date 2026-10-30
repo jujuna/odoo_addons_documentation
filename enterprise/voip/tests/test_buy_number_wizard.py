@@ -348,6 +348,25 @@ class TestBuyNumberWizardSearch(TestBuyNumberWizardBase):
         self.assertEqual(wizard.result_line_ids[0].phone_number, "+3287000001")
         self.assertEqual(wizard.result_line_ids[1].phone_number, "+3287000002")
 
+    def test_search_filters_only_contain_user_criteria(self):
+        wizard = self._create_wizard(starts_with="2", ends_with="34")
+        self.assertEqual(wizard._build_search_filters(), {
+            "filter[phone_number_type]": "local",
+            "filter[phone_number][starts_with]": "2",
+            "filter[phone_number][ends_with]": "34",
+        })
+
+        wizard = self._create_wizard(
+            did_number_type="toll_free",
+            starts_with="8",
+            consecutive=3,
+        )
+        self.assertEqual(wizard._build_search_filters(), {
+            "filter[phone_number_type]": "toll_free",
+            "filter[phone_number][starts_with]": "8",
+            "filter[consecutive]": 3,
+        })
+
     def test_search_result_location_is_narrowest_first_without_duplicates(self):
         wizard = self._create_wizard()
         with patch.object(PhoneServiceAPI, "_call_phone_service", side_effect=_mock_search_available_phone_numbers()):
@@ -1435,7 +1454,7 @@ class TestDidNumberTypeConstant(common.TransactionCase):
     def test_models_share_canonical_type_order(self):
         """All number-type selections share one canonical order, so the buy
         wizard's 'first covered' default is deterministic."""
-        expected = ["mobile", "local", "national", "toll_free"]
+        expected = ["local", "national", "mobile", "toll_free"]
         for model in ("voip.did.number", "voip.requirement.group", "voip.did.number.search.result.line"):
             codes = [code for code, _label in self.env[model]._fields["did_number_type"].selection]
             self.assertEqual(codes, expected, f"{model} drifted from the canonical order")
@@ -1445,7 +1464,7 @@ class TestDidNumberTypeConstant(common.TransactionCase):
             code for code, _label
             in self.env["voip.did.number.search.wizard"]._fields["did_number_type"].selection
         ]
-        self.assertEqual(wizard_codes, ["mobile", "local", "national", "toll_free"])
+        self.assertEqual(wizard_codes, ["local", "national", "mobile", "toll_free"])
         self.assertNotIn("compatible_requirement_group_ids", self.env["voip.did.number.search.result.line"]._fields)
         self.assertNotIn("has_requirements", self.env["voip.did.number.search.result.line"]._fields)
 
@@ -2039,12 +2058,12 @@ class TestBuyNumberWizardCoverage(TestBuyNumberWizardBase):
 
     def test_whitelist_dedupes_strips_shared_cost_and_uses_canonical_order(self):
         wizard = self._wizard_with_coverage(["toll_free", "local", "local", "shared_cost", "mobile"])
-        self.assertEqual(wizard.available_did_number_type_codes, ["mobile", "local", "toll_free"])
+        self.assertEqual(wizard.available_did_number_type_codes, ["local", "mobile", "toll_free"])
         self.assertTrue(wizard.has_available_types)
 
     def test_default_is_first_covered_in_canonical_order(self):
         wizard = self._wizard_with_coverage(["toll_free", "local", "mobile"])
-        self.assertEqual(wizard.did_number_type, "mobile")
+        self.assertEqual(wizard.did_number_type, "local")
 
     def test_explicit_type_survives_create_and_siblings_still_compute(self):
         """An explicit did_number_type on create must be kept AND the whitelist
@@ -2055,10 +2074,10 @@ class TestBuyNumberWizardCoverage(TestBuyNumberWizardBase):
         ):
             wizard = self.env["voip.did.number.search.wizard"].with_user(self.admin_user).create({
                 "country_id": self.country_be.id,
-                "did_number_type": "local",
+                "did_number_type": "mobile",
             })
-        self.assertEqual(wizard.did_number_type, "local")
-        self.assertEqual(wizard.available_did_number_type_codes, ["mobile", "local", "toll_free"])
+        self.assertEqual(wizard.did_number_type, "mobile")
+        self.assertEqual(wizard.available_did_number_type_codes, ["local", "mobile", "toll_free"])
         self.assertTrue(wizard.has_available_types)
 
     def test_empty_coverage_disables_search(self):
@@ -2083,7 +2102,7 @@ class TestBuyNumberWizardCoverage(TestBuyNumberWizardBase):
                 "country_id": self.country_be.id,
             })
             wizard.flush_recordset()  # stored computes are lazy; flush while mock is active
-        self.assertEqual(wizard.available_did_number_type_codes, ["mobile", "local", "national", "toll_free"])
+        self.assertEqual(wizard.available_did_number_type_codes, ["local", "national", "mobile", "toll_free"])
         self.assertTrue(wizard.has_available_types)
 
     def test_view_filters_type_dropdown_and_gates_search_on_coverage(self):

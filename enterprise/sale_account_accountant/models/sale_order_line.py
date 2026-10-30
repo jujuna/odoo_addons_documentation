@@ -1,8 +1,17 @@
-from odoo import _, api, models
+from odoo import _, api, fields, models
 
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
+
+    unit_cost = fields.Float(string="Cost by Unit", related='product_id.standard_price', groups='base.group_user')
+    total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost', groups='base.group_user')
+
+    @api.depends('qty_delivered_at_date', 'qty_invoiced_at_date', 'product_id.standard_price')
+    def _compute_total_cost(self):
+        for line in self:
+            line = line.with_company(line.company_id)
+            line.total_cost = (line.qty_delivered_at_date - line.qty_invoiced_at_date) * line.product_id.standard_price
 
     @api.model
     def _read_group(self, domain, groupby=(), aggregates=(), having=(), offset=0, limit=None, order=None) -> list[tuple]:

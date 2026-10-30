@@ -7,4 +7,5 @@ from . import test_planning_slot
 from . import test_industry_fsm_sale_flow
 from . import test_so_line_determined_in_timesheet
 from . import test_planning_field_service_at_install
+from . import test_planning_field_service_product_catalog
 from . import test_planning_field_service_with_travel_invoice

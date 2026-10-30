@@ -8,6 +8,7 @@ from odoo import Command
 from odoo.exceptions import UserError
 from odoo.tests.common import tagged
 from odoo.tools.misc import file_open
+from odoo.tools import mute_logger
 
 from odoo.addons.account.tests.test_account_move_send import TestAccountMoveSendCommon
 
@@ -17,6 +18,7 @@ from .common import (
     TestL10nFrPdpCommon,
     mock_pdp_annuaire_lookup,
     mock_pdp_documents_retrieval,
+    mock_pdp_peppol_lookup_success,
     mock_pdp_send_document,
     mock_pdp_send_response,
 )
@@ -125,6 +127,37 @@ class TestPdpMessage(TestL10nFrPdpCommon, TestAccountMoveSendCommon):
         self.assertTrue(wizard.sending_method_checkboxes['peppol']['readonly'])  # can't select peppol
         self.assertFalse(wizard.alerts)  # there is no alerts
 
+    def test_batch_send_pdp_partner(self):
+        """ Test that the batch sending wizard computes the alerts of french invoices """
+        self.env.company.account_peppol_proxy_state = 'sender'  # can send but not through the PDP
+        self.partner_a.invoice_sending_method = 'email'
+        with mock_pdp_annuaire_lookup(PDP_IDENTIFIER):
+            self.partner_a.button_account_peppol_check_partner_endpoint()
+        moves = self._create_french_invoice() + self._create_french_invoice()
+        moves.action_post()
+        wizard = self.env['account.move.send.batch.wizard'].create({
+            'move_ids': [Command.set(moves.ids)],
+        })
+        self.assertTrue('account_peppol_partner_want_peppol' in wizard.alerts)  # the alert is computed
+
+    def test_send_pdp_prod_valid_label(self):
+        """
+        The French e-invoicing label for Peppol should be shown even when there is nothing else
+        to add to it: no mode suffix (we're in prod, not demo/test) and no reason to disable the
+        checkbox (the customer is valid on Peppol).
+        """
+        self.proxy_user.edi_mode = 'prod'  # addendum_mode == ''
+        move = self._create_french_invoice()
+        move.action_post()
+        move.partner_id.peppol_verification_state = 'valid'
+
+        wizard = self.env['account.move.send.wizard'].create({'move_id': move.id})
+        self.assertFalse(wizard._get_peppol_checkbox_addendum_disable_reason())  # addendum_disable_reason == ''
+        self.assertEqual(
+            wizard.sending_method_checkboxes['peppol']['label'],
+            self.env._("by the Approved Platform"),
+        )
+
     def test_resend_error_pdp_message(self):
         # should be able to resend error invoices
         move = self._create_french_invoice()
@@ -171,6 +204,37 @@ class TestPdpMessage(TestL10nFrPdpCommon, TestAccountMoveSendCommon):
             [{
                 'peppol_move_state': 'done',
                 'pdp_ppf_move_state': 'in_progress',
+                'peppol_message_uuid': FAKE_UUID[0],
+            }],
+        )
+        self.assertTrue(bool(move.ubl_cii_xml_id))
+
+    def test_pdp_send_success_message_peppol(self):
+        # should be able to send valid invoices correctly
+        # attachment should be generated
+        # peppol_move_state should be set to done
+        # pdp_ppf_move_state should be `False`
+        partner = self.belgian_partner
+        move = self._create_invoice(partner_id=partner.id)
+        move.action_post()
+
+        with (
+            mock_pdp_peppol_lookup_success(['0208:0239843188']),
+            mock_pdp_send_document(),
+            mock_pdp_documents_retrieval(),
+        ):
+            wizard = self.create_send_and_print(move)
+            self.assertEqual(wizard.invoice_edi_format, 'ubl_bis3')
+            wizard.sending_methods = ['peppol']
+
+            wizard.action_send_and_print()
+
+            self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
+        self.assertRecordValues(
+            move,
+            [{
+                'peppol_move_state': 'done',
+                'pdp_ppf_move_state': False,
                 'peppol_message_uuid': FAKE_UUID[0],
             }],
         )
@@ -786,3 +850,128 @@ class TestPdpMessage(TestL10nFrPdpCommon, TestAccountMoveSendCommon):
             ],
             'move_id': move.id,
         }])
+
+    def test_paid_lifecycle_cron_response_not_created(self):
+        def mocked_pdp_send_response(self, reference_moves, status, additional_info=None):
+            # Do not do anything; i.e. do not create responses
+            return None
+
+        move = self._create_french_invoice()
+        move.action_post()
+
+        with self._mock_send():
+            send_wizard = self.create_send_and_print(move, default=True)
+            send_wizard.action_send_and_print()
+            self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
+        self.assertEqual(move.peppol_move_state, 'done')
+        self._pay(move)
+        # We only sent the payment lifecycle automatically in case the Flow 1 succeeded
+        move.pdp_ppf_move_state = 'sent'
+        self.assertEqual(move.payment_state, 'paid')
+        self.assertEqual(move.pdp_lifecycle_residual, move.amount_total)
+        self.assertFalse(move.peppol_response_ids)
+
+        with (
+            patch('odoo.addons.l10n_fr_pdp.models.account_edi_proxy_user.AccountEdiProxyClientUser._pdp_send_response', mocked_pdp_send_response),
+            self.enter_registry_test_mode(),
+        ):
+            self.env.ref('l10n_fr_pdp.ir_cron_pdp_send_lifecycles').method_direct_trigger()
+
+        paid_response = move.peppol_response_ids
+        self.assertRecordValues(paid_response, [{
+            'peppol_state': 'error',
+            'pdp_flow_number': '2',
+            'response_code': 'PD',
+            'pdp_ppf_state': False,
+            'pdp_payment_info': [
+                {'amount_changed': False, 'type_code': 'MEN', 'amount': '600.00', 'currency': 'EUR', 'tax_percent': '20.00'},
+                {'amount_changed': False, 'type_code': 'MEN', 'amount': '1085.00', 'currency': 'EUR', 'tax_percent': '8.50'},
+            ],
+            'move_id': move.id,
+        }])
+        self.assertEqual(move.pdp_lifecycle_residual, 0)
+        self.assertFalse(self.env['account_edi_proxy_client.user']._pdp_get_send_lifecycles_moves(move.company_id, 100))
+
+        with (
+            patch('odoo.addons.l10n_fr_pdp.wizard.pdp_response_wizard.PdpResponseWizard.button_send') as button_send,
+            self.enter_registry_test_mode(),
+        ):
+            self.env.ref('l10n_fr_pdp.ir_cron_pdp_send_lifecycles').method_direct_trigger()
+            self.assertFalse(button_send.called)
+
+    def test_paid_lifecycle_cron_sending_exception(self):
+        def mocked_button_send_raises(self):
+            raise Exception("test")
+
+        move = self._create_french_invoice()
+        move.action_post()
+
+        with self._mock_send():
+            send_wizard = self.create_send_and_print(move, default=True)
+            send_wizard.action_send_and_print()
+            self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
+        self.assertEqual(move.peppol_move_state, 'done')
+        self._pay(move)
+        # We only sent the payment lifecycle automatically in case the Flow 1 succeeded
+        move.pdp_ppf_move_state = 'sent'
+        self.assertEqual(move.payment_state, 'paid')
+        self.assertEqual(move.pdp_lifecycle_residual, move.amount_total)
+        self.assertFalse(move.peppol_response_ids)
+
+        with (
+            mute_logger('odoo.addons.l10n_fr_pdp.models.account_edi_proxy_user'),
+            patch('odoo.addons.l10n_fr_pdp.wizard.pdp_response_wizard.PdpResponseWizard.button_send', mocked_button_send_raises),
+            self.enter_registry_test_mode(),
+        ):
+            self.env.ref('l10n_fr_pdp.ir_cron_pdp_send_lifecycles').method_direct_trigger()
+
+        paid_response = move.peppol_response_ids
+        self.assertRecordValues(paid_response, [{
+            'peppol_state': 'error',
+            'pdp_flow_number': '2',
+            'response_code': 'PD',
+            'pdp_ppf_state': False,
+            'pdp_payment_info': [
+                {'amount_changed': False, 'type_code': 'MEN', 'amount': '600.00', 'currency': 'EUR', 'tax_percent': '20.00'},
+                {'amount_changed': False, 'type_code': 'MEN', 'amount': '1085.00', 'currency': 'EUR', 'tax_percent': '8.50'},
+            ],
+            'move_id': move.id,
+        }])
+        self.assertEqual(move.pdp_lifecycle_residual, 0)
+        self.assertFalse(self.env['account_edi_proxy_client.user']._pdp_get_send_lifecycles_moves(move.company_id, 100))
+
+        with (
+            patch('odoo.addons.l10n_fr_pdp.wizard.pdp_response_wizard.PdpResponseWizard.button_send') as button_send,
+            self.enter_registry_test_mode(),
+        ):
+            self.env.ref('l10n_fr_pdp.ir_cron_pdp_send_lifecycles').method_direct_trigger()
+            self.assertFalse(button_send.called)
+
+    def test_pdp_send_to_contact_can_send_response(self):
+        # We should be able to send invoices to a contact of a partner and then send responses
+        move = self._create_french_invoice()
+        commercial_partner = move.partner_id
+        contact = commercial_partner.copy({'parent_id': commercial_partner.id})
+        contact.write({'routing_scheme': False, 'routing_endpoint': False, 'invoice_edi_format': False})
+        move.partner_id = contact
+        self.assertEqual(contact.commercial_partner_id, commercial_partner)
+        move.action_post()
+
+        with self._mock_send():
+            send_wizard = self.create_send_and_print(move, default=True)
+            self.assertEqual(send_wizard.invoice_edi_format, 'ubl_21_fr')
+            self.assertTrue('peppol' in send_wizard.sending_methods)
+            send_wizard.action_send_and_print()
+            send_wizard.action_send_and_print()
+            self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
+
+        self.assertRecordValues(
+            move,
+            [{
+                'peppol_move_state': 'done',
+                'pdp_ppf_move_state': 'in_progress',
+                'peppol_message_uuid': FAKE_UUID[0],
+            }],
+        )
+        self.assertTrue(bool(move.ubl_cii_xml_id))
+        self.assertTrue(move.pdp_can_send_response)

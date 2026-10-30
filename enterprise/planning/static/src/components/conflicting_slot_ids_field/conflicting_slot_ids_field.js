@@ -57,7 +57,7 @@ export class ConflictingSlotIdsField extends Component {
 
     async showConflictedSlots() {
         if (this.props.record.isNew) {
-            await this.props.record.save({ noReload: true });
+            await this.props.record.save({ reload: false });
         }
         this.actionService.doActionButton({
             type: "object",

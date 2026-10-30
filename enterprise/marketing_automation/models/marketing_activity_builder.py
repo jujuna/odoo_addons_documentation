@@ -57,6 +57,9 @@ class MarketingActivity(models.Model):
             But we still keep the information linked to their options, interval_number/interval_type, trigger_type, etc.
             If the impacted node will become empty, we remove it.
         """
+        # Delete the activity triggers (mail interactions, etc.) related to the activities we're deleting:
+        self.triggered_activity_ids._delete_trigger()
+
         activities_to_keep = self.filtered(
             lambda activity: activity._has_delay_node() or activity._has_trigger_node())
         for activity in activities_to_keep:

@@ -1,9 +1,13 @@
+from copy import deepcopy
+
+
 def generate_response(invoice_line_ids):
     assert len(invoice_line_ids) == 1, "the mocked response is for 1 line"
 
-    for i, line in enumerate(RESPONSE['lines']):
+    response = deepcopy(RESPONSE)
+    for i, line in enumerate(response['lines']):
         line['lineCode'] = invoice_line_ids[i].id
-    return RESPONSE
+    return response
 
 
 RESPONSE = {'header': {'accountId': 'xxxxx',

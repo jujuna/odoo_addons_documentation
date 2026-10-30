@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -32,12 +33,21 @@ class HrAttendance(models.Model):
 
     @api.depends('employee_id', 'date')
     def _compute_show_contract_warning(self):
+        contract_dates_per_employee = defaultdict(list)
+        for employee, date_from, date_to in self.env['hr.version']._read_group(
+            domain=[('employee_id', 'in', self.employee_id._origin.ids), ('contract_date_start', '!=', False)],
+            groupby=['employee_id', 'contract_date_start:day', 'contract_date_end:day'],
+        ):
+            contract_dates_per_employee[employee.id].append((date_from, date_to))
         for attendance in self:
             if not attendance.employee_id or not attendance.date:
                 # New blank form: do not show the warning yet.
                 attendance.show_contract_warning = False
                 continue
-            attendance.show_contract_warning = not attendance.employee_id._is_in_contract(attendance.date)
+            attendance.show_contract_warning = not any(
+                date_from <= attendance.date and (not date_to or date_to >= attendance.date)
+                for date_from, date_to in contract_dates_per_employee[attendance.employee_id._origin.id]
+            )
 
     def _gantt_progress_bar(self, field, res_ids, start, stop):
         """
@@ -81,7 +91,7 @@ class HrAttendance(models.Model):
             total_days = (stop - start).days
             weeks = total_days // 7
             days = total_days % 7
-            calendar = employee.resource_calendar_id
+            calendar = employee.sudo()._get_version(start.date()).resource_calendar_id
             return (
                 weeks * calendar.hours_per_week + min(
                     (days * calendar.hours_per_day),
@@ -189,9 +199,10 @@ class HrAttendance(models.Model):
 
     @api.onchange('check_in')
     def _onchange_check_in(self):
-        if 'scale' in self.env.context and self.env.context["scale"] != 'day':
+        if 'scale' in self.env.context and self.env.context["scale"] != 'day' and self.check_in:
             # sudo() is needed because attendance officers may not have access to employee versions.
-            hours_per_day = self.employee_id.sudo().current_version_id.resource_calendar_id.hours_per_day
+            version = self.employee_id.sudo()._get_version(self.check_in.date()) if self.employee_id else self.env['hr.version']
+            hours_per_day = version.resource_calendar_id.hours_per_day
             self.check_out = self.check_in + timedelta(hours=hours_per_day)
 
     def action_open_details(self):

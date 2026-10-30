@@ -9,15 +9,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:30+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-11 12:33+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/account_batch_payment/zh_Hans/>\n"
+"projects/odoo-20/account_batch_payment/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,6 +41,14 @@ msgid ""
 "When you reconcile, simply select the corresponding batch payment to "
 "reconcile all the payments in the batch.\n"
 msgstr ""
+"\n"
+"批量付款\n"
+"=======================================\n"
+"批量付款允许将多笔付款归组。\n"
+"\n"
+"它们的主要用途（但不限于）是将多张支票归组，然后一次性存入银行。\n"
+"存入总额将作为单笔交易显示在您的银行对账单上。\n"
+"对账时，只需选中对应的批量付款，即可核销该批次中的所有付款。\n"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -133,7 +142,7 @@ msgstr "所有付款项目必须填写相关信息，否则不得填写。"
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "All payments must have the same payment method."
-msgstr ""
+msgstr "所有付款必须使用相同的付款方式。"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount
@@ -174,7 +183,7 @@ msgstr "银行日记账"
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "银行交易"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -457,7 +466,7 @@ msgstr "关注者（合作伙伴）"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
 msgid "Generate File"
-msgstr ""
+msgstr "生成文件"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_create_date
@@ -575,7 +584,7 @@ msgstr "留空以自动生成..."
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols 图标，例如 checklist"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -674,12 +683,6 @@ msgid "Only %s payments can be added to a batch. Invalid ones will be ignored."
 msgstr "仅%s笔有效付款可加入批量处理，无效项将被忽略。"
 
 #. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_payment.py:0
-msgid "Only outbound payments can be exported."
-msgstr ""
-
-#. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
 msgid "Outbound"
 msgstr "外向"
@@ -708,7 +711,7 @@ msgstr "付款 Ids 域"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_move_line__payment_lines_ids
 msgid "Payment Lines"
-msgstr ""
+msgstr "付款明细行"
 
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_payment_method
@@ -810,7 +813,7 @@ msgstr "搜索：批量付款"
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "Selected payments include methods that cannot generate a file."
-msgstr ""
+msgstr "所选付款中包含无法生成文件的付款方式。"
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__sent
@@ -831,7 +834,7 @@ msgstr "显示"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__show_download_xml_button
 msgid "Show Download Xml Button"
-msgstr ""
+msgstr "显示下载 XML 按钮"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__show_remove_button
@@ -1013,7 +1016,7 @@ msgstr "当导出文件已生成且所有付款均被标记为“已发送”时
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You can't generate a file for payments from more than one journal."
-msgstr ""
+msgstr "无法为来自多个日记账的付款生成文件。"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -1044,12 +1047,15 @@ msgstr "不能创建付款重叠的批次。"
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You must select at least one payment to generate a file."
-msgstr ""
+msgstr "您必须至少选择一笔付款才能生成文件。"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 msgid "payments"
 msgstr "付款"
+
+#~ msgid "Only outbound payments can be exported."
+#~ msgstr "只有对外付款才能导出。"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "银行对账单行"

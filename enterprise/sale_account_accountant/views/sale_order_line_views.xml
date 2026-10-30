@@ -19,10 +19,15 @@
                     domain="[('product_type', '=', 'service')]"
                     help="Display only service lines"/>
                 <filter
-                    string="Goods"
-                    name="goods"
-                    domain="[('product_type', '=', 'consu')]"
-                    help="Display only goods lines"/>
+                    string="Tracked Goods"
+                    name="tracked_goods"
+                    domain="[('product_type', '=', 'consu'), ('product_id.is_storable', '=', True)]"
+                    help="Display only storable goods lines"/>
+                <filter
+                    string="Untracked Goods"
+                    name="untracked_goods"
+                    domain="[('product_type', '=', 'consu'), ('product_id.is_storable', '=', False)]"
+                    help="Display only non-storable goods lines"/>
                 <separator/>
                 <filter
                     string="Invoice on Ordered"
@@ -66,6 +71,8 @@
                 <field name="product_uom_id" groups="uom.group_uom" widget="many2one_uom"/>
                 <field name="price_unit" widget="monetary"/>
                 <field name="amount_to_invoice_at_date" widget="monetary"/>
+                <field name="unit_cost" string="Unit Cost" optional="show"/>
+                <field name="total_cost" optional="show"/>
             </list>
         </field>
     </record>

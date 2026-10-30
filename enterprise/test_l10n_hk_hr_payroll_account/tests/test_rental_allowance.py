@@ -60,7 +60,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         rental.valid_up_to_date = date(2025, 1, 31)
         # That done, Jan payslip would now have the rental allowance applied to it!
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip_results = {'HRA': 8000.0, 'BASIC': 12000.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
+        payslip_results = {'HRA': 8000.0, 'BASIC': 12000.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_reimbursement_flow_partial(self):
@@ -75,7 +75,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         rental.valid_up_to_date = date(2025, 1, 31)
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
         # Ensure that the limit of 5000 was applied.
-        payslip_results = {'HRA': 5000.0, 'BASIC': 15000.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
+        payslip_results = {'HRA': 5000.0, 'BASIC': 15000.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_reimbursement_no_proof(self):
@@ -87,9 +87,10 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         rental = self._create_test_rental(self.version.employee_id)
         rental.action_confirm_rental()
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip_results = {'BASIC': 20000.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
+        payslip_results = {'BASIC': 20000.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
         self._validate_payslip(payslip, payslip_results)
         # Also validate the warning we display.
+        payslip.with_context(hr_payroll_force_compute_issue=True)._compute_issues()
         self.assertEqual(payslip.issues['0']['action_text'], 'Rental')
 
     def test_reimbursement_flow_installment(self):
@@ -103,7 +104,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         # We expect 8000 as HRA in the next three months
         for dt in rrule(MONTHLY, dtstart=datetime(2025, 1, 1), until=datetime(2025, 3, 1)):
             payslip = self._generate_payslip(dt.date(), dt.date() + relativedelta(day=31))
-            payslip_results = {'HRA': 8000.0, 'BASIC': 12000.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
+            payslip_results = {'HRA': 8000.0, 'BASIC': 12000.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
             self._validate_payslip(payslip, payslip_results)
 
     def test_reimbursement_two_proofs(self):
@@ -120,7 +121,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
         payslip._set_input_value('HRA_MANUAL', 8000)  # Two reimbursement of 4000 at once
         payslip.compute_sheet()
-        payslip_results = {'HRA_MANUAL': 8000, 'HRA': 8000.0, 'BASIC': 12000.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
+        payslip_results = {'HRA_MANUAL': 8000, 'HRA': 8000.0, 'BASIC': 12000.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_reimbursement_two_proofs_capped(self):
@@ -136,7 +137,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         payslip._set_input_value('HRA_MANUAL', 16000)  # Two reimbursement of 8000 at once
         payslip.compute_sheet()
         # Employee actively worked 184 hours, minimum wages in Jan 2025 were HKD $40 => minimum wages for this months were HKD$7360
-        payslip_results = {'HRA_MANUAL': 16000, 'HRA': 12640.0, 'BASIC': 7360.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
+        payslip_results = {'HRA_MANUAL': 16000, 'HRA': 12640.0, 'BASIC': 7360.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_direct_payment_flow(self):
@@ -149,7 +150,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         rental.action_confirm_rental()
         # Rental has now been approved, and should appear in the payslip!
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip_results = {'HEPR': 8000.0, 'BASIC': 20000.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
+        payslip_results = {'HEPR': 8000.0, 'BASIC': 20000.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 19190.0, 'MEA': 19190.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_co_payment_flow(self):
@@ -163,7 +164,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         rental.action_confirm_rental()
         # Rental has now been approved, and should appear in the payslip!
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip_results = {'HEPR': 8000, 'HC': -2000.0, 'BASIC': 20000.0, 'ALW.INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 17190.0, 'MEA': 17190.0}
+        payslip_results = {'HEPR': 8000, 'HC': -2000.0, 'BASIC': 20000.0, 'ALW_INT': 200.0, '713_GROSS': 20200.0, 'GROSS': 20200.0, 'EEMC': -1010.0, 'ERMC': -1010.0, 'NET': 17190.0, 'MEA': 17190.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_housing_allowance_flow(self):
@@ -172,7 +173,7 @@ class TestRentalAllowance(TestL10NHkHrPayrollAccountCommon):
         """
         self.version._set_property_input_value('HA', 8000)
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
-        payslip_results = {'HA': 8000, 'BASIC': 20000.0, 'ALW.INT': 200.0, '713_GROSS': 28200.0, 'GROSS': 28200.0, 'EEMC': -1410.0, 'ERMC': -1410.0, 'NET': 26790.0, 'MEA': 26790.0}
+        payslip_results = {'HA': 8000, 'BASIC': 20000.0, 'ALW_INT': 200.0, '713_GROSS': 28200.0, 'GROSS': 28200.0, 'EEMC': -1410.0, 'ERMC': -1410.0, 'NET': 26790.0, 'MEA': 26790.0}
         self._validate_payslip(payslip, payslip_results)
 
     def test_reminder(self):

@@ -337,6 +337,36 @@ class WhatsAppComposerInternals(WhatsAppComposerCase, CronMixinCase):
                         'field_name': field_path
                     })
 
+    def test_composer_variables_free_text_placeholders(self):
+        """Ensure body free-text placeholders are correctly mapped to demo values."""
+        body_variables = [{
+            'name': "{{1}}",
+            'line_type': 'body',
+            'field_type': 'field',
+            'field_name': 'country_id.name',
+            'demo_value': 'sample country',
+        }] + [{
+            'name': f"{{{{{i}}}}}",
+            'line_type': 'body',
+            'field_type': 'free_text',
+            'demo_value': f'Free text {i}',
+        } for i in range(2, 12)]
+
+        template = self.env['whatsapp.template'].create({
+            'body': 'Hello {{1}} {{11}} {{10}} {{2}} {{3}} {{4}} {{5}} {{6}} {{7}} {{8}} {{9}}',
+            'model_id': self.env['ir.model']._get_id('res.partner'),
+            'variable_ids': [(5, 0, 0)] + [(0, 0, values) for values in body_variables],
+            'wa_account_id': self.whatsapp_account.id,
+        })
+        # Reload the one2many so the test uses the database order.
+        template.invalidate_recordset(['variable_ids'])
+        self.maxDiff = None
+        self.assertDictEqual(
+            template.get_template_demo_values(),
+            {f"free_text_{i - 1}": f"Free text {i}" for i in range(2, 12)},
+            "Free text values are expected in order of their name, but always numbered 1 through 10 regardless of whether they actually start at 1",
+        )
+
 
 @tagged('wa_composer')
 @tagged('at_install', '-post_install')  # LEGACY at_install

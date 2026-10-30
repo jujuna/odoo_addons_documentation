@@ -5,16 +5,25 @@ import {
     AttachmentPreviewListController,
     AttachmentPreviewListRenderer,
 } from "../../attachment_preview_list_view/attachment_preview_list_view";
+import { useBankReconciliation } from "../bank_reconciliation_service";
 import { BankRecControlPanel } from "../control_action/control_action";
 import { BankRecModel } from "../kanban_renderer";
 
 export class BankRecListController extends AttachmentPreviewListController {
+    setup() {
+        super.setup();
+        this.bankReconciliation = useBankReconciliation();
+    }
+
     get previewerStorageKey() {
         return "account.statement_line_pdf_previewer_hidden";
     }
 
     get modelParams() {
         const params = super.modelParams;
+        // Only computed by the kanban otherwise, while the actions of the selected lines need them
+        params.hooks.onRootLoaded = (root) =>
+            this.bankReconciliation.computeAvailableReconcileModels(root.records);
         params.config.activeFields.bank_statement_attachment_ids = makeActiveField();
         params.config.activeFields.bank_statement_attachment_ids.related = {
             fields: {

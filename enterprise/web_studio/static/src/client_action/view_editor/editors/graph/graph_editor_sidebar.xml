@@ -48,9 +48,9 @@
                 <Property
                     name="'first_groupby'"
                     type="'selection'"
-                    value="this.modelParams.groupBy[0]"
+                    value="this.firstGroupBy"
                     childProps="{ choices: this.firstGroupbyChoices, required: false }"
-                    onChange="(value) => this.onGroupByChanged('col', value, this.oldFieldValues.firstDimension)"
+                    onChange.bind="(value) => this.onGroupByChanged('col', value, this.firstGroupBy)"
                 >
                     First dimension
                 </Property>
@@ -58,9 +58,9 @@
                 <Property
                     name="'second_groupby'"
                     type="'selection'"
-                    value="this.modelParams.groupBy[1]"
+                    value="this.secondGroupBy"
                     childProps="{ choices: this.secondGroupbyChoices, required: false }"
-                    onChange="(value) => this.onGroupByChanged('col', value, this.oldFieldValues.secondDimension)"
+                    onChange.bind="(value) => this.onGroupByChanged('col', value, this.secondGroupBy)"
                 >
                     Second dimension
                 </Property>
@@ -70,7 +70,7 @@
                     type="'selection'"
                     value="this.modelParams.measure"
                     childProps="{ choices: this.mesureChoices, required: false }"
-                    onChange.bind="(value) => this.onGroupByChanged('measure', value, this.oldFieldValues.measure)"
+                    onChange.bind="(value) => this.onGroupByChanged('measure', value, this.oldFieldValues?.measure)"
                 >
                     Measure
                 </Property>

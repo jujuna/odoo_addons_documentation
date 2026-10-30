@@ -152,6 +152,7 @@ class AIAgent(models.Model):
             author_id=bot_partner.id,
             message_type='comment',
             subtype_xmlid='mail.mt_comment',
+            silent=True,
         )
         channel.channel_member_ids.filtered(lambda m: m.partner_id == bot_partner).unlink()
         # Join the audience allowed to inspect runs (admins), so they get it live.

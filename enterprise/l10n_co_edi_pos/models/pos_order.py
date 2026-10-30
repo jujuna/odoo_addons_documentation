@@ -293,7 +293,7 @@ class PosOrder(models.Model):
 
         if doc.state == 'invoice_rejected':
             if self.env['account.move.send']._can_commit():
-                self._cr.commit()
+                self.env.cr.commit()
             raise UserError(self.env._("Error(s) when sending the document to the DIAN:\n- %s",
                               "\n- ".join(doc.message_json['errors']) or doc.message_json['status']))
         elif doc.state == 'invoice_accepted':
@@ -302,7 +302,7 @@ class PosOrder(models.Model):
 
             if error_msg:
                 if self.env['account.move.send']._can_commit():
-                    self._cr.commit()
+                    self.env.cr.commit()
                 raise UserError(self.env._("Error(s) when generating the Attached Document:\n- %s", error_msg))
             else:
                 self.env['ir.attachment'].create([{
@@ -311,6 +311,33 @@ class PosOrder(models.Model):
                     'res_model': 'pos.order',
                     'res_id': self.id,
                 }])
+
+    def l10n_co_edi_pos_action_retry_send_document(self):
+        """ Retry sending the selected orders to the DIAN, e.g. from the Action menu, in bulk.
+        Orders that aren't eligible anymore (already accepted, invoiced, ...) are skipped.
+        """
+        failed_orders = self.env['pos.order']
+        for order in self.filtered('l10n_co_edi_pos_enable_send'):
+            try:
+                order.l10n_co_edi_pos_action_send_document()
+            except UserError as e:
+                failed_orders |= order
+                order.message_post(body=str(e))
+
+        if failed_orders:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'danger',
+                    'sticky': True,
+                    'message': self.env._(
+                        "The following orders could not be sent to the DIAN: %(orders)s",
+                        orders=failed_orders.mapped('display_name'),
+                    ),
+                    'next': {'type': 'ir.actions.act_window_close'},
+                },
+            }
 
     def _l10n_co_edi_pos_get_qr_code(self):
         self.ensure_one()

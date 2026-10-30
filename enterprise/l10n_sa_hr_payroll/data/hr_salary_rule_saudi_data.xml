@@ -10,15 +10,61 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 # define to be used in all the calc after the basic
-total_number_of_work_days = sum(work_day.number_of_days for _code, work_day in worked_days.items() if not work_day.work_entry_type_id.is_extra_hours) or 1
+payslip_versions = employee._get_versions_with_contract_overlap_with_period(payslip.date_from, payslip.date_to)
+last_version = payslip_versions[-1] if payslip_versions else payslip.env['hr.version']
+
+total_number_of_work_days, work_days_per_version = payslip._l10n_sa_get_theoretical_work_days()
 total_number_of_days = 30 if version.schedule_pay == '30_monthly' else total_number_of_work_days
+
+if len(payslip_versions) == 1:  # Simplify the calculations in case of having only 1 version in the payslip period
+    work_days_per_version = {last_version: total_number_of_days}
+
+if version.wage_type == 'monthly':
+    daily_wage = sum(
+        (version.wage + version.l10n_sa_housing_allowance + version.l10n_sa_transportation_allowance + version.l10n_sa_other_allowances)
+        * duration for version, duration in work_days_per_version.items()) \
+        / (total_number_of_days * total_number_of_days)  # first division is to get the weighted average and the second to get daily_wage
+
+    contractual_wage = last_version.wage + last_version.l10n_sa_housing_allowance \
+        + last_version.l10n_sa_transportation_allowance + last_version.l10n_sa_other_allowances
+
+    wage_with_housing = last_version.wage + last_version.l10n_sa_housing_allowance
+else:
+    daily_wage = sum(
+        (version.hourly_wage + version.l10n_sa_housing_allowance + version.l10n_sa_transportation_allowance + version.l10n_sa_other_allowances)
+        * (version.resource_calendar_id.hours_per_day if version.resource_calendar_id else version.hours_per_day)
+        * duration for version, duration in work_days_per_version.items()) \
+        / total_number_of_days
+
+    contractual_wage = (last_version.hourly_wage + last_version.l10n_sa_housing_allowance
+        + last_version.l10n_sa_transportation_allowance + last_version.l10n_sa_other_allowances) \
+        * (last_version.resource_calendar_id.hours_per_day if last_version.resource_calendar_id else last_version.hours_per_day) \
+        * total_number_of_days
+
+    wage_with_housing = (last_version.hourly_wage + last_version.l10n_sa_housing_allowance) \
+        * (last_version.resource_calendar_id.hours_per_day if last_version.resource_calendar_id else last_version.hours_per_day) \
+        * total_number_of_days
+
+unpaid_days = sum(sum(lines.mapped('number_of_days')) for lines in worked_days.values() if lines.work_entry_type_id.amount_rate == 0)
+# when using 30_monthly pay schedule, we defer an amount to the next payslip in some total absence cases if the month is 31 days:
+# if unpaid_days = 31, we defer negative wage of 1 day so we don't have a negative payslip
+# if unpaid_days = 30, we defer positive wage of 1 day so it's less favourable than having 29 unpaid days (both get the wage of 1 day)
 amount_to_defer = 0
+if version.schedule_pay == '30_monthly':
+    month_days = (payslip.date_to - payslip.date_from).days + 1
+    if unpaid_days == month_days:
+        if unpaid_days == 31:
+            amount_to_defer = -daily_wage
+        unpaid_days = 30
+    elif unpaid_days == 30 and month_days == 31:
+        amount_to_defer = daily_wage
+###
 
 result = 0
-if version.has_static_work_entries():
-    result = version.wage
-elif '002.00' in worked_days:
-    result = (version.wage * worked_days['002.00'].number_of_days) / total_number_of_days
+if version.has_static_work_entries() and version.wage_type == 'monthly':
+    result = sum(version.wage * duration for version, duration in work_days_per_version.items()) / total_number_of_days
+else:
+    result = categories['BASIC_BASE']
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -66,15 +112,26 @@ result = -(inputs['LOAN_DEDUCTION'].amount if 'LOAN_DEDUCTION' in inputs else 0.
             <field name="category_ids" eval="[(6, 0, [ref('l10n_sa_category_allowance')])]"/>
             <field name="code">HOUALLOW</field>
             <field name="sequence">2</field>
-            <field name="condition_select">python</field>
-            <field name="condition_python">result = version.wage_type == 'monthly'</field>
+            <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 result = 0
-if version.has_static_work_entries():
-    result = version.l10n_sa_housing_allowance
-elif '002.00' in worked_days:
-    result = (version.l10n_sa_housing_allowance * worked_days['002.00'].number_of_days) / total_number_of_days
+if version.has_static_work_entries() and version.wage_type == 'monthly':
+    result = sum(version.l10n_sa_housing_allowance * duration for version, duration in work_days_per_version.items()) \
+           / total_number_of_days
+else:
+    for lines in worked_days.values():
+        for line in lines:
+            if line.work_entry_type_id.is_extra_hours:
+                continue
+            if line.version_id.wage_type == 'monthly':
+                result += line.version_id.l10n_sa_housing_allowance \
+                        * line.work_entry_type_id.amount_rate \
+                        * line.number_of_days / total_number_of_work_days
+            else:
+                result += line.version_id.l10n_sa_housing_allowance \
+                        * line.work_entry_type_id.amount_rate \
+                        * line.number_of_hours
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -86,15 +143,26 @@ elif '002.00' in worked_days:
             <field name="category_ids" eval="[(6, 0, [ref('l10n_sa_category_allowance')])]"/>
             <field name="code">TRAALLOW</field>
             <field name="sequence">3</field>
-            <field name="condition_select">python</field>
-            <field name="condition_python">result = version.wage_type == 'monthly'</field>
+            <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 result = 0
-if version.has_static_work_entries():
-    result = version.l10n_sa_transportation_allowance
-elif '002.00' in worked_days:
-    result = (version.l10n_sa_transportation_allowance * worked_days['002.00'].number_of_days) / total_number_of_days
+if version.has_static_work_entries() and version.wage_type == 'monthly':
+    result = sum(version.l10n_sa_transportation_allowance * duration for version, duration in work_days_per_version.items()) \
+           / total_number_of_days
+else:
+    for lines in worked_days.values():
+        for line in lines:
+            if line.work_entry_type_id.is_extra_hours:
+                continue
+            if line.version_id.wage_type == 'monthly':
+                result += line.version_id.l10n_sa_transportation_allowance \
+                        * line.work_entry_type_id.amount_rate \
+                        * line.number_of_days / total_number_of_work_days
+            else:
+                result += line.version_id.l10n_sa_transportation_allowance \
+                        * line.work_entry_type_id.amount_rate \
+                        * line.number_of_hours
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -106,15 +174,26 @@ elif '002.00' in worked_days:
             <field name="category_ids" eval="[(6, 0, [ref('l10n_sa_category_allowance')])]"/>
             <field name="code">OTALLOW</field>
             <field name="sequence">4</field>
-            <field name="condition_select">python</field>
-            <field name="condition_python">result = version.wage_type == 'monthly'</field>
+            <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 result = 0
-if version.has_static_work_entries():
-    result = version.l10n_sa_other_allowances
-elif '002.00' in worked_days:
-    result = (version.l10n_sa_other_allowances * worked_days['002.00'].number_of_days) / total_number_of_days
+if version.has_static_work_entries() and version.wage_type == 'monthly':
+    result = sum(version.l10n_sa_other_allowances * duration for version, duration in work_days_per_version.items()) \
+           / total_number_of_days
+else:
+    for lines in worked_days.values():
+        for line in lines:
+            if line.work_entry_type_id.is_extra_hours:
+                continue
+            if line.version_id.wage_type == 'monthly':
+                result += line.version_id.l10n_sa_other_allowances \
+                        * line.work_entry_type_id.amount_rate \
+                        * line.number_of_days / total_number_of_work_days
+            else:
+                result += line.version_id.l10n_sa_other_allowances \
+                        * line.work_entry_type_id.amount_rate \
+                        * line.number_of_hours
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -129,24 +208,13 @@ elif '002.00' in worked_days:
             <field name="sequence">10</field>
             <field name="condition_select">python</field>
             <field name="condition_python">
-result = any(line.work_entry_type_id.amount_rate == 0 for code, line in worked_days.items())
+result = version.has_static_work_entries() and version.wage_type == 'monthly' and \
+         any(lines.work_entry_type_id.amount_rate == 0 for lines in worked_days.values())
             </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-unpaid_days = sum(line.number_of_days for code, line in worked_days.items() if line.work_entry_type_id.amount_rate == 0)
-daily_salary = (payslip._get_contract_wage() + categories['SA_ALW']) / total_number_of_days
-
-if version.schedule_pay == '30_monthly':
-    month_days = (payslip.date_to - payslip.date_from).days + 1
-    if unpaid_days == month_days:
-        if unpaid_days == 31:
-            amount_to_defer = -daily_salary
-        unpaid_days = 30
-    elif unpaid_days == 30 and month_days == 31:
-        amount_to_defer = daily_salary
-
 result_qty = unpaid_days
-result = -daily_salary
+result = -daily_wage
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -172,7 +240,7 @@ company_contribution = version.l10n_sa_company_social_insurance_percentage \
                      + version.l10n_sa_company_oh_insurance_percentage \
                      + version.l10n_sa_company_unemployment_insurance_percentage
 
-result = (payslip._get_contract_wage() + version.l10n_sa_housing_allowance) * -company_contribution
+result = wage_with_housing * -company_contribution
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -200,7 +268,7 @@ employee_contribution = version.l10n_sa_employee_social_insurance_percentage \
                      + version.l10n_sa_employee_oh_insurance_percentage \
                      + version.l10n_sa_employee_unemployment_insurance_percentage
 
-result = (payslip._get_contract_wage() + version.l10n_sa_housing_allowance) * -employee_contribution
+result = wage_with_housing * -employee_contribution
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -214,13 +282,14 @@ result = (payslip._get_contract_wage() + version.l10n_sa_housing_allowance) * -e
             <field name="code">DEDSICKLEAVE</field>
             <field name="sequence">35</field>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = 'SASICKLEAVE75' in worked_days</field>
+            <field name="condition_python">
+result = version.has_static_work_entries() and version.wage_type == 'monthly' and 'SASICKLEAVE75' in worked_days
+            </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-daily_salary = (payslip._get_contract_wage() + categories['SA_ALW']) / total_number_of_days
-result_qty = worked_days['SASICKLEAVE75'].number_of_days
+result_qty = sum(worked_days['SASICKLEAVE75'].mapped('number_of_days'))
 result_rate = (1 - worked_days['SASICKLEAVE75'].work_entry_type_id.amount_rate) * 100
-result = -daily_salary
+result = -daily_wage
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -235,17 +304,15 @@ result = -daily_salary
             <field name="sequence">40</field>
             <field name="condition_select">python</field>
             <field name="condition_python">
-result = any(work_day.work_entry_type_id.is_extra_hours for _code, work_day in worked_days.items()) 
+result = any(lines.work_entry_type_id.is_extra_hours for lines in worked_days.values()) 
             </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-compensation = categories['BASIC'] + categories['SA_ALW']
-daily_wage = compensation / total_number_of_days
-
 result = 0
-for code, work_day in worked_days.items():
-    if work_day.work_entry_type_id.is_extra_hours:
-        result += daily_wage * work_day.number_of_days * work_day.work_entry_type_id.amount_rate
+for lines in worked_days.values():
+    for line in lines:
+        if line.work_entry_type_id.is_extra_hours:
+            result += daily_wage * line.number_of_days * line.work_entry_type_id.amount_rate
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -263,11 +330,11 @@ for code, work_day in worked_days.items():
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 paid_days = total_number_of_days
-if any(line.work_entry_type_id.amount_rate == 0 for code, line in worked_days.items()):
+if any(lines.work_entry_type_id.amount_rate == 0 for lines in worked_days.values()):
     paid_days -= unpaid_days
 if total_number_of_days:
     total_years = employee._l10n_sa_get_number_of_years(employee._get_first_version_date(), payslip.date_to)
-    provision_month = (categories['BASIC'] + categories['SA_ALW']) / 12
+    provision_month = contractual_wage / 12
     if total_years &lt;= 5:
         provision_month = provision_month / 2
     result = (provision_month / total_number_of_days) * paid_days
@@ -292,10 +359,8 @@ result = version.l10n_sa_number_of_days
             </field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-gross_salary = categories['BASIC'] + categories['SA_ALW']
 number_of_leave_days = version.l10n_sa_number_of_days
-daily_rate = gross_salary / total_number_of_days
-result = daily_rate * number_of_leave_days / 12
+result = daily_wage * number_of_leave_days / 12
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -311,8 +376,7 @@ result = daily_rate * number_of_leave_days / 12
             <field name="condition_select">python</field>
             <field name="condition_python">result = '016.00' in worked_days</field>
             <field name="amount_python_compute">
-annual_leave_days = worked_days['016.00'].number_of_days
-daily_wage = (categories['BASIC'] + categories["ALW"]) / total_number_of_days
+annual_leave_days = sum(worked_days['016.00'].mapped('number_of_days'))
 result = annual_leave_days * daily_wage
             </field>
             <field name="struct_ids" eval="[(6, 0, [
@@ -334,7 +398,7 @@ result = employee.departure_reason_id and employee.l10n_sa_remaining_annual_leav
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 result_qty = employee.l10n_sa_remaining_annual_leave_balance
-result = (version.wage + categories['SA_ALW']) / total_number_of_days
+result = daily_wage
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -434,7 +498,7 @@ result = eos_benefit - total_provisions
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-result = categories['BASIC'] + categories['ALW']
+result = categories['BASIC'] + categories['ALW'] + result_rules['UNPAID']['total']
             </field>
             <field name="struct_ids" eval="[(6, 0, [
                 ref('l10n_sa_hr_payroll.ksa_saudi_employee_payroll_structure'),
@@ -595,8 +659,7 @@ result_name = inputs['DEDUCTION'].name
             <field name="input_usage_payslip" eval="True"/>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-daily_salary = (version.wage + categories['SA_ALW']) / total_number_of_days
-result =  - daily_salary * (inputs['LEAVERECPAY'].amount if 'LEAVERECPAY' in inputs else 0.0)
+result = -daily_wage * (inputs['LEAVERECPAY'].amount if 'LEAVERECPAY' in inputs else 0.0)
             </field>
             <field name="input_usage_employee" eval="False"/>
             <field name="input_default_value" eval="0.0"/>
@@ -628,7 +691,8 @@ result_name = inputs['REIMBURSEMENT'].name
 
         <record id="l10n_sa_hr_payroll_ksa_saudi_employee_payroll_structure_paid_leave_salary_rule"
                 model="hr.salary.rule">
-            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(5, 0, 0)]"/>
             <field name="name">Paid Leave</field>
             <field name="sequence">120</field>
             <field name="code">PAIDLEAVE</field>
@@ -649,7 +713,8 @@ worked_days['016.00'].number_of_hours
 
         <record id="l10n_sa_hr_payroll_ksa_saudi_employee_payroll_structure_maternity_leave_salary_rule"
                 model="hr.salary.rule">
-            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(5, 0, 0)]"/>
             <field name="name">Maternity Leave</field>
             <field name="sequence">140</field>
             <field name="code">MATERNITY</field>
@@ -670,7 +735,8 @@ worked_days['SAMATERNITY'].number_of_hours
 
         <record id="l10n_sa_hr_payroll_ksa_saudi_employee_payroll_structure_emergency_leave_salary_rule"
                 model="hr.salary.rule">
-            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(5, 0, 0)]"/>
             <field name="name">Emergency Leave</field>
             <field name="sequence">150</field>
             <field name="code">EMERGENCY</field>
@@ -715,8 +781,7 @@ worked_days['SAEMERGENCY'].number_of_hours
             <field name="input_usage_payslip" eval="True"/>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-daily_salary = (version.wage + categories['SA_ALW']) / total_number_of_days
-result =  daily_salary * (inputs['LEAVEADVPAY'].amount if 'LEAVEADVPAY' in inputs else 0.0)
+result = daily_wage * (inputs['LEAVEADVPAY'].amount if 'LEAVEADVPAY' in inputs else 0.0)
             </field>
             <field name="input_usage_employee" eval="False"/>
             <field name="input_default_value" eval="0.0"/>

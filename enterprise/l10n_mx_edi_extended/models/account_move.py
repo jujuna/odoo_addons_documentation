@@ -96,6 +96,35 @@ class AccountMove(models.Model):
         ext_trade_values = cfdi_values['comercio_exterior'] = {}
         if self.l10n_mx_edi_external_trade:
 
+            def get_address_values(partner):
+                if partner.country_id.l10n_mx_edi_code == 'MEX':
+                    colony = partner.l10n_mx_edi_colony_code
+                    locality = partner.l10n_mx_edi_locality_id.code
+                    city = partner.city_id.l10n_mx_edi_code
+                # SAT allows to send colony, city and locality as text values for foreign partners
+                else:
+                    colony = partner.l10n_mx_edi_colony
+                    locality = partner.l10n_mx_edi_locality
+                    city = partner.city
+
+                if partner.country_id.l10n_mx_edi_code in ('MEX', 'USA', 'CAN') or partner.state_id.code:
+                    state = partner.state_id.code
+                else:
+                    state = 'NA'
+
+                format_string = cfdi_values['format_string']
+                return {
+                    'calle': partner.street_name,
+                    'numero_exterior': partner.street_number,
+                    'numero_interior': partner.street_number2,
+                    'colonia': format_string(colony, 120),
+                    'localidad': format_string(locality, 120),
+                    'municipio': format_string(city, 120),
+                    'estado': state,
+                    'pais': partner.country_id.l10n_mx_edi_code,
+                    'codigo_postal': partner.zip,
+                }
+
             # Customer.
             customer_values = cfdi_values['receptor']
             customer = customer_values['customer']
@@ -108,15 +137,7 @@ class AccountMove(models.Model):
             ext_trade_values['receptor'] = {
                 **cfdi_values['receptor'],
                 'curp': customer.l10n_mx_edi_curp,
-                'calle': customer.street_name,
-                'numero_exterior': customer.street_number,
-                'numero_interior': customer.street_number2,
-                'colonia': customer.l10n_mx_edi_colony_code,
-                'localidad': customer.l10n_mx_edi_locality_id.code,
-                'municipio': customer.city_id.l10n_mx_edi_code,
-                'estado': customer.state_id.code,
-                'pais': customer.country_id.l10n_mx_edi_code,
-                'codigo_postal': customer.zip,
+                **get_address_values(customer),
             }
 
             # Supplier.
@@ -157,32 +178,10 @@ class AccountMove(models.Model):
                 else:
                     shipping_vat = None
 
-                if shipping.country_id.l10n_mx_edi_code == 'MEX':
-                    colony = shipping.l10n_mx_edi_colony_code
-                    locality = shipping.l10n_mx_edi_locality_id.code
-                    city = shipping.city_id.l10n_mx_edi_code
-                else:
-                    colony = shipping.l10n_mx_edi_colony
-                    locality = shipping.l10n_mx_edi_locality
-                    city = shipping.city
-
-                if shipping.country_id.l10n_mx_edi_code in ('MEX', 'USA', 'CAN') or shipping.state_id.code:
-                    state = shipping.state_id.code
-                else:
-                    state = 'NA'
-
                 ext_trade_values['destinario'] = {
                     'num_reg_id_trib': shipping_vat,
                     'nombre': shipping.name,
-                    'calle': shipping.street_name,
-                    'numero_exterior': shipping.street_number,
-                    'numero_interior': shipping.street_number2,
-                    'colonia': colony,
-                    'localidad': locality,
-                    'municipio': city,
-                    'estado': state,
-                    'pais': shipping.country_id.l10n_mx_edi_code,
-                    'codigo_postal': shipping.zip,
+                    **get_address_values(shipping),
                 }
 
             # Certificate.

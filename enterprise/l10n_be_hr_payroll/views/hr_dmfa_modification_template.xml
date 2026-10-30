@@ -20,15 +20,15 @@
                     <Trusteeship>0</Trusteeship>
                     <CompanyID t-out="l10n_be_company_number"/>
                     <EmployerDeclarationPID t-out="onss_employer_declaration_id"/>
-                    <Justification>Justification</Justification>
+                    <Justification t-if="data.correction_reason" t-out="data.correction_reason[:560]"/>
                     <t t-foreach="natural_persons" t-as="person">
                         <t t-call="l10n_be_hr_payroll.NaturalPersonUpdate"/>
                     </t>
                     <t t-foreach="company_vehicles" t-as="vehicle">
                         <t t-call="l10n_be_hr_payroll.CompanyVehicleUpdate"/>
                     </t>
-                    <ContributionUnrelatedToNPUpdate t-if="group_insurance_basis != '00000000000'">
-                        <CUNPUpdateAction t-if="group_insurance_basis != '00000000000'">
+                    <ContributionUnrelatedToNPUpdate t-if="group_insurance_basis and group_insurance_basis != '00000000000'">
+                        <CUNPUpdateAction>
                             <UnrelatedEmployerClass t-out="employer_class"/>
                             <UnrelatedWorkerCode>865</UnrelatedWorkerCode>
                             <UnrelatedCalculationBasis t-out="group_insurance_basis"/>
@@ -103,7 +103,7 @@
             </t>
             <ContributionAmount t-out="contribution['amount']"/>
             <t t-if="contribution['first_hiring_date'] != -1">
-                <FirstHiringDate t-out="['first_hiring_date']"/>
+                <FirstHiringDate t-out="contribution['first_hiring_date']"/>
             </t>
         </WorkerContribution>
     </template>

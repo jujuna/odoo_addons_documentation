@@ -8,5 +8,5 @@ class WebsiteMenu(models.Model):
         super()._compute_visible()
         self.filtered(
             lambda menu: menu.url == '/service-requests'
-            and not menu.website_id.company_id.website_planning_field_service
+            and not menu.website_id.company_id.sudo().website_planning_field_service
         ).is_visible = False

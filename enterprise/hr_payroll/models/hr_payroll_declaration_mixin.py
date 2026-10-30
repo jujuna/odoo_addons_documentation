@@ -77,8 +77,9 @@ class HrPayrollDeclarationMixin(models.AbstractModel):
     def _process_files(self, files):
         self.ensure_one()
         self.pdf_error = False
+        lines_by_employee = self.line_ids.grouped('employee_id')
         for employee, filename, data in files:
-            line = self.line_ids.filtered(lambda l: l.employee_id == employee)
+            line = lines_by_employee.get(employee, self.env['hr.payroll.employee.declaration'])
             line.write({
                 'pdf_file': BinaryBytes(data),
                 'pdf_filename': filename,

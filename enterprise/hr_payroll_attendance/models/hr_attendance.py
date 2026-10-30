@@ -22,16 +22,29 @@ class HrAttendance(models.Model):
 
     @api.depends('employee_id', 'check_in', 'check_out')
     def _compute_payslip_id(self):
-        for attendance in self:
-            if not (attendance.employee_id and attendance.check_in and attendance.check_out):
-                attendance.payslip_id = False
-                continue
+        valid_attendances = self.filtered(lambda a: a.employee_id and a.check_in and a.check_out)
+        (self - valid_attendances).payslip_id = False
+        if not valid_attendances:
+            return
 
-            attendance.payslip_id = self.env['hr.payslip'].search(
-                attendance._get_payslip_domain(),
-                limit=1,
-                order='date_from desc, id desc',
-            )
+        # Search the payslips of all the attendances at once
+        check_in_dates = {attendance: attendance._get_localized_times()[0].date() for attendance in valid_attendances}
+        payslips_per_employee = self.env['hr.payslip'].search_fetch(
+            [
+                ('employee_id', 'in', valid_attendances.employee_id.ids),
+                ('date_from', '<=', max(check_in_dates.values())),
+                ('date_to', '>=', min(check_in_dates.values())),
+                ('state', 'not in', ['draft', 'cancel']),
+            ],
+            ['employee_id', 'date_from', 'date_to'],
+            order='date_from desc, id desc',
+        ).grouped('employee_id')
+        for attendance in valid_attendances:
+            check_in_date = check_in_dates[attendance]
+            attendance.payslip_id = next((
+                payslip for payslip in payslips_per_employee.get(attendance.employee_id, [])
+                if payslip.date_from <= check_in_date <= payslip.date_to
+            ), False)
 
     def _get_payslip_domain(self):
         self.ensure_one()

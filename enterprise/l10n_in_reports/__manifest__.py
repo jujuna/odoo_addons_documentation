@@ -49,6 +49,7 @@ Accounting reports for India
     'author': 'Odoo S.A.',
     'iap_paid_service': True,
     'license': 'OEEL-1',
+    'post_init_hook': '_post_init_hook',
     'assets': {
         'web.assets_backend': [
             'l10n_in_reports/static/src/**/*',

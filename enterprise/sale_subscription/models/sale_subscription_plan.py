@@ -101,7 +101,7 @@ class SaleSubscriptionPlan(models.Model):
             for plan in self.env['sale.subscription.plan'].search([])
             if any(v in plan.billing_period_display for v in value)
         ]
-        return [('id', 'in', plan_ids.ids)]
+        return [('id', 'in', plan_ids)]
 
     def _compute_active_subs_count(self):
         res = dict(self.env['sale.order']._read_group(

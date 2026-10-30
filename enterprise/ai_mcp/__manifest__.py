@@ -29,9 +29,6 @@
         'data/ir_actions_server_data.xml',
     ],
     'assets': {
-        'web.assets_frontend': [
-            'ai_mcp/static/src/**/*',
-        ],
         'web.assets_backend': [
             'ai_mcp/static/src/scss/res_config_settings.scss',
         ],

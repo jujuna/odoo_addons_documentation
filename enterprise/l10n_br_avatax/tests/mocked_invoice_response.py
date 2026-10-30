@@ -1,10 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from copy import deepcopy
+
+
 def generate_response(invoice_line_ids):
     assert len(invoice_line_ids) == 4, "the mocked response is for 4 lines"
 
-    for i, line in enumerate(RESPONSE['lines']):
+    response = deepcopy(RESPONSE)
+    for i, line in enumerate(response['lines']):
         line['lineCode'] = invoice_line_ids[i].id
-    return RESPONSE
+    return response
 
 # To reduce the size of this mocked response it was trimmed as follows:
 # del response['header']['additionalInfo']

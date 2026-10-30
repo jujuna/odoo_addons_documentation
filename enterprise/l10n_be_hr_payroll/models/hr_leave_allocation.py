@@ -45,7 +45,6 @@ class HrLeaveAllocation(models.Model):
         records = super().create(vals_list)
         if explicit_values_by_index:
             self._l10n_be_force_number_of_days_and_hours({records[i]: values for i, values in explicit_values_by_index.items()})
-        self._check_create_wech009()
         return records
 
     def write(self, vals):
@@ -57,7 +56,6 @@ class HrLeaveAllocation(models.Model):
             if tracked_records:
                 values = {'number_of_days': explicit_days, 'number_of_hours': explicit_hours}
                 self._l10n_be_force_number_of_days_and_hours({record: values for record in tracked_records})
-        self._check_create_wech009()
         return res
 
     def _l10n_be_force_number_of_days_and_hours(self, values_by_record):
@@ -252,36 +250,6 @@ class HrLeaveAllocation(models.Model):
                     "%(employee)s is not eligible for Senior Time Off.",
                     employee=emp.name,
                 )
-
-    def _check_create_wech009(self):
-        youth_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_youth_time_off', raise_if_not_found=False)
-        youth_holiday_risk_id = self.env.ref('l10n_be_hr_payroll.drs_risk_wech009_001').id
-        senior_holiday_risk_id = self.env.ref('l10n_be_hr_payroll.drs_risk_wech009_002').id
-        if not youth_type:
-            return
-        vals_list = []
-        for allocation in self:
-            if allocation.work_entry_type_id != youth_type or allocation.state != 'validate':
-                continue
-            # Right to youth holidays is defined based on the age at the end of the year
-            # at which the employee takes the holidays
-            age = allocation.employee_id._get_age(allocation.date_from.replace(month=12, day=31))
-            if age < 25:
-                risk_id = youth_holiday_risk_id
-            elif age >= 50:
-                risk_id = senior_holiday_risk_id
-            else:
-                continue
-            linked_wech009 = allocation.linked_drs_ids.filtered(lambda drs: drs.identification == 'WECH009' and drs.code == '001')
-            if not linked_wech009:
-                vals_list.append({
-                    'is_automatically_created': True,
-                    'employee_id': allocation.employee_id.id,
-                    'sector': 'unemployment',
-                    'risk_id': risk_id,
-                    'leave_allocation_id': allocation.id,
-                })
-        self.env['l10n.be.drs'].create(vals_list)
 
     def action_show_related_drs(self):
         self.ensure_one()

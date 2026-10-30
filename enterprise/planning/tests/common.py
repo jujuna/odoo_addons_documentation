@@ -114,6 +114,10 @@ class TestUiCommon(HttpCase):
             'resource_calendar_id': thibault_calendar.id,
         })
         start = datetime.now() + relativedelta(weekday=MO(-1), hour=10, minute=0, second=0, microsecond=0)
+        if start.date() == datetime.now().date():
+            # On Mondays, MO(-1) lands on today, colliding with the shift the UI tours create "today".
+            # Shift by a day,stays in Auto Plan's current-week domain.
+            start += relativedelta(days=1)
         cls.env['planning.slot'].create({
             'start_datetime': start,
             'end_datetime': start + relativedelta(hour=11),

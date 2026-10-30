@@ -95,17 +95,31 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         payslip_third_month_results = {'YTDGROSS': 55271.13, 'ACTD': 8290.67, 'GFNET': 65024.86, 'BASIC': 65024.86, 'SSIEDED': -9753.73, 'SSICDED': 15443.40, 'GROSS': 110542.26, 'CURTAXABLE': 55271.13, 'TAXB': 110542.26, 'TOTTB': 16581.34, 'BTAXNET': 8290.67, 'BTNET': -4974.97, 'SEVPROV': 4166.67, 'STAX': -296.16, 'NETTAX': -5271.13, 'EXPNET': 50000.0, 'NET': 50000.0, 'FDALW': 0, 'ALP': 3968.25}
         self._validate_payslip(payslip_third_month, payslip_third_month_results)
 
+    def test_ntg_payslip_unpaid_days(self):
+        self.version.l10n_tr_is_net_to_gross = True
+        unpaid_work_entry_type = self.env.ref('hr_work_entry.tr_work_entry_type_unpaid_leave')
+        unpaid_work_entry_type.sudo().amount_rate = 0
+        self.env['hr.leave'].create({
+            'name': 'Unpaid Leave',
+            'employee_id': self.employee.id,
+            'work_entry_type_id': unpaid_work_entry_type.id,
+            'request_date_from': date(2025, 1, 6),
+            'request_date_to': date(2025, 1, 8),
+        })
+        payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
+        payslip_results = {'YTDGROSS': 0.0, 'ACTD': 0.0, 'GFNET': 55902.39, 'BASIC': 55902.39, 'SSIEDED': -8385.36, 'SSICDED': 13276.82, 'GROSS': 47517.03, 'CURTAXABLE': 47517.03, 'TAXB': 47517.03, 'TOTTB': 7127.55, 'BTAXNET': 7127.55, 'BTNET': -3811.85, 'SEVPROV': 4166.67, 'STAX': -226.92, 'NETTAX': -4038.77, 'EXPNET': 43478.26, 'FDALW': 86.96, 'ALP': 3623.19, 'NET': 43565.21}
+        self._validate_payslip(payslip, payslip_results)
+
     def test_ntg_payslip_deduction(self):
         self.version.l10n_tr_is_net_to_gross = True
         self.version.l10n_tr_food_allowance = 0
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
         manual_deduction_rule_id = self.env.ref('l10n_tr_hr_payroll.l10n_tr_hr_payroll_structure_tr_employee_salary_manual_deduction')
         manual_addition_rule_id = self.env.ref('l10n_tr_hr_payroll.l10n_tr_hr_payroll_structure_tr_employee_salary_manual_addition')
-        for code, value in {
+        payslip._set_input_values({
             manual_deduction_rule_id.code: 100,
             manual_addition_rule_id.code: 295,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'YTDGROSS': 0.0, 'ACTD': 0.0, 'GFNET': 65024.86, 'BASIC': 65024.86, 'SSIEDED': -9753.73, 'SSICDED': 15443.40, 'GROSS': 55271.13, 'CURTAXABLE': 55271.13, 'TAXB': 55271.13, 'TOTTB': 8290.67, 'BTAXNET': 8290.67, 'BTNET': -4974.97, 'SEVPROV': 4166.67, 'STAX': -296.16, 'NETTAX': -5271.13, 'EXPNET': 50000.0, 'MANDED': 100.0, 'MANADD': 295.0, 'NET': 50195.0, 'FDALW': 0, 'ALP': 3623.19}
         self._validate_payslip(payslip, payslip_results)

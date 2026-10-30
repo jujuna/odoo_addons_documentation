@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-17 22:33+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-23 11:39+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "account_accountant/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +37,12 @@ msgid ""
 "as bank recon and payment follow-up.\n"
 "\n"
 msgstr ""
+"\n"
+"صلاحيات الوصول إلى الفوترة\n"
+"========================\n"
+"تمنح المُستخدِم المدير صلاحة الوصول إلى خصائص الفوترة المهمة كالتسوية البنكية "
+"والمتابعة بشأن المدفوعات.\n"
+"\n"
 
 #. module: account_accountant
 #. odoo-python
@@ -212,6 +218,12 @@ msgid ""
 "i>\n"
 "                                </span>"
 msgstr ""
+"<span class=\"text-muted\" "
+"invisible=\"min_fiscalyear_lock_date_exception_for_me_id or "
+"min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"                                    <i class=\"ms-2\">ولكن يُسمح "
+"بالاستثناءات</i>\n"
+"                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
@@ -222,6 +234,10 @@ msgid ""
 "i>\n"
 "                                </span>"
 msgstr ""
+"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id "
+"or min_tax_lock_date_exception_for_everyone_id\">\n"
+"                                    <i class=\"ms-2\">بعد إغلاق الضرائب</i>\n"
+"                                </span>"
 
 #. module: account_accountant
 #: model_terms:digest.tip,tip_description:account_accountant.digest_tip_account_accountant_1
@@ -271,6 +287,8 @@ msgid ""
 "payment: %(link)s.\n"
 "Its amount was deducted from this payment."
 msgstr ""
+"تم إنشاء دفعة مع قيد لفاتورة مرتبطة سابقًا بهذه الدفعة: %(link)s.\n"
+"وقد تم خصم مبلغها من هذه الدفعة."
 
 #. module: account_accountant
 #. odoo-python
@@ -279,6 +297,8 @@ msgid ""
 "A payment with entry was created for the related invoice during its "
 "reconciliation, replacing this one: %(link)s."
 msgstr ""
+"تم إنشاء دفعة مع قيد للفاتورة المعنية أثناء عملية التسوية، لتحل محل هذه "
+"الدفعة: %(link)s."
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
@@ -406,13 +426,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/quick_create/quick_create.xml:0
 msgid "Add & Close"
-msgstr ""
+msgstr "إضافة وإغلاق"
 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/quick_create/quick_create.xml:0
 msgid "Add & New"
-msgstr ""
+msgstr "إضافة وجديد"
 
 #. module: account_accountant
 #: model_terms:ir.actions.act_window,help:account_accountant.account_tag_action
@@ -441,6 +461,8 @@ msgid ""
 "All entries created by Invoicing before that date will be ignored in "
 "Accounting."
 msgstr ""
+"سيتم تجاهل جميع القيود التي أنشأها تطبيق \"الفوترة قبل ذلك التاريخ في تطبيق "
+"\"المحاسبة\"."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__reco_model_autocomplete_ids
@@ -560,8 +582,8 @@ msgstr ""
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
-msgid "Are you sure you want to delete this statement line?"
-msgstr "هل أنت متأكد من أنك ترغب في حذف بند كشف الحساب هذا؟"
+msgid "Are you sure you want to delete this transaction?"
+msgstr ""
 
 #. module: account_accountant
 #. odoo-javascript
@@ -594,13 +616,13 @@ msgstr "الموقِّع المصرّح له"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/move_line_list_reconcile/move_line_list_reconcile.xml:0
 msgid "Auto-reconcile"
-msgstr ""
+msgstr "التسوية التلقائية"
 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
 msgid "Automate"
-msgstr ""
+msgstr "أتمتة "
 
 #. module: account_accountant
 #. odoo-python
@@ -624,7 +646,7 @@ msgstr "القيود المسواة آلياً"
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/search_dialog/search_dialog_kanban.xml:0
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/search_dialog/search_dialog_list.xml:0
 msgid "Balance:"
-msgstr ""
+msgstr "الرصيد:"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -711,13 +733,13 @@ msgstr ""
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.bank_rec_auto_reconcile_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "إلغاء"
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/account_payment.py:0
 msgid "Canceled payment during reconciliation"
-msgstr ""
+msgstr "تم إلغاء عملية الدفع أثناء التسوية "
 
 #. module: account_accountant
 #. odoo-javascript
@@ -769,8 +791,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.bank_rec_auto_reconcile_wizard_view_form
 msgid ""
 "Choose a journal and a starting date. The system will try to automatically\n"
-"                    reconcile all unreconciled bank statement lines from "
-"that date until today."
+"                    reconcile all unreconciled bank transactions from that "
+"date until today."
 msgstr ""
 
 #. module: account_accountant
@@ -801,6 +823,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
 msgid "Click on the statement to unfold it."
+msgstr "انقر على كشف الحساب لتوسيعه."
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
+msgid "Click to select"
 msgstr ""
 
 #. module: account_accountant
@@ -825,7 +853,7 @@ msgstr "عملة الشركة"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Computation"
-msgstr ""
+msgstr "احتساب"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_res_config_settings
@@ -1005,7 +1033,7 @@ msgstr ""
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_form_inherit
 msgid "Deferral Entries"
-msgstr ""
+msgstr "القيود المؤجلة"
 
 #. module: account_accountant
 #. odoo-python
@@ -1017,7 +1045,7 @@ msgstr "تأجيل %s"
 #: model:ir.model.fields,field_description:account_accountant.field_account_account__is_deferred
 #: model:ir.model.fields,field_description:account_accountant.field_account_move_line__is_deferred_account
 msgid "Deferred"
-msgstr ""
+msgstr "مؤجل"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_account__deferred_account_id
@@ -1030,7 +1058,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_form_inherit
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_tree
 msgid "Deferred Date"
-msgstr ""
+msgstr "التاريخ المؤجل"
 
 #. module: account_accountant
 #. odoo-python
@@ -1083,7 +1111,7 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_move__deferred_entry_type__misc
 msgid "Deferred Miscellaneous"
-msgstr ""
+msgstr "متنوعات مؤجلة"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_move__deferred_entry_type__revenue
@@ -1138,7 +1166,7 @@ msgstr "تحديد السنوات المالية التي تزيد أو تقل �
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Delete Transaction"
-msgstr ""
+msgstr "حذف المعاملة"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__expense_depreciation
@@ -1160,7 +1188,7 @@ msgstr "الموجز"
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/quick_create/quick_create.xml:0
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_split_journal_item_view
 msgid "Discard"
-msgstr ""
+msgstr "إهمال"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
@@ -1262,12 +1290,12 @@ msgstr "وضع التحرير للمبلغ"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__module_account_transfer
 msgid "Enable Auto Transfer"
-msgstr ""
+msgstr "تمكين النقل التلقائي"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Enable Auto Transfers"
-msgstr ""
+msgstr "تمكين النقل التلقائي"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_fiscal_year__date_to
@@ -1283,7 +1311,7 @@ msgstr "تاريخ الانتهاء، ضمن السنة المالية."
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__equity
 msgid "Equity"
-msgstr ""
+msgstr "الأسهم"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_res_company__invoicing_switch_threshold
@@ -1455,7 +1483,7 @@ msgstr "يحتوي على تواريخ مؤجلة غير معتادة"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__has_attachments
 msgid "Has Attachments"
-msgstr ""
+msgstr "يحتوي على مرفقات"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_move_line__has_deferred_moves
@@ -1465,7 +1493,7 @@ msgstr "يحتوي على حركات مؤجلة"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__has_invalid_analytics
 msgid "Has Invalid Analytics"
-msgstr ""
+msgstr "يحتوي على تحليلات غير صالحة"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__has_message
@@ -1481,6 +1509,9 @@ msgid ""
 "revenues is not supported on journal entries involving both expense and "
 "revenue accounts. You can split this entry into two entries instead."
 msgstr ""
+"لا يتم دعم استخدام طرق مختلفة لإنشاء القيود المؤجلة للنفقات والإيراد في قيود "
+"دفتر اليومية التي تتضمن حسابات النفقات والإيرادات. يمكنك تقسيم هذا القيد إلى "
+"قيدين بدلاً من ذلك."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_account__id
@@ -1515,7 +1546,7 @@ msgstr "المُعرف"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "أيقونة"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_bank_statement_line__activity_exception_icon
@@ -1617,12 +1648,12 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.module.module,shortdesc:base.module_account_accountant
 msgid "Invoicing"
-msgstr ""
+msgstr "الفوترة"
 
 #. module: account_accountant
 #: model:res.groups,name:account_accountant.group_account_basic
 msgid "Invoicing & Banks"
-msgstr ""
+msgstr "الفوترة والبنوك"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__invoicing_switch_threshold
@@ -1874,7 +1905,7 @@ msgstr "المرفق الرئيسي"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Manage Models"
-msgstr ""
+msgstr "إدارة النماذج"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__generate_deferred_expense_entries_method__manual
@@ -1902,13 +1933,13 @@ msgstr "مطابقة"
 #. odoo-python
 #: code:addons/account_accountant/models/account_bank_statement.py:0
 msgid "Matching done"
-msgstr ""
+msgstr "تمت المطابقة"
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/account_bank_statement.py:0
 msgid "Matching unreconciled"
-msgstr ""
+msgstr "لم تتم تسوية عملية المطابقة "
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_bank_statement_line__activity_type_icon
@@ -1923,7 +1954,7 @@ msgstr "القائمة"
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_mail_message
 msgid "Message"
-msgstr ""
+msgstr "رسالة "
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__message_has_error
@@ -1999,13 +2030,13 @@ msgstr "دفتر يومية المنوعات"
 #. odoo-python
 #: code:addons/account_accountant/models/account_payment.py:0
 msgid "Modified amount during reconciliation"
-msgstr ""
+msgstr "المبلغ الذي تم تعديله أثناء التسوية"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_periodicity__month
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_revenue_periodicity__month
 msgid "Monthly"
-msgstr ""
+msgstr "شهرياً"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_move_line__move_attachment_ids
@@ -2037,12 +2068,12 @@ msgstr "هل تحتاج إلى قفل دائم لضمان عدم قابلية ا
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
 msgid "Never"
-msgstr ""
+msgstr "مطلقاً"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_journal_tree_inherit
 msgid "New"
-msgstr ""
+msgstr "جديد"
 
 #. module: account_accountant
 #: model:ir.actions.act_window,name:account_accountant.action_bank_statement_line_form_bank_rec_widget
@@ -2276,7 +2307,7 @@ msgstr "الدائن"
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "الدفع"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_payment_form_inherit_account_accountant
@@ -2313,7 +2344,7 @@ msgstr ""
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Periodicity"
-msgstr ""
+msgstr "الوتيرة"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_res_config_settings__deferred_expense_periodicity
@@ -2338,7 +2369,7 @@ msgstr "يرجى إعداد دفتر اليومية المؤجل في إعداد
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
 msgid "Post"
-msgstr ""
+msgstr "ترحيل"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_reconcile_search
@@ -2349,7 +2380,7 @@ msgstr "مُرحّل"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__asset_prepayments
 msgid "Prepayments"
-msgstr ""
+msgstr "المدفوعات المسددة مقدمًا"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_reconcile_model
@@ -2366,7 +2397,7 @@ msgstr "دفتر يومية المشتريات"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_split_journal_item_wizard__quantity
 msgid "Quantity"
-msgstr ""
+msgstr "الكمية"
 
 #. module: account_accountant
 #. odoo-python
@@ -2437,12 +2468,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
 msgid "Reconciled"
-msgstr ""
+msgstr "تمت التسوية"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__reconciled_lines_name
 msgid "Reconciled Lines Name"
-msgstr ""
+msgstr "اسم الأسطر التي تمت مطابقتها"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__reconcile_model_id
@@ -2453,7 +2484,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
 msgid "Reconciliation Models"
-msgstr ""
+msgstr "نماذج التسوية"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__reco_model_id
@@ -2470,7 +2501,7 @@ msgstr "سجِّل حركات أموالك وتحويلاتك النقدية"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_form_inherit
 msgid "Related Entries"
-msgstr ""
+msgstr "القيود ذات الصلة"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_form_inherit
@@ -2515,6 +2546,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "Review"
 msgstr "مراجعة"
+
+#. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/account_bank_statement.py:0
+msgid "Review Statements"
+msgstr ""
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
@@ -2703,13 +2740,13 @@ msgstr ""
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/control_action/control_action.js:0
 msgid ""
 "Some lines cannot be processed because they have already been reconciled."
-msgstr ""
+msgstr "لا يمكن معالجة بعض البنود لأنها تمت مطابقتها بالفعل."
 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
 msgid "Some lines have invalid analytic distribution"
-msgstr ""
+msgstr "تحتوي بعض البنود على توزيع تحليلي غير صالح"
 
 #. module: account_accountant
 #. odoo-python
@@ -2745,18 +2782,8 @@ msgid "Statement"
 msgstr "كشف الحساب"
 
 #. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
-msgid "Statement Line"
-msgstr "بند كشف الحساب"
-
-#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__statement_line_attachment_ids
 msgid "Statement Line Attachment"
-msgstr ""
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
-msgid "Statement Lines"
 msgstr ""
 
 #. module: account_accountant
@@ -2798,13 +2825,13 @@ msgstr "اشتراك لمدة 12 شهر"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Suggestions"
-msgstr ""
+msgstr "الاقتراحات "
 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/actions/switch_partner_account_action.js:0
 msgid "Switch"
-msgstr ""
+msgstr "تبديل"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_tax
@@ -2847,6 +2874,9 @@ msgid ""
 "(current_partner_name)s, click here to move it to partner %"
 "(potential_partner_name)s"
 msgstr ""
+"الحساب البنكي %(account_number)s مُعيّن حاليًا للشريك %"
+"(current_partner_name)s ، انقر هنا لنقله إلى الشريك %"
+"(potential_partner_name)s"
 
 #. module: account_accountant
 #. odoo-python
@@ -2949,12 +2979,12 @@ msgstr "يمكن استخدام ذلك فقط في عناصر اليومية"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/line_to_reconcile/line_to_reconcile.xml:0
 msgid "This line has invalid analytic distribution"
-msgstr ""
+msgstr "يحتوي هذا البند على توزيع تحليلي غير صالح"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_rec_edit_line
 msgid "This line requires analytic distribution."
-msgstr ""
+msgstr "يتطلب هذا البند توزيعًا تحليليًّا."
 
 #. module: account_accountant
 #. odoo-python
@@ -3001,7 +3031,7 @@ msgstr "لتعزيز صحة مستنداتك، أضف توقيعاً إلى فو
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
 msgid "Total"
-msgstr ""
+msgstr "الإجمالي "
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
@@ -3064,8 +3094,8 @@ msgstr "التحويل إلى %s"
 
 #. module: account_accountant
 #: model:ir.actions.server,name:account_accountant.auto_reconcile_bank_statement_line_ir_actions_server
-msgid "Try to reconcile automatically your statement lines"
-msgstr "حاول تسوية بنود كشف حسابك تلقائياً"
+msgid "Try to reconcile automatically your transactions"
+msgstr ""
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_mail_mail__message_type
@@ -3082,7 +3112,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
 msgid "Undo reconciliation"
-msgstr ""
+msgstr "التراجع عن عملية التسوية"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_bank_statement_line__transaction_uuid
@@ -3109,7 +3139,7 @@ msgstr "بنود كشف الحساب غير المسواة"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.xml:0
 msgid "Upload Bills"
-msgstr ""
+msgstr "رفع فواتير المورّدين"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -3135,12 +3165,22 @@ msgid ""
 "acknowledgment\n"
 "'user_notification': generated for a specific recipient"
 msgstr ""
+"يُستخدم لوضع الرسائل المنشأة في فئات\n"
+"'البريد الإلكتروني': يتم إنشاؤها عن طريق البريد الوارد. على سبيل المثال: "
+"بوابة البريد\n"
+"'تعليق': يتم إنشاؤه من خلال مدخلات المستخدمين. على سبيل المثال: من خلال "
+"تطبيق المناقشة أو الإنشاء\n"
+"'email_outgoing': يتم إنشاؤها عن طريق المراسلات\n"
+"'إشعار': يتم إنشاؤه عن طريق النظام. على سبيل المثال: رسائل التتبع\n"
+"'auto_comment': يتم إنشاؤه عن طريق آلية الإشعارات التلقائية. على سبيل "
+"المثال: الإقرار\n"
+"'user_notification': يتم إنشاؤها لمستلم محدد"
 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/control_action/control_action.js:0
 msgid "Validate"
-msgstr ""
+msgstr "تصديق"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -3189,7 +3229,7 @@ msgstr "شطب القيد"
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_periodicity__year
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_revenue_periodicity__year
 msgid "Yearly"
-msgstr ""
+msgstr "سنوياً "
 
 #. module: account_accountant
 #. odoo-python
@@ -3205,7 +3245,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
 msgid "You can now go back to the dashboard."
-msgstr ""
+msgstr "يمكنك الآن العودة إلى لوحة البيانات."
 
 #. module: account_accountant
 #. odoo-python
@@ -3313,6 +3353,7 @@ msgstr "عليك تحديد الأفراد الذين ينطبق عليهم ال
 #: model:res.groups,comment:account_accountant.group_account_basic
 msgid "adds the accounting dashboard, bank management and follow-up reports."
 msgstr ""
+"يضيف لوحة البيانات للمحاسبة، وإدارة الحسابات البنكية، وتقارير المتابعة."
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_duration__1h
@@ -3370,6 +3411,18 @@ msgstr "العملة الثانوية"
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_journal_dashboard_kanban_view
 msgid "to reconcile"
 msgstr "بانتظار التسوية"
+
+#~ msgid "Are you sure you want to delete this statement line?"
+#~ msgstr "هل أنت متأكد من أنك ترغب في حذف بند كشف الحساب هذا؟"
+
+#~ msgid "Statement Line"
+#~ msgstr "بند كشف الحساب"
+
+#~ msgid "Statement Lines"
+#~ msgstr "بنود كشف الحساب"
+
+#~ msgid "Try to reconcile automatically your statement lines"
+#~ msgstr "حاول تسوية بنود كشف حسابك تلقائياً"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "بند كشف الحساب البنكي"

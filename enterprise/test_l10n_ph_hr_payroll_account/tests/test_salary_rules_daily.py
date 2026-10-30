@@ -352,3 +352,12 @@ class TestPayslipValidationDaily(TestL10NPhHrPayrollCommon):
             '13THMONTHPROVISION': 1000.0,
         }
         self._validate_payslip(payslip, payslip_results)
+
+    def test_daily_wage_with_zero_days_workweek(self):
+        self.average_employee.resource_calendar_id.attendance_ids.unlink()
+
+        self.average_employee.wage = 26100.0
+        #  26100 * 12 / 261 = 1200.00 , 261 days because we fallback to 5 days workweek
+        #  1200.00 * 2 = 2400.00 because schedule pay is semi-monthly,
+        #  which means 1200.00 is paid to the employee twice in a month.
+        self.assertAlmostEqual(self.average_employee.l10n_ph_hr_payroll_daily_wage, 2400.0)

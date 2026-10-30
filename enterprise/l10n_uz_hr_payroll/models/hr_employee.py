@@ -9,13 +9,14 @@ from odoo import fields, models
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    l10n_uz_annual_leave_eligibility = fields.Float(related="version_id.l10n_uz_annual_leave_eligibility", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_uz_annual_leave_eligibility = fields.Float(related="version_id.l10n_uz_annual_leave_eligibility", inherited=True, readonly=False, groups="hr_payroll.group_hr_payroll_user")
     l10n_uz_initial_average_monthly_wage = fields.Monetary(
         related="version_id.l10n_uz_initial_average_monthly_wage",
         string="Initial Average Monthly Wage",
         currency_field="currency_id",
-        readonly=True,
+        readonly=False,
         tracking=True,
+        groups="hr_payroll.group_hr_payroll_user",
     )
 
     def action_open_initial_wage_update_wizard(self):

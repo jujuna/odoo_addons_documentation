@@ -109,7 +109,7 @@ class AccountOnlineLink(models.Model):
                 return action
 
             if template := self.env.ref('account_online_payment.mail_template_account_payment_activation', raise_if_not_found=False):
-                template.with_context({'url': response['url']}).send_mail(self.id)
+                template.with_context(url=response['url']).send_mail(self.id)
 
             self.activity_schedule(
                 'mail.mail_activity_data_todo',

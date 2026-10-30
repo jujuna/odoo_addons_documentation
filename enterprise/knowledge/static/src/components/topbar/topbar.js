@@ -1,3 +1,4 @@
+import { KnowledgeBreadcrumbs } from "@knowledge/components/breadcrumbs/breadcrumbs";
 import { KnowledgeFormStatusIndicator } from "@knowledge/components/form_status_indicator/form_status_indicator";
 import KnowledgeHierarchy from "@knowledge/components/hierarchy/hierarchy";
 import { PermissionPanel } from "@knowledge/components/permission_panel/permission_panel";
@@ -15,6 +16,7 @@ import { SidePanelToolbar } from "../side_panel/side_panel_toolbar";
 class KnowledgeTopbar extends Component {
     static template = "knowledge.KnowledgeTopbar";
     static components = {
+        KnowledgeBreadcrumbs,
         KnowledgeHierarchy,
         SidePanelToolbar,
         KnowledgeFormStatusIndicator,

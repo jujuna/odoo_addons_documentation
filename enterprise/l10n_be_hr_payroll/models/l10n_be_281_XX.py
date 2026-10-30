@@ -1,12 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from collections import defaultdict
 import logging
 
 from lxml import etree
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import BinaryBytes, file_path
+from odoo.tools import BinaryBytes, file_path, format_amount
 
 from stdnum.be.vat import compact as vat_be_compact
 
@@ -56,30 +57,35 @@ REPORT_CONFIG = {
         'relation_field': 'l10n_be_281_10_ids',
         'include_field': 'include_281_10',
         'count_field': 'l10n_be_281_10_id_lines_count',
+        'nature_code_274': '274.10',
     },
     '281.13': {
         'model': 'l10n_be.281_13',
         'relation_field': 'l10n_be_281_13_ids',
         'include_field': 'include_281_13',
         'count_field': 'l10n_be_281_13_id_lines_count',
+        'nature_code_274': '274.13',
     },
     '281.18': {
         'model': 'l10n_be.281_18',
         'relation_field': 'l10n_be_281_18_ids',
         'include_field': 'include_281_18',
         'count_field': 'l10n_be_281_18_id_lines_count',
+        'nature_code_274': '274.18',
     },
     '281.20': {
         'model': 'l10n_be.281_20',
         'relation_field': 'l10n_be_281_20_ids',
         'include_field': 'include_281_20',
         'count_field': 'l10n_be_281_20_id_lines_count',
+        'nature_code_274': '274.20',
     },
     '281.30': {
         'model': 'l10n_be.281_30',
         'relation_field': 'l10n_be_281_30_ids',
         'include_field': 'include_281_30',
         'count_field': 'l10n_be_281_30_id_lines_count',
+        'nature_code_274': '274.30',
     },
     '281.45': {
         'model': 'l10n_be.281_45',
@@ -171,6 +177,7 @@ class L10n_Be281_XX(models.Model):
     xml_filename = fields.Char(copy=False)
 
     error_message = fields.Text('Error Message', readonly=True, copy=False)
+    withholding_warning = fields.Text(compute='_compute_withholding_warning')
 
     @api.model
     def default_get(self, fields):
@@ -185,12 +192,13 @@ class L10n_Be281_XX(models.Model):
 
     @api.model
     def _get_lang_code(self, lang):
+        # Any variant of the language: nl_BE, fr_BE, de_BE...
         lang_dict = {
-            'nl_NL': 1,
-            'fr_FR': 2,
-            'de_DE': 3,
+            'nl': 1,
+            'fr': 2,
+            'de': 3,
         }
-        return lang_dict.get(lang, 0)
+        return lang_dict.get((lang or '').split('_')[0], 0)
 
     @api.model
     def _get_country_code(self, country):
@@ -220,6 +228,101 @@ class L10n_Be281_XX(models.Model):
                 if record[config['include_field']] and record[config['count_field']]:
                     types.append(report_key)
             record.form_types_display = ', '.join(types)
+
+    @api.depends(
+        'year', 'company_id', 'state', 'test_xml_file', 'xml_file',
+        *(config['include_field'] for config in REPORT_CONFIG.values()),
+    )
+    def _compute_withholding_warning(self):
+        for record in self:
+            if not (record.test_xml_file or record.xml_file) or record.state == 'error':
+                record.withholding_warning = False
+                continue
+            currency = record.company_id.currency_id
+            warnings = []
+            for report_key, (source, expected_amount) in record._get_declared_withholding_amounts().items():
+                config = REPORT_CONFIG[report_key]
+                amount = 0.0
+                if record[config['include_field']]:
+                    try:
+                        amount = record[config['relation_field']]._get_withholding_amount()
+                    except UserError:
+                        # Employee data became invalid since the last computation, which reports it when run again.
+                        continue
+                if currency.compare_amounts(amount, expected_amount):
+                    warnings.append(self.env._(
+                        "- %(report)s: %(amount)s, while the %(declaration)s declarations of the year total %(expected_amount)s",
+                        report=report_key,
+                        amount=format_amount(self.env, amount, currency),
+                        declaration=source,
+                        expected_amount=format_amount(self.env, expected_amount, currency),
+                    ))
+            record.withholding_warning = '\n'.join(warnings)
+
+    def _get_withholding_sources(self):
+        # Declaration of the year where the withholding taxes of each 281 form are declared: {281 form: source}.
+        sources = {
+            report_key: config['nature_code_274']
+            for report_key, config in REPORT_CONFIG.items() if config.get('nature_code_274')
+        }
+        # The 281.45 withholding taxes are declared in the 273S.
+        sources['281.45'] = '273S'
+        return sources
+
+    def _get_filed_273_sheets(self):
+        self.ensure_one()
+        sheets_273 = self.env['l10n_be.273_xx'].search([
+            ('year', '=', int(self.year)),
+            ('company_id', '=', self.company_id.id),
+            ('state', 'in', ['ready', 'done']),
+        ])
+        # A 273 correction replaces its original.
+        return sheets_273 - sheets_273.origin_id
+
+    def _get_declared_withholding_lines(self):
+        """Withholding taxes already declared during the year, per 281 form, employee and declaration.
+
+        :return: list of dicts with the keys report, source, employee, document and amount
+        """
+        self.ensure_one()
+        report_by_source = {source: report_key for report_key, source in self._get_withholding_sources().items()}
+        lines = [{
+            'report': report_by_source[nature_code],
+            'source': nature_code,
+            'employee': employee,
+            'document': sheet,
+            'amount': amount,
+        } for nature_code, employee, sheet, amount in self.env['l10n_be.274_xx.line']._read_group(
+            domain=[
+                ('sheet_id.year', '=', int(self.year)),
+                ('sheet_id.company_id', '=', self.company_id.id),
+                ('sheet_id.state', 'in', ['ready', 'done']),
+                ('nature_code', 'in', [source for source in report_by_source if source != '273S']),
+            ],
+            groupby=['nature_code', 'employee_id', 'sheet_id'],
+            aggregates=['withholding_amount:sum'],
+        )]
+        if '273S' in report_by_source:
+            for sheet in self._get_filed_273_sheets():
+                lines += [{
+                    'report': report_by_source['273S'],
+                    'source': '273S',
+                    'employee': beneficiary['employee'],
+                    'document': sheet,
+                    'amount': -beneficiary['tax_amount'],
+                } for beneficiary in sheet._get_rendering_data_273S()['beneficiaries']]
+        return lines
+
+    def _get_declared_withholding_amounts(self):
+        # Withholding taxes already declared during the year. Returns {281 form: (source declaration, amount)}.
+        self.ensure_one()
+        amounts = defaultdict(float)
+        for line in self._get_declared_withholding_lines():
+            amounts[line['report']] += line['amount']
+        return {
+            report_key: (source, amounts[report_key])
+            for report_key, source in self._get_withholding_sources().items()
+        }
 
     def _validate_xml_content(self, file_content, success_state):
         self.ensure_one()
@@ -454,24 +557,7 @@ class L10n_Be281_XX(models.Model):
                 self.env._("A correction declaration already exists for this declaration.")
             )
 
-        # Collect included reports to copy
-        reports_to_correct = []
-        if self.include_281_10 and self.l10n_be_281_10_ids:
-            reports_to_correct.append(self.l10n_be_281_10_ids)
-
-        if self.include_281_45 and self.l10n_be_281_45_ids:
-            reports_to_correct.append(self.l10n_be_281_45_ids)
-
-        if self.include_281_18 and self.l10n_be_281_18_ids:
-            reports_to_correct.append(self.l10n_be_281_18_ids)
-
-        if self.include_281_20 and self.l10n_be_281_20_ids:
-            reports_to_correct.append(self.l10n_be_281_20_ids)
-
-        if self.include_281_30 and self.l10n_be_281_30_ids:
-            reports_to_correct.append(self.l10n_be_281_30_ids)
-
-        if not reports_to_correct:
+        if not any(self[config['include_field']] and self[config['relation_field']] for config in REPORT_CONFIG.values()):
             raise ValidationError(self.env._(
                 "No forms to correct. Please ensure at least one form type is included."
             ))

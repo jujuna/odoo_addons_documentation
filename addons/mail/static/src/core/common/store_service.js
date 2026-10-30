@@ -1,10 +1,6 @@
 import { Store as BaseStore, fields, makeStore } from "@mail/model/export";
 import { formatLocalDateTime, resolveTimeZoneName } from "@mail/utils/common/dates";
-import {
-    attClassObjectToString,
-    generateEmojisOnHtml,
-    prettifyMessageText,
-} from "@mail/utils/common/format";
+import { attClassObjectToString, generateEmojisOnHtml } from "@mail/utils/common/format";
 
 import { proxy, usePlugin } from "@odoo/owl";
 
@@ -22,7 +18,6 @@ import { debounce } from "@web/core/utils/timing";
 import { getOrigin } from "@web/core/utils/urls";
 import { session } from "@web/session";
 import { isMarkup, createDocumentFragmentFromContent } from "@web/core/utils/html";
-import { nbsp } from "@web/core/utils/strings";
 
 const { DateTime } = luxon;
 
@@ -609,7 +604,7 @@ export class Store extends BaseStore {
             : [body];
         // Longest mention text first, so e.g. "@John" inside "@John Doe" isn't kept.
         const mentionTexts = (partner) => {
-            const name = thread?.getPersonaName(partner) ?? partner.displayName;
+            const name = (thread?.getPersonaName(partner) ?? partner.displayName)?.trim();
             return [name && `@${name}`, partner.email && `@${partner.email}`].filter(Boolean);
         };
         const remaining = [...segments];
@@ -835,7 +830,7 @@ export class Store extends BaseStore {
                 ...thread.getFetchParams(),
                 fetch_params: {
                     search_filter,
-                    search_term: (await prettifyMessageText(searchTerm)).replaceAll(nbsp, " "), // formatted like message_post
+                    search_term: searchTerm,
                     before,
                 },
             },

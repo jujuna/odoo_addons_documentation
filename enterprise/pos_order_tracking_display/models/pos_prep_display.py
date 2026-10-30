@@ -7,10 +7,20 @@ class PosPrepDisplay(models.Model):
 
     def _get_pos_orders(self):
         self.ensure_one()
-        if len(self.stage_ids) <= 1:
+        num_stages = len(self.stage_ids)
+        if num_stages <= 1:
             return {"done": [], "notDone": []}
-        second_last_stage = self.stage_ids[-2]  # order will be displayed as ready.
-        pdis_line_ids = self.env['pos.prep.line'].search([*self.get_preparation_display_orders_domain(), ('stage_id', '!=', self.stage_ids[-1].id)])
+        last_stage = self.stage_ids[-1]  # last stage always means that the order is done.
+        # With only 2 stages, the last stage doubles as the "ready" stage.
+        ready_stage = self.stage_ids[-2] if num_stages > 2 else last_stage
+        pdis_line_ids = self.env['pos.prep.line'].search(self.get_preparation_display_orders_domain())
+        if ready_stage != last_stage:
+            pdis_line_ids = pdis_line_ids.filtered(lambda o: o.stage_id != last_stage)
+        else:
+            # In a two-stage flow the final stage is shown as "Ready" only while
+            # it is active.  Once the kitchen marks it done (todo=False), remove
+            # the order from the customer display immediately.
+            pdis_line_ids = pdis_line_ids.filtered(lambda o: o.todo)
 
         # Prefetch the relational chain to avoid repeated lazy-load queries.
         pdis_line_ids.mapped('prep_order_id.pos_order_id')
@@ -26,7 +36,7 @@ class PosPrepDisplay(models.Model):
         orders_completed_ready_date = {}
 
         for lines in order_lines.values():
-            all_ready = all(line.stage_id == second_last_stage for line in lines)
+            all_ready = all(line.stage_id == ready_stage for line in lines)
             if all_ready:
                 # Use the latest stage change as the order ready date.
                 ready_line = max(lines, key=lambda line: line.last_stage_change)

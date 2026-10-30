@@ -2,8 +2,9 @@ import io
 import zipfile
 
 from base64 import b64encode
-from datetime import datetime
+from datetime import datetime, UTC
 from lxml import etree
+from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models
 from odoo.addons.l10n_co_edi import xml_utils
@@ -39,7 +40,11 @@ class L10nCoEdiDocument(models.Model):
             document_vals = self._l10n_co_edi_pos_send_bill_sync(data={
                 'company_id': data['company_id'],
                 'zipped_content': zipped_content,
+                'xml': data['xml'],
+                'record': data['record'],
             })
+
+        xml_to_store = document_vals.pop('xml', data['xml'])
 
         return self._l10n_co_edi_pos_create_document(
             data={
@@ -47,7 +52,7 @@ class L10nCoEdiDocument(models.Model):
                     'record': data['record'],
                     'field_name': 'pos_order_id',
                 },
-                'xml': data['xml'],
+                'xml': xml_to_store,
                 'state': document_vals['state'],
                 'company_id': data['company_id'],
             },
@@ -89,10 +94,39 @@ class L10nCoEdiDocument(models.Model):
                 'message_json': self._build_message(root),
             }
 
-        return {
+        document_vals = {
             'state': 'invoice_accepted' if root.findtext('.//{*}IsValid') == 'true' else 'invoice_rejected',
             'message_json': self._build_message(root),
         }
+
+        if self._document_already_processed(root) and (identifier := root.findtext('.//{*}XmlDocumentKey')):
+            outgoing_xml = etree.fromstring(data['xml'])
+
+            if identifier == outgoing_xml.findtext('./{*}UUID'):
+                document_vals |= {
+                    'state': 'invoice_accepted',
+                    'identifier': identifier,
+                }
+            elif xml := self._get_xml_by_document_key_for_company(identifier, data['company_id']):
+                def get_signature(doc_xml):
+                    return (
+                        doc_xml.findtext('./{*}ID'),
+                        doc_xml.findtext('.//{*}PayableAmount'),
+                        doc_xml.findtext('.//{*}AccountingSupplierParty//{*}CompanyID'),
+                        doc_xml.findtext('.//{*}AccountingCustomerParty//{*}CompanyID'),
+                    )
+
+                dian_xml = etree.fromstring(xml)
+                order_issue_date = data['record'].date_order.replace(tzinfo=UTC).astimezone(ZoneInfo('America/Bogota')).date().isoformat()
+
+                if get_signature(dian_xml) == get_signature(outgoing_xml) and dian_xml.findtext('./{*}IssueDate') == order_issue_date:
+                    document_vals |= {
+                        'state': 'invoice_accepted',
+                        'identifier': identifier,
+                        'xml': xml,
+                    }
+
+        return document_vals
 
     @api.model
     def _l10n_co_edi_pos_send_test_set_async(self, data: dict):

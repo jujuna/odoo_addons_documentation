@@ -763,6 +763,20 @@ test("An error is displayed in the side panel if the chart has invalid model", a
     expect(".o-validation-error").toHaveCount(1);
 });
 
+test("Can delete a chart with an invalid model from the side panel", async function () {
+    const { model, env } = await createSpreadsheetFromGraphView({
+        mockRPC: async function (route, { method }) {
+            if (method === "fields_get") {
+                throw makeServerError({ code: 404 });
+            }
+        },
+    });
+    await openChartSidePanel(model, env);
+
+    await contains("button:contains(Delete Chart)").click();
+    expect(model.getters.getChartIds(model.getters.getActiveSheetId())).toEqual([]);
+});
+
 test("display chart related filters", async function () {
     const { model, env } = await createSpreadsheetFromGraphView();
     const sheetId = model.getters.getActiveSheetId();

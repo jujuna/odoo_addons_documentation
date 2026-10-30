@@ -69,7 +69,7 @@ class AccountReturn(models.Model):
                 'message': _lt('Exclude sales made to private individuals from the listing.'),
                 'records_count': non_business_partners_count,
                 'records_model': self.env['ir.model']._get('res.partner').id,
-                'action': non_business_partner_ids._get_records_action() if non_business_partner_ids else False,
+                'action': non_business_partner_ids._get_records_action(name=self.env._('Customers without a VAT number')) if non_business_partner_ids else False,
                 'result': 'reviewed' if not non_business_partner_ids else 'anomaly',
             })
 

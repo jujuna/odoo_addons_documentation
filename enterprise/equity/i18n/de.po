@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-21 13:33+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-19 09:33+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-20/equity/"
 "de/>\n"
@@ -229,8 +229,8 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span>Anteilseigner<span invisible=\"equity_shareholders_count == 1\"></span>"
-"</span>"
+"<span>Anteilseigner<span invisible=\"equity_shareholders_count == 1\"></"
+"span></span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -238,8 +238,8 @@ msgid ""
 "<span> Transaction<span invisible=\"equity_transaction_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span> Transaktion<span invisible=\"equity_transaction_count == 1\">en</span>"
-"</span>"
+"<span> Transaktion<span invisible=\"equity_transaction_count == 1\">en</"
+"span></span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
@@ -479,6 +479,14 @@ msgid "Cannot change security class type because it has linked transactions"
 msgstr ""
 "Der Typ der Wertpapierklasse kann nicht geändert werden, da er mit "
 "Transaktionen verknüpft ist"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Cannot create new UBO for an existing holder"
+msgstr ""
+"Es kann kein neuer wirtschaftlich Berechtigter für einen bestehenden Inhaber "
+"angelegt werden"
 
 #. module: equity
 #. odoo-python
@@ -1477,8 +1485,8 @@ msgstr ""
 "Optionale Übersetzungssprache (ISO-Code), die beim Versenden einer E-Mail "
 "ausgewählt werden kann. Wenn keine Einstellung vorgenommen wird, wird die "
 "Hauptsprache des Partners verwendet. In der Regel sollte dies ein "
-"Platzhalterausdruck sein, der die entsprechende Sprache angibt, z. B. {{ "
-"object.partner_id.lang }}."
+"Platzhalterausdruck sein, der die entsprechende Sprache angibt, z. B. "
+"{{ object.partner_id.lang }}."
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__options
@@ -1522,6 +1530,13 @@ msgstr "Partner"
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids_all_have_email
 msgid "Partner Ids All Have Email"
 msgstr "Die Partner-ID haben alle E-Mails"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Partner is not allowed to fill UBO form"
+msgstr ""
+"Der Partner darf das Formular für wirtschaftlich Berechtigte nicht ausfüllen"
 
 #. module: equity
 #. odoo-javascript
@@ -1791,9 +1806,9 @@ msgid ""
 "The \"Transaction Price\" total is not counting the prices of options "
 "issuance transactions because that is a strike price."
 msgstr ""
-"Die Summe „# Wertpapiere“ berücksichtigt nicht die Transaktionen „"
-"Optionsausübung“ (da diese zum Zeitpunkt der „Optionsausgabe“ erfasst werden)"
-". Die Summe „Transaktionspreis“ berücksichtigt nicht die Preise von "
+"Die Summe „# Wertpapiere“ berücksichtigt nicht die Transaktionen "
+"„Optionsausübung“ (da diese zum Zeitpunkt der „Optionsausgabe“ erfasst "
+"werden). Die Summe „Transaktionspreis“ berücksichtigt nicht die Preise von "
 "Optionsausgabetransaktionen, da es sich hierbei um einen Ausübungspreis "
 "handelt."
 

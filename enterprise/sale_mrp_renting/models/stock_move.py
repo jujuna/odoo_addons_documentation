@@ -11,7 +11,7 @@ class StockMove(models.Model):
         res = super()._action_done(cancel_backorder=cancel_backorder)
         if self.env['res.groups']._is_feature_enabled('sale_stock_renting.group_rental_stock_picking'):
             for sale_line in res.sale_line_id:
-                if not sale_line.is_rental or 'phantom' not in sale_line.product_id.bom_ids.mapped('type'):
+                if not sale_line.is_rental or not sale_line.product_id.is_kits:
                     continue
                 bom = self.env['mrp.bom']._bom_find(sale_line.product_id, bom_type='phantom')[sale_line.product_id]
 

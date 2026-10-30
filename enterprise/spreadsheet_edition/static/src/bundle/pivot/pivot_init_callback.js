@@ -41,9 +41,9 @@ export function insertPivot(pivotData) {
      * @param {import("@spreadsheet").OdooSpreadsheetModel} model
      */
     return async (model, stores) => {
-        const sortedMeasure = pivotData.metaData.sortedColumn?.measure;
-        if (activeMeasures.includes(sortedMeasure)) {
-            pivot.sortedColumn = getPivotSortedColumn(model, pivotData);
+        const sortedColumn = getPivotSortedColumn(model, pivotData, pivot.measures);
+        if (sortedColumn) {
+            pivot.sortedColumn = sortedColumn;
         }
 
         const pivotId = UuidGenerator.smallUuid();
@@ -77,13 +77,19 @@ export function insertPivot(pivotData) {
     };
 }
 
-function getPivotSortedColumn(model, pivotData) {
-    if (!pivotData.metaData.sortedColumn) {
+function getPivotSortedColumn(model, pivotData, measures) {
+    const sortedColumn = pivotData.metaData.sortedColumn;
+    if (!sortedColumn) {
+        return undefined;
+    }
+
+    const measure = measures.find((measure) => measure.fieldName === sortedColumn.measure);
+    if (!measure) {
         return undefined;
     }
 
     const fields = pivotData.metaData.fields;
-    const sortedValues = pivotData.metaData.sortedColumn.groupId[1];
+    const sortedValues = sortedColumn.groupId[1];
     const sortColDomain = [];
     let currentBranch = pivotData.colGroupTree;
 
@@ -109,11 +115,9 @@ function getPivotSortedColumn(model, pivotData) {
         sortColDomain.push({ value, field, type: fieldType });
     }
 
-    const sortedColumn = pivotData.metaData.sortedColumn;
-    const measure = sortedColumn.measure;
     return {
         domain: sortColDomain,
         order: sortedColumn.order,
-        measure: fields[measure]?.aggregator ? `${measure}:${fields[measure].aggregator}` : measure,
+        measure: measure.id,
     };
 }

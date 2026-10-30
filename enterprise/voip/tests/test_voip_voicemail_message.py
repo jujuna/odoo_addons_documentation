@@ -69,6 +69,16 @@ class TestVoipVoicemailMessage(VoipPhoneServiceCase):
             self.env["voip.voicemail.message"].search_count([("event_id", "=", event_id)]), 1,
         )
 
+    def test_a_message_reported_again_under_another_event_id_is_stored_once(self):
+        mailbox = self._create_mailbox()
+        for event_id in ("evt-3a", "evt-3b"):
+            self.env["voip.voicemail.message"]._handle_message_created_event(
+                *_message_payload(event_id, mailbox.pbx_voicemail_id, "msg-3"), fields.Datetime.now(),
+            )
+
+        message = self.env["voip.voicemail.message"].search([("pbx_message_id", "=", "msg-3")])
+        self.assertRecordValues(message, [{"event_id": "evt-3a", "recording_version": 1}])
+
     def test_empty_message_does_not_fetch_a_recording(self):
         mailbox = self._create_mailbox()
         event_id, payload = _message_payload(

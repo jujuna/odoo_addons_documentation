@@ -1,8 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
+
+from freezegun import freeze_time
 
 from odoo import Command
 from odoo.exceptions import UserError
@@ -76,6 +78,7 @@ class TestAmazon(common.TestAmazonCommon):
             )
 
     @mute_logger("odoo.addons.sale_amazon.models.amazon_account")
+    @freeze_time("2020-01-01")
     def test_sync_orders_full(self):
         """Test the orders synchronization with on-the-fly creation of all required records."""
 
@@ -134,9 +137,8 @@ class TestAmazon(common.TestAmazonCommon):
             self.account._sync_orders(auto_commit=False)
             self.assertEqual(
                 self.account.last_orders_sync,
-                datetime(2020, 1, 1),
-                msg="The last_order_sync should be equal to the date returned by get_orders_data "
-                "when the synchronization is completed.",
+                datetime(2020, 1, 1) - timedelta(minutes=2),
+                msg="Should be equal to the maximum upper limit allowed by Amazon",
             )
             order = self.env["sale.order"].search([("amazon_order_ref", "=", "123456789")])
             self.assertEqual(len(order), 1, msg="There should have been exactly one order created.")
@@ -333,6 +335,29 @@ class TestAmazon(common.TestAmazonCommon):
                 len(products),
                 msg="FBA orders should generate one stock move per product that is not a service.",
             )
+
+    @mute_logger("odoo.addons.sale_amazon.models.amazon_account")
+    def test_sync_orders_for_zero_quantity_promotional_line(self):
+        """Test the orders synchronization of promotional lines with zero financial records (no
+        proceeds object)."""
+
+        def get_sp_api_response_mock(_account, operation_, **_kwargs):
+            """Return a mocked response without making an actual call to the SP-API."""
+            base_response_ = common.OPERATIONS_RESPONSES_MAP[operation_]
+            order_mock = base_response_["orders"][0]
+
+            order_item_mock = {**order_mock["orderItems"][0], "quantityOrdered": 0}
+            del order_item_mock["proceeds"]  # Remove the proceeds object from the order item
+
+            return {**base_response_, "orders": [{**order_mock, "orderItems": [order_item_mock]}]}
+
+        with patch(
+            "odoo.addons.sale_amazon.utils.make_sp_api_request", new=get_sp_api_response_mock
+        ):
+            self.account._sync_orders(auto_commit=False)
+            order = self.env["sale.order"].search([("amazon_order_ref", "=", "123456789")])
+            order_line = order.order_line.filtered(lambda ol: ol.product_type == "consu")
+            self.assertEqual(order_line.product_qty, 0)
 
     @mute_logger("odoo.addons.sale_amazon.models.amazon_account")
     def test_sync_orders_cancel(self):

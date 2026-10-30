@@ -324,24 +324,6 @@
     </record>
 
     <!-- Override action contexts to allow group_expand to apply for project_id and task_id -->
-    <record id="planning.planning_action_my_calendar" model="ir.actions.act_window">
-        <field name="context">{
-            'search_default_my_shifts': 1,
-            'my_planning_action': 1,
-            'planning_expand_resource': 1,
-            'planning_expand_role': 1,
-            'planning_expand_project': 1,
-            'planning_expand_task': 1,
-        }</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                No shifts found. Let's create one!
-            </p><p>
-                Find here your planning. Assign yourself open shifts that match your roles, or indicate your unavailability.
-            </p>
-        </field>
-    </record>
-
     <record id="planning.planning_action_open_shifts" model="ir.actions.act_window">
         <field name="domain">[('start_datetime', '!=', False), ('end_datetime', '!=', False)]</field>
         <field name="context">{

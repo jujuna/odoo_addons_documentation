@@ -69,7 +69,7 @@ class TestUyEdiPos(TestUyEdiPosCommon):
         """ Customer Account forces an invoice, the CFE of a non-RUT customer stays an e-Ticket. """
         for customer in (self.env.ref("l10n_uy.partner_cfu"), self.partner_local_tk):
             with self.subTest(customer=customer.name):
-                ui_args = {"pos_order_lines_ui_args": [(self.product_22, 1)], "customer": customer}
+                ui_args = {"pos_order_lines_ui_args": [(self.product_22, 1)], "customer": customer, "is_invoiced": True}
                 with self._pos_session():
                     total = self.create_ui_order_data(**ui_args)["amount_total"]
                     order = self._create_order(ui_args | {"payments": [(self.pay_later_pm, total)]})

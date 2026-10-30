@@ -268,6 +268,43 @@ class TestCFDIFactoring(TestAccountBankStatementTour, TestMxEdiCommon):
 
             self._assert_invoice_payment_cfdi(st_line.move_id, 'test_factoring_payment_multiple')
 
+    def test_factoring_payment_invoice_in_foreign_currency_paid_in_mxn(self):
+        invoice_date = self.frozen_today - relativedelta(days=1)
+        payment_date = self.frozen_today
+        usd = self.setup_other_currency(
+            code='USD',
+            rates=[
+                (fields.Date.subtract(invoice_date, days=1), 0.05),
+                (fields.Date.subtract(payment_date, days=1), 0.048),
+            ],
+        )
+
+        with self.mx_external_setup(invoice_date):
+            invoice = self._create_invoice_mx(
+                currency_id=usd.id,
+                invoice_line_ids=[self._prepare_invoice_line(product_id=self.product, price_unit=1000.0)],
+            )  # 1160 USD
+            with self.with_mocked_pac_sign_success():
+                invoice._l10n_mx_edi_cfdi_invoice_try_send()
+
+        with self.mx_external_setup(payment_date):
+            st_line = self.env['account.bank.statement.line'].create({
+                'journal_id': self.company_data['default_journal_bank'].id,
+                'amount': 23000.00,  # MXN
+                'payment_ref': 'PAY MXN Curr',
+                'partner_id': self.partner_mx.id,
+            })
+
+            receivable_lines = invoice.line_ids.filtered(lambda l: l.account_type == 'asset_receivable')
+            amount_vals = [{'amount_trans_currency': 23000.00, 'compensation_amount_trans_currency': 1166.67}]
+            factoring_wizard = self._create_factoring_payment(st_line, receivable_lines, amount_vals_list=amount_vals, apply=False)
+            self.assertRecordValues(factoring_wizard.line_ids, [{'has_invalid_amount': False}])
+
+            factoring_wizard.action_apply_factoring()
+
+            self.assertRecordValues(st_line, [{'is_reconciled': True}])
+            self.assertRecordValues(invoice, [{'payment_state': 'paid'}])
+
     def test_factoring_payment_with_payment_term(self):
         """Test the factoring when there is a payment term selected on the invoice."""
         mx_journal = self.env['account.journal'].create({

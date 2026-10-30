@@ -114,6 +114,8 @@ class TestPerformance(AccountTestInvoicingCommon):
             'address_id': cls.env['res.partner'].create({'name': "Fund A Partner"}).id,
             'usi': 'USI123456789',
         })
+        if 'is_valid' in cls.super_fund._fields:
+            cls.super_fund.is_valid = True
 
         cls.env['l10n_au.super.account'].create([{
             "employee_id": cls.employees[i].id,

@@ -14,9 +14,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:15+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-22 16:38+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-20/"
 "account_followup/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -52,11 +52,37 @@ msgid ""
 "reminders\n"
 "        to multiple customers at once using the 'Send Reminders' action.\n"
 msgstr ""
+"\n"
+"Modulo per automatizzare le lettere relative alle fatture non pagate, con "
+"solleciti a più livelli.\n"
+"=========================================================================\n"
+"\n"
+"È possibile definire i diversi livelli di sollecito tramite le impostazioni "
+"di fatturazione:\n"
+"-----------------------------------------------------------------------------"
+"\n"
+"    Configurazione/Impostazioni/Fatture clienti/Solleciti automatici delle "
+"fatture\n"
+"\n"
+"Caratteristiche:\n"
+"---------\n"
+"    - Solleciti automatici a più livelli in base alla durata della mora.\n"
+"    - Integrazione con Send & Print:\n"
+"        Se Send & Print viene eseguito nuovamente su una fattura scaduta, il "
+"sistema\n"
+"        passa automaticamente al modello di sollecito appropriato e allega\n"
+"        il resoconto di follow-up.\n"
+"    - Solleciti in batch:\n"
+"        Gli utenti possono selezionare più fatture dalla vista elenco e "
+"inviare solleciti\n"
+"        a più clienti contemporaneamente utilizzando l'azione \"Invia "
+"solleciti\".\n"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "\"Automatic Invoice Reminders\" is currently disabled."
 msgstr ""
+"La funzione \"Promemoria automatici fatture\" è attualmente disattivata."
 
 #. module: account_followup
 #. odoo-python
@@ -73,7 +99,7 @@ msgstr "%(display_delay)s giorni %(reminder_timing)s"
 #. module: account_followup
 #: model:ir.actions.report,print_report_name:account_followup.action_report_followup
 msgid "'Reminder ' + object.display_name"
-msgstr ""
+msgstr "'Promemoria ' + object.display_name"
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.mail_template_invoice_payment_kind_reminder
@@ -1644,7 +1670,7 @@ msgstr "I partner dovrebbero avere un indirizzo e-mail."
 #. module: account_followup
 #: model:ir.module.module,shortdesc:base.module_account_followup
 msgid "Payment Follow-up Management"
-msgstr ""
+msgstr "Gestione follow-up pagamenti"
 
 #. module: account_followup
 #: model:mail.template,name:account_followup.mail_template_payment_reminder_before_due

@@ -23,6 +23,12 @@ SFTP_HOST = "sftp.socialsecurity.be"
 SFTP_PORT = 8022
 
 
+# Service codes of the fraction of performance μ of the reductions, and of the hours paid of their reference wage S
+# https://www.socialsecurity.be/employer/instructions/dmfa/fr/latest/instructions/deductions/structuralreduction_targetgroupreductions/introduction.html
+MU_SERVICE_CODES = {1, 2, 3, 4, 5, 12, 16, 17, 20, 38, 72}
+WAGE_SERVICE_CODES = {1, 3, 4, 5, 20, 38}
+
+
 def xml_str_to_dict(xml_str):
     def strip_ns(tag):
         return tag.split('}', 1)[1] if tag.startswith('{') else tag
@@ -143,9 +149,32 @@ def format_amount(amount, width=11, hundredth=True):
     if isinstance(amount, str):
         amount = int(sub(r'\D', '', amount or '0'))
     if hundredth:
-        amount = round(amount * 100)
+        amount = to_eurocent(amount)
     return str(amount).zfill(width)
+
+
+def to_eurocent(amount):
+    # The amounts of the declaration files, in eurocents. Rounded, not truncated: 0.29 * 100 is 28.999...
+    return round(amount * 100)
 
 
 def round_eurocent(amount):
     return tools.float_round(amount, precision_digits=2, rounding_method="HALF-UP")
+
+
+def sum_values_by_group(payslips_by_group, values_by_code, codes, field='total'):
+    """Sum the values of _get_line_values / _get_worked_days_line_values for each group of payslips.
+
+    Walk the existing values: looking up every code of every payslip would insert an empty value in their
+    defaultdict for each code missing on a payslip, i.e. millions of them for a big company.
+
+    :return: {group: {code: amount}} with every code of codes
+    """
+    group_by_payslip_id = {payslip_id: group for group, payslips in payslips_by_group.items() for payslip_id in payslips.ids}
+    totals = {group: dict.fromkeys(codes, 0.0) for group in payslips_by_group}
+    for code, values_by_payslip_id in values_by_code.items():
+        for payslip_id, values in values_by_payslip_id.items():
+            group = group_by_payslip_id.get(payslip_id)
+            if group is not None:
+                totals[group][code] += values[field]
+    return totals

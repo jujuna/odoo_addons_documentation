@@ -53,3 +53,9 @@ class ResPartner(models.Model):
         """Returns the list of address fields usable to format addresses."""
         return super(ResPartner, self)._formatting_address_fields() + ['l10n_mx_edi_colony',
                                                                        'l10n_mx_edi_locality', 'l10n_mx_edi_colony_code']
+
+    def _get_frontend_writable_fields(self):
+        frontend_writable_fields = super()._get_frontend_writable_fields()
+        frontend_writable_fields.add('l10n_mx_edi_colony')
+
+        return frontend_writable_fields

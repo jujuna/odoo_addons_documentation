@@ -29,6 +29,7 @@ class TestPayrollOnboardingAPI(L10nPayrollAccountCommon, TestL10nAUPayrollAPICom
                 "zip": "2000",
                 'l10n_au_branch_code': '100',
         })
+        cls.employee_1.l10n_au_super_account_ids.fund_id.is_valid = True
 
         cls.env['ir.config_parameter'].sudo().set_str('l10n_au_payroll_iap.test_endpoint', 'http://127.0.0.1:8070')
         cls.proxy_user = cls.env['account_edi_proxy_client.user']._register_proxy_user(cls.company, 'l10n_au_payroll', 'demo')
@@ -77,12 +78,19 @@ class TestPayrollOnboardingAPI(L10nPayrollAccountCommon, TestL10nAUPayrollAPICom
         self.assertEqual(wizard.stage, "company")
         wizard = action_next(wizard)
 
-        # Bank details
+        # Bank details (Clearing number (BSB) and bank name are essential)
         self.assertEqual(wizard.stage, "bank")
-        with self.assertRaises(RedirectWarning):
+        with self.assertRaises(RedirectWarning, msg="Clearing number (BSB) is required"):
             self.company_bank_account.clearing_number = False
             wizard.journal_id = self.bank_journal
             action_next(wizard)
+        with self.assertRaises(RedirectWarning, msg="The bank name is required to register the payroll"):
+            self.company_bank_account.bank_name = False
+            action_next(wizard)
+
+        # BIC number is not required to continue to next step
+        self.company_bank_account.bank_bic = False
+
         wizard.journal_id = self.bank_journal
         wizard = action_next(wizard)
 

@@ -218,6 +218,8 @@ class AccountMove(models.Model):
         tax_details = self._prepare_invoice_aggregated_taxes()
         line_items = self._l10n_ke_oscu_get_json_from_lines(tax_details)
         tax_codes, tax_rates, taxable_amounts, tax_amounts = self._get_taxes_data(line_items)
+        total_taxable_amount = sum(taxable_amounts.values())
+        total_tax_amount = sum(tax_amounts.values())
 
         content = {
             'invcNo':           '',                                        # KRA Invoice Number (set at the point of sending)
@@ -234,9 +236,9 @@ class AccountMove(models.Model):
             **taxable_amounts,
             **tax_amounts,
             **tax_rates,
-            'totTaxblAmt':      json_float_round(tax_details['base_amount'], 2),
-            'totTaxAmt':        json_float_round(tax_details['tax_amount'], 2),
-            'totAmt':           json_float_round(abs(self.amount_total_signed), 2),
+            'totTaxblAmt':      json_float_round(total_taxable_amount, 2),
+            'totTaxAmt':        json_float_round(total_tax_amount, 2),
+            'totAmt':           json_float_round(total_taxable_amount + total_tax_amount, 2),
             'totItemCnt':       len(line_items),                           # Total Item count
             'itemList':         line_items,
             **self.company_id._l10n_ke_get_user_dict(self.create_uid, self.write_uid),

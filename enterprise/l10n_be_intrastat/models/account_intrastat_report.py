@@ -55,7 +55,7 @@ class AccountIntrastatReportHandler(models.AbstractModel):
         file_content = self._be_intrastat_get_csv_file_content(options, results)
         return {
             'file_name': self.env['account.report'].browse(options['report_id']).get_default_report_filename(options, 'csv'),
-            'file_content': file_content,
+            'file_content': file_content.encode(),
             'file_type': 'csv',
         }
 

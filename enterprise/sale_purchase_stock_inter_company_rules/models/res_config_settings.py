@@ -7,6 +7,6 @@ class ResConfigSettings(models.TransientModel):
 
     intercompany_sync_delivery_receipt = fields.Boolean(
         related='company_id.intercompany_sync_delivery_receipt',
-        string="Synchronize Transfers",
+        string="Synchronize Transfers from SO/PO",
         readonly=False,
     )

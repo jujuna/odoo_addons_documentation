@@ -110,6 +110,8 @@ class TestPayrollSuperStream(AccountTestInvoicingCommon):
             'address_id': cls.env['res.partner'].create({'name': "Fund A Partner"}).id,
             'usi': "2345678912"
         })
+        if 'is_valid' in cls.super_fund._fields:
+            cls.super_fund.is_valid = True
         smsf_partner = cls.env['res.partner'].create({'name': "Fund B"})
         cls.super_fund_smsf = cls.env['l10n_au.super.fund'].create({
             'name': 'Fund B',

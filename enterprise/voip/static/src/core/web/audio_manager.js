@@ -347,10 +347,8 @@ export class AudioManager {
             // In the other cases, we don't want to disrupt the process of the
             // call initialization.
             const shouldBrowserPrompt = this.voip.store.rtc.microphonePermission === "prompt";
-            if (
-                shouldBrowserPrompt &&
-                this._sdhToData.get(sessionDescriptionHandler).direction === "outgoing"
-            ) {
+            const direction = this._sdhToData.get(sessionDescriptionHandler).direction;
+            if (shouldBrowserPrompt && direction === "outgoing") {
                 const dismissed = await new Promise((resolve) => {
                     // Note that this is a clone since this is a getter
                     const configuration = this.voip.softphone.audioPermissionDialogConfiguration;
@@ -373,12 +371,25 @@ export class AudioManager {
             // that the microphone is not configured.
             const forceErrorDisplay = shouldBrowserPrompt && this._hasAudioInput;
             if (!stream) {
+                // The delay was required to avoid a flickering when answering
+                // the call with the microphone already enabled. It is kept to
+                // be sure and prevent having that message if answering quickly.
+                const resolveMicPrompt =
+                    shouldBrowserPrompt && direction === "incoming"
+                        ? this.voip.triggerError({
+                              isConnecting: true,
+                              message: _t("Please accept use of the microphone."),
+                              delay: 500,
+                          })
+                        : undefined;
                 try {
                     stream = await this.requestMediaStream(forceErrorDisplay);
                     cleanup = () => stopStream(stream);
                 } catch {
                     // Error display handled by requestMediaStream
                     ({ stream, cleanup } = makeEmptyStream());
+                } finally {
+                    resolveMicPrompt?.();
                 }
             }
         }

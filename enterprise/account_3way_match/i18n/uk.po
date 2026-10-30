@@ -4,7 +4,7 @@
 #
 # Translators:
 # Martin Trigaux, 2022
-# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2022
+# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2022, 2026.
 # Cécile Collart <cco@odoo.com>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
@@ -13,9 +13,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~14.4+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-28 17:51+0000\n"
-"PO-Revision-Date: 2026-09-18 01:06+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-05 09:32+0000\n"
+"Last-Translator: Alina Lisnenko <alina.lisnenko@erp.co.ua>\n"
+"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-20/"
 "account_3way_match/uk/>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -53,6 +53,28 @@ msgid ""
 "    - No (The bill cannot be paid, nothing has been delivered yet)\n"
 "    - Exception (Received and invoiced quantities differ)\n"
 msgstr ""
+"\n"
+"Керування тристороннім звірянням рахунків від постачальників\n"
+"==========================================================\n"
+"\n"
+"У виробничій сфері часто трапляється так, що рахунки від постачальників "
+"надходять раніше за самі товари, однак оплачувати рахунок до моменту "
+"фактичної доставки товарів не бажано.\n"
+"\n"
+"Рішенням цієї ситуації є створення рахунку від постачальника одразу після "
+"його отримання (на основі замовлених кількостей), але здійснення оплати лише "
+"тоді, коли отримані кількості (зазначені в рядках замовлення на закупівлю) "
+"збігаються з даними в рахунку.\n"
+"\n"
+"Цей модуль запроваджує механізм «дозволу на оплату», який позначає, чи "
+"підлягає кожен рахунок від постачальника оплаті.\n"
+"\n"
+"Кожен рахунок від постачальника набуває одного з трьох статусів:\n"
+"\n"
+"- Так (рахунок можна оплатити)\n"
+"- Ні (рахунок не можна оплатити, оскільки товари ще не доставлено)\n"
+"- Виняток (наявна розбіжність між отриманими та вказаними в рахунку "
+"кількостями)\n"
 
 #. module: account_3way_match
 #: model:ir.model.fields,help:account_3way_match.field_account_bank_statement_line__release_to_pay_manual
@@ -182,7 +204,7 @@ msgstr ""
 #. module: account_3way_match
 #: model:ir.module.module,shortdesc:base.module_account_3way_match
 msgid "Vendor Bill: Release to Pay"
-msgstr ""
+msgstr "Рахунок постачальника: Дозволити оплату"
 
 #. module: account_3way_match
 #: model:ir.model.fields.selection,name:account_3way_match.selection__account_move__release_to_pay__yes

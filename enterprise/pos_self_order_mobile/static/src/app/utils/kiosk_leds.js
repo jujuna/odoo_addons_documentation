@@ -1,10 +1,10 @@
-import { hasMobileNative, mobileNative } from "@pos_mobile_android/app/utils/native";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
 
 export const ODOO_COLOR = "#714B67";
 export const SUCCESS_COLOR = "#00FF00";
 export const SUCCESS_ANIMATION = "snake";
 
-const hasLeds = () => hasMobileNative("setLedAnimation");
+const hasLeds = () => Boolean(mobileNative.setLedAnimation);
 
 export function registerSuccessAnimation() {
     if (!hasLeds()) {
@@ -24,14 +24,14 @@ export function registerSuccessAnimation() {
 export function setCompanyColor(config) {
     if (hasLeds()) {
         const color = config.self_ordering_primary_color ?? ODOO_COLOR;
-        fireAndForget(() => mobileNative.setLedDefaultColor({ color }));
+        fireAndForget(() => mobileNative.setLedDefaultColor?.({ color }));
     }
 }
 
 export function playSuccessAnimation() {
     if (hasLeds()) {
         fireAndForget(() =>
-            mobileNative.playLedAnimation({
+            mobileNative.playLedAnimation?.({
                 preset: SUCCESS_ANIMATION,
                 durationMs: 3000,
                 restoreColor: SUCCESS_COLOR,

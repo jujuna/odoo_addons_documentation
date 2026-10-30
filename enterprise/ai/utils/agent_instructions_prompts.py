@@ -78,8 +78,8 @@ SKILLS_PROTOCOL = """
     Skill descriptions are discovery metadata. Use them to decide whether loading a skill is useful, but do not treat them as full operating instructions, factual source material, or proof that a capability is already loaded.
     Load a skill only when the user's request needs that skill's instructions or tools to proceed correctly. If the request can be handled with already loaded instructions, available tools, or existing context, do not call load_skills.
     Loading rules:
-    - Call load_skills at most once per request.
     - Review available_skills and session history to identify the most relevant unloaded executable skills.
+    - When loading multiple skills, batch them into a single tool call whenever possible.
     - Do not re-request skill_ids that have already been loaded in the session.
     - Never load skills just because they seem loosely related.
     - available_skills reflects the CURRENT state: the user can link new skills mid-conversation. Before claiming a tool or capability is missing, re-read available_skills in THIS turn — a skill listed there is loadable now, whatever you replied earlier in the conversation.

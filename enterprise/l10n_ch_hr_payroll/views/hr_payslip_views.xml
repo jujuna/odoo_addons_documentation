@@ -49,18 +49,21 @@
                     </div>
                 </button>
             </div>
-            <div name="period" position="after">
+            <group name="top_left" position="inside">
                 <field name="l10n_ch_pay_13th_month" invisible="country_code != 'CH'"/>
                 <field name="l10n_ch_after_departure_payment" string="After Departure Payment" invisible="country_code != 'CH'"/>
                 <field name="l10n_ch_is_code" invisible="not l10n_ch_is_code or country_code != 'CH'"/>
-            </div>
+            </group>
             <div name="payslip_summary_widget" position="attributes">
                 <attribute name="invisible">country_code == 'CH'</attribute>
             </div>
-            <page name="worked_days" position="attributes">
+            <div name="worked_days" position="attributes">
                 <attribute name="invisible">country_code == 'CH'</attribute>
-            </page>
-            <page name="worked_days" position="before">
+            </div>
+            <div name="salary_inputs" position="attributes">
+                <attribute name="invisible">country_code == 'CH'</attribute>
+            </div>
+            <page name="salary_computation" position="before">
                 <page string="Wage Types" invisible="country_code != 'CH'">
                 <separator string="Monthly Wages"/>
                 <field name="l10n_ch_swiss_wage_ids" readonly="state in ['cancel', 'validated', 'paid']">

@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-21 10:23+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-09-29 11:34+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
 "Language-Team: Dutch <https://translate.odoo.com/projects/odoo-20/sign/nl/>\n"
 "Language: nl\n"
@@ -370,15 +370,6 @@ msgstr "<small class=\"text-muted\">Afzender</small>"
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
 msgstr "<small class=\"text-muted\">Ondertekenaars</small>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<small>SMS Verification: The signatory has confirmed their control of the "
-"phone number using a unique code sent by SMS</small>"
-msgstr ""
-"<small>Sms-verificatie: De ondertekenaar heeft zijn/haar telefoonnummer "
-"bevestigd met een unieke code die via sms is verzonden</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -2022,20 +2013,6 @@ msgid "Email Subject"
 msgstr "E-mail onderwerp"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Email Verification"
-msgstr "E-mail verificatie"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"Email Verification: The signatory has confirmed control of their email inbox "
-"by clicking on a unique link"
-msgstr ""
-"E-mailverificatie: De ondertekenaar heeft zijn/haar e-mailadres bevestigd "
-"door op een unieke link te klikken"
-
-#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
 msgid "Email saved successfully!"
@@ -2861,7 +2838,7 @@ msgstr ""
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material Symbols icoon, bv. checklist"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template__message
@@ -3749,11 +3726,6 @@ msgid "SMS Token"
 msgstr "SMS token"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "SMS Verification"
-msgstr "Sms-verificatie"
-
-#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "Verkoop"
@@ -3839,6 +3811,11 @@ msgstr ""
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Zoek <span class=\"nolabel\"> (in document)</span>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Secure Link"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4828,6 +4805,11 @@ msgid "Subject"
 msgstr "Onderwerp"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "System Account"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
 msgid "Tag Name"
 msgstr "Labelnaam"
@@ -5510,8 +5492,14 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Unieke code via sms"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Unique Link via Email"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5672,6 +5660,11 @@ msgstr "Waarde"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "Deze waarde bestaat reeds!"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Verification method"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6338,6 +6331,26 @@ msgstr "jou"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{0}} Summary"
 msgstr "{{0}} Samenvatting"
+
+#~ msgid ""
+#~ "<small>SMS Verification: The signatory has confirmed their control of the "
+#~ "phone number using a unique code sent by SMS</small>"
+#~ msgstr ""
+#~ "<small>Sms-verificatie: De ondertekenaar heeft zijn/haar telefoonnummer "
+#~ "bevestigd met een unieke code die via sms is verzonden</small>"
+
+#~ msgid "Email Verification"
+#~ msgstr "E-mail verificatie"
+
+#~ msgid ""
+#~ "Email Verification: The signatory has confirmed control of their email "
+#~ "inbox by clicking on a unique link"
+#~ msgstr ""
+#~ "E-mailverificatie: De ondertekenaar heeft zijn/haar e-mailadres bevestigd "
+#~ "door op een unieke link te klikken"
+
+#~ msgid "SMS Verification"
+#~ msgstr "Sms-verificatie"
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr "Laat ondertekenaars hun identiteit verifiëren met itsme®"

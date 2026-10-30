@@ -49,6 +49,7 @@ test("corrections from one visit persist to the next: valid cards paint instantl
             id: 3,
             key: "monthly_3",
             name: "Payrun: Jun 2026",
+            sequence: 10,
             description: "",
             color_class: "info",
             button_name: "Start Pay Run",
@@ -59,6 +60,7 @@ test("corrections from one visit persist to the next: valid cards paint instantl
             id: 42,
             key: "monthly_42",
             name: "New Warning",
+            sequence: 10,
             description: "",
             color_class: "warning",
             button_name: "Review Records",
@@ -114,6 +116,7 @@ test("two cards sharing the same warning id but a different schedule don't colli
             id: 175,
             key: "monthly_175",
             name: "Untrusted Bank Accounts",
+            sequence: 10,
             description: "It will not possible to pay your employees",
             color_class: "info",
             button_name: "Review Bank Accounts",
@@ -124,6 +127,7 @@ test("two cards sharing the same warning id but a different schedule don't colli
             id: 175,
             key: "weekly_175",
             name: "Untrusted Bank Accounts",
+            sequence: 10,
             description: "It will not possible to pay your employees",
             color_class: "info",
             button_name: "Review Bank Accounts",
@@ -167,9 +171,30 @@ test("two cards sharing the same warning id but a different schedule don't colli
     await animationFrame();
 });
 
+test("a cached card is not reconciled with a card of another schedule on the same date", async () => {
+    seedCache([
+        { id: 175, key: "monthly_175_2026-06-25", name: "Warning", button_name: "Review", warning_date: "2026-06-25" },
+    ]);
+    onRpc("hr.payroll.warning", "get_payroll_dashboard_data", () => ({
+        closing_dates_data: [],
+        mandatory_config_id: false,
+        warning_ids: [175],
+    }));
+    mockWarningStream([
+        { id: 175, key: "quarterly_175", name: "Warning", button_name: "Review", warning_date: "2026-06-25", count: 1 },
+        { id: 175, key: "monthly_175", name: "Warning", button_name: "Review", warning_date: "2026-06-25", count: 1 },
+    ]);
+
+    const dashboard = await mountDashboard();
+    await waitUntil(() => !dashboard.state.isRecomputing);
+    await animationFrame();
+
+    expect(".o_payroll_warning_card").toHaveCount(2);
+});
+
 test("a malformed or outdated cache entry is discarded instead of being rendered", async () => {
     seedCache([
-        { id: 8, name: "Valid Cached Warning", button_name: "Review", warning_date: "2026-06-27" },
+        { id: 8, name: "Valid Cached Warning", sequence: 10, button_name: "Review", warning_date: "2026-06-27" },
         { id: 9, name: "Missing warning_date" }, // old/corrupted shape
         { name: "Missing id entirely", button_name: "Review", warning_date: "2026-06-27" },
         "not even an object",
@@ -184,6 +209,7 @@ test("a malformed or outdated cache entry is discarded instead of being rendered
             id: 8,
             key: "monthly_8",
             name: "Valid Cached Warning",
+            sequence: 10,
             description: "",
             color_class: "info",
             button_name: "Review",
@@ -212,6 +238,7 @@ test("a failing warning is isolated as its own card without blocking the others,
             id: 31,
             key: "error_31",
             name: "Broken Warning",
+            sequence: 10,
             description: "This warning could not be computed.",
             color_class: "danger",
             is_error: true,
@@ -223,6 +250,7 @@ test("a failing warning is isolated as its own card without blocking the others,
             id: 7,
             key: "monthly_7",
             name: "Configure your payslip layout",
+            sequence: 10,
             description: "",
             color_class: "info",
             button_name: "Configure",

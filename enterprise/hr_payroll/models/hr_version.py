@@ -1,13 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import contextlib
 from datetime import date, datetime
 from collections import defaultdict
 import json
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import _, api, fields, models, modules
 from odoo.models import MAGIC_COLUMNS
-from odoo.tools import float_round, html_sanitize
+from odoo.tools import float_round, html_sanitize, config
 from odoo.exceptions import RedirectWarning, UserError, ValidationError
 from odoo.fields import Domain
 from odoo.tools import format_date
@@ -194,6 +195,14 @@ class HrVersion(models.Model):
     @api.depends(lambda self: self._issues_dependencies())
     def _compute_issues(self):
         self.issues = {}
+        if (
+            (not self.env.registry.ready or config["test_enable"] or modules.module.current_test)
+            # This context key acts as an escape hatch for upgrade scripts that need to
+            # explicitly recompute payroll issues while the registry is still initializing,
+            # and for the tests that check the issues.
+            and not (self.env.context.get("hr_payroll_force_compute_issue"))
+        ):
+            return
         warnings = self.env["hr.payroll.warning"].search([
             ("display_on_model", "=", True),
             ("model_name", "in", ("hr.version", "hr.employee")),
@@ -226,7 +235,8 @@ class HrVersion(models.Model):
                     issues = version.issues or {}
                     if version in related_versions:
                         if warning_details:
-                            for detail in warning_details.get(version, []):
+                            warning_details_lookup_key = version if warning.model_name == 'hr.version' else version.employee_id
+                            for detail in warning_details.get(warning_details_lookup_key, []):
                                 issues[len(issues)] = detail
                         else:
                             issues[len(issues)] = warning._get_warning_issue()
@@ -251,7 +261,7 @@ class HrVersion(models.Model):
                     "type": "ir.actions.act_window",
                     "name": self.env._("Pay Runs"),
                     "res_model": "hr.payslip.run",
-                    "views": [[self.env.ref("hr_payroll.hr_payrun_payslip_kanban_card_view").id, "kanban"], [False, "list"]],
+                    "views": [[False, "kanban"], [False, "list"]],
                     "domain": [('id', 'in', payruns.ids)],
                     "context": {
                         "group_by": ["state"],
@@ -287,6 +297,10 @@ class HrVersion(models.Model):
             ]),
             Domain('employee_type_ids', 'in', [False] + versions_with_contract.employee_type_id.ids),
             Domain('state', 'in', ['00_draft', '01_ready']),
+            Domain.OR([
+                Domain('slip_ids', '=', False),
+                Domain('slip_ids', 'any', [('origin_payslip_id', '=', False)]),
+            ]),
         ])
         if max_end:
             payrun_domain = Domain.AND([payrun_domain, Domain('date_start', '<=', max_end)])
@@ -428,9 +442,9 @@ class HrVersion(models.Model):
 
     def _get_property_input_value(self, code):
         self.ensure_one()
-        rule = self.env['hr.salary.rule'].search([('code', '=', code), ('struct_ids', 'in', self.structure_id.id)], limit=1)
-        if rule:
-            return dict(self.payroll_properties).get(rule.code, 0.00)
+        if code in self.structure_id.rule_ids.mapped('code') and code in self.payroll_properties._values:
+            with contextlib.suppress(KeyError):  # no definition for it anymore
+                return self.payroll_properties[code]
         return 0.0
 
     def _set_property_input_value(self, code, value):
@@ -665,8 +679,7 @@ class HrVersion(models.Model):
         res = super().write(vals)
         dependendant_fields = self._get_fields_that_recompute_payslip()
         if any(key in dependendant_fields for key in vals):
-            for version_sudo in self.sudo():
-                version_sudo._recompute_payslips(version_sudo.date_start, version_sudo.date_end or date.max)
+            self.sudo()._recompute_payslips()
         return res
 
     def copy_data(self, default=None):
@@ -680,15 +693,20 @@ class HrVersion(models.Model):
                 vals.pop('final_yearly_costs')
         return vals_list
 
-    def _recompute_payslips(self, date_from, date_to):
-        self.ensure_one()
-        all_payslips = self.env['hr.payslip'].sudo().search([
-            ('version_id', '=', self.id),
+    def _recompute_payslips(self, date_from=None, date_to=None):
+        if not self:
+            return
+        # A payslip can contain worked days of several versions
+        payslip_domain = Domain.OR(
+            Domain('date_from', '<=', date_to or version.date_end or date.max)
+            & Domain('date_to', '>=', date_from or version.date_start)
+            & (Domain('version_id', '=', version.id) | Domain('worked_days_line_ids.version_id', '=', version.id))
+            for version in self
+        )
+        all_payslips = self.env['hr.payslip'].sudo().search(payslip_domain & Domain([
             ('state', '=', 'draft'),
-            ('date_from', '<=', date_to),
-            ('date_to', '>=', date_from),
             ('company_id', '=', self.env.company.id),
-        ]).filtered(lambda p: p.is_regular)
+        ])).filtered(lambda p: p.is_regular)
         if all_payslips:
             all_payslips.action_refresh_from_work_entries()
 
@@ -699,6 +717,7 @@ class HrVersion(models.Model):
             'name': _('Payslip Adjustment'),
             'res_model': 'hr.salary.attachment',
             'view_mode': 'form',
+            'view_id': self.env.ref('hr_payroll.hr_salary_attachment_view_form').id,
             'target': 'new',
             'context': {'default_employee_id': self.employee_id.id}
         }
@@ -764,7 +783,23 @@ class HrVersion(models.Model):
         return {
             'is_last_version': is_last,
             'valid_payslips_count': valid_payslips_count,
+            'date_start': self.date_start,
+            'next_period_start': self._get_next_period_start(),
         }
+
+    def _get_next_period_start(self):
+        """ Start of the first payslip period not paid yet, at most the beginning of this month (a new
+        version cannot start in the future), or False if it is not after the start of this version. """
+        self.ensure_one()
+        last_payslip = self.env['hr.payslip'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', 'in', ['validated', 'paid']),
+        ], order='date_to desc', limit=1)
+        today = fields.Date.context_today(self)
+        next_period_start = last_payslip.date_to + relativedelta(days=1) if last_payslip else today.replace(day=1)
+        if next_period_start > today:
+            next_period_start = today.replace(day=1)
+        return next_period_start if next_period_start > self.date_start else False
 
     def action_create_version_from_update(self, new_date_start_str, record_changes=None):
         """ Creates a new version with the applied updates starting at new_date_start_str. """
@@ -780,13 +815,6 @@ class HrVersion(models.Model):
                 current_start=self.date_start,
             ))
 
-        if new_start > fields.Date.context_today(self):
-            raise UserError(self.env._(
-                "The start date of the new version (%(new_start)s) cannot be in the future. "
-                "It needs to be today or before.",
-                new_start=new_start,
-            ))
-
         copy_vals = self.copy_data()[0]
         version_fields = set(self._fields.keys())
         valid_changes = {k: v for k, v in record_changes.items() if k in version_fields}
@@ -800,3 +828,28 @@ class HrVersion(models.Model):
             self.employee_id.create_version(copy_vals)
 
         return True
+
+    def get_benefit_fields_value(self):
+        if not self.env.user.has_groups('hr_payroll.group_hr_payroll_user'):
+            return []
+        self.ensure_one()
+        salary_benefits = self.env['hr.contract.salary.benefit'].search([
+            ('source', '=', 'field'),
+            ('res_field_id', '!=', False),
+            ('active', '=', True),
+            ('country_id', '=', self.company_country_id.id),
+            ('benefit_type_id.periodicity', '=', 'monthly'),
+            ('structure_type_id', '=', self.structure_type_id.id),
+        ])
+        benefits_list = []
+        for benefit in salary_benefits:
+            value = self[benefit.field]
+            field = self._fields.get(benefit.field)
+            currency = self.currency_id.id or self.company_id.currency_id.id if field.type == 'monetary' else None
+            benefits_list.append({
+                'id': benefit.id,
+                'name': benefit.display_name,
+                'value': value,
+                'currency': currency,
+            })
+        return benefits_list

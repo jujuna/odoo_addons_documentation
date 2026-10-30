@@ -6,6 +6,7 @@ patch(CalendarEventQuickCreateFormController.prototype, {
         const context = super.getFullEventContext(...arguments);
         if (this.model.root.data.appointment_type_id) {
             context.default_is_draft = false;
+            context.default_appointment_type_id = this.model.root.data.appointment_type_id.id;
         }
         return context;
     },

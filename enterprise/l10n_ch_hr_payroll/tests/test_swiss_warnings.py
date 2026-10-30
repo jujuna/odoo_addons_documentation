@@ -153,6 +153,7 @@ class TestWhitelistFromTemplate(TransactionCase):
     @freeze_time("2024-01-01")
     def test_ch_warnings_action_text_presence(self):
         """Test the presence of action_text values in payslip.issues."""
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         payslip = self.env['hr.payslip'].create({
             'employee_id': self.employee_ch.id,
             'date_from': "2024-01-01",

@@ -5,15 +5,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-17 23:39+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-22 02:33+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/ai/zh_Hans/>\n"
+"projects/odoo-20/ai/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -71,6 +72,43 @@ msgid ""
 "links.\n"
 "        "
 msgstr ""
+"\n"
+"            # 为要在聊天中显示为丰富卡片的记录准备预览元数据。\n"
+"\n"
+"            ## 仅在用户希望看到记录本身时调用此工具——\n"
+"            例如“给我看看……”“列出……”“查找……”“推荐/建议……？”，或任何此类语"
+"境，\n"
+"            以及当预览搜索结果有助于用户在采取其他操作前进行选择时。\n"
+"            根据上下文，你基本上可以自行判断记录本身是否就是答案。\n"
+"\n"
+"            ## 以下情况请勿调用：\n"
+"            - 记录只是用于为另一次工具调用提供输入的中间数据\n"
+"            （更新、创建、构建参数）。\n"
+"            - 用户提出的问题只是需要记录来回答\n"
+"            （数量、是/否、总计、“谁是……”“……是什么时候”）。请以文本\n"
+"            形式回答，不要预览其背后的记录。\n"
+"\n"
+"            返回 `preview_metadata`：权威的最终值（计算后的\n"
+"            价格、币种、链接）。请基于这些内容回复，切勿基于\n"
+"            先前搜索结果中的原始值。\n"
+"\n"
+"            ## 你的回复：\n"
+"            ### 丰富卡片/记录预览会自动显示在你的消息下方。由于预览已展示记录"
+"详情：\n"
+"            - 将你的整个回复控制在简短的一句话内（例如“这些是你可以购买的内"
+"容：”）\n"
+"            - 不要列出记录名称、描述、价格或任何其他详情——预览已经处理了这"
+"些\n"
+"            - 不要使用项目符号或编号列表，也绝不要在回复中列出搜索结果，即使"
+"数量很少。预览会以清晰的格式展示所有必要的记录。\n"
+"\n"
+"            ## 目前支持丰富预览卡片的模型：\n"
+"            - 产品（`product.template`、`product.product`）、预约"
+"（`appointment.type`）、活动（`event.event`）、\n"
+"            博客文章（`blog.post`）、课程（`slide.channel`）、课程内容/幻灯片"
+"（`slide.slide`）以及招聘职位（`hr.job`）。\n"
+"            - 所有其他记录预览都会呈现为常规的记录链接。\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_adjust_search
@@ -258,6 +296,11 @@ msgid ""
 "the view.\n"
 "        "
 msgstr ""
+"\n"
+"            对于当前用户可访问的每个菜单，此工具会返回菜单 ID 与完整名称、关"
+"联的操作 ID、操作类型与操作说明，\n"
+"            以及可用的视图类型、默认视图类型和视图所属的模型。\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_binary_content
@@ -267,6 +310,9 @@ msgid ""
 "any record.\n"
 "        "
 msgstr ""
+"\n"
+"            读取任意记录的附件、图片或任意二进制字段的内容。\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_graph
@@ -352,6 +398,11 @@ msgid ""
 "the menu's available measures\n"
 "        "
 msgstr ""
+"\n"
+"            获取可用于数据透视/图表视图聚合的数值字段（度量）。\n"
+"            必须先调用此工具，才能打开数据透视或图表菜单以获取该菜单可用的度"
+"量\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_fields
@@ -414,6 +465,14 @@ msgid ""
 "more) and at most 50 rows (max 200) are returned.\n"
 "        "
 msgstr ""
+"\n"
+"            在数据库中搜索记录及其值。\n"
+"            适用于“我是否有……”“是否存在”“……的名称是什么”、查找关联关系等场"
+"景。\n"
+"            返回 {records, total_count}，当还有更多行时返回分页提示；默认只获"
+"取 display_name（传入 `fields` 可获取更多字段），最多返回 50 行（上限 200 "
+"行）。\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_group
@@ -527,6 +586,77 @@ msgid ""
 "is genuinely still missing.\n"
 "        "
 msgstr ""
+"\n"
+"            当你希望用户选择某个方向或操作，并让其选择决定你下一步做什么时，"
+"请使用此工具。这包括\n"
+"            向用户展示供其选择的想法、建议、推荐、备选方案、改进项或后续操"
+"作。它会呈现可点击的选项，而不是\n"
+"            用文字列出选项。在推荐改进项时，务必用此工具把每项建议变成可选择"
+"的操作；不要先给出文字清单再询问是否应用。\n"
+"            ## 规则\n"
+"            - 只问一个能解决一项决策的聚焦问题，并提供 2-4 个选项。\n"
+"            - 每个选项都必须是对该问题的直接回答或操作。如果你需要几项互不相"
+"关的信息，\n"
+"            请为每项信息分别提一个问题，而不要把问题合并成一个选项列表。\n"
+"            - 问题本身必须是一个完整、独立的问题——完整的问句，无需依赖\n"
+"            前文即可在语法和含义上理解清楚。不能是片段或标签（例如应写“场景应"
+"使用哪种照明风格？”，而不是“照明风格：”）。\n"
+"            - 每个选项都必须能独立构成一项具体操作；无需重读问题即可理解并执"
+"行（例如应写“使用暖色\n"
+"            环境光”，而不是“照明氛围”或“是”）。选项之间必须互斥，除非把它们组"
+"合起来有意义，\n"
+"            此时应将 multi_select 设为 true，让用户可以选择多个选项，但绝不能"
+"添加集合性或以偏概全的选项（例如“以上\n"
+"            全部”“都不选”“这些的组合”“多种选项混合”），因为 multi_select 已经"
+"允许用户逐项选择每个选项。\n"
+"            - 绝不要用无实际作用的选项充数（“跳过”“暂不”“稍后再说”）：用户可"
+"以跳过该问题，并且当\n"
+"            allow_free_text 为 true 时还可以输入未列出的答案。\n"
+"            - 选项本身就是答案，而不是之后你还要展开的答案标签。如果你无论如"
+"何都会顺着\n"
+"            用户的选择把每个标签背后的内容写出来，那就不是在提问——直接写出答"
+"案即可。\n"
+"            - 绝不要添加“其他”/“其他内容”/“自定义”选项——当\n"
+"            allow_free_text 为 true 时会自动提供自由文本备选（见下文），而为 "
+"false 时则完全不提供。\n"
+"            - 当答案已可从上下文得知、合理的默认值很明确，或另一个工具\n"
+"            已自行处理其确认流程时，请直接给出回答或执行操作。当有意义的选择"
+"少于两个时，请用纯文本提问。\n"
+"            - 在创建或更新记录时，不要就次要字段选择提问。除非会影响用户的要"
+"求，否则请使用合理的默认值。\n"
+"            - 绝不要问用户最新消息中已经回答过的问题。如果他们要求给出一定数"
+"量的想法、选项或\n"
+"            策略，就恰好提供那么多。仅当他们需要从中选择或应用一项或多项时才"
+"使用此工具；否则直接回答。\n"
+"            ## MULTISELECT（多选）\n"
+"            - 仅当用户可能对这一个问题选择多个答案/操作，且每个选项本身都独立"
+"有意义时，才将 multi_select 设为 true。\n"
+"            - 某个选项把多个可独立应用的操作捆绑在一起（例如“应用文案和版式优"
+"化”），说明你\n"
+"            把本应分开的选项压缩在了一起：请把每项独立操作拆成单独的选项并将 "
+"multi_select 设为 true，而不是\n"
+"            强迫用户做全有或全无的选择。\n"
+"            - multi_select 是针对整个列表的一个标志：只有当每个选项都可独立选"
+"择时才设为 true。如果任何\n"
+"            选项与其他选项互斥，请保持为 false。\n"
+"            - 选项的任何组合都必须保持逻辑一致：如果同时选择其中两项会相互冲"
+"突或\n"
+"            不合逻辑，它们就不应出现在同一个列表里。\n"
+"            ## ALLOW_FREE_TEXT（允许自由文本）\n"
+"            - 在大多数工具调用中显式将 allow_free_text 设为 true，以便用户提"
+"供未列出的答案。\n"
+"            - 仅当有效答案是完整且固定的集合时才设为 false——例如简单的“是/否”"
+"问题、\n"
+"            从固定的搜索/查找结果集里挑选一条记录，或从常量枚举中选择且所有\n"
+"            有效值都已列出。在这些情况下，所列选项之外没有任何有效答案。\n"
+"            ## 用户回答\n"
+"            - 用户的回答即是对你正在做的事情的确认。当提问主要是为了获取执行"
+"操作所需的信息时，\n"
+"            请立即按回答行动；不要只是复述所选内容再等待另一条“应用它”“执行”"
+"或“确认”消息。\n"
+"            - 你的下一轮回复必须受该选择约束，只推进被选中的内容。\n"
+"            - 仅当确实还缺少一项*新*信息时，才追问后续问题。\n"
+"        "
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ai_generate_image
@@ -608,21 +738,24 @@ msgid ""
 "ai_tool_show_warning\" aria-hidden=\"true\" title=\"The AI will not be "
 "limited by the groups defined on tools\"/>"
 msgstr ""
+"<i class=\"oi text-warning me-2\" data-icon=\"warning\" invisible=\"not "
+"ai_tool_show_warning\" aria-hidden=\"true\" title=\"AI 将不受工具上所定义群组"
+"的限制\"/>"
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ai_log_action
 msgid "<span>with arguments</span>"
-msgstr ""
+msgstr "<span>含参数</span>"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_composer_unique_agent_interface_model
 msgid "A rule with this Action and Model combination already exists."
-msgstr ""
+msgstr "已存在使用此操作与模型组合的规则。"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_child_wait
 msgid "A session waiting for a child must retain its pending tool call."
-msgstr ""
+msgstr "等待子会话的会话必须保留其待处理的工具调用。"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_agent__skill_ids
@@ -634,12 +767,12 @@ msgstr "一项技能包含指导 Odoo AI 帮助用户完成任务的说明和工
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_interaction_wait
 msgid "A waiting AI interaction must retain its continuation data."
-msgstr ""
+msgstr "等待中的 AI 交互必须保留其延续数据。"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_web_page_url_uniq
 msgid "A web page for this URL already exists."
-msgstr ""
+msgstr "此 URL 的网络页面已存在。"
 
 #. module: ai
 #. odoo-javascript
@@ -674,7 +807,7 @@ msgstr "AI 代理源"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__ai_sources_ids
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__ai_sources_ids
 msgid "AI Agent Sources"
-msgstr ""
+msgstr "AI 代理来源"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_discuss_channel_ai_channel_type_check
@@ -685,17 +818,17 @@ msgstr "AI 代理只能设置为 ai_chat 或在线客服渠道。"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "AI Chat Settings"
-msgstr ""
+msgstr "AI 聊天设置"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_embedding_mixin
 msgid "AI Embedding Mixin"
-msgstr ""
+msgstr "AI 嵌入混合"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_embed_records_ir_actions_server
 msgid "AI Embedding: Create records embedding"
-msgstr ""
+msgstr "AI 嵌入：创建记录嵌入"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_generate_embedding_ir_actions_server
@@ -705,7 +838,7 @@ msgstr "AI 嵌入：产生嵌入"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_update_deprecated_embedding_models_ir_actions_server
 msgid "AI Embedding: Update deprecated embedding models"
-msgstr ""
+msgstr "AI 嵌入：更新已弃用的嵌入模型"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_attachment_vacuum
@@ -755,7 +888,7 @@ msgstr "AI 工具名称"
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_thinking_text
 #: model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_thinking_text
 msgid "AI Tool Thinking Text"
-msgstr ""
+msgstr "AI 工具思考文本"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_adjust_search
@@ -775,7 +908,7 @@ msgstr "AI 工具：计算报告指标"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_continue_session
 msgid "AI Tool: Continue Session"
-msgstr ""
+msgstr "AI 工具：继续会话"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_create_records
@@ -840,7 +973,7 @@ msgstr "AI 工具：准备记录预览"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_read_binary_content
 msgid "AI Tool: Read Binary Content"
-msgstr ""
+msgstr "AI 工具：读取二进制内容"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_read_group
@@ -860,7 +993,7 @@ msgstr "AI 工具：搜索"
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_start_session
 msgid "AI Tool: Start Session"
-msgstr ""
+msgstr "AI 工具：启动会话"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_update_records
@@ -882,17 +1015,17 @@ msgstr "人工智能工具"
 #. module: ai
 #: model:ir.model,name:ai.model_ai_web_page
 msgid "AI Web Page"
-msgstr ""
+msgstr "AI 网络页面"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_web_scraper_batch
 msgid "AI Web Scraper Batch"
-msgstr ""
+msgstr "AI 网络爬虫批次"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_cron_run_web_scraper_ir_actions_server
 msgid "AI Web Scraper: Run Batches"
-msgstr ""
+msgstr "AI 网络爬虫：运行批次"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__discuss_channel__channel_type__ai_chat
@@ -909,7 +1042,7 @@ msgstr "AI 正在听..."
 #. module: ai
 #: model:ir.model,name:ai.model_ai_composer
 msgid "AI model configurations (Default Prompt) for text drafting."
-msgstr ""
+msgstr "用于文本撰写的 AI 模型配置（默认提示词）。"
 
 #. module: ai
 #. odoo-python
@@ -926,12 +1059,12 @@ msgstr "AI会话已过期。请开始新的会话。"
 #. module: ai
 #: model:ir.module.module,description:base.module_ai
 msgid "AI-related features are accessible with limited configurability."
-msgstr ""
+msgstr "AI 相关功能可用，但可配置性有限。"
 
 #. module: ai
 #: model:ir.actions.server,name:ai.ir_actions_server_ask_user_question
 msgid "AI: Ask User Question"
-msgstr ""
+msgstr "AI：向用户提问"
 
 #. module: ai
 #. odoo-javascript
@@ -1008,7 +1141,7 @@ msgstr "代理名称"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Aggregated records in %s"
-msgstr ""
+msgstr "在 %s 中聚合的记录"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_channel__ai_agent_id
@@ -1047,12 +1180,12 @@ msgstr "AI 工具显示警告"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__allowed_agent_ids
 msgid "Allowed Agents"
-msgstr ""
+msgstr "允许的代理"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_complete_request_data
 msgid "An active AI exchange must retain its complete model request data."
-msgstr ""
+msgstr "活跃的 AI 交互必须保留其完整的模型请求数据。"
 
 #. module: ai
 #. odoo-javascript
@@ -1099,7 +1232,7 @@ msgstr "分析模型"
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Approved automatically because auto-approval is enabled for this chat."
-msgstr ""
+msgstr "由于此聊天已启用自动批准，因此已自动批准。"
 
 #. module: ai
 #. odoo-javascript
@@ -1138,12 +1271,12 @@ msgstr "附件区块嵌入"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Auto-Approve Actions"
-msgstr ""
+msgstr "自动批准操作"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__auto_confirm
 msgid "Automatically confirm tool calls for the session"
-msgstr ""
+msgstr "自动确认该会话的工具调用"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__available_prompt_ids
@@ -1168,12 +1301,12 @@ msgstr "基础"
 #. module: ai
 #: model:ir.module.module,summary:base.module_ai
 msgid "Base module for AI features"
-msgstr ""
+msgstr "AI 功能的基础模块"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__uuid
 msgid "Batch UUID"
-msgstr ""
+msgstr "批次 UUID"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_template__body_html
@@ -1185,12 +1318,12 @@ msgstr "主体"
 msgid ""
 "Built-in agents ship with a sequence below 10 to be listed first; custom "
 "agents default after them."
-msgstr ""
+msgstr "内置代理的序列号低于 10，以便排在最前；自定义代理默认排在其后。"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_skill__is_native_skill
 msgid "Built-in skill with fixed behavior that cannot be edited."
-msgstr ""
+msgstr "行为固定且不可编辑的内置技能。"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_compute_date
@@ -1200,29 +1333,29 @@ msgstr "计算日期范围"
 #. module: ai
 #: model:ir.model,name:ai.model_mail_call_artifact
 msgid "Call Artifact"
-msgstr ""
+msgstr "通话素材"
 
 #. module: ai
 #: model:ir.model,name:ai.model_call_transcription_mixin
 msgid "Call Transcription Mixin"
-msgstr ""
+msgstr "通话转录混合"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__callback_model
 msgid "Callback Model"
-msgstr ""
+msgstr "回调模型"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Can not enable %(key1)s and %(key2)s at the same time"
-msgstr ""
+msgstr "不能同时启用 %(key1)s 和 %(key2)s"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_patch.xml:0
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #. module: ai
 #. odoo-javascript
@@ -1238,13 +1371,13 @@ msgstr "频道"
 #. module: ai
 #: model:ir.model,name:ai.model_discuss_channel_member
 msgid "Channel Member"
-msgstr ""
+msgstr "频道成员"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Chat"
-msgstr ""
+msgstr "聊天"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_discuss_channel__channel_type
@@ -1258,7 +1391,7 @@ msgstr ""
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__checksum
 msgid "Checksum"
-msgstr ""
+msgstr "校验和"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__child_ids
@@ -1285,13 +1418,13 @@ msgstr "生成器"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Computed a date range for %s"
-msgstr ""
+msgstr "为 %s 计算了日期范围"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
 msgid "Confirm"
-msgstr ""
+msgstr "确认"
 
 #. module: ai
 #: model:ir.model,name:ai.model_res_partner
@@ -1301,7 +1434,7 @@ msgstr "联系"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__content
 msgid "Content"
-msgstr ""
+msgstr "内容"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_compose_message__body
@@ -1317,7 +1450,7 @@ msgstr "上下文"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_continue_session
 msgid "Continuing an agent"
-msgstr ""
+msgstr "正在继续代理"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_channel__channel_type
@@ -1370,6 +1503,14 @@ msgid ""
 "link (used in multiple records creation only)\n"
 "            - values: the list of records to create with their fields values."
 msgstr ""
+"创建记录\n"
+"        此工具用于在数据库中创建新记录。它提供三个主要参数：\n"
+"            - explanation：用于说明该工具调用的消息，其中包含请求用户确认"
+"（CONFIRMATION）的问题。\n"
+"            - model_name：要为其创建记录的模型技术名称\n"
+"            - preview_menu_id：用于生成链接的菜单 ID（仅在批量创建记录时使"
+"用）\n"
+"            - values：要创建的记录列表及其字段值。"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__create_uid
@@ -1405,7 +1546,7 @@ msgstr "创建日期"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Created records in %s"
-msgstr ""
+msgstr "在 %s 中创建了记录"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_create_records
@@ -1415,7 +1556,7 @@ msgstr "创建一些记录"
 #. module: ai
 #: model:iap.service,unit_name:ai.iap_service_odoo_ai
 msgid "Credits"
-msgstr ""
+msgstr "信用"
 
 #. module: ai
 #. odoo-python
@@ -1434,21 +1575,21 @@ msgstr "自定义设定，以控制相关程度及格式。"
 msgid ""
 "Declined by the user. Do not attempt to run this sub-agent again unless "
 "explicitly instructed."
-msgstr ""
+msgstr "已被用户拒绝。除非明确指示，否则不要再尝试运行此子代理。"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ai_prompt_button
 msgid ""
 "Default action prompt that can be attached to AI UI rules for quick access "
 "by the user."
-msgstr ""
+msgstr "可附加到 AI 界面规则的默认操作提示词，便于用户快速访问。"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_start_session
 msgid ""
 "Delegate a focused task to an allowed agent. Returns its final answer and "
 "session ID."
-msgstr ""
+msgstr "将一项专注的任务委派给允许的代理。返回其最终答案与会话 ID。"
 
 #. module: ai
 #. odoo-javascript
@@ -1478,7 +1619,7 @@ msgstr "听写文本或记录会议"
 #: model:ir.model.fields.selection,name:ai.selection__ir_attachment__embedding_status__dirty
 #: model:ir.model.fields.selection,name:ai.selection__knowledge_article__embedding_status__dirty
 msgid "Dirty"
-msgstr ""
+msgstr "待更新"
 
 #. module: ai
 #. odoo-javascript
@@ -1497,7 +1638,7 @@ msgstr "讨论群组"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/chat_window_patch.xml:0
 msgid "Dismiss"
-msgstr ""
+msgstr "关闭"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__display_name
@@ -1533,24 +1674,24 @@ msgstr "显示名称"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__done
 msgid "Done"
-msgstr ""
+msgstr "已完成"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__done
 msgid "Done transcribing"
-msgstr ""
+msgstr "转录完成"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
 msgid "Edit"
-msgstr ""
+msgstr "编辑"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_prompt/ai_prompt.xml:0
 msgid "Edit Prompt"
-msgstr ""
+msgstr "编辑提示词"
 
 #. module: ai
 #. odoo-javascript
@@ -1579,7 +1720,7 @@ msgstr "嵌入模型"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_status
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_status
 msgid "Embedding Status"
-msgstr ""
+msgstr "嵌入状态"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_vector
@@ -1589,39 +1730,39 @@ msgstr "嵌入向量"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_error
 msgid "Embedding error"
-msgstr ""
+msgstr "嵌入错误"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_resources_only
 msgid "Enable resource restriction for the session"
-msgstr ""
+msgstr "为会话启用资源限制"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_think_longer
 msgid "Enable think longer option for the session"
-msgstr ""
+msgstr "为会话启用“深度思考”选项"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__enable_web_search
 msgid "Enable web search capability for the session"
-msgstr ""
+msgstr "为会话启用网络搜索功能"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Enabled Skill %s"
-msgstr ""
+msgstr "已启用技能 %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Enabled Skills %s"
-msgstr ""
+msgstr "已启用技能 %s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__error
 msgid "Error"
-msgstr ""
+msgstr "错误"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__error_details
@@ -1631,12 +1772,12 @@ msgstr "错误详情"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__error
 msgid "Error, could not transcribe"
-msgstr ""
+msgstr "错误，无法转录"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__event_ids
 msgid "Event"
-msgstr ""
+msgstr "事件"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__failed
@@ -1656,26 +1797,26 @@ msgstr "失败的"
 msgid ""
 "Failed to extract content from the attachment. Content must be at least 10 "
 "character long."
-msgstr ""
+msgstr "无法从附件中提取内容。内容长度必须至少为 10 个字符。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Failed to fetch the content of this URL."
-msgstr ""
+msgstr "无法获取此 URL 的内容。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "Failed to process the content of this URL."
-msgstr ""
+msgstr "无法处理此 URL 的内容。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "Failed to process this URL."
-msgstr ""
+msgstr "无法处理此 URL。"
 
 #. module: ai
 #. odoo-python
@@ -1683,18 +1824,18 @@ msgstr ""
 msgid ""
 "Failed to retrieve web page content. Content must be at least 10 characters "
 "long."
-msgstr ""
+msgstr "无法获取网络页面内容。内容长度必须至少为 10 个字符。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Failed to submit this URL for processing."
-msgstr ""
+msgstr "无法提交此 URL 进行处理。"
 
 #. module: ai
 #: model:ir.model,name:ai.model_ir_model_fields
 msgid "Field"
-msgstr ""
+msgstr "字段"
 
 #. module: ai
 #. odoo-javascript
@@ -1705,12 +1846,12 @@ msgstr "字段选择"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_model_fields__ttype
 msgid "Field Type"
-msgstr ""
+msgstr "字段类型"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_session__state
 msgid "Field that can be used to store data between tool calls"
-msgstr ""
+msgstr "可用于在工具调用之间存储数据的字段"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__type__binary
@@ -1726,12 +1867,12 @@ msgstr "文件大小"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "Filters"
-msgstr ""
+msgstr "筛选"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_menu_details
 msgid "Finding the best view"
-msgstr ""
+msgstr "正在查找最佳视图"
 
 #. module: ai
 #. odoo-javascript
@@ -1754,7 +1895,7 @@ msgstr "利用人工智能生成或转换内容"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Generated image %s"
-msgstr ""
+msgstr "已生成图片 %s"
 
 #. module: ai
 #: model_terms:ai.prompt.button,prompt:ai.ai_prompt_customer_new_jersey
@@ -1782,22 +1923,22 @@ msgstr "获取有关记录的帮助"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_load_skills
 msgid "Getting ready"
-msgstr ""
+msgstr "正在准备"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__has_embedding_generation_failed
 msgid "Has Embedding Generation Failed"
-msgstr ""
+msgstr "嵌入生成失败"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__has_media_output
 msgid "Has Media Output"
-msgstr ""
+msgstr "有媒体输出"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_discuss_call_history__has_transcript
 msgid "Has Transcript"
-msgstr ""
+msgstr "有文字稿"
 
 #. module: ai
 #. odoo-javascript
@@ -1879,7 +2020,7 @@ msgstr "图片"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__incomplete
 msgid "Incomplete"
-msgstr ""
+msgstr "未完成"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__indexed
@@ -1952,12 +2093,12 @@ msgstr "无效记录"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_skill__is_native_skill
 msgid "Is Native Skill"
-msgstr ""
+msgstr "是否原生技能"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_mail_call_artifact__is_stt
 msgid "Is STT Artifact"
-msgstr ""
+msgstr "是否为语音转文本素材"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_composer__is_system_default
@@ -2043,12 +2184,12 @@ msgstr "记录为备注"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Looked up fields on %s"
-msgstr ""
+msgstr "已查询 %s 上的字段"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__loop_state
 msgid "Loop State"
-msgstr ""
+msgstr "循环状态"
 
 #. module: ai
 #: model:ir.model,name:ai.model_mail_composer_mixin
@@ -2074,7 +2215,7 @@ msgstr "消息"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__message_body_suffix
 msgid "Message Body Suffix"
-msgstr ""
+msgstr "消息正文后缀"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__mimetype
@@ -2097,7 +2238,7 @@ msgstr "模型"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "My Recent Chats"
-msgstr ""
+msgstr "我最近的聊天"
 
 #. module: ai
 #. odoo-javascript
@@ -2110,19 +2251,19 @@ msgstr "名称"
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be created."
-msgstr ""
+msgstr "无法创建原生技能。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be deleted."
-msgstr ""
+msgstr "无法删除原生技能。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_skill.py:0
 msgid "Native skills cannot be modified."
-msgstr ""
+msgstr "无法修改原生技能。"
 
 #. module: ai
 #. odoo-javascript
@@ -2134,7 +2275,7 @@ msgstr "新聊天已开始。"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "No AI Chats yet."
-msgstr ""
+msgstr "尚无 AI 聊天。"
 
 #. module: ai
 #. odoo-python
@@ -2152,7 +2293,7 @@ msgstr "未在此源文件夹中找到任何附加资源。"
 #. odoo-python
 #: code:addons/ai/models/ai_web_page.py:0
 msgid "No text content could be extracted from this URL."
-msgstr ""
+msgstr "无法从此 URL 提取文本内容。"
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ai_log_action
@@ -2163,7 +2304,7 @@ msgstr "没有执行任何工具。"
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "No, I want something else"
-msgstr ""
+msgstr "不，我想要其他内容"
 
 #. module: ai
 #. odoo-python
@@ -2175,13 +2316,13 @@ msgstr "无"
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0 code:addons/ai/utils/ai_utils.py:0
 msgid "Not enough credits to use Odoo AI"
-msgstr ""
+msgstr "信用不足，无法使用 Odoo AI"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "Not enough credits to use Odoo AI."
-msgstr ""
+msgstr "信用不足，无法使用 Odoo AI。"
 
 #. module: ai
 #. odoo-javascript
@@ -2195,7 +2336,7 @@ msgstr "备注"
 msgid ""
 "Notifications collected during a turn, that will be shown after the final "
 "response"
-msgstr ""
+msgstr "在一轮对话期间收集的通知，将在最终回复后显示"
 
 #. module: ai
 #. odoo-python
@@ -2209,19 +2350,19 @@ msgstr "连续 API 调用次数超限，请尝试提交更精确的请求。"
 #: model:iap.service,description:ai.iap_service_odoo_ai
 #: model:iap.service,name:ai.iap_service_odoo_ai
 msgid "Odoo AI"
-msgstr ""
+msgstr "Odoo AI"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_agent_source.py:0
 msgid "Odoo AI failed to index this source."
-msgstr ""
+msgstr "Odoo AI 无法为此来源建立索引。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Odoo AI is currently unreachable. Please try again later."
-msgstr ""
+msgstr "目前无法连接 Odoo AI。请稍后重试。"
 
 #. module: ai
 #. odoo-python
@@ -2233,7 +2374,7 @@ msgstr "只有管理员才能从 URL 创建来源。"
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Only internal users can view tool parameters."
-msgstr ""
+msgstr "只有内部用户才能查看工具参数。"
 
 #. module: ai
 #. odoo-javascript
@@ -2285,31 +2426,31 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened %s"
-msgstr ""
+msgstr "已打开 %s"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the graph view for %s"
-msgstr ""
+msgstr "已打开 %s 的图表视图"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the kanban view for %s"
-msgstr ""
+msgstr "已打开 %s 的看板视图"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the list view for %s"
-msgstr ""
+msgstr "已打开 %s 的列表视图"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Opened the pivot view for %s"
-msgstr ""
+msgstr "已打开 %s 的数据透视视图"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_prompt_button__lang
@@ -2325,17 +2466,17 @@ msgstr ""
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__parent_path
 msgid "Parent Path"
-msgstr ""
+msgstr "上级路径"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__parent_session_id
 msgid "Parent Session"
-msgstr ""
+msgstr "父会话"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__parent_id
 msgid "Parent Source"
-msgstr ""
+msgstr "父来源"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__partner_id
@@ -2360,7 +2501,7 @@ msgstr "准备您的列表视图"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_pivot
 msgid "Preparing your Pivot view"
-msgstr ""
+msgstr "正在准备您的数据透视视图"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_update_records
@@ -2376,7 +2517,7 @@ msgstr "准备您的视图"
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
 msgid "Pretty Edit"
-msgstr ""
+msgstr "可视化编辑"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_preview_records
@@ -2417,12 +2558,12 @@ msgstr "“AI”操作使用的提示词"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_read_binary_content
 msgid "Reading binary content"
-msgstr ""
+msgstr "正在读取二进制内容"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__ready
 msgid "Ready"
-msgstr ""
+msgstr "就绪"
 
 #. module: ai
 #. odoo-javascript
@@ -2435,7 +2576,7 @@ msgstr "记录"
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_ids
 #: model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_ids
 msgid "Record embedding ids"
-msgstr ""
+msgstr "记录嵌入 ID"
 
 #. module: ai
 #. odoo-javascript
@@ -2447,12 +2588,12 @@ msgstr "记录选择器"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Refined the search on %s"
-msgstr ""
+msgstr "已细化 %s 上的搜索"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_adjust_search
 msgid "Refining search filters"
-msgstr ""
+msgstr "正在细化搜索筛选条件"
 
 #. module: ai
 #: model_terms:ai.prompt.button,prompt:ai.ai_prompt_regenerate_image
@@ -2527,47 +2668,47 @@ msgstr "渲染模型"
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Replace all by %(new_relations)s"
-msgstr ""
+msgstr "全部替换为 %(new_relations)s"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_context
 msgid "Request Context"
-msgstr ""
+msgstr "请求上下文"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_guest_id
 msgid "Request Guest"
-msgstr ""
+msgstr "请求访客"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_payload
 msgid "Request Payload"
-msgstr ""
+msgstr "请求负载"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_round
 msgid "Request Round"
-msgstr ""
+msgstr "请求轮次"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_round_limit
 msgid "Request Round Limit"
-msgstr ""
+msgstr "请求轮次上限"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_user_id
 msgid "Request User"
-msgstr ""
+msgstr "请求用户"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_uuid
 msgid "Request Uuid"
-msgstr ""
+msgstr "请求 UUID"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__request_webhook_secret
 msgid "Request Webhook Secret"
-msgstr ""
+msgstr "请求 Webhook 密钥"
 
 #. module: ai
 #. odoo-javascript
@@ -2578,7 +2719,7 @@ msgstr "必填"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__res_id
 msgid "Res"
-msgstr ""
+msgstr "资源"
 
 #. module: ai
 #. odoo-javascript
@@ -2590,7 +2731,7 @@ msgstr "限制来源"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__resume_token
 msgid "Resume Token"
-msgstr ""
+msgstr "恢复令牌"
 
 #. module: ai
 #. odoo-javascript
@@ -2602,25 +2743,25 @@ msgstr "恢复之前的聊天"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved available measures for %s"
-msgstr ""
+msgstr "已获取 %s 的可用度量"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved menu details"
-msgstr ""
+msgstr "已获取菜单详情"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved menus"
-msgstr ""
+msgstr "已获取菜单"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Retrieved models"
-msgstr ""
+msgstr "已获取模型"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_load_skills
@@ -2635,7 +2776,7 @@ msgstr "检索菜单"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_models
 msgid "Retrieving models"
-msgstr ""
+msgstr "检索模型"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__html_field_text_select
@@ -2651,31 +2792,31 @@ msgstr "规则名称"
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_prompt/ai_prompt.xml:0
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_agent_source__web_page_id
 msgid ""
 "Scraped web page this source's content is fetched from, when the source type "
 "is 'url'."
-msgstr ""
+msgstr "当来源类型为“url”时，抓取其内容的网络页面。"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__result
 msgid "Scraper Result"
-msgstr ""
+msgstr "爬虫结果"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Searched records in %s"
-msgstr ""
+msgstr "已在 %s 中搜索记录"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Searched the web: %s"
-msgstr ""
+msgstr "已搜索网络：%s"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_search
@@ -2714,7 +2855,7 @@ msgstr "发送信息"
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_continue_session
 msgid ""
 "Send another message to an idle direct child, retaining its conversation."
-msgstr ""
+msgstr "向空闲的直接子会话发送另一条消息，并保留其对话。"
 
 #. module: ai
 #. odoo-javascript
@@ -2755,12 +2896,12 @@ msgstr "简要说明其作用"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Show Steps"
-msgstr ""
+msgstr "显示步骤"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__show_agent_steps
 msgid "Show agent steps"
-msgstr ""
+msgstr "显示代理步骤"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent__skill_ids
@@ -2771,14 +2912,14 @@ msgstr "技能"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
 msgid "Skip"
-msgstr ""
+msgstr "跳过"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 #: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__skipped
 msgid "Skipped"
-msgstr ""
+msgstr "忽略"
 
 #. module: ai
 #. odoo-python
@@ -2790,7 +2931,13 @@ msgstr "此文件夹中部分附带的来源文件未能成功处理。"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
 msgid "Something else"
-msgstr ""
+msgstr "其他内容"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Something went wrong. Please rephrase your prompt and try again."
+msgstr "出现错误。请重新表述您的提示并重试。"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__is_folder
@@ -2823,13 +2970,13 @@ msgstr "开始录音以获得对话的实时记录"
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_start_session
 msgid "Starting an agent"
-msgstr ""
+msgstr "正在启动代理"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__state
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__state
 msgid "State"
-msgstr ""
+msgstr "状态"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__status
@@ -2840,7 +2987,7 @@ msgstr "状态"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/thread_patch.xml:0
 msgid "Steps taken"
-msgstr ""
+msgstr "已执行步骤"
 
 #. module: ai
 #. odoo-javascript
@@ -2857,12 +3004,12 @@ msgstr "停止录制"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__submitted_on
 msgid "Submission Date"
-msgstr ""
+msgstr "提交日期"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__submitted
 msgid "Submitted"
-msgstr ""
+msgstr "已提交"
 
 #. module: ai
 #. odoo-javascript
@@ -2908,19 +3055,19 @@ msgstr "文本选择"
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "The AI is already responding in this chat."
-msgstr ""
+msgstr "AI 已在此聊天中回复。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "The AI is still waiting for its agents."
-msgstr ""
+msgstr "AI 仍在等待其代理。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "The AI prompt message was not found."
-msgstr ""
+msgstr "未找到 AI 提示词消息。"
 
 #. module: ai
 #. odoo-python
@@ -2928,12 +3075,12 @@ msgstr ""
 msgid ""
 "The AI used too many successive tool rounds. Please try a more precise "
 "request."
-msgstr ""
+msgstr "AI 连续执行的工具轮次过多。请尝试更精确的请求。"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__res_id
 msgid "The ID of a linked record."
-msgstr ""
+msgstr "关联记录的 ID。"
 
 #. module: ai
 #. odoo-python
@@ -2950,12 +3097,12 @@ msgstr "当“%s ”作为 AI 工具使用时，必须指定一个 AI 工具名�
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_valid_request_round
 msgid "The active AI request round must be within its exchange limit."
-msgstr ""
+msgstr "活动的 AI 请求轮次必须在其交互上限之内。"
 
 #. module: ai
 #: model:ir.model.constraint,message:ai.constraint_ai_session_request_uuid_unique
 msgid "The active IAP request UUID must be unique."
-msgstr ""
+msgstr "活动的 IAP 请求 UUID 必须唯一。"
 
 #. module: ai
 #. odoo-python
@@ -2971,7 +3118,7 @@ msgstr "代理规则接口组件的标识符"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_embedding__res_model
 msgid "The model of a linked record"
-msgstr ""
+msgstr "关联记录的模型"
 
 #. module: ai
 #. odoo-javascript
@@ -2995,6 +3142,12 @@ msgstr "点击按钮时将发送给 AI 的提示语"
 #: code:addons/ai/models/ai_session.py:0
 msgid "The record linked to the session was not found."
 msgstr "未找到与该会话关联的记录。"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "The session tree has reached its active-session limit."
+msgstr "会话树已达到其活动会话上限。"
 
 #. module: ai
 #: model:ir.model.fields,help:ai.field_ai_prompt_button__name
@@ -3028,7 +3181,7 @@ msgstr "参数“%(name)s ”的值与任何预期模式均不匹配。"
 #. odoo-python
 #: code:addons/ai/utils/tools_schema/validators.py:0
 msgid "The value of the parameter '%(name)s' must be at least %(minimum)s."
-msgstr ""
+msgstr "参数“%(name)s”的值必须至少为 %(minimum)s。"
 
 #. module: ai
 #. odoo-python
@@ -3042,13 +3195,13 @@ msgstr "该工具不支持“网络锚定”选项。请改用“网络搜索”
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "These attachments are not available to this session."
-msgstr ""
+msgstr "这些附件对此会话不可用。"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Think Longer"
-msgstr ""
+msgstr "深度思考"
 
 #. module: ai
 #. odoo-javascript
@@ -3060,25 +3213,25 @@ msgstr "思考"
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "This AI confirmation choice is no longer available."
-msgstr ""
+msgstr "此 AI 确认选项已不再可用。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/controllers/thread.py:0
 msgid "This AI interaction is not available."
-msgstr ""
+msgstr "此 AI 交互不可用。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "This AI question response is not valid."
-msgstr ""
+msgstr "此 AI 问题回复无效。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "This URL took too long to process and timed out after %(hours)d hours."
-msgstr ""
+msgstr "处理此 URL 耗时过长，已在 %(hours)d 小时后超时。"
 
 #. module: ai
 #. odoo-python
@@ -3096,13 +3249,13 @@ msgstr "该操作是交互式的，不能由代理执行。"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "This agent cannot run in the current context."
-msgstr ""
+msgstr "此代理无法在当前上下文中运行。"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/discuss_channel_model_patch.js:0
 msgid "This session's AI agent has been deleted."
-msgstr ""
+msgstr "此会话的 AI 代理已被删除。"
 
 #. module: ai
 #. odoo-javascript
@@ -3113,7 +3266,7 @@ msgstr "这些参数将作为操作的全局变量传递。"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__timeout_at
 msgid "Timeout At"
-msgstr ""
+msgstr "超时时间"
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.mail_template_view_form
@@ -3131,7 +3284,7 @@ msgstr "标题"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__to_submit
 msgid "To Submit"
-msgstr ""
+msgstr "待提交"
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
@@ -3141,7 +3294,7 @@ msgstr "要向人工智能代理返回结果，请执行 <code>ai[‘result’] 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session__pending_tool_call
 msgid "Tool call waiting on the client"
-msgstr ""
+msgstr "工具调用正在等待客户端"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_ids
@@ -3237,7 +3390,7 @@ msgstr "网址"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__url_payloads
 msgid "URL Payloads"
-msgstr ""
+msgstr "URL 负载"
 
 #. module: ai
 #. odoo-javascript
@@ -3255,13 +3408,13 @@ msgstr "无法切换视图"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Unread"
-msgstr ""
+msgstr "未读"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Unrecognized AI session configuration key: %(key)s"
-msgstr ""
+msgstr "无法识别的 AI 会话配置键：%(key)s"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_update_records
@@ -3276,29 +3429,35 @@ msgid ""
 "            - updates: the list of records to update with their fields "
 "values."
 msgstr ""
+"更新记录\n"
+"        此工具用于更新数据库中的现有记录。它提供三个主要参数：\n"
+"            - explanation：用于说明该工具调用的消息，其中包含请求用户确认"
+"（CONFIRMATION）的问题。\n"
+"            - preview_menus：按更新列表所涉及的模型分别打开的菜单列表。\n"
+"            - updates：要更新的记录列表及其字段值。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Updated records"
-msgstr ""
+msgstr "已更新记录"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_web_page__url
 msgid "Url"
-msgstr ""
+msgstr "URL"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_actions_patch.js:0
 msgid "Use This"
-msgstr ""
+msgstr "使用这个"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "Use an allowed agent or an idle direct child session."
-msgstr ""
+msgstr "使用允许的代理或空闲的直接子会话。"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ir_actions_server__use_in_ai
@@ -3326,7 +3485,7 @@ msgstr "用户有访问权限"
 #: model:ir.model.fields,help:ai.field_ir_actions_server__ai_tool_thinking_text
 #: model:ir.model.fields,help:ai.field_ir_cron__ai_tool_thinking_text
 msgid "Value used as thinking message during the agent loop processing."
-msgstr ""
+msgstr "代理循环处理期间用作思考消息的值。"
 
 #. module: ai
 #. odoo-javascript
@@ -3339,7 +3498,7 @@ msgstr "语音消息（%(keyboard_command)s ）"
 #: code:addons/ai/static/src/editor/embedded_components/core/readonly_voice_transcription.xml:0
 #: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
 msgid "Voice Recording"
-msgstr ""
+msgstr "语音录制"
 
 #. module: ai
 #. odoo-javascript
@@ -3350,55 +3509,55 @@ msgstr "录音文稿"
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_answer
 msgid "Waiting for Answer"
-msgstr ""
+msgstr "等待回答"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_child
 msgid "Waiting for Child Session"
-msgstr ""
+msgstr "等待子会话"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_client_result
 msgid "Waiting for Client Result"
-msgstr ""
+msgstr "等待客户端结果"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_confirmation
 msgid "Waiting for Confirmation"
-msgstr ""
+msgstr "等待确认"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_external_result
 msgid "Waiting for External Result"
-msgstr ""
+msgstr "等待外部结果"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_model
 msgid "Waiting for Model"
-msgstr ""
+msgstr "等待模型"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "Waiting for an external result…"
-msgstr ""
+msgstr "正在等待外部结果……"
 
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_agent_source__web_page_id
 msgid "Web Page"
-msgstr ""
+msgstr "网络页面"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
 msgid "Web Search"
-msgstr ""
+msgstr "网络搜索"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_web_scraper_batch.py:0
 msgid "Web scraping did not finish before the timeout."
-msgstr ""
+msgstr "网络抓取未在超时前完成。"
 
 #. module: ai
 #: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_ai_generate_image
@@ -3409,7 +3568,7 @@ msgstr "处理您的图片"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/message_patch.xml:0
 msgid "Working..."
-msgstr ""
+msgstr "处理中..."
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__mail_composer
@@ -3431,13 +3590,13 @@ msgstr "值“%(value)s”错误，应为：%(enum)s"
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Yes, always approve in this chat"
-msgstr ""
+msgstr "是，在此聊天中始终批准"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/utils/ai_utils.py:0
 msgid "Yes, do it"
-msgstr ""
+msgstr "是，执行"
 
 #. module: ai
 #. odoo-javascript
@@ -3449,9 +3608,9 @@ msgstr "您必须允许访问麦克风才能开始录音。请尝试刷新页面
 
 #. module: ai
 #. odoo-python
-#: code:addons/ai/controllers/thread.py:0
+#: code:addons/ai/models/ai_session.py:0
 msgid "Your company access changed while this AI response was running."
-msgstr ""
+msgstr "此 AI 回复运行期间，您的公司访问权限发生了变化。"
 
 #. module: ai
 #: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
@@ -3491,7 +3650,7 @@ msgstr "已执行。"
 #. odoo-javascript
 #: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
 msgid "filters active"
-msgstr ""
+msgstr "筛选器已启用"
 
 #. module: ai
 #. odoo-python
@@ -3509,7 +3668,7 @@ msgstr "已更新%s"
 #. module: ai
 #: model:ir.model.fields,field_description:ai.field_ai_session_event__metadata
 msgid "json representation of the event"
-msgstr ""
+msgstr "事件的 JSON 表示"
 
 #. module: ai
 #. odoo-python
@@ -3521,36 +3680,36 @@ msgstr "多条记录"
 #. odoo-python
 #: code:addons/ai/models/ai_tool.py:0
 msgid "records"
-msgstr ""
+msgstr "记录"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/views/fields/call_debrief/call_debrief.js:0
 msgid "silence (%(duration)s)"
-msgstr ""
+msgstr "静音 (%(duration)s)"
 
 #. module: ai
 #. odoo-javascript
 #: code:addons/ai/static/src/ai_prompt/ai_field_selector_plugin.js:0
 msgid "tag"
-msgstr ""
+msgstr "标签"
 
 #. module: ai
 #: model:ir.model.fields.selection,name:ai.selection__ir_model_fields__ttype__vector
 msgid "vector"
-msgstr ""
+msgstr "向量"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "⛔ Auto-approval deactivated."
-msgstr ""
+msgstr "⛔ 已停用自动批准。"
 
 #. module: ai
 #. odoo-python
 #: code:addons/ai/models/ai_session.py:0
 msgid "✅ Auto-approval enabled for this chat."
-msgstr ""
+msgstr "✅ 已为此聊天启用自动批准。"
 
 #~ msgid ""
 #~ "\n"

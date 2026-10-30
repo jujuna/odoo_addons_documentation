@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:50+0000\n"
-"PO-Revision-Date: 2026-09-18 04:46+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-19 11:34+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "pos_sale_planning/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr "Alle Ressourcen"
 #. odoo-javascript
 #: code:addons/pos_sale_planning/static/src/app/components/planning_slot_selection_popup/planning_slot_selection_popup.xml:0
 msgid "Choose a slot"
-msgstr ""
+msgstr "Zeitfenster auswählen"
 
 #. module: pos_sale_planning
 #: model:ir.model,website_form_label:pos_sale_planning.model_planning_slot
@@ -46,6 +46,7 @@ msgstr "Verwerfen"
 
 #. module: pos_sale_planning
 #: model:ir.model.fields,field_description:pos_sale_planning.field_planning_slot__display_name
+#: model:ir.model.fields,field_description:pos_sale_planning.field_pos_config__display_name
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_order__display_name
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_payment_method__display_name
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_session__display_name
@@ -58,6 +59,7 @@ msgstr "Anzeigename"
 
 #. module: pos_sale_planning
 #: model:ir.model.fields,field_description:pos_sale_planning.field_planning_slot__id
+#: model:ir.model.fields,field_description:pos_sale_planning.field_pos_config__id
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_order__id
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_payment_method__id
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_session__id
@@ -77,13 +79,13 @@ msgstr "Ist ein Steuerprodukt"
 #. module: pos_sale_planning
 #: model:ir.module.module,summary:base.module_pos_sale_planning
 msgid "Link between PoS and Sale Planning."
-msgstr ""
+msgstr "Verknüpfung zwischen Kassensystem und Verkaufspplanung."
 
 #. module: pos_sale_planning
 #. odoo-javascript
 #: code:addons/pos_sale_planning/static/src/app/components/planning_slot_selection_popup/planning_slot_selection_popup.xml:0
 msgid "No open slot found."
-msgstr ""
+msgstr "Kein offenes Zeitfenster gefunden."
 
 #. module: pos_sale_planning
 #. odoo-python
@@ -117,6 +119,11 @@ msgid "PoS Orders"
 msgstr "Kassenaufträge"
 
 #. module: pos_sale_planning
+#: model:ir.model,name:pos_sale_planning.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr ""
+
+#. module: pos_sale_planning
 #: model:ir.model,name:pos_sale_planning.model_pos_order
 #, fuzzy
 msgid "Point of Sale Order"
@@ -137,7 +144,7 @@ msgstr "Zahlungsmethode am Kassensystem"
 #. module: pos_sale_planning
 #: model:ir.module.module,shortdesc:base.module_pos_sale_planning
 msgid "Point of Sale Sale Planning"
-msgstr ""
+msgstr "Kassensystem, Verkauf & Planung"
 
 #. module: pos_sale_planning
 #: model:ir.model,name:pos_sale_planning.model_pos_session
@@ -192,7 +199,7 @@ msgstr "Verkaufsauftragszeile"
 #. odoo-javascript
 #: code:addons/pos_sale_planning/static/src/app/components/planning_slot_selection_popup/planning_slot_selection_popup.xml:0
 msgid "Search Slot..."
-msgstr ""
+msgstr "Zeitfenster suchen …"
 
 #. module: pos_sale_planning
 #. odoo-python
@@ -216,6 +223,12 @@ msgstr ""
 "vorhanden sind, kann der Benutzer am Kassensystem auswählen, welche davon "
 "bei der Bestätigung eines Auftrags bzew. einer Bestellung mit dieser "
 "Zahlungsmethode verwendet werden soll."
+
+#. module: pos_sale_planning
+#. odoo-python
+#: code:addons/pos_sale_planning/models/pos_payment_method.py:0
+msgid "Transfer to Room"
+msgstr ""
 
 #. module: pos_sale_planning
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_payment_method__type

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from freezegun import freeze_time
 
 from odoo import Command
@@ -540,9 +540,9 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
     @users('apt_manager')
     def test_appointment_resources_combinable_avoid_losing_extra_capacity(self):
-        """ Check that we don't lose capacity with the resource selected.
-            If a capacity needed is greater than the capacity of the resource initially selected
-            we should check if the linked resources of the one selected are not a better fit to avoid losing capacity.
+        """ Check that we always take the closest capacity combination with least elements in various cases
+            of sequences and linked resources.
+            When the first resource has enough capacity, use it (as we do not compute best combination in that case)
         """
 
         nordic, scandinavian, snow = self.env["appointment.resource"].create([{
@@ -568,7 +568,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
             slots = self.apt_type_resource._get_appointment_slots('UTC', asked_capacity=5)
         resource_slots_c5 = self._filter_appointment_slots(slots)
         available_resources_c5 = [resource['id'] for resource in resource_slots_c5[0]['available_resources']]
-        self.assertListEqual(available_resources_c5, scandinavian.ids)
+        self.assertListEqual(available_resources_c5, snow.ids)
 
         snow.sequence = 1
         with freeze_time(self.reference_now):
@@ -783,14 +783,53 @@ class AppointmentResourceBookingTest(AppointmentCommon):
                 filter_weekdays=[0],
                 filter_resources=table1_c2,
             )
-            table1_c2_c4_slots = self._filter_appointment_slots(
+            table1_c6_slots = self._filter_appointment_slots(
                 slots,
                 filter_weekdays=[0],
-                filter_resources=(table1_c2 + table1_c4),
+                filter_resources=(table1_c6),
             )
             self.assertTrue(len(resource_slots) > 0)
             self.assertEqual(len(table1_c2_slots), 0)
-            self.assertEqual(len(resource_slots), len(table1_c2_c4_slots))
+            self.assertEqual(len(resource_slots), len(table1_c6_slots))
+
+    @freeze_time('2022-02-13')
+    @users('apt_manager')
+    def test_appointment_resources_combinable_transitivity_case(self):
+        """ Check that the best combination does not only include linked resources, as link is not
+        transitive, this could lead to a validation error in the appointment flow checks. """
+        table_c1, table_c2, table_c3 = self.env["appointment.resource"].create([{
+            'appointment_type_ids': self.apt_type_resource.ids,
+            'capacity': i,
+            'name': f'Table for {i}',
+            'sequence': i,
+        } for i in (1, 2, 3)])
+
+        # Best combination cannot be c2 + c3 for 5 capacity, as not linked together except through c1
+        table_c1.linked_resource_ids = table_c2 | table_c3
+        self.assertEqual(table_c2.linked_resource_ids, table_c1)
+        self.assertEqual(table_c3.linked_resource_ids, table_c1)
+
+        slots = self.apt_type_resource._get_appointment_slots('UTC', asked_capacity=5)
+        resource_slots_c5 = self._filter_appointment_slots(slots)
+
+        available_resources_c5 = [resource['id'] for resource in resource_slots_c5[0]['available_resources']]
+        self.assertEqual(set(available_resources_c5), set((table_c1 | table_c2 | table_c3).ids))
+
+        for available_resources, expected_valid_slot in (
+            (table_c1 | table_c2 | table_c3, True),
+            (table_c2 | table_c3, False)
+        ):
+            with self.subTest(expected_valid_slot=expected_valid_slot):
+                check_valid_slot = self.apt_type_resource._check_appointment_is_valid_slot(
+                    False,
+                    available_resources,
+                    5,
+                    'UTC',
+                    datetime(2022, 2, 14, 15, 0, tzinfo=timezone.utc),  # First monday in the future
+                    duration=self.apt_type_resource.appointment_duration,
+                    allday=False,
+                )
+                self.assertEqual(check_valid_slot, expected_valid_slot)
 
     @users('apt_manager')
     def test_appointment_resources_combinable_with_manual_date_first(self):

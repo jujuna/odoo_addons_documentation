@@ -1,4 +1,4 @@
-from odoo import models
+from odoo import fields, models
 from odoo.addons.mail.tools.discuss import Store
 
 
@@ -90,7 +90,13 @@ class HrEmployee(models.Model):
 
         consumed_leaves, _ = self._get_consumed_leaves(allocation_work_entry_types)
         allocated_types = {}
+        today = fields.Date.today()
         for work_entry_type, allocations in consumed_leaves.get(self, {}).items():
+            # as on the dashboard, only the allocations valid today
+            allocations = {
+                allocation: values for allocation, values in allocations.items()
+                if allocation.date_from <= today and (not allocation.date_to or allocation.date_to >= today)
+            }
             primary_unit = 'hours' if work_entry_type.unit_of_measure == 'hour' else 'days'
             remaining = sum(a[f'{primary_unit}_virtual_remaining_leaves'] for a in allocations.values())
             allocated = sum(a[f'{primary_unit}_max_leaves'] for a in allocations.values())

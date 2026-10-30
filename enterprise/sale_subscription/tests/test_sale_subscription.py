@@ -2332,7 +2332,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail, PaymentCommon):
     def test_is_closing(self):
         """
         Test subscription to ensure is_closing is set correctly based on
-        subscription state, recurring invoices, and user-closing options.
+        subscription state, recurring invoices.
         """
         with freeze_time("2024-07-30"):
             # Confirm subscription and generate an recurring invoice
@@ -2342,9 +2342,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail, PaymentCommon):
             self.assertFalse(subscription.is_closing, "Subscription should not be marked for closure upon confirmation.")
             self.assertEqual(subscription.subscription_state, '3_progress', "Subscription state should be 'in progress'.")
 
-            subscription.plan_id.user_closable = True
-            subscription.plan_id.user_closable_options = 'end_of_period'
-            subscription.with_context(allow_future_end_date=True).set_close()
+            subscription.end_date = subscription.next_invoice_date
             # Verify that the subscription is now marked for closure
             self.assertTrue(subscription.is_closing, "Subscription should be marked for closure.")
 
@@ -3624,3 +3622,32 @@ class TestSubscription(TestSubscriptionCommon, MockEmail, PaymentCommon):
 
         self.assertEqual(upsell_so.state, 'sale')
         self.assertEqual(renewal_so.state, 'sale')
+
+    def test_renewal_order_line_without_product_and_name(self):
+        self.subscription.action_confirm()
+        self.subscription._create_recurring_invoice()
+
+        action = self.subscription.prepare_renewal_order()
+        renewal_so = self.env['sale.order'].browse(action['res_id'])
+        product = renewal_so.order_line[0].product_id
+        renewal_so.order_line[0].write({
+            'product_id': False,
+            'name': False,
+            'product_uom_qty': 3,
+        })
+
+        self.assertFalse(renewal_so.order_line[0].parent_line_id)
+        renewal_so.order_line[0].product_id = product
+        self.assertEqual(renewal_so.order_line[0].parent_line_id, self.subscription.order_line[0])
+
+    def test_subscription_template_line_without_description(self):
+        with freeze_time("2026-08-28"):
+            self.subscription.sale_order_template_id.sale_order_template_line_ids[0].write({"name": False, "product_id": False})
+            self.subscription._onchange_sale_order_template_id()
+
+            self.subscription.action_confirm()
+            invoice = self.subscription._create_invoices()
+
+            self.assertTrue(invoice)
+            self.assertEqual(invoice.invoice_line_ids[0].name, "1 Month 08/28/2026 to 09/27/2026")
+            self.assertFalse(invoice.invoice_line_ids[0].product_id)

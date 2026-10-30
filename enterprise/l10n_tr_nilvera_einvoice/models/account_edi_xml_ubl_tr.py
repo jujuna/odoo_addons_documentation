@@ -4,7 +4,7 @@ from collections import defaultdict
 from lxml import etree
 from num2words import num2words
 
-from odoo import api, models
+from odoo import Command, api, models
 from odoo.exceptions import UserError
 
 from odoo.tools import float_compare, float_round, frozendict, html2plaintext
@@ -49,6 +49,8 @@ class AccountEdiXmlUblTr(models.AbstractModel):
         # OVERRIDES account.edi.ubl_21
         if tax and tax.amount < 0:  # This is a withholding
             return '9015'
+        if tax and tax.tax_group_id == self.env['account.chart.template'].ref('tr_tax_group_stamp', raise_if_not_found=False):
+            return '1047'
         return '0015'
 
     def _add_invoice_currency_vals(self, vals):
@@ -93,9 +95,14 @@ class AccountEdiXmlUblTr(models.AbstractModel):
                 if vals['currency_id'] != vals['company_currency_id'] else None,
             'cbc:LineCountNumeric': {'_text': len(vals['base_lines'])},
             'cbc:BuyerReference': None,  # Nilvera will reject any <BuyerReference> tag, so remove it
-            'cbc:Note': {
-                '_text': html2plaintext(invoice.narration, include_references=False) if invoice.narration else None,
-            },
+            'cbc:Note': [
+                {
+                    '_text': html2plaintext(line.name, include_references=False),
+                }
+                for line in invoice.line_ids.filtered(
+                    lambda line: line.display_type == 'line_note' and line.name
+                )
+            ],
         })
 
         document_node['cac:OrderReference']['cbc:IssueDate'] = {'_text': invoice.invoice_date}
@@ -106,10 +113,9 @@ class AccountEdiXmlUblTr(models.AbstractModel):
             document_node['cbc:ID'] = {'_text': prefix}
 
         document_node['cac:AdditionalDocumentReference'] = self._get_additional_document_reference_vals(invoice)
-        document_node['cbc:Note'] = [
-            document_node['cbc:Note'],
+        document_node['cbc:Note'].append(
             {'_text': self._l10n_tr_get_amount_integer_partn_text_note(invoice.amount_residual_signed, self.env.ref('base.TRY')), 'note_attrs': {}}
-        ]
+        )
         if vals['invoice'].currency_id.name != 'TRY':
             document_node['cbc:Note'].append({'_text': self._l10n_tr_get_amount_integer_partn_text_note(invoice.amount_residual, vals['invoice'].currency_id), 'note_attrs': {}})
             document_node['cbc:Note'].append({'_text': f'KUR : {self._l10n_tr_get_currency_conversion_rate(invoice):.6f} TL'})
@@ -522,7 +528,7 @@ class AccountEdiXmlUblTr(models.AbstractModel):
             precision = currency_id.decimal_places
             tax_amount = 0
             tax_subtotals = []
-            for percent_return, subtotal in subtotal_aggregates.items():
+            for sequence, (percent_return, subtotal) in enumerate(subtotal_aggregates.items(), start=1):
                 tax_amount += subtotal["tax_amount"]
                 tax_subtotals.append(
                     {
@@ -539,6 +545,9 @@ class AccountEdiXmlUblTr(models.AbstractModel):
                                 precision,
                             ),
                             "currencyID": currency_name,
+                        },
+                        "cbc:CalculationSequenceNumeric": {
+                            "_text": sequence,
                         },
                         "cbc:Percent": {
                             "_text": percent_return,
@@ -651,6 +660,9 @@ class AccountEdiXmlUblTr(models.AbstractModel):
                             precision,
                         ),
                         "currencyID": currency_name,
+                    },
+                    "cbc:CalculationSequenceNumeric": {
+                        "_text": 1,
                     },
                     "cbc:Percent": {
                         "_text": percent_return,
@@ -839,10 +851,13 @@ class AccountEdiXmlUblTr(models.AbstractModel):
                     'cbc:TaxTypeCode': {'_text': grouping_key['tax_type_code']},
                 },
             }
-        is_withholding = grouping_key['tax_category_code'] == '9015'
+        tax_scheme_name = {
+            '9015': 'KDV Tevkifatı',
+            '1047': 'Damga V.',
+        }.get(grouping_key['tax_category_code'], 'Gerçek Usulde KDV')
         tax_category_node = {
             'cac:TaxScheme': {
-                'cbc:Name': {'_text': 'KDV Tevkifatı' if is_withholding else 'Gerçek Usulde KDV'},
+                'cbc:Name': {'_text': tax_scheme_name},
                 'cbc:TaxTypeCode': {'_text': grouping_key['tax_category_code']}
             }
         }
@@ -896,6 +911,14 @@ class AccountEdiXmlUblTr(models.AbstractModel):
         tax_subtotal_node = super()._get_tax_subtotal_node(vals)
         tax_subtotal_node['cac:TaxCategory']['cbc:Percent'] = None
         return tax_subtotal_node
+
+    def _get_tax_total_node(self, vals):
+        # EXTENDS account.edi.xml.ubl_21
+        tax_total_node = super()._get_tax_total_node(vals)
+        # super() builds the subtotals without their position
+        for sequence, tax_subtotal_node in enumerate(tax_total_node['cac:TaxSubtotal'], start=1):
+            tax_subtotal_node['cbc:CalculationSequenceNumeric'] = {'_text': sequence}
+        return tax_total_node
 
     @api.model
     def _get_tr_profile_id(self, invoice):
@@ -970,10 +993,13 @@ class AccountEdiXmlUblTr(models.AbstractModel):
                         # The percentatge can't be a float as it is expected to return as an integer
                         '_text': grouping_key['percent_withheld'] if is_withholding else grouping_key['amount'],
                     },
+                    'cbc:CalculationSequenceNumeric': {'_text': sequence},
                     'cac:TaxCategory': self._get_tax_category_node({**vals, 'grouping_key': grouping_key}),
                 }
-                for grouping_key, details in aggregated_tax_details.items()
-                if grouping_key
+                for sequence, (grouping_key, details) in enumerate(
+                    ((grouping_key, details) for grouping_key, details in aggregated_tax_details.items() if grouping_key),
+                    start=1,
+                )
             ],
         }
 
@@ -1027,6 +1053,10 @@ class AccountEdiXmlUblTr(models.AbstractModel):
 
     def _add_document_line_tax_category_nodes(self, line_node, vals):
         # No InvoiceLine/Item/ClassifiedTaxCategory in Turkey
+        pass
+
+    def _add_invoice_line_period_nodes(self, line_node, vals):
+        # Start and End Dates on Invoice Lines is not allowed in Turkey
         pass
 
     @api.model
@@ -1133,6 +1163,14 @@ class AccountEdiXmlUblTr(models.AbstractModel):
     def _import_fill_invoice(self, invoice, tree, qty_factor):
         # EXTENDS account.edi.xml.ubl_20
         logs = super()._import_fill_invoice(invoice, tree, qty_factor)
+        note_lines = [
+            Command.create({
+                'display_type': 'line_note',
+                'name': note.text,
+            })
+            for note in tree.findall('./{*}Note')
+            if note.text
+        ]
 
         scenario = self._find_value(".//cbc:ProfileID", tree)
         if scenario not in {key for key, _ in self.env['account.move']._fields['l10n_tr_gib_invoice_scenario'].selection}:
@@ -1145,6 +1183,10 @@ class AccountEdiXmlUblTr(models.AbstractModel):
             'l10n_tr_nilvera_uuid': self._find_value('./cbc:UUID', tree),
             'l10n_tr_gib_invoice_scenario': scenario,
             'l10n_tr_gib_invoice_type': invoice_type,
+            # The base import also puts document-level notes in the narration; they are
+            # imported as note lines instead, so keep only the PaymentTerms notes.
+            'narration': self._import_description(tree, xpaths=['./{*}PaymentTerms/{*}Note']),
+            'invoice_line_ids': note_lines,
         })
 
         if scenario == 'TICARIFATURA' and invoice.move_type in {'in_invoice', 'out_invoice'}:

@@ -29,6 +29,10 @@ ONSS_DECLARATION_TYPES = (
     'WECH009',
     'WECH010',
     'WECH011',
+    'ZIMA001',
+    'ZIMA002',
+    'ZIMA003',
+    'ZIMA006',
 )
 
 
@@ -309,7 +313,10 @@ class L10nBeOnssDeclaration(models.Model):
                         dimona_data = form['HandlingResult']['ImpactReport']['DimonaImpactReport'].get('DimonaPeriodAfter', {})
                         anomaly_report = form['HandlingResult'].get('AnomalyReport', False)
                         if anomaly_report and (anomaly_report.get('ErrorID', '').endswith('510') or anomaly_report.get('ErrorID', '').endswith('460')):
-                            for version in employee.mapped('version_ids').filtered(lambda v: v.is_flexi() and v.contract_date_start == dimona_data.get('StartingDate') and v.contract_date_end == dimona_data.get('EndingDate') and (v.date_start != v.date_end or v.date_start == dimona_data.get('StartingDate') and v.date_end == dimona_data.get('EndingDate'))):
+                            # The dates are strings in the notification
+                            dimona_start = fields.Date.to_date(dimona_data.get('StartingDate')) or False
+                            dimona_end = fields.Date.to_date(dimona_data.get('EndingDate')) or False
+                            for version in employee.mapped('version_ids').filtered(lambda v: v.is_flexi() and v.contract_date_start == dimona_start and v.contract_date_end == dimona_end and (v.date_start != v.date_end or v.date_start == dimona_start and v.date_end == dimona_end)):
                                 version.l10n_be_refused_flexijob = True
                         employee.message_post(
                             body=_(

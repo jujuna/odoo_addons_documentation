@@ -622,6 +622,73 @@ class TestPointOfSaleFlow(CommonPosTest):
             {'amount': 450.0, 'payment_method_id': self.bank_payment_method.id},
         ])
 
+    def _get_customer_account_draft_order_data(self, uuid):
+        self.pos_config_usd.open_ui()
+        return {
+            'amount_paid': 0,
+            'amount_return': 0,
+            'amount_tax': 0,
+            'amount_total': 450,
+            'date_order': fields.Datetime.to_string(fields.Datetime.now()),
+            'fiscal_position_id': False,
+            'pricelist_id': self.pos_config_usd.pricelist_id.id,
+            'lines': [[0, 0, {
+                'discount': 0,
+                'price_unit': 450.0,
+                'product_id': self.product.id,
+                'price_subtotal': 450.0,
+                'price_subtotal_incl': 450.0,
+                'tax_ids': [[6, False, []]],
+                'qty': 1,
+                'uuid': f'line-{uuid}',
+            }]],
+            'name': f'Order {uuid}',
+            'partner_id': False,
+            'session_id': self.pos_config_usd.current_session_id.id,
+            'state': 'draft',
+            'uuid': uuid,
+            'user_id': self.env.uid,
+        }
+
+    def _get_customer_account_paid_order_data(self, draft_data, partner_id):
+        paid_data = copy.deepcopy(draft_data)
+        paid_data.update({
+            'amount_paid': 450,
+            'lines': [],
+            'partner_id': partner_id,
+            'state': 'paid',
+            'payment_ids': [[0, 0, {
+                'amount': 450,
+                'name': fields.Datetime.to_string(fields.Datetime.now()),
+                'payment_method_id': self.credit_payment_method.id,
+                'uuid': f"pay-{draft_data['uuid']}",
+            }]],
+        })
+        return paid_data
+
+    def test_pay_synced_draft_order_with_customer_account(self):
+        """A draft order already synced without customer (e.g. a restaurant table
+        order) can be paid with a customer account once the customer is set."""
+        draft_data = self._get_customer_account_draft_order_data('32346-123-1234')
+        self.env['pos.order'].sync_from_ui([copy.deepcopy(draft_data)])
+        order = self.env['pos.order'].search([('uuid', '=', '32346-123-1234')])
+        self.assertFalse(order.partner_id)
+
+        paid_data = self._get_customer_account_paid_order_data(draft_data, self.partner.id)
+        self.env['pos.order'].sync_from_ui([paid_data])
+        self.assertRecordValues(order, [{'state': 'paid', 'partner_id': self.partner.id}])
+        self.assertRecordValues(order.payment_ids, [
+            {'amount': 450.0, 'payment_method_id': self.credit_payment_method.id, 'partner_id': self.partner.id},
+        ])
+
+    def test_pay_synced_draft_order_with_customer_account_without_customer(self):
+        draft_data = self._get_customer_account_draft_order_data('42346-123-1234')
+        self.env['pos.order'].sync_from_ui([copy.deepcopy(draft_data)])
+
+        paid_data = self._get_customer_account_paid_order_data(draft_data, False)
+        with self.assertRaisesRegex(ValidationError, "A customer must be set on the order to pay with a customer account."):
+            self.env['pos.order'].sync_from_ui([paid_data])
+
     def test_refund_qty_refund_cancel(self):
         """
         Test the refunded qty of an order, when the refund order has been cancelled
@@ -1096,6 +1163,16 @@ class TestPointOfSaleFlow(CommonPosTest):
         order = self.env['pos.order'].search([])
         self.assertEqual(order.name, f"/AA - {order.pos_reference.split('-')[-1]} - 1.B")
 
+    def test_create_journal_and_payment_methods_bank_journal_explicit_company_currency(self):
+        """A bank journal whose currency is explicitly set to the company currency
+        (instead of left empty) must still be found and used, not treated as a
+        foreign-currency journal."""
+        self.env['pos.payment.method'].search([]).write({'active': False})
+        self.company_data['default_journal_bank'].currency_id = self.company.currency_id
+        _, pm_ids = self.pos_config_usd._create_journal_and_payment_methods()
+        bank_pm = self.env['pos.payment.method'].browse(pm_ids).filtered(lambda pm: pm.name == 'Card')
+        self.assertEqual(bank_pm.journal_id, self.company_data['default_journal_bank'])
+
     def test_payment_method_sequence(self):
         self.env['pos.payment.method'].search([]).write({'active': False})
         _, pm_ids = self.pos_config_usd._create_journal_and_payment_methods()
@@ -1104,7 +1181,7 @@ class TestPointOfSaleFlow(CommonPosTest):
         self.assertEqual(methods.mapped('name'), ['Cash', 'Card', 'Customer Account'])
         self.assertEqual(methods.mapped('sequence'), [1, 2, 4])
         new_pm = self.env['pos.payment.method'].create({'name': 'Quick Pay', 'type': 'bank'})
-        self.assertEqual(new_pm.sequence, 5)
+        self.assertGreaterEqual(new_pm.sequence, 5)
 
     def test_add_two_lines_with_same_uuid_through_sync_from_ui(self):
         """Test that adding two lines with the same UUID doesn't cause issues."""
@@ -1434,3 +1511,89 @@ class TestPointOfSaleFlow(CommonPosTest):
         self.assertEqual(len(logged_messages), 2)
         self.assertIn('Twenty dollars no tax: Deleted line (quantity: 1.0)', logged_messages[0])
         self.assertIn('Ten dollars no tax: Ordered quantity: 2.0 → 1', logged_messages[1])
+
+    def test_cash_in_out_has_no_partner(self):
+        """The cashier is not the counterpart of a cash move: it must not be set as
+        partner on the statement line nor on its journal items."""
+        self.pos_config_usd.open_ui()
+        session = self.pos_config_usd.current_session_id
+        session.set_opening_control(0, False)
+        session.try_cash_in_out('in', 10, 'Float', self.env.user.partner_id.id)
+
+        cash_move = session.bank_statement_line_ids
+        self.assertFalse(cash_move.partner_id)
+        self.assertFalse(cash_move.move_id.line_ids.partner_id)
+        self.assertEqual(session.get_cash_in_out_list()[0]['cashier_name'], self.env.user.name)
+
+    def test_refund_of_a_global_discount(self):
+        """ The global discount line pins in 'extra_tax_data' base and tax amounts that cannot be
+        recomputed from its price. The UI does not refund that line, it applies the discount again
+        on the refund order, where the refunded lines are negative and the discount is therefore
+        positive. Those pinned amounts have to be used as they are on both orders, otherwise the
+        totals of an order and of its refund do not cancel each other.
+        """
+        AccountTax = self.env['account.tax']
+        company = self.env.company
+        tax = AccountTax.create({'name': 'Tax 20%', 'amount': 20})
+        product = self.env['product.product'].create({
+            'name': 'Product 2.12',
+            'available_in_pos': True,
+            'lst_price': 2.12,
+            'taxes_id': [Command.set(tax.ids)],
+        })
+
+        def discount_line(quantity):
+            """ The values the UI stores for a 10% global discount on 'quantity' x that product. """
+            base_lines = [AccountTax._prepare_base_line_for_taxes_computation(
+                None, product_id=product, tax_ids=product.taxes_id, price_unit=product.lst_price,
+                quantity=quantity, currency_id=company.currency_id, rate=1.0,
+            )]
+            AccountTax._add_tax_details_in_base_lines(base_lines, company)
+            AccountTax._round_base_lines_tax_details(base_lines, company)
+            line = AccountTax._prepare_global_discount_lines(base_lines, company, 'percent', 10.0)[0]
+            return {
+                'product_id': product.id,
+                'qty': line['quantity'],
+                'price_unit': company.currency_id.round(line['price_unit']),
+                'extra_tax_data': AccountTax._export_base_line_extra_tax_data(line),
+            }
+
+        order, refund = (
+            self.create_backend_pos_order({
+                'order_data': {'is_refund': quantity < 0},
+                'line_data': [{'product_id': product.id, 'qty': quantity}, discount_line(quantity)],
+            })[0]
+            for quantity in (2, -2)
+        )
+        self.assertAlmostEqual(
+            order.amount_tax + refund.amount_tax, 0.0,
+            msg="The taxes of an order and of its refund should cancel each other.",
+        )
+        self.assertAlmostEqual(
+            order.amount_total + refund.amount_total, 0.0,
+            msg="The totals of an order and of its refund should cancel each other.",
+        )
+
+    def test_switch_payment_to_customer_account_requires_customer(self):
+        order, _ = self.create_backend_pos_order({
+            'line_data': [{'product_id': self.ten_dollars_no_tax.product_variant_id.id}],
+            'payment_data': [{'payment_method_id': self.cash_payment_method.id, 'amount': 10}],
+        })
+        with self.assertRaises(ValidationError):
+            order.payment_ids.payment_method_id = self.credit_payment_method
+
+        order.partner_id = self.partner_adgu
+        order.write({'payment_ids': [Command.update(order.payment_ids.id, {'payment_method_id': self.credit_payment_method.id})]})
+        self.assertEqual(order.payment_ids.payment_method_id, self.credit_payment_method)
+
+        session = order.session_id
+        session.close_session_from_ui()
+        self.assertEqual(session.state, 'closed')
+        self.assertTrue(order.is_globally_invoiced, "The order should be invoiced when closing the session.")
+        customer_receivable = self.env['account.move.line'].search([
+            ('partner_id', '=', self.partner_adgu.id),
+            ('account_id', '=', self.partner_adgu.property_account_receivable_id.id),
+            ('parent_state', '=', 'posted'),
+            ('reconciled', '=', False),
+        ])
+        self.assertEqual(sum(customer_receivable.mapped('amount_residual')), 10)

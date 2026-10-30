@@ -6,11 +6,11 @@ import secrets
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
-from odoo.tools import BinaryBytes, consteq, file_open
+from odoo.tools import BinaryBytes, consteq, file_open, plaintext2html
 
 from ..utils.urbanpiper_connector import UrbanPiperConnector
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class PosUrbanPiperStore(models.Model):
@@ -61,7 +61,7 @@ class PosUrbanPiperStore(models.Model):
             with file_open(audio_url, 'rb') as audio_file:
                 return BinaryBytes(audio_file.read())
         except (FileNotFoundError, ValueError):
-            logger.exception('UrbanPiper: Failed to load local default audio %s', audio_url)
+            _logger.exception('UrbanPiper: Failed to load local default audio %s', audio_url)
             return False
 
     def _pos_config_domain(self):
@@ -97,7 +97,7 @@ class PosUrbanPiperStore(models.Model):
             ('total_included', 'Inclusive'),
             ('total_excluded', 'Exclusive')
         ],
-        default=_default_tax_type,
+        default=lambda self: self._default_tax_type(),
         tracking=True,
         help=(
             "Specify whether taxes are included in the price or added separately for UrbanPiper orders.\n"
@@ -206,6 +206,7 @@ class PosUrbanPiperStore(models.Model):
                 # Remove the existing store association before reassigning it.
                 old_config.urbanpiper_store_id = False
                 old_config.module_pos_urban_piper = False
+                old_config.flush_recordset(['urbanpiper_store_id'])
 
             if new_config := store.config_id:
                 # Link the selected PoS config to this store and enable
@@ -239,9 +240,12 @@ class PosUrbanPiperStore(models.Model):
             store.store_product_count = product_count_by_store.get(store.id, 0)
 
     def write(self, vals):
-        if 'config_id' in vals and any(store.is_webhook_register and store.config_id.has_active_session for store in self):
+        if (
+            {'store_identifier', 'config_id'} & vals.keys() and
+            any(store.is_webhook_register and store.config_id.has_active_session for store in self)
+        ):
             raise UserError(_(
-                "You cannot change the Point of Sale while a store session is still open and the store has already been synchronized"
+                "You cannot change the store while its Point of Sale has an active session.\n"
                 "Please close the active session first."
             ))
         if {'urbanpiper_apikey', 'urbanpiper_username', 'use_test_mode'} & vals.keys():
@@ -343,7 +347,8 @@ class PosUrbanPiperStore(models.Model):
             self.action_refresh_webhooks()
         response_json = UrbanPiperConnector(self).post_stores()
         if response_json.get('status') == 'success':
-            self.message_post(body=_('The store has been successfully updated on UrbanPiper.'))
+            # Track who initiated the store synchronization request and when.
+            self.message_post(body=self.env._("Store sync initiated on UrbanPiper."))
         return self._urbanpiper_handle_response(response_json)
 
     def action_sync_menu(self, flush=False):
@@ -440,3 +445,71 @@ class PosUrbanPiperStore(models.Model):
                 'next': {'type': 'ir.actions.act_window_close'},  # force a form reload
             }
         }
+
+    def _process_urbanpiper_store_action(self, data):
+        """
+        # UrbanPiper Webhook Handler
+        Send UrbanPiper store status updates (e.g., delivery aggregator enable/disable) to the POS UI.
+        """
+        self.ensure_one()
+        if not self.config_id:
+            _logger.warning('UrbanPiper: No PoS config linked to store %s for processing store action', self.name)
+            return
+        if self.config_id.current_session_id:
+            self.config_id._notify('STORE_ACTION', data)
+
+    def _process_urbanpiper_inventory_update(self, data):
+        """
+        # UrbanPiper Webhook Handler
+        Process the UrbanPiper inventory sync callback and log the sync summary.
+        Doc: https://api-docs.urbanpiper.com/downstream/api/endpoints/menu/add-update-menu#webhook-callback
+        """
+        self.ensure_one()
+        stats = data['stats']['items']
+        body = self.env._('Store menu synced successfully on UrbanPiper.\n')
+        for key, label in (
+            ('created', self.env._('Created')),
+            ('updated', self.env._('Updated')),
+            ('deleted', self.env._('Deleted')),
+            ('errors', self.env._('Errors')),
+        ):
+            if (value := stats.get(key)):
+                body += self.env._(' - %(label)s: %(value)s\n', label=label, value=value)
+        if failed_items := [
+            item for item in data.get('items', [])
+            if item.get('upipr_status', {}).get('error')
+        ]:
+            body += self.env._('\nItems that could not be synced:\n')
+            body += '\n'.join(
+                f" - {item.get('title')}: {item['upipr_status'].get('err_msg')}"
+                for item in failed_items
+            )
+        self.message_post(
+            body=plaintext2html(body),
+            author_id=self.env.ref('base.partner_root').id
+        )
+
+    def _process_urbanpiper_store_creation(self, data):
+        """
+        # UrbanPiper Webhook Handler
+        Process the UrbanPiper store sync callback and log the result.
+        Doc: https://api-docs.urbanpiper.com/downstream/api/endpoints/stores/add-update-stores#webhook-callback
+        """
+        self.ensure_one()
+        upipr_status = data['stores'][0]['upipr_status']
+
+        if upipr_status.get('error'):
+            body = self.env._(
+                'Store sync failed on UrbanPiper.\n'
+                'Error: %(error)s',
+                error=upipr_status.get('err_msg'),
+            )
+        else:
+            body = self.env._(
+                'Store %(action)s completed on UrbanPiper.',
+                action=self.env._('creation') if upipr_status.get('action') == 'A' else self.env._('update'),
+            )
+        self.message_post(
+            body=plaintext2html(body),
+            author_id=self.env.ref('base.partner_root').id
+        )

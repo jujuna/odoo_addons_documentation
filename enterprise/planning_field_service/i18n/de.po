@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~19.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-09-17 23:59+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-19 08:28+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-20/"
 "planning_field_service/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -36,16 +36,6 @@ msgstr "%(display_name)s (%(partner_city)s)"
 #: code:addons/planning_field_service/models/planning_slot.py:0
 msgid "%(employee)s requested a replacement for this shift."
 msgstr ""
-
-#. module: planning_field_service
-#. odoo-javascript
-#: code:addons/planning_field_service/static/src/js/tours/planning_field_service_tour.js:0
-msgid ""
-"<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "
-"equipment if needed.</i>"
-msgstr ""
-"<b>Ressource zuweisen</b><br/><i>Fügen Sie bei Bedarf mehrere Techniker "
-"hinzu oder reservieren Sie Ausrüstung.</i>"
 
 #. module: planning_field_service
 #. odoo-javascript
@@ -838,12 +828,12 @@ msgstr ""
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Email Template"
-msgstr ""
+msgstr "E-Mail-Vorlage zur Bestätigung des Außendiensteinsatzes"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_company__field_service_confirmation_mail_template_id
 msgid "Field Service Confirmation Mail Template"
-msgstr ""
+msgstr "E-Mail-Vorlage zur Bestätigung des Außendiensteinsatzes"
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_res_config_settings__rating_shift_request_mail_template_id
@@ -910,6 +900,11 @@ msgstr "Follower"
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Follower (Partner)"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Future Activities"
+msgstr ""
 
 #. module: planning_field_service
 #. odoo-python
@@ -1044,6 +1039,11 @@ msgid "Landscaper"
 msgstr "Landschaftsgärtner"
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Late Activities"
+msgstr ""
+
+#. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_resource_resource__live_latitude
 msgid "Live Latitude"
 msgstr "Aktueller Breitengrad"
@@ -1126,7 +1126,7 @@ msgstr "Marc Demo"
 #. module: planning_field_service
 #: model:ir.model.fields,help:planning_field_service.field_planning_slot__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Material-Symbols-Icon, z. B. Checkliste"
 
 #. module: planning_field_service
 #: model_terms:ir.actions.act_window,help:planning_field_service.rating_rating_action_planning_field_service
@@ -1164,6 +1164,11 @@ msgstr "Nachrichten"
 #: model:ir.ui.menu,name:planning_field_service.planning_menu_planning_my
 msgid "My"
 msgstr "Meine"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "My Activities"
+msgstr ""
 
 #. module: planning_field_service
 #: model:ir.model.fields,field_description:planning_field_service.field_planning_slot__my_activity_date_deadline
@@ -1524,6 +1529,11 @@ msgid "Shifts to Schedule"
 msgstr ""
 
 #. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Show all records whose next activity date is past"
+msgstr ""
+
+#. module: planning_field_service
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_form
 msgid "Sign Field Service Report"
 msgstr "Tätigkeitsbericht unterzeichnen"
@@ -1714,6 +1724,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:planning_field_service.portal_my_field_service_report_list
 msgid "To Review"
 msgstr "Zu prüfen"
+
+#. module: planning_field_service
+#: model_terms:ir.ui.view,arch_db:planning_field_service.planning_slot_view_search_activities
+msgid "Today Activities"
+msgstr ""
 
 #. module: planning_field_service
 #. odoo-python
@@ -1909,6 +1924,13 @@ msgid ""
 msgstr ""
 "{{ object.company_id.name or object.user_id.company_id.name }}: Anfrage zur "
 "Bewertung der Dienstleistung"
+
+#~ msgid ""
+#~ "<b>Assign a resource</b><br/><i>Add multiple technicians or reserve "
+#~ "equipment if needed.</i>"
+#~ msgstr ""
+#~ "<b>Ressource zuweisen</b><br/><i>Fügen Sie bei Bedarf mehrere Techniker "
+#~ "hinzu oder reservieren Sie Ausrüstung.</i>"
 
 #~ msgid "Field Service Resources Changed"
 #~ msgstr "Ausßendienstressource geändert"

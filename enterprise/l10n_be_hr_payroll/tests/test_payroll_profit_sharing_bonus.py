@@ -59,8 +59,10 @@ class TestPayrollProfitSharingBonus(TestPayrollBase, TestBelgiumCommon):
     def test_profit_sharing_bonus_no_withholding_tax(self):
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
         payslip.version_id.no_withholding_taxes = True
-        payslip._set_input_value('PROFITSHARINGLOW', 2452.87)
-        payslip._set_input_value('PROFITSHARINGHIGH', 2452.87)
+        payslip._set_input_values({
+            'PROFITSHARINGLOW': 2452.87,
+            'PROFITSHARINGHIGH': 2452.87,
+        })
         payslip.compute_sheet()
         payslip_results = {'PROFITSHARINGLOW': 2452.87, 'BEPROFITSHARING_BASIC': 4905.74, 'PROFITSHARINGHIGH': 2452.87, 'PROFITSHARING_SALARY': 4905.74, 'ONSS_PROFITSHARING': -641.18, 'ONSSTOTAL': 641.18, 'PPTOTAL': 0.0, 'NET': 4264.56}
         self._validate_payslip(payslip, payslip_results)

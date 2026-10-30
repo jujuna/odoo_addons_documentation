@@ -188,6 +188,18 @@ test("'Add Closing Day' button rendering - 2", async () => {
     });
 });
 
+test("Total row only displayed for a single appointment type", async () => {
+    const arch = CalendarEvent._views.gantt.replace("<gantt", '<gantt total_row="1"');
+    await mountGanttView({ resModel: "calendar.event", arch });
+    expect(".o_gantt_row_total").toHaveCount(0);
+    await mountGanttView({
+        resModel: "calendar.event",
+        arch,
+        context: { default_appointment_type_id: 1 },
+    });
+    expect(".o_gantt_row_total").toHaveCount(2); // Row's sidebar cell + grid content
+});
+
 test("group pill colors", async () => {
     mockDate("2022-01-12 11:00:00", 0);
     Object.assign(CalendarEvent._records[0], {

@@ -7,7 +7,7 @@ class HrContractSalaryBenefit(models.Model):
     l10n_be_joint_committee_ids = fields.Many2many(
         comodel_name='l10n.be.joint.committee',
         string="Joint Committees",
-        help="List all joint committees where the benefit rule should be applied",
+        help="The benefit is activated with the first of these joint committees, and archived with the last one.",
         context={'active_test': False},
     )
     l10n_be_excluded_joint_committee_ids = fields.Many2many(

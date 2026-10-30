@@ -501,6 +501,8 @@ class StockPicking(models.Model):
         return dte_barcode_xml['barcode'], signed_dte
 
     def _l10n_cl_get_dte_envelope(self, receiver_rut='60803000-K'):
+        if not self.l10n_cl_dte_file:
+            return False, False
         file_name = 'F{}T{}.xml'.format(self.l10n_latam_document_number, self.l10n_latam_document_type_id.code)
         digital_signature_sudo = self.company_id.sudo()._get_digital_signature(user_id=self.env.user.id)
         # Guia is always DTE
@@ -528,6 +530,8 @@ class StockPicking(models.Model):
 
     def _l10n_cl_create_partner_dte(self):
         dte_signed, file_name = self._l10n_cl_get_dte_envelope(self.partner_id.vat)
+        if not dte_signed:
+            return False
         dte_partner_attachment = self.env['ir.attachment'].create({
             'name': file_name,
             'res_model': self._name,
@@ -545,6 +549,8 @@ class StockPicking(models.Model):
     def _l10n_cl_send_dte_to_partner(self):
         # We need a DTE with the partner vat as RutReceptor to be sent to the partner
         dte_partner_attachment = self._l10n_cl_create_partner_dte()
+        if not dte_partner_attachment:
+            return
         self.env.ref('l10n_cl_edi_stock.l10n_cl_edi_email_template_picking').send_mail(
             self.id, email_values={'attachment_ids': [dte_partner_attachment.id]})
         self.l10n_cl_dte_partner_status = 'sent'

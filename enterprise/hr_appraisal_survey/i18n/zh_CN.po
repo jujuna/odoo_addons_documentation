@@ -5,15 +5,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 00:38+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-10-09 17:48+0000\n"
+"PO-Revision-Date: 2026-10-11 12:35+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/hr_appraisal_survey/zh_Hans/>\n"
+"projects/odoo-20/hr_appraisal_survey/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,6 +29,8 @@ msgid ""
 "This module adds an integration with Survey to ask feedbacks to any "
 "employee, based on a survey to fill.\n"
 msgstr ""
+"\n"
+"本模块集成了调查功能，可通过填写调查问卷向任何员工征求反馈。\n"
 
 #. module: hr_appraisal_survey
 #: model:ir.actions.act_window,name:hr_appraisal_survey.survey_survey_action_appraisal
@@ -86,11 +89,46 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "
+"20px;\">\n"
+"                    尊敬的 <t t-out=\"object.partner_id.name or "
+"'participant'\">[参与者]</t>，\n"
+"                    <br/>\n"
+"                    作为我们 360° 反馈流程的一部分，<t t-out=\"ctx.get"
+"('logged_user')\">[当前用户]</t> 希望了解您对 <t t-out=\"ctx.get('employee')"
+"\">[该员工]</t> 绩效表现的看法。\n"
+"                    <br/>\n"
+"                    您的反馈有助于我们识别优势并发现成长机会。\n"
+"                    <br/>\n"
+"                    只需几分钟，您可以通过下方链接提交您的反馈：\n"
+"                    <br/>\n"
+"                    <div style=\"text-align: center; margin: 24px 0;\">\n"
+"                        <a t-att-href=\"object.get_start_url()\" t-attf-"
+"style=\"background-color: {{user.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size:13px;\">\n"
+"                            提供您的反馈\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    请在以下日期之前完成调查：<t t-out=\"ctx.get('deadline')"
+"\">[指定截止日期]</t>。\n"
+"                    <br/>\n"
+"                    感谢您付出的时间和坦诚！\n"
+"                    <br/>\n"
+"                    <t t-if=\"ctx.get('user_body')\">\n"
+"                        <div class=\"my-3 py-2 px-3 bg-300\">\n"
+"                            <t t-out=\"ctx.get('user_body')\">[可选备注]</t>"
+"\n"
+"                        </div>\n"
+"                    </t>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "<i class=\"oi me-2\" data-icon=\"east\"/>Go to Appraisal"
-msgstr ""
+msgstr "<i class=\"oi me-2\" data-icon=\"east\"/>前往评价"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
@@ -174,15 +212,6 @@ msgid "Almost always"
 msgstr "几乎总是"
 
 #. module: hr_appraisal_survey
-#. odoo-python
-#: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
-msgid ""
-"An appraisal feedback was requested. Please take time to fill the <a "
-"href=\"%s\" target=\"_blank\">survey</a>"
-msgstr ""
-"要求进行一次评估反馈。请花时间填写<a href=\"%s\" target=\"_blank\">调查表</a>"
-
-#. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_11
 msgid "Analytical and synthetic mind"
 msgstr "分析和综合思维"
@@ -202,7 +231,7 @@ msgstr "评价"
 #. module: hr_appraisal_survey
 #: model:ir.module.module,shortdesc:base.module_hr_appraisal_survey
 msgid "Appraisal - Survey"
-msgstr ""
+msgstr "评价 - 调查"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_id
@@ -292,7 +321,7 @@ msgstr "可以编辑主体"
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_select_survey_view_form
 msgid "Choose Survey"
-msgstr ""
+msgstr "选择调查"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_3
@@ -434,7 +463,7 @@ msgstr "对项目/任务的热情和憧憬"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_template_view_form
 msgid "Every template allowed"
-msgstr ""
+msgstr "允许所有模板"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
@@ -504,7 +533,7 @@ msgstr "根据员工未来一年的职业持续发展，提出您建议的专业
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "If you need,"
-msgstr ""
+msgstr "如果需要，"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_5
@@ -600,7 +629,7 @@ msgstr "从不"
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 msgid "No surveys found for this appraisal."
-msgstr ""
+msgstr "未找到此评价的调查问卷。"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2_1
@@ -615,7 +644,7 @@ msgstr "经常"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
 msgid "Optional comment..."
-msgstr ""
+msgstr "可选备注..."
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_appraisal_ask_feedback__lang
@@ -755,7 +784,7 @@ msgstr "在制定解决方案之前寻求了解问题"
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_appraisal_select_survey
 msgid "Select survey type for an appraisal to show its results"
-msgstr ""
+msgstr "选择评价的调查类型以显示其结果"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
@@ -775,7 +804,7 @@ msgstr "发送给员工以收集评估反馈"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_survey_view_form
 msgid "Shared with everybody"
-msgstr ""
+msgstr "与所有人共享"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_4
@@ -832,7 +861,7 @@ msgstr "调查反馈"
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__survey_input_ids
 msgid "Survey Inputs"
-msgstr ""
+msgstr "调查输入"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_survey_question_answer
@@ -919,7 +948,7 @@ msgstr ""
 msgid ""
 "The survey templates available to choose from for the appraisals that use "
 "this template."
-msgstr ""
+msgstr "使用此模板的评价可从中选择的调查模板。"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.survey,description:hr_appraisal_survey.appraisal_feedback_template
@@ -1041,23 +1070,23 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 msgid "You can't ask feedback for multiple appraisals at once."
-msgstr ""
+msgstr "无法同时为多个评价征求反馈。"
 
 #. module: hr_appraisal_survey
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/survey_survey.py:0
 msgid "You can't select multiple feedback templates."
-msgstr ""
+msgstr "无法选择多个反馈模板。"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "ask feedback"
-msgstr ""
+msgstr "征求反馈"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
 msgid "at the request of"
-msgstr ""
+msgstr "应以下人员的要求"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_fill_form_start
@@ -1080,7 +1109,14 @@ msgstr "或"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "to a selection of colleagues you work with."
-msgstr ""
+msgstr "向与您共事的部分同事。"
+
+#~ msgid ""
+#~ "An appraisal feedback was requested. Please take time to fill the <a "
+#~ "href=\"%s\" target=\"_blank\">survey</a>"
+#~ msgstr ""
+#~ "要求进行一次评估反馈。请花时间填写<a href=\"%s\" target=\"_blank\">调查表"
+#~ "</a>"
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "

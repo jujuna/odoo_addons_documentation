@@ -60,7 +60,10 @@ class HrPayslip(models.Model):
         }
 
     def _get_document_members(self):
-        return [(self.employee_id.user_id.partner_id or self.employee_id.work_contact_id, ('view', False))]
+        return [(self._get_document_partner(), ('view', False))]
+
+    def _get_document_partner(self):
+        return self.employee_id.user_id.partner_id or self.employee_id.work_contact_id
 
     def _get_document_folder(self):
         return self.employee_id.hr_employee_payroll_folder_id
@@ -85,6 +88,10 @@ class HrPayslip(models.Model):
             for document in attachments.document_ids
         ])
 
+    def _check_create_documents(self):
+        self.ensure_one()
+        return self.state in ('validated', 'paid') and super()._check_create_documents()
+
     def _get_email_template(self):
         return self.env.ref(
             'documents_hr_payroll.mail_template_new_payslip', raise_if_not_found=False
@@ -92,13 +99,17 @@ class HrPayslip(models.Model):
 
     def _compute_document_access_url(self):
         documents = self.env["documents.document"].search(
-            [('res_model', '=', self._name), ('res_id', 'in', self.ids)],
+            [
+                ('res_model', '=', self._name),
+                ('res_id', 'in', self.ids),
+                ('shortcut_document_id', '=', False),
+            ],
             order='res_id, id desc'
         )
         access_url_per_payslip = dict()
         for document in documents:
             if document.res_id not in access_url_per_payslip:  # keep last document for each payslip
-                access_url_per_payslip[document.res_id] = document.access_url
+                access_url_per_payslip[document.res_id] = f"{document.access_url}?documents_init_open_preview="
         for payslip in self:
             payslip.document_access_url = access_url_per_payslip.get(payslip.id)
 

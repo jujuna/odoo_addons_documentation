@@ -264,10 +264,6 @@ class AccountReturn(models.Model):
         # OVERRIDE
         self._check_all_branches_allowed()
         if self.type_external_id == 'l10n_be_reports.be_vat_return_type':
-            if self.company_id.l10n_be_intervat_mode != 'disabled':
-                if not self.company_id._l10n_be_intervat_is_authentication_valid():
-                    return self.company_id._l10n_be_intervat_authentication_action(self.id, 'submit')
-                return self._l10n_be_submit_xml()
             return self.env['l10n_be_reports.vat.return.submission.wizard']._open_submission_wizard(self)
 
         if self.type_external_id == 'account_reports.annual_corporate_tax_return_type' and self.company_id.account_fiscal_country_id.code == 'BE':
@@ -343,7 +339,9 @@ class AccountReturn(models.Model):
 
     def _l10n_be_submit_xml(self):
         self.write({'l10n_be_submission_error': False})
-        att = next(a for a in self.attachment_ids if a.res_name == self.name and a.name.endswith('.xml'))
+        att = self.attachment_ids.filtered(lambda a: a.res_name == self.name and a.name.endswith('.xml'))[:1]
+        if not att:
+            raise UserError(self.env._("The XML to send to intervat is not generated."))
         try:
             response = self.company_id._l10n_be_post_vat_declaration(att.raw.content, att.name)
         except UserError as e:
@@ -354,7 +352,7 @@ class AccountReturn(models.Model):
                 'title': self.env._("Submission Error"),
                 'message': e.args[0],
             })
-            return 'error'
+            return
 
         if response is None:
             return self.company_id._l10n_be_intervat_authentication_action(self.id, 'submit')

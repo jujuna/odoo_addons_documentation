@@ -333,10 +333,13 @@ class HrEmployee(models.Model):
             payrun = employee.env['hr.payslip.run'].browse(payrun_id)
             employee.off_cycle_invisible = payrun and payrun.state not in ['00_draft', '01_ready']
 
-    def action_move_to_off_cycle(self):
+    def get_benefit_fields_value(self, version_id):
+        if not self.env.user.has_groups('hr_payroll.group_hr_payroll_user'):
+            return []
         self.ensure_one()
-        payrun_id = self.env.context.get('payrun_id')
-        payrun = self.env['hr.payslip.run'].browse(payrun_id)
-        if payrun:
-            return payrun.action_move_to_off_cycle(self.id)
-        return None
+        version = self.version_id
+        if version_id:
+            version = self.env['hr.version'].browse(version_id)
+            if version.employee_id != self:
+                raise ValueError(self.env._("The corresponding version does not belong to employee %(name)s.", name=self.name))
+        return version.get_benefit_fields_value()

@@ -141,6 +141,47 @@ class TestDeliveryUPS(DeliveryUPSCommon):
             picking.cancel_shipment()
             self.assertEqual(picking.carrier_tracking_ref, False, 'Shipment cancel failed')
 
+    def test_ups_basic_intl_flow(self):
+        """
+        Basic delivery flow, to an international "res.partner" with a VAT number.
+        """
+        def delivery_confirmation_data_check(endpoint, payload):
+            if endpoint == "ship":
+                tax_info = payload["ShipmentRequest"]["Shipment"]["GlobalTaxInformation"]['AgentTaxIdentificationNumber'][0]['TaxIdentificationNumber'][0]
+                self.assertEqual(
+                    (tax_info['IdentificationNumber'], tax_info['IDNumberIssuingCntryCd']),
+                    ("123.45-6789", "HK")
+                )
+                reference_number = payload["ShipmentRequest"]["Shipment"]["ReferenceNumber"][0]
+                self.assertEqual(reference_number, {"Code": "BM", "Value": picking.name})
+
+        self.hong_kong_partner.vat = "123.45-6789"
+        sale_order = self.env["sale.order"].create({
+            "partner_id": self.hong_kong_partner.id,
+            "order_line": [(0, 0, {
+                "product_id": self.product.id,
+                "name": "Fancy box",
+                "product_uom_qty": 1.0,
+                "price_unit": 20,
+            })]
+        })
+        wiz_action = sale_order.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action["res_model"]].with_context(wiz_action["context"]).create({
+            "carrier_id": self.ups_delivery.id,
+            "order_id": sale_order.id
+        })
+        with _mock_request_call(delivery_confirmation_data_check):
+            choose_delivery_carrier.update_price()
+            choose_delivery_carrier.button_confirm()
+            sale_order.action_confirm()
+
+            picking = sale_order.picking_ids[0]
+            self.assertEqual(picking.carrier_id.id, sale_order.carrier_id.id)
+            picking._action_done()
+            self.assertEqual(picking.carrier_tracking_ref, "123")
+            picking.cancel_shipment()
+            self.assertEqual(picking.carrier_tracking_ref, False)
+
     def test_ups_rest_sends_correct_delivery_type_for_amazon(self):
         amazon_expected_delivery_type = self.ups_delivery._get_delivery_type()
         self.assertEqual(amazon_expected_delivery_type, 'ups')
@@ -409,3 +450,47 @@ class TestDeliveryUPS(DeliveryUPSCommon):
             with self.assertRaises(UserError, msg="Shipper Phone should be at least 1 character") as ue_shipper_short:
                 choose_delivery_carrier.update_price()
             self.assertIn("Shipper Phone must be between 1 and 15", str(ue_shipper_short.exception))
+
+    def test_ups_canary_island_delivery(self):
+        def canary_island_country_code_check(endpoint, payload):
+            if endpoint == 'ship':
+                ship_to = payload['ShipmentRequest']['Shipment']['ShipTo']
+                sold_to = payload['ShipmentRequest']['Shipment']['ShipmentServiceOptions']['InternationalForms']['Contacts']['SoldTo']
+                self.assertEqual(ship_to['Address']['CountryCode'], 'IC')
+                self.assertEqual(sold_to['Address']['CountryCode'], 'ES')
+
+        canarito_address = self.env['res.partner'].create([
+            {
+                'name': 'Canary Island Address',
+                'country_id': self.env.ref('base.es').id,
+                'street': 'Calle del Canarito 1',
+                'state_id': self.env.ref('base.state_es_gc').id,
+                'city': "Arucas",
+                'phone': '1234567890',
+                'zip': '35414',
+            },
+        ])
+        sale_order = self.env['sale.order'].create({
+            'partner_id': canarito_address.id,
+            'order_line': [Command.create({
+                'product_id': self.product.id,
+                'name': "Fancy box",
+                'product_uom_qty': 1.0,
+                'price_unit': 20,
+            })]
+        })
+        wiz_action = sale_order.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.ups_delivery.id,
+            'order_id': sale_order.id
+        })
+        with _mock_request_call(canary_island_country_code_check):
+            choose_delivery_carrier.update_price()
+            choose_delivery_carrier.button_confirm()
+            sale_order.action_confirm()
+            self.assertGreater(len(sale_order.picking_ids), 0)
+
+            picking = sale_order.picking_ids[0]
+            picking.action_assign()
+            picking.move_line_ids[0].quantity = 1.0
+            picking._action_done()

@@ -20,6 +20,8 @@ patch(OboxActionButton.prototype, {
                 return _t("Request screenshot");
             case "action_request_logs":
                 return _t("Request logs");
+            case "action_kiosk_update":
+                return _t("Update App");
             default:
                 return super.label;
         }
@@ -33,6 +35,10 @@ patch(OboxActionButton.prototype, {
                 return _t("Unlock the screen on this device?");
             case "action_kiosk_reload":
                 return _t("Reload the page on this device?");
+            case "action_kiosk_update":
+                return _t(
+                    "The device downloads the latest app release and installs it silently, then restarts the app. It only proceeds when the screen has been idle for 5 minutes."
+                );
             default:
                 return super.confirmationSentence;
         }

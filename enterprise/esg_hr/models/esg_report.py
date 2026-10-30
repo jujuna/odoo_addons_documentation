@@ -27,6 +27,7 @@ class EsgReport(models.Model):
                     SELECT employee_id, MAX(date_version) AS max_date
                     FROM hr_version
                     WHERE date_version <= %(end_date)s
+                      AND active = TRUE
                 GROUP BY employee_id
                 ) latest_employee_version
                     ON hv.employee_id = latest_employee_version.employee_id

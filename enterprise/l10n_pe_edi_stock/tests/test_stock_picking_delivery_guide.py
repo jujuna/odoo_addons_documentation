@@ -436,3 +436,25 @@ class TestPEDeliveryGuideCommon(TestPeEdiCommon):
         html = self.env['ir.actions.report']._render_qweb_html('stock.report_deliveryslip', self.picking.ids)[0]
         self.assertIn(b'TEST_QR_VALUE', html)
         self.assertIn(b'Sender Electronic Delivery Guide', html)
+
+    def test_address_type_code_omitted_for_reason_18(self):
+        """ The AddressTypeCode in the DeliveryAddress must be omitted when the transfer reason is 18."""
+
+        # Try transfer reason 18
+        self.picking.l10n_latam_document_number = "T001-00000002"
+        self.picking.l10n_pe_edi_reason_for_transfer = '18'
+        ubl_reason_18 = self.picking._l10n_pe_edi_create_delivery_guide()
+        tree_reason_18 = self.get_xml_tree_from_string(ubl_reason_18)
+        namespaces = {
+            'cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
+            'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
+        }
+        delivery_address_type_code_18 = tree_reason_18.xpath('//cac:Delivery/cac:DeliveryAddress/cbc:AddressTypeCode', namespaces=namespaces)
+        self.assertFalse(delivery_address_type_code_18)
+
+        # Try another transfer reason (ex. 01)
+        self.picking.l10n_pe_edi_reason_for_transfer = '01'
+        ubl_reason_01 = self.picking._l10n_pe_edi_create_delivery_guide()
+        tree_reason_01 = self.get_xml_tree_from_string(ubl_reason_01)
+        delivery_address_type_code_01 = tree_reason_01.xpath('//cac:Delivery/cac:DeliveryAddress/cbc:AddressTypeCode', namespaces=namespaces)
+        self.assertTrue(delivery_address_type_code_01)

@@ -24,6 +24,7 @@ class HrVersion(models.Model):
         store=True,
         readonly=False,
         tracking=True,
+        groups="hr_payroll.group_hr_payroll_user",
         help="Average monthly wage carried over from before the employee's first payslip in the system, so historical payroll data does not need to be re-entered."
     )
 

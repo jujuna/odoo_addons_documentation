@@ -34,7 +34,17 @@
                                 <span> weeks</span>
                             </div>
                             <field name="departure_date" readonly="l10n_be_notice_respect != 'partial'"/>
-                            <field name="l10n_be_professional_reclassification" string="Outplacement" placeholder="None" widget="outplacement_selection"
+                            <field name="l10n_be_work_time_rate" invisible="1"/>
+                            <field name="l10n_be_special_outplacement_warning" invisible="1"/>
+                            <div class="o_row gap-2" invisible="l10n_be_reason_code not in (342, 358, 359)">
+                                <label for="l10n_be_professional_reclassification" string="Outplacement" invisible="l10n_be_reason_code not in (342, 358, 359)"/>
+                                <i class="oi oi-filled text-info" data-icon="info" role="img"
+                                    invisible="not l10n_be_special_outplacement_warning"
+                                    aria-label="Since work rate of this employee is less than 50%, outplacement (Special Scheme) is not mandatory, unless requested directly from the employee."
+                                    title="Since work rate of this employee is less than 50%, outplacement (Special Scheme) is not mandatory, unless requested directly from the employee."
+                                    data-tooltip="Since work rate of this employee is less than 50%, outplacement (Special Scheme) is not mandatory, unless requested directly from the employee."/>
+                            </div>
+                            <field name="l10n_be_professional_reclassification" string="Outplacement" placeholder="None" widget="outplacement_selection" nolabel="1"
                                 invisible="l10n_be_reason_code not in (342, 358, 359)"/>
                         </group>
                         <group>

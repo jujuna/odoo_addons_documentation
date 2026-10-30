@@ -41,6 +41,22 @@ class TestOboxPos(TransactionCase):
 
         self.assertFalse(self.env["obox.obox"].search(domain))
 
+    def test_the_pos_loads_the_serial_of_the_box_behind_a_printer(self):
+        device = self.env["obox.device"].create({
+            "name": "Kitchen",
+            "identifier": "usb_kitchen",
+            "type": "printer",
+            "obox_id": self.obox.id,
+        })
+        printer = self.env["pos.printer"].create({
+            "name": "Kitchen printer",
+            "printer_type": "obox",
+            "obox_device_id": device.id,
+        })
+
+        self.assertIn("obox_serial", self.env["pos.printer"]._load_pos_data_fields(self.pos_config))
+        self.assertEqual(printer.obox_serial, "POS-TEST")
+
     def test_the_pos_session_loads_oboxes_and_their_devices(self):
         models = self.env["pos.session"]._load_pos_data_models(self.pos_config)
 

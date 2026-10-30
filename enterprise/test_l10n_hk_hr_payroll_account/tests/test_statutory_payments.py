@@ -180,8 +180,10 @@ class TestStatutoryPayments(TestL10NHkHrPayrollAccountCommon):
             employee=self.veteran,
             termination_reason='l10n_hk_hr_payroll.hr_departure_reason_redundancy',
         )
-        last_payslip._set_input_value('TERMINATION_PAYMENT_PRE_TRANSITION', 375000.00)
-        last_payslip._set_input_value('TERMINATION_PAYMENT_POST_TRANSITION', 25000.00)
+        last_payslip._set_input_values({
+            'TERMINATION_PAYMENT_PRE_TRANSITION': 375000.00,
+            'TERMINATION_PAYMENT_POST_TRANSITION': 25000.00,
+        })
         last_payslip.compute_sheet()  # As this changes the outcome of the already computed lines, recomputation is needed.
         # In practice this setup is wrong, as pre+post is above 390k. Here, we just make sure that we protect the final payout
         # from being illegally over the cap even if manual overrides would trigger it.
@@ -247,8 +249,10 @@ class TestStatutoryPayments(TestL10NHkHrPayrollAccountCommon):
         )
         base_net = last_payslip.line_ids.filtered(lambda line: line.code == 'NET').total
 
-        last_payslip._set_input_value('TERMINATION_PAYMENT_PRE_TRANSITION_OFFSET', 100000.00)
-        last_payslip._set_input_value('TERMINATION_PAYMENT_POST_TRANSITION_OFFSET', 1000.00)
+        last_payslip._set_input_values({
+            'TERMINATION_PAYMENT_PRE_TRANSITION_OFFSET': 100000.00,
+            'TERMINATION_PAYMENT_POST_TRANSITION_OFFSET': 1000.00,
+        })
         result = {
             'TERMINATION_PAYMENT_PRE_TRANSITION': 379931.51,
             'TERMINATION_PAYMENT_POST_TRANSITION': 10068.49,
@@ -383,8 +387,10 @@ class TestStatutoryPayments(TestL10NHkHrPayrollAccountCommon):
             employee=self.veteran,
             termination_reason='l10n_hk_hr_payroll.hr_departure_reason_redundancy',
         )
-        last_payslip._set_input_value('PAYMENT_IN_LIEU_OF_NOTICE', 2)  # 2 months
-        last_payslip._set_input_value('CUST_AVG_MONTHLY_SALARY', 50000)
+        last_payslip._set_input_values({
+            'PAYMENT_IN_LIEU_OF_NOTICE': 2,
+            'CUST_AVG_MONTHLY_SALARY': 50000,
+        })
         result = {
             'PAYMENT_IN_LIEU_OF_NOTICE': 100000.00,
         }

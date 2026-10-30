@@ -11,15 +11,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:15+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"PO-Revision-Date: 2026-10-11 12:34+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/account_followup/zh_Hans/>\n"
+"projects/odoo-20/account_followup/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -53,11 +54,30 @@ msgid ""
 "reminders\n"
 "        to multiple customers at once using the 'Send Reminders' action.\n"
 msgstr ""
+"\n"
+"用于自动发送未付发票催款函的模块，支持多级催款。\n"
+"=========================================================================\n"
+"\n"
+"您可以通过开票设置定义多个催款级别：\n"
+"-----------------------------------------------------------------------------"
+"\n"
+"    配置 / 设置 / 客户发票 / 自动发票提醒\n"
+"\n"
+"功能：\n"
+"---------\n"
+"    - 根据逾期时长自动进行多级提醒。\n"
+"    - 发送与打印集成：\n"
+"        如果对一张逾期发票再次执行发送与打印，系统\n"
+"        会自动切换到合适的提醒模板并附上\n"
+"        跟进报告。\n"
+"    - 批量提醒：\n"
+"        用户可以在列表视图中选择多张发票，并使用“发送提醒”操作\n"
+"        一次向多个客户发送提醒。\n"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "\"Automatic Invoice Reminders\" is currently disabled."
-msgstr ""
+msgstr "“自动发票提醒”目前已禁用。"
 
 #. module: account_followup
 #. odoo-python
@@ -1047,12 +1067,12 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
 msgid "<span class=\"o_stat_text\">Open Items</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">未结项目</span>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "<strong class=\"text-muted\">To: </strong>"
-msgstr ""
+msgstr "<strong class=\"text-muted\">收件人：</strong>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -1114,7 +1134,7 @@ msgstr "警告"
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__automatic
 msgid "Automatic"
-msgstr ""
+msgstr "自动"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_company__automatic_invoice_reminder
@@ -1143,14 +1163,14 @@ msgstr "正文内容与模板相同"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_mail_compose_message__cached_followup_attachment_id
 msgid "Cached Followup Report"
-msgstr ""
+msgstr "缓存的跟进报告"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_mail_compose_message__cached_followup_attachment_id
 msgid ""
 "Caches the generated followup report to prevent recalculation when switching "
 "templates."
-msgstr ""
+msgstr "缓存已生成的跟进报告，以免切换模板时重新计算。"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__can_edit_body
@@ -1176,6 +1196,8 @@ msgid ""
 "                'Manual' pauses all automatic reminders and level updates "
 "for this partner."
 msgstr ""
+"选择此合作伙伴的提醒处理方式。\n"
+"                “手动”会暂停此合作伙伴的所有自动提醒和级别更新。"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
@@ -1351,7 +1373,7 @@ msgstr "EMail模板"
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_mail_compose_message
 msgid "Email composition wizard"
-msgstr ""
+msgstr "EMail撰写向导"
 
 #. module: account_followup
 #. odoo-python
@@ -1412,7 +1434,7 @@ msgstr "第四次跟进提醒"
 #. odoo-python
 #: code:addons/account_followup/models/ir_cron.py:0
 msgid "Go to Settings"
-msgstr ""
+msgstr "前往设置"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__has_moves
@@ -1448,13 +1470,13 @@ msgstr "设置催款通知是在发票到期日前发送，还是到期日后发
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Invoice Follow-ups"
-msgstr ""
+msgstr "发票跟进"
 
 #. module: account_followup
 #: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
 #: model:ir.ui.menu,name:account_followup.account_followup_menu
 msgid "Invoice Reminders"
-msgstr ""
+msgstr "发票提醒"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -1491,7 +1513,7 @@ msgstr "语言"
 #: model:ir.model.fields,field_description:account_followup.field_account_bank_statement_line__last_auto_reminder
 #: model:ir.model.fields,field_description:account_followup.field_account_move__last_auto_reminder
 msgid "Last Automatic Reminder"
-msgstr ""
+msgstr "上次自动提醒"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_bank_statement_line__last_reminder
@@ -1535,7 +1557,7 @@ msgstr "管理您的自动提醒"
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__manual
 msgid "Manual"
-msgstr ""
+msgstr "手动"
 
 #. module: account_followup
 #. odoo-python
@@ -1558,13 +1580,13 @@ msgstr "名称"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_next_action_date
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_next_action_date
 msgid "Next Reminder"
-msgstr ""
+msgstr "下次提醒"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_next_action_date
 #: model:ir.model.fields,help:account_followup.field_res_users__followup_next_action_date
 msgid "No Reminder action will be taken before this date."
-msgstr ""
+msgstr "在此日期之前不会执行任何提醒操作。"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_note
@@ -1579,7 +1601,7 @@ msgstr "通知"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Open settings"
-msgstr ""
+msgstr "打开设置"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_followup_manual_reminder__lang
@@ -1606,7 +1628,7 @@ msgstr "合作伙伴应有电子邮件地址。"
 #. module: account_followup
 #: model:ir.module.module,shortdesc:base.module_account_followup
 msgid "Payment Follow-up Management"
-msgstr ""
+msgstr "付款跟进管理"
 
 #. module: account_followup
 #: model:mail.template,name:account_followup.mail_template_payment_reminder_before_due
@@ -1616,17 +1638,17 @@ msgstr "到期日前的付款提醒"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Preview, the content will be adapted per client"
-msgstr ""
+msgstr "预览，内容将根据客户进行调整"
 
 #. module: account_followup
 #: model:ir.actions.report,name:account_followup.action_report_followup
 msgid "Print Reminder Letter"
-msgstr ""
+msgstr "打印催款函"
 
 #. module: account_followup
 #: model:ir.actions.server,name:account_followup.action_account_reports_customer_statements_do_followup
 msgid "Process Automatic Reminders"
-msgstr ""
+msgstr "处理自动提醒"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
@@ -1638,12 +1660,12 @@ msgstr "提醒"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_line_id
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_line_id
 msgid "Reminder Level"
-msgstr ""
+msgstr "提醒级别"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__followup
 msgid "Reminder Responsible"
-msgstr ""
+msgstr "提醒负责人"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__reminder_timing
@@ -1653,13 +1675,13 @@ msgstr "提醒时间"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.report_followup_print_all
 msgid "Reminder details"
-msgstr ""
+msgstr "提醒详情"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_reminder_type
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_reminder_type
 msgid "Reminders"
-msgstr ""
+msgstr "提醒"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__render_model
@@ -1696,7 +1718,7 @@ msgstr "安排活动"
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_ir_cron
 msgid "Scheduled Action"
-msgstr ""
+msgstr "计划操作"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
@@ -1771,7 +1793,7 @@ msgstr "向客户发送第二封催款通知，并附上其发票"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_config_settings_view_form
 msgid "Send reminders for invoices and customer statement"
-msgstr ""
+msgstr "发送发票和对账单提醒"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__delay
@@ -1826,12 +1848,12 @@ msgstr "设置账单到期日前/到期日后等待多少天再发送提醒通�
 msgid ""
 "The responsible assigned to manual reminder activities, if defined in the "
 "level."
-msgstr ""
+msgstr "分配给手动提醒活动的负责人（若级别中已定义）。"
 
 #. module: account_followup
 #: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_days_uniq
 msgid "There can only be one reminder level with a given delay (per company)"
-msgstr ""
+msgstr "同一公司每个给定的延迟天数只能有一个提醒级别"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_bank_statement_line__last_auto_reminder
@@ -1839,7 +1861,7 @@ msgstr ""
 msgid ""
 "This field helps with automatic reminder sending date calculations when the "
 "reminder is belated"
-msgstr ""
+msgstr "当提醒延迟时，此字段有助于计算自动提醒的发送日期"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_tree_view
@@ -1856,7 +1878,7 @@ msgstr "应付总额"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_due_abs
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_due_abs
 msgid "Total All Due Abs"
-msgstr ""
+msgstr "全部到期总额（绝对值）"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_overdue
@@ -1874,13 +1896,13 @@ msgstr "到期总额"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due_currency_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_due_currency_followup
 msgid "Total Due Currency Followup"
-msgstr ""
+msgstr "跟进到期总额（外币）"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_due_followup
 msgid "Total Due Followup"
-msgstr ""
+msgstr "跟进到期总额"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue
@@ -1892,13 +1914,13 @@ msgstr "逾期总额"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue_currency_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_overdue_currency_followup
 msgid "Total Overdue Currency Followup"
-msgstr ""
+msgstr "跟进逾期总额（外币）"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_overdue_followup
 msgid "Total Overdue Followup"
-msgstr ""
+msgstr "跟进逾期总额"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__unreconciled_aml_ids
@@ -1952,7 +1974,7 @@ msgstr "您正在尝试发送短信，但没有为客户%s设置任何手机/电
 msgid ""
 "You cannot activate this action because 'Automatic Invoice Reminders' are "
 "disabled."
-msgstr ""
+msgstr "无法激活此操作，因为“自动发票提醒”已禁用。"
 
 #. module: account_followup
 #. odoo-python
@@ -1965,12 +1987,12 @@ msgstr "您无法删除此邮件模板，它用于发票提醒的发送流程中
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__after
 msgid "after"
-msgstr ""
+msgstr "之后"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__before
 msgid "before"
-msgstr ""
+msgstr "之前"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
@@ -1986,7 +2008,7 @@ msgstr "付款提醒"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "to enable them."
-msgstr ""
+msgstr "以启用它们。"
 
 #. module: account_followup
 #: model:mail.template,subject:account_followup.mail_template_partner_payment_kind_reminder

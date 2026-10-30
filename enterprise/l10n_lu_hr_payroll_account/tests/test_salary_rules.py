@@ -75,14 +75,13 @@ class TestPayslipValidation(TestPayslipValidationCommon):
         input_wage_supplement_200 = self.env.ref(
             'l10n_lu_hr_payroll.l10n_lu_employees_overtime_supplement_200')
 
-        for code, value in {
+        payslip._set_input_values({
             input_wage_supplement_70.code: 10,
             input_overtime.code: 10,
             input_wage_supplement_40.code: 10,
             input_wage_supplement_150.code: 10,
             input_wage_supplement_200.code: 10,
-        }.items():
-            payslip._set_input_value(code, value)
+        })
         payslip.compute_sheet()
         payslip_results = {'BASIC': 7500.0, 'VEHICLE_ALLOWANCE': 300.0, 'BIK_VEHICLE': 500.0, 'WAGE_SUPPLEMENT_70': 303.47, 'OVERTIME': 433.53, 'OVERTIME_SUPPLEMENT_150': 650.29, 'OVERTIME_SUPPLEMENT_200': 867.05, 'OVERTIME_SUPPLEMENT_40': 173.41, 'GROSS': 10727.75, 'CASH_SICKNESS_FUND': 20.26, 'DEPENDENCY_INSURANCE': 117.52, 'HEALTH_FUND': 253.04, 'RETIREMENT_FUND': 688.28, 'TOTAL_CONTRIBUTIONS': 1079.09, 'AC_AE': 181.5, 'FD': 214.5, 'OVERTIME_ALW': 421.39, 'OVERTIME_SUPPLEMENT_40_ALW': 173.41, 'WAGE_SUPPLEMENT_70_ALW': 303.47, 'TOTAL_ALLOWANCES': 1294.27, 'TAXABLE_AMOUNT': 8471.91, 'TAXES': 2474.6, 'CIS': 0.0, 'CISSM': 0.0, 'CIS_CI_CO2': 0.0, 'NET_TEMP': 7174.05, 'BIK_VEHICLE_NET': 500.0, 'MEAL_VOUCHERS': 50.4, 'NET': 6623.65}
         self._validate_payslip(payslip, payslip_results)

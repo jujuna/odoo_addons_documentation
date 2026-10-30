@@ -40,6 +40,11 @@ class TestUi(TestWebsiteSaleRentingPlanning):
             "odoo.addons.website_sale_renting_planning.controllers.main.WebsiteSalePlanningRenting.renting_product_availabilities",
             wraps(og_renting_product_availabilities)(_patched_renting_product_availabilities),
         ):
+            # The routing map is cached (the "routing" ormcache) with the controller endpoints
+            # baked in. When it was already built with the original method, the patch above
+            # is ignored.
+            self.env.transaction.invalidate_ormcache("routing")
+
             self.start_tour(
                 "/shop?search=Product+Renting+Planning",
                 "website_sale_renting_select_unavailable_date",
@@ -66,6 +71,11 @@ class TestUi(TestWebsiteSaleRentingPlanning):
             "odoo.addons.website_sale_renting_planning.controllers.main.WebsiteSalePlanningRenting.renting_product_availabilities",
             wraps(og_renting_product_availabilities)(_patched_renting_product_availabilities),
         ):
+            # The routing map is cached (the "routing" ormcache) with the controller endpoints
+            # baked in. When it was already built with the original method, the patch above
+            # is ignored.
+            self.env.transaction.invalidate_ormcache("routing")
+
             self.start_tour(
                 "/shop?search=Product+Renting+Planning",
                 "website_sale_renting_planning_max_qty",

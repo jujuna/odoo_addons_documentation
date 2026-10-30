@@ -1,29 +1,37 @@
-import { hasMobileNative, mobileNative } from "@pos_mobile_android/app/utils/native";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
 import { debounce } from "@web/core/utils/timing";
 
 const LOOPBACK = "127.0.0.1";
-const OWN_IP_CACHE_MS = 2000;
-const ADDRESS_RE = /^(\w+:\/\/)?([^/:]+)(.*)$/;
+const OWN_STATUS_CACHE_MS = 2000;
+const ADDRESS_RE = /^(\w+:\/\/)?([^/:]+)(:\d+)?(.*)$/;
 
-let ownIp;
-const forgetOwnIp = debounce(() => (ownIp = undefined), OWN_IP_CACHE_MS);
+let ownStatus;
+const forgetOwnStatus = debounce(() => (ownStatus = undefined), OWN_STATUS_CACHE_MS);
 
-function getOwnIp() {
-    if (ownIp === undefined) {
-        ownIp = mobileNative.getLocalIp().catch(() => null);
+function getOwnStatus() {
+    if (ownStatus === undefined) {
+        ownStatus = mobileNative.getDeviceManagerStatus().catch(() => null);
     }
-    forgetOwnIp();
-    return ownIp;
+    forgetOwnStatus();
+    return ownStatus;
 }
 
-export async function resolveDeviceAddress(address) {
-    if (!address || !hasMobileNative("getLocalIp")) {
+const normalizeSerial = (serial) => (serial || "").trim().toUpperCase();
+
+export async function resolveDeviceAddress(address, oboxSerial) {
+    const match = address && address.match(ADDRESS_RE);
+    if (!match || !mobileNative.getDeviceManagerStatus) {
         return address;
     }
-    const ip = await getOwnIp();
-    const match = ip && address.match(ADDRESS_RE);
-    if (!match || match[2] !== ip) {
+    const own = await getOwnStatus();
+    if (!own) {
         return address;
     }
-    return `${match[1] ?? ""}${LOOPBACK}${match[3]}`;
+    const [, scheme = "", host, port = "", rest] = match;
+    const serial = normalizeSerial(oboxSerial);
+    if (serial ? serial !== normalizeSerial(own.serial) : host !== own.ip) {
+        return address;
+    }
+    const ownPort = serial && own.port ? `:${own.port}` : port;
+    return `${scheme}${LOOPBACK}${ownPort}${rest}`;
 }

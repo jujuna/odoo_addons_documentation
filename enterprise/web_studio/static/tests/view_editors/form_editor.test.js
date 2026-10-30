@@ -1810,6 +1810,47 @@ test("notebook page hooks", async () => {
     );
 });
 
+test("drop columns on the hooks around a notebook", async () => {
+    const arch = `
+        <form>
+            <sheet>
+                <notebook>
+                    <page string="Kikou">
+                        <field name="id"/>
+                    </page>
+                </notebook>
+            </sheet>
+        </form>`;
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch,
+    });
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        const operation = params.operations.at(-1);
+        expect.step(`${operation.position} ${operation.target.tag}`);
+        return editView(params, "form", arch);
+    });
+
+    expect(".o_web_studio_hook[data-type='notebook']").toHaveCount(2);
+    expect(".o_web_studio_hook[data-type='notebook'][data-position='before']").toHaveAttribute(
+        "data-xpath",
+        "/form[1]/sheet[1]/notebook[1]"
+    );
+    expect(".o_web_studio_hook[data-type='notebook'][data-position='after']").toHaveAttribute(
+        "data-xpath",
+        "/form[1]/sheet[1]/notebook[1]"
+    );
+
+    await contains(".o_web_studio_field_type_container .o_web_studio_field_columns").dragAndDrop(
+        ".o_web_studio_hook[data-type='notebook'][data-position='before']"
+    );
+    expect.verifySteps(["before notebook"]);
+});
+
 test("notebook edition", async () => {
     expect.assertions(9);
 
@@ -4301,6 +4342,75 @@ test("navigate in x2many list which some field has a context -- with records in 
         ".o_web_studio_form_view_editor .o_field_one2many .o_web_studio_editX2Many[data-type='list']"
     ).click();
     expect(".o_view_controller.o_list_view .o_data_row .o_list_many2one").toHaveText("couic");
+});
+
+test("navigate in x2many and back to main view", async () => {
+    Product._views = { "list,2": /*xml*/ `<list><field name='display_name'/></list>` };
+    Coucou._views = {
+        "form,1": /*xml*/ `
+            <form>
+                <sheet>
+                    <field name='display_name'/>
+                    <field name='product_ids'>
+                        <form>
+                            <sheet>
+                                <field name="m2o_partner"
+                                    invisible="parent.display_name == 'coucou'"
+                                    domain="[('display_name', '=', parent.display_name)]" />
+                            </sheet>
+                        </form>
+                    </field>
+                </sheet>
+            </form>
+        `,
+    };
+    const { env: pyEnv } = await makeMockServer();
+    const partnerId = pyEnv["partner"].create({ display_name: "jacques" });
+    const productId = pyEnv["product"].create({
+        display_name: "xpad",
+        m2o_partner: partnerId,
+    });
+    const coucouId1 = pyEnv["coucou"].create({
+        display_name: "Coucou 11",
+        product_ids: [productId],
+    });
+    defineActions([
+        {
+            xml_id: "studio.coucou_action",
+            name: "coucouAction",
+            res_model: "coucou",
+            res_id: coucouId1,
+            type: "ir.actions.act_window",
+            views: [[false, "form"]],
+        },
+    ]);
+    handleDefaultStudioRoutes();
+
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+    await getService("action").doAction("studio.coucou_action");
+    await openStudio();
+    await waitFor(".o_web_studio_menu .breadcrumb-item:contains(Form)");
+    expect(queryAll(".o_web_studio_menu .breadcrumb-item").map((e) => e.textContent)).toEqual([
+        "Views",
+        "Form",
+    ]);
+
+    // edit the x2m form view
+    await contains(".o_field_one2many").click();
+    await contains('.o_web_studio_editX2Many[data-type="list"]').click();
+    await waitFor(".o_web_studio_list_view_editor");
+    expect(queryAll(".o_web_studio_menu .breadcrumb-item").map((e) => e.textContent)).toEqual([
+        "Views",
+        "Form",
+        "Subview List",
+    ]);
+    await contains(".breadcrumb-item:contains(Form)").click();
+    await waitFor(".o_web_studio_view_renderer .o_form_view");
+    expect(queryAll(".o_web_studio_menu .breadcrumb-item").map((e) => e.textContent)).toEqual([
+        "Views",
+        "Form",
+    ]);
 });
 
 test("x2many list with virtual record", async () => {

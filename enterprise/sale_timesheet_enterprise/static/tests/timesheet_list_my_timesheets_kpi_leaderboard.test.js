@@ -1,5 +1,5 @@
 import { expect, test, beforeEach, describe } from "@odoo/hoot";
-import { animationFrame } from "@odoo/hoot-mock";
+import { animationFrame, mockDate } from "@odoo/hoot-mock";
 import { WebClient } from "@web/webclient/webclient";
 import { contains, getService, mockService, mountView, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 
@@ -39,10 +39,9 @@ test("hr.timesheet (list)(kpi)(leaderboard): Check that headers displays current
         type: "list",
     });
     await checkKpiHeader();
-    // default date is 2019-03-11, as defined by the framework
-    expect("div[name=worked_time_kpi][title*='March']").toHaveCount(1);
-    expect("div[name=billable_time_kpi][title*='March']").toHaveCount(1);
-    expect("div[name=billing_rate_kpi][title*='March']").toHaveCount(1);
+    expect("div[name=worked_time_kpi][title*='January']").toHaveCount(1);
+    expect("div[name=billable_time_kpi][title*='January']").toHaveCount(1);
+    expect("div[name=billing_rate_kpi][title*='January']").toHaveCount(1);
 });
 
 test("hr.timesheet (list)(kpi)(leaderboard): Check basics, view is grouped.", async () => {
@@ -98,6 +97,28 @@ test("hr.timesheet (list)(kpi)(leaderboard): Check billable time button filters 
     expect(".o_pager").toHaveText("1-3 / 3");
     expect(".o_searchview_facet").toHaveCount(1);
     expect(".o_data_row").toHaveCount(3);
+});
+
+test("hr.timesheet (list)(kpi)(leaderboard): Check that the header follows the clock when the session crosses a month.", async () => {
+    await mountWithCleanup(WebClient);
+    await getService("action").doAction({
+        res_model: "account.analytic.line",
+        type: "ir.actions.act_window",
+        views: [
+            [false, "list"],
+            [false, "kanban"],
+        ],
+    });
+    await checkKpiHeader();
+    expect("div[name=worked_time_kpi][title*='January']").toHaveCount(1);
+
+    mockDate("2017-02-14 00:00:00");
+    await contains(".o_switch_view.o_kanban").click();
+    await animationFrame();
+    await checkKpiHeader();
+    expect("div[name=worked_time_kpi][title*='February']").toHaveCount(1, {
+        message: "the header should show the month the clock is now on, not the one the session started in",
+    });
 });
 
 test("hr.timesheet (list)(kpi)(leaderboard): switch view with GroupBy.", async () => {

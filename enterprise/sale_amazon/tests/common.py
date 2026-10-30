@@ -1,5 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from datetime import datetime
+
 from odoo.tests import TransactionCase
 
 ORDER_BUYER_INFO_MOCK = {
@@ -121,6 +123,7 @@ class TestAmazonCommon(TransactionCase):
             "available_marketplace_ids": [cls.marketplace.id],
             "active_marketplace_ids": [cls.marketplace.id],
             "company_id": cls.env.company.id,
+            "last_orders_sync": datetime(2019, 12, 30),
         })
 
         # Create an offer linked to the product

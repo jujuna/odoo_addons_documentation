@@ -2,10 +2,13 @@
 from odoo import Command
 from odoo.tests import tagged
 from odoo.tools import file_open
+from odoo.addons.l10n_pe_edi.models.account_move import AccountMove
 from .common import TestPeEdiCommon
+from odoo.tools.zeep import Client
 
 from freezegun import freeze_time
 from lxml import etree
+from unittest.mock import patch
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
@@ -691,6 +694,29 @@ class TestEdiXmls(TestPeEdiCommon):
             expected_etree = self.get_xml_tree_from_string(expected_file.read())
         self.assertXmlTreeEqual(current_etree, expected_etree)
 
+    def test_invoice_withholding_on_all_igv_lines(self):
+        """The IGV withholding tax must be on every IGV line, lines without IGV are ignored."""
+        ChartTemplate = self.env['account.chart.template']
+        invoice = self._create_invoice_pe(invoice_line_ids=[
+            Command.create({
+                'product_id': self.product.id,
+                'price_unit': 1000.0,
+                'tax_ids': [Command.set((self.tax_18 | ChartTemplate.ref('sale_tax_withholding_3')).ids)],
+            }),
+            Command.create({
+                'product_id': self.product.id,
+                'price_unit': 1000.0,
+                'tax_ids': [Command.set(self.tax_18.ids)],
+            }),
+        ])
+        self.assertEqual(
+            invoice._l10n_pe_edi_check_move_constraints()['l10n_pe_mixed_withholding']['message'],
+            "Withholding tax applies to all taxable items (with IGV). Ensure retention is applied to all IGV-eligible products on this invoice.",
+        )
+
+        invoice.invoice_line_ids[1].tax_ids = ChartTemplate.ref('sale_tax_exo')
+        self.assertNotIn('l10n_pe_mixed_withholding', invoice._l10n_pe_edi_check_move_constraints())
+
     def test_invoice_icbper_fixed_tax(self):
         """ Test that an invoice with an ICBPER fixed-amount tax generates EDI XML without errors."""
         tax_icbper = self.env['account.tax'].create({
@@ -716,6 +742,39 @@ class TestEdiXmls(TestPeEdiCommon):
 
             generated_files, _errors = move._l10n_pe_edi_generate_invoice_bstr()
             self.assertTrue(generated_files)
+
+    def test_invoice_tax_free_tourist(self):
+        """ A Tax Free sale (operation type 2106) to a tourist identified by passport is issued as an invoice """
+        self.partner_a.write({
+            'additional_identifiers': {'PASSPORT': "AB1234567"},
+            'vat': False,
+            'country_id': self.env.ref('base.us').id,
+        })
+        with freeze_time(self.frozen_today):
+            invoice = self.env['account.move'].create({
+                'name': 'F FFI-%s1' % self.time_name,
+                'move_type': 'out_invoice',
+                'partner_id': self.partner_a.id,
+                'invoice_date': '2017-01-01',
+                'date': '2017-01-01',
+                'l10n_pe_edi_operation_type': '2106',
+                'invoice_line_ids': [Command.create({
+                    'product_id': self.product.id,
+                    'price_unit': 100.0,
+                    'quantity': 1,
+                    'tax_ids': [Command.set(self.tax_18.ids)],
+                })],
+            })
+            self.assertIn(self.env.ref('l10n_pe.document_type01'), invoice.l10n_latam_available_document_type_ids)
+            invoice.l10n_latam_document_type_id = self.env.ref('l10n_pe.document_type01')
+            invoice.with_context(edi_test_mode=True).action_post()
+
+            edi_xml, _errors = invoice._l10n_pe_edi_generate_invoice_bstr()
+
+        etree = self.get_xml_tree_from_string(edi_xml)
+        invoice_type_code = etree.find('./{*}InvoiceTypeCode')
+        self.assertEqual((invoice_type_code.text, invoice_type_code.get('listID')), ('01', '2106'))
+        self.assertEqual(etree.find('.//{*}AccountingCustomerParty//{*}PartyIdentification/{*}ID').get('schemeID'), '7')
 
     def test_invoice_foreign_customer(self):
         """Invoice for a foreign customer"""
@@ -988,3 +1047,55 @@ class TestEdiXmls(TestPeEdiCommon):
         self.assertEqual(monetary_total.findtext('{*}TaxInclusiveAmount'), '14.75')
         self.assertEqual(monetary_total.findtext('{*}PayableRoundingAmount'), '-0.05')
         self.assertEqual(monetary_total.findtext('{*}PayableAmount'), '14.70')
+
+    def test_post_invoice_refreshes_attachment_cache(self):
+        """
+        The ZIP is created through res_field, which doesn't trigger the depends chain: any caller of
+        _l10n_pe_edi_post_invoice (not only the Send wizard) must see the new attachment afterwards.
+        """
+        move = self._create_invoice_pe()
+        move.action_post()
+        self.assertFalse(move.l10n_pe_edi_attachment_id)  # put the field in cache
+
+        with patch.object(
+            AccountMove, '_l10n_pe_edi_sign_invoices_sunat_estela',
+            return_value={'success': True, 'xml_document': b'<xml/>', 'cdr': b'<cdr/>'},
+        ):
+            move._l10n_pe_edi_post_invoice()
+
+        self.assertTrue(move.l10n_pe_edi_attachment_id)
+
+    def test_send_mail_and_sunat_attaches_zip(self):
+        """
+        Sending by email and to SUNAT in the same Send must attach the SUNAT ZIP to the email.
+        """
+        self.partner_a.email = 'partner_a@example.com'
+        move = self._create_invoice_pe()
+        move.action_post()
+
+        wizard = self._create_account_move_send_wizard_single(move, sending_methods=['email'])
+        with (
+            patch.object(
+                AccountMove, '_l10n_pe_edi_sign_invoices_sunat_estela',
+                return_value={'success': True, 'xml_document': b'<xml/>', 'cdr': b'<cdr/>'},
+            ),
+            patch.object(
+                AccountMove, '_l10n_pe_edi_get_extra_report_values',
+                return_value={},
+            ),
+        ):
+            wizard.action_send_and_print()
+
+        mail_message = move.message_ids.filtered(lambda m: self.partner_a in m.partner_ids)
+        self.assertIn('.zip', ''.join(mail_message.attachment_ids.mapped('name')))
+
+    def test_sunat_beta_wsdl(self):
+        """The beta WSDL is shipped inline, so zeep must be able to build the client without any request."""
+        wsdl = self.env['account.move']._l10n_pe_edi_get_sunat_beta_wsdl()
+        service = Client(wsdl=wsdl).bind('billService', 'BillServicePort')
+        self.assertEqual(
+            service._binding_options['address'],
+            'https://e-beta.sunat.gob.pe:443/ol-ti-itcpfegem-beta/billService',
+        )
+        for operation in ('sendBill', 'sendPack', 'sendSummary', 'getStatus'):
+            self.assertTrue(service[operation])

@@ -1,9 +1,8 @@
 import { registry } from "@web/core/registry";
-import { formView } from "@web/views/form/form_view";
-import { FormRenderer } from "@web/views/form/form_renderer";
+import { ExpenseFormView } from "@hr_expense/views/expense_form_view";
 import { ExtractMixinFormRenderer } from "@iap_extract/components/manual_correction/form_renderer";
 
-export class HrExpenseFormRenderer extends ExtractMixinFormRenderer(FormRenderer) {
+export class HrExpenseFormRenderer extends ExtractMixinFormRenderer(ExpenseFormView.Renderer) {
     setup() {
         super.setup();
 
@@ -12,7 +11,7 @@ export class HrExpenseFormRenderer extends ExtractMixinFormRenderer(FormRenderer
 }
 
 export const HrExpenseFormRendererFormViewExtract = {
-    ...formView,
+    ...ExpenseFormView,
     Renderer: HrExpenseFormRenderer,
 };
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo import Command
 from odoo.addons.planning_field_service_sale_timesheet.tests.common import TestPlanningFieldServiceSaleTimesheetCommon
-from odoo.tests import tagged
+from odoo.tests import Form, tagged
 
 
 @tagged('post_install', '-at_install')
@@ -65,3 +65,41 @@ class TestWorksheet(TestPlanningFieldServiceSaleTimesheetCommon):
 
         service.planning_enabled = False
         self.assertFalse(service.worksheet_template_id, "The worksheet template should be removed from the service product is planning feature is disabled.")
+
+    def test_apply_shift_template_with_worksheet_on_sale_slot(self):
+        """
+            Test that a shift template holding a worksheet template still plans a shift linked to a sales order item
+        """
+        self.env.user.tz = 'UTC'
+        resource = self.george_employee.resource_id
+        resource.tz = 'UTC'
+        role = self.env['planning.role'].create({'name': 'Installation'})
+        self.planning_service_product.planning_role_id = role
+        slot_template = self.env['planning.slot.template'].create({
+            'start_time': 13.0,
+            'end_time': 17.0,
+            'role_id': role.id,
+            'worksheet_template_id': self.worksheet_template.id,
+        })
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'order_line': [Command.create({
+                'product_id': self.planning_service_product.id,
+                'product_uom_qty': 10,
+            })],
+        })
+        sale_order.action_confirm()
+        slot = self.env['planning.slot'].create({
+            'resource_ids': resource.ids,
+            'sale_line_id': sale_order.order_line.id,
+            'worksheet_template_id': self.worksheet_template.id,
+            'start_datetime': datetime(2026, 9, 10, 6, 0),
+            'end_datetime': datetime(2026, 9, 10, 7, 0),
+        })
+
+        with Form(slot) as slot_form:
+            slot_form.template_id = slot_template
+
+        self.assertEqual(slot.template_id, slot_template)
+        self.assertEqual(slot.start_datetime, datetime(2026, 9, 10, 13, 0))
+        self.assertEqual(slot.end_datetime, datetime(2026, 9, 10, 17, 0))

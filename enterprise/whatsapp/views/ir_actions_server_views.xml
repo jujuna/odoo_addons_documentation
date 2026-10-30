@@ -5,13 +5,13 @@
         <field name="model">ir.actions.server</field>
         <field name="inherit_id" ref="base.view_server_action_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//t[@name='action_content']" position="inside">
+            <xpath expr="//t[@name='action_content']//notebook" position="before">
                 <group invisible="state != 'whatsapp'">
                     <group>
                         <field name="wa_template_id"
                             placeholder="Choose a template..."
-                            required="state == 'whatsapp'"
-                            options="{'no_create': True}"/>
+                            options="{'no_create': True}"
+                            required="state == 'whatsapp'"/>
                     </group>
                 </group>
             </xpath>

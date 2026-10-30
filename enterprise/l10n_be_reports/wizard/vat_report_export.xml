@@ -61,7 +61,7 @@
                             <field name="prorata_at_0"/>
                         </group>
                     </group>
-                    <group id="instructions">
+                    <group id="instructions" invisible="should_display_intervat">
                         <separator string="Submission Instructions"/>
                         <ol colspan="2">
                             <li>
@@ -76,7 +76,18 @@
                             <li>Validate the VAT return</li>
                         </ol>
                     </group>
+                    <group invisible="not should_display_intervat">
+                        <div class="d-inline-block align-top">
+                            <span>Before submitting to Intervat you may want to verify the <button string='xml' name="print_xml" type="object" class="btn btn-link p-0 border-0 align-baseline"/></span>
+                        </div>
+                    </group>
                 </field>
+                <button name="action_proceed_with_submission" position="attributes">
+                    <attribute name="invisible">should_display_intervat</attribute>
+                </button>
+                <button name="action_proceed_with_submission" position="after">
+                    <button string='Submit to Intervat' name="action_submit_intervat" type="object" class="btn-primary" invisible="not should_display_intervat"/>
+                </button>
             </field>
         </record>
     </data>

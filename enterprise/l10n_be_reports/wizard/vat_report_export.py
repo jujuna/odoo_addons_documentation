@@ -44,6 +44,13 @@ class L10n_Be_ReportsPeriodicVatXmlExport(models.TransientModel):
     special_prorata_5 = fields.Float('Special Prorata 5')
     submit_more = fields.Boolean('I want to submit more than 5 specific prorata')
 
+    should_display_intervat = fields.Boolean(compute='_compute_should_display_intervat')
+
+    @api.depends('return_id.company_id.l10n_be_intervat_mode')
+    def _compute_should_display_intervat(self):
+        for wizard in self:
+            wizard.should_display_intervat = wizard.return_id.company_id.l10n_be_intervat_mode != 'disabled'
+
     @api.depends('return_id')
     def _compute_amount_to_get(self):
         for wizard in self:
@@ -144,17 +151,31 @@ class L10n_Be_ReportsPeriodicVatXmlExport(models.TransientModel):
 
         return result
 
-    def action_proceed_with_submission(self):
-        self.ensure_one()
-
-        submission_options = self._get_submission_options_to_inject()
-
-        # Generate the XML file that will be needed for the submission
+    def _add_xml_attachment(self, submission_options):
         options = self.return_id._get_closing_report_options()
         options.update(submission_options)
         self.return_id._add_attachment(self.env['l10n_be.tax.report.handler'].export_tax_report_to_xml(options))
 
+    def action_proceed_with_submission(self):
+        self.ensure_one()
+
+        submission_options = self._get_submission_options_to_inject()
+        self._add_xml_attachment(submission_options)
+
         return self.return_id._proceed_with_submission(options_to_inject=submission_options)
+
+    def action_submit_intervat(self):
+        self.ensure_one()
+        if att := self.return_id.attachment_ids.filtered(lambda a: a.res_name == self.return_id.name and a.name.endswith('.xml')):
+            att.unlink()
+        # Generate the XML here rather than in the OAuth callback, where the env companies are not the return's ones
+        self._add_xml_attachment(self._get_submission_options_to_inject())
+
+        company = self.return_id.company_id
+        if not company._l10n_be_intervat_is_authentication_valid():
+            return company._l10n_be_intervat_authentication_action(self.return_id.id, 'submit')
+
+        return self.return_id._l10n_be_submit_xml()
 
     def print_xml(self):
         options = {

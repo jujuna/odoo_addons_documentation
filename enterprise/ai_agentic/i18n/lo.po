@@ -1,16 +1,17 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* ai_agentic
+# * ai_agentic
 #
+# Bone NI <bounkirdni@gmail.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.3a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 05:32+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Lao <https://translate.odoo.com/projects/odoo-master/"
-"ai_agentic/lo/>\n"
+"POT-Creation-Date: 2026-10-02 17:46+0000\n"
+"PO-Revision-Date: 2026-10-21 16:36+0000\n"
+"Last-Translator: Bone NI <bounkirdni@gmail.com>\n"
+"Language-Team: Lao <https://translate.odoo.com/projects/odoo-20/ai_agentic/"
+"lo/>\n"
 "Language: lo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,6 +67,42 @@ msgid ""
 "is 2026-08-24)\n"
 "        "
 msgstr ""
+"\n"
+"            ສ້າງ ແລະ ອັບເດດລະບົບອັດຕະໂນມັດແບບຖາວອນ ສຳລັບການກະທຳທີ່ທ່ານຄວນເຮັດພາຍຫຼັງ, ເຮັດ"
+"ຊ້ຳຄືນ ຫຼື ເພື່ອຕອບສະໜອງຕໍ່ເຫດການຂອງຂໍ້ມູນ. ໃຊ້ເຄື່ອງມືນີ້ເມື່ອຜູ້ໃຊ້ຮ້ອງຂໍໃຫ້ທ່ານປະຕິບັດການກະທຳ ຫຼື ສົ່ງການແ"
+"ຈ້ງເຕືອນໃນອະນາຄົດ, ຕາມຕາຕະລາງທີ່ກຳນົດ, ຫຼື ເມື່ອມີການສ້າງ, ປ່ຽນແປງ, ລຶບ, ສົ່ງຂໍ້ຄວາມ, ຫຼື ຕົກຕາມເງື່"
+"ອນໄຂທີ່ລະບຸໄວ້.\n"
+"            ເມື່ອສ້າງລະບົບອັດຕະໂນມັດໃໝ່, ຕ້ອງມີ `name`, `description`, `trigger`, "
+"`ai_action_prompt` ແລະ `explanation`.\n"
+"            ເມື່ອແກ້ໄຂລະບົບອັດຕະໂນມັດທີ່ມີຢູ່ແລ້ວ, ຕ້ອງມີ `automation_id` ແລະ "
+"`explanation`. ສຳລັບພາຣາມິເຕີອື່ນໆ, ໃຫ້ລະບຸສະເພາະອັນທີ່ຕ້ອງການອັບເດດເທົ່ານັ້ນ.\n"
+"            ## ປະເພດຕົວກະຕຸ້ນ (Trigger type)\n"
+"            ຄວນເລືອກຕົວກະຕຸ້ນຕາມເວລາ (`on_time_created`, `on_time_updated`, "
+"`on_time`) ຫຼາຍກວ່າຕົວກະຕຸ້ນແບບທັນທີ (`on_create`, `on_create_or_write`): ເພາະມັນຈະເຮັ"
+"ດວຽກຫຼັງຈາກເກີດເຫດການບໍ່ດົນ ແທນທີ່ຈະເຮັດວຽກໃນລະຫວ່າງທີ່ຜູ້ໃຊ້ກົດບັນທຶກ. \"ເມື່ອມີການສ້າງປີ້, …\" ແມ່ນ "
+"`on_time_created` ພ້ອມກັບການຊັກຊ້າ 1 ນາທີ; \"ທຸກຄັ້ງທີ່ລູກຄ້າເປົ້າໝາຍມີການອັບເດດ, …\" ແມ່ນ "
+"`on_time_updated`. ໃຊ້ `on_create` / `on_create_or_write` ສະເພາະເມື່ອຜູ້ໃຊ້ຮ້ອງຂໍການກ"
+"ະທຳແບບທັນທີຢ່າງຈະແຈ້ງ, ຫຼື ສຳລັບການປ່ຽນແປງສະຖານະໃນຊ່ອງຂໍ້ມູນສະເພາະທີ່ຕ້ອງການ "
+"`filter_pre_domain`.\n"
+"            ## ຕົວຢ່າງຕົວກະຕຸ້ນ (Trigger examples)\n"
+"            - ຕິດແທັກໃຫ້ທຸກປີ້ໃໝ່ (ຕົວກະຕຸ້ນການສ້າງທີ່ແນະນຳ): `{\"trigger\": {\"type\": "
+"\"on_time_created\", \"target_model\": \"helpdesk.ticket\", "
+"\"date_offset_or_interval\": {\"amount\": 1, \"unit\": \"minutes\"}}}`\n"
+"            - ກະຕຸ້ນເມື່ອມີການເພີ່ມແທັກ \"Bug\" ໃນໜ້າວຽກຂອງຂ້ອຍ (ການປ່ຽນແປງຊ່ອງຂໍ້ມູນ, ຈຶ່ງໃຊ້ "
+"`on_create_or_write`): `{\"trigger\": {\"type\": \"on_create_or_write\", "
+"\"observed_fields\": [\"tag_ids\"], \"filter_pre_domain\": \"[('tag_ids', "
+"'not in', ['Bug'])]\", \"filter_domain\": \"[('tag_ids', 'in', ['Bug']), "
+"('user_id', '=', 3)]\"}}` (ຖ້າ ID ຂອງຜູ້ໃຊ້ແມ່ນ 3).\n"
+"            - ກະຕຸ້ນກ່ອນມື້ປິດທີ່ຄາດໄວ້ໜຶ່ງມື້: `{\"trigger\": {\"type\": \"on_time\", "
+"\"observed_fields\": \"date_deadline\", \"date_offset_or_interval\": "
+"{\"direction\": \"before\", \"amount\": 1, \"unit\": \"day\"}}}`\n"
+"            - ກະຕຸ້ນເມື່ອສ້າງ ຖ້າຂໍ້ມູນຍັງບໍ່ໄດ້ມອບໝາຍໃຫ້ໃຜ: `{\"trigger\": {\"type\": "
+"\"on_time_created\", \"filter_domain\": \"[('user_id', '=', False)]\", "
+"\"date_offset_or_interval\": {\"amount\": 5, \"unit\": \"minutes\"}}}`\n"
+"            - ກະຕຸ້ນທຸກໆວັນຈັນ: `{\"trigger\": {\"type\": \"on_schedule\", "
+"\"date_offset_or_interval\": {\"amount\": 7, \"unit\": \"day\", "
+"\"next_trigger_date\": \"2026-08-24 09:00:00\"}}}` (ຖ້າວັນຈັນໜ້າແມ່ນ 2026-08-24)\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_description:ai_agentic.ir_actions_server_ai_run_automation
@@ -85,6 +122,18 @@ msgid ""
 "instead, that leaves the user without the Run button.\n"
 "        "
 msgstr ""
+"\n"
+"            ດຳເນີນການລະບົບອັດຕະໂນມັດຕາມເວລາໃນຕອນນີ້ທັນທີ, ຄືກັນກັບຕາຕະລາງເວລາທີ່ກຳນົດໄວ້: ສ້າ"
+"ງຕົວຈຳລອງຂອງຕົວແທນເພື່ອປະຕິບັດຕາມຄຳແນະນຳໃນຮູບແບບເບື້ອງຫຼັງ (headless), ແລະ ສະແດງຜົນລັບໃນຫ້ອ"
+"ງສົນທະນາ.\n"
+"            ໃຊ້ເຄື່ອງມືນີ້ເມື່ອຜູ້ໃຊ້ຮ້ອງຂໍໃຫ້ດຳເນີນການ, ທົດສອບ ຫຼື ລອງລະບົບອັດຕະໂນມັດໃນຕອນນີ້, ແທນທີ່"
+"ຈະປະຕິບັດຂັ້ນຕອນຕ່າງໆເອງໃນບົດສົນທະນາ. ມີພຽງລະບົບອັດຕະໂນມັດຕາມເວລາເທົ່ານັ້ນ (ການກະທຳຕາມກຳນົດເວ"
+"ລາ ແລະ ກົດເກນເວລາ) ທີ່ສາມາດສັ່ງໃຫ້ເຮັດວຽກຕາມຕ້ອງການໄດ້; ສ່ວນກົດເກນຕາມເຫດການແມ່ນທົດສອບໂດຍກາ"
+"ນສ້າງ ຫຼື ອັບເດດຂໍ້ມູນທີ່ກົງກັບຕົວກະຕຸ້ນ.\n"
+"            ຫຼັງຈາກສ້າງລະບົບອັດຕະໂນມັດຕາມເວລາແລ້ວ, ໃຫ້ສະເໜີໃຫ້ຜູ້ໃຊ້ທົດລອງດຳເນີນການໜຶ່ງຄັ້ງໂດຍກາ"
+"ນຮຽກໃຊ້ເຄື່ອງມືນີ້ທັນທີ: ບັດຢືນຢັນ (\"ດຳເນີນການ\" / \"ບໍ່ແມ່ນຕອນນີ້\") ແມ່ນຂໍ້ສະເໜີ. ຢ່າຖາມວ່າ \"ຂ້ອຍ"
+"ຄວນດຳເນີນການເລີຍບໍ່?\" ໃນຂໍ້ຄວາມສົນທະນາ, ເພາະມັນຈະເຮັດໃຫ້ຜູ້ໃຊ້ບໍ່ມີປຸ່ມກົດດຳເນີນການ.\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.module.module,description:base.module_ai_agentic
@@ -96,6 +145,12 @@ msgid ""
 "* Enhance customer service with AI-powered responses\n"
 "* Automate routine tasks with intelligent workflows\n"
 msgstr ""
+"\n"
+"* ສ້າງ ແລະ ຈັດການຕົວແທນ AI ສຳລັບໜ້າວຽກທຸລະກິດຕ່າງໆ\n"
+"* ເຊື່ອມໂຍງກັບໂມເດວ ແລະ ບໍລິການ AI ຍອດນິຍົມ\n"
+"* ປະມວນຜົນເອກະສານ ແລະ ດຶງຂໍ້ມູນອອກມາໂດຍອັດຕະໂນມັດ\n"
+"* ຍົກລະດັບການບໍລິການລູກຄ້າດ້ວຍການຕອບກັບຈາກ AI\n"
+"* ເຮັດໃຫ້ວຽກປະຈຳເປັນລະບົບອັດຕະໂນມັດດ້ວຍຂະບວນການເຮັດວຽກອັດສະລິຍະ\n"
 
 #. module: ai_agentic
 #. odoo-python
@@ -103,27 +158,30 @@ msgstr ""
 msgid ""
 "\"%s\" ran. The full transcript is in its own chat, under the Automation tab."
 msgstr ""
+"\"%s\" ດຳເນີນການແລ້ວ. ປະຫວັດການສົນທະນາທັງໝົດຢູ່ໃນຫ້ອງສົນທະນາຂອງມັນເອງ, ພາຍໃຕ້ແທັບ ລະບົບອັດຕະ"
+"ໂນມັດ."
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/base_automation.py:0
 msgid "%(agent)s: %(automation)s"
-msgstr ""
+msgstr "%(agent)s: %(automation)s"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Archive"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>ຈັດເກັບ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Delete"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>ລຶບ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Unarchive"
 msgstr ""
+"<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>ຍົກເລີກການຈັດເກັບ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -132,6 +190,8 @@ msgid ""
 "focused_model_id) and interface_key != 'systray_ai_button'\">All Models</"
 "span>"
 msgstr ""
+"<span class=\"text-muted\" invisible=\"(not is_system_default or "
+"focused_model_id) and interface_key != 'systray_ai_button'\">ທຸກໂມເດວ</span>"
 
 #. module: ai_agentic
 #: model:ir.module.module,summary:base.module_ai_agentic
@@ -139,95 +199,94 @@ msgid ""
 "A powerful suite of AI tools and agents integrated directly into your Odoo "
 "environment"
 msgstr ""
+"ຊຸດເຄື່ອງມື ແລະ ຕົວແທນ AI ທີ່ມີປະສິດທິພາບສູງ ເຊິ່ງເຊື່ອມໂຍງເຂົ້າກັບລະບົບ Odoo ຂອງທ່ານໂດຍກົງ"
 
 #. module: ai_agentic
-#. odoo-javascript
-#: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 #: model:ir.module.module,shortdesc:base.module_ai_agentic
 #: model:ir.ui.menu,name:ai_agentic.ai_menu_root
 msgid "AI"
-msgstr ""
+msgstr "AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_agent
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_agent_id
 msgid "AI Agent"
-msgstr ""
+msgstr "ຕົວແທນ AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_agent_source
 msgid "AI Agent Source"
-msgstr ""
+msgstr "ແຫຼ່ງຂໍ້ມູນຕົວແທນ AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_automation_trigger
 msgid "AI Automation Trigger"
-msgstr ""
+msgstr "ຕົວກະຕຸ້ນລະບົບອັດຕະໂນມັດ AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_automation_trigger_ids
 msgid "AI Automation Triggers"
-msgstr ""
+msgstr "ຕົວກະຕຸ້ນລະບົບອັດຕະໂນມັດ AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_session
 msgid "AI Session"
-msgstr ""
+msgstr "ເຊດຊັນ AI"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_tool
 msgid "AI Tool"
-msgstr ""
+msgstr "ເຄື່ອງມື AI"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "AI Tool: Create or Update Automation"
-msgstr ""
+msgstr "ເຄື່ອງມື AI: ສ້າງ ຫຼື ອັບເດດລະບົບອັດຕະໂນມັດ"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_run_automation
 msgid "AI Tool: Run Automation"
-msgstr ""
+msgstr "ເຄື່ອງມື AI: ດຳເນີນການລະບົບອັດຕະໂນມັດ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_list
 msgid "AI Tools"
-msgstr ""
+msgstr "ເຄື່ອງມື AI"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ir_actions_server_view_form
 msgid "Actions"
-msgstr ""
+msgstr "ການກະທຳ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_list.xml:0
 msgid "Add"
-msgstr ""
+msgstr "ເພີ່ມ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Links"
-msgstr ""
+msgstr "ເພີ່ມລິ້ງ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add Sources"
-msgstr ""
+msgstr "ເພີ່ມແຫຼ່ງຂໍ້ມູນ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "Add a Link"
-msgstr ""
+msgstr "ເພີ່ມລິ້ງ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.js:0
 msgid "Add skills to expand what your agent can do."
-msgstr ""
+msgstr "ເພີ່ມທັກສະເພື່ອຂະຫຍາຍຂອບເຂດຄວາມສາມາດຂອງຕົວແທນຂອງທ່ານ."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -235,12 +294,14 @@ msgstr ""
 msgid ""
 "Add sources to give your agent the information it needs to answer accurately."
 msgstr ""
+"ເພີ່ມແຫຼ່ງຂໍ້ມູນເພື່ອໃຫ້ຕົວແທນຂອງທ່ານມີຂໍ້ມູນທີ່ຈຳເປັນໃນການຕອບຢ່າງຖືກຕ້ອງ."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Add sources to your AI Agent to get answers based on specific content."
 msgstr ""
+"ເພີ່ມແຫຼ່ງຂໍ້ມູນໃຫ້ກັບຕົວແທນ AI ຂອງທ່ານ ເພື່ອໃຫ້ໄດ້ຄຳຕອບຕາມເນື້ອຫາສະເພາະ."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -249,48 +310,49 @@ msgid ""
 "Add triggers to let your agent run automatically on a schedule or when key "
 "events happen."
 msgstr ""
+"ເພີ່ມຕົວກະຕຸ້ນເພື່ອໃຫ້ຕົວແທນຂອງທ່ານເຮັດວຽກໂດຍອັດຕະໂນມັດຕາມຕາຕະລາງ ຫຼື ເມື່ອມີເຫດການສຳຄັນເກີດຂຶ້ນ."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Adding sources..."
-msgstr ""
+msgstr "ກຳລັງເພີ່ມແຫຼ່ງຂໍ້ມູນ..."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Creation"
-msgstr ""
+msgstr "ຫຼັງຈາກການສ້າງ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "After Update"
-msgstr ""
+msgstr "ຫຼັງຈາກການອັບເດດ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_search
 msgid "Agent"
-msgstr ""
+msgstr "ຕົວແທນ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Name"
-msgstr ""
+msgstr "ຊື່ຕົວແທນ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Agent Subtitle"
-msgstr ""
+msgstr "ຄຳອະທິບາຍຍ່ອຍຂອງຕົວແທນ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/thread_actions_patch.js:0
 msgid "Agent configuration"
-msgstr ""
+msgstr "ການຕັ້ງຄ່າຕົວແທນ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_base_automation__ai_agent_id
@@ -298,6 +360,8 @@ msgid ""
 "Agent that runs the AI actions of this automation rule. Its tool calls are "
 "auto-confirmed and each run is kept in a chat for inspection."
 msgstr ""
+"ຕົວແທນທີ່ດຳເນີນການ AI ຕາມກົດເກນອັດຕະໂນມັດນີ້. ການຮຽກໃຊ້ເຄື່ອງມືຈະຖືກຢືນຢັນໂດຍອັດຕະໂນມັດ ແລະ ການ"
+"ເຮັດວຽກແຕ່ລະຄັ້ງຈະຖືກເກັບໄວ້ໃນຫ້ອງສົນທະນາເພື່ອກວດສອບ."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -306,68 +370,68 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_skill__agent_ids
 #: model:ir.ui.menu,name:ai_agentic.ai_agent_menu_action
 msgid "Agents"
-msgstr ""
+msgstr "ຕົວແທນ"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_agent_action
 msgid "Agents help you manage and organize your AI operations."
-msgstr ""
+msgstr "ຕົວແທນຊ່ວຍໃຫ້ທ່ານຈັດການ ແລະ ຈັດລະບຽບການເຮັດວຽກຂອງ AI."
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_action_prompt
 msgid "Ai Action Prompt"
-msgstr ""
+msgstr "ພຣອມທ໌ການກະທຳ AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_next_trigger_date
 msgid "Ai Next Trigger Date"
-msgstr ""
+msgstr "ວັນທີກະຕຸ້ນຖັດໄປຂອງ AI"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "All Models"
-msgstr ""
+msgstr "ທຸກໂມເດວ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.js:0
 msgid "Allow this Agent to ask for help to other Agents"
-msgstr ""
+msgstr "ອະນຸຍາດໃຫ້ຕົວແທນນີ້ຂໍຄວາມຊ່ວຍເຫຼືອຈາກຕົວແທນອື່ນໄດ້"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__architect
 msgid "Architect"
-msgstr ""
+msgstr "ສະຖາປະນິກ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Archive"
-msgstr ""
+msgstr "ຈັດເກັບ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_search
 msgid "Archived"
-msgstr ""
+msgstr "ຈັດເກັບແລ້ວ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to archive this agent?"
-msgstr ""
+msgstr "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການຈັດເກັບຕົວແທນນີ້?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to delete this agent?"
-msgstr ""
+msgstr "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຕົວແທນນີ້?"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__artist
 msgid "Artist"
-msgstr ""
+msgstr "ນັກສິລະປິນ"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -376,72 +440,72 @@ msgstr ""
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__automation_id
 msgid "Automation"
-msgstr ""
+msgstr "ລະບົບອັດຕະໂນມັດ"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_base_automation
 msgid "Automation Rule"
-msgstr ""
+msgstr "ກົດເກນອັດຕະໂນມັດ"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Automation Rule %(name)s"
-msgstr ""
+msgstr "ກົດເກນອັດຕະໂນມັດ %(name)s"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__automation_ids
 msgid "Automation rules that run this agent by themselves."
-msgstr ""
+msgstr "ກົດເກນອັດຕະໂນມັດທີ່ສັ່ງໃຫ້ຕົວແທນນີ້ເຮັດວຽກດ້ວຍຕົນເອງ."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.js:0
 msgid "Automation triggered!"
-msgstr ""
+msgstr "ລະບົບອັດຕະໂນມັດຖືກກະຕຸ້ນແລ້ວ!"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__avatar_role
 msgid "Avatar Role"
-msgstr ""
+msgstr "ບົດບາດຮູບແທນຕົວ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Based on a Date Field"
-msgstr ""
+msgstr "ອີງຕາມຊ່ອງວັນທີ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "Buttons"
-msgstr ""
+msgstr "ປຸ່ມຕ່າງໆ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "Call the Agent"
-msgstr ""
+msgstr "ຮຽກໃຊ້ຕົວແທນ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "Channel opened by an automation rule or scheduled action."
-msgstr ""
+msgstr "ຊ່ອງທາງທີ່ເປີດໂດຍກົດເກນອັດຕະໂນມັດ ຫຼື ການກະທຳຕາມກຳນົດເວລາ."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "Close"
-msgstr ""
+msgstr "ປິດ"
 
 #. module: ai_agentic
 #: model:ir.ui.menu,name:ai_agentic.ai_config_menu
 msgid "Configuration"
-msgstr ""
+msgstr "ການກຳນົດຄ່າ"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ai_agent_action_create
 msgid "Create Agent"
-msgstr ""
+msgstr "ສ້າງຕົວແທນ"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_skill
@@ -449,49 +513,50 @@ msgid ""
 "Create a skill that leverages instructions and tools to direct Odoo AI in "
 "assisting the user with their tasks."
 msgstr ""
+"ສ້າງທັກສະທີ່ນຳໃຊ້ຄຳແນະນຳ ແລະ ເຄື່ອງມື ເພື່ອນຳພາ Odoo AI ໃນການຊ່ວຍເຫຼືອຜູ້ໃຊ້ປະຕິບັດວຽກງານ."
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_agent_action
 msgid "Create your first Agent!"
-msgstr ""
+msgstr "ສ້າງຕົວແທນທຳອິດຂອງທ່ານ!"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_skill_action
 msgid "Create your first skill!"
-msgstr ""
+msgstr "ສ້າງທັກສະທຳອິດຂອງທ່ານ!"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Created a Trigger"
-msgstr ""
+msgstr "ສ້າງຕົວກະຕຸ້ນແລ້ວ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "ສ້າງໂດຍ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_date
 msgid "Created on"
-msgstr ""
+msgstr "ສ້າງເມື່ອ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
 msgid "Custom Rules"
-msgstr ""
+msgstr "ກົດເກນກຳນົດເອງ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__custom_skill_ids
 msgid "Custom Skills"
-msgstr ""
+msgstr "ທັກສະກຳນົດເອງ"
 
 #. module: ai_agentic
 #: model:ir.actions.act_window,name:ai_agentic.ai_composer_action
 #: model:ir.ui.menu,name:ai_agentic.menu_ai_composer
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_tree
 msgid "Default Prompts"
-msgstr ""
+msgstr "ພຣອມທ໌ເລີ່ມຕົ້ນ"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -502,35 +567,39 @@ msgid ""
 "- What can it do?\n"
 "- How should it work?"
 msgstr ""
+"ກຳນົດຂອບການເຮັດວຽກຂອງຕົວແທນຂອງທ່ານ:\n"
+"- ຄວນຮັບບົດບາດໃດ?\n"
+"- ສາມາດເຮັດຫຍັງໄດ້ແດ່?\n"
+"- ຄວນເຮັດວຽກແນວໃດ?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "ລຶບ"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__detective
 msgid "Detective"
-msgstr ""
+msgstr "ນັກສືບ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Disable"
-msgstr ""
+msgstr "ປິດໃຊ້ງານ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Discard"
-msgstr ""
+msgstr "ຍົກເລີກ"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "ຊ່ອງທາງການສົນທະນາ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__display_name
@@ -543,58 +612,58 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__display_name
 #: model:ir.model.fields,field_description:ai_agentic.field_ir_actions_server__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "ຊື່ທີ່ສະແດງ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.xml:0
 msgid "Dropdown menu"
-msgstr ""
+msgstr "ເມນູເລື່ອນລົງ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 msgid "Edit"
-msgstr ""
+msgstr "ແກ້ໄຂ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Enable"
-msgstr ""
+msgstr "ເປີດໃຊ້ງານ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_form
 msgid "Explain to the Agent what they need to do..."
-msgstr ""
+msgstr "ອະທິບາຍໃຫ້ຕົວແທນຮູ້ສິ່ງທີ່ຕ້ອງເຮັດ..."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "File"
-msgstr ""
+msgstr "ໄຟລ໌"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "From AI Automation"
-msgstr ""
+msgstr "ຈາກລະບົບອັດຕະໂນມັດ AI"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__headset
 msgid "Headset"
-msgstr ""
+msgstr "ຫູຟັງ"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__hoodie
 msgid "Hoodie"
-msgstr ""
+msgstr "ເສື້ອກັນໜາວມີໝວກ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "I need help to choose"
-msgstr ""
+msgstr "ຂ້ອຍຕ້ອງການຄວາມຊ່ວຍເຫຼືອໃນການເລືອກ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__id
@@ -607,7 +676,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__id
 #: model:ir.model.fields,field_description:ai_agentic.field_ir_actions_server__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -615,12 +684,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Instructions"
-msgstr ""
+msgstr "ຄຳແນະນຳ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Interval"
-msgstr ""
+msgstr "ໄລຍະຫ່າງ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__avatar_role
@@ -628,32 +697,33 @@ msgid ""
 "Job role the agent depicts. Setting it redraws the avatar in the agent's own "
 "color."
 msgstr ""
+"ບົດບາດໜ້າທີ່ວຽກທີ່ຕົວແທນສະແດງ. ການຕັ້ງຄ່ານີ້ຈະປ່ຽນຮູບແທນຕົວຕາມສີສະເພາະຂອງຕົວແທນ."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
 msgid "Key"
-msgstr ""
+msgstr "ຄີ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Knowledge"
-msgstr ""
+msgstr "ຄັງຄວາມຮູ້"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__prev_trigger_date
 msgid "Last Trigger Date"
-msgstr ""
+msgstr "ວັນທີກະຕຸ້ນຫຼ້າສຸດ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "ອັບເດດຫຼ້າສຸດໂດຍ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "ອັບເດດຫຼ້າສຸດເມື່ອ"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -662,69 +732,64 @@ msgid ""
 "Let's create a new Trigger together, I'm not sure what setup is best for my "
 "use case."
 msgstr ""
+"ມາສ້າງຕົວກະຕຸ້ນໃໝ່ນຳກັນ, ຂ້ອຍບໍ່ແນ່ໃຈວ່າການຕັ້ງຄ່າແບບໃດດີທີ່ສຸດສຳລັບກໍລະນີການນຳໃຊ້ຂອງຂ້ອຍ."
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__librarian
 msgid "Librarian"
-msgstr ""
+msgstr "ບັນນານຸກົມ/ບັນນານິທານ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "Link"
-msgstr ""
+msgstr "ລິ້ງ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "Mail Template extra prompt"
-msgstr ""
+msgstr "ພຣອມທ໌ເພີ່ມເຕີມສຳລັບແມ່ແບບອີເມວ"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_agent.py:0
 msgid "My agent"
-msgstr ""
+msgstr "ຕົວແທນຂອງຂ້ອຍ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_tree
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_kanban
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_tree
 msgid "Name"
-msgstr ""
+msgstr "ຊື່"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__next_trigger_date
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Next Trigger Date"
-msgstr ""
-
-#. module: ai_agentic
-#. odoo-javascript
-#: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
-msgid "No AI Chats yet."
-msgstr ""
+msgstr "ວັນທີກະຕຸ້ນຖັດໄປ"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_composer_action
 msgid "No Default Prompts found!"
-msgstr ""
+msgstr "ບໍ່ພົບພຣອມທ໌ເລີ່ມຕົ້ນ!"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_tool_action
 msgid "No Tools found!"
-msgstr ""
+msgstr "ບໍ່ພົບເຄື່ອງມື!"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "No automation runs yet."
-msgstr ""
+msgstr "ຍັງບໍ່ທັນມີການດຳເນີນການລະບົບອັດຕະໂນມັດເທື່ອ."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "No valid URLs found to process."
-msgstr ""
+msgstr "ບໍ່ພົບ URL ທີ່ຖືກຕ້ອງເພື່ອປະມວນຜົນ."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -733,92 +798,94 @@ msgid ""
 "No valid files to upload. Only PDF, Word, PowerPoint, Excel, Text, CSV, "
 "OpenDocument, and Markdown files are allowed."
 msgstr ""
+"ບໍ່ມີໄຟລ໌ທີ່ຖືກຕ້ອງເພື່ອອັບໂຫຼດ. ອະນຸຍາດສະເພາະໄຟລ໌ PDF, Word, PowerPoint, Excel, Text, "
+"CSV, OpenDocument ແລະ Markdown ເທົ່ານັ້ນ."
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Not now"
-msgstr ""
+msgstr "ບໍ່ແມ່ນຕອນນີ້"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent_source__file_sources_count
 msgid "Number of file sources"
-msgstr ""
+msgstr "ຈຳນວນແຫຼ່ງໄຟລ໌"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "On a Schedule"
-msgstr ""
+msgstr "ຕາມຕາຕະລາງ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "On the Model"
-msgstr ""
+msgstr "ໃນໂມເດວ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Paste your links, one per line"
-msgstr ""
+msgstr "ວາງລິ້ງຂອງທ່ານ, ໜຶ່ງແຖວຕໍ່ໜຶ່ງລິ້ງ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Prompt"
-msgstr ""
+msgstr "ພຣອມທ໌"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_tree
 msgid "Properties"
-msgstr ""
+msgstr "ຄຸນສົມບັດ"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Ran the trigger %(name)s"
-msgstr ""
+msgstr "ດຳເນີນການຕົວກະຕຸ້ນ %(name)s ແລ້ວ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__system_prompt_rendered
 msgid ""
 "Read-only rendering of the Markdown instructions, shown in the agent panel."
-msgstr ""
+msgstr "ການສະແດງຜົນຄຳແນະນຳ Markdown ແບບອ່ານຢ່າງດຽວ, ເຊິ່ງສະແດງໃນແຖບຕົວແທນ."
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_skills.xml:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.xml:0
 msgid "Remove"
-msgstr ""
+msgstr "ລຶບອອກ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__system_prompt_rendered
 msgid "Rendered Instructions"
-msgstr ""
+msgstr "ຄຳແນະນຳທີ່ສະແດງຜົນແລ້ວ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Reprocess"
-msgstr ""
+msgstr "ປະມວນຜົນຄືນໃໝ່"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_panel_sources.xml:0
 msgid "Restrict answers to Sources"
-msgstr ""
+msgstr "ຈຳກັດຄຳຕອບສະເພາະແຫຼ່ງຂໍ້ມູນ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_row.js:0
 msgid "Retry"
-msgstr ""
+msgstr "ລອງໃໝ່"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "Rule Name"
-msgstr ""
+msgstr "ຊື່ກົດເກນ"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -826,68 +893,69 @@ msgstr ""
 #: code:addons/ai_agentic/models/ai_tool.py:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.xml:0
 msgid "Run"
-msgstr ""
+msgstr "ດຳເນີນການ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run automatically at a set frequency, e.g. on Mondays 8AM"
 msgstr ""
+"ເຮັດວຽກອັດຕະໂນມັດຕາມຄວາມຖີ່ທີ່ກຳນົດ, ເຊັ່ນ: ທຸກໆວັນຈັນ ເວລາ 8:00 ໂມງເຊົ້າ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run once per record, when a specific date is reached"
-msgstr ""
+msgstr "ເຮັດວຽກໜຶ່ງຄັ້ງຕໍ່ແຕ່ລະຂໍ້ມູນ, ເມື່ອຮອດວັນທີທີ່ກຳນົດ"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Run this automation now?"
-msgstr ""
+msgstr "ດຳເນີນການລະບົບອັດຕະໂນມັດນີ້ຕອນນີ້ເລີຍບໍ່?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run whenever a new record is added"
-msgstr ""
+msgstr "ເຮັດວຽກທຸກຄັ້ງທີ່ມີການເພີ່ມຂໍ້ມູນໃໝ່"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.js:0
 msgid "Run whenever a specific field gets updated"
-msgstr ""
+msgstr "ເຮັດວຽກທຸກຄັ້ງທີ່ຊ່ອງຂໍ້ມູນສະເພາະມີການອັບເດດ"
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_thinking_text:ai_agentic.ir_actions_server_ai_run_automation
 msgid "Running the automation"
-msgstr ""
+msgstr "ກຳລັງດຳເນີນການລະບົບອັດຕະໂນມັດ"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__sales
 msgid "Sales"
-msgstr ""
+msgstr "ການຂາຍ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.xml:0
 msgid "Save"
-msgstr ""
+msgstr "ບັນທຶກ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "Select an action..."
-msgstr ""
+msgstr "ເລືອກການກະທຳ..."
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ir_actions_server
 msgid "Server Action"
-msgstr ""
+msgstr "ການກະທຳຂອງເຊີບເວີ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_search
 msgid "Skill"
-msgstr ""
+msgstr "ທັກສະ"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -898,17 +966,17 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_tree
 msgid "Skills"
-msgstr ""
+msgstr "ທັກສະ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__custom_skill_ids
 msgid "Skills configured by the user, excluding built-in native skills."
-msgstr ""
+msgstr "ທັກສະທີ່ກຳນົດໂດຍຜູ້ໃຊ້, ບໍ່ລວມທັກສະພື້ນຖານທີ່ມີມາພ້ອມລະບົບ."
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_skill_action
 msgid "Skills help you manage and organize your AI operations."
-msgstr ""
+msgstr "ທັກສະຊ່ວຍໃຫ້ທ່ານຈັດການ ແລະ ຈັດລະບຽບການເຮັດວຽກຂອງ AI."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -917,6 +985,7 @@ msgid ""
 "Some URLs are invalid and were skipped. URLs must start with http://, "
 "https://, or ftp://"
 msgstr ""
+"ບາງ URL ບໍ່ຖືກຕ້ອງ ແລະ ຖືກຂ້າມໄປ. URL ຕ້ອງເລີ່ມຕົ້ນດ້ວຍ http://, https:// ຫຼື ftp://"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -925,33 +994,35 @@ msgid ""
 "Some files have invalid formats and were skipped: %s. Only PDF, Word, "
 "PowerPoint, Excel, Text, CSV, and OpenDocument files are allowed."
 msgstr ""
+"ບາງໄຟລ໌ມີຮູບແບບບໍ່ຖືກຕ້ອງ ແລະ ຖືກຂ້າມໄປ: %s. ອະນຸຍາດສະເພາະໄຟລ໌ PDF, Word, PowerPoint, "
+"Excel, Text, CSV ແລະ OpenDocument ເທົ່ານັ້ນ."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_search
 msgid "Sources"
-msgstr ""
+msgstr "ແຫຼ່ງຂໍ້ມູນ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.xml:0
 msgid "Subagents"
-msgstr ""
+msgstr "ຕົວແທນຍ່ອຍ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 msgid "Summarize the chatter"
-msgstr ""
+msgstr "ສະຫຼຸບການສົນທະນາ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_form
 msgid "Summarize what this skill does"
-msgstr ""
+msgstr "ສະຫຼຸບສິ່ງທີ່ທັກສະນີ້ເຮັດ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
 msgid "System Rules"
-msgstr ""
+msgstr "ກົດເກນລະບົບ"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_composer_action
@@ -959,12 +1030,13 @@ msgid ""
 "Those are used to configure when to call a specific agent, or to add an "
 "extra prompt to your request."
 msgstr ""
+"ສິ່ງເຫຼົ່ານີ້ໃຊ້ສຳລັບຕັ້ງຄ່າວ່າເວລາໃດຄວນຮຽກໃຊ້ຕົວແທນສະເພາະ, ຫຼື ເພີ່ມພຣອມທ໌ພິເສດໃສ່ຄຳຮ້ອງຂໍຂອງທ່ານ."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_list
 msgid "Title"
-msgstr ""
+msgstr "ຫົວຂໍ້"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -973,7 +1045,7 @@ msgstr ""
 #: model:ir.ui.menu,name:ai_agentic.ai_tool_menu_action
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 msgid "Tools"
-msgstr ""
+msgstr "ເຄື່ອງມື"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_tool_action
@@ -982,6 +1054,8 @@ msgid ""
 "                generating an image or updating a record) when called by an "
 "Agent."
 msgstr ""
+"ເຄື່ອງມືແມ່ນການກະທຳສະເພາະທີ່ຕົວແທນ AI ສາມາດເຮັດໄດ້ໃນຖານຂໍ້ມູນຂອງທ່ານ (ເຊັ່ນ: \n"
+"                ການສ້າງຮູບພາບ ຫຼື ການອັບເດດຂໍ້ມູນ) ເມື່ອຖືກຮຽກໃຊ້ໂດຍຕົວແທນ."
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -989,91 +1063,91 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__automation_ids
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 msgid "Triggers"
-msgstr ""
+msgstr "ຕົວກະຕຸ້ນ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Unarchive"
-msgstr ""
+msgstr "ຍົກເລີກການຈັດເກັບ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 msgid "Unread"
-msgstr ""
+msgstr "ຍັງບໍ່ໄດ້ອ່ານ"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Updated a Trigger"
-msgstr ""
+msgstr "ອັບເດດຕົວກະຕຸ້ນແລ້ວ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
 msgid "Upload a File"
-msgstr ""
+msgstr "ອັບໂຫຼດໄຟລ໌"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_tool_view_search
 msgid "Use in AI is set"
-msgstr ""
+msgstr "ມີການຕັ້ງຄ່າໃຫ້ໃຊ້ໃນ AI ແລ້ວ"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "When should your agent be triggered?"
-msgstr ""
+msgstr "ຄວນກະຕຸ້ນຕົວແທນຂອງທ່ານເມື່ອໃດ?"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "When users need to"
-msgstr ""
+msgstr "ເມື່ອຜູ້ໃຊ້ຕ້ອງການ"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__worker
 msgid "Worker"
-msgstr ""
+msgstr "ພະນັກງານ"
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_thinking_text:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "Working on your automation"
-msgstr ""
+msgstr "ກຳລັງດຳເນີນການລະບົບອັດຕະໂນມັດຂອງທ່ານ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
 msgid "Write your prompt..."
-msgstr ""
+msgstr "ຂຽນພຣອມທ໌ຂອງທ່ານ..."
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_skill_view_form
 msgid "e.g. Chat with customers"
-msgstr ""
+msgstr "ຕົວຢ່າງ: ສົນທະນາກັບລູກຄ້າ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 msgid "e.g. Get tips to close more sales"
-msgstr ""
+msgstr "ຕົວຢ່າງ: ຮັບຄຳແນະນຳເພື່ອປິດການຂາຍເພີ່ມເຕີມ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 msgid "e.g. SDR Advisor"
-msgstr ""
+msgstr "ຕົວຢ່າງ: ທີ່ປຶກສາ SDR"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
 msgid "e.g. write a one paragraph summary of the chatter conversation"
-msgstr ""
+msgstr "ຕົວຢ່າງ: ຂຽນບົດສະຫຼຸບໜຶ່ງຫຍໍ້ໜ້າກ່ຽວກັບບົດສົນທະນາ"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "has run %s"
-msgstr ""
+msgstr "ໄດ້ດຳເນີນການ %s ແລ້ວ"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "self-updated its configuration"
-msgstr ""
+msgstr "ອັບເດດການຕັ້ງຄ່າຂອງຕົນເອງແລ້ວ"

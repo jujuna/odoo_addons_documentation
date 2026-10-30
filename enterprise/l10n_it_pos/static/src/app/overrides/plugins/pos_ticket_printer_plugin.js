@@ -30,7 +30,7 @@ patch(PosTicketPrinterPlugin.prototype, {
                 isBasicPrint: basic,
                 isEarlyPrint: printBillActionTriggered,
             });
-        } else if (!order.nb_print) {
+        } else if (!order.it_fiscal_receipt_number) {
             try {
                 result = order.to_invoice
                     ? await this.fiscalPrinter.printFiscalInvoice({ order })
@@ -44,7 +44,7 @@ patch(PosTicketPrinterPlugin.prototype, {
 
             if (result.success) {
                 this.data.write("pos.order", [order.id], {
-                    it_fiscal_receipt_number: result.addInfo.fiscalReceiptNumber,
+                    it_fiscal_receipt_number: `${result.addInfo.fiscalReceiptNumber}|${result.addInfo.serialNumber}`,
                     it_fiscal_receipt_date: result.addInfo.fiscalReceiptDate,
                     it_z_rep_number: result.addInfo.zRepNumber,
                     //update the number of times the order got printed, handling undefined

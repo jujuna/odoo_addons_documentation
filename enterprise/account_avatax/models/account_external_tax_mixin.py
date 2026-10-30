@@ -183,7 +183,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
     @api.model
     def _extract_tax_values_from_avatax_detail(self, service_params, line_details, tax_detail):
-        company = service_params['line_data'][0]['base_line']['record'].company_id
+        company = self._find_avatax_credentials_company(service_params['line_data'][0]['base_line']['record'].company_id)
         fiscal_position = service_params['fiscal_position']
         amount_type = 'fixed' if tax_detail.get('unitOfBasis') == 'FlatAmount' else 'percent'
         amount = tax_detail['rate'] * (1 if amount_type == 'fixed' else 100)

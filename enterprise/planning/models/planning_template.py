@@ -66,7 +66,7 @@ class PlanningSlotTemplate(models.Model):
 
     def _compute_company_id(self):
         for template in self:
-            template.company_id = template._get_company_id()
+            template.company_id = template._get_company()
 
     @api.model
     def formatted_read_group(self, domain, groupby=(), aggregates=(), having=(), offset=0, limit=None, order=None) -> list[dict]:
@@ -78,7 +78,7 @@ class PlanningSlotTemplate(models.Model):
                 data['end_time'] = float_to_time(data['end_time']).strftime('%H:%M')
         return res
 
-    def _get_company_id(self):
+    def _get_company(self):
         return self.env['res.company']
 
     def _get_name(self, time_condensed=False):

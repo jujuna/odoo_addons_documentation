@@ -1,7 +1,7 @@
 import { _t } from "@web/core/l10n/translation";
 import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
-import { hasMobileNative, mobileNative } from "@pos_mobile_android/app/utils/native";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
 
 export const DEVICE_MANAGER_ITEM = "obox_pos_mobile.device_manager";
 
@@ -24,6 +24,10 @@ export function deviceManagerItem(env) {
     };
 }
 
-if (hasMobileNative("openDeviceManager")) {
-    registry.category("user_menuitems").add(DEVICE_MANAGER_ITEM, deviceManagerItem);
+if (mobileNative.openDeviceManager) {
+    Promise.resolve(mobileNative.isKioskModeEnabled?.().catch(() => false)).then((inKioskMode) => {
+        if (!inKioskMode) {
+            registry.category("user_menuitems").add(DEVICE_MANAGER_ITEM, deviceManagerItem);
+        }
+    });
 }

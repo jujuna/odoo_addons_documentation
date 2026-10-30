@@ -11,7 +11,7 @@
                     <field name="action" nolabel="1" widget="radio" required="1" class="w-100"/>
                     <group class="mt-2">
                         <field name="partner_id" widget="res_partner_many2one"
-                            context="{'res_partner_search_mode': 'customer', 'show_vat': True}"
+                            context="{'res_partner_search_mode': 'customer', 'show_identifier': True}"
                             invisible="action != 'exist'"
                             required="action == 'exist'"/>
                     </group>

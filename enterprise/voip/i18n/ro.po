@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"POT-Creation-Date: 2026-10-16 17:50+0000\n"
 "PO-Revision-Date: 2026-09-18 04:39+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
@@ -682,6 +682,12 @@ msgid "A phone service event is processed only once."
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/pbx_service.py:0
+msgid "A tenant migration cannot reuse an identifier with a different mapping."
+msgstr ""
+
+#. module: voip
 #: model:ir.model.constraint,message:voip.constraint_voip_call_check_unique_control_handle_per_user
 msgid "A user can only have one live call per control handle and direction."
 msgstr ""
@@ -1041,6 +1047,12 @@ msgstr "A apărut o eroare în timpul încercării de a răspunde la apelul prim
 
 #. module: voip
 #. odoo-python
+#: code:addons/voip/models/pbx_service.py:0
+msgid "An older tenant migration mapping cannot replace the current mapping."
+msgstr ""
+
+#. module: voip
+#. odoo-python
 #: code:addons/voip/models/voip_call.py:0
 msgid "Answer"
 msgstr ""
@@ -1305,6 +1317,7 @@ msgstr ""
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/no_phone_number_card.xml:0
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
 msgid "Buy a Number"
 msgstr ""
 
@@ -2208,6 +2221,12 @@ msgstr "Dată"
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Date:"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Dear %(name)s,"
 msgstr ""
 
 #. module: voip
@@ -4480,6 +4499,11 @@ msgid "No number"
 msgstr ""
 
 #. module: voip
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
+msgid "No number requests found"
+msgstr ""
+
+#. module: voip
 #. odoo-python
 #: code:addons/voip/models/phone_service_api.py:0
 msgid ""
@@ -4778,6 +4802,12 @@ msgstr ""
 #. module: voip
 #: model:iap.service,name:voip.iap_service_phone_service
 msgid "Odoo Phone Service"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Odoo Phone Team"
 msgstr ""
 
 #. module: voip
@@ -5259,6 +5289,7 @@ msgstr ""
 #. module: voip
 #: model:ir.module.module,shortdesc:base.module_voip
 #: model:ir.ui.menu,name:voip.menu_voip_root
+#: model:res.groups.privilege,name:voip.res_groups_privilege_voip
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 msgid "Phone"
@@ -5344,6 +5375,7 @@ msgstr ""
 #. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/no_phone_number_card.xml:0
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
 msgid "Phone numbers"
 msgstr ""
 
@@ -5373,7 +5405,7 @@ msgstr ""
 
 #. module: voip
 #. odoo-javascript
-#: code:addons/voip/static/src/core/web/session.js:0
+#: code:addons/voip/static/src/core/web/audio_manager.js:0
 msgid "Please accept use of the microphone."
 msgstr ""
 
@@ -6182,6 +6214,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/country_selector_items.xml:0
 msgid "Search country or prefix"
+msgstr ""
+
+#. module: voip
+#: model_terms:ir.actions.act_window,help:voip.action_voip_did_number_request
+msgid ""
+"Search for a number to buy. If none are available,<br>\n"
+"                    click Request Numbers to submit a request and track it "
+"here."
 msgstr ""
 
 #. module: voip
@@ -7260,6 +7300,31 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s could not be completed. You can "
+"find more details on the phone number."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s has been received and is under "
+"review. The documents you have submitted are being evaluated. You will be "
+"notified if we need more information to complete the order."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"The order for your phone number %(number)s is complete. Your number is now "
+"active and you can assign it."
+msgstr ""
+
+#. module: voip
 #: model:ir.model.fields,help:voip.field_res_partner__t9_name
 #: model:ir.model.fields,help:voip.field_res_users__t9_name
 msgid ""
@@ -8110,11 +8175,6 @@ msgid "Visible to all"
 msgstr "Vizibil pentru toți"
 
 #. module: voip
-#: model:res.groups.privilege,name:voip.res_groups_privilege_voip
-msgid "VoIP"
-msgstr "VoIP"
-
-#. module: voip
 #: model:ir.model.fields,field_description:voip.field_mail_call_artifact__voip_call_id
 msgid "VoIP Call"
 msgstr ""
@@ -8645,11 +8705,29 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number has been released (%(number)s)"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number is active! (%(number)s)"
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/core/web/voip_service.js:0
 msgid ""
 "Your number is active. Your phone setup is still being finalized. Calling "
 "will be available once setup is complete."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number is suspended (%(number)s)"
 msgstr ""
 
 #. module: voip
@@ -8701,6 +8779,18 @@ msgid ""
 msgstr ""
 
 #. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number order has failed (%(number)s)"
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid "Your number order is under review (%(number)s)"
+msgstr ""
+
+#. module: voip
 #. odoo-javascript
 #: code:addons/voip/static/src/softphone/status_menu.js:0
 msgid "Your numbers"
@@ -8709,19 +8799,24 @@ msgstr ""
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
-msgid "Your phone number activation has failed."
+msgid ""
+"Your phone number %(number)s has been released. It is no longer yours and "
+"can no longer be used to make or receive calls."
+msgstr ""
+
+#. module: voip
+#. odoo-python
+#: code:addons/voip/models/voip_did_number.py:0
+msgid ""
+"Your phone number %(number)s has been suspended because your credit balance "
+"could not cover its monthly fee. Buy credits to reactivate it, otherwise it "
+"will be released."
 msgstr ""
 
 #. module: voip
 #. odoo-python
 #: code:addons/voip/models/voip_did_number.py:0
 msgid "Your phone number is in \"%(state)s\" state."
-msgstr ""
-
-#. module: voip
-#. odoo-python
-#: code:addons/voip/models/voip_did_number.py:0
-msgid "Your phone number is now active and can be assigned."
 msgstr ""
 
 #. module: voip
@@ -8897,6 +8992,9 @@ msgstr ""
 #: code:addons/voip/static/src/softphone/status_menu.xml:0
 msgid "phone_disabled"
 msgstr ""
+
+#~ msgid "VoIP"
+#~ msgstr "VoIP"
 
 #~ msgid "Cancel transfer"
 #~ msgstr "Anulare transfer"

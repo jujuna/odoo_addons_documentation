@@ -1,14 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from collections import defaultdict
 from datetime import datetime, time
 
-from collections import defaultdict
-
-from odoo import api, fields, models, _
-from odoo.fields import Command
+from odoo import _, api, fields, models, modules
 from odoo.exceptions import AccessError, UserError
-from odoo.tools.intervals import Intervals
+from odoo.fields import Command, Domain
+from odoo.tools import config
 from odoo.tools.date_utils import localized
+from odoo.tools.intervals import Intervals
 
 
 class HrLeave(models.Model):
@@ -30,7 +30,8 @@ class HrLeave(models.Model):
     options_on_work_entry_type_ids = fields.Many2many(related='work_entry_type_id.optional_category_ids', groups="hr_payroll.group_hr_payroll_user")
     issues = fields.Json(compute='_compute_issues', store=True, readonly=True)
 
-    @api.depends('employee_id', 'date_from')
+    @api.depends('employee_id', 'date_from', 'employee_id.version_ids.active', 'employee_id.version_ids.date_version',
+                 'employee_id.version_ids.employee_type_id', 'employee_id.version_ids.job_id', 'employee_id.version_ids.structure_type_id')
     def _compute_version_fields(self):
         for leave in self:
             if not leave.date_from or not leave.employee_id:
@@ -87,6 +88,14 @@ class HrLeave(models.Model):
     @api.depends(lambda self: self._issues_dependencies())
     def _compute_issues(self):
         self.issues = {}
+        if (
+            (not self.env.registry.ready or config["test_enable"] or modules.module.current_test)
+            # This context key acts as an escape hatch for upgrade scripts that need to
+            # explicitly recompute payroll issues while the registry is still initializing,
+            # and for the tests that check the issues.
+            and not (self.env.context.get("hr_payroll_force_compute_issue"))
+        ):
+            return
         warnings = self.env["hr.payroll.warning"].search([
             ("display_on_model", "=", True),
             ("model_name", "=", "hr.leave"),
@@ -103,7 +112,8 @@ class HrLeave(models.Model):
                         issues[len(issues)] = warning._get_warning_issue()
                     leave.issues = issues
             else:
-                related_leaves, warning_details, _, _ = warning._get_warning_python_records(localdict={'active_ids': self.ids})
+                # A request that is not saved yet has no id, so the records are given as well (self).
+                related_leaves, warning_details, _, _ = warning._get_warning_python_records(localdict={'active_ids': self.ids, 'records': self})
                 for leave in self:
                     issues = leave.issues or {}
                     if leave in related_leaves:
@@ -202,7 +212,7 @@ class HrLeave(models.Model):
         res_ids_for_availabilities = defaultdict(set)
         field = 'employee_id'
         for group in gantt_data['groups']:
-            res_id = group[field][0] if group[field] else False
+            res_id = group[field][0] if group.get(field) else False
             if res_id:
                 res_ids_for_availabilities[field].add(res_id)
         if not res_ids_for_availabilities[field]:
@@ -389,7 +399,18 @@ class HrLeave(models.Model):
     def write(self, vals):
         if vals.get('active') and self._check_uncovered_by_validated_payslip():
             self._check_uncovered_by_validated_payslip()
-        return super().write(vals)
+
+        res = super().write(vals)
+        for leave in self:
+            invalid_options = leave.sudo().category_options_ids - leave.sudo().options_on_work_entry_type_ids
+            if invalid_options:
+                raise UserError(self.env._(
+                    "You cannot select the option(s) '%(options)s' for the time off type '%(work_type)s'.",
+                    options=", ".join(invalid_options.mapped('name')),
+                    work_type=leave.work_entry_type_id.name,
+                ))
+
+        return res
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_no_payslip(self):
@@ -414,3 +435,33 @@ class HrLeave(models.Model):
         if category_options_ids := self.sudo().category_options_ids:
             vals['category_options_ids'] = [(Command.set(category_options_ids.ids))]
         return vals
+
+    @api.model
+    def _gantt_progress_bar(self, field, res_ids, start, stop):
+        """
+        The number of hours displayed in the Gantt view of Time Off is based
+        on the worked hours of the employee, but in the case of Belgium we also want
+        to display the overtime hours in that counter
+        """
+        res = super()._gantt_progress_bar(field, res_ids, start, stop)
+
+        work_entries = self.env['hr.work.entry.type'].sudo().search([
+            ('category_ids', 'in', self.env.ref('hr_payroll.EXTRA_HOURS').id),
+        ])
+
+        aggregated_hours = self.env['hr.leave']._read_group(
+            domain=Domain([
+                ('employee_id', 'in', res_ids),
+                ('state', '=', 'validate'),
+                ('work_entry_type_id', 'in', work_entries.ids),
+                ('date_from', '<=', stop),
+                ('date_to', '>=', start),
+            ]),
+            groupby=['employee_id'],
+            aggregates=['number_of_hours:sum'],
+        )
+
+        for employee, hours in aggregated_hours:
+            res[employee.id]['value'] += hours
+
+        return res

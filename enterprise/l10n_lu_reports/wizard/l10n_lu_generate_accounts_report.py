@@ -201,7 +201,7 @@ class L10n_LuGenerateAccountsReport(models.TransientModel):
             :return: a dictionary in which the values for the different fields (dict keys) are filled in
         """
         account_fields = {}
-        lines = report._get_lines(report.get_options(options))
+        lines = report._get_lines(report.get_options({**options, 'no_report_reroute': True}))
         # Read the debit and credit from all accounts and add the values to the corresponding fields.
         # Name hierarchy allows easy calculation of the totals.
         # eg the debit from account 106284 will be added to the fields: 106284, 10628, 1062, 106, 10

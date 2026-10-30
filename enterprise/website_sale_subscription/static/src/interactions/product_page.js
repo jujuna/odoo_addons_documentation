@@ -65,6 +65,10 @@ patch(ProductPage.prototype, {
         }
     },
 
+    _hasUomPrice(combination) {
+        return super._hasUomPrice(combination) && !combination.is_subscription;
+    },
+
     /**
      * Override of `website_sale` to add the selected plan to the optional combination info
      * parameters.

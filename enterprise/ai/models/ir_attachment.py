@@ -7,12 +7,11 @@ import logging
 from odoo import api, fields, models
 from odoo.fields import Domain
 from odoo.http.router import root
-from odoo.addons.ai.models.models import AI_SUPPORTED_IMG_TYPES
 from odoo.tools.pdf import OdooPdfFileReader, OdooPdfFileWriter, to_pdf_stream, PdfReadError
 from odoo.tools.image import ImageProcess
 
 from odoo.addons.mail.tools.discuss import Store
-from odoo.addons.ai.utils.ai_image_tools import retrieve_image_data_from_record, field_to_image_path, closest_aspect_ratio
+from odoo.addons.ai.utils.ai_image_tools import retrieve_image_data_from_record, field_to_image_path, closest_aspect_ratio, AI_SUPPORTED_IMG_TYPES
 from odoo.addons.ai.utils.ai_text_tools import process_csv_text
 
 
@@ -116,10 +115,10 @@ class IrAttachment(models.Model):
                 size = None
                 try:
                     image_process = ImageProcess(raw_data)
-                    size = image_process.image.size
-                    if max(size) > 1024:
+                    if (image := image_process.image) and max(image.size) > 1024:
+                        w, h = image.size
                         raw_data = image_process \
-                            .crop_resize(min(size[0], 1024), min(size[1], 1024), 0, 0) \
+                            .crop_resize(min(w, 1024), min(h, 1024), 0, 0) \
                             .image_quality(output_format='PNG')
                 except Exception as e:  # noqa: BLE001
                     _logger.error("Image resize failed %s", e)

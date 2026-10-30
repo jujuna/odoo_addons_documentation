@@ -84,6 +84,10 @@
                     <div invisible="not correction_ids" class="alert alert-info mb-3" role="alert">
                         This Declaration is already corrected by another Declaration. Please check the correction(s) for more details.
                     </div>
+                    <div invisible="not withholding_warning" class="alert alert-warning mb-3" role="alert">
+                        The withholding taxes of these forms do not match the ones already declared for this year:
+                        <field name="withholding_warning" class="d-block mt-1"/>
+                    </div>
                     <group>
                         <group>
                             <field name="year" readonly="xml_file or state in ['done', 'cancel']"/>

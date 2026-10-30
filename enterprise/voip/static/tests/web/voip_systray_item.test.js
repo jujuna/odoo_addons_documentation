@@ -7,13 +7,13 @@ import { Voip } from "@voip/core/web/voip_service";
 setupVoipTests();
 
 test("Clicking on systray item when softphone is hidden shows the softphone.", async () => {
-    start();
+    await start();
     await click(".o_menu_systray button[title='Show Softphone']");
     await contains(".o-voip-Softphone");
 });
 
 test("Clicking on systray item when softphone is displayed hides the softphone.", async () => {
-    start();
+    await start();
     await click(".o_menu_systray button[title='Show Softphone']");
     await click(".o_menu_systray button[title='Hide Softphone']");
     await contains(".o-voip-Softphone");
@@ -24,7 +24,7 @@ test("Display missed call count in systray rounded pill “10” when there are 
     for (let i = 0; i < 10; ++i) {
         pyEnv["voip.call"].create({ state: "missed", user_id: serverState.userId });
     }
-    start();
+    await start();
     await contains("button[title='Show Softphone']", { text: "10" });
 });
 

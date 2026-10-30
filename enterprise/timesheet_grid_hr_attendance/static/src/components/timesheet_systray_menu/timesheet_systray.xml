@@ -13,7 +13,7 @@
             <t t-if="this.hrAttendanceProps.attendanceCheckInPermission">
                 <div class="m-3 d-flex flex-row align-items-center gap-3">
                     <div name="ts_checkin_btn"
-                        class="o_wrap_btn_sign_out position-md-sticky bottom-0 z-2
+                        class="o_wrap_btn_sign_out position-md-sticky bottom-0
                             align-self-center d-flex flex-grow-1">
                         <button t-if="this.hrAttendanceProps.signInOut" t-on-click="this.hrAttendanceProps.signInOut"
                             class="btn btn-secondary">
@@ -41,7 +41,7 @@
             <div t-elif="this.timesheetCheckInPermission" class="m-3 d-flex flex-row align-items-center"
                 name="ts_systray_footer">
                 <div name="ts_checkin_btn"
-                    class="o_wrap_btn_sign_out position-md-sticky bottom-0 z-2
+                    class="o_wrap_btn_sign_out position-md-sticky bottom-0
                         align-self-center d-flex flex-grow-1">
                     <button t-on-click="() => this.hrAttendanceProps.signInOut()"
                             t-attf-class="btn btn-{{ this.props.checkInData.checkedIn ? 'secondary' : 'primary w-100' }}">

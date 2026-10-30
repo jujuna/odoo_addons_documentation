@@ -21,12 +21,13 @@ class PlanningSlot(models.Model):
         'worksheet.template', string="Worksheet",
         tracking=15,
         default=lambda self: self._domain_worksheet_template_id(),
+        compute='_compute_worksheet_template_id', store=True, readonly=False,
         group_expand='_group_expand_worksheet_template_id',
         domain="[('res_model', '=', 'planning.slot'), '|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Create templates for each type of intervention you have and customize their content with your own custom fields.",
         check_company=True,
     )
-    worksheet_properties = fields.Properties('Worksheet Properties', definition='worksheet_template_id.worksheet_properties_definition', copy=True)
+    worksheet_properties = fields.Properties('Worksheet Properties', definition='worksheet_template_id.worksheet_properties_definition', copy=True, precompute=False)
     photo_ids = fields.One2many(
         'ir.attachment', 'res_id',
         domain=[('res_model', '=', 'planning.slot'), ('mimetype', '=like', 'image/%')],
@@ -50,10 +51,15 @@ class PlanningSlot(models.Model):
     def _compute_allow_template_creation(self):
         super()._compute_allow_template_creation()
 
-    @api.onchange('template_id')
+    @api.depends('template_id')
+    def _compute_worksheet_template_id(self):
+        for slot in self:
+            if slot.template_id.worksheet_template_id:
+                slot.worksheet_template_id = slot.template_id.worksheet_template_id
+
     def _onchange_template_id(self):
-        if self.template_id.worksheet_template_id:
-            self.worksheet_template_id = self.template_id.worksheet_template_id
+        # TODO: remove me in master
+        pass
 
     def _is_node_invisible(self, xml_node, record_data):
         current_node = xml_node

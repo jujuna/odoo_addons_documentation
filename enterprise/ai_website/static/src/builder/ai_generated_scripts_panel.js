@@ -1,5 +1,6 @@
 import { Component, t, useProps } from "@odoo/owl";
 import { useOperation } from "@html_builder/core/operation_plugin";
+import { _t } from "@web/core/l10n/translation";
 import { getScriptTitle } from "../utils";
 
 export class AiGeneratedScriptsPanel extends Component {
@@ -18,6 +19,7 @@ export class AiGeneratedScriptsPanel extends Component {
     }
 
     getScriptTitle = getScriptTitle;
+    notRemovableTooltip = _t("Removing a script requires 'Editor and Designer' access");
 
     stopScript(scriptEl) {
         this.shared.aiScript.stopScript(scriptEl);

@@ -1,9 +1,11 @@
 import base64
+import json
 import logging
 
 from odoo import _, api, models
 from odoo.exceptions import ValidationError
 from odoo.modules.registry import Registry
+from odoo.tools import consteq, hmac
 
 from odoo.addons.voip.models.phone_service_api import CLIENT_UUID_PARAM, PhoneServiceAPI
 
@@ -12,6 +14,9 @@ _logger = logging.getLogger(__name__)
 PBX_DEFAULT_RINGING_TIME = 32
 PBX_SYNC_USER_TIMEOUT = 35
 PBX_TENANT_RECOVERY_SCHEMA_VERSION = 1
+PBX_TENANT_MIGRATION_ID_PARAM = "voip.phone_service_tenant_migration_id"
+PBX_TENANT_MIGRATION_FINGERPRINT_PARAM = "voip.phone_service_tenant_migration_fingerprint"
+PBX_TENANT_MIGRATION_FINGERPRINT_SCOPE = "voip_phone_service_tenant_migration_mapping"
 PBX_DESTINATION_MODELS = [
     ("voip.extension", "Extension"),
     ("voip.call.group", "Group"),
@@ -574,6 +579,104 @@ class PBXService(models.AbstractModel):
             "schedules": schedules_payload,
             "incalls": incalls_payload,
         }
+
+    def _apply_tenant_migration_mapping(self, migration_id, resources):
+        """Apply the destination PBX's ids after a phone_service tenant
+        migration, keyed by the same odoo_id used in the recovery payload.
+
+        Idempotent by construction (every write targets a record found by
+        its stable odoo_id and simply overwrites its cached PBX id/uuid), so
+        phone_service may safely resend the same mapping if an earlier
+        attempt's response never made it back. A record phone_service no
+        longer sees as existing (deleted locally since the recovery payload
+        was taken) is silently skipped rather than raised on, since there is
+        nothing left here to point at the new PBX.
+        """
+        env = self.env(su=True)
+        parameters = env["ir.config_parameter"]
+        fingerprint = hmac(
+            env,
+            PBX_TENANT_MIGRATION_FINGERPRINT_SCOPE,
+            json.dumps(resources, sort_keys=True, separators=(",", ":")),
+        )
+        # The configured client UUID is a stable singleton row. Locking it
+        # serializes callbacks before reading or updating their ordering state.
+        parameters.flush_model(["key", "value"])
+        env.cr.execute(
+            "SELECT id FROM ir_config_parameter WHERE key = %s FOR UPDATE",
+            [CLIENT_UUID_PARAM],
+        )
+        state_parameters = parameters.search([(
+            "key", "in", (
+                PBX_TENANT_MIGRATION_ID_PARAM,
+                PBX_TENANT_MIGRATION_FINGERPRINT_PARAM,
+            ),
+        )])
+        state_parameter_by_key = {parameter.key: parameter for parameter in state_parameters}
+        migration_id_parameter = state_parameter_by_key.get(PBX_TENANT_MIGRATION_ID_PARAM)
+        fingerprint_parameter = state_parameter_by_key.get(
+            PBX_TENANT_MIGRATION_FINGERPRINT_PARAM,
+        )
+        last_migration_id = int(migration_id_parameter.value) if migration_id_parameter else 0
+        if migration_id < last_migration_id:
+            raise ValidationError(env._(
+                "An older tenant migration mapping cannot replace the current mapping."
+            ))
+        if migration_id == last_migration_id:
+            if consteq(
+                fingerprint_parameter.value if fingerprint_parameter else "",
+                fingerprint,
+            ):
+                return
+            raise ValidationError(env._(
+                "A tenant migration cannot reuse an identifier with a different mapping."
+            ))
+        model_and_field_by_resource = {
+            "users": ("res.users", {
+                "user_id": "voip_pbx_user_id",
+                "user_uuid": "voip_pbx_user_uuid",
+                "line_id": "voip_pbx_line_id",
+            }),
+            "agents": ("res.users", {"agent_id": "voip_pbx_agent_id"}),
+            "extensions": ("voip.extension", {"extension_id": "pbx_extension_id"}),
+            "voicemails": ("voip.voicemail", {"voicemail_id": "pbx_voicemail_id"}),
+            "groups": ("voip.call.group", {
+                "group_id": "pbx_group_id", "group_uuid": "pbx_group_uuid",
+            }),
+            "queues": ("voip.queue", {"queue_id": "pbx_queue_id"}),
+            "ivrs": ("voip.ivr", {"ivr_id": "pbx_ivr_id"}),
+            "schedules": ("voip.time.condition", {"schedule_id": "pbx_schedule_id"}),
+            "incalls": ("voip.did.number", {
+                "incall_id": "pbx_incall_id", "extension_id": "pbx_incall_extension_id",
+            }),
+            "music_on_holds": ("voip.music.on.hold", {
+                "moh_uuid": "pbx_moh_uuid", "moh_name": "pbx_moh_name",
+            }),
+        }
+        for resource, (model_name, field_by_key) in model_and_field_by_resource.items():
+            for entry in resources.get(resource, []):
+                odoo_id = entry["user_odoo_id"] if resource == "agents" else entry["odoo_id"]
+                record = env[model_name].browse(odoo_id).exists()
+                if not record:
+                    continue
+                # These ids are recorded, not (re)provisioned: skip the
+                # write-triggered PBX sync some of these models fire on
+                # their own config fields, or this would call back into the
+                # very PBX that just supplied the ids.
+                record.with_context(voip_skip_pbx_sync=True).write({
+                    field: entry[key]
+                    for key, field in field_by_key.items()
+                    if key in entry
+                })
+        values_by_key = {
+            PBX_TENANT_MIGRATION_ID_PARAM: str(migration_id),
+            PBX_TENANT_MIGRATION_FINGERPRINT_PARAM: fingerprint,
+        }
+        for key, value in values_by_key.items():
+            if parameter := state_parameter_by_key.get(key):
+                parameter.value = value
+            else:
+                parameters.create({"key": key, "value": value})
 
     # ----- Users, lines, extensions -----
 

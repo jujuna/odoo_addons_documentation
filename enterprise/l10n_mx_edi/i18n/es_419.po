@@ -10,10 +10,10 @@ msgstr ""
 "Project-Id-Version: Odoo Server 18.1alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 18:21+0000\n"
-"PO-Revision-Date: 2026-09-18 05:04+0000\n"
+"PO-Revision-Date: 2026-10-09 23:33+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/l10n_mx_edi/es_419/>\n"
+"odoo-20/l10n_mx_edi/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,54 +32,63 @@ msgid ""
 "This module allows the creation of the EDI documents and the communication "
 "with the Mexican certification providers (PACs) to sign/cancel them.\n"
 msgstr ""
+"\n"
+"Localización de EDI para México\n"
+"========================\n"
+"Permite que el usuario genere el documento EDI para la facturación "
+"mexicana.\n"
+"\n"
+"Este módulo permite la creación de los documentos EDI y la comunicación con "
+"los proveedores autorizados de certificación (PAC) mexicanos para firmarlos "
+"o cancelarlos.\n"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid " fee"
-msgstr ""
+msgstr " tarifa"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "%(processed)s document(s) imported, %(failed)s failed."
-msgstr ""
+msgstr "%(processed)s documento(s) importado(s), %(failed)s fallaron."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "%(tax_type)s tax with %(amount)s rate"
-msgstr ""
+msgstr "Impuesto %(tax_type)s con tasa de %(amount)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "%s document(s) imported."
-msgstr ""
+msgstr "%s documento(s) importado(s)."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "- Extra details: %(message)s"
-msgstr ""
+msgstr "- Detalles adicionales: %(message)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "- Request Status %(code)s: %(info)s"
-msgstr ""
+msgstr "- Estado de la solicitud %(code)s: %(info)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/res_company.py:0
 msgid "- Request for %(receipt_type)s CFDIs failed with: %(message)s"
-msgstr ""
+msgstr "- La solicitud de los %(receipt_type)s de CFDI falló con: %(message)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "- Verification Status %(code)s: %(info)s"
-msgstr ""
+msgstr "- Estado de la verificación %(code)s: %(info)s"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_invoice_cancellation_reason__01
@@ -202,7 +211,7 @@ msgstr "<span class=\"fw-bold\">Por distribuir: </span>"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_form_view
 msgid "<span class=\"o_stat_text\">Imported Documents</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Documentos importados</span>"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_payment_document
@@ -250,7 +259,7 @@ msgstr "<span> | Lugar de expedición:</span>"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_invoice_document
 msgid "<span> | Export:</span>"
-msgstr ""
+msgstr "<span> | Exportar:</span>"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_invoice_document
@@ -481,7 +490,7 @@ msgstr "Ya existe un método de pago con el mismo código."
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "A request with the same criteria already exists."
-msgstr ""
+msgstr "Ya existe una solicitud con los mismos criterios."
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_payment_document
@@ -632,6 +641,8 @@ msgstr "Proveedor autorizado de certificación (PAC)"
 #: model:ir.actions.server,name:l10n_mx_edi.ir_cron_update_pac_status_invoice_ir_actions_server
 msgid "Automatic update of state on the SAT (for invoices and payslips)"
 msgstr ""
+"Actualización automática del estado en el SAT (para facturas y recibos de "
+"nómina)"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_invoice_cancel__available_cancellation_reasons
@@ -656,7 +667,7 @@ msgstr "Nombre del banco de la cuenta ordenante"
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Transacción bancaria"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_invoice_document
@@ -671,6 +682,8 @@ msgid ""
 "Before %(tax_name)s: %(computed_amount)s  |  After %(tax_name)s: %"
 "(cfdi_amount)s"
 msgstr ""
+"Antes de %(tax_name)s: %(computed_amount)s  |  Después de %(tax_name)s: %"
+"(cfdi_amount)s"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_global_invoice_create__periodicity__05
@@ -702,40 +715,42 @@ msgid ""
 "CFDI %(result_label)s: %(cfdi_amount)s  |  Invoice %(result_label)s: %"
 "(invoice_amount)s"
 msgstr ""
+"CFDI %(result_label)s: %(cfdi_amount)s  |  Factura %(result_label)s: %"
+"(invoice_amount)s"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__certificate_certificate__scope__cfdi_csd
 msgid "CFDI (CSD)"
-msgstr ""
+msgstr "CFDI (CSD)"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__request_type__batch_issued
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request_wizard__request_type__batch_issued
 msgid "CFDI (Issued)"
-msgstr ""
+msgstr "CFDI (Emitido)"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__request_type__batch_received
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request_wizard__request_type__batch_received
 msgid "CFDI (Received)"
-msgstr ""
+msgstr "CFDI (Recibido)"
 
 #. module: l10n_mx_edi
 #: model:ir.actions.act_window,name:l10n_mx_edi.action_l10n_mx_edi_document
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_document_list_view
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_document_search_view
 msgid "CFDI Documents"
-msgstr ""
+msgstr "Documentos CFDI"
 
 #. module: l10n_mx_edi
 #: model:ir.ui.menu,name:l10n_mx_edi.l10n_mx_edi_document_menu
 msgid "CFDI Documents (MX)"
-msgstr ""
+msgstr "Documentos CFDI (MX)"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
 msgid "CFDI Massive Download"
-msgstr ""
+msgstr "Descarga masiva de CFDI"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_origin
@@ -755,18 +770,18 @@ msgstr "CFDI Relacionado:"
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_document__cfdi_request_id
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_wizard_form_view
 msgid "CFDI Request"
-msgstr ""
+msgstr "Solicitud de CFDI"
 
 #. module: l10n_mx_edi
 #: model:ir.actions.act_window,name:l10n_mx_edi.action_l10n_mx_edi_cfdi_request_list_view
 #: model:ir.ui.menu,name:l10n_mx_edi.l10n_mx_edi_cfdi_request_menu
 msgid "CFDI Requests"
-msgstr ""
+msgstr "Solicitudes de CFDI"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__cfdi_uuid
 msgid "CFDI UUID"
-msgstr ""
+msgstr "UUID del CFDI"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
@@ -778,6 +793,8 @@ msgstr "Configuración del CFDI"
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "CFDI failed to be imported. Check invoice for more info."
 msgstr ""
+"No se pudo importar el CFDI. Consulta la factura para obtener más "
+"información."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -880,7 +897,7 @@ msgstr "Se obtuvo un error al cancelar"
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_certificate_certificate
 msgid "Certificate"
-msgstr ""
+msgstr "Certificado"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cer_source
@@ -892,12 +909,12 @@ msgstr "Certificado Origen"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Certificate revoked or expired."
-msgstr ""
+msgstr "El certificado fue revocado o caducó."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_certificate_certificate__scope
 msgid "Certificate scope"
-msgstr ""
+msgstr "Alcance del certificado"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
@@ -913,7 +930,7 @@ msgstr "Certificados (MX)"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request_wizard__cfdi_uuid
 msgid "Cfdi Uuid"
-msgstr ""
+msgstr "UUID del CFDI"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -997,7 +1014,7 @@ msgstr "Ajustes de configuración"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
 msgid "Configuration for CFDI Massive Download Service"
-msgstr ""
+msgstr "Configuración del servicio de descarga masiva de CFDI"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
@@ -1007,7 +1024,7 @@ msgstr "Configure los certificados"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
 msgid "Configure your E-Firma Certificate"
-msgstr ""
+msgstr "Configura tu certificado de e.firma"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
@@ -1046,13 +1063,13 @@ msgstr "Coordinados"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Could not retrieve %(tax_name)s."
-msgstr ""
+msgstr "No se pudo obtener %(tax_name)s."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Couldn't find the institution RFC on the imported CFDI."
-msgstr ""
+msgstr "No se encontró el RFC de la institución en el CFDI importado."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1063,6 +1080,10 @@ msgid ""
 "from SAT, or remove/archive current certificate to stop receiving this "
 "notification."
 msgstr ""
+"No se pudieron sincronizar los CFDI del SAT para la empresa %(company)s. El "
+"certificado de e.firma no es válido o caducó. Sube un certificado válido "
+"para continuar con la sincronización de los CFDI del SAT o elimina/archiva "
+"el certificado actual para dejar de recibir esta notificación."
 
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_res_country
@@ -1087,7 +1108,7 @@ msgstr "Crear"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_document_list_view
 msgid "Create CFDI Request"
-msgstr ""
+msgstr "Crear solicitud de CFDI"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1114,7 +1135,7 @@ msgstr "Crear una factura global"
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_l10n_mx_edi_cfdi_request_wizard
 msgid "Create and send a new CFDI Request"
-msgstr ""
+msgstr "Crea y envía una nueva solicitud de CFDI"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_addenda__create_uid
@@ -1133,7 +1154,7 @@ msgstr "Creado por"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Created new contact for %s from invoice CFDI"
-msgstr ""
+msgstr "Se creó un nuevo contacto para %s a partir del CFDI de la factura"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_addenda__create_date
@@ -1171,7 +1192,7 @@ msgstr "Moneda"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Current document is already associated with a CFDI."
-msgstr ""
+msgstr "El documento actual ya está asociado a un CFDI."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_customer_rfc
@@ -1199,7 +1220,7 @@ msgstr "Fecha"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request_wizard__date_options
 msgid "Date Options"
-msgstr ""
+msgstr "Opciones de fecha"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_document__datetime
@@ -1299,12 +1320,12 @@ msgstr "Documento"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "Document attachment is not a valid CFDI file."
-msgstr ""
+msgstr "El archivo adjunto del documento no es un archivo CFDI válido."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__unpacked_count
 msgid "Documents Unpacked"
-msgstr ""
+msgstr "Documentos descomprimidos"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_usage__d04
@@ -1315,7 +1336,7 @@ msgstr "Donativos"
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__state__done
 msgid "Done"
-msgstr ""
+msgstr "Listo"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.account_move_form_inherit_l10n_mx_edi
@@ -1326,13 +1347,13 @@ msgstr "Descargar"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_form_view
 msgid "Download Package"
-msgstr ""
+msgstr "Descargar paquete"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Download of cancelled documents is not allowed."
-msgstr ""
+msgstr "No se permite descargar documentos cancelados."
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_register_factoring_view_form
@@ -1348,23 +1369,23 @@ msgstr "Debido (en la empresa)"
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__receipt_type__e
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request_wizard__receipt_type__e
 msgid "E (Credit Note)"
-msgstr ""
+msgstr "E (Nota de crédito)"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__certificate_certificate__scope__e_firma
 msgid "E Firma (FIEL)"
-msgstr ""
+msgstr "e.firma (FIEL)"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/res_config_settings.py:0
 msgid "E-Firma Certificates"
-msgstr ""
+msgstr "Certificados de e.firma"
 
 #. module: l10n_mx_edi
 #: model:ir.module.module,shortdesc:base.module_l10n_mx_edi
 msgid "EDI for Mexico"
-msgstr ""
+msgstr "EDI para México"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_invoice_document
@@ -1374,7 +1395,7 @@ msgstr "EKU9003173C9"
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_account_tax
 msgid "ETA tax codes mixin"
-msgstr ""
+msgstr "Mixin de códigos de impuestos ETA"
 
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_mail_compose_message
@@ -1384,12 +1405,12 @@ msgstr "Asistente de redacción de correo electrónico"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request_wizard__emission_date_from
 msgid "Emission Date From"
-msgstr ""
+msgstr "Fecha de emisión desde"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request_wizard__emission_date_to
 msgid "Emission Date To"
-msgstr ""
+msgstr "Fecha de emisión hasta"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_res_company__l10n_mx_edi_pac_test_env
@@ -1434,7 +1455,7 @@ msgstr "Exento"
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__state__expired
 msgid "Expired"
-msgstr ""
+msgstr "Caducado"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1474,7 +1495,7 @@ msgstr "El factoraje solo se permite para facturas de clientes contabilizadas."
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/res_company.py:0
 msgid "Failed to create automatic company request: %s"
-msgstr ""
+msgstr "No se pudo crear la solicitud automática de la empresa: %s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1487,6 +1508,7 @@ msgstr "No fue posible distribuir algunas líneas negativas"
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Failed to find/create partner from given invoice CFDI."
 msgstr ""
+"No se pudo encontrar o crear el contacto a partir del CFDI de la factura."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1505,12 +1527,15 @@ msgid ""
 "Failed to import local taxes. Generic local tax is missing from this "
 "document's company.Reload Company's CoA to regenerate the tax."
 msgstr ""
+"No se pudieron importar los impuestos locales. Falta el impuesto local "
+"genérico en este documento de la empresa. Vuelve a cargar el plan de cuentas "
+"de la empresa para regenerar el impuesto."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/certificate_certificate.py:0
 msgid "Failed to renew Token. Authentication failed with: %s"
-msgstr ""
+msgstr "No se pudo renovar el token. La autenticación falló con: %s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1520,6 +1545,9 @@ msgid ""
 "(date_to)s. More info:\n"
 "%(causes)s"
 msgstr ""
+"No se pudieron solicitar los CFDI de la empresa %(company)s del %(date_from)"
+"s al %(date_to)s. Obtén más información:\n"
+"%(causes)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1531,7 +1559,7 @@ msgstr "Ocurrió un error durante la actualización del estado del SAT: %s"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Fault Error - %(msg)s"
-msgstr ""
+msgstr "Error de fallo - %(msg)s"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_uuid
@@ -1561,7 +1589,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__request_type__folio
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request_wizard__request_type__folio
 msgid "Folio"
-msgstr ""
+msgstr "Folio"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_uuid
@@ -1581,14 +1609,14 @@ msgstr "Quincenal"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__emission_date_from
 msgid "From"
-msgstr ""
+msgstr "Desde"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_form_view
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_list_view
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_wizard_form_view
 msgid "From - To"
-msgstr ""
+msgstr "Desde - Hasta"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_usage__d03
@@ -1648,17 +1676,25 @@ msgid ""
 "- Rejected: SAT refused the request.\n"
 "- Expired: Request/Package expired."
 msgstr ""
+"Estado de la solicitud.\n"
+"- En proceso en el SAT: El SAT aceptó la solicitud y prepara el paquete.\n"
+"- Listo para descargar: El paquete está listo para descargar desde el SAT.\n"
+"- Descompresión: El paquete se descargó y los documentos se extraen en "
+"segundo plano.\n"
+"- Listo: El paquete terminó de extraer los documentos.\n"
+"- Rechazado: El SAT rechazó la solicitud.\n"
+"- Caducado: La solicitud o el paquete caducó."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__unpacked_count
 msgid "How many CFDI of the package already became documents."
-msgstr ""
+msgstr "Cuántos CFDI del paquete ya se convirtieron en documentos."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__receipt_type__i
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request_wizard__receipt_type__i
 msgid "I (Income)"
-msgstr ""
+msgstr "I (Ingreso)"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__id
@@ -1715,13 +1751,13 @@ msgstr "Si la empresa no usa esta forma de pago, se puede desactivar."
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_document_list_view
 msgid "Import Documents"
-msgstr ""
+msgstr "Importar documentos"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Import amounts results:"
-msgstr ""
+msgstr "Resultados de la importación de importes:"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -1730,23 +1766,25 @@ msgid ""
 "Import of CFDI Invoice documents is only supported on purchase or sale "
 "journals."
 msgstr ""
+"La importación de documentos de facturas CFDI solo es compatible con diarios "
+"de compra o venta."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "Import of document failed with: %s"
-msgstr ""
+msgstr "No se pudo importar el documento con: %s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Importing a CFDI on a sales receipt is not supported."
-msgstr ""
+msgstr "No es posible importar un CFDI en un recibo de venta."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__state__in_process_at_sat
 msgid "In Process at SAT"
-msgstr ""
+msgstr "En proceso en el SAT"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_origin
@@ -1852,19 +1890,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Invalid certificate."
-msgstr ""
+msgstr "Certificado no válido."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "Invalid date range for this request."
-msgstr ""
+msgstr "El rango de fechas no es válido para esta solicitud."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Invalid user."
-msgstr ""
+msgstr "Usuario no válido."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_document__invoice_ids
@@ -1940,6 +1978,12 @@ msgid ""
 "- E (Credit Note): a customer credit note for an Issued request, a vendor "
 "credit note for a Received request."
 msgstr ""
+"Tipo de CFDI que se descargará y documento en el que se convertirá en Odoo.\n"
+"- I (Ingreso): Una factura de cliente para una solicitud de CFDI emitido, "
+"una factura de proveedor para una solicitud de CFDI recibido.\n"
+"- E (Nota de crédito): Una nota de crédito de cliente para una solicitud de "
+"CFDI emitido, una nota de crédito de proveedor para una solicitud de CFDI "
+"recibido."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_can_use_factoring
@@ -1984,18 +2028,18 @@ msgstr "Documento de pago"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_certificate_certificate__l10n_mx_edi_sat_token
 msgid "L10N Mx Edi Sat Token"
-msgstr ""
+msgstr "Token del SAT"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_certificate_certificate__l10n_mx_edi_sat_token_expiry
 msgid "L10N Mx Edi Sat Token Expiry"
-msgstr ""
+msgstr "Vencimiento del token del SAT"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_show_import_totals_alert
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_move__l10n_mx_edi_show_import_totals_alert
 msgid "L10N Mx Edi Show Import Totals Alert"
-msgstr ""
+msgstr "Mostrar alerta de totales de importación"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_update_payments_needed
@@ -2013,18 +2057,18 @@ msgstr "Se necesita la actualización del SAT"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__last_cron_attempt
 msgid "Last Attempt"
-msgstr ""
+msgstr "Último intento"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request_wizard__date_options__last_month
 msgid "Last Month"
-msgstr ""
+msgstr "Mes pasado"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_res_company__l10n_mx_edi_last_sync
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_res_config_settings__l10n_mx_edi_last_sync
 msgid "Last Sync"
-msgstr ""
+msgstr "Última sincronización"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_addenda__write_uid
@@ -2055,7 +2099,7 @@ msgstr "Última actualización el"
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request_wizard__date_options__last_week
 msgid "Last Week"
-msgstr ""
+msgstr "Semana pasada"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_res_company__l10n_mx_edi_last_sync
@@ -2064,6 +2108,8 @@ msgid ""
 "Last date CFDIs were requested from SAT for this company, in the company's "
 "timezone."
 msgstr ""
+"Última fecha en que se solicitaron CFDI al SAT para esta empresa, según la "
+"zona horaria de la empresa."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_register_factoring__line_ids
@@ -2073,27 +2119,27 @@ msgstr "Línea"
 #. module: l10n_mx_edi
 #: model:ir.actions.server,name:l10n_mx_edi.ir_cron_l10n_mx_edi_create_records_from_documents_ir_actions_server
 msgid "MX EDI: Create Records From Documents"
-msgstr ""
+msgstr "MX EDI: Crear registros a partir de documentos"
 
 #. module: l10n_mx_edi
 #: model:ir.actions.server,name:l10n_mx_edi.ir_cron_l10n_mx_edi_download_packages_ir_actions_server
 msgid "MX EDI: Download CFDI Packages"
-msgstr ""
+msgstr "MX EDI: Descargar paquetes de CFDI"
 
 #. module: l10n_mx_edi
 #: model:ir.actions.server,name:l10n_mx_edi.ir_cron_l10n_mx_edi_create_company_request_ir_actions_server
 msgid "MX EDI: Sync Documents from SAT"
-msgstr ""
+msgstr "MX EDI: Sincronizar documentos del SAT"
 
 #. module: l10n_mx_edi
 #: model:ir.actions.server,name:l10n_mx_edi.ir_cron_l10n_mx_edi_unpack_packages_ir_actions_server
 msgid "MX EDI: Unpack CFDI Packages"
-msgstr ""
+msgstr "MX EDI: Descomprimir paquetes de CFDI"
 
 #. module: l10n_mx_edi
 #: model:ir.actions.server,name:l10n_mx_edi.ir_cron_l10n_mx_edi_verify_requests_ir_actions_server
 msgid "MX EDI: Verify CFDI Requests"
-msgstr ""
+msgstr "MX EDI: Verificar solicitudes de CFDI"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
@@ -2107,12 +2153,14 @@ msgid ""
 "Malformed XML. The request carries invalid information, such as an unknown "
 "RFC."
 msgstr ""
+"XML con formato erróneo. La solicitud contiene información no válida, como "
+"un RFC desconocido."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Malformed seal."
-msgstr ""
+msgstr "Sello con formato incorrecto."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_usage__d08
@@ -2152,7 +2200,7 @@ msgstr "Mensaje: %s"
 #. module: l10n_mx_edi
 #: model:ir.module.module,summary:base.module_l10n_mx_edi
 msgid "Mexican Localization for EDI documents"
-msgstr ""
+msgstr "Localización mexicana para documentos EDI"
 
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_l10n_mx_edi_document
@@ -2162,13 +2210,13 @@ msgstr "Documentos mexicanos que se deben procesar fuera de Odoo"
 #. module: l10n_mx_edi
 #: model:ir.ui.menu,name:l10n_mx_edi.l10n_mx_audit_menu
 msgid "Mexico"
-msgstr ""
+msgstr "México"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "Missing Fiscal Folio for this request."
-msgstr ""
+msgstr "Falta el folio fiscal para esta solicitud."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2218,24 +2266,24 @@ msgstr "Botón “Se necesita una factura rectificativa”"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_search_view
 msgid "Needs Attention"
-msgstr ""
+msgstr "Requiere atención"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "New CFDI Request"
-msgstr ""
+msgstr "Nueva solicitud de CFDI"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.actions.act_window,help:l10n_mx_edi.action_l10n_mx_edi_document
 msgid "No CFDI document found"
-msgstr ""
+msgstr "No se encontró ningún documento CFDI"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "No Code"
-msgstr ""
+msgstr "Sin código"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2253,7 +2301,7 @@ msgstr "No se especificó un PAC"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "No Status"
-msgstr ""
+msgstr "Sin estado"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2266,7 +2314,7 @@ msgstr "Ninguna addenda o complemento fue procesado exitosamente."
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "No documents found with request criteria."
-msgstr ""
+msgstr "No se encontraron documentos con los criterios de la solicitud."
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_invoice_document
@@ -2277,7 +2325,7 @@ msgstr "No identificado"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "No information available"
-msgstr ""
+msgstr "No hay información disponible"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2304,6 +2352,7 @@ msgstr "No encontrado"
 #: code:addons/l10n_mx_edi/models/res_company.py:0
 msgid "Not a valid FIEL certificate was found for request company."
 msgstr ""
+"No se encontró un certificado FIEL válido para la empresa de la solicitud."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_res_currency__l10n_mx_edi_decimal_places
@@ -2344,7 +2393,7 @@ msgstr "Monto original"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
 msgid "Other Accounts"
-msgstr ""
+msgstr "Otras cuentas"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_usage__i08
@@ -2400,25 +2449,25 @@ msgstr "Pago PUE"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__package_uuid
 msgid "Package UUID"
-msgstr ""
+msgstr "UUID del paquete"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "Package attachment downloaded successfully"
-msgstr ""
+msgstr "El archivo adjunto del paquete se descargó con éxito"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "Package downloaded successfully. Unpacking documents."
-msgstr ""
+msgstr "El paquete se descargó con éxito. Se descomprimen los documentos."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "Package is ready for download."
-msgstr ""
+msgstr "El paquete está listo para descargar."
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_payment_cfdi
@@ -2580,7 +2629,7 @@ msgstr "Producto"
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "Variante del producto"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__res_company__l10n_mx_edi_pac__finkok
@@ -2591,13 +2640,15 @@ msgstr "Quadrum"
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_document__customer_rfc
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_document_search_view
 msgid "RFC"
-msgstr ""
+msgstr "RFC"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Reached lifetime limit for requests for packages with same criteria."
 msgstr ""
+"Se alcanzó el límite de solicitudes durante la vigencia para paquetes con "
+"los mismos criterios."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2605,22 +2656,24 @@ msgstr ""
 msgid ""
 "Reached maximum of downloads allowed. A package can only be downloaded twice."
 msgstr ""
+"Se alcanzó el número máximo de descargas permitidas. Un paquete solo se "
+"puede descargar dos veces."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Reached the daily download limit for this fiscal folio."
-msgstr ""
+msgstr "Se alcanzó el límite diario de descargas para este folio fiscal."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__ready_at
 msgid "Ready At"
-msgstr ""
+msgstr "Listo desde"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__state__in_download
 msgid "Ready for Download"
-msgstr ""
+msgstr "Listo para descargar"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_usage__d05
@@ -2640,13 +2693,13 @@ msgstr "Motivo"
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request_wizard__receipt_type
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_document__receipt_type
 msgid "Receipt Type"
-msgstr ""
+msgstr "Tipo de comprobante"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "Receipt type %s is not importable."
-msgstr ""
+msgstr "El tipo de comprobante %s no se puede importar."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_cfdi_state__received
@@ -2667,12 +2720,12 @@ msgstr "Registrar pago de factoraje"
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__state__rejected
 msgid "Rejected"
-msgstr ""
+msgstr "Rechazado"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_search_view
 msgid "Rejected/Expired"
-msgstr ""
+msgstr "Rechazado/Caducado"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.report_invoice_document
@@ -2689,7 +2742,7 @@ msgstr "Factura rectificativa"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Request Accepted"
-msgstr ""
+msgstr "Solicitud aceptada"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2702,12 +2755,12 @@ msgstr "Solicitar cancelación del CFDI"
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__request_type
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request_wizard__request_type
 msgid "Request Type"
-msgstr ""
+msgstr "Tipo de solicitud"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__request_uuid
 msgid "Request UUID"
-msgstr ""
+msgstr "UUID de la solicitud"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2716,6 +2769,8 @@ msgid ""
 "Request expired. \n"
 "%(message)s"
 msgstr ""
+"La solicitud caducó.\n"
+"%(message)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2724,6 +2779,8 @@ msgid ""
 "Request is still in process. Try later. \n"
 "%(message)s"
 msgstr ""
+"La solicitud aún está en proceso. Inténtalo de nuevo más tarde.\n"
+"%(message)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2732,18 +2789,20 @@ msgid ""
 "Request rejected. \n"
 "%(message)s"
 msgstr ""
+"Solicitud rechazada. \n"
+"%(message)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/wizard/l10n_mx_edi_cfdi_request_wizard.py:0
 msgid "Request sent to SAT. Documents will arrive in the background."
-msgstr ""
+msgstr "Solicitud enviada al SAT. Los documentos llegarán en segundo plano."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "Request was %(state)s with code %(code_status)s: %(message)s"
-msgstr ""
+msgstr "La solicitud fue %(state)s con el código %(code_status)s: %(message)s"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_wizard_form_view
@@ -2754,6 +2813,11 @@ msgid ""
 "&gt;&gt; Mexico &gt;&gt; Review CFDI Requests</i>\n"
 "                        to see the state of existing requests."
 msgstr ""
+"La solicitud se procesará en segundo plano. Puedes volver más tarde para "
+"consultar qué documentos\n"
+"                    han llegado o ir a <i class=\"fw-bold\">Revisar &gt;&gt; "
+"México &gt;&gt; Revisar solicitudes de CFDI</i>\n"
+"                    para consultar el estado de las solicitudes existentes."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__res_company__l10n_mx_edi_fiscal_regime__610
@@ -2775,7 +2839,7 @@ msgstr "Importe residual en moneda"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Response Error - Code: %(code)s %(msg)s"
-msgstr ""
+msgstr "Error de respuesta - Código: %(code)s %(msg)s"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.account_move_form_inherit_l10n_mx_edi
@@ -2791,12 +2855,12 @@ msgstr "Botón para volver a intentar necesario"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_form_view
 msgid "Retry Request"
-msgstr ""
+msgstr "Reintentar solicitud"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__is_retryable
 msgid "Retryable"
-msgstr ""
+msgstr "Se puede volver a intentar"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_usage__g02
@@ -2808,7 +2872,7 @@ msgstr "Devoluciones, descuentos o bonificaciones"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Rounding"
-msgstr ""
+msgstr "Redondeo"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__res_company__l10n_mx_edi_fiscal_regime__626
@@ -2846,17 +2910,17 @@ msgstr "S01"
 #. module: l10n_mx_edi
 #: model:ir.model,name:l10n_mx_edi.model_l10n_mx_edi_sat_download_client
 msgid "SAT CFDI Mass Download - SOAP Transport"
-msgstr ""
+msgstr "Descarga masiva de CFDI del SAT - Transporte SOAP"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_form_view
 msgid "SAT Package"
-msgstr ""
+msgstr "Paquete del SAT"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_document_search_view
 msgid "SAT Status"
-msgstr ""
+msgstr "Estado del SAT"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2865,6 +2929,9 @@ msgid ""
 "SAT Verification Service responded with status %(request_status)s: \n"
 "%(details)s"
 msgstr ""
+"El servicio de verificación del SAT respondió con el estado %(request_status)"
+"s:\n"
+"%(details)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2873,6 +2940,8 @@ msgid ""
 "SAT answered with an unexpected error: \n"
 "%s"
 msgstr ""
+"El SAT respondió con un error inesperado:\n"
+"%s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2881,12 +2950,14 @@ msgid ""
 "SAT answered with the following errors\n"
 ": - %s"
 msgstr ""
+"El SAT respondió con los siguientes errores\n"
+": - %s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "SAT answered without a token."
-msgstr ""
+msgstr "El SAT respondió sin un token."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2895,6 +2966,8 @@ msgid ""
 "SAT answered without the expected result: \n"
 "%s"
 msgstr ""
+"El SAT respondió sin el resultado esperado:\n"
+"%s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2903,18 +2976,20 @@ msgid ""
 "SAT could not be reached. Try again later, and contact your administrator if "
 "it keeps happening."
 msgstr ""
+"No se pudo establecer conexión con el SAT. Inténtalo más tarde y contacta a "
+"tu administrador si el problema persiste."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "SAT found no information for the requested package."
-msgstr ""
+msgstr "El SAT no encontró información para el paquete solicitado."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "SAT found no information for this request."
-msgstr ""
+msgstr "El SAT no encontró información para esta solicitud."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2923,6 +2998,8 @@ msgid ""
 "SAT processing error, this will be retried. \n"
 "%(message)s"
 msgstr ""
+"Error de procesamiento del SAT. Se volverá a intentar.\n"
+"%(message)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2931,24 +3008,26 @@ msgid ""
 "SAT refused the credentials. Check that your e.firma certificate is valid "
 "for your RFC."
 msgstr ""
+"El SAT rechazó las credenciales. Verifica que tu certificado de e.firma sea "
+"válido para tu RFC."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "SAT reported an uncontrolled error."
-msgstr ""
+msgstr "El SAT informó sobre un error no controlado."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "SAT reported the package as sent but it did not arrive."
-msgstr ""
+msgstr "El SAT informó que el paquete se envió, pero no llegó."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "SAT response could not be decoded: %s"
-msgstr ""
+msgstr "No se pudo decodificar la respuesta del SAT: %s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2956,12 +3035,14 @@ msgstr ""
 msgid ""
 "SAT returned a success code but no request UUID. Service responded with: %s"
 msgstr ""
+"El SAT devolvió un código de éxito, pero no proporcionó un UUID de "
+"solicitud. El servicio respondió con: %s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "SAT returned an empty response."
-msgstr ""
+msgstr "El SAT devolvió una respuesta vacía."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -2970,6 +3051,8 @@ msgid ""
 "SAT service only allows requests for a single Fiscal Folio or Issued/"
 "Received documents."
 msgstr ""
+"El servicio del SAT solo permite solicitudes para un único folio fiscal o "
+"para documentos emitidos o recibidos."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_sat_state
@@ -3016,6 +3099,12 @@ msgid ""
 "- CFDI (Issued): all CFDI issued by this company within a date range.\n"
 "- CFDI (Received): all CFDI issued to this company within a date range."
 msgstr ""
+"Alcance de la solicitud de descarga enviada al SAT.\n"
+"- Folio: Un único CFDI, identificado por su folio fiscal.\n"
+"- CFDI (Emitido): Todos los CFDI emitidos por esta empresa dentro de un "
+"rango de fechas.\n"
+"- CFDI (Recibido): Todos los CFDI emitidos a esta empresa dentro de un rango "
+"de fechas."
 
 #. module: l10n_mx_edi
 #. odoo-javascript
@@ -3036,7 +3125,7 @@ msgstr "Error en el envío"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_wizard_form_view
 msgid "Send Request"
-msgstr ""
+msgstr "Enviar solicitud"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_to_public
@@ -3058,7 +3147,7 @@ msgstr "Global enviado"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "Service %s is not valid."
-msgstr ""
+msgstr "El servicio %s no es válido."
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.res_config_settings_view_form
@@ -3106,7 +3195,7 @@ msgstr "Omitir"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "Skipping document. Invoice already contains a CFDI attached to it."
-msgstr ""
+msgstr "Se omitió el documento. La factura ya contiene un CFDI adjunto."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__res_company__l10n_mx_edi_fiscal_regime__620
@@ -3135,6 +3224,8 @@ msgid ""
 "Something unexpected occurred when processing request: \n"
 "%s"
 msgstr ""
+"Ocurrió algo inesperado al procesar la solicitud:\n"
+"%s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3143,6 +3234,8 @@ msgid ""
 "Something unexpected occurred when unpacking package content: \n"
 "%s"
 msgstr ""
+"Ocurrió algo inesperado al descomprimir el contenido del paquete:\n"
+"%s"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_certificate_id
@@ -3173,7 +3266,7 @@ msgstr "Sustituido por"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Subtotal With Discount"
-msgstr ""
+msgstr "Subtotal con descuento"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__res_company__l10n_mx_edi_fiscal_regime__605
@@ -3233,6 +3326,8 @@ msgstr "El servicio Finkok no pudo firmar con el siguiente error: %s"
 msgid ""
 "The Fiscal Folio of the document to be requested in case of a folio request"
 msgstr ""
+"El folio fiscal del documento que se solicitará en caso de una solicitud por "
+"folio"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3258,7 +3353,7 @@ msgstr "El PAC que firmará y cancelará las facturas"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "The RFC doesn't match with document's company VAT."
-msgstr ""
+msgstr "El RFC no coincide con el IVA de la empresa del documento."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3276,6 +3371,8 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_mx_edi.field_l10n_mx_edi_document__cfdi_request_id
 msgid "The SAT download request whose package this document came from."
 msgstr ""
+"La solicitud de descarga del SAT de la que proviene el paquete de este "
+"documento."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3310,6 +3407,9 @@ msgid ""
 "The contents of this package couldn't or failed to be extracted after some "
 "time. Retry it manually to resolve it, or download the ZIP to inspect it."
 msgstr ""
+"No se pudo extraer el contenido de este paquete o ocurrió un error durante "
+"la extracción después de cierto tiempo. Vuelve a intentarlo de forma manual "
+"para resolver el problema o descarga el ZIP para inspeccionarlo."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_customer_rfc
@@ -3323,6 +3423,8 @@ msgstr "El número de identificación fiscal del cliente."
 msgid ""
 "The end date must be before today. Today's CFDIs might not be settled yet."
 msgstr ""
+"La fecha de finalización debe ser anterior a hoy. Es posible que los CFDI de "
+"hoy aún no se hayan liquidado."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3364,7 +3466,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "The following ocurred while trying to retrieve taxes: "
-msgstr ""
+msgstr "Ocurrió lo siguiente al intentar obtener los impuestos: "
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3378,18 +3480,22 @@ msgstr ""
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "The following tax amounts where fixed while importing CFDI:"
 msgstr ""
+"Los siguientes importes de impuestos se corrigieron durante la importación "
+"del CFDI:"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "The following taxes were not found in the CFDI's tax totals."
 msgstr ""
+"No se encontraron los siguientes impuestos en los totales de impuestos del "
+"CFDI."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "The imported file is not a valid CFDI Invoice."
-msgstr ""
+msgstr "El archivo importado no es una factura CFDI válida."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3422,12 +3528,16 @@ msgstr "La periodicidad en la que desea enviar las facturas globales CFDI."
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "The request exceeds the maximum number of results per request type."
 msgstr ""
+"La solicitud supera el número máximo de resultados permitido por tipo de "
+"solicitud."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "The requested package no longer exists. A package only lives for 72hrs."
 msgstr ""
+"El paquete solicitado ya no existe. Un paquete solo está disponible durante "
+"72 horas."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_l10n_mx_edi_register_factoring_line__amount_residual_currency
@@ -3450,7 +3560,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_sat_client.py:0
 msgid "The seal does not match the requesting RFC."
-msgstr ""
+msgstr "El sello no coincide con el RFC solicitante."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_supplier_rfc
@@ -3471,6 +3581,8 @@ msgid ""
 "The total amounts of the CFDI do not match the totals of the invoice. \n"
 "Review the chatter for more information."
 msgstr ""
+"Los importes totales del CFDI no coinciden con los totales de la factura.\n"
+"Revisa el chatter para obtener más información."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3498,6 +3610,8 @@ msgid ""
 "This package was not downloaded in time and has expired at SAT. Create a new "
 "request for the same period."
 msgstr ""
+"Este paquete no se descargó a tiempo y caducó en el SAT. Crea una nueva "
+"solicitud para el mismo periodo."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3506,31 +3620,34 @@ msgid ""
 "This request has been in process for too long. Retry it manually to resolve "
 "it or create a new request."
 msgstr ""
+"Esta solicitud lleva demasiado tiempo en proceso. Vuelve a intentarlo de "
+"forma manual para resolver el problema o crea una nueva solicitud."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__last_cron_attempt
 msgid "Time a scheduled action last processed this request."
 msgstr ""
+"Hora en que una acción programada procesó esta solicitud por última vez."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__ready_at
 msgid "Time the package became ready for download."
-msgstr ""
+msgstr "Hora en que el paquete estuvo listo para descargar."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__emission_date_to
 msgid "To"
-msgstr ""
+msgstr "Hasta"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_document__state__to_import
 msgid "To Import"
-msgstr ""
+msgstr "Por importar"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_document__state__to_import_error
 msgid "To Import (Error)"
-msgstr ""
+msgstr "Por importar (error)"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_register_factoring_line__amount_trans_currency
@@ -3551,13 +3668,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Total %s Tax"
-msgstr ""
+msgstr "Total de impuestos de %s"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_account_bank_statement_line__l10n_mx_edi_cfdi_amount
@@ -3569,13 +3686,13 @@ msgstr "Importe total"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Total Local Taxes"
-msgstr ""
+msgstr "Total de impuestos locales"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Total Withholding"
-msgstr ""
+msgstr "Total de retenciones"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields,field_description:l10n_mx_edi.field_l10n_mx_edi_register_factoring__transaction_currency_id
@@ -3602,6 +3719,7 @@ msgid ""
 "Unauthorized third party. You cannot download receipts that do not belong to "
 "you."
 msgstr ""
+"Tercero no autorizado. No puedes descargar comprobantes que no te pertenecen."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3610,12 +3728,14 @@ msgid ""
 "Unhandled status %(request_status)s. \n"
 "%(message)s"
 msgstr ""
+"Estado %(request_status)s sin gestionar.\n"
+"%(message)s"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3623,22 +3743,23 @@ msgstr ""
 msgid ""
 "Unknown currency %s was not found. Falling back to the company's currency"
 msgstr ""
+"No se encontró la moneda desconocida %s, se utilizará la moneda de la empresa"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_form_view
 msgid "Unpack Documents"
-msgstr ""
+msgstr "Descomprimir documentos"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "Unpacked %(done)s of %(total)s documents."
-msgstr ""
+msgstr "Se descomprimieron %(done)s de %(total)s documentos."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_cfdi_request__state__unpacking
 msgid "Unpacking"
-msgstr ""
+msgstr "Descomprimiendo"
 
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.account_move_form_inherit_l10n_mx_edi
@@ -3709,13 +3830,14 @@ msgstr "Validado"
 #. module: l10n_mx_edi
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi.l10n_mx_edi_cfdi_request_form_view
 msgid "Verify Request Status"
-msgstr ""
+msgstr "Verificar estado de la solicitud"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "Verify if you are importing it on the correct company or journal."
 msgstr ""
+"Verifica que la importación se realice en la empresa o el diario correctos."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3738,7 +3860,7 @@ msgstr "Semanal"
 #. module: l10n_mx_edi
 #: model:ir.model.fields,help:l10n_mx_edi.field_l10n_mx_edi_cfdi_request__is_retryable
 msgid "Whether a scheduled action may still process this request."
-msgstr ""
+msgstr "Indica si una acción programada aún puede procesar esta solicitud."
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__account_move__l10n_mx_edi_usage__s01
@@ -3762,6 +3884,8 @@ msgstr "Asistente"
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "Wrong RFC for this document. This CFDI was neither issued by nor to %s."
 msgstr ""
+"RFC incorrecto para este documento. Este CFDI no fue emitido por %s ni está "
+"dirigido a %s."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3773,7 +3897,7 @@ msgstr "XML CFDI"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_document.py:0
 msgid "You are not allowed to generate an invoice through this document!"
-msgstr ""
+msgstr "¡No puedes generar una factura a través de este documento!"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3790,7 +3914,7 @@ msgstr "Solo puedes procesar las facturas que compartan la misma moneda."
 #. module: l10n_mx_edi
 #: model_terms:ir.actions.act_window,help:l10n_mx_edi.action_l10n_mx_edi_document
 msgid "You can see here all the generated CFDI documents."
-msgstr ""
+msgstr "Aquí puedes consultar todos los documentos CFDI generados."
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3818,6 +3942,7 @@ msgstr ""
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "You cannot create a CFDI request prior or inclusive of %s"
 msgstr ""
+"No puedes crear una solicitud de CFDI para una fecha anterior o igual a %s"
 
 #. module: l10n_mx_edi
 #. odoo-python
@@ -3861,19 +3986,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/l10n_mx_edi_cfdi_request.py:0
 msgid "You need to specify a date range for your request."
-msgstr ""
+msgstr "Debes especificar un intervalo de fechas para tu solicitud."
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "amount_local_taxes"
-msgstr ""
+msgstr "amount_local_taxes"
 
 #. module: l10n_mx_edi
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/account_move.py:0
 msgid "amount_total"
-msgstr ""
+msgstr "amount_total"
 
 #. module: l10n_mx_edi
 #: model:ir.model.fields.selection,name:l10n_mx_edi.selection__l10n_mx_edi_invoice_cancel__mode__ginvoice
@@ -3904,7 +4029,7 @@ msgstr "en"
 #. odoo-python
 #: code:addons/l10n_mx_edi/models/res_config_settings.py:0
 msgid "scope"
-msgstr ""
+msgstr "scope"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Línea del estado de cuenta bancario"

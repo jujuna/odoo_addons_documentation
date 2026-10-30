@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
 "PO-Revision-Date: 2026-09-18 03:21+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
@@ -62,8 +62,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"info\"/> Available shipping services depend on "
 "enabled carriers in your Starshipit account."
 msgstr ""
-"<i class=\"oi\" data-icon=\"info\"/> 利用可能な配送サービスは、Starshipit"
-"アカウントで有効になっている配送業者によって異なります。"
+"<i class=\"oi\" data-icon=\"info\"/> 利用可能な配送サービスは、Starshipitアカ"
+"ウントで有効になっている配送業者によって異なります。"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
@@ -94,8 +94,8 @@ msgid ""
 "<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
 "the api keys."
 msgstr ""
-"<i class=\"oi\" data-icon=\"warning\"/> API キーの設定は管理者のみが可能です"
-"。"
+"<i class=\"oi\" data-icon=\"warning\"/> API キーの設定は管理者のみが可能で"
+"す。"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -255,8 +255,8 @@ msgid ""
 "directly.\n"
 "Manifest number: %(manifest_number)s"
 msgstr ""
-"ラベル作成時に配送業者にオーダ%(order)sが送信されました。テスト環境であるため"
-"、必ず配送業者に対して直接オーダをキャンセルして下さい。\n"
+"ラベル作成時に配送業者にオーダ%(order)sが送信されました。テスト環境であるた"
+"め、必ず配送業者に対して直接オーダをキャンセルして下さい。\n"
 "伝票番号 :%(manifest_number)s"
 
 #. module: delivery_starshipit
@@ -511,6 +511,15 @@ msgid "The Shipping Cost is being fetched in the background."
 msgstr "送料はバックグラウンドで取得されています。"
 
 #. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The address of your company/warehouse is incomplete or wrong (Missing "
+"field(s):  \n"
+" %s)"
+msgstr ""
+
+#. module: delivery_starshipit
 #: model:ir.model.fields,help:delivery_starshipit.field_delivery_carrier__starshipit_carrier_code
 msgid ""
 "The carrier on starshipit used by this carrier. The service code belongs to "
@@ -550,6 +559,14 @@ msgid ""
 msgstr ""
 "ピッキング%(picking_name)s付番がStarshipitには長すぎます。ピッキング付番を50"
 "文字以内に更新して下さい。"
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The recipient address is incomplete or wrong (Missing field(s):  \n"
+" %s)"
+msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -599,7 +616,8 @@ msgstr "このアクションにはStarshipit配送業者が必要です。"
 msgid ""
 "This address will be used when fetching the available services from "
 "starshipit."
-msgstr "このアドレスは、Starshipitから利用可能なサービスを取得する際に使用されます。"
+msgstr ""
+"このアドレスは、Starshipitから利用可能なサービスを取得する際に使用されます。"
 
 #. module: delivery_starshipit
 #: model:ir.model,name:delivery_starshipit.model_stock_picking

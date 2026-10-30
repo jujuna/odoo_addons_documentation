@@ -36,6 +36,8 @@ patch(EmployeeFormController.prototype, {
         const choice = await new Promise((resolve) => {
             this.dialogService.add(VersionUpdateDialog, {
                 payslipsCount: status.valid_payslips_count,
+                nextPeriodStart: status.next_period_start,
+                currentVersionStart: status.date_start,
                 confirm: (selection) => resolve(selection),
                 cancel: () => resolve(null),
                 close: () => resolve(null),
@@ -43,41 +45,32 @@ patch(EmployeeFormController.prototype, {
         });
 
         if (!choice) {
-            record.discard();  // User cancel -> discard the chnages
-        } else {
-            this.versionChoice = choice;  // User select -> cache the choice locally
+            record.discard();  // Cancel -> discard the chnages
+            return;
+        }
+        if (choice.mode === "create_new_version") {  // create new version directly without wait to save()
+
+            const filteredChanges = Object.fromEntries(
+                Object.entries(changes).filter(([key]) => !EXCLUDED_FIELDS.includes(key))
+            );
+
+            await this.orm.call(
+                "hr.version",
+                "action_create_version_from_update",
+                [[versionId], choice.dateStart, filteredChanges]
+            );
+
+            this.versionChoice = null;
+
+            record.discard();  // Reset the changes on current version
+            this.model.load(); // Reload model to point to the newly created version
+
+        } else if (choice.mode === "correct_current_version") {  // save the choice locally and wait to save()
+            this.versionChoice = choice;
         }
     },
 
     async save() {
-        const record = this.model.root;
-
-        if (this.versionChoice?.mode === "create_new_version") {
-            const versionId = record.data.version_id?.id;
-
-            if (versionId) {
-                record._skipContractEndDialog = true;
-
-                const changes = record._getChanges()
-                const filteredChanges = Object.fromEntries(
-                    Object.entries(changes).filter(([key]) => !EXCLUDED_FIELDS.includes(key))
-                );
-
-                await this.orm.call(
-                    "hr.version",
-                    "action_create_version_from_update",
-                    [[versionId], this.versionChoice.dateStart, filteredChanges]
-                );
-
-                this.versionChoice = null;
-                delete record._skipContractEndDialog;
-
-                await record.discard(); // Reset changes on current record
-                await this.model.load(); // Reload model to the newly created version
-                return true;
-            }
-        }
-
         const saved = await super.save();
         if (saved) {
             this.versionChoice = null;

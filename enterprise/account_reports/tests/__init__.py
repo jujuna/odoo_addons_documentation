@@ -21,6 +21,7 @@ from . import test_aged_receivable_report
 from . import test_aged_payable_report
 from . import test_tax_report
 from . import test_tax_report_default_part
+from . import test_cash_flow_indirect_report
 from . import test_cash_flow_report
 from . import test_financial_report
 from . import test_multicurrencies_revaluation_report

@@ -58,7 +58,7 @@
                 </xpath>
                 <xpath expr="//field[@name='ref']" position="before">
                     <field name="partner_id" widget="res_partner_many2one"
-                        context="{'show_address': 1, 'default_is_company': True, 'show_vat': True}"
+                        context="{'show_address': 1, 'default_is_company': True, 'show_identifier': True}"
                         options='{"no_quick_create": True}'
                         invisible="l10n_ec_withhold_type not in ('out_withhold', 'in_withhold')"
                         readonly="state != 'draft'"/>

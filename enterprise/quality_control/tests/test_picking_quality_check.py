@@ -1339,7 +1339,8 @@ class TestQualityCheck(TestQualityCommon):
         differ. Test that the quality check can be created by using the
         picking's company.
         """
-        out_picking_type = self.env['stock.picking.type'].search([('company_id', '=', self.env.company.id), ('code', '=', 'outgoing')], limit=1)
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
+        out_picking_type = warehouse.out_type_id
         self.env['quality.point'].create([
             {
                 'title': "Delivery QCP",
@@ -1350,6 +1351,11 @@ class TestQualityCheck(TestQualityCommon):
                 'title': "Delivery QCP",
                 'picking_type_ids': out_picking_type.ids,
             },
+            {
+                'measure_on': 'operation',
+                'title': 'Receipts Main Company',
+                'picking_type_ids': [Command.link(warehouse.in_type_id.id)],
+            }
         ])
         customer_location = self.env['stock.location'].search([('usage', '=', 'customer')], limit=1)
         picking_out = self.env['stock.picking'].create({
@@ -1374,6 +1380,32 @@ class TestQualityCheck(TestQualityCommon):
             'state': 'assigned', 'quality_check_todo': True,
         }])
         self.assertTrue(picking_out.check_ids)
+
+        # Warehouse are automatically created in test mode.
+        new_company_wh = self.env['stock.warehouse'].search([('company_id', '=', new_company.id)])
+        new_company_wh.resupply_wh_ids = [Command.link(warehouse.id)]
+
+        # Ensure a quality point in main company gets correctly created when generated through a push from another company
+        nc_delivery = self.env['stock.picking'].with_company(new_company).create({
+            'partner_id': warehouse.partner_id.id,
+            'location_id': new_company_wh.lot_stock_id.id,
+            'location_dest_id': warehouse.partner_id.with_company(new_company).property_stock_customer.id,
+            'picking_type_id': new_company_wh.out_type_id.id,
+            'move_ids': [
+                Command.create({
+                    'product_id': self.product.id,
+                    'product_uom_qty': 1,
+                }),
+            ],
+        })
+        nc_delivery.action_confirm()
+        nc_delivery.move_ids.write({
+            'quantity': 1,
+            'picked': True,
+        })
+        nc_delivery.button_validate()
+        receipt = nc_delivery._get_next_transfers()
+        self.assertEqual(receipt.check_ids.company_id, warehouse.company_id)
 
     def test_receipt_validation_triggers_serial_number_label_print(self):
         """

@@ -8,6 +8,10 @@ from . import test_dmfa
 from . import test_flexi_at_work
 from . import test_double_holiday
 from . import test_drs
+from . import test_drs_end_of_contract
+from . import test_drs_health_insurance
+from . import test_drs_part_time
+from . import test_drs_temporary_unemployment
 from . import test_credit_time
 from . import test_ui
 from . import test_main_flow
@@ -25,6 +29,7 @@ from . import test_social_balance_sheet
 from . import test_holiday_attest_allocation
 from . import test_company_executive
 from . import test_third_party_transport
+from . import test_commuting_fuel_card
 from . import test_scientific_research_exemption
 from . import test_payroll_config_settings
 from . import test_apprenticeship_min_wage

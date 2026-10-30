@@ -12,6 +12,8 @@ class WebsiteSaleSubscriptionDonation(WebsiteSaleDonation):
             return info
         # Unpublished, sudo to allow public users to read it
         recurring_product_sudo = recurring_product.sudo()
+        if not recurring_product_sudo.active:
+            return info
         plan_ids = recurring_product_sudo.subscription_rule_ids.plan_id
         info.update({
             "recurring_product_template_id": recurring_product_sudo.id,

@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:55+0000\n"
-"PO-Revision-Date: 2026-09-18 00:13+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-02 17:51+0000\n"
+"PO-Revision-Date: 2026-10-15 15:38+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/sale_account_accountant/es_419/>\n"
+"odoo-20/sale_account_accountant/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,6 +27,9 @@ msgid ""
 "\n"
 "Notify that a matching sale order exists in the reconciliation widget.\n"
 msgstr ""
+"\n"
+"Notifica que existe una orden de venta que coincide en el widget de "
+"conciliación.\n"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.res_config_settings_view_form
@@ -34,17 +37,33 @@ msgid ""
 "Accounts used by the inventory valuation report to accrue the value of goods "
 "delivered but not invoiced yet, or invoiced but not delivered yet."
 msgstr ""
+"Cuentas usadas por el reporte de valoración de inventario para acumular el "
+"valor de los bienes entregados que aún no se han facturado o de los bienes "
+"facturados que aún no se han entregado."
+
+#. module: sale_account_accountant
+#. odoo-python
+#: code:addons/sale_account_accountant/models/sale_order.py:0
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__accrual_move_ids
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_view_form
+msgid "Accrual Entries"
+msgstr "Asientos de devengo"
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__accrual_move_count
+msgid "Accrual Move Count"
+msgstr "Número de movimientos de devengo"
 
 #. module: sale_account_accountant
 #. odoo-python
 #: code:addons/sale_account_accountant/models/sale_order_line.py:0
 msgid "Accrued Revenue Entry"
-msgstr ""
+msgstr "Asiento de ingresos devengados"
 
 #. module: sale_account_accountant
 #: model:ir.module.module,summary:base.module_sale_account_accountant
 msgid "Bridge between Sale and Accounting"
-msgstr ""
+msgstr "Enlace entre Ventas y Contabilidad"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
@@ -54,7 +73,12 @@ msgstr "Empresa"
 #. module: sale_account_accountant
 #: model:ir.model,name:sale_account_accountant.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Ajustes de configuración"
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__unit_cost
+msgid "Cost by Unit"
+msgstr "Costo por unidad"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_list
@@ -65,13 +89,13 @@ msgstr "Crear asientos de devengo"
 #. odoo-python
 #: code:addons/sale_account_accountant/models/sale_order_line.py:0
 msgid "Create Invoiced Not Delivered Entry"
-msgstr ""
+msgstr "Crear asiento de facturado y no entregado"
 
 #. module: sale_account_accountant
 #. odoo-python
 #: code:addons/sale_account_accountant/models/sale_order_line.py:0
 msgid "Create Invoices to be Issued Entry"
-msgstr ""
+msgstr "Crear asiento de facturas por emitir"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
@@ -81,14 +105,10 @@ msgstr "Cliente"
 #. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_advance_payment_inv__display_name
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__display_name
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__display_name
 msgid "Display Name"
 msgstr "Mostrar nombre"
-
-#. module: sale_account_accountant
-#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
-msgid "Display only goods lines"
-msgstr "Solo mostrar líneas de bienes"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
@@ -104,8 +124,18 @@ msgstr ""
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Display only non-storable goods lines"
+msgstr "Mostrar solo las líneas de bienes no almacenables"
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
 msgid "Display only service lines"
 msgstr "Solo mostrar líneas de servicio"
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Display only storable goods lines"
+msgstr "Mostrar solo las líneas de bienes almacenables"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
@@ -113,13 +143,9 @@ msgid "For the Last 365 Days"
 msgstr "Durante los últimos 365 días"
 
 #. module: sale_account_accountant
-#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
-msgid "Goods"
-msgstr "Bienes"
-
-#. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_advance_payment_inv__id
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__id
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__id
 msgid "ID"
 msgstr "ID"
@@ -144,12 +170,12 @@ msgstr "Facturado y no entregado"
 #. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__account_invoiced_not_delivered_id
 msgid "Invoiced Not Delivered Account"
-msgstr ""
+msgstr "Cuenta de facturado y no entregado"
 
 #. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__account_invoiced_not_delivered_active
 msgid "Invoiced Not Delivered Account Active"
-msgstr ""
+msgstr "Cuenta de facturado y no entregado activa"
 
 #. module: sale_account_accountant
 #: model:ir.actions.act_window,name:sale_account_accountant.sale_order_line_accrual_to_bill_action
@@ -160,17 +186,17 @@ msgstr "Facturas por emitir"
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.res_config_settings_view_form
 msgid "Invoices to be Issued"
-msgstr ""
+msgstr "Facturas por emitir"
 
 #. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__account_invoices_to_issue_id
 msgid "Invoices to be Issued Account"
-msgstr ""
+msgstr "Cuenta de facturas por emitir"
 
 #. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__account_invoices_to_issue_active
 msgid "Invoices to be Issued Account Active"
-msgstr ""
+msgstr "Cuenta de facturas por emitir activa"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
@@ -185,12 +211,12 @@ msgstr "Categoría del producto"
 #. module: sale_account_accountant
 #: model:ir.module.module,shortdesc:base.module_sale_account_accountant
 msgid "Sale Accounting"
-msgstr ""
+msgstr "Ventas y Contabilidad"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.res_config_settings_view_form
 msgid "Sale Accruals:"
-msgstr ""
+msgstr "Devengos de ventas:"
 
 #. module: sale_account_accountant
 #. odoo-javascript
@@ -203,6 +229,11 @@ msgstr "Ventas"
 #: model:ir.model,name:sale_account_accountant.model_sale_advance_payment_inv
 msgid "Sales Advance Payment Invoice"
 msgstr "Factura de anticipo de ventas"
+
+#. module: sale_account_accountant
+#: model:ir.model,name:sale_account_accountant.model_sale_order
+msgid "Sales Order"
+msgstr "Orden de venta"
 
 #. module: sale_account_accountant
 #: model:ir.model,name:sale_account_accountant.model_sale_order_line
@@ -223,6 +254,51 @@ msgstr "Líneas de las órdenes de venta procesadas durante los últimos 365 dí
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
 msgid "Service"
 msgstr "Servicio"
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__total_cost
+msgid "Total Cost"
+msgstr "Costo total"
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Tracked Goods"
+msgstr "Bienes con seguimiento"
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_list
+msgid "Unit Cost"
+msgstr "Costo unitario"
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Untracked Goods"
+msgstr "Bienes sin seguimiento"
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,help:sale_account_accountant.field_sale_order_line__unit_cost
+msgid ""
+"Value of the product (automatically computed in AVCO).\n"
+"        Used to value the product when the purchase cost is not known (e.g. "
+"inventory adjustment).\n"
+"        Used to compute margins on sale orders."
+msgstr ""
+"El valor del producto (calculado de forma automática con AVCO).\n"
+"        Se utiliza para valorar el producto cuando se desconoce el costo de "
+"compra (por ejemplo, en un ajuste de inventario).\n"
+"        Se utiliza para calcular los márgenes de las órdenes de venta."
+
+#. module: sale_account_accountant
+#. odoo-python
+#: code:addons/sale_account_accountant/models/sale_order.py:0
+msgid "id"
+msgstr "id"
+
+#~ msgid "Display only goods lines"
+#~ msgstr "Solo mostrar líneas de bienes"
+
+#~ msgid "Goods"
+#~ msgstr "Bienes"
 
 #~ msgid "Deferred Revenue"
 #~ msgstr "Ingresos diferidos"

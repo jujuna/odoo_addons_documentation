@@ -145,7 +145,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker (-0.01 because regularization is on the onss employer basic)
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSS', [-141.16] * 3, 3000 * 1.08 * -13.07 / 100 - 0.01)
+        self.check_quarter_total('ONSS', [-141.16] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * -13.07 / 100 - 0.01)
 
         # Student Employee
         self.version.l10n_be_worker_code_id = self.be_employee
@@ -155,7 +155,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         # Student Worker (-0.01 because regularization is on the onss employer basic)
         self.version.l10n_be_worker_code_id = self.be_worker
         self.version.l10n_be_dimona_category = 'stu'
-        self.check_quarter_total('ONSS', [-29.27] * 3, 3000 * 1.08 * -2.71 / 100 - 0.01)
+        self.check_quarter_total('ONSS', [-29.27] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * -2.71 / 100 - 0.01)
 
     def test_onss_basic_condition(self):
         """
@@ -175,7 +175,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker (-0.01 because regularization is not done on the employee onss)
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYERBASIC', [270, 269.99, 270], 3000 * 1.08 * 25 / 100 - 0.01)
+        self.check_quarter_total('ONSSEMPLOYERBASIC', [270, 269.99, 270], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 25 / 100 - 0.01)
 
         # Student Employee
         self.version.l10n_be_worker_code_id = self.be_employee
@@ -185,7 +185,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         # Student Worker
         self.version.l10n_be_worker_code_id = self.be_worker
         self.version.l10n_be_dimona_category = 'stu'
-        self.check_quarter_total('ONSSEMPLOYERBASIC', [58.64, 58.64, 58.65], 3000 * 1.08 * 5.43 / 100)
+        self.check_quarter_total('ONSSEMPLOYERBASIC', [58.64, 58.64, 58.65], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 5.43 / 100)
 
     def _validate_onss_employer_basic_deductions(self, totals):
         self.quarter_payslips.action_payslip_draft()
@@ -251,7 +251,8 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self._validate_onss_employer_basic_deductions(totals)
 
         self.version.l10n_be_dimona_category = 's17'
-        totals = [None, -16395, -19035, -19035]
+        # on the remuneration code 1, as for the other workers
+        totals = [None, -3325, -12500, -12500]
         self._validate_onss_employer_basic_deductions(totals)
 
         for slip in self.quarter_payslips:
@@ -284,7 +285,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.payroll_config.l10n_be_employer_category_id = self.category_horeca
         self.version.l10n_be_worker_code_id = self.be_worker
         self.payslip.compute_sheet()
-        self.check_quarter_total('ONSSEMPLOYER_253', [60.16, 60.15, 60.16], 3000 * 1.08 * 5.57 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_253', [60.16, 60.15, 60.16], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 5.57 / 100)
 
     def test_onss_255_condition(self):
         """
@@ -305,7 +306,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_255', [0.22, 0.21, 0.22], 3000 * 1.08 * 0.02 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_255', [0.22, 0.21, 0.22], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.02 / 100)
 
     def test_onss_256_condition(self):
         """
@@ -316,8 +317,174 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.check_condition('ONSSEMPLOYER_256', True)
         self.check_condition_dimona_categories('ONSSEMPLOYER_256', ['stu', 'ivt', 'flx'], False)
 
-        self.payslip.date_from = date(2026, 7, 1)
+        # the quarters due come from the ONSS combinations of the quarter, not from the month
+        self.payslip.write({'date_from': date(2026, 7, 1), 'date_to': date(2026, 7, 31)})
+        self.check_condition('ONSSEMPLOYER_256', True)
+        employer_class = self.payslip.payroll_config_id.l10n_be_employer_category_id.dmfa_code
+        code = f'l10n_be_onss_combinations_{employer_class}_{self.version.l10n_be_worker_code_id.dmfa_code}'
+        combinations = self.payslip._rule_parameter(code)
+        self.env['hr.rule.parameter.value'].sudo().create({
+            'rule_parameter_id': self.env['hr.rule.parameter'].sudo().search([('code', '=', code)]).id,
+            'parameter_value': str({key: value for key, value in combinations.items() if key != '256'}),
+            'date_from': date(2026, 7, 1),
+        })
         self.check_condition('ONSSEMPLOYER_256', False)
+
+    def _enable_onss_804(self):
+        employer_class = self.payslip.payroll_config_id.l10n_be_employer_category_id.dmfa_code
+        code = f'l10n_be_onss_combinations_{employer_class}_{self.version.l10n_be_worker_code_id.dmfa_code}'
+        combinations = self.payslip._rule_parameter(code)
+        # the ONSS lists the contribution from the second quarter of 2026
+        self.env['hr.rule.parameter.value'].sudo().create({
+            'rule_parameter_id': self.env['hr.rule.parameter'].sudo().search([('code', '=', code)]).id,
+            'parameter_value': str({**combinations, '804': ['0']}),
+            'date_from': date(2026, 4, 1),
+        })
+        # the first moderated indexation of the JC 200: 1 January 2027
+        self.env['hr.rule.parameter.value'].sudo().create({
+            'rule_parameter_id': self.env.ref('l10n_be_hr_payroll.rule_parameter_l10n_be_legal_index').id,
+            'parameter_value': str({'200': (0.0185, 4000.0)}),
+            'date_from': date(2027, 1, 1),
+        })
+
+    def test_onss_804_wage_moderation_on_the_index(self):
+        """
+        ONSSEMPLOYER_804
+        Special wage moderation contribution on the index: from the first indexation from 1 June 2026, on the part of the indexed reference
+        wage above the capped one (4,000 EUR), never negative, prorated by the fraction of performance.
+        """
+        self._enable_onss_804()
+        # a full-time worker: the 38 hours week is the reference (the company's calendar has 40 hours)
+        self.version.resource_calendar_id.reference_calendar_id = self.version.resource_calendar_id
+        self.version.generate_work_entries(date(2026, 6, 1), date(2026, 6, 30))
+        self.version.generate_work_entries(date(2027, 6, 1), date(2027, 6, 30))
+        self.payslip.write({'date_from': date(2027, 6, 1), 'date_to': date(2027, 6, 30)})
+        self.check_condition('ONSSEMPLOYER_804', True)
+        self.assertEqual(self.get_total(self.payslip, 'ONSSEMPLOYER_804'), 0.0, "A wage below the cap owes nothing")
+
+        self.version.wage = 5000
+        rate = self.payslip._rule_parameter('l10n_be_legal_index')['200'][0]
+        part_a = (5000 - 4000 * (1 + rate)) * min(rate, 0.02)
+        self.assertAlmostEqual(self.get_total(self.payslip, 'ONSSEMPLOYER_804'), (part_a + part_a * 0.25) / 2, delta=0.01)
+
+        self.payslip.write({'date_from': date(2026, 6, 1), 'date_to': date(2026, 6, 30)})
+        self.assertEqual(self.get_total(self.payslip, 'ONSSEMPLOYER_804'), 0.0,
+                         "The indexation of January 2026 is before the measure: nothing is due in 2026")
+
+        # The fraction of performance (J / D) prorates the part above the cap: temporary unemployment (no performance,
+        # DmfA code 76) from 15 to 30 June leaves 10 of the 22 days of June 2027
+        self.payslip.write({'date_from': date(2027, 6, 1), 'date_to': date(2027, 6, 30)})
+        unemployment = self.env.ref('hr_work_entry.l10n_be_work_entry_type_temporary_economic_unemployement_employee')
+        self._generate_leave(self.employee, date(2027, 6, 15), date(2027, 6, 30), unemployment)
+        self.assertAlmostEqual(
+            self.get_total(self.payslip, 'ONSSEMPLOYER_804'), (part_a + part_a * 0.25) / 2 * 10 / 22, delta=0.01)
+        self._generate_leave(self.employee, date(2027, 6, 1), date(2027, 6, 14), unemployment)
+        self.assertEqual(self.get_total(self.payslip, 'ONSSEMPLOYER_804'), 0.0, "Nothing is due without performance")
+
+    def test_onss_804_wage_moderation_part_time(self):
+        """
+        ONSSEMPLOYER_804
+        A part-time wage is converted to a full-time one (Q/S) and the fraction of performance is the part-time
+        worker's against a full-time worker: half-time at 3,000 EUR is 6,000 EUR full-time, performed at 50%.
+        """
+        self._enable_onss_804()
+        self.version.resource_calendar_id = self.env['resource.calendar'].create({
+            'name': 'Half-time 19 hours',
+            'company_id': self.company.id,
+            'reference_calendar_id': self.version.resource_calendar_id.id,
+            'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                'dayofweek': dayofweek,
+                'hour_from': 8.0,
+                'hour_to': 11.8,
+            }) for dayofweek in ['0', '1', '2', '3', '4']],
+        })
+        self.version.wage = 3000
+        self.assertAlmostEqual(self.version.work_time_rate, 0.5, places=2)
+        self.version.generate_work_entries(date(2027, 6, 1), date(2027, 6, 30))
+        self.payslip.write({'date_from': date(2027, 6, 1), 'date_to': date(2027, 6, 30)})
+        rate = self.payslip._rule_parameter('l10n_be_legal_index')['200'][0]
+        part_a = (3000 / 0.5 - 4000 * (1 + rate)) * 0.5 * min(rate, 0.02)
+        self.assertAlmostEqual(self.get_total(self.payslip, 'ONSSEMPLOYER_804'), (part_a + part_a * 0.25) / 2, delta=0.01)
+
+    def test_horeca_occasional_flat_wage(self):
+        """
+        HORECA_OCC_FLAT, HORECA_OCC_TAXABLE, HORECA_OCC_PP
+        Horeca occasional workers (DIMONA EXT, employer category 317): the contributions of their first 50 days of
+        work of the year are computed on a flat wage per started hour, 6 hours a day at most, and the pay of those
+        days is taxed at a flat rate apart from the scale; the days after follow the ordinary regime.
+        """
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00317')
+        self.version.write({
+            'contract_date_start': date(2026, 4, 1),
+            'l10n_be_dimona_category': 'ext',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00011').id,
+            'l10n_be_joint_committee_id': self.cp_302.id,
+            'wage_type': 'hourly',
+            'hourly_wage': 15.0,
+        })
+        self.version.generate_work_entries(date(2026, 4, 1), date(2026, 6, 30))
+        payslips = self.env['hr.payslip'].create([{
+            'name': f'Extra {month}',
+            'employee_id': self.employee.id,
+            'company_id': self.company.id,
+            'struct_id': self.struct.id,
+            'date_from': date(2026, month, 1),
+        } for month in (4, 5, 6)])
+        payslips.compute_sheet()
+        flat_hourly_wage = self.payslip._rule_parameter('horeca_occasional_hourly_wage', date(2026, 4, 1))
+        used = 0
+        for payslip in payslips:
+            worked = payslip.worked_days_line_ids.filtered(lambda wd: wd.work_entry_type_id.count_as == 'working_time')
+            days = round(sum(worked.mapped('number_of_days')))
+            flat_days = max(0, min(days, 50 - used))
+            used += days
+            values = payslip._get_line_values([
+                'BASIC', 'SALARY', 'GROSS', 'P.P', 'EmpBonus.1', 'P.P.DED', 'PPTOTAL', 'HORECA_OCC_TAXABLE', 'HORECA_OCC_PP',
+            ])
+            values = {code: values[code][payslip.id]['total'] for code in values}
+            # the 7.6 hours of a day count 8 started hours, capped at 6; the other days keep their pay
+            expected = flat_days * 6 * flat_hourly_wage + values['BASIC'] * (days - flat_days) / days
+            self.assertAlmostEqual(values['SALARY'], expected, 2, payslip.name)
+            if flat_days == days:
+                # the whole taxable pay is taxed at the flat rate, the scale gets none of it
+                self.assertTrue(values['HORECA_OCC_TAXABLE'], payslip.name)
+                self.assertAlmostEqual(values['HORECA_OCC_PP'], -values['HORECA_OCC_TAXABLE'] * 0.3331, delta=0.01,
+                                       msg=payslip.name)
+                self.assertFalse(values['GROSS'], payslip.name)
+                self.assertFalse(values['P.P'], payslip.name)
+                # the fiscal work bonus only reduces the tax of the scale, never the flat rate
+                self.assertTrue(values['EmpBonus.1'], payslip.name)
+                self.assertFalse(values['P.P.DED'], payslip.name)
+                self.assertAlmostEqual(values['PPTOTAL'], -values['HORECA_OCC_PP'], 2, payslip.name)
+        self.assertGreater(used, 50, "The third month goes past the worker's contingent")
+
+    def test_horeca_occasional_no_withholding_taxes(self):
+        # an occasional Horeca worker without withholding taxes (a cross-border worker) pays neither the flat rate nor
+        # the scale
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00317')
+        self.version.write({
+            'contract_date_start': date(2026, 4, 1),
+            'l10n_be_dimona_category': 'ext',
+            'l10n_be_worker_code_id': self.env.ref('l10n_be_hr_payroll.l10n_be_worker_code_00011').id,
+            'l10n_be_joint_committee_id': self.cp_302.id,
+            'wage_type': 'hourly',
+            'hourly_wage': 15.0,
+            'no_withholding_taxes': True,
+        })
+        self.version.generate_work_entries(date(2026, 4, 1), date(2026, 4, 30))
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Extra April',
+            'employee_id': self.employee.id,
+            'company_id': self.company.id,
+            'struct_id': self.struct.id,
+            'date_from': date(2026, 4, 1),
+        })
+        payslip.compute_sheet()
+        values = payslip._get_line_values(['SALARY', 'HORECA_OCC_PP', 'P.P', 'PPTOTAL'])
+        self.assertTrue(values['SALARY'][payslip.id]['total'])
+        self.assertFalse(values['HORECA_OCC_PP'][payslip.id]['total'])
+        self.assertFalse(values['P.P'][payslip.id]['total'])
+        self.assertFalse(values['PPTOTAL'][payslip.id]['total'])
 
     def test_onss_256_computation(self):
         """
@@ -329,7 +496,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_256', [0.11, 0.11, 0.1], 3000 * 1.08 * 0.01 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_256', [0.11, 0.11, 0.1], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.01 / 100)
 
     def test_onss_260_condition(self):
         """
@@ -357,7 +524,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_260', [675] * 3, 3000 * 1.08 * 62.5 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_260', [675] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 62.5 / 100)
 
         # 60 years <= Age < 62 years
         # Employee
@@ -367,7 +534,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_260', [607.5] * 3, 3000 * 1.08 * 56.25 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_260', [607.5] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 56.25 / 100)
 
         # 62 years <= Age
         # Employee
@@ -377,7 +544,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_260', [540] * 3, 3000 * 1.08 * 50 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_260', [540] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 50 / 100)
 
         # == Employees with Activation < 10% ==
         # Age < 60 years
@@ -395,7 +562,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_260', [540] * 3, 3000 * 1.08 * 50 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_260', [540] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 50 / 100)
 
         # 60 years <= Age < 62 years
         # Employee
@@ -405,7 +572,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_260', [486] * 3, 3000 * 1.08 * 45 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_260', [486] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 45 / 100)
 
         # 62 years <= Age
         # Employee
@@ -415,7 +582,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_260', [432] * 3, 3000 * 1.08 * 40 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_260', [432] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 40 / 100)
 
     def test_onss_450_condition(self):
         """
@@ -424,6 +591,23 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         """
         self.check_condition('ONSSEMPLOYER_450', False)
         self.check_condition_dimona_categories('ONSSEMPLOYER_450', ['flx'], True)
+
+    def test_flexi_holiday_pay_benefits_in_kind(self):
+        """
+        FLEXI_PECULE
+        The flexi holiday pay is 7.67% of the whole flexi wage, its benefits in kind included
+        """
+        self.version.write({
+            'contract_date_start': date(2026, 1, 1),
+            'contract_date_end': date(2026, 3, 31),
+            'l10n_be_dimona_category': 'flx',
+            'mobile': 30.0,
+        })
+        self.payslip.compute_sheet()
+        lines = self.payslip._get_line_values(['BASIC', 'ATN.MOB', 'FLEXI_PECULE'])
+        basic, mobile, holiday_pay = (lines[code][self.payslip.id]['total'] for code in ('BASIC', 'ATN.MOB', 'FLEXI_PECULE'))
+        self.assertTrue(mobile)
+        self.assertAlmostEqual(holiday_pay, (basic + mobile) * 7.67 / 100, delta=0.005)
 
     def test_onss_450_computation(self):
         """
@@ -437,9 +621,9 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.version.l10n_be_dimona_category = 'flx'
         self.check_quarter_total('ONSSEMPLOYER_450', [301.48, 301.47, 301.48], 3230.1 * 28 / 100)
 
-        # Worker
+        # Worker: no 108% base, the flexi holiday pay replaces the holiday fund
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_450', [325.59, 325.6, 325.59], 3230.1 * 1.08 * 28 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_450', [301.48, 301.47, 301.48], 3230.1 * 28 / 100)
 
     def test_onss_800_condition(self):
         """
@@ -458,6 +642,21 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self._generate_leave(self.employee, '2026-01-01', '2026-01-02', self.economic_unemployment)
         self.check_condition('ONSSEMPLOYER_800', True)
         self.check_condition_dimona_categories('ONSSEMPLOYER_800', ['stu', 'ivt', 'flx'], False)
+
+    def test_onss_800_two_versions(self):
+        """
+        ONSSEMPLOYER_800
+        The days of economic unemployment of every line of the month count: a new version in the month gives a second
+        137.00 line
+        """
+        self.payroll_config.l10n_be_employer_category_id = self.category_horeca
+        self.version.l10n_be_worker_code_id = self.be_worker
+        self.version.copy({'date_version': date(2026, 1, 15)})
+        self._generate_leave(self.employee, '2026-01-05', '2026-01-06', self.economic_unemployment)
+        self._generate_leave(self.employee, '2026-01-19', '2026-01-20', self.economic_unemployment)
+        self.payslip.compute_sheet()
+        self.assertEqual(len(self.payslip.worked_days_line_ids.filtered(lambda wd: wd.code == '137.00')), 2)
+        self._validate_rule_computed(self.payslip, 'ONSSEMPLOYER_800', True)
 
     def test_onss_800_computation(self):
         """
@@ -542,7 +741,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker - Small Commercial Company
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_809', [3.67, 3.67, 3.68], 3000 * 1.08 * 0.34 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_809', [3.67, 3.67, 3.68], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.34 / 100)
 
         # Employee No Salary Moderation - Small Commercial Company
         self.version.l10n_be_worker_code_id = self.be_employee_no_salary_moderation
@@ -550,7 +749,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker No Salary Moderation - Small Commercial Company
         self.version.l10n_be_worker_code_id = self.be_worker_no_salary_moderation
-        self.check_quarter_total('ONSSEMPLOYER_809', [3.46, 3.45, 3.46], 3000 * 1.08 * 0.32 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_809', [3.46, 3.45, 3.46], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.32 / 100)
 
         # Employee - Large Commercial Company
         self.payroll_config.onss_importance_code = '4'
@@ -563,7 +762,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker - Large Commercial Company
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_809', [4.21, 4.21, 4.22], 3000 * 1.08 * 0.39 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_809', [4.21, 4.21, 4.22], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.39 / 100)
 
         # Employee No Salary Moderation - Large Commercial Company
         self.version.l10n_be_worker_code_id = self.be_employee_no_salary_moderation
@@ -571,7 +770,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker No Salary Moderation - Large Commercial Company
         self.version.l10n_be_worker_code_id = self.be_worker_no_salary_moderation
-        self.check_quarter_total('ONSSEMPLOYER_809', [4, 3.99, 4], 3000 * 1.08 * 0.37 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_809', [4, 3.99, 4], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.37 / 100)
 
     def test_onss_810_condition(self):
         """
@@ -592,7 +791,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_810', [1.08] * 3, 3000 * 1.08 * 0.1 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_810', [self.payslip._rule_parameter('worker_onss_calculation_basis_uplift')] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.1 / 100)
 
     def test_onss_811_condition(self):
         """
@@ -619,7 +818,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker - Non-Commercial Sector
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_811', [0.11, 0.11, 0.1], 3000 * 1.08 * 0.01 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_811', [0.11, 0.11, 0.1], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.01 / 100)
 
         # Employee No Salary Moderation - Non-Commercial Sector
         self.version.l10n_be_worker_code_id = self.be_employee_no_salary_moderation
@@ -627,7 +826,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker No Salary Moderation - Non-Commercial Sector
         self.version.l10n_be_worker_code_id = self.be_worker_no_salary_moderation
-        self.check_quarter_total('ONSSEMPLOYER_811', [0.11, 0.11, 0.1], 3000 * 1.08 * 0.01 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_811', [0.11, 0.11, 0.1], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.01 / 100)
 
     def test_onss_820_condition(self):
         """
@@ -651,11 +850,40 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.payroll_config.onss_importance_code = '4'
         self.payroll_config.l10n_be_employer_category_id = self.category_horeca
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_820', [15.12] * 3, 3000 * 1.08 * 1.4 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_820', [15.12] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 1.4 / 100)
 
         # Worker - Large Company
         self.payroll_config.onss_importance_code = '5'
-        self.check_quarter_total('ONSSEMPLOYER_820', [15.66] * 3, 3000 * 1.08 * 1.45 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_820', [15.66] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 1.45 / 100)
+
+    def test_onss_820_auxiliary_committee_workers(self):
+        """
+        ONSSEMPLOYER_820
+        The workers of category 210 (auxiliary committee 100) pay the training fund of their committee: 0.15 % from
+        1 April 2026, a single rate of type 0 whatever the size of the employer (ONSS dmfa_rate_2026_2)
+        """
+        for code, value in (
+            ('l10n_be_onss_combinations_210_015', {'820': ['1']}),
+            ('l10n_be_onss_rates_210_820_0', {'personal_rate': 0.0, 'employer_rate': 0.15, 'salary_moderation_rate': 0.0, 'total_rate': 0.15}),
+        ):
+            parameter = self.env['hr.rule.parameter'].sudo().search([('code', '=', code)]) or self.env['hr.rule.parameter'].sudo().create({
+                'name': code,
+                'code': code,
+                'country_id': self.env.ref('base.be').id,
+            })
+            self.env['hr.rule.parameter.value'].sudo().create({
+                'rule_parameter_id': parameter.id,
+                'parameter_value': str(value),
+                'date_from': date(2000, 1, 1),
+            })
+        self.payroll_config.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00210')
+        self.payroll_config.onss_importance_code = '2'
+        self.version.l10n_be_worker_code_id = self.be_worker
+        self.check_condition('ONSSEMPLOYER_820', True)
+        self.check_quarter_total('ONSSEMPLOYER_820', [1.62] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.15 / 100)
+
+        self.payroll_config.onss_importance_code = '5'
+        self.check_quarter_total('ONSSEMPLOYER_820', [1.62] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.15 / 100)
 
     def test_onss_825_condition(self):
         """
@@ -690,6 +918,34 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         self.check_condition_dimona_categories('ONSSEMPLOYER_825', ['stu', 'ivt', 'flx'], False)
 
+    def test_horeca_pension_apprentices_and_extras(self):
+        self.payroll_config.write({
+            'l10n_be_employer_category_id': self.category_horeca.id,
+            'l10n_be_worker_retirement_fund': '0',
+            'l10n_be_employee_retirement_fund': '0',
+        })
+        self.version.l10n_be_joint_committee_id = self.cp_302
+        # The exclusion still applies after the apprentice enters ordinary
+        # social security in January of the year of their nineteenth birthday.
+        self.employee.birthday = date(2007, 12, 1)
+        for worker_code, rule_code in [(self.be_worker, 'ONSSEMPLOYER_825'), (self.be_employee, 'ONSSEMPLOYER_835')]:
+            with self.subTest(rule_code=rule_code):
+                self.version.write({
+                    'l10n_be_worker_code_id': worker_code.id,
+                    'l10n_be_dimona_category': 'oth',
+                    'l10n_be_apprenticeship_contract_number': False,
+                })
+                self.assertGreater(self.get_total(self.payslip, rule_code), 0)
+                self.version.l10n_be_dimona_category = 'alt'
+                self.assertAlmostEqual(self.get_total(self.payslip, rule_code), 0, places=2)
+                self.version.l10n_be_dimona_category = 'ext'
+                self.assertAlmostEqual(self.get_total(self.payslip, rule_code), 0, places=2)
+                self.version.write({
+                    'l10n_be_dimona_category': 'oth',
+                    'l10n_be_apprenticeship_contract_number': 'TEST-APPRENTICE',
+                })
+                self.assertAlmostEqual(self.get_total(self.payslip, rule_code), 0, places=2)
+
     def test_onss_825_computation(self):
         """
         ONSSEMPLOYER_825
@@ -699,20 +955,20 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         self.payroll_config.l10n_be_worker_retirement_fund = '0'
         self.payroll_config.l10n_be_employer_category_id = self.category_horeca
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_825', [11.88] * 3, 3000 * 1.08 * 1.1 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_825', [11.88] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 1.1 / 100)
 
         # Worker - Contribution Not Due
         self.payroll_config.l10n_be_worker_retirement_fund = '8'
-        self.check_quarter_total('ONSSEMPLOYER_825', [0] * 3, 3000 * 1.08 * 0 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_825', [0] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0 / 100)
 
         # Worker - Increased Contribution
         self.payroll_config.l10n_be_worker_retirement_fund = '1'
         self.payroll_config.l10n_be_employer_category_id = self.category_food_industry
-        self.check_quarter_total('ONSSEMPLOYER_825', [1.08] * 3, 3000 * 1.08 * 0.1 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_825', [self.payslip._rule_parameter('worker_onss_calculation_basis_uplift')] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.1 / 100)
 
         # Worker - Solidarity Contribution
         self.payroll_config.l10n_be_worker_retirement_fund = '2'
-        self.check_quarter_total('ONSSEMPLOYER_825', [0.65, 0.65, 0.64], 3000 * 1.08 * 0.06 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_825', [0.65, 0.65, 0.64], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.06 / 100)
 
     def test_onss_830_condition(self):
         """
@@ -745,6 +1001,21 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
         # ACS - Large Company
         self.payroll_config.onss_importance_code = '5'
         self.check_quarter_total('ONSSEMPLOYER_830', [14.5] * 3, 3000 * 1.45 / 100)
+
+    def test_onss_subsistence_funds_adult_apprentice(self):
+        """
+        ONSSEMPLOYER_820 / 830 / 831
+        No subsistence fund contribution for an apprentice in alternance training, for the whole of its contract,
+        whatever its age (the generic owedness of the ONSS combinations only spares the apprentices under 18)
+        """
+        self.employee.birthday = date(2000, 1, 1)
+        self.check_condition('ONSSEMPLOYER_831', True)
+        self.check_condition_dimona_categories('ONSSEMPLOYER_831', ['alt'], False)
+
+        self.payroll_config.l10n_be_employer_category_id = self.category_horeca
+        self.version.l10n_be_worker_code_id = self.be_worker
+        self.check_condition('ONSSEMPLOYER_820', True)
+        self.check_condition_dimona_categories('ONSSEMPLOYER_820', ['alt'], False)
 
     def test_onss_831_condition(self):
         """
@@ -833,7 +1104,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_852', [1.08] * 3, 3000 * 1.08 * 0.1 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_852', [self.payslip._rule_parameter('worker_onss_calculation_basis_uplift')] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.1 / 100)
 
     def test_onss_855_condition(self):
         """
@@ -863,7 +1134,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_855', [18.25, 18.25, 18.26], 3000 * 1.08 * 1.69 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_855', [18.25, 18.25, 18.26], 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 1.69 / 100)
 
     def test_onss_857_condition(self):
         """
@@ -894,7 +1165,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker No Salary Moderation
         self.version.l10n_be_worker_code_id = self.be_worker_no_salary_moderation
-        self.check_quarter_total('ONSSEMPLOYER_857', [17.28] * 3, 3000 * 1.08 * 1.6 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_857', [17.28] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 1.6 / 100)
 
     def test_onss_859_condition(self):
         """
@@ -915,7 +1186,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_859', [1.08] * 3, 3000 * 1.08 * 0.1 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_859', [self.payslip._rule_parameter('worker_onss_calculation_basis_uplift')] * 3, 3000 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 0.1 / 100)
 
     def test_onss_865_condition(self):
         """
@@ -939,7 +1210,7 @@ class TestPayrollOnssContributions(TestPayrollBase, TestBelgiumCommon):
 
         # Worker
         self.version.l10n_be_worker_code_id = self.be_worker
-        self.check_quarter_total('ONSSEMPLOYER_865', [47.84, 47.85, 47.84], 1500 * 1.08 * 8.86 / 100)
+        self.check_quarter_total('ONSSEMPLOYER_865', [47.84, 47.85, 47.84], 1500 * self.payslip._rule_parameter('worker_onss_calculation_basis_uplift') * 8.86 / 100)
 
     def test_onss_878_condition(self):
         """

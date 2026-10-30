@@ -38,8 +38,11 @@ class TestExpenseStripeEU(TestExpenseStripeCommon):
     def test_physical_card_no_shipping(self):
         super().test_physical_card_no_shipping()
 
-    def test_create_employee_cardholder(self):
-        super().test_create_employee_cardholder()
+    def test_transfer_messages_to_card(self):
+        super().test_transfer_messages_to_card()
+
+    def test_create_cardholder_no_user(self):
+        super().test_create_cardholder_no_user()
 
     def test_create_cardholder(self):
         super().test_create_cardholder()

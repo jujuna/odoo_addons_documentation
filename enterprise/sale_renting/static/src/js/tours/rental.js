@@ -1,6 +1,7 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
+import { searchOrCreateMany2X } from "@web_tour/tour_scenarios";
 
 import { markup } from "@odoo/owl";
 
@@ -66,16 +67,15 @@ registry.category("web_tour.tours").add("rental_tour", {
             content: _t("Click here to create a new quotation."),
             run: "click",
         },
-        {
+        ...searchOrCreateMany2X({
             trigger: ".o_field_widget[name=partner_id] input",
-            content: _t("Create or select a customer here."),
-            run: "edit Agrolait",
-        },
-        {
-            content: _t("Select the customer in the list."),
-            trigger: ".o_field_widget[name=partner_id] .dropdown-item:not(.o_loading)",
-            run: "click",
-        },
+            label: "customer",
+            searchText: "Agrolait",
+            fields: {
+                name: "Agrolait",
+                email: "agrolait@example.com",
+            },
+        }),
         {
             trigger: "button:contains('Add Line')",
             content: _t("Click here to start filling the quotation."),

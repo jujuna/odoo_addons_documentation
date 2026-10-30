@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
 "PO-Revision-Date: 2026-09-18 02:45+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
@@ -339,8 +339,8 @@ msgstr ""
 "            <body><div>\n"
 "                <p>Đã gặp lỗi và không thể hoàn tất việc đồng bộ hóa hàng "
 "tồn kho cho Cửa hàng Shopee\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
-"\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
+"b>\n"
 "                    .</p>\n"
 "                <p>Đây là lỗi được gửi về từ Shopee: </p>\n"
 "                <table class=\"shopee_table\">\n"
@@ -353,8 +353,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></th>"
-"\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></"
+"th>\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -1142,13 +1142,6 @@ msgid "Shopee Order Discount"
 msgstr ""
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-#: code:addons/sale_shopee/tests/test_shopee.py:0
-msgid "Shopee Pricelist %(currency)s"
-msgstr "Bảng giá Shopee %(currency)s"
-
-#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_account__api_endpoint__production_brazil
 msgid "Shopee Production Endpoint (Brazil)"
 msgstr "Endpoint Production Shopee (Brazil)"
@@ -1237,7 +1230,8 @@ msgstr "Tài khoản Shopee tương ứng với tài khoản Shopee Seller Centr
 msgid ""
 "Shopee is processing the shipping label. Odoo will try fetching the shipping "
 "label again later."
-msgstr "Shopee đang xử lý nhãn vận chuyển. Odoo sẽ thử lấy nhãn vận chuyển sau."
+msgstr ""
+"Shopee đang xử lý nhãn vận chuyển. Odoo sẽ thử lấy nhãn vận chuyển sau."
 
 #. module: sale_shopee
 #. odoo-python
@@ -1548,3 +1542,6 @@ msgstr "shop_id"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "shopee_shop_id"
 msgstr "shopee_shop_id"
+
+#~ msgid "Shopee Pricelist %(currency)s"
+#~ msgstr "Bảng giá Shopee %(currency)s"

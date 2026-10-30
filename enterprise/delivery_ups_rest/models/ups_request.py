@@ -265,7 +265,7 @@ class UPSRequest:
         return re.sub(r'[^A-Za-z0-9]', '', zip)[:9]
 
     def _get_ship_data_from_partner(self, partner, shipper_no=None):
-        return {
+        ship_data = {
             'AttentionName': (partner.name or '')[:35],
             'Name': (partner.parent_id.name or partner.name or '')[:35],
             'EMailAddress': partner.email or '',
@@ -281,6 +281,9 @@ class UPSRequest:
                 'StateProvinceCode': self._sanitize_province_code(partner),
             },
         }
+        if (partner.country_id and partner.country_id.code == 'ES') and (partner.zip and partner.zip[:2] in ('35', '38')):
+            ship_data['Address']['CountryCode'] = 'IC'  # Canary
+        return ship_data
 
     def _get_delivery_confirmation_origin_destination_pair_type(self, ship_from, ship_to):
         # Check whether delivery confirmation should be requested at package level or shipment level
@@ -318,7 +321,7 @@ class UPSRequest:
                     'Service': {
                         'Code': service_type,
                     },
-                    'NumOfPieces': str(int(total_qty)) if service_type == '96' else None,
+                    'NumOfPieces': str(int(total_qty)) if service_type in ('71', '96') else None,
                     'ShipmentServiceOptions': shipment_service_options if shipment_service_options else None,
                     'PackageServiceOptions': package_service_options or None,
                     'ShipmentRatingOptions': {
@@ -414,6 +417,7 @@ class UPSRequest:
             })
         shipment_service_options = {}
         package_service_options = {}
+        global_tax_information = {}
         if shipment_info.get('require_invoice'):
             picking = packages[0].picking_id
             if picking.sale_id:
@@ -433,6 +437,20 @@ class UPSRequest:
             shipment_service_options['InternationalForms']['PurchaseOrderNumber'] = shipment_info.get('purchase_order_number')
             shipment_service_options['InternationalForms']['TermsOfShipment'] = shipment_info.get('terms_of_shipment')
             shipment_service_options['InternationalForms']['FreightCharges'] = {'MonetaryValue': float_repr(shipment_info.get('freight_charge', 0.0), 2)}
+            if sold_to.vat:
+                global_tax_information = {
+                    'AgentTaxIdentificationNumber': [{
+                        'AgentRole': '30',
+                        'TaxIdentificationNumber': [{
+                            'IdentificationNumber': sold_to.vat,
+                            'IDNumberTypeCode': '1002',  # 1002 = Company/Business Tax ID Number
+                            'IDNumberCustomerRole': '05',  # 05 = Importer address
+                            'IDNumberIssuingCntryCd': sold_to.country_id.code,
+                            'IDNumberEncryptionIndicator': '0',
+                            'IDNumberPurposeCode': '01',  # 01 = Customs/Brokerage (Default)
+                        }],
+                    }],
+                }
         if saturday_delivery:
             shipment_service_options['SaturdayDeliveryIndicator'] = saturday_delivery
         if carrier.ups_require_signature:
@@ -462,7 +480,7 @@ class UPSRequest:
                     'Service': {
                         'Code': service_type,
                     },
-                    'NumOfPiecesInShipment': int(shipment_info.get('total_qty')) if service_type == '96' else None,
+                    'NumOfPiecesInShipment': str(int(shipment_info.get('total_qty'))) if service_type in ('71', '96') else None,
                     'ShipmentServiceOptions': shipment_service_options if shipment_service_options else None,
                     'PackageServiceOptions': package_service_options or None,
                     'ShipmentRatingOptions': {
@@ -471,6 +489,7 @@ class UPSRequest:
                     'PaymentInformation': {
                         'ShipmentCharge': payment_info,
                     },
+                    'GlobalTaxInformation': global_tax_information or None,
                 },
             },
         }
@@ -480,9 +499,7 @@ class UPSRequest:
             (ship_from.country_id.code == 'US' and ship_to.country_id.code == 'US') or
             (ship_from.country_id.code == 'PR' and ship_to.country_id.code == 'PR')
         ):
-            request['ShipmentRequest']['Shipment']['ReferenceNumber'] = {
-                'Value': shipment_info.get('reference_number')
-            }
+            request['ShipmentRequest']['Shipment']['ReferenceNumber'] = shipment_info.get('reference_number')
 
         # Shipments from US to CA or PR require extra info
         if ship_from.country_id.code == 'US' and ship_to.country_id.code in ['CA', 'PR']:

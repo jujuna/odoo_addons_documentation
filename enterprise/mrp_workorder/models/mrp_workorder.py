@@ -61,10 +61,11 @@ class MrpWorkorder(models.Model):
     # employees assigned to the wo
     employee_assigned_ids = fields.Many2many('hr.employee', 'mrp_workorder_employee_assigned',
                                              'workorder_id', 'employee_id', string='Assigned', tracking=True, falsy_value_label='Unassigned Work Orders',
+                                             bypass_search_access=True,
                                              domain="[('company_id', 'in', allowed_company_ids)]")
 
     # list of employees allowed to work on the workcenter
-    allowed_employees = fields.Many2many(related='workcenter_id.employee_ids')
+    allowed_employees = fields.Many2many(related='workcenter_id.employee_ids', bypass_search_access=True)
     # True if all employees are allowed on that workcenter
     all_employees_allowed = fields.Boolean(compute='_all_employees_allowed')
 

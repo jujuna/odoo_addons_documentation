@@ -47,7 +47,8 @@ class AIEmbeddingMixin(models.AbstractModel):
     @api.ondelete(at_uninstall=False)
     def _unlink_embeddings(self):
         """Unlinks the linked embeddings records."""
-        self.embedding_ids.unlink()
+        # sudo: ai.embedding - embeddings must not prevent users from deleting their records
+        self.sudo().embedding_ids.unlink()
 
     @api.model
     def _cron_embed_records(self, batch_size: int = 100):
@@ -107,9 +108,11 @@ class AIEmbeddingMixin(models.AbstractModel):
         :return: an `ai.embedding` recordset
         :rtype: AIEmbedding
         """
+        # sudo: ai.embedding - embeddings must not prevent users from creating records
+        Embedding = self.env["ai.embedding"].sudo()
         already_embedded = {
             (res_id, model)
-            for res_id, model in self.env["ai.embedding"]._read_group(
+            for res_id, model in Embedding._read_group(
                 [
                     ("res_model", "=", self._name),
                     ("res_id", "in", self.ids),
@@ -145,14 +148,15 @@ class AIEmbeddingMixin(models.AbstractModel):
                         )
                 except ValueError as e:
                     record._on_embedding_failure(e)
-        return self.env["ai.embedding"].create(
+        return Embedding.create(
             [item for vals in embedding_vals.values() for item in vals],
         )
 
     def _recreate_embeddings(self):
         """Re-creates the embedding records for the model. Used when embedded content changes,
         which requires re-chunking."""
-        self.embedding_ids.unlink()
+        # sudo: ai.embedding - embeddings must not prevent users from regenerating them
+        self.sudo().embedding_ids.unlink()
 
         for record in self:
             record._create_embedding_records(record._get_embedding_models())

@@ -119,7 +119,7 @@ class L10nBeIntervatController(http.Controller):
             except UserError as e:
                 error_title = request.env._("Fetching Error: \n") if request_type == 'fetch' else request.env._("Submission Error: \n")
                 error_message = error_title + "\n".join(e.args)
-                return_id.sudo.write({'l10n_be_submission_error': "\n".join(e.args)})
+                return_id.sudo().write({'l10n_be_submission_error': "\n".join(e.args)})
                 return_id._message_log(body=error_message)
                 request.env.user._bus_send('simple_notification', {
                     'type': 'danger',

@@ -25,10 +25,11 @@ class AccountJournal(models.Model):
 
     def _get_organization_id_node_text(self, payment_method_code, postal_address):
         # EXTENDS account_iso_20022
-        if payment_method_code == 'iso20022_se' and postal_address and self.company_id.additional_identifiers.get('SE_EN') and self.bank_bic == 'SWEDSESS':
-            return f"06{re.sub(r'[^0-9]', '', self.company_id.additional_identifiers['SE_EN'])}B001"
+        result = super()._get_organization_id_node_text(payment_method_code, postal_address)
+        if payment_method_code == 'iso20022_se' and self.bank_bic == 'SWEDSESS' and postal_address:
+            result = re.split(r'[^0-9]', result)[0]
 
-        return super()._get_organization_id_node_text(payment_method_code, postal_address)
+        return result
 
     def _get_CtgyPurp(self, payment_method_code):
         if not self._is_se_bban(payment_method_code):
@@ -135,7 +136,7 @@ class AccountJournal(models.Model):
             postal_address = self.get_postal_address(partner_id, payment_method_line)
             if postal_address is not None:
                 PstlAdr = etree.Element("PstlAdr")
-                for node_name, attr, size in [('StrtNm', 'street', 70), ('PstCd', 'zip', 140), ('TwnNm', 'city', 140), ('Ctry', 'country', 2)]:
+                for node_name, attr, size in [('StrtNm', 'street', 70), ('PstCd', 'zip', 16), ('TwnNm', 'city', 35), ('Ctry', 'country', 2)]:
                     if postal_address[attr]:
                         address_element = etree.SubElement(PstlAdr, node_name)
                         address_element.text = sanitize_communication(postal_address[attr], size)

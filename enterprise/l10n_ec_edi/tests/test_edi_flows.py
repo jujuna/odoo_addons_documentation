@@ -1,4 +1,6 @@
 from datetime import datetime, timezone, timedelta
+from unittest import mock
+from requests.exceptions import RequestException
 
 from odoo.tests import tagged
 from odoo.tools.misc import file_open
@@ -94,3 +96,16 @@ class TestEcEdiFlow(TestEcEdiCommon):
             'partner_id': self.partner_a.id,
         })
         self.assertNotIn('l10n_ec_edi_missing_provider_vat', (in_invoice.alerts or {}))
+
+    def test_send_invoice_sri_unreachable(self):
+        expected_operations = (
+            ('validarComprobante', {'xml': mock.ANY}, {'estado': 'RECIBIDA', 'comprobantes': None}),
+            ('autorizacionComprobante', {'claveAccesoComprobante': mock.ANY}, RequestException()),
+        )
+        out_invoice = self.get_invoice({'move_type': 'out_invoice', 'partner_id': self.partner_a.id})
+        out_invoice.action_post()
+
+        with self.mock_zeep_client(expected_operations):
+            out_invoice.button_process_edi_web_services()
+
+        self.assertEqual(out_invoice.edi_document_ids.blocking_level, 'warning')

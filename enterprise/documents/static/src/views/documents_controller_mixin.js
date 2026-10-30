@@ -227,6 +227,7 @@ export const DocumentsControllerMixin = (ControllerComponent) =>
             );
             this.firstLoadSelectId = this.documentService.initData?.documentId;
             this.userIsInternal = this.documentService.userIsInternal;
+            this.userIsDocumentUser = this.documentService.userIsDocumentUser;
             this.userIsDocumentManager = this.documentService.userIsDocumentManager;
 
             this.searchBarToggler = useSearchBarToggler();

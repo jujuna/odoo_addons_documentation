@@ -381,7 +381,7 @@ class SaleOrderLine(models.Model):
                 line_key = (
                     line.order_id.subscription_id,
                     line.product_id,
-                    line.name.removesuffix('(*)') if not line.product_id else None,
+                    line.name.removesuffix('(*)') if not line.product_id and line.name else None,
                     line.product_uom_id,
                     line_currency,
                     line.order_id.plan_id,
@@ -471,7 +471,7 @@ class SaleOrderLine(models.Model):
             if self.order_id.subscription_state == '7_upsell' and self.order_id.plan_id.billing_first_day:
                 duration = _('%s days', number_of_days)
 
-            description = res.get('name') or self.name
+            description = res.get('name') or self.name or ''
             if self.recurring_invoice and not self._is_delivery():
                 format_start = format_date(self.env, new_period_start, lang_code=lang_code)
                 format_next = format_date(self.env, new_period_stop, lang_code=lang_code)
@@ -538,7 +538,10 @@ class SaleOrderLine(models.Model):
         elif self._is_postpaid_line():
             # skip this line if start_date == nid. Itit only happens when we mix postpaid and prepaid lines.
             # otherwise, the next invoice date is bumped at SO confirmation
-            return bool(self.order_id.start_date != self.order_id.next_invoice_date)
+            return bool(
+                self.order_id.start_date != self.order_id.next_invoice_date
+                or (self.order_id.invoice_overages and self.qty_overage > 0)
+            )
         else:
             # We don't invoice line past their SO's end_date
             return not self.order_id.end_date or (self.order_id.next_invoice_date and self.order_id.next_invoice_date < self.order_id.end_date)
@@ -796,7 +799,10 @@ class SaleOrderLine(models.Model):
 
     def _is_postpaid_line(self):
         self.ensure_one()
-        return self.invoice_policy == 'delivery'
+        return (
+            self.invoice_policy == 'delivery'
+            or (self.order_id.invoice_overages and self.qty_overage > 0)
+        )
 
     def _is_all_postpaid(self):
         """ Helper to know if all lines are postpaid.

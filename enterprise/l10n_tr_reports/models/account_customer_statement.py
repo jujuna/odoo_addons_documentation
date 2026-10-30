@@ -20,30 +20,19 @@ class CustomerStatementTRHandler(models.AbstractModel):
         partner_ids = options.get('partner_ids') or []
         if (
             self.env.company.account_fiscal_country_id.code == 'TR'
-            and len(partner_ids) == 1
+            and len(partner_ids) == 1 and partner_ids[0]
         ):
-            selected_partner = self.env['res.partner'].browse(partner_ids)
-            partner_line = None
-            invoice_count = 0
-            for line in lines:
-                if line.level == 2 and line.groupby == 'id':
-                    partner_line = line
-                if line.level == 4 and line.groupby is None:
-                    invoice_count += 1
-
-            invoice_total = next(
-                (col.name for col in partner_line.columns if col.expression_label == 'amount'),
-                ''
-            ) if partner_line else ''
+            partner = self.env['res.partner'].browse(partner_ids)
+            invoice_count = sum(1 for line in lines if line.level == 4 and line.groupby is None)
 
             additional_context.update({
-                'selected_partner': selected_partner,
+                'reconciliation_letter': True,
+                'partner_name': partner.name,
                 'is_turkish': (
-                    selected_partner.lang == 'tr_TR'
+                    partner.lang == 'tr_TR'
                     or self.env.user.lang == 'tr_TR'
                 ),
                 'invoice_count': invoice_count,
-                'invoice_total': invoice_total,
             })
 
         return self.env['account.report'].browse(options['report_id'])._get_pdf_export_html(

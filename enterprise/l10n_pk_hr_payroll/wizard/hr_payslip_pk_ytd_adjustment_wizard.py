@@ -49,10 +49,14 @@ class HrPayslipPkYtdAdjustmentWizard(models.TransientModel):
                 }
             }
         if tax_difference < 0:
-            self.payslip_id._set_input_value('TAX_CORRECT_NEG', -tax_difference)
-            self.payslip_id._set_input_value('TAX_CORRECT_POS', 0)
+            self.payslip_id._set_input_values({
+                'TAX_CORRECT_NEG': -tax_difference,
+                'TAX_CORRECT_POS': 0,
+            })
         else:
-            self.payslip_id._set_input_value('TAX_CORRECT_POS', tax_difference)
-            self.payslip_id._set_input_value('TAX_CORRECT_NEG', 0)
+            self.payslip_id._set_input_values({
+                'TAX_CORRECT_POS': tax_difference,
+                'TAX_CORRECT_NEG': 0,
+            })
         self.payslip_id.compute_sheet()
         return {'type': 'ir.actions.client', 'tag': 'soft_reload'}

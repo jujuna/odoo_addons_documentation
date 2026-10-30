@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from odoo.exceptions import UserError
 
 from odoo.addons.obox.tests.common import CommonOboxTest
@@ -52,3 +54,36 @@ class TestOboxAndroidQueue(CommonOboxTest):
         second = self.obox._queue_action("request_sync", "/odoo/sync")
 
         self.assertNotEqual(first, second)
+
+    def test_asking_a_printer_status_queues_the_command(self):
+        self.obox_printer.action_printer_status()
+
+        payload = self._pending("printer_status").payload
+        self.assertEqual(payload["url"], "/usb/v1/printer/status")
+        self.assertEqual(payload["payload"], {"identifier": "test_obox_printer"})
+
+    def test_the_printer_status_is_told_to_the_user_who_asked(self):
+        self.obox_printer.action_printer_status()
+
+        with patch.object(self.registry["res.users"], "_bus_send", autospec=True) as sent:
+            self.respond_to_pending_actions({"status": "ok", "printer_status": "cover_open"})
+
+        user, notification_type, notification = sent.call_args.args
+        self.assertEqual(user, self.env.user)
+        self.assertEqual(notification_type, "simple_notification")
+        self.assertEqual(notification, {"type": "warning", "message": "The printer cover is open"})
+
+    def test_an_unreadable_printer_status_is_told_to_the_user(self):
+        self.obox_printer.action_printer_status()
+
+        with patch.object(self.registry["res.users"], "_bus_send", autospec=True) as sent:
+            self.respond_to_pending_actions({"error": "printer status not available"})
+
+        self.assertEqual(sent.call_args.args[2]["message"], "The printer status could not be read")
+
+    def test_the_printer_status_is_only_offered_by_a_box_that_reads_it(self):
+        self.assertFalse(self.obox_printer.supports_printer_status)
+
+        self.obox.services = ["usb", "printer_status"]
+
+        self.assertTrue(self.obox_printer.supports_printer_status)

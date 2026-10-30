@@ -10,6 +10,7 @@ import { purgeOldCacheKeys } from "@timesheet_grid/utils/timesheets_assistant";
 
 const { DateTime, Duration } = luxon;
 export const MINIMUM_DURATION_FOR_EVENT = 60;
+export const MINIMUM_DURATION_FOR_CONTEXT_SWITCH = 2;
 export const MINIMUM_AFK_FILLING = 60 * 3;
 
 /**
@@ -85,14 +86,19 @@ export class TimesheetAssistantModel {
         return '{"project_id":false,"task_id":false}';
     }
 
+    get blacklistEmails() {
+        // List of email which should not have a project or task associated with them
+        return new Set(["online@odoo.com"]);
+    }
+
     getTimesheets(data = this.data) {
         return data.timesheets;
     }
 
     projectTaskKey(project_id, task_id) {
         return JSON.stringify({
-            project_id,
-            task_id,
+            project_id: project_id || false,
+            task_id: task_id || false,
         });
     }
 
@@ -138,7 +144,7 @@ export class TimesheetAssistantModel {
 
     hasVisibleActivities(groupKey) {
         return Object.values(this.data.grouped[groupKey].suggestions).some(
-            (activity) => activity.type !== "afk"
+            (activity) => activity.type !== "afk" && this.isVisible(activity)
         );
     }
 
@@ -170,7 +176,9 @@ export class TimesheetAssistantModel {
             const events = fakeEvents[watcherType] || [];
             for (const event of events) {
                 let eventType = watcherType;
-                this.parseWatcherActivity(event, gmailEmails, composingEvents);
+                if (!this.parseWatcherActivity(event, gmailEmails, composingEvents)) {
+                    continue;
+                }
                 if (event.always_active) {
                     eventType = "always_active";
                 }
@@ -199,6 +207,10 @@ export class TimesheetAssistantModel {
     }
 
     parseWatcherActivity(event, gmailEmails, composingEvents) {
+        // Filter out window events that have no app and no title (e.g. system startup without open apps)
+        if (!event.data?.app?.trim() && !event.data?.title?.trim()) {
+            return false;
+        }
         if (event.data.gmail_activity) {
             event.keyEvent = true;
             event.type = "gmail_activity";
@@ -221,6 +233,7 @@ export class TimesheetAssistantModel {
         } else {
             this.extractWatcherActivity(event);
         }
+        return true;
     }
 
     extractWatcherActivity(event) {
@@ -430,7 +443,9 @@ export class TimesheetAssistantModel {
                                 event.name = _t("Development");
                             }
                         } else if (["currentwindow", "web.tab.current"].includes(eventType)) {
-                            this.parseWatcherActivity(event, gmailEmails, composingEvents);
+                            if (!this.parseWatcherActivity(event, gmailEmails, composingEvents)) {
+                                continue;
+                            }
                             if (event.always_active) {
                                 eventType = "always_active";
                             }
@@ -537,6 +552,52 @@ export class TimesheetAssistantModel {
             range.task_id = rangeProjectTaskData.task_id;
         }
         return rangeProjectTaskData;
+    }
+
+    computeKeyEventGroups(ranges) {
+        const getDuration = (range) => range.duration ?? (range.stop - range.start) / 1000;
+        const isAfk = (range) => range.data?.status === "afk" || range.type === "afk";
+        const isSameActivity = (a, b) =>
+            ["name", "type", "project_id", "task_id", "_res_model", "_res_id"].every(
+                (field) => a[field] === b[field]
+            );
+
+        let group = null;
+        const closeGroup = () => {
+            for (const range of group?.keyEvents || []) {
+                range.groupDuration = group.duration;
+            }
+            group = null;
+        };
+
+        for (const range of ranges) {
+            delete range.groupDuration;
+            delete range.isInKeyEventGroup;
+            const duration = getDuration(range);
+            if (
+                range.isConsumed ||
+                (isAfk(range) &&
+                    duration >= MINIMUM_DURATION_FOR_EVENT &&
+                    !group?.keyEvents[0].always_active)
+            ) {
+                closeGroup();
+                continue;
+            }
+            if (range.keyEvent && duration >= MINIMUM_DURATION_FOR_CONTEXT_SWITCH) {
+                if (!group || !isSameActivity(group.keyEvents[0], range)) {
+                    closeGroup();
+                    group = { keyEvents: [], duration: 0 };
+                }
+                group.keyEvents.push(range);
+            }
+            if (group) {
+                group.duration += duration;
+                if (isAfk(range)) {
+                    range.isInKeyEventGroup = true;
+                }
+            }
+        }
+        closeGroup();
     }
 
     /**
@@ -699,7 +760,7 @@ export class TimesheetAssistantModel {
         let gmailPartners = {};
         if (gmailEmails && gmailEmails.size > 0) {
             gmailPartners = await this.orm.call(this.timesheetModel, "resolve_gmail_partners", [
-                [...gmailEmails],
+                [...gmailEmails.difference(this.blacklistEmails)],
             ]);
         }
 
@@ -804,14 +865,19 @@ export class TimesheetAssistantModel {
 
             if (peopleStr) {
                 if (range.data.subject) {
-                    range.template =
-                        range.data.gmail_activity === "reading_email"
-                            ? _t('Reading email from $1: "$2"')
-                            : _t('Composing email to $1: "$2"');
+                    const isReading = range.data.gmail_activity === "reading_email";
+                    range.template = isReading ? _t("Reading email $1") : _t("Composing email $1");
                     range.matches = [
                         `${peopleStr}|${range.data.subject}`,
-                        peopleStr,
-                        range.data.subject,
+                        isReading
+                            ? _t('from %(person)s: "%(subject)s"', {
+                                  person: peopleStr,
+                                  subject: range.data.subject,
+                              })
+                            : _t('to %(person)s: "%(subject)s"', {
+                                  person: peopleStr,
+                                  subject: range.data.subject,
+                              }),
                     ];
                 } else {
                     range.template =
@@ -933,8 +999,9 @@ export class TimesheetAssistantModel {
 
         const metaData = { rawOdooEvents, allSuggestedAwEvents };
 
-        await this.computeSuggestions(data, metaData);
+        // the manual timesheets are deducted from the suggestions, so they must be loaded first
         await this.loadTimesheets(data);
+        await this.computeSuggestions(data, metaData);
 
         return { data, metaData };
     }
@@ -965,10 +1032,25 @@ export class TimesheetAssistantModel {
         }
 
         this.merge(ranges, metaData.allSuggestedAwEvents);
+        // resolving the project/task can make a range a non key event (e.g. a task without
+        // project), so it must be done before grouping the key events.
+        for (const range of ranges) {
+            if (range.type !== "gmail_activity") {
+                this._resolveProjectTaskFromResModel(range);
+            }
+        }
+        this.computeKeyEventGroups(ranges);
 
         let currentTimelineBlock = null;
 
-        const processTimelineBlock = (range, projectTask, name, duration, matchKey = name) => {
+        const processTimelineBlock = (
+            range,
+            projectTask,
+            name,
+            duration,
+            matchKey = name,
+            type = range.type
+        ) => {
             if (
                 !currentTimelineBlock ||
                 currentTimelineBlock.groupKey !== projectTask ||
@@ -985,7 +1067,7 @@ export class TimesheetAssistantModel {
                     formattedStart: range.start.toLocaleString(DateTime.TIME_SIMPLE),
                     duration: 0.0,
                     threshold: range.threshold ?? 1,
-                    type: range.type,
+                    type,
                     title: name,
                     name,
                     key: range.key || null,
@@ -1008,6 +1090,7 @@ export class TimesheetAssistantModel {
 
         const activeKeyEvent = {
             name: null,
+            type: "other",
             projectId: false,
             taskId: false,
             start: null,
@@ -1022,7 +1105,8 @@ export class TimesheetAssistantModel {
 
             if (
                 (range.data?.status === "afk" || range.type === "afk") &&
-                !activeKeyEvent.alwaysActive
+                !activeKeyEvent.alwaysActive &&
+                !range.isInKeyEventGroup
             ) {
                 range.type = "afk";
                 const away = _t("Away");
@@ -1044,8 +1128,9 @@ export class TimesheetAssistantModel {
                 this.frequencyViewerLocalConfig.getDominantSuggestion(frequencyKey);
 
             if (range.type !== "gmail_activity") {
-                const rangeProjectTaskData = this._resolveProjectTaskFromResModel(range);
                 if (range.isOdooModelEvent) {
+                    const rangeProjectTaskData =
+                        this.projectAndTaskData?.[range._res_model]?.[range._res_id];
                     const recordName =
                         range._res_model === "project.task"
                             ? rangeProjectTaskData?.task_name
@@ -1083,12 +1168,14 @@ export class TimesheetAssistantModel {
 
             let groupKey;
             let name;
+            let type;
 
             if (isUnmatchedGmailActivity) {
                 // If the event is a gmail activity and has no project or task, group under unmatched
                 // without impacting the next events.
                 groupKey = this.unmatchedProjectTaskKey;
                 name = range.name;
+                type = range.type;
             } else {
                 let targetProjectId = activeKeyEvent.projectId;
                 let targetTaskId = activeKeyEvent.taskId;
@@ -1110,11 +1197,16 @@ export class TimesheetAssistantModel {
                     targetTaskId = false;
                 }
 
-                if (range.keyEvent && range.duration >= MINIMUM_DURATION_FOR_EVENT) {
+                if (
+                    range.keyEvent &&
+                    (range.groupDuration ?? range.duration) >= MINIMUM_DURATION_FOR_EVENT
+                ) {
                     if (this._isSideActivityEvent(range)) {
                         name = range.name;
+                        type = range.type;
                     } else {
                         activeKeyEvent.name = range.name;
+                        activeKeyEvent.type = range.type;
                         activeKeyEvent.alwaysActive = range.always_active ?? false;
                         if (foundNewContext) {
                             activeKeyEvent.projectId = targetProjectId;
@@ -1122,43 +1214,20 @@ export class TimesheetAssistantModel {
                             activeKeyEvent.start = range.start;
                         }
                         name = activeKeyEvent.name;
+                        type = activeKeyEvent.type;
                     }
                 } else {
                     name = activeKeyEvent.name;
+                    type = activeKeyEvent.type;
                 }
                 groupKey = this.projectTaskKey(targetProjectId, targetTaskId);
             }
-            if (!(groupKey in data.grouped)) {
-                data.grouped[groupKey] = {
-                    groupDuration: 0,
-                    suggestions: {},
-                };
-            }
             name = name || range.data?.title || _t("Unknown Activity");
-            if (!data.grouped[groupKey].suggestions[name]) {
-                data.grouped[groupKey].suggestions[name] = {
-                    duration: 0.0,
-                    threshold: range.threshold ?? 1,
-                    type: range.type,
-                    id: range.id,
-                    res_model: range.res_model,
-                    start: range.start,
-                    template: range.template,
-                    description: range.description,
-                    matches: range.matches,
-                    title: name,
-                    key: range.key || null,
-                    matchKey: frequencyKey,
-                    source_model: range._res_model,
-                    source_id: range._res_id,
-                };
-            }
             let duration = range.duration ?? (range.stop - range.start) / 1000;
             if (range.max_hours && duration / 3600 > range.max_hours) {
                 duration = range.max_hours * 3600;
             }
-            data.grouped[groupKey].suggestions[name].duration += duration;
-            processTimelineBlock(range, groupKey, name, duration, frequencyKey);
+            processTimelineBlock(range, groupKey, name, duration, frequencyKey, type);
         }
 
         if (currentTimelineBlock) {
@@ -1173,103 +1242,49 @@ export class TimesheetAssistantModel {
             }
         }
 
+        // legacy: the time taken or deleted from the project view was only stored as a duration
+        // (`duration` minus the `timelineDuration` taken or deleted from the chronological view)
+        const legacyConsumedByKey = {};
+        for (const record of Object.values(data.recordsByStart)) {
+            const key = this.titleAndDayKey(record.title, record);
+            const consumedEvent = this.consumedEvents[key];
+            let trackedDuration = record.duration;
+            if (consumedEvent?.timelineStartTimes?.includes(record.start)) {
+                // a taken or deleted record stays hidden, so that the manual timesheets are
+                // deducted from the same records, in the same order, as before the reload
+                record.consumedDuration =
+                    consumedEvent.timelineDurations?.[record.start] ?? trackedDuration;
+            } else if (consumedEvent?.duration) {
+                // removed from the records of the same title, from the first one
+                legacyConsumedByKey[key] ??= Math.max(
+                    0,
+                    consumedEvent.duration - (consumedEvent.timelineDuration || 0)
+                );
+                const legacyConsumed = Math.min(legacyConsumedByKey[key], trackedDuration);
+                legacyConsumedByKey[key] -= legacyConsumed;
+                trackedDuration -= legacyConsumed;
+            }
+            record.trackedDuration = trackedDuration;
+            record.remaining = trackedDuration;
+            record.duration = this._getDisplayedDuration(record);
+        }
+
+        // the project view is built from the chronological records, so that both views
+        // always show the same time for the same project/task.
+        data.grouped = {};
+        data.totalDuration = 0;
+        for (const record of Object.values(data.recordsByStart)) {
+            this._addRecordToGrouped(data, record);
+        }
+
         const today = data.currentDate.toISO().split("T")[0];
         const assistantIdsForDay = new Set(this.assistantTimesheetIds[today] || []);
-        const manualTimesheetedByProjectTask = {};
         for (const ts of this.getTimesheets(data)) {
             if (!assistantIdsForDay.has(ts.id)) {
-                const pId = ts.project_id.id || false;
-                const tId = ts.task_id.id || false;
-                const ptKey = this.projectTaskKey(pId, tId);
-                manualTimesheetedByProjectTask[ptKey] =
-                    (manualTimesheetedByProjectTask[ptKey] || 0) + ts.unit_amount * 3600;
+                const groupKey = this.projectTaskKey(ts.project_id.id, ts.task_id.id);
+                this.refreshSuggestions(groupKey, ts.unit_amount * 3600, data);
             }
         }
-
-        const toDelete = new Set();
-        const consumedEventsCopy = {};
-        data.totalDuration = 0;
-        for (const [groupKey, groupData] of Object.entries(data.grouped)) {
-            groupData.groupDuration = 0;
-
-            for (const [title, item] of Object.entries(groupData.suggestions)) {
-                const eventKey = this.titleAndDayKey(title);
-                const consumedEvent = this.consumedEvents[eventKey];
-                if (consumedEvent) {
-                    let consumed = {
-                        duration: consumedEvent.duration || 0,
-                    };
-                    if (groupKey in consumedEventsCopy) {
-                        consumed = consumedEventsCopy[groupKey];
-                    } else {
-                        consumedEventsCopy[groupKey] = consumed;
-                    }
-                    const remaining = consumed.duration;
-                    const durationToRemove = Math.min(item.duration, remaining);
-                    item.duration -= durationToRemove;
-                    consumed.duration -= durationToRemove;
-                }
-
-                if (manualTimesheetedByProjectTask[groupKey] > 0) {
-                    const manualToRemove = Math.min(
-                        item.duration,
-                        manualTimesheetedByProjectTask[groupKey]
-                    );
-                    item.duration -= manualToRemove;
-                    manualTimesheetedByProjectTask[groupKey] -= manualToRemove;
-                }
-
-                // we should not edit the object while looping
-                if (item.duration < item.threshold * 60) {
-                    toDelete.add({ groupKey, title });
-                }
-
-                const roundedDurationSeconds = Math.round(item.duration / 60) * 60;
-                groupData.groupDuration += roundedDurationSeconds;
-                data.totalDuration += roundedDurationSeconds;
-            }
-        }
-
-        for (const { groupKey, title } of toDelete) {
-            delete data.grouped[groupKey].suggestions[title];
-            if (Object.keys(data.grouped[groupKey].suggestions).length === 0) {
-                delete data.grouped[groupKey];
-            }
-        }
-
-        const consumedEventsTimelineCopy = {};
-        const recordsToKeep = {};
-        for (const record of Object.values(data.recordsByStart)) {
-            const eventKey = this.titleAndDayKey(record.title);
-            const consumedEvent = this.consumedEvents[eventKey];
-            if (consumedEvent) {
-                let consumed = {
-                    duration: consumedEvent.duration || 0,
-                    timelineDuration: consumedEvent.timelineDuration || 0,
-                    timelineStartTimes: [...(consumedEvent.timelineStartTimes || [])],
-                };
-                if (eventKey in consumedEventsTimelineCopy) {
-                    consumed = consumedEventsTimelineCopy[eventKey];
-                } else {
-                    consumedEventsTimelineCopy[eventKey] = consumed;
-                }
-                if (consumed.timelineStartTimes.includes(record.start)) {
-                    record.duration = 0;
-                } else {
-                    const restTime = Math.max(
-                        0,
-                        consumed.duration - (consumed.timelineDuration || 0)
-                    );
-                    const durationToRemove = Math.min(record.duration, restTime);
-                    record.duration -= durationToRemove;
-                    consumed.timelineDuration = (consumed.timelineDuration || 0) + durationToRemove;
-                }
-            }
-            if (record.duration >= record.threshold * 60) {
-                recordsToKeep[record.start] = record;
-            }
-        }
-        data.recordsByStart = recordsToKeep;
     }
 
     getTimerBlockouts(data) {
@@ -1298,47 +1313,122 @@ export class TimesheetAssistantModel {
         return this.normalizeEvents(blockoutRanges);
     }
 
-    refreshSuggestions(groupKey, deltaSeconds) {
-        const group = this.data.grouped[groupKey];
-        if (!group || !group.suggestions) {
+    /**
+     * Displayed duration of a record: rounded to the minute, so that both views sum up the
+     * exact same displayed minutes, or 0 if it is too short to be displayed.
+     */
+    _roundDuration(seconds, minimum = MINIMUM_DURATION_FOR_EVENT) {
+        return seconds >= minimum ? Math.round(seconds / 60) * 60 : 0;
+    }
+
+    _getDisplayedDuration(record) {
+        if (record.consumedDuration != null) {
+            return 0;
+        }
+        // a record shorter than the threshold of its rule (in minutes) is hidden
+        const minimum =
+            record.threshold != null ? record.threshold * 60 : MINIMUM_DURATION_FOR_EVENT;
+        return this._roundDuration(record.remaining, minimum);
+    }
+
+    /**
+     * Update the displayed duration of a record, and its share of its project suggestion.
+     */
+    _refreshRecordDuration(record, data = this.data) {
+        const diff = this._getDisplayedDuration(record) - record.duration;
+        record.duration += diff;
+        const suggestion = this._getRecordSuggestion(record, data);
+        if (suggestion) {
+            suggestion.duration += diff;
+            data.grouped[record.groupKey].groupDuration += diff;
+            data.totalDuration += diff;
+        }
+    }
+
+    isVisible(item) {
+        return item.duration >= MINIMUM_DURATION_FOR_EVENT;
+    }
+
+    _getRecordSuggestion(record, data = this.data) {
+        if (record.type === "afk") {
+            return null;
+        }
+        return data.grouped[record.groupKey]?.suggestions[record.title] || null;
+    }
+
+    _addRecordToGrouped(data, record) {
+        if (record.type === "afk") {
             return;
         }
+        const { groupKey, title } = record;
+        if (!(groupKey in data.grouped)) {
+            data.grouped[groupKey] = {
+                groupDuration: 0,
+                starts: new Set(), // chronological, including the hidden records
+                overflow: 0, // manual timesheeted time that exceeded the tracked time of the group
+                suggestions: {},
+            };
+        }
+        const group = data.grouped[groupKey];
+        if (!group.suggestions[title]) {
+            group.suggestions[title] = {
+                duration: 0,
+                starts: new Set(),
+                type: record.type,
+                id: record.id,
+                res_model: record.res_model,
+                start: record.start,
+                template: record.template,
+                description: record.description,
+                matches: record.matches,
+                title,
+                key: record.key,
+                matchKey: record.matchKey,
+                source_model: record.source_model,
+                source_id: record.source_id,
+            };
+        }
+        group.starts.add(record.start);
+        group.suggestions[title].starts.add(record.start);
+        group.suggestions[title].duration += record.duration;
+        group.groupDuration += record.duration;
+        data.totalDuration += record.duration;
+    }
 
-        const activities = group.suggestions;
+    /**
+     * Deduct a manual timesheeted duration from the records of a project/task, from the first
+     * one to the last one, or give it back from the last one to the first one when negative.
+     * A record left with less than MINIMUM_DURATION_FOR_EVENT is hidden, not removed, so that
+     * it shows up again when its time is given back. A taken or deleted record stays hidden,
+     * but its time that was not taken or deleted can still be deducted and given back.
+     */
+    refreshSuggestions(groupKey, deltaSeconds, data = this.data) {
+        const group = data.grouped[groupKey];
+        if (!group) {
+            return;
+        }
         let rem = deltaSeconds;
-        const toDelete = [];
-        for (const title in activities) {
+        if (rem < 0) {
+            const fromOverflow = Math.min(group.overflow, -rem);
+            group.overflow -= fromOverflow;
+            rem += fromOverflow;
+        }
+        const starts = rem > 0 ? [...group.starts] : [...group.starts].reverse();
+        for (const start of starts) {
             if (rem === 0) {
                 break;
             }
-            const activity = activities[title];
-            const change = rem > 0 ? Math.min(activity.duration, rem) : rem;
-            activity.duration -= change;
+            const record = data.recordsByStart[start];
+            const change =
+                rem > 0
+                    ? Math.min(record.remaining - (record.consumedDuration ?? 0), rem)
+                    : Math.max(record.remaining - record.trackedDuration, rem);
             rem -= change;
-
-            // Sync with records list
-            const record = Object.values(this.data.recordsByStart).find(
-                (r) => r.groupKey === groupKey && r.title === title
-            );
-            if (record) {
-                record.duration = activity.duration;
-            }
-
-            if (activity.duration < 60) {
-                toDelete.push(title);
-                this.data.recordsByStart = Object.fromEntries(
-                    Object.entries(this.data.recordsByStart).filter(
-                        ([, r]) => r.groupKey !== groupKey || r.title !== title
-                    )
-                );
-            }
+            record.remaining -= change;
+            this._refreshRecordDuration(record, data);
         }
-
-        for (const title of toDelete) {
-            delete activities[title];
-        }
-        if (Object.keys(activities).length === 0) {
-            delete this.data.grouped[groupKey];
+        if (rem > 0) {
+            group.overflow += rem;
         }
     }
 
@@ -1384,7 +1474,7 @@ export class TimesheetAssistantModel {
     }
 
     _isSideActivityEvent(range) {
-        return false;
+        return range.side_activity;
     }
 
     async loadTimesheets(data = this.data) {
@@ -1443,11 +1533,8 @@ export class TimesheetAssistantModel {
     addTimesheet(timesheet, isAssistant = false, data = this.data) {
         this.refreshTimesheetsOnAdd(timesheet, data);
         if (!isAssistant) {
-            const groupKey = this.projectTaskKey(
-                timesheet.project_id.id || false,
-                timesheet.task_id.id || false
-            );
-            this.refreshSuggestions(groupKey, timesheet.unit_amount * 3600);
+            const groupKey = this.projectTaskKey(timesheet.project_id.id, timesheet.task_id.id);
+            this.refreshSuggestions(groupKey, timesheet.unit_amount * 3600, data);
         }
     }
 
@@ -1471,8 +1558,8 @@ export class TimesheetAssistantModel {
         const isAssistant = (this.assistantTimesheetIds[today] || []).includes(timesheetId);
         if (!isAssistant) {
             const groupKey = this.projectTaskKey(
-                timesheetToRemove.project_id.id || false,
-                timesheetToRemove.task_id.id || false
+                timesheetToRemove.project_id.id,
+                timesheetToRemove.task_id.id
             );
             this.refreshSuggestions(groupKey, -timesheetToRemove.unit_amount * 3600);
         }
@@ -1499,18 +1586,18 @@ export class TimesheetAssistantModel {
         const isAssistant = (this.assistantTimesheetIds[today] || []).includes(timesheet.id);
         if (!isAssistant) {
             const oldGroupKey = this.projectTaskKey(
-                oldTimesheet.project_id.id || false,
-                oldTimesheet.task_id.id || false
+                oldTimesheet.project_id.id,
+                oldTimesheet.task_id.id
             );
-            const newGroupKey = this.projectTaskKey(
-                timesheet.project_id.id || false,
-                timesheet.task_id.id || false
-            );
+            const newGroupKey = this.projectTaskKey(timesheet.project_id.id, timesheet.task_id.id);
             if (oldGroupKey !== newGroupKey) {
                 this.refreshSuggestions(oldGroupKey, -oldTimesheet.unit_amount * 3600);
                 this.refreshSuggestions(newGroupKey, timesheet.unit_amount * 3600);
             } else {
-                this.refreshSuggestions(oldGroupKey, timesheet.unit_amount * 3600);
+                this.refreshSuggestions(
+                    oldGroupKey,
+                    (timesheet.unit_amount - oldTimesheet.unit_amount) * 3600
+                );
             }
         }
     }
@@ -1620,80 +1707,48 @@ export class TimesheetAssistantModel {
     }
 
     onDelete(groupKey, title, refresh = true, isConsumed = false, start = false, groupBy) {
-        const event = this.data.grouped[groupKey]?.suggestions?.[title];
-        const keyWithDay = this.titleAndDayKey(title, event);
-        if (!this.consumedEvents[keyWithDay]) {
-            this.consumedEvents[keyWithDay] = {
-                duration: 0,
-                isConsumed: false,
-                timelineStartTimes: [],
-                timelineDuration: 0,
+        // both views show the same chronological records: a row of the project view is made
+        // of all the records sharing its project/task and title.
+        const starts =
+            groupBy === "timeline"
+                ? [start]
+                : [...(this.data.grouped[groupKey]?.suggestions?.[title]?.starts || [])];
+        let hasMeeting = false;
+        for (const recordStart of starts) {
+            const record = this.data.recordsByStart[recordStart];
+            // a hidden record stays, so that it shows up again if its time is given back
+            if (!record || !this.isVisible(record)) {
+                continue;
+            }
+            hasMeeting ||= record.type === "meeting";
+            const keyWithDay = this.titleAndDayKey(record.title, record);
+            if (!this.consumedEvents[keyWithDay]) {
+                this.consumedEvents[keyWithDay] = {
+                    isConsumed: false,
+                    timelineStartTimes: [],
+                };
+            }
+            const consumedEvent = this.consumedEvents[keyWithDay];
+            consumedEvent.timelineStartTimes = [
+                ...(consumedEvent.timelineStartTimes || []),
+                recordStart,
+            ];
+            // the rest of the tracked time was deducted by manual timesheets, it can still be
+            // given back to them or deducted by others
+            consumedEvent.timelineDurations = {
+                ...consumedEvent.timelineDurations,
+                [recordStart]: record.remaining,
             };
-        }
-
-        if (groupBy === "timeline") {
-            const record = this.data.recordsByStart[start];
-            if (record) {
-                this.consumedEvents[keyWithDay].duration += record.duration;
-                this.consumedEvents[keyWithDay].timelineDuration += record.duration;
-                this.consumedEvents[keyWithDay].timelineStartTimes.push(start);
-
-                if (this.data.grouped[groupKey]?.suggestions?.[title]) {
-                    const roundedRemoval = Math.round(record?.duration / 60) * 60;
-                    this.data.grouped[groupKey].groupDuration -= roundedRemoval;
-                    this.data.totalDuration -= roundedRemoval;
-
-                    this.data.grouped[groupKey].suggestions[title].duration -= record.duration;
-                    if (this.data.grouped[groupKey].suggestions[title].duration <= 0) {
-                        delete this.data.grouped[groupKey].suggestions[title];
-                        if (Object.keys(this.data.grouped[groupKey].suggestions).length === 0) {
-                            delete this.data.grouped[groupKey];
-                        }
-                    }
-                }
-                delete this.data.recordsByStart[start];
+            if (isConsumed) {
+                consumedEvent.isConsumed = true;
             }
-        } else {
-            this.consumedEvents[keyWithDay].duration += event?.duration || 0;
-
-            if (this.data.grouped[groupKey]) {
-                const roundedRemoval = Math.round(event?.duration / 60) * 60;
-                this.data.grouped[groupKey].groupDuration -= roundedRemoval;
-                this.data.totalDuration -= roundedRemoval;
-
-                delete this.data.grouped[groupKey].suggestions[title];
-                if (Object.keys(this.data.grouped[groupKey].suggestions).length === 0) {
-                    delete this.data.grouped[groupKey];
-                }
-            }
-            let durationToConsume = event?.duration || 0;
-            const recordsToKeep = {};
-            for (const record of Object.values(this.data.recordsByStart)) {
-                if (
-                    durationToConsume > 0 &&
-                    record.groupKey === groupKey &&
-                    record.title === title
-                ) {
-                    const durationToRemove = Math.min(record.duration, durationToConsume);
-                    record.duration -= durationToRemove;
-                    durationToConsume -= durationToRemove;
-                    if (record.duration > 0) {
-                        recordsToKeep[record.start] = record;
-                    }
-                } else {
-                    recordsToKeep[record.start] = record;
-                }
-            }
-            this.data.recordsByStart = recordsToKeep;
-        }
-
-        if (isConsumed) {
-            this.consumedEvents[keyWithDay].isConsumed = true;
+            record.consumedDuration = record.remaining;
+            this._refreshRecordDuration(record);
         }
 
         localStorage.setItem(this.consumedEventsKey, JSON.stringify(this.consumedEvents));
 
-        if (event?.type === "meeting" && refresh) {
+        if (hasMeeting && refresh) {
             this.computeSuggestions();
         }
     }

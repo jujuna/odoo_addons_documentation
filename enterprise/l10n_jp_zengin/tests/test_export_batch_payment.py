@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import fields
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.exceptions import RedirectWarning
 from odoo.tests import tagged
 
 
@@ -90,6 +91,42 @@ class TestZenginBatchPayment(AccountTestInvoicingCommon):
             payments = cls.create_payment(cls, cls.partner_b, 150000, 'partner_b', 0) | cls.create_payment(cls, cls.partner_a, 1000000, 'partner_a', 0)
 
         cls.batch.payment_ids = payments.sorted()
+
+    def test_zengin_batch_payment_sender_validation(self):
+        self.journal.bank_account_id = False
+        with self.assertRaisesRegex(RedirectWarning, "The bank account on journal '.*' is not set"):
+            self.batch._generate_export_file()
+
+        sender_account = self.env["res.partner.bank"].create({
+            "partner_id": self.company_data["company"].partner_id.id,
+            "account_number": "9999999",
+            "l10n_jp_zengin_account_type": False,
+        })
+        self.journal.bank_account_id = sender_account
+
+        with self.assertRaisesRegex(
+            RedirectWarning,
+            "(?s)Following fields are missing.*BIC.*Bank name in Kana.*Zengin branch code.*Branch name in Kana"
+            ".*Account holder name in Kana.*Zengin account type",
+        ):
+            self.batch._generate_export_file()
+        sender_account.write({
+            "bank_bic": "0009",
+            "l10n_jp_zengin_bank_name_kana": "ﾃｽﾄ",
+            "clearing_label_id": self.env.ref("base.clearing_label_jp").id,
+            "clearing_number": "410",
+            "country_id": self.env.ref("base.jp").id,
+            "l10n_jp_zengin_branch_name_kana": "ﾃｽﾄ",
+            "l10n_jp_zengin_holder_name_kana": "ﾃｽﾄ",
+            "l10n_jp_zengin_account_type": "regular",
+        })
+
+        with self.assertRaisesRegex(RedirectWarning, "Please set a client code"):
+            self.batch._generate_export_file()
+        sender_account.l10n_jp_zengin_client_code = "8818002600"
+
+        generated = self.batch._generate_export_file()
+        self.assertTrue(generated.get("file"))
 
     def test_generate_zengin_batch_payment_file(self):
         generated = self.batch._generate_export_file()

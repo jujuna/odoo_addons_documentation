@@ -15,7 +15,7 @@ from odoo.tools.image import image_process
 
 from odoo.addons.base.models.assetsbundle import AssetsBundle, StylesheetAsset
 from odoo.addons.html_editor.controllers.main import attachment_create
-from odoo.addons.web.icons import search_icons
+from odoo.addons.html_editor.tools import search_icons
 
 _logger = logging.getLogger(__name__)
 
@@ -192,8 +192,8 @@ class AIWebsiteService(models.AbstractModel):
         for keyword in keywords:
             if not keyword.strip():
                 continue
-            if match := next(search_icons(keyword), None):
-                return match[0]
+            if match := next(search_icons(self.env, keyword), None):
+                return match
         return None
 
     @api.model

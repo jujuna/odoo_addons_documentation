@@ -339,7 +339,42 @@ class TestShopee(common.TestShopeeCommon):
             self.assertEqual(self.body["stock_list"][0]["seller_stock"][0]["stock"], 10)
             self.assertEqual(self.item.last_inventory_sync_date, datetime.now())
 
-    @mute_logger("odoo.addons.sale_shopee.models.shopee_shop")
+    @mute_logger('odoo.addons.sale_shopee.models.shopee_shop')
+    def test_sync_inventory_negative_free_qty(self):
+        """ Test that a negative free quantity is pushed to Shopee as zero.
+
+        Shopee rejects stock below zero. The payload is clamped, the sync date moves
+        forward, and the negative quantity stays on the Odoo product.
+        """
+
+        def get_shopee_api_response_mock(
+            _shop, operation_, _params="", body="", _files="", method="GET"
+        ):
+            if operation_ == 'update_stock':
+                self.body = body
+                return common.OPERATIONS_RESPONSES_MAP[operation_]
+            raise Exception()
+
+        with patch(
+            'odoo.addons.sale_shopee.utils.make_shopee_api_request',
+            new=get_shopee_api_response_mock,
+        ):
+            self.shop.synchronize_inventory = True
+            warehouse = self.env['stock.warehouse'].search(
+                [('company_id', '=', self.shop.company_id.id)], limit=1,
+            )
+            self.env['stock.quant']._update_available_quantity(
+                self.item.product_id, warehouse.lot_stock_id, -4,
+            )
+            self.assertLess(self.item.product_id.free_qty, 0)
+
+            self.shop._sync_inventory(auto_commit=False)
+
+            self.assertEqual(self.body['stock_list'][0]['seller_stock'][0]['stock'], 0)
+            self.assertGreater(self.item.last_inventory_sync_date, self.initial_sync_date)
+            self.assertLess(self.item.product_id.free_qty, 0)
+
+    @mute_logger('odoo.addons.sale_shopee.models.shopee_shop')
     def test_sync_inventory_is_skipped_when_disabled(self):
         """Test skipping the inventory synchronization when the shop disabled the feature.
 
@@ -562,7 +597,7 @@ class TestShopee(common.TestShopeeCommon):
         """
         currency = self.env["res.currency"].create({"name": "TEST", "symbol": "T"})
         self.env["product.pricelist"].create({
-            "name": self.env._("Shopee Pricelist %(currency)s", currency=currency.name),
+            "name": f"Shopee {currency.name}",
             "active": False,
             "currency_id": currency.id,
         })
@@ -593,6 +628,7 @@ class TestShopee(common.TestShopeeCommon):
             pricelists_count + 1,
         )
         self.assertFalse(pricelist.active)
+        self.assertEqual(pricelist.name, f"Shopee {currency.name}")
         self.assertEqual(pricelist.currency_id.id, currency.id)
 
     # --- Get Partner --- #
@@ -952,6 +988,40 @@ class TestShopee(common.TestShopeeCommon):
             )
             self.assertEqual(len(adjustment_lines), 0)
             self.assertEqual(order.amount_total, order_payload["total_amount"])
+
+    @mute_logger("odoo.addons.sale_shopee.models.shopee_shop")
+    def test_order_ignores_existing_currency_pricelist_discount(self):
+        """An existing percentage pricelist in the order currency does not discount imported lines."""
+        self.env.user.group_ids += self.env.ref("sale.group_discount_per_so_line")
+        currency = self.env.ref("base.USD")
+        self.product.list_price = 100.0
+        self.env["product.pricelist"].create({
+            "name": "Existing USD",
+            "currency_id": currency.id,
+            "company_id": self.shop.company_id.id,
+            "sequence": 1,
+            "item_ids": [Command.create({
+                "compute_price": "discount",
+                "price_discount": 10.0,
+            })],
+        })
+        order_payload = common.build_order_mock(
+            "PRICELIST_001",
+            [dict(common.ORDER_ITEM_MOCK, model_quantity_purchased=1)],
+            buyer_paid_shipping_fee=0,
+            currency="USD",
+        )
+
+        def api_mock(_shop, operation_, *_args):
+            if operation_ == "get_escrow_detail":
+                return common.build_escrow_mock(buyer_paid_shipping_fee=0)
+            return common.OPERATIONS_RESPONSES_MAP[operation_]
+
+        with patch("odoo.addons.sale_shopee.utils.make_shopee_api_request", new=api_mock):
+            order = self.shop._create_order_from_data(order_payload)
+            self.assertEqual(order.pricelist_id.name, f"Shopee {currency.name}")
+            product_line = order.order_line.filtered(lambda line: line.product_id == self.product)
+            self.assertEqual(product_line.discount, 0.0)
 
     # --- Test Shipping Lines --- #
 

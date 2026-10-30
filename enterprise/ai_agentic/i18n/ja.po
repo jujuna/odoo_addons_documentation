@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:46+0000\n"
-"PO-Revision-Date: 2026-09-18 05:32+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-02 17:46+0000\n"
+"PO-Revision-Date: 2026-10-16 02:03+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/"
 "ai_agentic/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -68,6 +68,51 @@ msgid ""
 "is 2026-08-24)\n"
 "        "
 msgstr ""
+"\n"
+"            後で、繰り返し、またはレコードのイベントに応じて実行すべき"
+"アクションのために、持続的な自動化を作成および更新します。将来の時点、定期的"
+"なスケジュール、またはレコードが作成・変更・削除・メッセージ送信された際、も"
+"しくは特定の条件を満たしたときにアクションの実行やリマインダの送信をユーザか"
+"ら要求された場合、このツールを使用してください。\n"
+"            新規の自動化を作成する場合、`name`(名前)、`description`(説明)"
+"、`trigger`(トリガ)、`ai_action_prompt`(AIアクションプロンプト)、および "
+"`explanation`(説明)が必須です。\n"
+"            既存の自動化を編集する場合、`automation_id` と `explanation` が必"
+"須です。その他のパラメータについては、更新が必要なもののみを指定してください"
+"。\n"
+"            ## トリガの種類\n"
+"            同期トリガ (`on_create`, `on_create_or_write`)よりも、時間ベース"
+"のトリガ (`on_time_created`, `on_time_updated`, `on_time`)を優先してください"
+"。これらはユーザの保存時ではなく、イベントの直後に実行されます。「チケットが"
+"作成されたとき…」は1分遅延の `on_time_created` を使用し、「リードが更新される"
+"たびに…」は `on_time_updated` を使用します。ユーザーが即時の同期アクションを"
+"明示的に要求した場合や、`filter_pre_domain` を必要とする特定フィールドの"
+"ステータス遷移（状態変化）にのみ、`on_create` / `on_create_or_write` を使用し"
+"てください。\n"
+"            ## トリガの例\n"
+"            - すべての新規チケットにタグを付ける(推奨される作成トリガ): `"
+"{\"trigger\": {\"type\": \"on_time_created\", \"target_model\": "
+"\"helpdesk.ticket\", \"date_offset_or_interval\": {\"amount\": 1, \"unit\": "
+"\"minutes\"}}}`\n"
+"            - 自分のタスクに「Bug」タグが追加されたときにトリガーする "
+"(フィールドの遷移であるため `on_create_or_write`を使用): `{\"trigger\": "
+"{\"type\": \"on_create_or_write\", \"observed_fields\": [\"tag_ids\"], "
+"\"filter_pre_domain\": \"[('tag_ids', 'not in', ['Bug'])]\", "
+"\"filter_domain\": \"[('tag_ids', 'in', ['Bug']), ('user_id', '=', 3)]\"}}` "
+"(ユーザIDが3の場合)。\n"
+"            - 完了予定日の前日にトリガする: `{\"trigger\": {\"type\": "
+"\"on_time\", \"observed_fields\": \"date_deadline\", "
+"\"date_offset_or_interval\": {\"direction\": \"before\", \"amount\": 1, "
+"\"unit\": \"day\"}}}`\n"
+"            - レコードが未割当の状態で作成されたときにトリガする: `"
+"{\"trigger\": {\"type\": \"on_time_created\", \"filter_domain\": \"["
+"('user_id', '=', False)]\", \"date_offset_or_interval\": {\"amount\": 5, "
+"\"unit\": \"minutes\"}}}`\n"
+"            - 毎週月曜日にトリガする: `{\"trigger\": {\"type\": "
+"\"on_schedule\", \"date_offset_or_interval\": {\"amount\": 7, \"unit\": "
+"\"day\", \"next_trigger_date\": \"2026-08-24 09:00:00\"}}}` (次の月曜日が "
+"2026-08-24の場合)\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_description:ai_agentic.ir_actions_server_ai_run_automation
@@ -87,6 +132,20 @@ msgid ""
 "instead, that leaves the user without the Run button.\n"
 "        "
 msgstr ""
+"\n"
+"            スケジュール通りの挙動とまったく同じように、時間ベースの自動化を"
+"今すぐ実行します。ヘッドレス実行でアクションの指示を実行するエージェントの複"
+"製を起動し、その結果をチャットに表示します。\n"
+"            会話の中で自分自身で自動化のステップを実行するのではなく、ユーザ"
+"から今すぐ自動化を実行、テスト、または試したいと要求された場合にこのツールを"
+"使用してください。オンデマンドで実行できるのは時間ベースの自動化(スケジュール"
+"設定されたアクションおよび時間ルール)のみです。イベントベースのルールは、その"
+"トリガに一致するレコードを作成または更新することによってテストします。\n"
+"            時間ベースの自動化を作成した後は、このツールをすぐに呼び出すこと"
+"で、ユーザーに一度実行してみるよう提案してください。その確認カード(\"Run\"「"
+"実行」/\"Not now\"「後で」)自体が提案となります。メッセージテキスト内で「実行"
+"しますか?」と尋ねないでください。ユーザーが 実行ボタンを押せなくなります。\n"
+"        "
 
 #. module: ai_agentic
 #: model:ir.module.module,description:base.module_ai_agentic
@@ -118,22 +177,22 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_agentic/models/base_automation.py:0
 msgid "%(agent)s: %(automation)s"
-msgstr ""
+msgstr "%(agent)s: %(automation)s"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>Archive"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"archive\"/>アーカイブ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>Delete"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"delete\"/>削除"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
 msgid "<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>Unarchive"
-msgstr ""
+msgstr "<i class=\"oi me-1\" role=\"img\" data-icon=\"unarchive\"/>アーカイブ解除"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -154,8 +213,6 @@ msgid ""
 msgstr "Odoo環境と直接連携した強力なAIツールとエージェントのスイート"
 
 #. module: ai_agentic
-#. odoo-javascript
-#: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
 #: model:ir.module.module,shortdesc:base.module_ai_agentic
 #: model:ir.ui.menu,name:ai_agentic.ai_menu_root
 msgid "AI"
@@ -185,7 +242,7 @@ msgstr "AI自動化トリガー"
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_session
 msgid "AI Session"
-msgstr ""
+msgstr "AIセッション"
 
 #. module: ai_agentic
 #: model:ir.model,name:ai_agentic.model_ai_tool
@@ -195,7 +252,7 @@ msgstr "AIツール"
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "AI Tool: Create or Update Automation"
-msgstr ""
+msgstr "AIツール：自動化の作成または更新"
 
 #. module: ai_agentic
 #: model:ir.actions.server,name:ai_agentic.ir_actions_server_ai_run_automation
@@ -336,12 +393,12 @@ msgstr "エージェントは、AIの運用を管理・整理するのに役立�
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_action_prompt
 msgid "Ai Action Prompt"
-msgstr ""
+msgstr "AIアクションプロンプト"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_base_automation__ai_next_trigger_date
 msgid "Ai Next Trigger Date"
-msgstr ""
+msgstr "AIの次回トリガ日"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -352,19 +409,19 @@ msgstr "全モデル📖"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.js:0
 msgid "Allow this Agent to ask for help to other Agents"
-msgstr ""
+msgstr "このエージェントが他のエージェントにヘルプを求めることを許可"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__architect
 msgid "Architect"
-msgstr ""
+msgstr "アーキテクト"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Archive"
-msgstr ""
+msgstr "アーカイブ"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_kanban
@@ -376,18 +433,18 @@ msgstr "アーカイブ済"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to archive this agent?"
-msgstr ""
+msgstr "このエージェントを本当にアーカイブしてもよろしいですか?"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Are you sure that you want to delete this agent?"
-msgstr ""
+msgstr "このエージェント本当に削除してもよろしいですか?"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__artist
 msgid "Artist"
-msgstr ""
+msgstr "アーティスト"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -407,7 +464,7 @@ msgstr "自動化ルール"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Automation Rule %(name)s"
-msgstr ""
+msgstr "自動化ルール%(name)s"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__automation_ids
@@ -418,12 +475,12 @@ msgstr "このエージェントを自動実行する自動化ルール。"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_triggers/ai_agent_panel_triggers.js:0
 msgid "Automation triggered!"
-msgstr ""
+msgstr "自動化がトリガされました!"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__avatar_role
 msgid "Avatar Role"
-msgstr ""
+msgstr "アバターの役割"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -487,7 +544,7 @@ msgstr "初めてのスキルを作成しましょう!"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Created a Trigger"
-msgstr ""
+msgstr "トリガを作成しました"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__create_uid
@@ -535,12 +592,12 @@ msgstr ""
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "削除"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__detective
 msgid "Detective"
-msgstr ""
+msgstr "ディテクティブ"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -600,28 +657,28 @@ msgstr "エージェントに実行すべき内容を説明してください…
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_sources/ai_agent_source_icons.js:0
 msgid "File"
-msgstr ""
+msgstr "ファイル"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__from_ai_automation
 msgid "From AI Automation"
-msgstr ""
+msgstr "AI自動化から"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__headset
 msgid "Headset"
-msgstr ""
+msgstr "ヘッドセット"
 
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__hoodie
 msgid "Hoodie"
-msgstr ""
+msgstr "フードつきパーカー"
 
 #. module: ai_agentic
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/components/agent_add_trigger_dialog/agent_add_trigger_dialog.xml:0
 msgid "I need help to choose"
-msgstr ""
+msgstr "選択のアドバイスをお願いします:"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent__id
@@ -634,7 +691,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ai_agentic.field_discuss_channel__id
 #: model:ir.model.fields,field_description:ai_agentic.field_ir_actions_server__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -642,12 +699,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_agent_view_form
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Instructions"
-msgstr ""
+msgstr "指示"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Interval"
-msgstr ""
+msgstr "間隔"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__avatar_role
@@ -655,6 +712,8 @@ msgid ""
 "Job role the agent depicts. Setting it redraws the avatar in the agent's own "
 "color."
 msgstr ""
+"エージェントが果たす役割を設定します。選択すると、エージェント固有のカラーで"
+"アバターが更新されます。"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_view_search
@@ -665,22 +724,22 @@ msgstr "キー"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.js:0
 msgid "Knowledge"
-msgstr ""
+msgstr "ナレッジ"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__prev_trigger_date
 msgid "Last Trigger Date"
-msgstr ""
+msgstr "直近のトリガ日"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "最終更新者"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "最終更新日"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -695,7 +754,7 @@ msgstr ""
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__librarian
 msgid "Librarian"
-msgstr ""
+msgstr "図書館員"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -725,13 +784,7 @@ msgstr "名称"
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_automation_trigger__next_trigger_date
 #: model_terms:ir.ui.view,arch_db:ai_agentic.base_automation_view_form_inherit_ai
 msgid "Next Trigger Date"
-msgstr ""
-
-#. module: ai_agentic
-#. odoo-javascript
-#: code:addons/ai_agentic/static/src/discuss/messaging_menu_model_patch.js:0
-msgid "No AI Chats yet."
-msgstr ""
+msgstr "次のトリガ日"
 
 #. module: ai_agentic
 #: model_terms:ir.actions.act_window,help:ai_agentic.ai_composer_action
@@ -762,12 +815,14 @@ msgid ""
 "No valid files to upload. Only PDF, Word, PowerPoint, Excel, Text, CSV, "
 "OpenDocument, and Markdown files are allowed."
 msgstr ""
+"アップロード可能なファイルがありません。PDF、Word、PowerPoint、Excel、Text、"
+"CSV、OpenDocument、およびMarkdown形式のファイルのみが許可されています。"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Not now"
-msgstr ""
+msgstr "後で"
 
 #. module: ai_agentic
 #: model:ir.model.fields,field_description:ai_agentic.field_ai_agent_source__file_sources_count
@@ -806,7 +861,7 @@ msgstr "属性"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Ran the trigger %(name)s"
-msgstr ""
+msgstr "トリガ%(name)sを実行しました"
 
 #. module: ai_agentic
 #: model:ir.model.fields,help:ai_agentic.field_ai_agent__system_prompt_rendered
@@ -895,7 +950,7 @@ msgstr "自動化を実施中"
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__sales
 msgid "Sales"
-msgstr ""
+msgstr "セールス"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -969,7 +1024,7 @@ msgstr "ソース"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel_skills/ai_agent_panel_allowed_agents.xml:0
 msgid "Subagents"
-msgstr ""
+msgstr "サブエージェント"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_prompt_button_view_form
@@ -1033,7 +1088,7 @@ msgstr "トリガー"
 #. odoo-javascript
 #: code:addons/ai_agentic/static/src/discuss/core/web/ai_agent_panel/ai_agent_panel.xml:0
 msgid "Unarchive"
-msgstr ""
+msgstr "アーカイブ解除"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -1045,7 +1100,7 @@ msgstr "未読"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "Updated a Trigger"
-msgstr ""
+msgstr "トリガーを更新済"
 
 #. module: ai_agentic
 #. odoo-javascript
@@ -1072,12 +1127,12 @@ msgstr "ユーザーが以下を行う必要がある場合："
 #. module: ai_agentic
 #: model:ir.model.fields.selection,name:ai_agentic.selection__ai_agent__avatar_role__worker
 msgid "Worker"
-msgstr ""
+msgstr "ワーカー"
 
 #. module: ai_agentic
 #: model:ir.actions.server,ai_tool_thinking_text:ai_agentic.ir_actions_server_ai_create_update_automation
 msgid "Working on your automation"
-msgstr ""
+msgstr "自動化の作業中"
 
 #. module: ai_agentic
 #: model_terms:ir.ui.view,arch_db:ai_agentic.ai_composer_form
@@ -1108,13 +1163,13 @@ msgstr "例：チャット会話の概要を1段落で記述する"
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "has run %s"
-msgstr ""
+msgstr "%sを実行しました"
 
 #. module: ai_agentic
 #. odoo-python
 #: code:addons/ai_agentic/models/ai_tool.py:0
 msgid "self-updated its configuration"
-msgstr ""
+msgstr "設定を自動更新しました"
 
 #~ msgid ""
 #~ "\n"

@@ -748,3 +748,64 @@ class TestL10nClDte(TestL10nClEdiCommon):
             active_model='account.move',
             active_ids=bill.ids,
         ).create({'move_id': bill.id})
+
+    def test_l10n_cl_create_from_xml_access_right(self):
+        """ Test that creating an invoice from XML works with lower access right """
+        invoice = self.env['account.move'].with_user(self.simple_accountman).create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_anonimo.id,
+        })
+        with file_open('l10n_cl_edi/tests/expected_dtes/dte_33.xml', 'rb') as file:
+            xml_content = file.read()
+        attachment = self.env['ir.attachment'].sudo().create({
+            'name': 'test_dte.xml',
+            'mimetype': 'text/xml',
+            'raw': xml_content,
+            'res_model': 'account.move',
+            'res_id': invoice.id,
+        })
+        file_data = invoice._to_files_data(attachment)[0]
+        invoice.with_user(self.simple_accountman)._l10n_cl_import_dte(invoice, file_data, new=False)
+        self.assertEqual(invoice.amount_untaxed, 295286.0)
+
+    @freeze_time('2019-10-24T20:00:00', tz_offset=3)
+    def test_l10n_cl_send_dte_to_partner_missing_dte_file(self):
+        """If a user deletes a DTE attachment, sending to the partner must not crash
+        (it would otherwise block the whole cron)."""
+        self.tax_19 = self.env['account.tax'].search([
+            ('name', '=', '19% VAT'),
+            ('type_tax_use', '=', 'sale'),
+            ('company_id', '=', self.company_data['company'].id)])
+        invoice = self.env['account.move'].with_context(default_move_type='out_invoice').create({
+            'partner_id': self.partner_sii.id,
+            'move_type': 'out_invoice',
+            'invoice_date_due': '2019-10-23',
+            'invoice_date': '2019-10-23',
+            'currency_id': self.env.ref('base.CLP').id,
+            'journal_id': self.sale_journal.id,
+            'l10n_latam_document_type_id': self.env.ref('l10n_cl.dc_a_f_dte').id,
+            'company_id': self.company_data['company'].id,
+            'invoice_line_ids': [(0, 0, {
+                'name': 'Tapa Ranurada UL FM 300 6"',
+                'product_id': self.product_a.id,
+                'product_uom_id': self.product_a.uom_id.id,
+                'quantity': 26,
+                'price_unit': 2391.0,
+                'tax_ids': [self.tax_19.id],
+            }), (0, 0, {
+                'name': 'Copla Flexible 1NS 6"',
+                'product_id': self.product_a.id,
+                'product_uom_id': self.product_a.uom_id.id,
+                'quantity': 80,
+                'price_unit': 2914.0,
+                'tax_ids': [self.tax_19.id],
+            })],
+        })
+        invoice.action_post()
+        self.assertTrue(invoice.sudo().l10n_cl_dte_file)
+        invoice.sudo().l10n_cl_dte_file.unlink()
+        self.assertFalse(invoice.sudo().l10n_cl_dte_file)
+
+        invoice._l10n_cl_send_dte_to_partner()
+
+        self.assertNotEqual(invoice.l10n_cl_dte_partner_status, 'sent')

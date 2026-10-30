@@ -456,4 +456,24 @@ export class HrHolidaysGanttRenderer extends hrGanttView.Renderer {
         }
         this.multiSelectionButtonsReactive.pendingAdd = true;
     }
+
+    /**
+     * @override
+     */
+    onCellClicked(rowId, column, row) {
+        if (!this.rowByIds[rowId]?.fromServer) {
+            return;
+        }
+        super.onCellClicked(rowId, column, row);
+    }
+
+    /**
+     * @override
+     */
+    isHoverable(row = null) {
+        if (row && !row.fromServer) {
+            return false;
+        }
+        return super.isHoverable(...arguments);
+    }
 }

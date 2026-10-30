@@ -9,9 +9,9 @@ from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import fields, Command
-from odoo.tests import Form
+from odoo.tests import new_test_user
 from odoo.addons.hr_payroll.tests.common import TestPayslipContractBase
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools.float_utils import float_compare
 
 
@@ -637,6 +637,96 @@ class TestHrPayrollAccount(TestHrPayrollAccountCommon):
         ])
         self.assertTrue(reverse_invoice, 'Reverse move not created')
 
+    def _set_hra_rule_account(self):
+        test_account = self.env['account.account'].create({
+            'name': 'House Rental',
+            'code': '654321',
+            'account_type': 'income',
+        })
+        self.hra_rule.account_credit = test_account
+        self.hra_rule.account_debit = test_account
+        self.hr_structure_softwaredeveloper.rule_ids = [Command.link(self.hra_rule.id)]
+
+    def test_payslip_cancel_draft_entry_without_accounting_rights(self):
+        """ A payroll manager without any accounting right can cancel a payslip whose entry was never posted:
+        payroll created that draft entry itself. """
+        payroll_user = new_test_user(
+            self.env, login='payroll_only',
+            groups='base.group_user,hr_payroll.group_hr_payroll_manager',
+        )
+        self.assertFalse(payroll_user.has_group('account.group_account_invoice'))
+        self._set_hra_rule_account()
+
+        self.hr_payslip_john.compute_sheet()
+        self.hr_payslip_john.action_payslip_done()
+        move = self.hr_payslip_john.move_id
+        self.assertTrue(move, 'Accounting entry has not been created!')
+        self.assertEqual(move.state, 'draft')
+
+        self.hr_payslip_john.with_user(payroll_user).action_payslip_cancel()
+
+        self.assertEqual(self.hr_payslip_john.state, 'cancel')
+        self.assertFalse(move.exists(), 'The draft entry created by payroll should have been deleted')
+
+    def test_payslip_cancel_draft_entry_in_locked_period(self):
+        """ A never-posted entry is deleted on cancel even once its period has been locked: there is nothing to
+        reverse, a posted reversal would book amounts that were never posted. """
+        payroll_user = new_test_user(
+            self.env, login='payroll_only',
+            groups='base.group_user,hr_payroll.group_hr_payroll_manager',
+        )
+        self._set_hra_rule_account()
+
+        self.hr_payslip_john.compute_sheet()
+        self.hr_payslip_john.action_payslip_done()
+        move = self.hr_payslip_john.move_id
+        journal = move.journal_id
+        self.assertEqual(move.state, 'draft')
+        move.company_id.fiscalyear_lock_date = move.date
+
+        self.hr_payslip_john.with_user(payroll_user).action_payslip_cancel()
+
+        self.assertEqual(self.hr_payslip_john.state, 'cancel')
+        self.assertFalse(move.exists(), 'The draft entry should have been deleted, not reversed')
+        self.assertFalse(self.env['account.move'].search([('journal_id', '=', journal.id)]), 'No entry may remain in the salary journal')
+
+    def test_payslip_cancel_posted_entry_without_accounting_rights(self):
+        """ Once the entry has been posted, cancelling the payslip must not delete or reverse it with escalated
+        rights: only a user with accounting rights can do it, with their own rights. """
+        payroll_user = new_test_user(
+            self.env, login='payroll_only',
+            groups='base.group_user,hr_payroll.group_hr_payroll_manager',
+        )
+        billing_user = new_test_user(
+            self.env, login='payroll_billing',
+            groups='base.group_user,hr_payroll.group_hr_payroll_manager,account.group_account_invoice',
+        )
+        self.hr_payslip_john.journal_id.restrict_mode_hash_table = True
+        self._set_hra_rule_account()
+
+        self.hr_payslip_john.compute_sheet()
+        self.hr_payslip_john.action_payslip_done()
+        move = self.hr_payslip_john.move_id
+        move.action_post()
+        self.assertEqual(move.state, 'posted')
+
+        with self.assertRaises(UserError):
+            self.hr_payslip_john.with_user(payroll_user).action_payslip_cancel()
+        self.assertEqual(self.hr_payslip_john.state, 'validated')
+        self.assertEqual(move.state, 'posted')
+        self.assertFalse(
+            self.env['account.move'].search([('reversed_entry_id', '=', move.id)]),
+            'No reversal may be created by a user without accounting rights',
+        )
+
+        self.hr_payslip_john.with_user(billing_user).action_payslip_cancel()
+
+        self.assertEqual(self.hr_payslip_john.state, 'cancel')
+        self.assertEqual(move.state, 'posted', 'A hashed entry is reversed, not deleted')
+        reversal = self.env['account.move'].search([('reversed_entry_id', '=', move.id)])
+        self.assertEqual(reversal.state, 'posted')
+        self.assertEqual(reversal.create_uid, billing_user)
+
     def test_payslip_paid_create_journal_entry(self):
         """ Check that you cannot create a journal entry for a paid payslip """
         # I compute the payslip sheet.
@@ -650,3 +740,51 @@ class TestHrPayrollAccount(TestHrPayrollAccountCommon):
 
         # I verify that an error is thrown if we try to recreate a journal entry on paid payslip.
         self.assertRaises(ValidationError, self.hr_payslip_john.action_payslip_done)
+
+    def test_multi_company_payslip_done(self):
+        """ Check that payslips belonging to different companies can be validated together in a multi-company environment """
+        company_2 = self.env['res.company'].create({
+            'name': 'Company 2',
+        })
+        journal_2 = self.env['account.journal'].create({
+            'name': 'Salary Journal 2',
+            'code': 'SLR2',
+            'type': 'general',
+            'company_id': company_2.id,
+        })
+        self.hr_structure_softwaredeveloper.with_company(company_2).journal_id = journal_2
+
+        employee_2 = self.env['hr.employee'].create({
+            'name': 'Employee Company 2',
+            'company_id': company_2.id,
+            'wage': 3000.0,
+        })
+        employee_2.version_id.write({
+            'contract_date_start': date(2020, 1, 1),
+            'date_version': date(2020, 1, 1),
+            'structure_type_id': self.hr_structure_type.id,
+        })
+
+        payslip_2 = self.env['hr.payslip'].with_company(company_2).create({
+            'name': 'Payslip Company 2',
+            'employee_id': employee_2.id,
+            'struct_id': self.hr_structure_softwaredeveloper.id,
+            'version_id': employee_2.version_id.id,
+        })
+
+        self.hr_payslip_john.compute_sheet()
+        payslip_2.compute_sheet()
+
+        payslips = self.hr_payslip_john | payslip_2
+        self.assertEqual(len(payslips.company_id), 2, "Payslips must belong to two distinct companies")
+
+        payslips.action_payslip_done()
+
+        self.assertEqual(self.hr_payslip_john.state, 'validated')
+        self.assertEqual(payslip_2.state, 'validated')
+        self.assertTrue(self.hr_payslip_john.move_id, 'Accounting entry for company 1 payslip should be created')
+        self.assertTrue(payslip_2.move_id, 'Accounting entry for company 2 payslip should be created')
+        self.assertEqual(self.hr_payslip_john.move_id.company_id, self.company_us)
+        self.assertEqual(payslip_2.move_id.company_id, company_2)
+        self.assertEqual(self.hr_payslip_john.move_id.journal_id, self.hr_payslip_john.journal_id)
+        self.assertEqual(payslip_2.move_id.journal_id, journal_2)

@@ -83,6 +83,7 @@ test("loop state controls sending while the agent or its subagent is busy", asyn
     });
     onRpc("/ai/start_session_advance", () => {
         expect.step("start session advance");
+        getService("mail.store")["ai.session"].get(sessionId).loop_state = "waiting_model";
         return {
             loop_state: "waiting_model",
         };
@@ -127,6 +128,7 @@ test("loop state controls sending while the agent or its subagent is busy", asyn
         expect(params.resume_token).toBe("child-confirmation");
         expect(params.response).toEqual({ kind: "confirmation", value: "confirm_once" });
         expect.step("child confirmed");
+        child.loop_state = "ready";
         return { loop_state: "ready", interactionConsumed: true };
     });
     child.loop_state = "waiting_confirmation";

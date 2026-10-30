@@ -111,6 +111,17 @@ class TestSalaryIncreaseWizard(TestPayslipBase):
 
         self.assertAlmostEqual(later_version[wage_field], wage_before * 1.1, places=2)
 
+    def test_multiple_future_affected_versions_updated(self):
+        increase_date = date.today() + relativedelta(months=1, day=1)
+        later_versions = self.richard_emp.create_version({'date_version': date.today() + relativedelta(months=3, day=1)}) \
+            | self.richard_emp.create_version({'date_version': date.today() + relativedelta(months=5, day=1)})
+        wages_before = [version.wage for version in later_versions]
+
+        self._create_wizard(self.richard_emp, increase_date, rate=0.1).action_confirm()
+
+        for version, wage_before in zip(later_versions, wages_before):
+            self.assertAlmostEqual(version.wage, wage_before * 1.1, places=2)
+
     def test_past_increase_detects_affected_payslips(self):
         increase_date = date.today() - relativedelta(months=3, day=1)
         payslip_date = increase_date + relativedelta(months=1)

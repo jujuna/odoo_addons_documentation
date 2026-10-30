@@ -4,6 +4,8 @@
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import AccessError, ValidationError
 
+SELF_MEMBER_CREATE_SENTINEL = object()
+
 
 class KnowledgeArticleMember(models.Model):
     _name = 'knowledge.article.member'
@@ -30,6 +32,24 @@ class KnowledgeArticleMember(models.Model):
         'unique(article_id, partner_id)',
         "You already added this partner on this article.",
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        sudo_flags = [
+            vals.pop('_knowledge_self_member_create', None) is SELF_MEMBER_CREATE_SENTINEL for vals in vals_list
+        ]
+        vals_list_sudo = [vals for vals, sudo in zip(vals_list, sudo_flags) if sudo]
+        vals_list_regular = [vals for vals, sudo in zip(vals_list, sudo_flags) if not sudo]
+
+        if not vals_list_sudo:
+            return super().create(vals_list)
+
+        sudo_members = iter(super(KnowledgeArticleMember, self.sudo()).create(vals_list_sudo))
+        other_members = iter(super().create(vals_list_regular))
+        return self.browse([
+            next(sudo_members).id if sudo else next(other_members).id
+            for sudo in sudo_flags
+        ])
 
     @api.constrains('article_permission', 'permission')
     def _check_is_writable(self, on_unlink=False):

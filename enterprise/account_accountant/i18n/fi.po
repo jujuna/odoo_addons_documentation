@@ -33,10 +33,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:46+0000\n"
-"PO-Revision-Date: 2026-09-17 22:34+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
+"PO-Revision-Date: 2026-10-20 10:34+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "account_accountant/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -334,7 +334,7 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_res_groups
 msgid "Access Groups"
-msgstr ""
+msgstr "Pääsyoikeusryhmät"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -357,7 +357,7 @@ msgstr "Tilikartan mallipohja"
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_select_account_line
 msgid "Account Select Account Line"
-msgstr ""
+msgstr "Valitse tilin rivi"
 
 #. module: account_accountant
 #: model:ir.actions.act_window,name:account_accountant.account_tag_action
@@ -373,7 +373,7 @@ msgstr "Tilin siirto kohteesta"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_select_account_line__account_type
 msgid "Account Type"
-msgstr ""
+msgstr "Tilityyppi"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_auto_reconcile_wizard
@@ -422,7 +422,7 @@ msgstr "Toimenpiteet"
 #. module: account_accountant
 #: model:ir.actions.server,name:account_accountant.action_schedule_activity_bank_statement_line
 msgid "Activity"
-msgstr ""
+msgstr "Toimenpide"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__activity_exception_decoration
@@ -503,7 +503,7 @@ msgstr "Salli tilikauden pituudeksi muu kuin kalenterivuosi"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__allowed_reconcile_model_ids
 msgid "Allowed Reconcile Model"
-msgstr ""
+msgstr "Sallittu täsmäytysmalli"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__amount_currency
@@ -605,8 +605,8 @@ msgstr ""
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
-msgid "Are you sure you want to delete this statement line?"
-msgstr "Haluatko varmasti poistaa tämän tilioterivin?"
+msgid "Are you sure you want to delete this transaction?"
+msgstr "Haluatko varmasti poistaa tämän tapahtuman?"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -728,12 +728,12 @@ msgstr "Pankkitiliote.pdf"
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Pankkitapahtuma"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__asset_cash
 msgid "Bank and Cash"
-msgstr ""
+msgstr "Pankki ja käteinen"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_amount_computation_method__day
@@ -816,11 +816,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.bank_rec_auto_reconcile_wizard_view_form
 msgid ""
 "Choose a journal and a starting date. The system will try to automatically\n"
-"                    reconcile all unreconciled bank statement lines from "
-"that date until today."
+"                    reconcile all unreconciled bank transactions from that "
+"date until today."
 msgstr ""
 "Valitse päiväkirja ja aloituspäivä. Järjestelmä yrittää automaattisesti\n"
-"                    täsmäyttää kaikki täsmäyttämättömät tilioterivit "
+"                    täsmäyttää kaikki täsmäyttämättömät pankkitapahtumat "
 "kyseisestä päivästä tähän päivään asti."
 
 #. module: account_accountant
@@ -855,9 +855,15 @@ msgid "Click on the statement to unfold it."
 msgstr "Klikkaa tiliotetta avataksesi sen."
 
 #. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/statement_line/statement_line.xml:0
+msgid "Click to select"
+msgstr ""
+
+#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_select_account_line__code
 msgid "Code"
-msgstr ""
+msgstr "Koodi"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_res_company
@@ -914,7 +920,7 @@ msgstr "Yhdistä luottokorttitilisi ja hallinnoi maksujasi"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__expense_direct_cost
 msgid "Cost of Revenue"
-msgstr ""
+msgstr "Liikevaihdon kustannukset"
 
 #. module: account_accountant
 #: model:ir.actions.act_window,name:account_accountant.action_bank_statement_form_bank_rec_widget
@@ -985,7 +991,7 @@ msgstr "Luotu"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__liability_credit_card
 msgid "Credit Card"
-msgstr ""
+msgstr "Luottokortti"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__cron_last_check
@@ -1023,12 +1029,12 @@ msgstr "Nykyinen kiinteä lukitus"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__liability_current
 msgid "Current Liabilities"
-msgstr ""
+msgstr "Lyhytaikainen vieras pääoma"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__equity_unaffected
 msgid "Current Year Earnings"
-msgstr ""
+msgstr "Kuluvan vuoden tulos"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__date
@@ -1194,12 +1200,12 @@ msgstr "Poista tapahtuma"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__expense_depreciation
 msgid "Depreciation"
-msgstr ""
+msgstr "Poisto"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_select_account_line__description
 msgid "Description"
-msgstr ""
+msgstr "Kuvaus"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_digest_digest
@@ -1334,7 +1340,7 @@ msgstr "Tilikauteen sisältyvä päätöspäivä."
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__equity
 msgid "Equity"
-msgstr ""
+msgstr "Oma pääoma"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_res_company__invoicing_switch_threshold
@@ -1409,7 +1415,7 @@ msgstr "Tilikauden viimeinen kuukausi"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__asset_fixed
 msgid "Fixed Assets"
-msgstr ""
+msgstr "Käyttöomaisuus"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__message_follower_ids
@@ -1637,23 +1643,23 @@ msgstr "Virheelliset tiliotteet"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Inventory Accounting"
-msgstr ""
+msgstr "Varastoinnin kirjanpito"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__cost_method
 msgid "Inventory Cost Method"
-msgstr ""
+msgstr "Varaston kustannusmenetelmä"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__inventory_period
 msgid "Inventory Period"
-msgstr ""
+msgstr "Varastointijakso"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__valuation_method
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Inventory Valuation"
-msgstr ""
+msgstr "Varaston arvonmääritys"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_list_bank_rec_widget
@@ -1969,7 +1975,7 @@ msgstr "Kohdistusta ei täsmäytetty"
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_bank_statement_line__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr "Aineellisten symboleiden kuvake, esim. muistilista"
+msgstr "Material Symbols -kuvake, esim. muistilista"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_ir_ui_menu
@@ -2154,12 +2160,12 @@ msgstr "Ei tiliotetta"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__asset_non_current
 msgid "Non-current Assets"
-msgstr ""
+msgstr "Pitkäaikaiset varat"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__liability_non_current
 msgid "Non-current Liabilities"
-msgstr ""
+msgstr "Pitkäaikaiset velat"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
@@ -2217,7 +2223,7 @@ msgstr "Toimitusvirheen sisältävien viestien lukumäärä"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__off_balance
 msgid "Off-Balance Sheet"
-msgstr ""
+msgstr "Taseen ulkopuolella"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__generate_deferred_expense_entries_method__on_validation
@@ -2283,12 +2289,12 @@ msgstr "Alkuperäinen vero"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__expense_other
 msgid "Other Expenses"
-msgstr ""
+msgstr "Muut kulut"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__income_other
 msgid "Other Income"
-msgstr ""
+msgstr "Muut tulot"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_search_bank_rec_widget
@@ -2365,7 +2371,7 @@ msgstr "Täydellinen täsmäävyys"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Periodic Valuation"
-msgstr ""
+msgstr "Jaksoittainen arvonmääritys"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
@@ -2395,7 +2401,7 @@ msgstr "Määritä siirtosaamisten/-velkojen päiväkirja kirjanpidon asetuksiss
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
 msgid "Post"
-msgstr ""
+msgstr "Kirjaa"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_reconcile_search
@@ -2406,7 +2412,7 @@ msgstr "Kirjattu"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_select_account_line__account_type__asset_prepayments
 msgid "Prepayments"
-msgstr ""
+msgstr "Ennakkomaksut"
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_reconcile_model
@@ -2505,13 +2511,13 @@ msgstr "Täsmäytettyjen rivien nimi"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__reconcile_model_id
 msgid "Reconciliation Model"
-msgstr ""
+msgstr "Täsmäytysmalli"
 
 #. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/button_list/button_list.js:0
 msgid "Reconciliation Models"
-msgstr ""
+msgstr "Täsmäytysmallit"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__reco_model_id
@@ -2575,6 +2581,12 @@ msgid "Review"
 msgstr "Tarkasta"
 
 #. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/account_bank_statement.py:0
+msgid "Review Statements"
+msgstr ""
+
+#. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "Revoke"
 msgstr "Peruuta"
@@ -2629,7 +2641,7 @@ msgstr "Tallenna & luo uusi"
 #. odoo-python
 #: code:addons/account_accountant/models/account_bank_statement.py:0
 msgid "Schedule Activity"
-msgstr ""
+msgstr "Aikatauluta toimenpide"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_reconcile_search
@@ -2807,19 +2819,9 @@ msgid "Statement"
 msgstr "Tiliote"
 
 #. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
-msgid "Statement Line"
-msgstr "Tilioterivi"
-
-#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__statement_line_attachment_ids
 msgid "Statement Line Attachment"
 msgstr "Tilioterivin liite"
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
-msgid "Statement Lines"
-msgstr "Tilioterivit"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_search_bank_rec_widget
@@ -2834,7 +2836,7 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"Toimenpiteisiin perustuva tila\n"
+"Tila toimenpiteiden perusteella\n"
 "Myöhässä: Eräpäivä on jo mennyt\n"
 "Tänään: Toimenpiteen päivämäärä on tänään\n"
 "Suunniteltu: Tulevat toimenpiteet."
@@ -2842,17 +2844,17 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__stock_journal_id
 msgid "Stock Journal"
-msgstr ""
+msgstr "Varastopäiväkirja"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__stock_valuation_account_id
 msgid "Stock Valuation Account"
-msgstr ""
+msgstr "Varaston arvonmääritystili"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__stock_valuation_account_active
 msgid "Stock Valuation Account Active"
-msgstr ""
+msgstr "Varaston arvonmääritystili aktiivinen"
 
 #. module: account_accountant
 #. odoo-python
@@ -3074,7 +3076,7 @@ msgstr "Lisää laskuihin allekirjoitus parantaaksesi niiden aitoutta"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_form_bank_rec_widget
 msgid "Total"
-msgstr ""
+msgstr "Yhteensä"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
@@ -3137,8 +3139,8 @@ msgstr "Siirrä kohteeseen %s"
 
 #. module: account_accountant
 #: model:ir.actions.server,name:account_accountant.auto_reconcile_bank_statement_line_ir_actions_server
-msgid "Try to reconcile automatically your statement lines"
-msgstr "Yritä täsmäyttää tiliotteesi rivit automaattisesti"
+msgid "Try to reconcile automatically your transactions"
+msgstr "Yritä täsmäyttää tapahtumasi automaattisesti"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_mail_mail__message_type
@@ -3149,7 +3151,7 @@ msgstr "Tyyppi"
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_bank_statement_line__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Tallennettu poikkeustoimenpiteen tyyppi."
+msgstr "Kirjatun poikkeustoimenpiteen tyyppi."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -3324,6 +3326,7 @@ msgstr ""
 #: code:addons/account_accountant/models/account_bank_statement.py:0
 msgid "You cannot delete a statement that was posted on a hashed cash journal"
 msgstr ""
+"Et voi poistaa tiliotetta, joka on kirjattu hajautettuun kassapäiväkirjaan"
 
 #. module: account_accountant
 #. odoo-python
@@ -3461,6 +3464,28 @@ msgstr "toissijainen valuutta"
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_journal_dashboard_kanban_view
 msgid "to reconcile"
 msgstr "täsmäytettävä"
+
+#~ msgid "Are you sure you want to delete this statement line?"
+#~ msgstr "Haluatko varmasti poistaa tämän tilioterivin?"
+
+#~ msgid ""
+#~ "Choose a journal and a starting date. The system will try to "
+#~ "automatically\n"
+#~ "                    reconcile all unreconciled bank statement lines from "
+#~ "that date until today."
+#~ msgstr ""
+#~ "Valitse päiväkirja ja aloituspäivä. Järjestelmä yrittää automaattisesti\n"
+#~ "                    täsmäyttää kaikki täsmäyttämättömät tilioterivit "
+#~ "kyseisestä päivästä tähän päivään asti."
+
+#~ msgid "Statement Line"
+#~ msgstr "Tilioterivi"
+
+#~ msgid "Statement Lines"
+#~ msgstr "Tilioterivit"
+
+#~ msgid "Try to reconcile automatically your statement lines"
+#~ msgstr "Yritä täsmäyttää tiliotteesi rivit automaattisesti"
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Pankkitiliotteen rivi"

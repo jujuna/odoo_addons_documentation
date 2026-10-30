@@ -35,6 +35,7 @@
                 <widget name="obox_action_button" function="action_kiosk_reload" class="btn-secondary btn-toolbar" string="Reload Kiosk" invisible="not android_kiosk_enabled"/>
                 <widget name="obox_action_button" function="action_kiosk_lock_screen" class="btn-secondary btn-toolbar" string="Lock Screen" invisible="not android_kiosk_enabled or android_locked_by_admin"/>
                 <widget name="obox_action_button" function="action_kiosk_unlock_screen" class="btn-secondary btn-toolbar" string="Unlock Screen" invisible="not android_kiosk_enabled or not android_locked_by_admin"/>
+                <widget name="obox_action_button" function="action_kiosk_update" class="btn-secondary btn-toolbar" groups="base.group_no_one" invisible="not is_android or not android_is_device_owner"/>
             </xpath>
             <xpath expr="//sheet//field[@name='local_ip']" position="after">
                 <field name="local_port" readonly="true" groups="base.group_no_one" options="{'enable_formatting': false}" />
@@ -114,6 +115,17 @@
                     </div>
                 </page>
             </page>
+        </field>
+    </record>
+
+    <record id="obox_device_view_form" model="ir.ui.view">
+        <field name="name">obox.device.view.form.inherit.obox_android</field>
+        <field name="model">obox.device</field>
+        <field name="inherit_id" ref="obox.obox_device_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_printer_status" type="object" string="Printer Status" class="ms-md-4" groups="base.group_no_one" invisible="type != 'printer' or not supports_printer_status"/>
+            </xpath>
         </field>
     </record>
 

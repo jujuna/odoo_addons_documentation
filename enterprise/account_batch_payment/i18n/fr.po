@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-18 01:30+0000\n"
+"POT-Creation-Date: 2026-10-16 17:51+0000\n"
+"PO-Revision-Date: 2026-10-01 15:33+0000\n"
 "Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-20/"
 "account_batch_payment/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +43,17 @@ msgid ""
 "When you reconcile, simply select the corresponding batch payment to "
 "reconcile all the payments in the batch.\n"
 msgstr ""
+"\n"
+"Paiements par lot\n"
+"=======================================\n"
+"Les paiements par lot permettent de regrouper des paiements.\n"
+"\n"
+"Ils sont notamment utilisés, mais pas uniquement, pour regrouper plusieurs "
+"chèques avant de les déposer à la banque en un seul lot.\n"
+"Le montant total déposé apparaîtra alors comme une seule transaction sur "
+"votre relevé bancaire.\n"
+"Lors du rapprochement, il vous suffit de sélectionner le paiement par lot "
+"correspondant pour rapprocher tous les paiements du lot.\n"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -138,7 +149,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "All payments must have the same payment method."
-msgstr ""
+msgstr "Tous les paiements doivent avoir le même mode de paiement."
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount
@@ -179,7 +190,7 @@ msgstr "Journal de banque"
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Transaction bancaire"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -466,7 +477,7 @@ msgstr "Abonnés (Partenaires)"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
 msgid "Generate File"
-msgstr ""
+msgstr "Générer le fichier"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_create_date
@@ -584,7 +595,7 @@ msgstr "Laisser vide pour générer automatiquement..."
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_type_icon
 msgid "Material Symbols icon e.g. checklist"
-msgstr ""
+msgstr "Icône Material Symbols, par ex. checklist"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -683,12 +694,6 @@ msgid "Only %s payments can be added to a batch. Invalid ones will be ignored."
 msgstr ""
 "Seuls les paiements %s peuvent être ajoutés à un lot. Les paiements "
 "invalides seront ignorés."
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_payment.py:0
-msgid "Only outbound payments can be exported."
-msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
@@ -822,6 +827,8 @@ msgstr "Rechercher : Paiement par lot"
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "Selected payments include methods that cannot generate a file."
 msgstr ""
+"Les paiements sélectionnés incluent des modes qui ne peuvent pas générer de "
+"fichier."
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__sent
@@ -842,7 +849,7 @@ msgstr "Afficher"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__show_download_xml_button
 msgid "Show Download Xml Button"
-msgstr ""
+msgstr "Afficher le bouton Télécharger le XML"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__show_remove_button
@@ -1043,6 +1050,8 @@ msgstr ""
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You can't generate a file for payments from more than one journal."
 msgstr ""
+"Vous ne pouvez pas générer de fichier pour des paiements provenant de "
+"plusieurs journaux."
 
 #. module: account_batch_payment
 #. odoo-python
@@ -1077,12 +1086,15 @@ msgstr "Vous ne pouvez pas créer de lots dont les paiements se chevauchent."
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "You must select at least one payment to generate a file."
-msgstr ""
+msgstr "Vous devez sélectionner au moins un paiement pour générer un fichier."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
 msgid "payments"
 msgstr "paiements"
+
+#~ msgid "Only outbound payments can be exported."
+#~ msgstr "Seuls les paiements sortants peuvent être exportés."
 
 #~ msgid "Bank Statement Line"
 #~ msgstr "Ligne de relevé bancaire"

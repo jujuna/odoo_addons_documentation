@@ -10,6 +10,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
 from odoo.tools import BinaryBytes, format_date
 from odoo.tools.misc import file_path
+from odoo.addons.l10n_be_hr_payroll.models.utils import to_eurocent
 
 
 class L10n_Be273Xx(models.Model):
@@ -305,6 +306,7 @@ class L10n_Be273Xx(models.Model):
             },
             'beneficiaries': [
                 {
+                    'employee': employee,
                     'identification': {
                         'nature': "Citizen",
                         'name': employee.legal_name,
@@ -370,7 +372,7 @@ class L10n_Be273Xx(models.Model):
             'period': fields.Date.today(),
             'declaration_273S': self._get_rendering_data_273S(),
             'declaration_273_part': self._get_rendering_data_273_part(),
-            'to_eurocent': lambda amount: '%s' % int(amount * 100),
+            'to_eurocent': lambda amount: str(to_eurocent(amount)),
             'to_monetary': lambda amount: '%.2f %s' % (amount, self.company_id.currency_id.symbol),
         }
         return data

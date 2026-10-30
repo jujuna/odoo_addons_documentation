@@ -6,12 +6,12 @@ const { DateTime } = luxon;
 const MILLIS_IN_HOUR = 3600000;
 
 patch(RestaurantTable.prototype, {
-    get startDateForDuration() {
-        return this.firstAppointment?.start || super.startDateForDuration;
+    startDateForDuration() {
+        return this.firstAppointment?.start || super.startDateForDuration();
     },
     /**
      * Get the earliest upcoming appointment for a table.
-     * Filters out past, cancelled, and no-show appointments.
+     * Filters out past, cancelled, checked-in and no-show appointments.
      */
     get firstAppointment() {
         if (!this.appointment_resource_id) {
@@ -31,7 +31,7 @@ patch(RestaurantTable.prototype, {
         const nowTs = now.ts;
         const startOfTodayTs = now.startOf("day").ts;
         const startOfTomorrowTs = now.plus({ days: 1 }).startOf("day").ts;
-        const excludedStatuses = new Set(["no_show", "cancelled"]);
+        const excludedStatuses = new Set(["attended", "no_show", "cancelled"]);
 
         const validAppointments = appointments.filter((a) => {
             const startTs = a.start.ts;

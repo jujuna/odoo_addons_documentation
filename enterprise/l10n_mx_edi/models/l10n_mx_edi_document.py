@@ -2082,12 +2082,12 @@ Content-Disposition: form-data; name="xml"; filename="xml"
                 'datetime': today,
             })
 
-            # During Global Invoice creation, this method is called from an empty recordset `records=self.env['l10n_mx_edi.document']`.
-            # In that case we want the attachment res_id to be the newly created document.
-            # sudo because attachment made by SUPERUSER requires group_system to modify
-            result_attachment = result_document.attachment_id
-            if result_attachment.res_model == result_document._name and not result_attachment.res_id:
-                result_attachment.with_user(SUPERUSER_ID).res_id = result_document.id
+        # During Global Invoice creation, this method is called from an empty recordset `records=self.env['l10n_mx_edi.document']`.
+        # In that case we want the attachment res_id to be the newly created document.
+        # sudo because attachment made by SUPERUSER requires group_system to modify
+        result_attachment = result_document.attachment_id
+        if result_attachment.res_model == result_document._name and not result_attachment.res_id:
+            result_attachment.with_user(SUPERUSER_ID).res_id = result_document.id
 
         return result_document
 
@@ -2572,6 +2572,7 @@ Content-Disposition: form-data; name="xml"; filename="xml"
             client = Client(wsdl=url, transport=transport)
             response = client.service.Consulta(params)
             fetched_state = response['Estado'] if hasattr(response, 'Estado') else ''
+            fetched_cancel_status = response['EstatusCancelacion'] if hasattr(response, 'EstatusCancelacion') else ''
             # pylint: disable=broad-except
         except Exception as e:
             return {
@@ -2579,7 +2580,11 @@ Content-Disposition: form-data; name="xml"; filename="xml"
                 'value': 'error',
             }
 
-        if fetched_state == 'Vigente':
+        # Documents that are Cancelado con aceptación report as 'valid' during
+        # the 72 hour processing window. Since current code cannot differentiate
+        # between in process and rejected cancellation documents, in-process
+        # cancellation documents should stay 'not_defined'.
+        if fetched_state == 'Vigente' and fetched_cancel_status != 'En proceso':
             return {'value': 'valid'}
         elif fetched_state == 'Cancelado':
             return {'value': 'cancelled'}

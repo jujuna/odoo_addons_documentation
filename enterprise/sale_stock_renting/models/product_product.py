@@ -159,6 +159,21 @@ class ProductProduct(models.Model):
         )
         return sum(active_lines.mapped('product_uom_qty'))
 
+    def _get_physical_unavailable_qty_in_rent(self, pivot_date, **kwargs):
+        """
+        Return the quantity already taken into account by the current, physical available
+        quantity (qty_available), because it has been picked up but not returned.
+
+        :param datetime pivot_date:
+        :param dict kwargs: search domain restrictions (ignored_soline_id, warehouse_id):
+        """
+        kwargs['rental_pivot_date'] = True
+        active_lines = self._get_active_rental_lines(
+            from_date=pivot_date, to_date=pivot_date, **kwargs
+        )
+        active_lines = active_lines.filtered(lambda line: line.order_id.rental_status == 'return')
+        return sum(line.qty_delivered - line.qty_returned for line in active_lines)
+
     """
         Products with tracking (by serial number)
     """

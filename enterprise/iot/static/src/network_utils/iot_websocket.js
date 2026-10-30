@@ -87,7 +87,9 @@ export class IotWebsocket {
             if (
                 iot_box_identifier !== iotBoxIdentifier ||
                 device_identifier !== deviceIdentifier ||
-                (sessionId && session_id !== sessionId)
+                (sessionId && session_id !== sessionId) ||
+                message.status === "duplicate" ||
+                (message.status === "success" && message.result === "pending")
             ) {
                 return;
             }

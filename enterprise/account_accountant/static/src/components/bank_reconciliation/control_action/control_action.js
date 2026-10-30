@@ -381,9 +381,11 @@ export class BankRecControlPanel extends ControlPanel {
 
     get reconcileModelsToDisplay() {
         if (this.selectedUnreconciledStatementLinesIds.length === 1) {
-            return this.bankReconciliation.reconcileModelPerStatementLineId[
-                this.selectedUnreconciledStatementLinesIds[0]
-            ];
+            return (
+                this.bankReconciliation.reconcileModelPerStatementLineId[
+                    this.selectedUnreconciledStatementLinesIds[0]
+                ] ?? []
+            );
         }
 
         const allReconcileModels = [];

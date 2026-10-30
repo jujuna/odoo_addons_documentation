@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
 "PO-Revision-Date: 2026-09-24 12:16+0000\n"
 "Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
 "Language-Team: French <https://translate.odoo.com/projects/odoo-20/sign/fr/"
@@ -374,15 +374,6 @@ msgstr "<small class=\"text-muted\">Expéditeur</small>"
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<small class=\"text-muted\">Signers</small>"
 msgstr "<small class=\"text-muted\">Signataires</small>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<small>SMS Verification: The signatory has confirmed their control of the "
-"phone number using a unique code sent by SMS</small>"
-msgstr ""
-"<small>Vérification par SMS : le signataire a confirmé qu’il contrôle le "
-"numéro de téléphone à l’aide d’un code unique envoyé par SMS</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -2025,20 +2016,6 @@ msgstr "E-mail"
 #: model:ir.model.fields,field_description:sign.field_sign_request__subject
 msgid "Email Subject"
 msgstr "Sujet de l'e-mail"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Email Verification"
-msgstr "Vérification par e-mail"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"Email Verification: The signatory has confirmed control of their email inbox "
-"by clicking on a unique link"
-msgstr ""
-"Vérification par e-mail : le signataire a confirmé qu’il contrôle sa boîte "
-"de réception en cliquant sur un lien unique"
 
 #. module: sign
 #. odoo-javascript
@@ -3744,11 +3721,6 @@ msgid "SMS Token"
 msgstr "Jeton SMS"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "SMS Verification"
-msgstr "Vérification par SMS"
-
-#. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
 msgid "Sales"
 msgstr "Ventes"
@@ -3834,6 +3806,11 @@ msgstr ""
 #: code:addons/sign/controllers/portal.py:0
 msgid "Search <span class=\"nolabel\"> (in Document)</span>"
 msgstr "Chercher <span class=\"nolabel\"> (dans le Document)</span>"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Secure Link"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__access_token
@@ -4827,6 +4804,11 @@ msgid "Subject"
 msgstr "Sujet"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "System Account"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
 msgid "Tag Name"
 msgstr "Nom de l'étiquette"
@@ -5508,8 +5490,14 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_role__auth_method__sms
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Unique Code via SMS"
 msgstr "Code unique par SMS"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Unique Link via Email"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5671,6 +5659,11 @@ msgstr "Valeur"
 #: model:ir.model.constraint,message:sign.constraint_sign_item_option_value_uniq
 msgid "Value already exists!"
 msgstr "La valeur existe déjà !"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Verification method"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -6343,6 +6336,26 @@ msgstr "vous"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{0}} Summary"
 msgstr "{{0}} Résumé"
+
+#~ msgid ""
+#~ "<small>SMS Verification: The signatory has confirmed their control of the "
+#~ "phone number using a unique code sent by SMS</small>"
+#~ msgstr ""
+#~ "<small>Vérification par SMS : le signataire a confirmé qu’il contrôle le "
+#~ "numéro de téléphone à l’aide d’un code unique envoyé par SMS</small>"
+
+#~ msgid "Email Verification"
+#~ msgstr "Vérification par e-mail"
+
+#~ msgid ""
+#~ "Email Verification: The signatory has confirmed control of their email "
+#~ "inbox by clicking on a unique link"
+#~ msgstr ""
+#~ "Vérification par e-mail : le signataire a confirmé qu’il contrôle sa "
+#~ "boîte de réception en cliquant sur un lien unique"
+
+#~ msgid "SMS Verification"
+#~ msgstr "Vérification par SMS"
 
 #~ msgid "Allow signatories to provide their identity using itsme®"
 #~ msgstr "Autoriser les signataires à s'identifier avec itsme®"

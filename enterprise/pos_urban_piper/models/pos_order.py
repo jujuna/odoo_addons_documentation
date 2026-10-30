@@ -97,7 +97,7 @@ class PosOrder(models.Model):
         )
 
         if self.urbanpiper_printed:
-            raise UserError(self.env._("This delivery order has already been printed automatically."))
+            return False
 
         self.urbanpiper_printed = True
         return True
@@ -421,6 +421,7 @@ class PosOrder(models.Model):
                     'tax_ids': discount_base_line['tax_ids'],
                     'extra_tax_data': AccountTax._export_base_line_extra_tax_data(discount_base_line),
                     'note': self._reframe_notes('\n'.join([discount.get('code', discount.get('title', ''))])),
+                    'urbanpiper_tax_liability': 'merchant',
                 })
 
     def process_urbanpiper_order_status_update(self, data, urbanpiper_store):

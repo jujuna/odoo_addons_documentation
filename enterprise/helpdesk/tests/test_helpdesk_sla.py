@@ -318,6 +318,29 @@ class HelpdeskSLA(TransactionCase):
                 rows.ticket_open_hours, 9,
                 f"{report} should count the 9 hours the ticket stayed open, from its creation to its closing")
 
+    def test_sla_success_in_analysis_reports(self):
+        """ The SLA Success filter of the analysis reports should only match SLAs reached
+        on time, even once their deadline is in the past. """
+        with self._ticket_patch_now(NOW):
+            ticket_reached = self.create_ticket(team=self.test_team_reached)
+            ticket_late = self.create_ticket(team=self.test_team_late)
+            ticket_ongoing = self.create_ticket(team=self.test_team_reached)
+
+        with self._ticket_patch_now(NOW + relativedelta(days=5)):
+            tickets = ticket_reached + ticket_late
+            tickets.write({'stage_id': self.stage_progress.id})
+
+        # Keep the ongoing SLA deadline in the future
+        ticket_ongoing.sla_status_ids.deadline = fields.Datetime.now() + relativedelta(days=1)
+        self.env.flush_all()
+
+        all_tickets = ticket_reached + ticket_late + ticket_ongoing
+        for report in ('helpdesk.ticket.report.analysis', 'helpdesk.sla.report.analysis'):
+            self.assertEqual(
+                self.env[report].search([('ticket_id', 'in', all_tickets.ids), ('sla_success', '=', True)]).ticket_id,
+                ticket_reached,
+                f"{report} should only consider the SLA reached on time as a success")
+
     def test_move_ticket_to_done_and_cancel_with_disabled_sla_and_no_calendar(self):
         """ Test moving a ticket does not cause an exception when SLAs are disabled when the calendar is empty. """
         # Create a ticket on a team with SLAs enabled

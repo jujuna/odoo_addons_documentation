@@ -17,7 +17,7 @@
                     <span>Upload</span>
                 </DropdownItem>
                 <DropdownItem tag="'button'" class="'btn btn-link o_documents_kanban_request'"
-                    t-if="this.userIsInternal"
+                    t-if="this.userIsDocumentUser"
                     onSelected="this.onClickDocumentsRequest"
                     attrs="{'data-hotkey': 'r', disabled: !this.canUploadInFolder(folder) || folder.id === 'COMPANY'}">
                     <i class="oi oi-fw me-1" data-icon="send"/>

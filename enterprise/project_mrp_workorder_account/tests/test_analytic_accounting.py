@@ -270,7 +270,6 @@ class TestMrpAnalyticAccountHr(TestMrpAnalyticAccount):
                 line.loss_id = self.env.ref('mrp.block_reason7')
                 line.workcenter_id = self.workcenter
 
-        mo.button_mark_done()
         # check that the aal is created with the right values
         first_amount = mo.workorder_ids.employee_analytic_account_line_ids.filtered(lambda l: l.employee_id == self.employee1).amount
         self.assertEqual(first_amount, -50, "the workcenter productivity has a duration of 30 min so the aal should be half of the employee's hourly cost")
@@ -280,6 +279,12 @@ class TestMrpAnalyticAccountHr(TestMrpAnalyticAccount):
                 line.date_end = "2025-05-15 14:16:46"
                 self.assertEqual(mo.workorder_ids.employee_analytic_account_line_ids.filtered(lambda l: l.employee_id == self.employee1).amount, first_amount,
                 "changing the date_end and triggering the compute_duration method should not modify the aal amount")
+
+        mo.button_mark_done()
+        # Check that time entries cannot be edited once the manufacturing order is done.
+        with Form(mo.workorder_ids) as form:
+            with self.assertRaisesRegex(AssertionError, "field 'time_ids' is not editable"):
+                form.time_ids.edit(0)
 
     def test_mrp_aa_employee_without_account_rights(self):
         """

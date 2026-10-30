@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
+from unittest.mock import patch
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
@@ -25,13 +26,13 @@ class TestElderlyReduction(TestPayrollCommon):
         cls.partner_wallonia = cls.env['res.partner'].create({'name': 'WA Work Address'})
         cls.env['hr.work.location'].create([{
             'company_id': cls.belgian_company.id,
-            'bce_code': '8888888888',
+            'bce_code': '8888888473',
             'location_type': 'dmfa_unit',
             'address_id': cls.partner_brussels.id,
             'competence': 'br',
         }, {
             'company_id': cls.belgian_company.id,
-            'bce_code': '8888888881',
+            'bce_code': '8888888176',
             'location_type': 'dmfa_unit',
             'address_id': cls.partner_wallonia.id,
             'competence': 'wa',
@@ -82,7 +83,8 @@ class TestElderlyReduction(TestPayrollCommon):
             ps.compute_sheet()
             payslips |= ps
             cursor = month_end + relativedelta(days=1)
-        return DMFAWorker(payslips, quarter_start, quarter_end, '1')
+        declaration_data = self.env['l10n_be.dmfa']._get_declaration_data(payslips)
+        return DMFAWorker(payslips, quarter_start, quarter_end, '1', declaration_data=declaration_data)
 
     def _elderly_deductions(self, worker):
         elderly_codes = self.env['hr.payslip']._l10n_be_elderly_reduction_codes()
@@ -196,12 +198,20 @@ class TestElderlyReduction(TestPayrollCommon):
         self.assertEqual(deductions[0].deduction_code, 8320)
         self.assertEqual(int(deductions[0].deduction_amount) / 100, 1000.0)
 
-        # Wallonia post-2023, age 63 @freeze_time('2026-01-01') in Q1 2026 and hired in 1/3/2026  → (8322, 60, 63, 1000).
+        # Wallonia post-2023, age 63 @freeze_time('2026-01-01') in Q1 2026 and hired in 1/3/2026  → (8322, 60, 64, 1000).
         emp = self._make_employee(date(1963, 1, 1), self.partner_wallonia, hire_date=date(2026, 3, 1))
         deductions = self._elderly_deductions(self._build_dmfa_worker(emp, date(2026, 3, 1)))
         self.assertEqual(len(deductions), 1)
         self.assertEqual(deductions[0].deduction_code, 8322)
         self.assertEqual(int(deductions[0].deduction_amount) / 100, 1000.0)
+
+        # 8322: still G1 at 64, G8 from the quarter the worker reaches 65 (at most the employer's basic
+        # contributions left after the structural reduction)
+        for birthday, amount in ((date(1962, 1, 1), 1000.0), (date(1961, 1, 1), 1013.72)):
+            emp = self._make_employee(birthday, self.partner_wallonia, hire_date=date(2026, 3, 1))
+            deductions = self._elderly_deductions(self._build_dmfa_worker(emp, date(2026, 3, 1)))
+            self.assertEqual(deductions[0].deduction_code, 8322)
+            self.assertEqual(int(deductions[0].deduction_amount) / 100, amount)
 
         # Age 50 → no matching bracket → no elderly deduction.
         emp = self._make_employee(date(1975, 1, 1), self.partner_wallonia)
@@ -245,7 +255,9 @@ class TestElderlyReduction(TestPayrollCommon):
         deductions = self._elderly_deductions(self._build_dmfa_worker(emp, date(2025, 1, 1)))
         self.assertEqual(len(deductions), 1)
         self.assertEqual(deductions[0].deduction_code, 8320)
-        self.assertEqual(int(deductions[0].deduction_amount) / 100, 1500.0)
+        # G = 1500, at most the employer's basic contributions left after the structural reduction
+        self.assertEqual(int(deductions[0].deduction_amount) / 100, 1404.09)
+        self.assertEqual(deductions[0].deduction_right_starting_date, -1)
 
         # Wallonia late hire (2026-04-01), age 55: bumped 400€ sub-bracket
         # starts at 57, so age 55 is out → no elderly deduction.
@@ -264,6 +276,52 @@ class TestElderlyReduction(TestPayrollCommon):
         self.assertEqual(len(deductions), 1)
         self.assertEqual(deductions[0].deduction_code, 8321)
         self.assertEqual(int(deductions[0].deduction_amount) / 100, 400.0)
+        # The date of the start of the right is mandatory for 8321: the hire date
+        self.assertEqual(deductions[0].deduction_right_starting_date, '2026-04-01')
+
+    @freeze_time('2026-01-01')
+    def test_target_group_reduction_capped_by_contributions(self):
+        # The target group reductions are at most the employer's basic contributions left after the
+        # structural reduction: G = 1500 for a worker paid 1800 a month
+        emp = self._make_employee(date(1961, 1, 1), self.partner_wallonia, wage=1800.0)
+        worker = self._build_dmfa_worker(emp, date(2025, 1, 1))
+        deductions = self._elderly_deductions(worker)
+        self.assertEqual(len(deductions), 1)
+        payslips = worker.payslips
+        rates = payslips[0]._get_onss_rates(contribution_type='0')
+        contribution = next(c for c in worker.contributions if c.worker_code == worker.worker_code)
+        employer_contributions = int(contribution.calculation_basis) * (rates['total_rate'] - rates['personal_rate']) / 100
+        structural = sum(
+            int(d.deduction_amount) for occupation in worker.occupations for d in occupation.occupation_deductions
+            if d.deduction_code == 3000)
+        self.assertLess(int(deductions[0].deduction_amount), 150000)
+        self.assertAlmostEqual(int(deductions[0].deduction_amount), employer_contributions - structural, delta=1)
+
+    @freeze_time('2026-04-01')
+    def test_wallonia_8321_age_at_engagement(self):
+        # 8321 is for the workers engaged from 55 (57) to 59: not for a worker engaged at 54, aged 56 now
+        emp = self._make_employee(date(1970, 1, 1), self.partner_wallonia, hire_date=date(2024, 1, 1))
+        self.assertEqual(self._elderly_deductions(self._build_dmfa_worker(emp, date(2026, 1, 1))), [])
+        # engaged at 55, aged 57 now: G2
+        emp = self._make_employee(date(1969, 1, 1), self.partner_wallonia, hire_date=date(2024, 1, 1))
+        deductions = self._elderly_deductions(self._build_dmfa_worker(emp, date(2026, 1, 1)))
+        self.assertEqual([(d.deduction_code, int(d.deduction_amount) / 100) for d in deductions], [(8321, 400.0)])
+
+    @freeze_time('2026-10-01')
+    def test_wallonia_no_reduction_for_engagements_from_july_2026(self):
+        # The Walloon reduction is removed for the engagements from 1 July 2026
+        emp = self._make_employee(date(1965, 1, 1), self.partner_wallonia, hire_date=date(2026, 7, 1))
+        self.assertEqual(self._elderly_deductions(self._build_dmfa_worker(emp, date(2026, 7, 1))), [])
+
+    @freeze_time('2026-07-01')
+    def test_one_target_group_reduction_per_occupation(self):
+        # At most one target group reduction on an occupation line, with the structural reduction
+        emp = self._make_employee(date(1969, 1, 1), self.partner_wallonia, hire_date=date(2026, 4, 1))
+        with patch.object(self.env.registry['hr.payslip'], '_l10n_be_target_group_reductions', lambda self: ['elderly', 'elderly']):
+            worker = self._build_dmfa_worker(emp, date(2026, 4, 1))
+        for occupation in worker.occupations:
+            self.assertLessEqual(len([d for d in occupation.occupation_deductions if isinstance(d, DMFAOccupationTargetGroup)]), 1)
+        self.assertEqual(len(self._elderly_deductions(worker)), 1)
 
     @freeze_time('2026-07-01')
     def test_brussels_elderly_reduction_removed_q3_2026(self):
@@ -277,3 +335,24 @@ class TestElderlyReduction(TestPayrollCommon):
             self._elderly_deductions(self._build_dmfa_worker(emp, date(2026, 7, 1))),
             [],
         )
+
+    @freeze_time('2026-04-01')
+    def test_wallonia_service_exemption_notion(self):
+        # The service exemption notion is declared on the occupations with a Walloon elderly reduction
+        emp = self._make_employee(date(1969, 1, 1), self.partner_wallonia, hire_date=date(2024, 1, 1))
+        worker = self._build_dmfa_worker(emp, date(2026, 1, 1))
+        self.assertEqual([d.deduction_code for d in self._elderly_deductions(worker)], [8321])
+        self.assertEqual([info.service_exemption_notion for info in worker.occupations[0].occupation_informations], ['0'])
+
+        # No Walloon reduction for a worker exempted from work during the whole quarter
+        emp = self._make_employee(date(1969, 1, 1), self.partner_wallonia, hire_date=date(2024, 1, 1))
+        emp.version_id.write({'l10n_be_work_exemption': '2', 'l10n_be_work_exemption_date': date(2025, 12, 1)})
+        worker = self._build_dmfa_worker(emp, date(2026, 1, 1))
+        self.assertEqual(self._elderly_deductions(worker), [])
+        self.assertEqual([info.service_exemption_notion for info in worker.occupations[0].occupation_informations], ['2'])
+
+        # Not for a Brussels reduction
+        emp = self._make_employee(date(1963, 1, 1), self.partner_brussels)
+        worker = self._build_dmfa_worker(emp, date(2026, 1, 1))
+        self.assertTrue(self._elderly_deductions(worker))
+        self.assertEqual(worker.occupations[0].occupation_informations, [])

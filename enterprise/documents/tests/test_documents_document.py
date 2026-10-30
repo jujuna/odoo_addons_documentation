@@ -331,6 +331,18 @@ class TestCaseDocuments(TransactionCaseDocuments, MailCommon):
         self.assertTrue(document.exists() and not document.active,
                         "The document request is archived as its related activity is deleted")
 
+    def test_document_not_archived_on_unlink_related_activity(self):
+        """Test that deleting an upload activity scheduled on a document does not archive the document."""
+        activity = self.folder_a.activity_schedule('mail.mail_activity_data_upload_document')
+        self.assertEqual(
+            self.folder_a.request_activity_id,
+            activity,
+            "Scheduling an upload activity on a folder links it to the activity",
+        )
+        activity.unlink()
+        self.assertFalse(self.folder_a.request_activity_id)
+        self.assertTrue(self.folder_a.active, "The folder should not go to the trash on activity deletion")
+
     def test_is_favorited(self):
         """ Test the is_favorited field (compute and inverse method). """
         # Test the compute method

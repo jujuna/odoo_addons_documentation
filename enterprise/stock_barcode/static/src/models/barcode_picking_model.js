@@ -926,8 +926,9 @@ export default class BarcodePickingModel extends BarcodeModel {
             this._clearScanData();
             return false;
         }
-        if (!selectedLine.lot_id) {
-            await this.splitLine(selectedLine);
+        const splitLine = selectedLine.lot_id ? null : await this.splitLine(selectedLine);
+        if (splitLine && this.config.lines_need_destination_location) {
+            splitLine.wasUpdated = false;
         }
         // If the line has no reservation and is grouped with sibling lines,
         // checks if we can assign to it a part of the reservation.
@@ -1480,7 +1481,8 @@ export default class BarcodePickingModel extends BarcodeModel {
 
     async _closeValidate(ev) {
         const record = await this.orm.read(this.resModel, [this.record.id], ["state"]);
-        if (record[0].state === "done") {
+        if (record[0].state === "done" && !this._closed) {
+            this._closed = true;
             // Checks if the picking generated a backorder. Updates the picking's data if it's the case.
             const backorders = await this.orm.searchRead(
                 this.backorderModel,
@@ -1610,6 +1612,15 @@ export default class BarcodePickingModel extends BarcodeModel {
         }
 
         if (this.reloadingMoveLines) {
+            if (this.config.lines_need_destination_location) {
+                smlData.wasUpdated = smlData.picked;
+                if (
+                    !smlData.lastScannedDestination &&
+                    smlData.location_dest_id.id != this.record.location_dest_id
+                ) {
+                    smlData.lastScannedDestination = smlData.location_dest_id;
+                }
+            }
             if (prevLine) {
                 smlData.sortIndex = prevLine.sortIndex;
                 if (smlData.quantity && !smlData.qty_done) {
@@ -1664,6 +1675,68 @@ export default class BarcodePickingModel extends BarcodeModel {
         for (const id of picking.move_line_ids) {
             const smlData = this._getMoveLineData(id);
             lines.push(smlData);
+        }
+        if (this.shareReservation) {
+            this._shareReservedQuantity(lines);
+            this.shareReservation = false;
+        }
+        return lines;
+    }
+
+    _shareReservedQuantity(lines) {
+        const groupedLinesByMove = {};
+        // Group the lines by their move's id.
+        for (const line of lines) {
+            if (!groupedLinesByMove[line.move_id]) {
+                groupedLinesByMove[line.move_id] = [];
+            }
+            groupedLinesByMove[line.move_id].push(line);
+        }
+        // Share reservation by subset of move's lines.
+        for (const lines of Object.values(groupedLinesByMove)) {
+            // Define which lines have too much reservation and which one need reservation.
+            const groupedValues = lines.reduce(
+                (values, line) => {
+                    if (!line.reserved_uom_qty) {
+                        values.missingReservedQty += line.quantity;
+                        values.linesWithNoReservation.push(line);
+                    } else if (line.reserved_uom_qty > line.quantity) {
+                        values.extraReservedQty += line.reserved_uom_qty - line.quantity;
+                        values.linesWithExtraReservation.push(line);
+                    }
+                    return values;
+                },
+                {
+                    extraReservedQty: 0,
+                    missingReservedQty: 0,
+                    linesWithNoReservation: [],
+                    linesWithExtraReservation: [],
+                }
+            );
+            let { extraReservedQty, missingReservedQty } = groupedValues;
+            const { linesWithNoReservation, linesWithExtraReservation } = groupedValues;
+            // Share reserved quantity.
+            while (
+                linesWithNoReservation.length &&
+                linesWithExtraReservation.length &&
+                missingReservedQty > 0 &&
+                extraReservedQty >= missingReservedQty
+            ) {
+                const sharingLine = linesWithExtraReservation.pop();
+                let reservationQtyToShare = sharingLine.reserved_uom_qty - sharingLine.quantity;
+                for (const line of linesWithNoReservation) {
+                    const need = line.quantity - line.reserved_uom_qty;
+                    const takenQty = Math.min(reservationQtyToShare, need);
+                    line.reserved_uom_qty += takenQty;
+                    sharingLine.reserved_uom_qty -= takenQty;
+                    reservationQtyToShare -= takenQty;
+                    extraReservedQty -= takenQty;
+                    missingReservedQty -= takenQty;
+                    if (reservationQtyToShare <= 0) {
+                        break;
+                    }
+                }
+            }
         }
         return lines;
     }
@@ -2078,6 +2151,17 @@ export default class BarcodePickingModel extends BarcodeModel {
         if (this.previousScannedLinesByPackage?.length) {
             // In case some lines were added by scanning a package, get those lines.
             lines.push(...this.previousScannedLinesByPackage);
+        }
+        // A package can't be split across locations, so move all of its lines together.
+        const outermostPackageId = (line) =>
+            line.outermost_result_package_id?.id || line.result_package_id?.id;
+        const packageIds = new Set(lines.map(outermostPackageId).filter(Boolean));
+        if (packageIds.size) {
+            lines.push(
+                ...this.currentState.lines.filter((line) =>
+                    packageIds.has(outermostPackageId(line))
+                )
+            );
         }
 
         return Array.from(new Set(lines));
@@ -2628,6 +2712,7 @@ export default class BarcodePickingModel extends BarcodeModel {
             context,
         });
         if (typeof result === "object" && result.type) {
+            this.shareReservation = true;
             return this.trigger("process-action", result);
         }
         this.trigger("refresh");

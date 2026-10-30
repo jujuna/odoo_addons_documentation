@@ -135,12 +135,16 @@ class HrPayrollWarning(models.Model):
 
     def _get_payroll_translation(self, text, **kwargs):
         # Please order alphabetically to easily spot duplicates
+        if text == "%(count)s payslips of the quarter aren't validated, they won't be declared: %(names)s":
+            return self.env._("%(count)s payslips of the quarter aren't validated, they won't be declared: %(names)s", **kwargs)
         if text == "%(days)s days of Paid time off remaining.\nThe employee was sick in december and couldn't take all paid time off. You can decide to postpone them for next year.":
             return self.env._("%(days)s days of Paid time off remaining.\nThe employee was sick in december and couldn't take all paid time off. You can decide to postpone them for next year.", **kwargs)
         if text == "%(days)s days of Postponed off remaining.\nThe employee was sick during all this year and couldn't take the paid time off postponed from the previous year. You can decide to postpone them again to next year.":
             return self.env._("%(days)s days of Postponed off remaining.\nThe employee was sick during all this year and couldn't take the paid time off postponed from the previous year. You can decide to postpone them again to next year.", **kwargs)
         if text == "Adjust Wage":
             return self.env._("Adjust Wage")
+        if text == "Basic Remuneration is equal to 0":
+            return self.env._("Basic Remuneration is equal to 0")
         if text == "Cannot encode additional hours during regular working time.":
             return self.env._("Cannot encode additional hours during regular working time.")
         if text == "Continue":
@@ -159,6 +163,10 @@ class HrPayrollWarning(models.Model):
             return self.env._("DMFA employees missing DIMONA %(names)s", **kwargs)
         if text == "DMFA Submission %(year)s Q%(quarter)s":
             return self.env._("DMFA Submission %(year)s Q%(quarter)s", **kwargs)
+        if text == 'DMFA units with an invalid establishment unit code %(names)s':
+            return self.env._('DMFA units with an invalid establishment unit code %(names)s', **kwargs)
+        if text == 'DMFA units without establishment unit code %(names)s':
+            return self.env._('DMFA units without establishment unit code %(names)s', **kwargs)
         if text == "Draft payslips excluded.":
             return self.env._("Draft payslips excluded.")
         if text == "Edit":
@@ -175,8 +183,14 @@ class HrPayrollWarning(models.Model):
             return self.env._("Employees with work address missing ONSS code %(names)s", **kwargs)
         if text == "Employer category required to import ONSS rates.":
             return self.env._("Employer category required to import ONSS rates.")
+        if text == 'Flexi-jobs at the employer already employing the worker in the quarter, to declare as an ordinary employment: %(names)s':
+            return self.env._('Flexi-jobs at the employer already employing the worker in the quarter, to declare as an ordinary employment: %(names)s', **kwargs)
         if text == "Invalid license plates %(names)s":
             return self.env._("Invalid license plates %(names)s", **kwargs)
+        if text == 'Invalid NISS for employees %(names)s':
+            return self.env._('Invalid NISS for employees %(names)s', **kwargs)
+        if text == "Mark as done":
+            return self.env._("Mark as done")
         if text == "Max 12 additional hours/month pay excess at +50% or +100%.":
             return self.env._("Max 12 additional hours/month pay excess at +50% or +100%.")
         if text == "Meal vouchers exceed annual limit (%(max_count)s).":
@@ -201,12 +215,18 @@ class HrPayrollWarning(models.Model):
             return self.env._("Occupation days mismatch working schedule %(names)s", **kwargs)
         if text == "Only one day of sick time off can be flagged without certificate":
             return self.env._("Only one day of sick time off can be flagged without certificate")
+        if text == 'Refused flexi-jobs are declared as ordinary workers: set the worker code 015 or 495 on their contract and recompute their payslips: %(names)s':
+            return self.env._('Refused flexi-jobs are declared as ordinary workers: set the worker code 015 or 495 on their contract and recompute their payslips: %(names)s', **kwargs)
         if text == "Salary below %(limit)s%(currency)s threshold transport benefit required.":
             return self.env._("Salary below %(limit)s%(currency)s threshold transport benefit required.", **kwargs)
         if text == "See addresses":
             return self.env._("See addresses")
         if text == "See company settings":
             return self.env._("See company settings")
+        if text == 'See DMFA units':
+            return self.env._('See DMFA units')
+        if text == "See employee":
+            return self.env._("See employee")
         if text == "See employees":
             return self.env._("See employees")
         if text == "See payslips":
@@ -221,10 +241,30 @@ class HrPayrollWarning(models.Model):
             return self.env._("Set Employer Category")
         if text == "Start":
             return self.env._("Start")
+        if text == 'Students with more than 650 hours in the quarter: the hours above the yearly 650 hours are declared with the ordinary contributions: %(names)s':
+            return self.env._('Students with more than 650 hours in the quarter: the hours above the yearly 650 hours are declared with the ordinary contributions: %(names)s', **kwargs)
+        if text == "Submit":
+            return self.env._("Submit")
+        if text == "Sub-type":
+            return self.env._("Sub-type")
+        if text == "Start date of occupation prior to the employer's registration date":
+            return self.env._("Start date of occupation prior to the employer's registration date")
         if text == "Sunday additional hours must be paid.":
             return self.env._("Sunday additional hours must be paid.")
+        if text == 'Termination indemnities to declare with a modification of the DMFA of the quarter of the end of the contract: %(names)s':
+            return self.env._('Termination indemnities to declare with a modification of the DMFA of the quarter of the end of the contract: %(names)s', **kwargs)
+        if text == "The complementary indemnities (RCC, RCIC: worker codes 879, 883, 885) can't be declared by Odoo: declare them through the ONSS portal or your social secretariat: %(names)s":
+            return self.env._("The complementary indemnities (RCC, RCIC: worker codes 879, 883, 885) can't be declared by Odoo: declare them through the ONSS portal or your social secretariat: %(names)s", **kwargs)
+        if text == 'The date of the start of the holidays of the manual workers (HolidayStartingDate) is mandatory in the declaration of the fourth quarter: add it to the declaration file before sending it.':
+            return self.env._('The date of the start of the holidays of the manual workers (HolidayStartingDate) is mandatory in the declaration of the fourth quarter: add it to the declaration file before sending it.')
         if text == "The employee is under the legal minimum working age (18 years old)":
             return self.env._("The employee is under the legal minimum working age (18 years old)")
+        if text == 'The exemption from work of these employees has no start date: %(names)s':
+            return self.env._('The exemption from work of these employees has no start date: %(names)s', **kwargs)
+        if text == 'The percentage of the increased hourly pay (PercentagePaid) of the reductions of the working time with an unpaid compensatory rest is mandatory: add it to the remuneration code 1 in the declaration file of %(names)s':
+            return self.env._('The percentage of the increased hourly pay (PercentagePaid) of the reductions of the working time with an unpaid compensatory rest is mandatory: add it to the remuneration code 1 in the declaration file of %(names)s', **kwargs)
+        if text == "The quarter isn't ended yet: it can only be declared from %(date)s.":
+            return self.env._("The quarter isn't ended yet: it can only be declared from %(date)s.", **kwargs)
         if text == "The student is under the legal minimum working age (15 years old)":
             return self.env._("The student is under the legal minimum working age (15 years old)")
         if text == "Tax Forms 281, %(year)s":
@@ -235,12 +275,16 @@ class HrPayrollWarning(models.Model):
             return self.env._("The intellectual property limit of %(limit)s is reached: the exceeding part is paid as a regular remuneration", **kwargs)
         if text == "The remaining mobility budget can't be negative (%(mobility_remaining)s €). Adjust Pillar 2 or Pillar 3 amounts to resolve the deficit.":
             return self.env._("The remaining mobility budget can't be negative (%(mobility_remaining)s €). Adjust Pillar 2 or Pillar 3 amounts to resolve the deficit.", **kwargs)
+        if text == 'The students (Dimona STU) must have the worker code 840 or 841, used only for them: %(names)s':
+            return self.env._('The students (Dimona STU) must have the worker code 840 or 841, used only for them: %(names)s', **kwargs)
         if text == "The total number of meal vouchers for this year exceeds %(max_count)s":
             return self.env._("The total number of meal vouchers for this year exceeds %(max_count)s", **kwargs)
-        if text == "There are %(count)s public holiday(s) in the 30/14th days following the end of the contract, it should be paid if the employee didn't":
-            return self.env._("There are %(count)s public holiday(s) in the 30/14th days following the end of the contract, it should be paid if the employee didn't", **kwargs)
+        if text == "There are %(count)s public holiday(s) in the 30/14th days following the end of the contract, it should be paid if the employee didn't find a new job.":
+            return self.env._("There are %(count)s public holiday(s) in the 30/14th days following the end of the contract, it should be paid if the employee didn't find a new job.", **kwargs)
         if text == "Time types missing DMFA code %(names)s":
             return self.env._("Time types missing DMFA code %(names)s", **kwargs)
+        if text == "This employee does not have a DIMONA covering the period":
+            return self.env._("This employee does not have a DIMONA covering the period")
         if text == "This employee is not eligible to be paid for Work accident or Work illness (009.00). 110.00 should be used instead.":
             return self.env._("This employee is not eligible to be paid for Work accident or Work illness (009.00). 110.00 should be used instead.")
         if text == "This time off will be split into:\n%(lines)s":
@@ -251,12 +295,16 @@ class HrPayrollWarning(models.Model):
             return self.env._("Weekly hours exceed schedule limit convert excess to Extra-hours.")
         if text == "Time Off with Exceeded Duration":
             return self.env._("Time Off with Exceeded Duration")
+        if text == "This sub-type can only be used until December 31 of the year the employee turns 18.":
+            return self.env._("This sub-type can only be used until December 31 of the year the employee turns 18.")
         if text == "Too many Additional Hours per day.\nThe number of Additional Hours and working hours can not exceed 9h per day, transform the exceeding hours into Extra-hours":
             return self.env._("Too many Additional Hours per day.\nThe number of Additional Hours and working hours can not exceed 9h per day, transform the exceeding hours into Extra-hours")
         if text == "Too many Additional Hours per month.\nThe number of Additional Hours can not exceed 12h per month, exceeding hours should be paid +50% or +100%":
             return self.env._("Too many Additional Hours per month.\nThe number of Additional Hours can not exceed 12h per month, exceeding hours should be paid +50% or +100%")
         if text == "Too many Additional Hours per week.\nThe number of Additional Hours and working hours can not exceed the reference working schedule, transform the exceeding hours into Extra-hours":
             return self.env._("Too many Additional Hours per week.\nThe number of Additional Hours and working hours can not exceed the reference working schedule, transform the exceeding hours into Extra-hours")
+        if text == "Update Sub-type":
+            return self.env._("Update Sub-type")
         if text == "Withholding taxes: %(date)s %(year)s":
             return self.env._("Withholding taxes: %(date)s %(year)s", **kwargs)
         if text == "Withholding taxes on Intellectual Property & Employee Participation: %(date)s %(year)s":

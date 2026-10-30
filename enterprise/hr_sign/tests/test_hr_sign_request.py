@@ -144,3 +144,15 @@ class TestHrSignRequest(TestHrCommon, SignRequestCommon):
             ]),
             "No sign request should be created when the work email is missing.",
         )
+
+    def test_sign_requests_without_employee_role(self):
+        """
+        Ensure that the sign requests of the employees are still reachable when
+        the employee signatory role has been removed.
+        """
+        employee = self.env['hr.employee'].create({'name': 'Employee Without Role'})
+        self.env.ref('hr_sign.sign_item_role_employee_signatory').unlink()
+
+        self.assertEqual(employee.sign_request_count, 0)
+        action = employee.open_employee_sign_requests()
+        self.assertEqual(action['domain'], [('id', 'in', [])])

@@ -193,12 +193,14 @@ class IrAttachment(models.Model):
                     with open(tmp_path, 'wb') as tmp_file:
                         shutil.copyfileobj(bin_value, tmp_file)
                         tmp_file.flush()
-                        if hasattr(os, 'fchmod'):
-                            os.fchmod(tmp_file.fileno(), 0o444)  # r--r--r--
-                        else:
-                            os.chmod(tmp_path, 0o444)  # r--r--r--
+                        with contextlib.suppress(PermissionError):
+                            if hasattr(os, 'fchmod'):
+                                os.fchmod(tmp_file.fileno(), 0o444)  # r--r--r--
+                            else:
+                                os.chmod(tmp_path, 0o444)  # r--r--r--
                 else:
-                    os.chmod(tmp_path, 0o444)  # r--r--r--
+                    with contextlib.suppress(PermissionError):
+                        os.chmod(tmp_path, 0o444)  # r--r--r--
 
                 # "commit" the file by moving it to its right place
                 try:
@@ -689,10 +691,11 @@ class IrAttachment(models.Model):
         self.fetch(SECURITY_FIELDS)  # fetch only these fields
         user_model = self.sudo(False)
         forbidden_ids = set()
+        is_system = user_model.env.is_system()
         for attachment in self:
             att_id = attachment.id
             res_model, res_id = attachment.res_model, attachment.res_id
-            if not user_model.env.is_system():
+            if not is_system:
                 if not res_id and attachment.create_uid.id != self.env.uid:
                     forbidden_ids.add(att_id)
                     continue
@@ -830,6 +833,21 @@ class IrAttachment(models.Model):
             raise ValueError("Cannot generate SQL for whole ir.attachment")
         if 0 < len(condition_values(self, 'res_model', domain) or ()) <= MAX_COMODELS_FOR_DOMAIN:
             return super()._search(domain, offset, limit, order, active_test=active_test, bypass_access=bypass_access)
+
+        # Filter in SQL with the read access domain, where res_access_* keep
+        # the attachments they may accept and conditions SQL cannot express
+        # keep every attachment. The check in Python drops the rest.
+        def to_sql(cond):
+            if cond.field_expr in ('res_access_read', 'res_access_write'):
+                if cond.operator == 'in' and set(cond.value) == {True} and not self.env.is_system():
+                    # a linked record, or no record and created by the user
+                    return Domain('res_id', '!=', False) | Domain('create_uid', '=', self.env.uid)
+                return Domain.TRUE
+            if not cond._field(self)._description_searchable:
+                return Domain.TRUE
+            return cond
+
+        domain &= self._access_domain('read').optimize(self).map_conditions(to_sql)
 
         self_sudo = self.sudo().with_context(active_test=False)
         ordered = bool(order)
@@ -975,11 +993,14 @@ class IrAttachment(models.Model):
                 raise UserError(_("Attachment is not encoded in base64."))
             checksum = self._compute_checksum(vals['raw'] or b'')
             # Create only if record does not already exist for checksum and mimetype
-            result += self.sudo().search([
+            # only reuse the attachments the current user can write, as callers may
+            # link new attachments to them (e.g. the resized variants of an image).
+            existing = self.sudo().search([
                 ['id', '!=', False],  # No implicit condition on res_field.
                 ['checksum', '=', checksum],
                 ['mimetype', '=', vals['mimetype']],
-            ], limit=1) or self.create(vals)
+            ], limit=100, order='res_field nulls first, id').with_env(self.env)._filtered_access('write')[:1]
+            result += existing or self.create(vals)
         return result
 
     def _generate_access_token(self):

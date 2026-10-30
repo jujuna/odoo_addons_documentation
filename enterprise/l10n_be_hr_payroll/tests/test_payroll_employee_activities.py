@@ -57,26 +57,22 @@ class TestPayrollEmployeeActivities(TestPayrollCommon):
             })
             wizard.action_validate()
 
-    def test_only_one_dimona_activity_for_hr_version(self):
+    def test_only_one_part_time_activity_for_hr_version(self):
         """
-        Test that a version only creates a related dimona or part time activity
+        Test that a version only creates a related part time activity
         if there is none yet.
         """
         employee_domain = [('res_model', '=', 'hr.employee'), ('res_id', '=', self.employee.id)]
 
         employee_activities = self.env['mail.activity'].search(employee_domain)
-        part_time_activities = employee_activities.filtered(lambda a: a.summary == 'Part Time')
-        dimona_activities = employee_activities.filtered(lambda a: a.summary == 'Dimona')
+        part_time_activities = employee_activities.filtered(lambda a: a.technical_usage == 'l10n_be_hr_payroll_part_time')
         self.assertEqual(len(part_time_activities), 1, 'A part time activity should have been created.')
-        self.assertEqual(len(dimona_activities), 1, 'A dimona activity should have been created.')
 
         self.employee._trigger_l10n_be_next_activities()
 
         employee_activities = self.env['mail.activity'].search(employee_domain)
-        part_time_activities = employee_activities.filtered(lambda a: a.summary == 'Part Time')
-        dimona_activities = employee_activities.filtered(lambda a: a.summary == 'Dimona')
+        part_time_activities = employee_activities.filtered(lambda a: a.technical_usage == 'l10n_be_hr_payroll_part_time')
         self.assertEqual(len(part_time_activities), 1, 'The existing part time activity should prevent the creation of a new one.')
-        self.assertEqual(len(dimona_activities), 1, 'The existing dimona activity should prevent the creation of a new one.')
 
     def test_part_time_activity_for_new_version(self):
         """
@@ -91,7 +87,7 @@ class TestPayrollEmployeeActivities(TestPayrollCommon):
             employee_domain = [('res_model', '=', 'hr.employee'), ('res_id', '=', self.employee.id)]
 
             employee_activities = self.env['mail.activity'].search(employee_domain)
-            part_time_activities = employee_activities.filtered(lambda a: a.summary == 'Part Time')
+            part_time_activities = employee_activities.filtered(lambda a: a.technical_usage == 'l10n_be_hr_payroll_part_time')
             self.assertEqual(len(part_time_activities), 1, 'Only one part time activity should exist.')
 
         with freeze_time('2025-03-03'):
@@ -106,7 +102,7 @@ class TestPayrollEmployeeActivities(TestPayrollCommon):
 
             self.employee._cron_update_current_version_id()
             employee_activities = self.env['mail.activity'].search(employee_domain)
-            part_time_activities = employee_activities.filtered(lambda a: a.summary == 'Part Time')
+            part_time_activities = employee_activities.filtered(lambda a: a.technical_usage == 'l10n_be_hr_payroll_part_time')
             self.assertEqual(len(part_time_activities), 2, 'A second part time activity should have been created for the new contract.')
 
         with freeze_time('2025-04-01'):
@@ -122,5 +118,14 @@ class TestPayrollEmployeeActivities(TestPayrollCommon):
         with freeze_time('2025-04-04'):
             self.employee._cron_update_current_version_id()
             employee_activities = self.env['mail.activity'].search(employee_domain)
-            part_time_activities = employee_activities.filtered(lambda a: a.summary == 'Part Time')
+            part_time_activities = employee_activities.filtered(lambda a: a.technical_usage == 'l10n_be_hr_payroll_part_time')
             self.assertEqual(len(part_time_activities), 3, 'A third part time activity should have been created for the new contract.')
+
+    def test_credit_time_unusual_days_dashboard(self):
+        date_from = '2025-01-06 00:00:00'  # Monday
+        date_to = '2025-01-12 23:59:59'  # Sunday
+
+        dashboard_unusual_days = self.env['hr.leave'].with_context(employee_id=self.employee.id).get_unusual_days(date_from, date_to)
+
+        self.assertTrue(dashboard_unusual_days.get('2025-01-08'))  # Wednesday = credit time
+        self.assertFalse(dashboard_unusual_days.get('2025-01-09'))  # Thursday = normal attendance

@@ -1,6 +1,4 @@
-import { stockBarcodeProductExpiryModels } from "./stock_barcode_product_expiry_test_helpers.js";
-import { expect, test } from "@odoo/hoot";
-import { mockDate } from "@odoo/hoot-mock";
+import { expect, mockDate, test } from "@odoo/hoot";
 import {
     defineActions,
     defineModels,
@@ -10,10 +8,9 @@ import {
     onRpc,
 } from "@web/../tests/web_test_helpers";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
+import { stockBarcodeProductExpiryModels } from "./stock_barcode_product_expiry_test_helpers.js";
 
-defineModels({
-    ...stockBarcodeProductExpiryModels,
-});
+defineModels(stockBarcodeProductExpiryModels);
 
 defineActions([
     {
@@ -26,17 +23,17 @@ defineActions([
     },
 ]);
 
-onRpc("/stock_barcode/get_barcode_data", (...args) => ({
+onRpc("/stock_barcode/get_barcode_data", () => ({
     data: {
         records: {
-            "stock.picking": MockServer.current._models["stock.picking"],
-            "stock.picking.type": MockServer.current._models["stock.picking.type"],
-            "stock.move": MockServer.current._models["stock.move"],
-            "stock.move.line": MockServer.current._models["stock.move.line"],
-            "product.product": MockServer.current._models["product.product"],
-            "uom.uom": MockServer.current._models["uom.uom"],
-            "stock.location": MockServer.current._models["stock.location"],
-            "barcode.nomenclature": MockServer.current._models["barcode.nomenclature"],
+            "stock.picking": MockServer.env["stock.picking"],
+            "stock.picking.type": MockServer.env["stock.picking.type"],
+            "stock.move": MockServer.env["stock.move"],
+            "stock.move.line": MockServer.env["stock.move.line"],
+            "product.product": MockServer.env["product.product"],
+            "uom.uom": MockServer.env["uom.uom"],
+            "stock.location": MockServer.env["stock.location"],
+            "barcode.nomenclature": MockServer.env["barcode.nomenclature"],
         },
         nomenclature_id: 1,
     },

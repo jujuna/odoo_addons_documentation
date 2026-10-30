@@ -20,7 +20,9 @@
                             <i class="oi text-success" data-icon="play_arrow"/>
                         </button>
                     </t>
-                    <button class="btn" t-on-click="() => this.removeScript(script.el)">
+                    <button class="btn" t-att-disabled="!script.isRemovable"
+                            t-att-data-tooltip="!script.isRemovable and this.notRemovableTooltip"
+                            t-on-click="() => this.removeScript(script.el)">
                         <i class="oi oi-filled text-danger" data-icon="delete"/>
                     </button>
                 </div>

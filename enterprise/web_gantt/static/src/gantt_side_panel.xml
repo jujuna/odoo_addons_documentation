@@ -28,9 +28,10 @@
                         t-as="event"
                         t-key="event.id"
                         t-att-data-res-id="event.id"
+                        t-on-click="() => this.props.editRecord(event.id)"
                     >
                         <i class="oi o_event_to_schedule_handle" data-icon="drag_indicator"/>
-                        <span class="cursor-pointer ps-1" t-out="event.display_name" t-att-title="event.display_name" t-on-click="() => this.props.editRecord(event.id)"/>
+                        <span class="cursor-pointer ps-1" t-out="event.display_name" t-att-title="event.display_name"/>
                     </div>
                 </div>
                 <button t-if="this.displayLoadMoreButton" class="btn btn-link" t-on-click="() => this.props.model.loadMoreEventsToSchedule()">

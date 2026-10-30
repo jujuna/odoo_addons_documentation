@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
 "PO-Revision-Date: 2026-09-18 03:33+0000\n"
 "Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
@@ -276,16 +276,16 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/>"
-"\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
 "    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
 "style=\"width:100%; margin:0;\">\n"
 "    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            <t t-if=\"partner.name\">\n"
-"                <t t-out=\"partner.name or ''\">Brandon Freeman</t> 你好"
-"！<br/><br/>\n"
+"                <t t-out=\"partner.name or ''\">Brandon Freeman</t> 你好！"
+"<br/><br/>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
 "                你好！<br/>\n"
@@ -455,8 +455,8 @@ msgid ""
 "title=\"Unhappy\"/>"
 msgstr ""
 "<i class=\"oi oi-fw o_button_icon text-success\" data-"
-"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" title=\"滿"
-"意\"/>\n"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" title=\"滿意"
+"\"/>\n"
 "                            <i class=\"oi oi-fw o_button_icon text-warning\" "
 "data-icon=\"sentiment_neutral\" invisible=\"rating_avg &lt; 2.33 or "
 "rating_avg &gt;= 3.66\" title=\"中性\"/>\n"
@@ -478,8 +478,8 @@ msgid ""
 "title=\"Unhappy\"/>"
 msgstr ""
 "<i class=\"oi oi-fw o_button_icon text-success\" data-"
-"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" title=\"滿"
-"意\"/>\n"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" title=\"滿意"
+"\"/>\n"
 "                            <i class=\"oi oi-fw o_button_icon text-warning\" "
 "data-icon=\"sentiment_neutral\" invisible=\"rating_avg &lt; 2.33 or "
 "rating_avg &gt;= 3.66\" title=\"中性\"/>\n"
@@ -1678,8 +1678,8 @@ msgid ""
 msgstr ""
 "支援請求到達此階段時，會自動向客戶發送電子郵件。\n"
 "預設情況下，電子郵件將從技術支援團隊的電郵別名發送。\n"
-"否則，會以公司的電郵地址，或使用泛郵箱（catchall，正如系統參數中所定義）發送"
-"。"
+"否則，會以公司的電郵地址，或使用泛郵箱（catchall，正如系統參數中所定義）發"
+"送。"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_domain
@@ -1714,7 +1714,8 @@ msgstr "為支援團隊啟用「客戶評分」功能"
 msgid ""
 "Enter the <b>subject</b> of your ticket <br/><i>(e.g. Problem with my "
 "installation, Wrong order, etc.).</i>"
-msgstr "輸入支援請求的<b>主題</b><br/>（例如：安裝發生問題、訂單出錯，等等）<i></i>"
+msgstr ""
+"輸入支援請求的<b>主題</b><br/>（例如：安裝發生問題、訂單出錯，等等）<i></i>"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_status__exceeded_hours
@@ -2742,8 +2743,8 @@ msgid ""
 "necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"載有該別名的母項模型。載有別名參照的模型，不一定是 alias_model_id 提供的模型"
-"，例如：專案（parent_model）與任務（model）"
+"載有該別名的母項模型。載有別名參照的模型，不一定是 alias_model_id 提供的模"
+"型，例如：專案（parent_model）與任務（model）"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__partner_ticket_ids
@@ -3292,12 +3293,6 @@ msgid "Security Token"
 msgstr "安全金鑰"
 
 #. module: helpdesk
-#. odoo-javascript
-#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
-msgid "Select the <b>customer</b> of your ticket."
-msgstr "選擇支援請求的<b>客戶</b>。"
-
-#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Self-Service"
 msgstr "自助服務"
@@ -3327,9 +3322,9 @@ msgid ""
 "team. Automatically send an email to customers when a ticket reaches a "
 "specific stage in a helpdesk team by setting this template on that stage."
 msgstr ""
-"向客戶發送確認電子郵件，通知他們技術支援請求已收到，目前正由技術支援團隊審視"
-"。在特定階段設定此範本，當支援請求到達支援團隊中的該階段時，自動向客戶發送電"
-"子郵件。"
+"向客戶發送確認電子郵件，通知他們技術支援請求已收到，目前正由技術支援團隊審"
+"視。在特定階段設定此範本，當支援請求到達支援團隊中的該階段時，自動向客戶發送"
+"電子郵件。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -3618,7 +3613,8 @@ msgstr "此"
 msgid ""
 "This is a name that helps you keep track of your different campaign efforts, "
 "e.g. Fall_Drive, Christmas_Special"
-msgstr "這是一個幫助您追蹤不同行銷活動的名稱，例如，Fall_Drive、Christmas_Special"
+msgstr ""
+"這是一個幫助您追蹤不同行銷活動的名稱，例如，Fall_Drive、Christmas_Special"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__medium_id
@@ -3922,7 +3918,8 @@ msgstr "追蹤客戶對技術支援的滿意度"
 msgid ""
 "Track the performance of your teams, the success rate of your tickets, and "
 "how quickly you reach your service level agreements (SLAs)."
-msgstr "追蹤團隊的績效表現、支援服務的成功率，以及達至服務水平協議（SLA）的速度。"
+msgstr ""
+"追蹤團隊的績效表現、支援服務的成功率，以及達至服務水平協議（SLA）的速度。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -4163,7 +4160,8 @@ msgstr ""
 msgid ""
 "You cannot delete stages containing tickets. You can either archive them or "
 "first delete all of their tickets."
-msgstr "不可刪除包含支援請求的階段。你可封存它們，或者先刪除它們的所有支援請求。"
+msgstr ""
+"不可刪除包含支援請求的階段。你可封存它們，或者先刪除它們的所有支援請求。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
@@ -4283,8 +4281,8 @@ msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name or "
 "'Helpdesk' }}: Service Rating Request"
 msgstr ""
-"{{ object.company_id.name or object.user_id.company_id.name or '技術支援' }}"
-"：服務評分請求"
+"{{ object.company_id.name or object.user_id.company_id.name or '技術支"
+"援' }}：服務評分請求"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.new_ticket_request_email_template
@@ -4296,6 +4294,9 @@ msgstr "{{ object.name }}"
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 msgid "👤 Unassigned"
 msgstr "👤 未指派"
+
+#~ msgid "Select the <b>customer</b> of your ticket."
+#~ msgstr "選擇支援請求的<b>客戶</b>。"
 
 #~ msgid "Auto Assigment"
 #~ msgstr "自動分配"

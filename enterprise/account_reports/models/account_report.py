@@ -2192,6 +2192,7 @@ class AccountReport(models.Model):
     ####################################################
     def _init_options_export_mode(self, options, previous_options):
         options['export_mode'] = previous_options.get('export_mode')
+        options['export_format'] = previous_options.get('export_format')
 
     def _init_options_export(self, options, previous_options):
         options['report_title'] = previous_options.get('report_title')
@@ -6709,6 +6710,13 @@ class AccountReport(models.Model):
             return self.env['account.report'].browse([section['id'] for section in options['sections']])
         return self
 
+    def _get_documents_to_print(self, options, lines):
+        # This method should be overridden to split the lines of a report into several documents (each rendered on its own pages) in the final PDF export.
+        custom_handler_model = self._get_custom_handler_model()
+        if custom_handler_model and hasattr(self.env[custom_handler_model], '_get_documents_to_print'):
+            return self.env[custom_handler_model]._get_documents_to_print(self, options, lines)
+        return [(options, lines)]
+
     def _get_specific_paperformat_args(self, options):
         # This method should be overridden in a report in order to customize paper format arguments (e.g., margins, header spacing) passed to wkhtmltopdf for PDF generation.
         return {
@@ -6728,7 +6736,7 @@ class AccountReport(models.Model):
             'app_version': version,
         }
 
-        print_options = self.get_options(previous_options={**options, 'export_mode': 'print'})
+        print_options = self.get_options(previous_options={**options, 'export_mode': 'print', 'export_format': 'pdf'})
         reports_to_print = self._get_reports_to_print(print_options)
 
         reports_options = []
@@ -6754,11 +6762,13 @@ class AccountReport(models.Model):
                 handler = self.env[custom_handler_model] if (
                     custom_handler_model and hasattr(self.env[custom_handler_model], '_get_pdf_export_html')
                 ) else report
-                bodies.append(handler._get_pdf_export_html(
-                    report_options,
-                    report._filter_out_folded_children(report._get_lines(report_options)),
-                    additional_context={'base_url': base_url}
-                ))
+                lines = report._filter_out_folded_children(report._get_lines(report_options))
+                for document_options, document_lines in report._get_documents_to_print(report_options, lines):
+                    bodies.append(handler._get_pdf_export_html(
+                        document_options,
+                        document_lines,
+                        additional_context={'base_url': base_url}
+                    ))
 
             pdf_bytes = action_report._run_pdf_engine_without_processing(
                 engine_name,
@@ -6798,8 +6808,6 @@ class AccountReport(models.Model):
             return footer_html.decode()
 
     def _get_pdf_export_html(self, options, lines, additional_context=None, template=None):
-        report_info = self.get_report_information(options)
-
         custom_print_templates = options['custom_display_config'].get('pdf_export', {})
         template = custom_print_templates.get('pdf_export_main', 'account_reports.pdf_export_main')
 
@@ -6835,7 +6843,7 @@ class AccountReport(models.Model):
             for line in lines:
                 line.update_values(last_comment=last_annotations.get(line.id))
         else:
-            render_values['annotations'] = self._build_annotations_list_for_pdf_export(lines, report_info['annotations'])
+            render_values['annotations'] = self._build_annotations_list_for_pdf_export(lines, self._get_annotations(options, lines))
 
         options['css_custom_class'] = options['custom_display_config'].get('css_custom_class', '')
 
@@ -6899,7 +6907,7 @@ class AccountReport(models.Model):
             'strings_to_formulas': False,
         })
 
-        print_options = self.get_options(previous_options={**options, 'export_mode': 'print'})
+        print_options = self.get_options(previous_options={**options, 'export_mode': 'print', 'export_format': 'xlsx'})
         if print_options['sections']:
             reports_to_print = self.env['account.report'].browse([section['id'] for section in print_options['sections']])
         else:
@@ -7232,7 +7240,7 @@ class AccountReport(models.Model):
                 columns += [line.horizontal_group_total_data or AccountReportColumnData(name=0)]
             company_currency = self.env.company.currency_id
             for x, column in enumerate(columns, start=x_offset):
-                cell_value = column.name or ''
+                cell_value = column.name if column.name is not None else ''
                 cell_type = 'text'
                 if column.figure_type == 'monetary' and isinstance(cell_value, float):
                     currency = column.currency or company_currency
@@ -7874,7 +7882,7 @@ class AccountReport(models.Model):
         ]
 
         # tag_ids already linked to an account - avoid several search_count to know if the tag is used or not
-        tag_ids_linked_to_account = set(AccountAccount.search([('tag_ids', '!=', False)]).tag_ids.ids)
+        tag_ids_linked_to_account = set(AccountAccount.search([*common_account_domain, ('tag_ids', '!=', False)]).tag_ids.ids)
 
         expressions = self.line_ids.expression_ids._expand_aggregations()
         for i, expr in enumerate(expressions):
@@ -7892,7 +7900,7 @@ class AccountReport(models.Model):
                             continue
                         operand[0] = operand[0].replace('account_id.', '')
                         # Check that the code exists in the CoA
-                        if operand[0] == 'code' and not AccountAccount.search_count([operand]):
+                        if operand[0] == 'code' and not AccountAccount.search_count([*common_account_domain, operand]):
                             non_existing_codes[operand[2]] |= expr.report_line_id
                         elif operand[0] == 'tag_ids':
                             tag_ids = operand[2]
@@ -7908,7 +7916,10 @@ class AccountReport(models.Model):
                                     lines_using_bad_operator_per_tag[f'{tag.name} ({tag.id}) - Operator: {operand[1]}'] |= expr.report_line_id
 
                     accounts_domain.append(operand)
-                reported_accounts += AccountAccount.search(accounts_domain)
+                reported_accounts += AccountAccount.search([
+                    *common_account_domain,
+                    *accounts_domain,
+                ])
             elif expr.engine == "account_codes":
                 account_codes = []
                 for token in ACCOUNT_CODES_ENGINE_SPLIT_REGEX.split(expr.formula.replace(' ', '')):

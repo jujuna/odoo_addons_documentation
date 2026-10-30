@@ -148,6 +148,7 @@ CURRENCY_PROVIDER_SELECTION = [
     (['AE'], 'cbuae', '[AE] Central Bank of the UAE'),
     (['AZ'], 'cbar', '[AZ] Central Bank of Azerbaijan'),
     (['BG'], 'bnb', '[BG] Bulgaria National Bank'),
+    (['BH'], 'cbb', '[BH] Central Bank of Bahrain'),
     (['BR'], 'bbr', '[BR] Central Bank of Brazil'),
     (['CA'], 'boc', '[CA] Bank of Canada'),
     (['CH'], 'fta', '[CH] Federal Tax Administration of Switzerland'),
@@ -429,6 +430,27 @@ class ResCompany(models.Model):
 
         if 'AED' in available_currency_names:
             rslt['AED'] = (1.0, date_rate)
+        return rslt
+
+    def _parse_cbb_data(self, available_currencies):
+        """This method is used to update the currencies by using the Central Bank of Bahrain API.
+            Exchange rates are expressed as the value of 1 BHD in the available currencies.
+        """
+        iap_proxy_url = self.env['ir.config_parameter'].sudo().get_param('currency_rate_live.iap_proxy_url', PROXY_URL)
+        currency_data = iap_jsonrpc(f'{iap_proxy_url}/api/currency_rate/1/get_currency_rates', params={'provider': 'cbb'})
+
+        rslt = {}
+        date_rate = None
+        available_currency_names = set(available_currencies.mapped('name'))
+        for date_str, rates in currency_data.items():
+            for code, rate in rates.items():
+                if code in available_currency_names:
+                    date_rate = datetime.datetime.strptime(date_str, "%d-%b-%Y").date()
+                    rate = float(rate) or 1.0
+                    rslt[code] = (1.0 / rate, date_rate)
+
+        if rslt and date_rate and 'BHD' in available_currency_names:
+            rslt['BHD'] = (1.0, date_rate)
         return rslt
 
     def _parse_cbar_data(self, available_currencies):
@@ -991,7 +1013,8 @@ class ResCompany(models.Model):
         rate = float(tree.find(f'.//{{{generic_ns}}}ObsValue').get('value'))
 
         time_period = tree.find(f'.//{{{generic_ns}}}ObsDimension').get('value')
-        date = fields.Date.to_string(datetime.datetime.strptime(time_period, '%Y%m%d'))
+        trm_date = datetime.datetime.strptime(time_period, '%Y%m%d').date()
+        date = trm_date - datetime.timedelta(days=1)  # rates are shifted by one day
 
         return {'COP': (1, date), 'USD': (1.0 / rate, date)}
 

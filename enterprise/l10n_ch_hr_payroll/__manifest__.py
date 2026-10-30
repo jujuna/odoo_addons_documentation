@@ -91,7 +91,10 @@ Switzerland Payroll Rules.
         ],
         'web.report_assets_common': [
             'l10n_ch_hr_payroll/static/src/scss/*',
-        ]
+        ],
+        'web.assets_tests': [
+            'l10n_ch_hr_payroll/static/tests/tours/*',
+        ],
     },
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -31,6 +31,9 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
             'file_export_type': 'XML',
         })
 
+    def _get_ignored_partner_vat_prefix(self):
+        return None if self.env.company.account_fiscal_country_id.code == 'FR' else super()._get_ignored_partner_vat_prefix()
+
     def l10n_fr_intrastat_open_export_wizard(self, options):
         if self.env.company.currency_id.display_name != 'EUR':
             raise UserError(_('The currency of the company must be EUR to generate the XML export'))

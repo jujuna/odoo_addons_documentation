@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.4a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"POT-Creation-Date: 2026-10-23 17:50+0000\n"
 "PO-Revision-Date: 2026-09-18 04:47+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
@@ -44,6 +44,7 @@ msgstr "ละทิ้ง"
 
 #. module: pos_sale_planning
 #: model:ir.model.fields,field_description:pos_sale_planning.field_planning_slot__display_name
+#: model:ir.model.fields,field_description:pos_sale_planning.field_pos_config__display_name
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_order__display_name
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_payment_method__display_name
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_session__display_name
@@ -56,6 +57,7 @@ msgstr "ชื่อที่ใช้แสดง"
 
 #. module: pos_sale_planning
 #: model:ir.model.fields,field_description:pos_sale_planning.field_planning_slot__id
+#: model:ir.model.fields,field_description:pos_sale_planning.field_pos_config__id
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_order__id
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_payment_method__id
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_session__id
@@ -108,6 +110,11 @@ msgstr "การขายหน้าร้านอื่นๆ (%(account_nam
 #: model_terms:ir.ui.view,arch_db:pos_sale_planning.view_order_form_inherit_pos_sale_planning
 msgid "PoS Orders"
 msgstr "คำสั่งการขายหน้าร้าน"
+
+#. module: pos_sale_planning
+#: model:ir.model,name:pos_sale_planning.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr ""
 
 #. module: pos_sale_planning
 #: model:ir.model,name:pos_sale_planning.model_pos_order
@@ -184,8 +191,8 @@ msgid ""
 "The invoice for this order will be generated in the related Sales Order, "
 "because you used a payment method linked to a resource."
 msgstr ""
-"ใบแจ้งหนี้สำหรับคำสั่งซื้อนี้จะถูกสร้างขึ้นในคำสั่งขายที่เกี่ยวข้อง เนื่องจากคุณได้ใช้วิธีการชำระเงินที่เชื่อม"
-"โยงกับทรัพยากร"
+"ใบแจ้งหนี้สำหรับคำสั่งซื้อนี้จะถูกสร้างขึ้นในคำสั่งขายที่เกี่ยวข้อง "
+"เนื่องจากคุณได้ใช้วิธีการชำระเงินที่เชื่อมโยงกับทรัพยากร"
 
 #. module: pos_sale_planning
 #: model:ir.model.fields,help:pos_sale_planning.field_pos_payment_method__resource_ids
@@ -194,8 +201,14 @@ msgid ""
 "the user will be able to choose on the POS which one to use when validating "
 "an order with this payment method."
 msgstr ""
-"ทรัพยากรการวางแผนที่เชื่อมโยงกับวิธีการชำระเงินนี้ หากมีหลายตัวเลือก ผู้ใช้จะสามารถเลือกบนการขา"
-"ยหน้าร้านได้ว่าจะใช้ตัวเลือกใดเมื่อยืนยันคำสั่งซื้อด้วยวิธีการชำระเงินนี้"
+"ทรัพยากรการวางแผนที่เชื่อมโยงกับวิธีการชำระเงินนี้ หากมีหลายตัวเลือก "
+"ผู้ใช้จะสามารถเลือกบนการขายหน้าร้านได้ว่าจะใช้ตัวเลือกใดเมื่อยืนยันคำสั่งซื้อด้วยวิธีการชำระเงินนี้"
+
+#. module: pos_sale_planning
+#. odoo-python
+#: code:addons/pos_sale_planning/models/pos_payment_method.py:0
+msgid "Transfer to Room"
+msgstr ""
 
 #. module: pos_sale_planning
 #: model:ir.model.fields,field_description:pos_sale_planning.field_pos_payment_method__type
@@ -210,8 +223,8 @@ msgid ""
 "lines coming from a sale order. You can split the order if you want to pay "
 "the other lines with this payment method."
 msgstr ""
-"คุณไม่สามารถเพิ่มวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรได้เมื่อคำสั่งซื้อมีรายการที่มาจากคำสั่งขาย คุณส"
-"ามารถแบ่งคำสั่งซื้อได้หากต้องการชำระรายการอื่นด้วยวิธีการชำระเงินนี้"
+"คุณไม่สามารถเพิ่มวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรได้เมื่อคำสั่งซื้อมีรายการที่มาจากคำสั่งขาย "
+"คุณสามารถแบ่งคำสั่งซื้อได้หากต้องการชำระรายการอื่นด้วยวิธีการชำระเงินนี้"
 
 #. module: pos_sale_planning
 #. odoo-javascript
@@ -219,8 +232,7 @@ msgstr ""
 msgid ""
 "You cannot add another payment method if there is already a resource-linked "
 "payment on the order."
-msgstr ""
-"คุณไม่สามารถเพิ่มวิธีการชำระเงินอื่นได้หากในคำสั่งซื้อนั้นมีวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรอยู่แล้ว"
+msgstr "คุณไม่สามารถเพิ่มวิธีการชำระเงินอื่นได้หากในคำสั่งซื้อนั้นมีวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรอยู่แล้ว"
 
 #. module: pos_sale_planning
 #. odoo-javascript
@@ -228,8 +240,7 @@ msgstr ""
 msgid ""
 "You cannot create an invoice for an order that will be paid with a resource-"
 "linked payment method."
-msgstr ""
-"คุณไม่สามารถสร้างใบแจ้งหนี้สำหรับคำสั่งซื้อที่จะชำระด้วยวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรได้"
+msgstr "คุณไม่สามารถสร้างใบแจ้งหนี้สำหรับคำสั่งซื้อที่จะชำระด้วยวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรได้"
 
 #. module: pos_sale_planning
 #. odoo-javascript
@@ -237,8 +248,7 @@ msgstr ""
 msgid ""
 "You cannot edit the payment if there is a resource-linked payment method on "
 "the order."
-msgstr ""
-"คุณไม่สามารถแก้ไขการชำระเงินได้หากในคำสั่งซื้อมีวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากร"
+msgstr "คุณไม่สามารถแก้ไขการชำระเงินได้หากในคำสั่งซื้อมีวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากร"
 
 #. module: pos_sale_planning
 #. odoo-javascript
@@ -246,8 +256,7 @@ msgstr ""
 msgid ""
 "You cannot pay with a resource-linked payment method if there are already "
 "other payments."
-msgstr ""
-"คุณไม่สามารถชำระเงินด้วยวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรได้หากมีการชำระเงินอื่นอยู่แล้ว"
+msgstr "คุณไม่สามารถชำระเงินด้วยวิธีการชำระเงินที่เชื่อมโยงกับทรัพยากรได้หากมีการชำระเงินอื่นอยู่แล้ว"
 
 #. module: pos_sale_planning
 #. odoo-python
@@ -264,8 +273,7 @@ msgstr ""
 msgid ""
 "You cannot use more than one payment method when one of them is linked to a "
 "resource"
-msgstr ""
-"คุณไม่สามารถใช้วิธีการชำระเงินมากกว่าหนึ่งวิธีได้ หากหนึ่งในนั้นถูกเชื่อมโยงกับทรัพยากร"
+msgstr "คุณไม่สามารถใช้วิธีการชำระเงินมากกว่าหนึ่งวิธีได้ หากหนึ่งในนั้นถูกเชื่อมโยงกับทรัพยากร"
 
 #. module: pos_sale_planning
 #. odoo-python

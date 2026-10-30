@@ -103,7 +103,7 @@ class SaleCommissionReport(models.Model):
         }
         if self.plan_id.user_type == 'team':
             team_ids = self.env['crm.team'].search([('user_id', '=', self.user_id.id)])
-            context.update({'commission_team_ids': self.user_id.sale_team_id.ids + team_ids.ids})
+            context.update({'commission_team_ids': self.plan_id.team_id.ids + team_ids.ids})
         else:
             if self.plan_id.target_type == 'static':
                 user_ids = self.user_id.ids

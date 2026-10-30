@@ -138,6 +138,8 @@ class PhoneServiceEventCase(PbxScenarioMixin, VoipPhoneServiceCase):
         )
         if event:
             event._process_event()
+            # The pushes leave once the event's transaction commits.
+            self.env.cr.postcommit.run()
 
     def add_member(self, login="bob", name="Bob Bristow",
                    phone="+3281234599", user_uuid=UUID_BOB):
@@ -1139,6 +1141,7 @@ class TestNotificationPayload(PhoneServiceEventCase):
         call = self.call_of("bernard")
         with patch(NOTIFY_SEND) as send:
             call._notify_devices()
+            self.env.cr.postcommit.run()
         data = send.call_args.args[0]
         self.assertEqual(data["control_handle"], CONVERSATION)
         self.assertEqual(data["control_handle"], call.control_handle)
@@ -1442,6 +1445,30 @@ class TestVoipPhoneServiceEventWebhookRoundtrip(VoipPhoneServiceCase):
         bus_messages = self.env["bus.bus"].sudo().search(
             [("message", "like", "event_not_processed")])
         self.assertEqual(len(bus_messages), 1)
+
+    def test_failed_processing_notifies_the_other_party_number(self):
+        """The user is told about the call with their correspondent, whichever
+        side placed it: on the leg of a call the user placed, the caller id is
+        their own."""
+        for label, payload, number in (
+            ("incoming", self._payload(), self.partner_phone),
+            ("outgoing", self._payload(
+                direction="outbound",
+                is_caller=True,
+                dialed_extension=self.partner_phone,
+                caller_id_number=self.user.voip_username,
+                peer_caller_id_number=self.partner_phone,
+            ), self.partner_phone),
+        ):
+            with (
+                self.subTest(label),
+                patch(PROCESS_EVENT, side_effect=ValueError("boom")),
+                mute_logger(EVENT_LOGGER),
+            ):
+                self._receive("call_created", payload)
+                bus_message = self.env["bus.bus"].sudo().search(
+                    [("message", "like", "event_not_processed")], order="id desc", limit=1)
+                self.assertEqual(json.loads(bus_message.message)["payload"]["from"], number)
 
     def test_failed_processing_rolls_back_partial_writes(self):
         # _ensure_leg fails after the conversation and the call were created:

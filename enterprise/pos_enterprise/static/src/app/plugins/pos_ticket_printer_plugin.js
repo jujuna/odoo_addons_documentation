@@ -40,11 +40,11 @@ patch(PosTicketPrinterPlugin.prototype, {
         }
         return [linesData];
     },
-    async printOrderChanges({ order, opts = {}, printers = this.config.preparation_printer_ids }) {
+    async printOrderChanges({ opts = {}, ...params }) {
         if (opts.prepOrderLines) {
             opts.orderChange = this.getPreparationReceiptData(opts.prepOrderLines);
             opts.skipRetry = true;
         }
-        return super.printOrderChanges({ order, opts, printers });
+        return super.printOrderChanges({ opts, ...params });
     },
 });

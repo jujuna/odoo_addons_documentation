@@ -71,6 +71,8 @@ class L10n_Eu_OssTaxReportHandler(models.AbstractModel):
         lines = super()._dynamic_lines_generator(report, options, all_column_groups_expression_totals, warnings=warnings)
 
         rslt = []
+        france = self.env.ref('base.fr')
+        monaco = self.env.ref('base.mc')
         tax_type_markups = {'sale', 'purchase'}
         tax_lines_by_country = defaultdict(lambda: [])
         last_tax_type_line = None
@@ -92,6 +94,8 @@ class L10n_Eu_OssTaxReportHandler(models.AbstractModel):
                 tax = self.env['account.tax'].browse(model_id)
                 # TODO: handle taxes shared by the fiscal positions of multiple countries
                 tax_oss_country = tax.fiscal_position_ids.country_id or tax.fiscal_position_ids.country_group_id.country_ids
+                if monaco in tax_oss_country:
+                    tax_oss_country = (tax_oss_country - monaco) | france
 
                 if not tax_oss_country:
                     raise UserError(_("Tax %s is used on some OSS-tagged journal items in the period, but is not mapped by any fiscal position with a country set.", tax.display_name))

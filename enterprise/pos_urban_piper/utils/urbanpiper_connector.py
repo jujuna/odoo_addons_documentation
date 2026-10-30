@@ -91,7 +91,7 @@ class UrbanPiperConnector:
         base_url = self.sudo_env['ir.config_parameter'].get_str('web.base.url')
         db_uuid = self.sudo_env['ir.config_parameter'].get_str('database.uuid')
         self.store.is_webhook_register = True
-        self.env.cr.commit()
+        self.store.flush_recordset(['is_webhook_register'])
 
         webhook_url = f'{base_url}/pos_urban_piper/v1/{db_uuid}/'
         if not self.is_production:
@@ -241,9 +241,9 @@ class UrbanPiperConnector:
         response = self.make_request(endpoint, 'POST', data=data)
         if response.get('status') == 'success':
             self.store._update_urbanpiper_synced_json(products)
-            # for tracking a date & time of menu syncing
+            # Track who initiated the menu synchronization request and when it was requested.
             self.store.message_post(
-                body=_('Store menu successfully synced on UrbanPiper (%s products)', len(data['items']))
+                body=self.env._('Menu sync initiated on UrbanPiper.')
             )
             self.post_category_timing_groups(products.pos_categ_ids)
         return response

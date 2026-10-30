@@ -11,7 +11,7 @@ export class OboxActionButton extends Component {
 
     props = useProps({
         ...standardWidgetProps,
-        function: t.string(),
+        function: t.string().optional(),
         class: t.string().optional(),
         delete: t.boolean().optional(false),
     });

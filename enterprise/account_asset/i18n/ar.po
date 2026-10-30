@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:50+0000\n"
-"PO-Revision-Date: 2026-09-17 23:28+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-10-23 11:39+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "account_asset/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -38,30 +38,36 @@ msgid ""
 "Keeps track of depreciations, and creates corresponding journal entries.\n"
 "\n"
 msgstr ""
+"\n"
+"إدارة الأصول\n"
+"=================\n"
+"يمكنك إدارة الأصول التي تملكها شركة أو شخص.\n"
+"يقوم بمتابعة الإهلاكات، وينشئ قيود يومية مناظِرة.\n"
+"\n"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants cancelled."
-msgstr ""
+msgstr " تم إلغاء جميع المتغيرات."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants reopened."
-msgstr ""
+msgstr " تم إعادة فتح جميع المتغيرات."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid " All variants set to draft."
-msgstr ""
+msgstr " تم تعيين جميع المتغيرات إلى حالة \"مسودة\"."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid " in journal %s"
-msgstr ""
+msgstr " في دفتر اليومية %s"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__total_depreciation_entries_count
@@ -87,6 +93,8 @@ msgstr "عدد قيود الإهلاك المُرحلة"
 msgid ""
 "%(asset)s does not depreciate, so no ledger depreciation can be based on it."
 msgstr ""
+"تعذر حساب الإهلاك المالي نظرًا لأن الأصل %(asset)s غير قابل للإهلاك، ولا يمكن "
+"تسجيل أي قيود إهلاك دفتري مرتبطة به."
 
 #. module: account_asset
 #. odoo-python
@@ -104,13 +112,13 @@ msgstr "%(asset)s: البيع"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(asset_name)s - %(journal_name)s"
-msgstr ""
+msgstr "%(asset_name)s - %(journal_name)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(pause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(pause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
@@ -119,24 +127,26 @@ msgid ""
 "%(progress_factor)s%(duration)s%(method)s%(prorata_name)s%(salvage_percent)s%"
 "(journal_name)s"
 msgstr ""
+"%(progress_factor)s%(duration)s%(method)s%(prorata_name)s%(salvage_percent)s%"
+"(journal_name)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "%(unpause_message)s%(variant_message)s%(note)s"
-msgstr ""
+msgstr "%(unpause_message)s%(variant_message)s%(note)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant)s confirmed with %(model)s%(journal_message)s"
-msgstr ""
+msgstr "%(variant)s تم تأكيده مع %(model)s%(journal_message)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "%(variant_name)s Cancellation:"
-msgstr ""
+msgstr "%(variant_name)sالإلغاء:"
 
 #. module: account_asset
 #. odoo-python
@@ -156,19 +166,19 @@ msgstr "%s: الإهلاك"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "(Choose Account)"
-msgstr ""
+msgstr "(اختر الحساب)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
 msgid "(No Asset Group)"
-msgstr ""
+msgstr "(لا توجد مجموعة أصول)"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
 msgid "(No Root)"
-msgstr ""
+msgstr "(لا يوجد جذر)"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -185,12 +195,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "- %(model)s%(journal_message)s"
-msgstr ""
+msgstr "- %(model)s%(journal_message)s"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
 msgid "<span invisible=\"method_mode != 'rate'\"> per</span>"
-msgstr ""
+msgstr "<span invisible=\"method_mode != 'rate'\"> لكل</span>"
 
 #. module: account_asset
 #. odoo-python
@@ -199,6 +209,8 @@ msgid ""
 "A Recovery Account is required on the depreciation model %(model)s: its "
 "journal %(journal)s belongs to the ledger %(ledger)s."
 msgstr ""
+"يلزم وجود حساب استرداد في نموذج الاستهلاك %(model)s: حيث ينتمي دفتر اليومية "
+"الخاص به %(journal)s إلى دفتر الأستاذ %(ledger)s."
 
 #. module: account_asset
 #. odoo-python
@@ -208,8 +220,8 @@ msgid ""
 "> %(extra_text)s Future entries will be recomputed to depreciate the asset "
 "following the changes."
 msgstr ""
-"سيتم ترحيل إحدى قيود الإهلاك بتاريخ %(date)s. <br/> %(extra_text)s سيتم احتساب "
-"القيود المستقبلية لإهلاك الأصل الذي يتبع التغييرات."
+"سيتم ترحيل إحدى قيود الإهلاك بتاريخ %(date)s. <br/> %(extra_text)s سيتم "
+"احتساب القيود المستقبلية لإهلاك الأصل الذي يتبع التغييرات."
 
 #. module: account_asset
 #. odoo-python
@@ -268,6 +280,11 @@ msgid ""
 "will begin from <strong>%(date)s</strong> using the depreciation parameters "
 "configured on the new account."
 msgstr ""
+"سيقوم قيد اليومية بنقل قيمة الأصل من <strong><em>\"%(old_account)s\"</em></"
+"strong> إلى <strong><em>\"%(new_account)s\"</em></strong> في <strong>%"
+"(date)s</strong>.<br/> سيتم إغلاق الأصل الحالي وإنشاء أصل جديد بنفس القيمة "
+"الدفترية.<br/> سيبدأ الإهلاك من <strong>%(date)s</strong> باستخدام معايير "
+"الإهلاك المهيأة في الحساب الجديد."
 
 #. module: account_asset
 #. odoo-python
@@ -292,8 +309,8 @@ msgid ""
 "A non deductible tax value of %(tax_value)s was added to %(name)s's initial "
 "value of %(purchase_value)s"
 msgstr ""
-"تمت إضافة قيمة ضريبة غير قابلة للخصم %(tax_value)s إلى قيمة %(name)s المبدئية"
-"، وهي %(purchase_value)s"
+"تمت إضافة قيمة ضريبة غير قابلة للخصم %(tax_value)s إلى قيمة %(name)s "
+"المبدئية، وهي %(purchase_value)s"
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_account
@@ -304,24 +321,8 @@ msgstr "الحساب"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid ""
-"Account %(account)s should have accumulated depreciation and depreciation "
-"expense accounts set in order to generate an asset"
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
 "Account %(name)s cannot be used to create an asset. The account must be of "
 "the Fixed Asset type."
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Account %(name)s not setup to generate assets. Depreciation model and asset "
-"accounts need to be set on account."
 msgstr ""
 
 #. module: account_asset
@@ -578,7 +579,7 @@ msgstr "سيتم إنشاء أصل لزيادة قيمة الأصل. <br/>"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Analytic"
-msgstr ""
+msgstr "تحليلي "
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__analytic_distribution
@@ -595,7 +596,7 @@ msgstr "الدقة التحليلية"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.depreciation_ledger_wizard_form
 msgid "Apply"
-msgstr ""
+msgstr "تطبيق"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
@@ -743,7 +744,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset disposed. %(message)s"
-msgstr ""
+msgstr "تم التخلص من الأصل. %(message)s"
 
 #. module: account_asset
 #: model:account.return.check.template,name:account_asset.account_return_check_template_asset_movement_and_accounting_treatment
@@ -772,13 +773,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset sold. %(message)s See %(invoice_links)s"
-msgstr ""
+msgstr "تم بيع الأصل. %(message)s ألقِ نظرة على %(invoice_links)s"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset_variant.py:0
 msgid "Asset sold: %s"
-msgstr ""
+msgstr "الأصل المباع: %s"
 
 #. module: account_asset
 #. odoo-python
@@ -903,6 +904,11 @@ msgid "Can Create Asset"
 msgstr "يمكن إنشاء الأصل"
 
 #. module: account_asset
+#: model:ir.model.fields,field_description:account_asset.field_account_asset__can_edit_asset_accounts
+msgid "Can Edit Asset Accounts"
+msgstr ""
+
+#. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Cancel Asset"
 msgstr "إلغاء الأصل"
@@ -958,8 +964,8 @@ msgid ""
 "Check depreciation periods for new acquisitions and ensure consistency with "
 "similar assets. Document any changes in accounting methods."
 msgstr ""
-"تحقق من فترات الإهلاك للمقتنيات الجديدة وتأكد من اتساقها مع الأصول المماثلة. قم "
-"بتوثيق أي تغييرات في أساليب المحاسبة."
+"تحقق من فترات الإهلاك للمقتنيات الجديدة وتأكد من اتساقها مع الأصول المماثلة. "
+"قم بتوثيق أي تغييرات في أساليب المحاسبة."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__children_ids
@@ -978,6 +984,12 @@ msgid ""
 "  * Declining then Straight Line: Like Declining but with a minimum "
 "depreciation value equal to the straight line value."
 msgstr ""
+"اختر الطريقة لاستخدامها لاحتساب عدد بنود الإهلاك.\n"
+"  * بلا وصف\n"
+"  * القيمة الثابتة: يتم احتسابها على أساس: القيمة الكلية / المدة\n"
+"  * المنخفضة: يتم احتسابها على أساس: القيمة المتبقية * عامل الانخفاض\n"
+"  * الانخفاض ثم قيمة ثابتة: مثل القيمة المنخفضة ولكن مع قيمة إهلاك دنيا "
+"تساوي القيمة الثابتة."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_mode
@@ -1232,6 +1244,7 @@ msgstr "إهلاك"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Depreciation Account"
 msgstr "حساب الإهلاك"
 
@@ -1456,6 +1469,10 @@ msgid ""
 "align with tax requirements (e.g. linear depreciation, pro rata temporis "
 "application, no double declining for tax purposes)."
 msgstr ""
+"تأكد من الامتثال للقواعد الضريبية المحلية المتعلقة بالاستهلاك.\n"
+"احرص على توافق طرق الاستهلاك وفترة الاستهلاك وتواريخ البدء مع المتطلبات "
+"الضريبية (مثل: الاستهلاك الثابت، تطبيق طريقة الاستهلاك التناسبي، وعدم تطبيق "
+"طريقة الاستهلاك المتناقص المزدوج لأغراض ضريبية)."
 
 #. module: account_asset
 #. odoo-python
@@ -1473,8 +1490,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_variant__account_depreciation_expense_id
 #: model:ir.model.fields,field_description:account_asset.field_account_depreciation_model__ledger_expense_account_id
 #: model:ir.model.fields,field_description:account_asset.field_depreciation_ledger_wizard__expense_account_id
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Expense Account"
 msgstr "حساب النفقات"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr
+msgid "Financial instruments"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -1536,7 +1559,6 @@ msgstr "قيمة الربح"
 
 #. module: account_asset
 #. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "Go to Account"
 msgstr ""
@@ -1653,13 +1675,8 @@ msgstr ""
 msgid ""
 "Import your fixed assets' original data and their already accumulated "
 "depreciation."
-msgstr "قم باستيراد البيانات الأصلية لأصولك الثابتة واستهلاكها المتراكم بالفعل."
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid "Important Change"
 msgstr ""
+"قم باستيراد البيانات الأصلية لأصولك الثابتة واستهلاكها المتراكم بالفعل."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__already_depreciated_amount_import
@@ -1677,6 +1694,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__informational_text
 msgid "Informational Text"
 msgstr "نص معلوماتي"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass
+msgid "Intangible assets"
+msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__invoice_line_ids
@@ -1755,14 +1777,6 @@ msgid "Journal Items"
 msgstr "عناصر اليومية"
 
 #. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_move.py:0
-msgid ""
-"Journal Items of %(account)s should have a label in order to generate an "
-"asset"
-msgstr "يجب أن يكون لعناصر يومية %(account)s علامة تصنيف حتى تتمكن من إنشاء أصل"
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__journal_id
 msgid ""
 "Journal used for asset creation. The value is stored per company, so a model "
@@ -1773,7 +1787,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Journals"
-msgstr ""
+msgstr "دفاتر اليومية"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__write_uid
@@ -1803,7 +1817,7 @@ msgstr "الأنشطة المتأخرة"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Ledger"
-msgstr ""
+msgstr "دفاتر الأستاذ"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_account__ledger_depreciation_model_ids
@@ -1941,13 +1955,13 @@ msgstr "تعديل الإهلاكات"
 #. module: account_asset
 #: model:account.return.check.template,name:account_asset.account_return_check_template_monitoring_of_depreciation
 msgid "Monitoring of Depreciation "
-msgstr ""
+msgstr "مراقبة عمليات الإهلاك"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_period__1
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_period__1
 msgid "Month"
-msgstr ""
+msgstr "الشهر"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_form_asset_inherit
@@ -2076,9 +2090,12 @@ msgid "No Prorata"
 msgstr "بلاتناسب"
 
 #. module: account_asset
+#. odoo-javascript
 #. odoo-python
 #: code:addons/account_asset/models/account_assets_report.py:0
+#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method__no_depreciation
+#: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "No depreciation"
 msgstr ""
 
@@ -2181,8 +2198,8 @@ msgid ""
 "recorded for this period. Ensure assets are properly registered for "
 "automatic depreciation calculation."
 msgstr ""
-"يقوم أودو بإدارة إهلاك أصولك الثابتة. لم يتم تسجيل أي إهلاك لهذه الفترة. تأكد "
-"من تسجيل الأصول بشكل صحيح لحساب الإهلاك تلقائياً."
+"يقوم أودو بإدارة إهلاك أصولك الثابتة. لم يتم تسجيل أي إهلاك لهذه الفترة. "
+"تأكد من تسجيل الأصول بشكل صحيح لحساب الإهلاك تلقائياً."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__paused
@@ -2252,15 +2269,7 @@ msgstr "إيقاف التاريخ النسبي مؤقتاً"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_search
 msgid "Period"
-msgstr ""
-
-#. module: account_asset
-#. odoo-python
-#: code:addons/account_asset/models/account_depreciation_model.py:0
-msgid ""
-"Please note that by doing this, you will remove this model from other "
-"companies"
-msgstr ""
+msgstr "الفترة"
 
 #. module: account_asset
 #. odoo-python
@@ -2281,10 +2290,35 @@ msgid "Posted Entries"
 msgstr "القيود المُرحّلة"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_sale
+msgid "Proceeds from financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_sale
+msgid "Proceeds from sale of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_sale
+msgid "Proceeds from sale of property, plant and equipment"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_rou
+msgid "Proceeds from sale of right-of-use assets"
+msgstr ""
+
+#. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
 msgid "Properties"
 msgstr "الخصائص"
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe
+msgid "Property plant and equipment"
+msgstr ""
 
 #. module: account_asset
 #. odoo-python
@@ -2300,6 +2334,21 @@ msgid "Purchase"
 msgstr "الشراء"
 
 #. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_fin_instr_purch
+msgid "Purchase of financial instruments"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_int_ass_purch
+msgid "Purchase of intangible assets"
+msgstr ""
+
+#. module: account_asset
+#: model:account.report.line,name:account_asset.cash_flow_indirect_inv_ppe_purch
+msgid "Purchase of property, plant and equipment"
+msgstr ""
+
+#. module: account_asset
 #: model:account.report.column,name:account_asset.account_grouped_assets_report_duration_rate
 #: model:account.report.column,name:account_asset.asset_grouped_assets_report_duration_rate
 #: model:account.report.column,name:account_asset.assets_report_duration_rate
@@ -2307,7 +2356,7 @@ msgstr "الشراء"
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_mode__rate
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "Rate"
-msgstr ""
+msgstr "المعدل"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__rating_ids
@@ -2418,12 +2467,6 @@ msgid "Select Invoice Line"
 msgstr "تحديد بند الفاتورة"
 
 #. module: account_asset
-#. odoo-javascript
-#: code:addons/account_asset/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
-msgid "Select a Depreciation Model"
-msgstr ""
-
-#. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_depreciation_model__company_id
 msgid ""
 "Select a specific company to limit this model's use, or leave it empty to "
@@ -2527,7 +2570,7 @@ msgstr "خط مستقيم"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Sub-Assets"
-msgstr ""
+msgstr "الأصول الفرعية"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__book_value
@@ -2536,7 +2579,8 @@ msgid ""
 "Sum of the depreciable value, the salvage value and the book value of all "
 "value increase items"
 msgstr ""
-"إجمالي قيمة الإهلاك، القيمة المستردة والقيمة الدفترية لكافة عناصر زيادة القيمة"
+"إجمالي قيمة الإهلاك، القيمة المستردة والقيمة الدفترية لكافة عناصر زيادة "
+"القيمة"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__country_code
@@ -2563,6 +2607,8 @@ msgid ""
 "The accumulated depreciation account (contra-asset account). Must exist in "
 "Odoo and be of \"Fixed Asset\" or \"Non-current Assets\" type."
 msgstr ""
+"حساب الإهلاك المتراكم (حساب الأصل المعاكس). يجب أن يكون موجودًا في أودو وأن "
+"يكون من نوع ”الأصول الثابتة“ أو ”الأصول غير المتداولة“."
 
 #. module: account_asset
 #. odoo-python
@@ -2608,6 +2654,10 @@ msgid ""
 "Assets\" type with depreciation model, accumulated depreciation, and "
 "depreciation expense account set."
 msgstr ""
+"حساب الميزانية العمومية للأصل نفسه (على سبيل المثال، \"151000 الأصول "
+"الثابتة\"). يجب أن يكون موجودًا في Odoo وأن يكون من نوع \"الأصول الثابتة\" أو "
+"\"الأصول غير المتداولة\" مع نموذج الاستهلاك، والاستهلاك المتراكم، وحساب "
+"مصروفات الاستهلاك المحدد."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset_variant__children_ids
@@ -2635,8 +2685,8 @@ msgid ""
 "The estimated residual value of the asset at the end of its useful life. "
 "This amount will not be depreciated. Considered in company currency."
 msgstr ""
-"القيمة المتبقية المقدرة للأصل في نهاية عمره الإنتاجي. لن يتم إهلاك هذا المبلغ. "
-"يتم اعتباره بعملة الشركة."
+"القيمة المتبقية المقدرة للأصل في نهاية عمره الإنتاجي. لن يتم إهلاك هذا "
+"المبلغ. يتم اعتباره بعملة الشركة."
 
 #. module: account_asset
 #. odoo-python
@@ -2646,6 +2696,15 @@ msgid ""
 "\"630000 Depreciation Expenses\"). Must exist in Odoo and be of "
 "\"Depreciation\" or \"Expense\" type."
 msgstr ""
+"حساب النفقات الخاص بتسجيل قيود الإهلاك الدورية (على سبيل المثال، ”630000 "
+"نفقات الإهلاك“). يجب أن يكون موجودًا في أودو وأن يكون من نوع ”الإهلاك“ أو "
+"”النفقات“."
+
+#. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "The fixed asset account differs from the account on the bill. Click"
+msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__new_account_asset_id
@@ -2653,12 +2712,6 @@ msgid ""
 "The fixed asset account to transfer this asset to. The depreciation "
 "parameters of this account will be applied to the new asset."
 msgstr ""
-
-#. module: account_asset
-#: model:ir.model.fields,help:account_asset.field_account_asset_variant__method_number
-#: model:ir.model.fields,help:account_asset.field_account_depreciation_model__method_number
-msgid "The number of depreciations needed to depreciate your asset"
-msgstr "عدد الإهلاكات المطلوبة لإهلاك الأصل"
 
 #. module: account_asset
 #. odoo-python
@@ -2679,8 +2732,8 @@ msgid ""
 "The total amount of depreciation already recorded for the asset before "
 "import. This amount will be considered in company currency."
 msgstr ""
-"المبلغ الإجمالي للإهلاك المسجل بالفعل للأصل قبل الاستيراد. سيتم احتساب هذا المبلغ "
-"بعملة الشركة."
+"المبلغ الإجمالي للإهلاك المسجل بالفعل للأصل قبل الاستيراد. سيتم احتساب هذا "
+"المبلغ بعملة الشركة."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__invoice_line_ids
@@ -2835,14 +2888,15 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account_asset.selection__account_depreciation_model__method_period__12
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_period__12
 msgid "Year"
-msgstr ""
+msgstr "السنة "
 
 #. module: account_asset
 #. odoo-javascript
 #: code:addons/account_asset/static/src/views/fields/properties/properties_field.js:0
 msgid "You can add Property fields only on Assets with an Asset Model set."
 msgstr ""
-"لا يمكنك إضافة حقول الخصائص إلا في الأصول التي تحتوي على مجموعة لنموذج الأصول."
+"لا يمكنك إضافة حقول الخصائص إلا في الأصول التي تحتوي على مجموعة لنموذج "
+"الأصول."
 
 #. module: account_asset
 #. odoo-python
@@ -2915,7 +2969,8 @@ msgid ""
 "You cannot create an asset from lines containing credit and debit on the "
 "account or with a null amount"
 msgstr ""
-"لا يمكنك إنشاء أصل من البنود التي تحتوي على رصيد وخصم في الحساب أو بقيمة فارغة"
+"لا يمكنك إنشاء أصل من البنود التي تحتوي على رصيد وخصم في الحساب أو بقيمة "
+"فارغة"
 
 #. module: account_asset
 #. odoo-python
@@ -2982,13 +3037,13 @@ msgstr "account_asset_id"
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "account_depreciation_expense_id"
-msgstr ""
+msgstr "account_depreciation_expense_id"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/controller/asset_template_controller.py:0
 msgid "account_depreciation_id"
-msgstr ""
+msgstr "account_depreciation_id"
 
 #. module: account_asset
 #. odoo-python
@@ -3000,7 +3055,7 @@ msgstr "acquisition_date"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "activate_depreciation"
-msgstr ""
+msgstr "activate_depreciation"
 
 #. module: account_asset
 #. odoo-python
@@ -3098,6 +3153,12 @@ msgid "gain/loss"
 msgstr "الأرباح/الخسائر"
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/components/depreciation_schedule/warnings.xml:0
+msgid "here"
+msgstr ""
+
+#. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "loss"
@@ -3130,7 +3191,7 @@ msgstr "إيقاف"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
 msgid "per"
-msgstr ""
+msgstr "لكل"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_depreciation_model_form
@@ -3171,7 +3232,16 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/models/account_depreciation_model.py:0
 msgid "variant_ids.model_id"
-msgstr ""
+msgstr "variant_ids.model_id"
+
+#~ msgid ""
+#~ "Journal Items of %(account)s should have a label in order to generate an "
+#~ "asset"
+#~ msgstr ""
+#~ "يجب أن يكون لعناصر يومية %(account)s علامة تصنيف حتى تتمكن من إنشاء أصل"
+
+#~ msgid "The number of depreciations needed to depreciate your asset"
+#~ msgstr "عدد الإهلاكات المطلوبة لإهلاك الأصل"
 
 #~ msgid ""
 #~ "Account Type is used for information purpose, to generate country-"

@@ -73,7 +73,7 @@ class ShopeeItem(models.Model):
                             "stock_list": [
                                 {
                                     "model_id": int(item.shopee_model_identifier),
-                                    "seller_stock": [{"stock": int(item.product_id.free_qty)}],
+                                    "seller_stock": [{"stock": int(max(item.product_id.free_qty, 0))}],
                                 }
                                 for item in items
                             ],

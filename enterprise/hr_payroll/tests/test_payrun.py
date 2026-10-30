@@ -433,3 +433,22 @@ class TestPayrun(TestPayslipBase):
                 payrun_form.structure_id = self.developer_pay_structure
                 self.assertEqual(payrun_form.date_start, datetime.date(2025, 1, 16))
                 self.assertEqual(payrun_form.date_end, datetime.date(2025, 1, 31))
+
+    def test_work_time_report_from_payrun(self):
+        self.payrun_pikachu._generate_payslips()
+        action = self.payrun_pikachu.action_work_time_report()
+        self.assertEqual(action['context']['search_default_payslip_run_id'], self.payrun_pikachu.id)
+        self.assertEqual(action['context']['pivot_measures'], ['number_of_days', 'number_of_hours'])
+
+        groups = self.env['hr.payslip.worked_days'].with_context(action['context']).formatted_read_group(
+            action['domain'] + [('payslip_run_id', '=', self.payrun_pikachu.id)],
+            ['work_entry_type_id'],
+            ['number_of_days:sum'],
+        )
+        work_entry_types = self.payrun_pikachu.slip_ids.worked_days_line_ids.work_entry_type_id
+        self.assertTrue(work_entry_types)
+        self.assertCountEqual(
+            [group['work_entry_type_id'] for group in groups],
+            [(wet.id, f"{wet.name} [{wet.code}]") for wet in work_entry_types],
+        )
+        self.assertEqual(work_entry_types[0].display_name, work_entry_types[0].name)

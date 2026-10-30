@@ -48,11 +48,15 @@ class PlanningAttendanceAnalysisReport(models.Model):
                           0.0 AS allocated_hours
                      FROM hr_attendance A
                 LEFT JOIN hr_employee E ON E.id = A.employee_id
-                LEFT JOIN (
-                    SELECT DISTINCT ON (employee_id) *
+                -- version effective at the date of the entry (or the first one if none)
+                LEFT JOIN LATERAL (
+                    SELECT department_id
                     FROM hr_version
-                    ORDER BY employee_id, date_version DESC
-                ) V ON V.employee_id = E.id
+                    WHERE employee_id = E.id
+                      AND active
+                    ORDER BY date_version <= A.check_in::date DESC, ABS(date_version - A.check_in::date)
+                    LIMIT 1
+                ) V ON TRUE
                 UNION ALL
                    SELECT S.id AS id,
                           d::date AS entry_date,
@@ -74,11 +78,14 @@ class PlanningAttendanceAnalysisReport(models.Model):
                        ON R.planning_slot_id = S.id
                 LEFT JOIN hr_employee E
                        ON E.resource_id = R.resource_resource_id
-                LEFT JOIN (
-                    SELECT DISTINCT ON (employee_id) *
+                LEFT JOIN LATERAL (
+                    SELECT department_id
                     FROM hr_version
-                    ORDER BY employee_id, date_version DESC
-                ) V ON V.employee_id = E.id
+                    WHERE employee_id = E.id
+                      AND active
+                    ORDER BY date_version <= d::date DESC, ABS(date_version - d::date)
+                    LIMIT 1
+                ) V ON TRUE
                ) AS t
          WHERE t.employee_id IS NOT NULL
            AND entry_date <= CURRENT_DATE

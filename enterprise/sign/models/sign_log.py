@@ -85,7 +85,7 @@ class SignLog(models.Model):
             vals.update(self._prepare_vals_from_item(sign_request_item))
         for vals, sign_request in zip(vals_list_request, sign_requests):
             vals.update(self._prepare_vals_from_request(sign_request))
-        if self.env.context.get('logged_user_id'):
+        if 'logged_user_id' in self.env.context:
             user_id = self.env.context['logged_user_id']
         else:
             user_id = self.env.user.id if not self.env.user._is_public() else None

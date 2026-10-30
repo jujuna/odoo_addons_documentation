@@ -5,6 +5,7 @@ from freezegun import freeze_time
 
 from odoo.addons.mail.tests.common import mail_new_test_user
 
+from odoo.fields import Command
 from odoo.tests.common import HttpCase, tagged
 
 
@@ -14,6 +15,7 @@ class TestHrAppraisalFeedbackController(HttpCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env['res.lang']._activate_lang('en_US')
 
         cls.user = mail_new_test_user(
             cls.env,
@@ -71,6 +73,7 @@ class TestHrAppraisalFeedbackController(HttpCase):
             'questions_selection': 'all',
             'access_mode': 'public',
             'survey_type': 'appraisal',
+            'lang_ids': [Command.set(cls.env.ref('base.lang_en').ids)],
         })
         cls.question = cls.env['survey.question'].create({
             'survey_id': cls.appraisal_survey.id,

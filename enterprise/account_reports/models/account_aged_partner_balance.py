@@ -340,13 +340,11 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
                 ('residual_at_date', '!=', 0),
                 ('journal_id.type', '!=', journal_type_to_exclude.get(journal_type)),
                 *self._build_domain_from_period(options, params['expression_label']),
-                *report._get_options_domain(options, 'from_beginning'),
+                *report._get_options_domain(options | {'recon_date': None}, 'from_beginning'),
                 *report._get_audit_line_groupby_domain(params['calling_line_dict_id']),
             ]
             action['domain'] = domain
-            action['context'] = {
-                'recon_limit': options['date']['date_to'],
-            }
+            action['context'] = {}
             if recon_date := report._get_option_recon_date(options):
                 action['context']['search_default_open_on'] = recon_date.strftime('%Y-%m-%d')
         return action

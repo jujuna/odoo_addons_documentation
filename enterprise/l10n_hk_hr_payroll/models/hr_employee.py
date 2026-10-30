@@ -237,11 +237,8 @@ class HrEmployee(models.Model):
             employee.l10n_hk_rentals_count = employees_rentals_count.get(employee, 0)
 
     def _get_proxy_type(self):
-        self.ensure_one()
-        if self.l10n_hk_autopay_account_type == "bban":
-            return self.primary_bank_account_id.sanitized_account_number
-        else:
-            return self[f"l10n_hk_autopay_{self.l10n_hk_autopay_account_type}"]
+        """ Deprecated: use `_l10n_hk_get_autopay_proxy_id` instead. TODO: remove in master. """
+        return self._l10n_hk_get_autopay_proxy_id()
 
     def action_open_rentals(self):
         self.ensure_one()
@@ -256,6 +253,20 @@ class HrEmployee(models.Model):
             },
         })
         return action
+
+    def _l10n_hk_get_autopay_proxy_id(self):
+        self.ensure_one()
+        match self.l10n_hk_autopay_account_type:
+            case 'bban':
+                return self.primary_bank_account_id.sanitized_account_number
+            case 'svid':
+                return self.l10n_hk_autopay_svid
+            case 'emal':
+                return self.l10n_hk_autopay_email
+            case 'mobn':
+                return self.l10n_hk_autopay_mobile
+            case 'hkid':
+                return self.identification_id
 
     def _l10n_hk_get_468_rule_employees(self):
         """

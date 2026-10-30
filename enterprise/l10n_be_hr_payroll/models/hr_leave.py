@@ -1,5 +1,5 @@
 from collections import Counter
-from datetime import date, timedelta, datetime, UTC
+from datetime import date, time, timedelta, timezone, datetime, UTC
 from bisect import bisect_left
 from dateutil.relativedelta import relativedelta
 from zoneinfo import ZoneInfo
@@ -27,6 +27,7 @@ class HrLeave(models.Model):
         compute="_compute_l10n_be_sickness_relapse_origin_leave_id",
         store=True,
         readonly=False,
+        recursive=True,
         domain='[("id", "in", allowed_l10n_be_sickness_relapse_origin_leave_ids)]'
     )
     country_code = fields.Char(related='company_id.country_id.code', depends=['company_id'])
@@ -153,62 +154,222 @@ class HrLeave(models.Model):
         for leave in self:
             leave.l10n_be_sickness_relapse = leave.company_id.country_code == "BE" and bool(leave.l10n_be_sickness_relapse_origin_leave_id)
 
+    @api.depends('name', 'date_from', 'date_to', 'number_of_days', 'duration_display', 'tz')
+    @api.depends_context('l10n_be_sickness_relapse_display')
+    def _compute_display_name(self):
+        if not self.env.context.get('l10n_be_sickness_relapse_display'):
+            return super()._compute_display_name()
+        for leave in self:
+            user_tz = ZoneInfo(leave.tz or self.env.user.tz or 'UTC')
+            display_date = leave._get_leave_display_date(
+                leave.date_from and leave.date_from.replace(tzinfo=timezone.utc).astimezone(user_tz).date(),
+                leave.date_to and leave.date_to.replace(tzinfo=timezone.utc).astimezone(user_tz).date(),
+                leave.number_of_days
+            )
+            details = self.env._("%(duration)s %(dates)s",
+                duration=leave.duration_display,
+                dates=display_date)
+
+            if not leave.name:
+                leave.display_name = details
+                continue
+
+            name = leave.name
+            if len(name) > 30:  # 30 characters max in the description
+                name = name[:30].rstrip() + "…"
+            leave.display_name = self.env._(
+                "%(name)s: %(duration)s %(dates)s",
+                name=name,
+                duration=leave.duration_display,
+                dates=display_date
+            )
+
     def _issues_dependencies(self):
         return super()._issues_dependencies() + ['work_entry_type_id', 'date_from', 'date_to', 'employee_id', 'l10n_be_sickness_relapse', 'state', 'category_options_ids']
 
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
-        self._check_create_wech010()
+        res._check_create_wech002()
+        res._check_create_wech005()
+        res._check_create_wech009_wech010()
+        res._check_create_zima001()
+        res._check_create_zima006()
         return res
 
     def write(self, vals):
         res = super().write(vals)
-        if any(field in vals for field in ('state', 'date_from', 'date_to', 'employee_id', 'work_entry_type_id')):
-            self._check_create_wech010()
+        if any(field in vals for field in ('state', 'request_date_from', 'request_date_to', 'employee_id', 'work_entry_type_id')):
+            self._check_create_wech002()
+            self._check_create_wech005()
+            self._check_create_wech009_wech010()
+            self._check_create_zima001()
+            self._check_create_zima006()
+        if vals.get('state') in ('refuse', 'cancel') or 'request_date_from' in vals or 'request_date_to' in vals:
+            self._unlink_unnecessary_l10n_be_drs()
         return res
 
-    def _check_create_wech010(self):
-        youth_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_youth_time_off', raise_if_not_found=False)
-        youth_holiday_risk_id = self.env.ref('l10n_be_hr_payroll.drs_risk_wech010_001').id
-        senior_holiday_risk_id = self.env.ref('l10n_be_hr_payroll.drs_risk_wech010_002').id
-        leaves_to_check = self.filtered(lambda leave: leave.work_entry_type_id == youth_type and leave.state == 'validate')
-        if not youth_type or not leaves_to_check:
+    def _check_create_wech002(self):
+        """ Declare the right to temporary unemployment on the days requiring it, during the time off """
+        # sudo: l10n.be.drs - time off officers can approve the leaves without payroll access
+        leaves = self.sudo().filtered(lambda leave:
+            leave.state == 'validate'
+            and 'WECH002' in leave.work_entry_type_id.l10n_be_drs_risk_ids.mapped('identification'))
+        drs_model = self.env['l10n.be.drs'].sudo()
+        vals_list = []
+        for employee, employee_leaves in leaves.grouped('employee_id').items():
+            vals_list += [{
+                'employee_id': employee.id,
+                'sector': 'unemployment',
+                'risk_id': risk.id,
+                'month': start_date.month,
+                'year': start_date.year,
+            } for start_date, risk, leave in drs_model._get_wech002_start_dates(employee) if leave in employee_leaves]
+        drs_model._create_missing_declarations(vals_list)
+
+    def _unlink_unnecessary_l10n_be_drs(self):
+        """ Remove the declarations automatically created for the time off, that aren't needed anymore """
+        leaves = self.sudo().filtered(lambda leave: leave.work_entry_type_id.l10n_be_drs_risk_ids)
+        if not leaves:
             return
-        existing_drs = self.env['l10n.be.drs']._read_group([
-            ('risk_id', 'in', (youth_holiday_risk_id, senior_holiday_risk_id)),
-            ('employee_id', 'in', leaves_to_check.employee_id.ids),
-        ], groupby=['risk_id', 'employee_id', 'year', 'month'], aggregates=['id:recordset'])
-        existing_drs_dict = {(r, e.id, y, m): drs for r, e, y, m, drs in existing_drs}
-        drs_vals = []
-        for leave in leaves_to_check:
-            # Right to youth holidays is defined based on the age at the end of the year
-            # at which the employee takes the holidays
-            age = leave.employee_id._get_age(leave.date_from.replace(month=12, day=31))
-            if age < 25:
-                risk_id = youth_holiday_risk_id
-            elif age >= 50:
-                risk_id = senior_holiday_risk_id
-            else:
+        declarations = self.env['l10n.be.drs'].sudo()
+        for leave in leaves:
+            identifications = leave.work_entry_type_id.l10n_be_drs_risk_ids.mapped('identification')
+            # The return to work follows the end of the risk
+            if 'ZIMA001' in identifications:
+                identifications.append('ZIMA006')
+            declarations |= declarations.search([
+                ('employee_id', '=', leave.employee_id.id),
+                ('risk_id.identification', 'in', identifications),
+                ('is_automatically_created', '=', True),
+                ('state', '=', 'draft'),
+                ('year', '>=', leave.request_date_from.year),
+                ('year', '<=', leave.request_date_to.year),
+            ])
+        # The data computed from the time off changed
+        declarations.invalidate_recordset()
+        declarations.filtered(lambda drs: not drs._is_necessary()).unlink()
+
+    def _check_create_wech005(self):
+        """ Declare the hours of temporary unemployment of each month of the time off """
+        # sudo: l10n.be.drs - time off officers can approve the leaves without payroll access
+        vals_list = []
+        for leave in self.sudo().filtered(lambda leave: leave.state == 'validate'):
+            risk = leave.work_entry_type_id.l10n_be_drs_risk_ids.filtered(lambda risk: risk.identification == 'WECH005')[:1]
+            if not risk:
                 continue
-            l_month = leave.date_from.month
-            l_year = leave.date_from.year
-            if (risk_id, leave.employee_id, l_year, l_month) not in existing_drs_dict:
-                drs_vals.append({
-                    'is_automatically_created': True,
+            month = leave.request_date_from.replace(day=1)
+            while month <= leave.request_date_to:
+                vals_list.append({
                     'employee_id': leave.employee_id.id,
                     'sector': 'unemployment',
-                    'risk_id': risk_id,
-                    'month': l_month,
-                    'year': l_year,
+                    'risk_id': risk.id,
+                    'month': month.month,
+                    'year': month.year,
                 })
-        self.env['l10n.be.drs'].create(drs_vals)
+                month += relativedelta(months=1)
+        self.env['l10n.be.drs'].sudo()._create_missing_declarations(vals_list)
+
+    def _check_create_zima001(self):
+        """ Declare the risks of the health insurance (incapacity, maternity, birth...) of the time off """
+        # sudo: l10n.be.drs - time off officers can approve the leaves without payroll access
+        leaves = self.sudo().filtered(lambda leave: leave.state == 'validate' and leave.country_code == 'BE' and any(
+            risk.identification == 'ZIMA001' for risk in leave.work_entry_type_id.l10n_be_drs_risk_ids))
+        drs_model = self.env['l10n.be.drs'].sudo()
+        vals_list = []
+        for employee in leaves.employee_id:
+            vals_list += [{
+                'employee_id': employee.id,
+                'sector': 'compensation',
+                'risk_id': period['risk'].id,
+                'month': period['start'].month,
+                'year': period['start'].year,
+            } for period in drs_model._get_zima001_periods(employee) if period['leaves'] & leaves and drs_model._is_zima001_needed(period)]
+        drs_model._create_missing_declarations(vals_list)
+
+    def _check_create_wech009_wech010(self):
+        """ The first month of the year with youth or senior holidays is declared once (WECH009),
+        and the youth or senior holidays of each month (WECH010) """
+        # sudo: l10n.be.drs - time off officers can approve the leaves without payroll access
+        leaves = self.sudo().filtered(lambda leave: leave.state == 'validate' and leave.employee_id and any(
+            risk.identification in ('WECH009', 'WECH010') for risk in leave.work_entry_type_id.l10n_be_drs_risk_ids))
+        if not leaves:
+            return
+        drs_model = self.env['l10n.be.drs'].sudo()
+        first_month_vals, monthly_vals = {}, []
+        for leave in leaves:
+            month = leave.request_date_from.replace(day=1)
+            while month <= leave.request_date_to:
+                values = {'employee_id': leave.employee_id.id, 'sector': 'unemployment', 'year': month.year, 'month': month.month}
+                for risk in leave.work_entry_type_id.l10n_be_drs_risk_ids:
+                    if risk.identification == 'WECH010':
+                        monthly_vals.append(dict(values, risk_id=risk.id))
+                    elif risk.identification == 'WECH009':
+                        key = (leave.employee_id.id, risk.id, month.year)
+                        if key not in first_month_vals or month.month < first_month_vals[key]['month']:
+                            first_month_vals[key] = dict(values, risk_id=risk.id, leave_allocation_id=leave._get_l10n_be_allocation(month).id)
+                month += relativedelta(months=1)
+        drs_model._create_missing_declarations(monthly_vals)
+
+        yearly_declarations = drs_model.search([
+            ('risk_id', 'in', [key[1] for key in first_month_vals]),
+            ('employee_id', 'in', [key[0] for key in first_month_vals]),
+            ('year', 'in', [key[2] for key in first_month_vals]),
+        ], order='year, month desc')
+        declaration_by_key = {(drs.employee_id.id, drs.risk_id.id, drs.year): drs for drs in yearly_declarations}
+        vals_to_create = []
+        for key, values in first_month_vals.items():
+            declaration = declaration_by_key.get(key)
+            if not declaration:
+                vals_to_create.append(values)
+            elif declaration.is_automatically_created and declaration.state in ('draft', 'ready', 'error') and int(declaration.month) > values['month']:
+                # The holidays of an earlier month were approved later, the declaration wasn't sent yet
+                declaration.write({'month': str(values['month']), 'xml_file': False})
+        drs_model._create_missing_declarations(vals_to_create)
+
+    def _get_l10n_be_allocation(self, month):
+        self.ensure_one()
+        return self.env['hr.leave.allocation'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('work_entry_type_id', '=', self.work_entry_type_id.id),
+            ('state', '=', 'validate'),
+            ('date_from', '<=', month + relativedelta(day=31)),
+            '|', ('date_to', '=', False), ('date_to', '>=', month),
+        ], limit=1)
+
+    def _check_create_zima006(self):
+        """ Declare the return to work after the risks declared to the health insurance """
+        # sudo: l10n.be.drs - time off officers can approve the leaves without payroll access
+        leaves = self.sudo().filtered(lambda leave: leave.state == 'validate' and leave.country_code == 'BE' and any(
+            risk.identification == 'ZIMA001' for risk in leave.work_entry_type_id.l10n_be_drs_risk_ids))
+        risk = self.env.ref('l10n_be_hr_payroll.drs_risk_zima006_001', raise_if_not_found=False)
+        if not leaves or not risk:
+            return
+        drs_model = self.env['l10n.be.drs'].sudo()
+        vals_list = []
+        for employee in leaves.employee_id:
+            vals_list += [{
+                'employee_id': employee.id,
+                'sector': 'compensation',
+                'risk_id': risk.id,
+                'month': recovery_date.month,
+                'year': recovery_date.year,
+            } for recovery_date, declaration in drs_model._get_zima006_recoveries(employee)]
+            # A risk extended after the return to work postpones it
+            recovery_months = {(vals['year'], str(vals['month'])) for vals in vals_list if vals['employee_id'] == employee.id}
+            drs_model.search([
+                ('employee_id', '=', employee.id),
+                ('risk_id', '=', risk.id),
+                ('is_automatically_created', '=', True),
+                ('state', '=', 'draft'),
+            ]).filtered(lambda drs: (drs.year, drs.month) not in recovery_months).unlink()
+        drs_model._create_missing_declarations(vals_list)
 
     def _get_calendar_days(self, date_min=date.min, date_max=date.max):
         self.ensure_one()
         leave_tz = ZoneInfo(self.tz)
-        date_from = max(date_min, self.date_from.astimezone(leave_tz).date())
-        date_to = min(date_max, self.date_to.astimezone(leave_tz).date())
+        date_from = max(date_min, self._l10n_be_local_date(self.date_from, leave_tz))
+        date_to = min(date_max, self._l10n_be_local_date(self.date_to, leave_tz))
         days = (date_to - date_from).days + 1
         if self.work_entry_type_request_unit == 'half_day':
             if self.request_date_from_period == self.request_date_to_period:
@@ -227,17 +388,29 @@ class HrLeave(models.Model):
         Ref: Art. 52 §5, Loi coord. 14/07/1994 (mod. Loi 19/12/2025, MB 30/12/2025).
         """
         self.ensure_one()
+
+        def is_progressive_resumption(version):
+            return any(
+                att.work_entry_type_id.code == '122.04'
+                for att in version.resource_calendar_id.attendance_ids
+            )
+
         version = self.employee_id.sudo()._get_version(date=self.date_from)
-        is_progressive_resumption = any(
-            att.work_entry_type_id.code == '122.04'
-            for att in version.resource_calendar_id.attendance_ids
-        )
-        if not is_progressive_resumption:
+        if not is_progressive_resumption(version):
             return False
         sick_leave_start = self.request_date_from
         if sick_leave_start >= date(2026, 1, 1):
             return True
-        days_since_resumption_start = (sick_leave_start - version.date_start).days
+        # The progressive resumption started with the first of the contiguous versions
+        # in progressive resumption, not with the last amendment
+        resumption_start = version.date_start
+        previous_versions = version.employee_id.version_ids.filtered(
+            lambda v: v.contract_date_start and v.date_start < resumption_start).sorted('date_start', reverse=True)
+        for previous_version in previous_versions:
+            if previous_version.date_end != resumption_start - timedelta(days=1) or not is_progressive_resumption(previous_version):
+                break
+            resumption_start = previous_version.date_start
+        days_since_resumption_start = (sick_leave_start - resumption_start).days
         return days_since_resumption_start < 140
 
     def _get_l10n_be_sick_leave_split(self):
@@ -264,8 +437,11 @@ class HrLeave(models.Model):
 
         leave_duration = self._get_calendar_days()
         version = self.employee_id.sudo()._get_version(date=self.date_from)
-        is_worker = version.is_worker()
-        is_short_term_employee = version.is_short_term_contract() and version.is_employee()
+        # Students follow the scheme of their occupation: manual workers (840) the workers' one, white-collar
+        # students (841) the short-term employees' one on a contract of less than three months
+        worker_code = version.l10n_be_worker_code_id.dmfa_code
+        is_worker = version.is_worker() or worker_code == '840'
+        is_short_term_employee = version.is_short_term_contract() and (version.is_employee() or worker_code == '841')
 
         if self._l10n_be_is_progressive_resumption_neutralised():
             return [(unpaid_sick_work_entry_type, leave_duration)]
@@ -407,8 +583,11 @@ class HrLeave(models.Model):
 
         leave_duration = self._get_calendar_days()
         version = self.employee_id.sudo()._get_version(date=self.date_from)
-        is_worker = version.is_worker()
-        is_short_term_employee = version.is_short_term_contract() and version.is_employee()
+        # Student manual workers (840) follow the worker guaranteed wage scheme, white-collar students (841) on a
+        # contract of less than three months the short-term employees' one
+        worker_code = version.l10n_be_worker_code_id.dmfa_code
+        is_worker = version.is_worker() or worker_code == '840'
+        is_short_term_employee = version.is_short_term_contract() and (version.is_employee() or worker_code == '841')
 
         unpaid_work_accident_work_entry_type = self.env.ref('hr_work_entry.l10n_be_work_entry_type_work_accident_unpaid')
 
@@ -636,8 +815,13 @@ class HrLeave(models.Model):
                 ('calendar_id', '=', employee.resource_calendar_id.id),
         ])
 
-        years_covered = {self.date_from.year, self.date_to.year}
-        min_date_fetch_leaves = datetime.combine(date(min(years_covered), 1, 1), datetime.min.time())
+        leave_tz = ZoneInfo(self.tz)
+        years_covered = {
+            self._l10n_be_local_date(self.date_from, leave_tz).year,
+            self._l10n_be_local_date(self.date_to, leave_tz).year,
+        }
+        min_date_fetch_leaves = self._l10n_be_local_datetime_to_utc(
+            datetime.combine(date(min(years_covered), 1, 1), time.min), leave_tz)
 
         # relevant codes = unemployment + 207
         previous_leaves = self.env['hr.leave'].search([
@@ -658,8 +842,10 @@ class HrLeave(models.Model):
         segment_calendar_days = {leave.id: leave._get_calendar_days() for leave in current_leave_split}
 
         segments = []
-        previous_leaves_by_year = previous_leaves.grouped(lambda l: l.date_from.year)
-        current_leave_split_by_year = current_leave_split.grouped(lambda l: l.date_from.year)
+        previous_leaves_by_year = previous_leaves.grouped(
+            lambda leave: self._l10n_be_local_date(leave.date_from, leave_tz).year)
+        current_leave_split_by_year = current_leave_split.grouped(
+            lambda leave: self._l10n_be_local_date(leave.date_from, leave_tz).year)
         # in case the current_leave is straddling two years
         for current_year in years_covered:
             # compute YTD temporary unemployment and 006.11
@@ -763,19 +949,23 @@ class HrLeave(models.Model):
                 cp200 = self.env.ref("l10n_be_hr_payroll.l10n_be_joint_committee_200")
                 cp302 = self.env.ref("l10n_be_hr_payroll.l10n_be_joint_committee_302")
                 voluntary_threshold_codes = {
-                    (cp200, '039.23'): 'cp200_voluntary_overtime_no_onss_threshold',
-                    (cp200, 'OTHER'): 'cp200_voluntary_overtime_threshold',
-                    (cp302, '039.23', True): 'cp302_voluntary_overtime_no_onss_threshold_white_cash_register',
-                    (cp302, 'OTHER', True): 'cp302_voluntary_overtime_threshold_white_cash_register',
-                    (cp302, '039.23', False): 'cp302_voluntary_overtime_no_onss_threshold_not_white_cash_register',
-                    (cp302, 'OTHER', False): 'cp302_voluntary_overtime_threshold_not_white_cash_register',
+                    ('200', '039.23'): 'cp200_voluntary_overtime_no_onss_threshold',
+                    ('200', 'OTHER'): 'cp200_voluntary_overtime_threshold',
+                    ('302', '039.23', True): 'cp302_voluntary_overtime_no_onss_threshold_white_cash_register',
+                    ('302', 'OTHER', True): 'cp302_voluntary_overtime_threshold_white_cash_register',
+                    ('302', '039.23', False): 'cp302_voluntary_overtime_no_onss_threshold_not_white_cash_register',
+                    ('302', 'OTHER', False): 'cp302_voluntary_overtime_threshold_not_white_cash_register',
                 }
-                key = (
-                    leave.employee_id.l10n_be_joint_committee_id,
-                    wet_code if wet_code == '039.23' else 'OTHER',
-                )
-                if leave.employee_id.l10n_be_joint_committee_id == cp302:
-                    key += (leave.employee_id.company_id.l10n_be_cash_register_active,)
+                jc = leave.employee_id.l10n_be_joint_committee_id
+                # The sub-committees follow the rules of their joint committee
+                jc_code = False
+                if jc and jc.is_descendant_of(cp302):
+                    jc_code = '302'
+                elif jc and jc.is_descendant_of(cp200):
+                    jc_code = '200'
+                key = (jc_code, wet_code if wet_code == '039.23' else 'OTHER')
+                if jc_code == '302':
+                    key += (leave.employee_id.company_id._l10n_be_has_white_cash_register(),)
                 threshold_code = voluntary_threshold_codes.get(key)
                 if threshold_code:
                     threshold = self.env['hr.rule.parameter']._get_parameter_from_code(threshold_code, leave.request_date_from)
@@ -887,23 +1077,39 @@ class HrLeave(models.Model):
             ) % amount_unemployment_days
         )
 
+    def _l10n_be_local_date(self, utc_datetime, tz):
+        """Convert a UTC datetime to a date in the given timezone."""
+        assert isinstance(utc_datetime, datetime)
+        return utc_datetime.replace(tzinfo=UTC).astimezone(tz).date()
+
+    def _l10n_be_local_datetime_to_utc(self, local_datetime, tz):
+        """Convert a local datetime to a naive UTC datetime."""
+        assert isinstance(local_datetime, datetime)
+        return local_datetime.replace(tzinfo=tz).astimezone(UTC).replace(tzinfo=None)
+
     def _virtual_split(self, leaves):
-        """ Splits leaves (virtually) leaping over two years into to subsegments"""
-        straddling = leaves.filtered(lambda leave: leave.date_from.year != leave.date_to.year)
+        tz = ZoneInfo(self.tz)
+        straddling = leaves.filtered(
+            lambda leave: self._l10n_be_local_date(leave.date_from, tz).year
+            != self._l10n_be_local_date(leave.date_to, tz).year
+        )
         result = leaves - straddling
 
         for leave in straddling:
-            year_from, year_to = leave.date_from.year, leave.date_to.year
+            year_from = self._l10n_be_local_date(leave.date_from, tz).year
+            year_to = self._l10n_be_local_date(leave.date_to, tz).year
 
             year_from_part = self.env['hr.leave'].new({
                 'employee_id': leave.employee_id.id,
                 'date_from': leave.date_from,
-                'date_to': date(year_from, 12, 31),
+                'date_to': self._l10n_be_local_datetime_to_utc(
+                    datetime.combine(date(year_from, 12, 31), time.max), tz),
                 'work_entry_type_id': leave.work_entry_type_id.id,
             })
             year_to_part = self.env['hr.leave'].new({
                 'employee_id': leave.employee_id.id,
-                'date_from': date(year_to, 1, 1),
+                'date_from': self._l10n_be_local_datetime_to_utc(
+                    datetime.combine(date(year_to, 1, 1), time.min), tz),
                 'date_to': leave.date_to,
                 'work_entry_type_id': leave.work_entry_type_id.id,
             })

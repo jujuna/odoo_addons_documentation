@@ -96,6 +96,7 @@ export class IotHttpService {
                 const result = await navigator.permissions.query({ name: "local-network-access" });
                 if (["granted", "prompt"].includes(result?.state)) {
                     this.lnaInitialised = true;
+                    return records;
                 }
 
                 const message = _t(

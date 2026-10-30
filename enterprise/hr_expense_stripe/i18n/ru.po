@@ -9,9 +9,9 @@ msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-18 17:48+0000\n"
-"PO-Revision-Date: 2026-09-17 22:54+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
+"PO-Revision-Date: 2026-10-23 14:33+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-20/"
 "hr_expense_stripe/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -50,7 +50,7 @@ msgstr "<span class=\"ps-2\">Карты</span>"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_view_form_inherits_stripe
 msgid "<span class=\"ps-2\">Dispute</span>"
-msgstr ""
+msgstr "<span class=\"ps-2\">Оспаривание</span>"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_card_receive_wizard_form
@@ -89,6 +89,8 @@ msgid ""
 "<span>unmapped MCC code<span invisible=\"unmapped_mcc_count == 1\">s</span>."
 "</span>"
 msgstr ""
+"<span>несопоставленный код MCC<span invisible=\"unmapped_mcc_count == 1\">ы</"
+"span>.</span>"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_topup_wizard_form
@@ -210,6 +212,112 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление о выпуске "
+"карты</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Вам "
+"назначена карта</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Здравствуйте, <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Имя получателя]</t>!<br/><br/>\n"
+"                    Вам была назначена корпоративная карта.\n"
+"                    Вы можете просмотреть информацию о карте и управлять ей "
+"в любое время: зайдите в «Мой профиль» и откройте раздел «Карты».<br/><br/>\n"
+"                    Если у вас возникнут вопросы, пожалуйста, свяжитесь с "
+"нами.<br/><br/>\n"
+"                    С уважением,<br/>\n"
+"                    <t t-out=\"object.ordered_by.name or ''\">[Администратор "
+"расходов]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_card_canceled
@@ -322,6 +430,112 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление о доставке "
+"карты</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">"
+"Доставка карты отменена</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Здравствуйте, <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Держатель карты]</t>!<br/><br/>\n"
+"                    Уведомляем вас о том, что доставка вашей карты "
+"отменена.<br/>\n"
+"                    Если вы все еще хотите получить карту, пожалуйста, "
+"оформите новый заказ в удобное для вас время.<br/><br/>\n"
+"                    Если у вас возникнут вопросы или потребуется помощь, "
+"наша команда с радостью вам поможет.<br/><br/>\n"
+"                    С уважением,<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Название компании]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_card_ordered
@@ -430,6 +644,109 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление о заказе "
+"карты</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ваша "
+"карта заказана</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Здравствуйте, <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Имя получателя]</t>!<br/><br/>\n"
+"                    Для вас оформлен заказ корпоративной карты.\n"
+"                    Мы сразу же уведомим вас, как только она будет "
+"отправлена.<br/><br/>\n"
+"                    С уважением,<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Название компании]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_card_shipped
@@ -557,6 +874,127 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление об отправке "
+"карты</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">Ваша "
+"карта отправлена</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Здравствуйте, <t t-out=\"ctx.get('recipient_name', "
+"object.user_id.name)\">[Держатель карты]</t>!<br/><br/>\n"
+"                    Ваша корпоративная карта уже в пути!<br/><br/>\n"
+"                    <t t-if=\"object.tracking_number\">\n"
+"                        <strong>Трек-номер:</strong> <t t-"
+"out=\"object.tracking_number\">TRACK123</t><br/>\n"
+"                    </t>\n"
+"                    <t t-if=\"object.tracking_url\">\n"
+"                        <strong>Отследить доставку:</strong>\n"
+"                        <a t-att-href=\"object.tracking_url\" style=\"color: "
+"#875A7B; text-decoration: underline;\"><t t-out=\"object.tracking_url\">"
+"[Ссылка]</t></a><br/>\n"
+"                    </t>\n"
+"                    <t t-if=\"ctx.get('shipping_estimated_delivery', '')\">\n"
+"                        <strong>Ориентировочная дата доставки:</strong>\n"
+"                        <t t-out=\"ctx.get('shipping_estimated_delivery', '')"
+"\">[24.12.2025]</t><br/><br/>\n"
+"                    </t>\n"
+"                    Инструкция по активации после получения:<br/><br/>\n"
+"                    1) Перейдите в раздел <a t-attf-href=\"{{ website_url }}/"
+"odoo/cards\">список ваших карт</a><br/>\n"
+"                    2) Нажмите на нужную карту и следуйте инструкциям<br/>"
+"<br/>\n"
+"                    С уважением,<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Название компании]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_dispute_lost
@@ -668,6 +1106,111 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление об "
+"оспаривании операции</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">"
+"Оспаривание отклонено</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Здравствуйте, <t t-out=\"ctx.get('submitted_by')\">[Имя "
+"заявителя]</t>!<br/><br/>\n"
+"                    Сожалеем, но ваше заявление на оспаривание транзакции "
+"<strong><t t-out=\"object.name\"/></strong> было отклонено по следующей "
+"причине:<br/><br/>\n"
+"                    <t t-out=\"ctx.get('loss_reason', 'Причина не указана')"
+"\"/><br/><br/>\n"
+"                    С уважением,<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Название компании]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
@@ -779,6 +1322,111 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление об "
+"оспаривании операции</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">"
+"Заявление на оспаривание отправлено</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Здравствуйте, <t t-out=\"ctx.get('submitted_by')\">[Имя "
+"заявителя]</t>!<br/><br/>\n"
+"                    Подтверждаем, что ваше заявление на оспаривание "
+"транзакции <strong><t t-out=\"object.name\"/></strong> успешно передано в "
+"Stripe.<br/><br/>\n"
+"                    Мы будем держать вас в курсе рассмотрения и сразу "
+"сообщим о принятом решении.<br/><br/>\n"
+"                    С уважением,<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Название компании]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
@@ -889,6 +1537,110 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <!-- HEADER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление об "
+"оспаривании операции</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">"
+"Оспаривание успешно завершено</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- CONTENT -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Здравствуйте, <t t-out=\"ctx.get('submitted_by', "
+"object.employee_id.user_id.name)\">[Имя заявителя]</t>!<br/><br/>\n"
+"                    Рады сообщить, что оспаривание транзакции <strong><t t-"
+"out=\"object.name\"/></strong> завершилось в вашу пользу.<br/><br/>\n"
+"                    Оспариваемая сумма будет возвращена на ваш счет в "
+"ближайшее время.<br/><br/>\n"
+"                    С уважением,<br/>\n"
+"                    <t t-out=\"company.name or ''\">[Название компании]</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <!-- FOOTER -->\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <!-- POWERED BY -->\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #: model:mail.template,body_html:hr_expense_stripe.email_template_hr_expense_stripe_restriction
@@ -1027,6 +1779,140 @@ msgid ""
 "            </table>\n"
 "        "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"            <tbody>\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object\"/>\n"
+"                    <span style=\"font-size: 10px;\">Уведомление аккаунта "
+"Stripe</span><br/>\n"
+"                    <span style=\"font-size: 20px; font-weight: bold;\">"
+"Требуется действие</span>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                    </td></tr>\n"
+"                    <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                        <p>Здравствуйте, <t t-out=\"ctx.get('user_name')\"/>"
+"!</p>\n"
+"                        <t t-if=\"ctx.get('due_date')\">\n"
+"                            <p>\n"
+"                                Сервис Stripe обнаружил проблему при "
+"проверке вашего подключенного аккаунта.\n"
+"                                Если ее не устранить, доступ к аккаунту "
+"будет ограничен в ближайшее время (до <t t-out=\"ctx.get('due_date')\"/>),\n"
+"                                и вы не сможете выпускать корпоративные "
+"карты.\n"
+"                            </p>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <p>\n"
+"                                Сервис Stripe обнаружил проблему при "
+"проверке вашего подключенного аккаунта.\n"
+"                                Если ее не устранить, доступ к аккаунту "
+"будет ограничен в ближайшее время,\n"
+"                                и вы не сможете выпускать корпоративные "
+"карты.\n"
+"                            </p>\n"
+"                        </t>\n"
+"                        <p>\n"
+"                            Чтобы решить проблему, пожалуйста, проверьте и "
+"обновите необходимые данные в разделе\n"
+"                            <strong>Расходы &gt; Настройки &gt; "
+"Корпоративная карта &gt; Настроить</strong> или перейдите по следующей "
+"ссылке:\n"
+"                        </p>\n"
+"                        <p>\n"
+"                            <a t-attf-href=\"{{ object.get_base_url() }}/"
+"odoo/settings#hr_expense\" style=\"color: #875A7B; text-decoration: "
+"underline;\">Обновить информацию</a>\n"
+"                        </p>\n"
+"                        <p>\n"
+"                            После обновления данных Stripe проверит их "
+"повторно.\n"
+"                            Если вам потребуется помощь, пожалуйста, "
+"свяжитесь с нашей службой поддержки.\n"
+"                        </p>\n"
+"                        <p>С уважением,</p><br/>\n"
+"                        <p><t t-out=\"object.name\"/></p>\n"
+"                    </td></tr>\n"
+"                    <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-color:rgb"
+"(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-"
+"height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr>\n"
+"                <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                    <tr><td valign=\"middle\" align=\"left\">\n"
+"                        <t t-out=\"company.name or ''\">ВашаКомпания</t>\n"
+"                    </td></tr>\n"
+"                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"mailto:{{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"{{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"                </td>\n"
+"            </tr>\n"
+"            </tbody>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: "
+"#454748; padding: 8px; border-collapse:separate;\">\n"
+"            <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"                Работает на базе <a target=\"_blank\" href=\"https://"
+"www.odoo.com?utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: {"
+"{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
+"            </td></tr>\n"
+"            </table>\n"
+"            </td></tr>\n"
+"            </table>"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1045,19 +1931,19 @@ msgstr "Была использована карта, которая не сущ
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "A dispute has been created."
-msgstr ""
+msgstr "Заявление на оспаривание создано."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "A dispute must be unsubmitted to be able to be updated."
-msgstr ""
+msgstr "Чтобы внести изменения, необходимо отозвать спор."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "A dispute that doesn't exist on the database was used"
-msgstr ""
+msgstr "Использовано оспаривание, которое отсутствует в базе данных"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1065,12 +1951,14 @@ msgstr ""
 msgid ""
 "A proof of original payment must be provided for a duplicate payment dispute."
 msgstr ""
+"Для оспаривания дублирующегося платежа необходимо предоставить подтверждение "
+"исходного платежа."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "A reason must be set to create or update a dispute."
-msgstr ""
+msgstr "Для создания или обновления оспаривания необходимо указать причину."
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_hr_expense_stripe_card_block_wizard
@@ -1090,7 +1978,7 @@ msgstr "Ремонт систем кондиционирования и охла
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__return_status__successful
 msgid "Accepted"
-msgstr ""
+msgstr "Принято"
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_account_chart_template
@@ -1139,12 +2027,12 @@ msgstr "Активный"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__additional_documentation
 msgid "Additional Documentation"
-msgstr ""
+msgstr "Дополнительная документация"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Additional documentation"
-msgstr ""
+msgstr "Дополнительная документация"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.advertising_services
@@ -1230,7 +2118,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "An expense that doesn't exist on the database was used"
-msgstr ""
+msgstr "Использован расход, который отсутствует в базе данных"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1262,7 +2150,7 @@ msgstr "Архитектурные и геодезические услуги"
 #. odoo-javascript
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.js:0
 msgid "Are you sure you want to delete this attachment?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить это вложение?"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.art_dealers_and_galleries
@@ -1357,11 +2245,14 @@ msgid ""
 "letters) + Country Code (2 letters) + Location Code (2 letters/numbers) + "
 "Optional Branch Code (3 letters/numbers)."
 msgstr ""
+"Банковский идентификационный код (BIC/SWIFT) для международных переводов в "
+"формате: код банка (4 буквы) + код страны (2 буквы) + код местоположения (2 "
+"буквы/цифры) + опциональный код филиала (3 буквы/цифры)."
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_account_bank_statement_line
 msgid "Bank Transaction"
-msgstr ""
+msgstr "Банковская транзакция"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_topup_wizard__statement_description
@@ -1482,7 +2373,7 @@ msgstr "Магазины фототехники и фототоваров"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__can_submit
 msgid "Can Submit"
-msgstr ""
+msgstr "Можно отправить"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__canceled
@@ -1492,7 +2383,7 @@ msgstr "Отменено"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__canceled_at
 msgid "Cancellation Date"
-msgstr ""
+msgstr "Дата отмены"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__cancellation_reason
@@ -1509,13 +2400,13 @@ msgstr "Магазины кондитерских изделий, сладост
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Cannot modify the dispute details once it has been submitted."
-msgstr ""
+msgstr "Нельзя изменить детали оспаривания после того, как оно было отправлено."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/wizard/hr_expense_split.py:0
 msgid "Cannot split an expense that is already disputed."
-msgstr ""
+msgstr "Нельзя разделить расход, который уже оспаривается."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.car_rental_agencies
@@ -1591,7 +2482,7 @@ msgstr "Получение карты"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__card_statement
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__card_statement
 msgid "Card Statement"
-msgstr ""
+msgstr "Выписка по карте"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card_block_wizard__card_id
@@ -1625,7 +2516,7 @@ msgstr "Номер карты скопирован в буфер обмена."
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Card statement"
-msgstr ""
+msgstr "Выписка по карте"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card_receive_wizard__card_id
@@ -1672,7 +2563,7 @@ msgstr "Держатель карты обновлен"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__cancellation_reason
 msgid "Cardholder's rationale for canceling the purchase."
-msgstr ""
+msgstr "Обоснование держателя карты для отмены покупки."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -1707,12 +2598,12 @@ msgstr "Чистка ковров и обивки"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__cash_receipt
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__cash_receipt
 msgid "Cash Receipt"
-msgstr ""
+msgstr "Чек об оплате наличными"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Cash receipt"
-msgstr ""
+msgstr "Чек об оплате наличными"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.view_hr_expense_stripe_card_form
@@ -1733,12 +2624,12 @@ msgstr "Благотворительные и социальные органи�
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__check_image
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__check_image
 msgid "Check Image"
-msgstr ""
+msgstr "Изображение чека"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Check image"
-msgstr ""
+msgstr "Изображение чека"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.chemicals_and_allied_products
@@ -1865,7 +2756,7 @@ msgstr "Страна компании"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_cardholder_wizard__company_country_code
 msgid "Company Country Code"
-msgstr ""
+msgstr "Код страны компании"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__company_partner_id
@@ -1881,7 +2772,7 @@ msgstr "Соблюдение нормативных требований"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__policy_compliance__compliant
 msgid "Compliant with policy"
-msgstr ""
+msgstr "Соответствует правилам компании"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.computer_network_services
@@ -1927,7 +2818,7 @@ msgstr "Настроить"
 #. odoo-javascript
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.js:0
 msgid "Confirm Deletion"
-msgstr ""
+msgstr "Подтвердить удаление"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -1960,12 +2851,12 @@ msgstr "Услуги по контракту"
 msgid ""
 "Copy of the card statement showing that the product had already been paid "
 "for."
-msgstr ""
+msgstr "Копия выписки по карте, подтверждающая, что товар уже был оплачен."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__cash_receipt
 msgid "Copy of the receipt showing that the product had been paid for in cash."
-msgstr ""
+msgstr "Копия чека, подтверждающая оплату товара наличными."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.correspondence_schools
@@ -2016,7 +2907,7 @@ msgstr "Судебные издержки"
 #. module: hr_expense_stripe
 #: model:ir.module.module,summary:base.module_hr_expense_stripe
 msgid "Create and manage company expense cards via Stripe"
-msgstr ""
+msgstr "Создавайте и управляйте корпоративными картами расходов через Stripe"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.res_config_settings_view_form
@@ -2096,21 +2987,23 @@ msgid ""
 "Date the cardholder canceled the purchase. Cancellation is required to file "
 "a Dispute."
 msgstr ""
+"Дата отмены покупки держателем карты. Для подачи заявления на оспаривание "
+"требуется отмена."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__expected_at
 msgid "Date the cardholder expected to receive the purchase."
-msgstr ""
+msgstr "Дата, когда держатель карты ожидал получить покупку."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__returned_at
 msgid "Date the cardholder initiated return of the purchase."
-msgstr ""
+msgstr "Дата, когда держатель карты оформил возврат покупки."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__received_at
 msgid "Date the cardholder received the purchase."
-msgstr ""
+msgstr "Дата получения покупки держателем карты."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.dating_escort_services
@@ -2127,7 +3020,7 @@ msgstr "День"
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.js:0
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "Удалить"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__delivered
@@ -2162,7 +3055,7 @@ msgstr "Дизайн отклонен"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__return_description
 msgid "Details on how the merchandise was returned."
-msgstr ""
+msgstr "Подробная информация о том, как был возвращен товар."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.detective_agencies
@@ -2283,36 +3176,39 @@ msgstr "Display Name"
 #: model:ir.actions.server,name:hr_expense_stripe.action_hr_expense_stripe_dispute
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense__dispute_id
 msgid "Dispute"
-msgstr ""
+msgstr "Оспорить"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense__dispute_currency_id
 msgid "Dispute Currency"
-msgstr ""
+msgstr "Валюта оспаривания"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Dispute automatically created and submitted due to negative balance."
 msgstr ""
+"В связи с отрицательным балансом оспаривание сформировано и направлено "
+"автоматически."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Dispute automatically created due to negative journal balance."
 msgstr ""
+"Оспаривание автоматически сформировано из-за отрицательного баланса журнала."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Dispute funds %(movement_type)s"
-msgstr ""
+msgstr "Движение средств по оспариванию: %(movement_type)s"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense__disputed_amount
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__amount
 msgid "Disputed Amount"
-msgstr ""
+msgstr "Оспариваемая сумма"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.doctors
@@ -2333,7 +3229,7 @@ msgstr "Прямые продажи"
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "Downloading a file is only supported for single disputes."
-msgstr ""
+msgstr "Скачивание файла поддерживается только для отдельных оспариваний."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__state__draft
@@ -2372,7 +3268,7 @@ msgstr "Химчистки"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__duplicate
 msgid "Duplicate Charge"
-msgstr ""
+msgstr "Дублирующееся списание"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.durable_goods
@@ -2500,7 +3396,7 @@ msgstr "Ошибка"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Error when processing the dispute %(dispute_id)s, no moves were created"
-msgstr ""
+msgstr "Ошибка при обработке оспаривания %(dispute_id)s, проводки не созданы"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__shipping_estimated_delivery
@@ -2510,7 +3406,7 @@ msgstr "Ориентировочный срок доставки"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__expected_at
 msgid "Expected Date"
-msgstr ""
+msgstr "Ожидаемая дата"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -2556,7 +3452,7 @@ msgstr "Распределение расходов"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Expense Stripe Dispute"
-msgstr ""
+msgstr "Оспаривание расхода Stripe"
 
 #. module: hr_expense_stripe
 #: model:ir.actions.server,name:hr_expense_stripe.hr_expense_stripe_issuing_status_cron_ir_actions_server
@@ -2567,30 +3463,31 @@ msgstr "Расходы Stripe Issuing: обновление статуса ак�
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically approved due to negative journal balance"
-msgstr ""
+msgstr "Расход автоматически утвержден из-за отрицательного баланса журнала"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically posted due to negative balance"
-msgstr ""
+msgstr "Расход автоматически проведен из-за отрицательного баланса"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically reset to draft due to negative journal balance"
 msgstr ""
+"Расход автоматически сброшен в черновик из-за отрицательного баланса журнала"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Expense automatically submitted due to negative journal balance"
-msgstr ""
+msgstr "Расход автоматически отправлен из-за отрицательного баланса журнала"
 
 #. module: hr_expense_stripe
 #: model:ir.module.module,shortdesc:base.module_hr_expense_stripe
 msgid "Expense cards"
-msgstr ""
+msgstr "Корпоративные карты"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -2625,7 +3522,7 @@ msgstr "Корпоративная карта Stripe"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Expenses must be paid to submit a dispute."
-msgstr ""
+msgstr "Для подачи заявления на оспаривание расходы должны быть оплачены."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__expiration
@@ -2636,12 +3533,12 @@ msgstr "Дата окончания"
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__state__expired
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Expired"
-msgstr ""
+msgstr "Срок истек"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__explanation
 msgid "Explanation"
-msgstr ""
+msgstr "Пояснение"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.exterminating_services
@@ -2658,7 +3555,7 @@ msgstr "Не удалось получить параметры инициали
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Failed to find the related expense for the dispute from Stripe."
-msgstr ""
+msgstr "Не удалось найти связанный расход для оспаривания из Stripe."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -2752,7 +3649,7 @@ msgstr "Доступ к прокси-серверу IAP запрещен"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__fraudulent
 msgid "Fraudulent"
-msgstr ""
+msgstr "Мошенническая операция"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.freezer_and_locker_meat_provisioners
@@ -2815,7 +3712,7 @@ msgstr "Магазины стеклянной посуды и хрусталя"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Go to expenses"
-msgstr ""
+msgstr "Перейти к расходам"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.golf_courses_public
@@ -2886,22 +3783,22 @@ msgstr "Расходы отдела кадров: Карта Stripe отправ
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_hr_expense_stripe_dispute
 msgid "HR Expense Stripe Dispute"
-msgstr ""
+msgstr "Оспаривание расходов Stripe"
 
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_dispute_lost
 msgid "HR Expense Stripe Dispute Lost"
-msgstr ""
+msgstr "Оспаривание расходов Stripe отклонено"
 
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
 msgid "HR Expense Stripe Dispute Submitted"
-msgstr ""
+msgstr "Заявление на оспаривание расходов Stripe отправлено"
 
 #. module: hr_expense_stripe
 #: model:mail.template,name:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
 msgid "HR Expense Stripe Dispute Won"
-msgstr ""
+msgstr "Заявление на оспаривание расходов Stripe успешно рассмотрено"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.hardware_equipment_and_supplies
@@ -2927,7 +3824,7 @@ msgstr "Есть сообщение"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__has_only_one_expense
 msgid "Has Only One Expense"
-msgstr ""
+msgstr "Содержит только один расход"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.health_and_beauty_spas
@@ -3066,6 +3963,8 @@ msgid ""
 "Image of the front and back of the check that was used to pay for the "
 "product."
 msgstr ""
+"Изображение лицевой и обратной стороны чека, использованного для оплаты "
+"товара."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__state__inactive
@@ -3076,6 +3975,8 @@ msgstr "Неактивный"
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__explanation
 msgid "Include timelines, cardholder rationale, and additional evidence."
 msgstr ""
+"Укажите временные рамки, обоснование держателя карты и дополнительные "
+"доказательства."
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -3119,6 +4020,8 @@ msgstr "Недействительный сотрудник"
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Invalid email type must be one of 'submitted', 'won' or 'lost'."
 msgstr ""
+"Недопустимый тип электронного письма. Допустимые варианты: 'Отправлено', 'В "
+"вашу пользу' или 'Отказано'."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3246,7 +4149,7 @@ msgstr "Услуги прачечных и химчисток"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Learn more about how your dispute is handled"
-msgstr ""
+msgstr "Узнайте больше о том, как обрабатывается ваше заявление на оспаривание"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.legal_services_attorneys
@@ -3273,7 +4176,7 @@ msgstr "Ограничение ответственности"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Linked expenses"
-msgstr ""
+msgstr "Связанные расходы"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_topup_wizard__is_live_mode
@@ -3283,7 +4186,7 @@ msgstr "Реальный режим"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__loss_reason
 msgid "Loss Reason"
-msgstr ""
+msgstr "Причина отказа"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__cancellation_reason__lost
@@ -3400,7 +4303,7 @@ msgstr "Магазины мужской и подростковой одежды
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__product_type__merchandise
 msgid "Merchandise"
-msgstr ""
+msgstr "Товар"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_product_product__stripe_mcc_ids
@@ -3549,7 +4452,7 @@ msgstr "Магазины и дилеры мотоциклов"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Multiple cards for one dispute is not possible."
-msgstr ""
+msgstr "Привязка нескольких карт к одному оспариванию невозможна."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.music_stores_musical_instruments_pianos_and_sheet_music
@@ -3616,7 +4519,7 @@ msgstr "MCC не установлен"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__no_valid_authorization
 msgid "No Valid Authorization"
-msgstr ""
+msgstr "Отсутствует корректная авторизация"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3628,18 +4531,18 @@ msgstr "Страна не найдена"
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "No file provided for upload."
-msgstr ""
+msgstr "Файл для загрузки не предоставлен."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "No file was uploaded for this field."
-msgstr ""
+msgstr "Для этого поля не загружен файл."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__policy_compliance__no_policy
 msgid "No policy"
-msgstr ""
+msgstr "Нет подходящего политики"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3682,12 +4585,12 @@ msgstr "Потребительские товары"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__not_received
 msgid "Not Received"
-msgstr ""
+msgstr "Не получено"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__not_as_described
 msgid "Not as Described"
-msgstr ""
+msgstr "Не соответствует описанию"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__message_needaction_counter
@@ -3781,19 +4684,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Only an expense manager can create or update a dispute."
-msgstr ""
+msgstr "Только менеджер расходов может создавать или обновлять оспаривание."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Only an expense manager can edit a dispute."
-msgstr ""
+msgstr "Только менеджер расходов может редактировать оспаривание."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Only an expense manager can submit a dispute."
-msgstr ""
+msgstr "Только менеджер расходов может отправлять заявление на оспаривание."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3809,11 +4712,13 @@ msgid ""
 "Only one bank statement can be created from a single stripe transaction (two "
 "are allowed for a dispute: reinstatement and rescindment)"
 msgstr ""
+"Из одной транзакции Stripe можно сформировать только одну банковскую выписку "
+"(для оспаривания допускается две: восстановление и аннулирование)"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.res_config_settings_view_form
 msgid "Open MCC"
-msgstr ""
+msgstr "Открыть MCC"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -3850,7 +4755,7 @@ msgstr "Исходный номер телефона"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__original_transaction
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__proof_of_original_payment__original_transaction
 msgid "Original Transaction ID"
-msgstr ""
+msgstr "ID исходной транзакции"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.orthopedic_goods_prosthetic_devices
@@ -3937,7 +4842,7 @@ msgstr "Оплатить"
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "Платеж"
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_account_payment_method_line
@@ -4006,6 +4911,8 @@ msgstr "Ткани, галантерея и другие текстильные 
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "Please contact Odoo for more information about this dispute.\n"
 msgstr ""
+"Пожалуйста, свяжитесь с Odoo для получения подробной информации об этом "
+"оспаривании.\n"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -4028,7 +4935,7 @@ msgstr "Сантехника, отопительное оборудование 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__policy_compliance
 msgid "Policy Compliance"
-msgstr ""
+msgstr "Соответствие политике"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.political_organizations
@@ -4048,7 +4955,7 @@ msgstr "Драгоценные камни, металлы, часы и ювел�
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__reason__canceled
 msgid "Previously Canceled"
-msgstr ""
+msgstr "Ранее отменено"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4059,7 +4966,7 @@ msgstr "Закрытый ключ, используемый для Stripe Issuin
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__product_description
 msgid "Product Description"
-msgstr ""
+msgstr "Описание товара"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_product_mcc_stripe_tag__product_name
@@ -4069,7 +4976,7 @@ msgstr "Название товара"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__product_type
 msgid "Product Type"
-msgstr ""
+msgstr "Тип товара"
 
 #. module: hr_expense_stripe
 #: model:ir.model,name:hr_expense_stripe.model_product_product
@@ -4089,7 +4996,7 @@ msgstr "Профессиональные услуги и членские орг
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__proof_of_original_payment
 msgid "Proof Of Original Payment"
-msgstr ""
+msgstr "Подтверждение исходного платежа"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.public_warehousing_and_storage
@@ -4141,7 +5048,7 @@ msgstr "Причина"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__received_at
 msgid "Received Date"
-msgstr ""
+msgstr "Дата получения"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.record_stores
@@ -4161,7 +5068,7 @@ msgstr "Обновить"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__return_status__merchant_rejected
 msgid "Rejected"
-msgstr ""
+msgstr "Отклонено"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_card__user_id
@@ -4193,13 +5100,13 @@ msgstr "Запрос разрешен только держателю карты
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Required"
-msgstr ""
+msgstr "Обязательно"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Rescission of stripe transaction %(tr_id)s"
-msgstr ""
+msgstr "Аннулирование транзакции Stripe %(tr_id)s"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -4225,17 +5132,17 @@ msgstr "Услуги розничных торговых точек"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__returned_at
 msgid "Return Date"
-msgstr ""
+msgstr "Дата возврата"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__return_description
 msgid "Return Description"
-msgstr ""
+msgstr "Описание возврата"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__return_status
 msgid "Return Status"
-msgstr ""
+msgstr "Статус возврата"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__returned
@@ -4251,13 +5158,13 @@ msgstr "Показать"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Reversal of %(name)s"
-msgstr ""
+msgstr "Сторнирование %(name)s"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/account_bank_statement_line.py:0
 msgid "Reversal of stripe transaction %(tr_id)s"
-msgstr ""
+msgstr "Сторнирование транзакции Stripe %(tr_id)s"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.roofing_siding_sheet_metal
@@ -4279,7 +5186,7 @@ msgstr "Сохранить"
 #. odoo-javascript
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.xml:0
 msgid "Save for later"
-msgstr ""
+msgstr "Отложить"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4307,7 +5214,7 @@ msgstr "Sent to the administrator when Stripe restricts the account"
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
 msgid "Sent to the person that submitted the dispute"
-msgstr ""
+msgstr "Отправлено пользователю, подавшему заявление на оспаривание"
 
 #. module: hr_expense_stripe
 #: model:mail.template,description:hr_expense_stripe.email_template_hr_expense_stripe_card_canceled
@@ -4329,7 +5236,7 @@ msgstr "Станции технического обслуживания"
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__product_type__service
 msgid "Service or digital goods"
-msgstr ""
+msgstr "Услуга или цифровые товары"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4338,6 +5245,8 @@ msgid ""
 "Several expenses sharing the same stripe transaction id use different "
 "currencies. Please verify the currencies of the expenses."
 msgstr ""
+"Несколько расходов с одинаковым ID транзакции Stripe используют разные "
+"валюты. Пожалуйста, проверьте валюты расходов."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.sewing_needlework_fabric_and_piece_goods_stores
@@ -4529,7 +5438,7 @@ msgstr "Валюта Stripe"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__stripe_id
 msgid "Stripe Dispute ID"
-msgstr ""
+msgstr "ID оспаривания в Stripe"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_employee__private_stripe_id
@@ -4604,7 +5513,7 @@ msgstr ""
 #. module: hr_expense_stripe
 #: model:ir.module.module,description:base.module_hr_expense_stripe
 msgid "Stripe Issuing integration for expenses"
-msgstr ""
+msgstr "Интеграция Stripe Issuing для расходов"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4688,6 +5597,8 @@ msgid ""
 "Stripe has determined that this is an invalid use of the card network "
 "dispute process; no dispute conditions apply.\n"
 msgstr ""
+"Сервис Stripe установил, что данный случай не подпадает под правила "
+"оспаривания операций в платежной системе.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4696,6 +5607,8 @@ msgid ""
 "Stripe has restricted your account. Please update your information by the %"
 "(due_date)s to avoid disruption."
 msgstr ""
+"Сервис Stripe ограничил доступ к вашему аккаунту. Пожалуйста, обновите "
+"данные до %(due_date)s, чтобы избежать приостановки обслуживания."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4727,7 +5640,7 @@ msgstr "ID транзакции Stripe"
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.js:0
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.xml:0
 msgid "Submit"
-msgstr ""
+msgstr "Отправить"
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -4735,7 +5648,7 @@ msgstr ""
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 #: code:addons/hr_expense_stripe/static/src/components/dispute_form_view.js:0
 msgid "Submit Dispute"
-msgstr ""
+msgstr "Отправить оспаривание"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_card__shipping_status__submitted
@@ -4747,7 +5660,7 @@ msgstr "Отправлено"
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_dispute__submitted_by
 msgid "Submitted By"
-msgstr ""
+msgstr "Кем подано"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_dispute__additional_documentation
@@ -4755,6 +5668,8 @@ msgid ""
 "Supporting files or images. Please combine them into a PDF or JPEG, and "
 "upload it here."
 msgstr ""
+"Подтверждающие файлы или изображения. Пожалуйста, объедините их в один файл "
+"PDF или JPEG и загрузите сюда."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.swimming_pools_sales
@@ -4850,6 +5765,8 @@ msgid ""
 "The ISO country code in two chars. \n"
 "You can use this field for quick search."
 msgstr ""
+"Код страны в формате ISO из двух символов.\n"
+"Вы можете использовать это поле для быстрого поиска."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -4896,7 +5813,7 @@ msgstr "Адрес, по которому будет доставлена кар
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The amount disputed should match the amount on the expenses."
-msgstr ""
+msgstr "Оспариваемая сумма должна совпадать с суммой в расходах."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5005,6 +5922,10 @@ msgid ""
 "cardholder.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Держатель карты утверждает, что отменил подписку/заказ, однако у продавца "
+"нет записей об отмене, и держатель карты не предоставил подтверждений.\n"
+"Сервис Stripe рассмотрел предоставленные доказательства и признал их "
+"убедительными.\n"
 
 #. module: hr_expense_stripe
 #: model:mail.message.subtype,description:hr_expense_stripe.mt_stripe_cardholder_updated
@@ -5037,6 +5958,9 @@ msgid ""
 "on previous transactions.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Держатель карты или банк-эмитент не заблокировали карту после заявления о "
+"мошенничестве по предыдущим операциям.\n"
+"Оспаривание было автоматически отклонено платежной системой.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5064,6 +5988,7 @@ msgstr "Код доступа к вашей корпоративной карт�
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The content type provided is not valid for the purpose '%(purpose)s'."
 msgstr ""
+"Предоставленный тип содержимого не подходит для назначения «%(purpose)s»."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5122,18 +6047,20 @@ msgid ""
 "The dispute can only be submitted if the journal entries of all related "
 "expenses are posted."
 msgstr ""
+"Оспаривание может быть отправлено только после проведения всех связанных "
+"проводок по расходам."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The dispute has been %(status)s."
-msgstr ""
+msgstr "Статус оспаривания изменился на: %(status)s."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The dispute has been updated."
-msgstr ""
+msgstr "Данные оспаривания обновлены."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5144,6 +6071,9 @@ msgid ""
 "transaction amount.\n"
 "The dispute was automatically rejected due to this discrepancy.\n"
 msgstr ""
+"Оспаривание недействительно, так как по операции уже был выполнен возврат, и "
+"общая сумма возврата и оспаривания превышает сумму исходной транзакции.\n"
+"Оспаривание было автоматически отклонено из-за обнаруженного расхождения."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5152,6 +6082,8 @@ msgid ""
 "The dispute was submitted past the disputable deadline.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Заявление на оспаривание было подано с нарушением установленного срока.\n"
+"Оспаривание было автоматически отклонено платежной системой.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5161,18 +6093,21 @@ msgid ""
 "to the transaction being authorized as indicated in the Mastercard Core "
 "Rules and Mastercard Product and Service Rules.\n"
 msgstr ""
+"Оспаривание по Условию 11.3 «Отсутствие авторизации» недействительно, так "
+"как операция была авторизована в соответствии с основными правилами и "
+"регламентами Mastercard.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "The disputed amount cannot be greater than the expense amount."
-msgstr ""
+msgstr "Оспариваемая сумма не может превышать сумму расхода."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "The disputed amount cannot be negative."
-msgstr ""
+msgstr "Оспариваемая сумма не может быть отрицательной."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5188,12 +6123,14 @@ msgid ""
 "The file name provided is not valid. Only use alpha-numeric characters or '.-"
 "_'."
 msgstr ""
+"Недопустимое имя файла. Используйте только латинские буквы, цифры или "
+"символы «.-_»."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The file provided is too large. Maximum size is %(size)s MiB."
-msgstr ""
+msgstr "Загруженный файл слишком большой. Максимальный размер: %(size)s МиБ."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_card_receive_wizard__last_4_challenge
@@ -5222,6 +6159,10 @@ msgid ""
 "present transaction was authorized with a chip-reading terminal.\n"
 "This dispute was automatically rejected by the card network.\n"
 msgstr ""
+"При оспаривании мошеннических операций с присутствием карты ответственность "
+"переносится на банк-эмитент, если транзакция была авторизована через "
+"терминал с чтением чипа.\n"
+"Оспаривание было автоматически отклонено платежной системой.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5231,6 +6172,10 @@ msgid ""
 "authorized by the cardholder.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Продавец предоставил доказательства того, что операция была санкционирована "
+"держателем карты.\n"
+"Сервис Stripe рассмотрел предоставленные доказательства и признал их "
+"убедительными.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5240,6 +6185,10 @@ msgid ""
 "delivered.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Продавец предоставил доказательства того, что товар был отправлен или "
+"доставлен.\n"
+"Сервис Stripe рассмотрел предоставленные доказательства и признал их "
+"убедительными.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5249,6 +6198,10 @@ msgid ""
 "matched the description.\n"
 "Stripe has evaluated this evidence and determined that it is compelling.\n"
 msgstr ""
+"Продавец предоставил информацию, подтверждающую, что предоставленный товар "
+"или услуга соответствовали описанию.\n"
+"Сервис Stripe рассмотрел предоставленные доказательства и признал их "
+"убедительными.\n"
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,help:hr_expense_stripe.field_hr_expense_stripe_card__card_name
@@ -5275,19 +6228,19 @@ msgstr "Номер телефона недействителен."
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The purpose '%(purpose)s' is not allowed to be used with this model."
-msgstr ""
+msgstr "Назначение «%(purpose)s» не может быть использовано с данной моделью."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The purpose provided is not valid."
-msgstr ""
+msgstr "Указано недопустимое назначение."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "The record doesn't exist."
-msgstr ""
+msgstr "Запись не существует."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5310,7 +6263,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "The specified field doesn't support attachments."
-msgstr ""
+msgstr "Указанное поле не поддерживает вложения."
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.view_hr_expense_stripe_card_form
@@ -5384,6 +6337,8 @@ msgid ""
 "This dispute has not met the minimum amount threshold set by the card "
 "network based on the MCC.\n"
 msgstr ""
+"Сумма оспаривания не достигла минимального порога, установленного платежной "
+"системой для данного MCC-кода.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5392,6 +6347,8 @@ msgid ""
 "This dispute is invalid as more than 35 total disputes have been submitted "
 "within 120 calendar days of this dispute.\n"
 msgstr ""
+"Это оспаривание недействительно, так как за последние 120 календарных дней "
+"было подано более 35 оспариваний.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5403,6 +6360,12 @@ msgid ""
 "The liability is on the card provider for these types of transactions.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Это оспаривание недействительно, так как операция была совершена на "
+"терминале самообслуживания с помощью чипа и прошла онлайн-авторизацию "
+"(например, оплата картой с чипом на автоматической АЗС, паркомате или в "
+"банкомате).\n"
+"Ответственность за такие типы операций лежит на банке-эмитенте карты.\n"
+"Оспаривание было автоматически отклонено платежной системой.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5413,6 +6376,10 @@ msgid ""
 "for the card.\n"
 "The dispute was automatically rejected by the card network.\n"
 msgstr ""
+"Это оспаривание недействительно, так как продавец попытался применить 3DS "
+"для операции без присутствия карты (CNP), но у банка-эмитента не была "
+"включена поддержка 3DS для данной карты.\n"
+"Оспаривание было автоматически отклонено платежной системой.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5424,6 +6391,11 @@ msgid ""
 "With MEPS, the liability shifts onto the card provider.\n"
 "The dispute was automatically rejected by Mastercard.\n"
 msgstr ""
+"Это оспаривание недействительно, так как операция подпадает под условия "
+"Mastercard Easy Payment Service (MEPS), позволяющие принимать карты "
+"Mastercard без необходимости вводить PIN-код или подписывать чек.\n"
+"При использовании MEPS ответственность переносится на банк-эмитент карты.\n"
+"Оспаривание было автоматически отклонено системой Mastercard.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5432,6 +6404,9 @@ msgid ""
 "This dispute, created for Card-Not-Present fraud, is invalid because the "
 "card network has indicated the cardholder was securely authenticated.\n"
 msgstr ""
+"Оспаривание по причине мошенничества без присутствия карты недействительно, "
+"так как платежная система подтвердила успешную аутентификацию держателя "
+"карты.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5441,6 +6416,9 @@ msgid ""
 "ECI 5 Token Transaction where the Token Authentication Verification Value "
 "(TAVV) was included in the Authorization Request.\n"
 msgstr ""
+"Оспаривание по Условию 10.4 «Другие виды мошенничества» недействительно для "
+"токенизированной операции ECI 5, если значение проверки аутентификации "
+"токена (TAVV) было включено в запрос на авторизацию.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5450,6 +6428,9 @@ msgid ""
 "the criteria set by Mastercard.\n"
 "The dispute must include evidence of the correct amount.\n"
 msgstr ""
+"Оспаривание по Условию 12.5 «Неверная сумма» не соответствует критериям "
+"Mastercard.\n"
+"Оспаривание должно содержать доказательства корректной суммы.\n"
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5458,6 +6439,8 @@ msgid ""
 "This dispute, created under Condition 12.6: Duplicate Processing/Paid by "
 "Other Means, has not met the criteria set by Mastercard.\n"
 msgstr ""
+"Оспаривание по Условию 12.6 «Дублирование операции / Оплата другим способом» "
+"не соответствует критериям Mastercard.\n"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.timeshares
@@ -5529,7 +6512,7 @@ msgstr "Пополнить"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Total Amount"
-msgstr ""
+msgstr "Общая сумма"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.tourist_attractions_and_exhibits
@@ -5563,6 +6546,9 @@ msgid ""
 "Of the two or more transactions that are copies of each other, this is "
 "original undisputed one."
 msgstr ""
+"Транзакция (например, ipi_…), дубликатом которой является оспариваемая "
+"операция. Из двух или более копирующих друг друга транзакций эта является "
+"исходной и неоспоренной."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_card__spending_policy_transaction_amount
@@ -5594,6 +6580,7 @@ msgid ""
 "Transaction amount exceeded the card daily/transaction hard limit of "
 "50,000 €."
 msgstr ""
+"Сумма операции превысила лимит по карте (50 000 € на транзакцию или в день)."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -5605,7 +6592,7 @@ msgstr "Транзакция создана из %(expense)s"
 #. odoo-python
 #: code:addons/hr_expense_stripe/models/hr_expense.py:0
 msgid "Transaction must be captured to submit a dispute."
-msgstr ""
+msgstr "Транзакция должна быть проведена для подачи заявления на оспаривание."
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_topup_wizard_form
@@ -5702,7 +6689,7 @@ msgstr "Без лимита"
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_res_company__unmapped_mcc_count
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_res_config_settings__unmapped_mcc_count
 msgid "Unmapped Mcc Count"
-msgstr ""
+msgstr "Количество несопоставленных MCC"
 
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.view_hr_expense_stripe_card_form
@@ -5713,13 +6700,13 @@ msgstr "Обновить информацию"
 #. odoo-javascript
 #: code:addons/hr_expense_stripe/static/src/components/stripe_attachment_widget.xml:0
 msgid "Upload"
-msgstr ""
+msgstr "Загрузить"
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "Uploading a file is only supported for single disputes."
-msgstr ""
+msgstr "Загрузка файла поддерживается только для отдельных оспариваний."
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.used_merchandise_and_secondhand_stores
@@ -5913,7 +6900,7 @@ msgstr "Магазины женской одежды"
 #: model:ir.model.fields.selection,name:hr_expense_stripe.selection__hr_expense_stripe_dispute__state__won
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "Won"
-msgstr ""
+msgstr "В вашу пользу"
 
 #. module: hr_expense_stripe
 #: model:product.mcc.stripe.tag,name:hr_expense_stripe.wrecking_and_salvage_yards
@@ -5978,6 +6965,8 @@ msgid ""
 "You can only create a dispute for an expense linked to a Stripe transaction "
 "or authorization."
 msgstr ""
+"Оспаривание можно создать только для расхода, связанного с транзакцией или "
+"авторизацией Stripe."
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -5986,6 +6975,8 @@ msgid ""
 "You can only submit a dispute once. If you have additional evidence, press "
 "\"Discard\" and add it later."
 msgstr ""
+"Отправить заявление на оспаривание можно только один раз. Если у вас есть "
+"дополнительные доказательства, нажмите «Отменить» и добавьте их позже."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -6044,12 +7035,13 @@ msgstr "Нельзя удалить расход, созданный из тра
 #: code:addons/hr_expense_stripe/models/hr_expense_stripe_dispute.py:0
 msgid "You cannot download an attachment of a dispute you're not linked to."
 msgstr ""
+"Вы не можете скачать вложение оспаривания, к которому у вас нет доступа."
 
 #. module: hr_expense_stripe
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "You cannot download stripe attachment for the given model."
-msgstr ""
+msgstr "Вы не можете скачать вложение Stripe для данной модели."
 
 #. module: hr_expense_stripe
 #. odoo-python
@@ -6121,7 +7113,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_expense_stripe/controllers/main.py:0
 msgid "You cannot upload stripe attachment for the given model."
-msgstr ""
+msgstr "Вы не можете загрузить вложение Stripe для данной модели."
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -6136,6 +7128,8 @@ msgid ""
 "You do not have the necessary access rights to file a dispute. Please "
 "contact your expense administrator to file the dispute."
 msgstr ""
+"У вас нет прав доступа для подачи заявления на оспаривание. Пожалуйста, "
+"обратитесь к администратору расходов."
 
 #. module: hr_expense_stripe
 #. odoo-javascript
@@ -6184,17 +7178,17 @@ msgstr "Вы должны быть подключены к Stripe, чтобы н
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_dispute_lost
 msgid "Your Dispute for the transaction {{ object.name }} Has Been Lost"
-msgstr ""
+msgstr "Ваше заявление на оспаривание транзакции {{ object.name }} отклонено"
 
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_dispute_submitted
 msgid "Your Dispute for the transaction {{ object.name }} Has Been Submitted"
-msgstr ""
+msgstr "Ваше заявление на оспаривание транзакции {{ object.name }} отправлено"
 
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_dispute_won
 msgid "Your Dispute for the transaction {{ object.name }} Has Been Won"
-msgstr ""
+msgstr "Оспаривание по транзакции {{ object.name }} завершено в вашу пользу"
 
 #. module: hr_expense_stripe
 #: model:mail.template,subject:hr_expense_stripe.email_template_hr_expense_stripe_card_canceled
@@ -6248,6 +7242,8 @@ msgstr ""
 msgid ""
 "Your dispute creation rate limit has been reached. Please try again later."
 msgstr ""
+"Превышен лимит на создание запросов на оспаривание. Пожалуйста, повторите "
+"попытку позже."
 
 #. module: hr_expense_stripe
 #: model:ir.model.fields,field_description:hr_expense_stripe.field_hr_expense_stripe_cardholder_wizard__billing_zip
@@ -6257,7 +7253,7 @@ msgstr "Почтовый индекс"
 #. module: hr_expense_stripe
 #: model_terms:ir.ui.view,arch_db:hr_expense_stripe.hr_expense_stripe_dispute_form
 msgid "here"
-msgstr ""
+msgstr "здесь"
 
 #. module: hr_expense_stripe
 #. odoo-python

@@ -86,6 +86,7 @@ class SignContract(Sign):
             request.env.flush_all()
             version.write({'active': True})
             if must_archive_current_version:
+                self.env['hr.payslip'].sudo().search([('version_id', '=', current_employee_version.id)]).write({'version_id': version.id})
                 current_employee_version.write({'active': False})
             if version.employee_id:
                 version.employee_id.active = True
@@ -767,11 +768,11 @@ class HrContractSalary(http.Controller):
         new_version.final_yearly_costs = float(benefits_values['final_yearly_costs'] or 0.0)
 
         benefits_values = benefits['version']
-        with hr_version_context(request):
-            version = offer._get_version()
-            new_version.write({
-                'payroll_properties': dict(version.payroll_properties),
-            })
+        with hr_version_context(request, invalidate=True):
+            payroll_properties = dict(offer._get_version().payroll_properties)
+        new_version.write({
+            'payroll_properties': payroll_properties,
+        })
         self._update_version_payroll_properties(new_version, benefits_values)
 
         return new_version, version_diff

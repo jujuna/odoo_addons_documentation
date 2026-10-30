@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
 "PO-Revision-Date: 2026-09-17 22:51+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
 "Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/equity/"
@@ -136,10 +136,10 @@ msgstr ""
 "                        In overeenstemming met onze wettelijke "
 "verplichtingen om klanten te identificeren, moeten we natuurlijke personen "
 "melden die direct of indirect ten minste 25% bezitten of controleren in het "
-"kapitaal of de stemrechten van <b><t t-out=\"user_id.company_id.name\"/></b>"
-". <br/> <br/>\n"
-"                        Vul het UBO-verzoek in via de bovenstaande "
-"link.<br/> <br/>\n"
+"kapitaal of de stemrechten van <b><t t-out=\"user_id.company_id.name\"/></"
+"b>. <br/> <br/>\n"
+"                        Vul het UBO-verzoek in via de bovenstaande link.<br/"
+"> <br/>\n"
 "                        Hartelijk dank,\n"
 "                        <t t-if=\"user_id.signature\">\n"
 "                            <br/>--<br/>\n"
@@ -404,8 +404,8 @@ msgid ""
 "company."
 msgstr ""
 "Uiteindelijke begunstigden zijn natuurlijke perso(o)n(en) die uiteindelijk "
-"eigenaar zijn van of zeggenschap hebben over de klant of de natuurlijke perso"
-"(o)n(en)\n"
+"eigenaar zijn van of zeggenschap hebben over de klant of de natuurlijke "
+"perso(o)n(en)\n"
 "                    voor wiens rekening of namens wie een transactie wordt "
 "uitgevoerd of een zakelijke relatie wordt aangegaan. Het\n"
 "                    omvat ook de natuurlijke personen die geen "
@@ -477,6 +477,12 @@ msgid "Cannot change security class type because it has linked transactions"
 msgstr ""
 "Kan het effectenklassetype niet wijzigen omdat er transacties aan gekoppeld "
 "zijn"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Cannot create new UBO for an existing holder"
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -1321,10 +1327,10 @@ msgstr ""
 "Executive Officer (CEO), Chief Financial Officer (CFO) of Treasurer "
 "(penningmeester) worden genoemd (of een equivalent hiervan). Als een "
 "rechtspersoon een mandaat uitoefent in het bestuur van het bedrijf, moet het "
-"alle mandaathouders op bestuursniveau vermelden, inclusief hun functie. "
-"<br/> Natuurlijke personen die geen controlerende participatie in het "
-"bedrijf of een formeel mandaat van welke aard dan ook hebben, maar die de "
-"facto een vergelijkbare controle over het bedrijf uitoefenen."
+"alle mandaathouders op bestuursniveau vermelden, inclusief hun functie. <br/"
+"> Natuurlijke personen die geen controlerende participatie in het bedrijf of "
+"een formeel mandaat van welke aard dan ook hebben, maar die de facto een "
+"vergelijkbare controle over het bedrijf uitoefenen."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
@@ -1520,6 +1526,12 @@ msgstr "Partner"
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids_all_have_email
 msgid "Partner Ids All Have Email"
 msgstr "Alle partner-id's hebben een e-mail"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Partner is not allowed to fill UBO form"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript

@@ -8,15 +8,16 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
+# 张飞虎 <feihu.zhang@live.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:54+0000\n"
-"PO-Revision-Date: 2026-09-18 02:24+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-23 17:53+0000\n"
+"PO-Revision-Date: 2026-10-11 12:34+0000\n"
+"Last-Translator: 张飞虎 <feihu.zhang@live.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-master/hr_payroll_account_iso20022/zh_Hans/>\n"
+"projects/odoo-20/hr_payroll_account_iso20022/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -50,7 +51,7 @@ msgstr "人力资源薪资支付报告向导"
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__sepa_priority__high
 msgid "High"
-msgstr ""
+msgstr "高"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_employee__id
@@ -68,19 +69,14 @@ msgid ""
 msgstr "即时支付将由银行直接处理，但会产生额外费用。"
 
 #. module: hr_payroll_account_iso20022
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payrun_payslip_kanban_card_view
-msgid "Mark as Paid"
-msgstr "标记为已付款"
-
-#. module: hr_payroll_account_iso20022
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payroll_payment_report_view_form
 msgid "Method"
-msgstr ""
+msgstr "方法"
 
 #. module: hr_payroll_account_iso20022
 #: model:hr.payroll.warning,name:hr_payroll_account_iso20022.hr_payroll_warning_employee_no_country
 msgid "Missing country on employee address"
-msgstr ""
+msgstr "员工地址缺少国家/地区"
 
 #. module: hr_payroll_account_iso20022
 #. odoo-python
@@ -88,7 +84,7 @@ msgstr ""
 msgid ""
 "No payment method found. Check the outgoing payment methods linked to the "
 "journal '%s'."
-msgstr ""
+msgstr "未找到付款方式。请检查与日记账“%s”关联的付款方式（支出）。"
 
 #. module: hr_payroll_account_iso20022
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payrun_payslip_kanban_card_view
@@ -108,32 +104,32 @@ msgstr "工资单"
 #. module: hr_payroll_account_iso20022
 #: model:ir.module.module,summary:base.module_hr_payroll_account_iso20022
 msgid "Pay your employees with SEPA payment."
-msgstr ""
+msgstr "使用 SEPA 付款支付员工工资。"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__payment_method_line_id
 msgid "Payment Method Line"
-msgstr ""
+msgstr "付款方式行"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__sepa_priority
 msgid "Priority"
-msgstr ""
+msgstr "优先级"
 
 #. module: hr_payroll_account_iso20022
 #: model:hr.payroll.warning,button_name:hr_payroll_account_iso20022.hr_payroll_warning_employee_no_country
 msgid "Review Employees"
-msgstr ""
+msgstr "审核员工"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__sepa_priority__sct
 msgid "SCT (Instant Credit Transfer)"
-msgstr ""
+msgstr "SCT（即时信用转账）"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_account_iso20022
 msgid "SEPA Payments for Payroll"
-msgstr ""
+msgstr "薪资 SEPA 付款"
 
 #. module: hr_payroll_account_iso20022
 #. odoo-python
@@ -150,7 +146,7 @@ msgstr "一些员工 (%s) 未填写工作联系人。"
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__sepa_priority__std
 msgid "Standard"
-msgstr ""
+msgstr "标准"
 
 #. module: hr_payroll_account_iso20022
 #. odoo-python
@@ -164,14 +160,14 @@ msgstr "日记账 '%s' 需要一个正确的IBAN 账号来通过SEPA付费。请
 #. odoo-python
 #: code:addons/hr_payroll_account_iso20022/wizard/hr_payroll_payment_report_wizard.py:0
 msgid "The payment date cannot be in the past."
-msgstr ""
+msgstr "付款日期不能早于今天。"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,help:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__payment_method_line_id
 msgid ""
 "The payment method to use for this payment report. It will determine the XML "
 "format to use."
-msgstr ""
+msgstr "此付款报告中使用的付款方式，它将决定所采用的 XML 格式。"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payslip__iso20022_uetr
@@ -182,3 +178,6 @@ msgstr "UETR"
 #: model:ir.model.fields,help:hr_payroll_account_iso20022.field_hr_payslip__iso20022_uetr
 msgid "Unique end-to-end transaction reference"
 msgstr "独特的端到端交易参考"
+
+#~ msgid "Mark as Paid"
+#~ msgstr "标记为已付款"

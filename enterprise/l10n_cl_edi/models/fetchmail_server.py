@@ -6,6 +6,7 @@ import os
 
 from lxml import etree
 
+from markupsafe import Markup
 from xmlrpc import client as xmlrpclib
 
 from odoo import api, fields, models, _
@@ -187,9 +188,13 @@ class FetchmailServer(models.Model):
                 _logger.info('Attachment %s has been discarded! Origin type: %s' % (attachment.fname, origin_type))
                 continue
             company = self._get_dte_recipient_company(xml_tree, origin_type)
-            if not company or not self._is_dte_enabled_company(company):
-                _logger.info('Attachment %s has been discarded! It is not a valid company (id: %s)' % (
-                    attachment.fname, company.id))
+            if not company:
+                _logger.info('Attachment %s has been discarded! No matching company has been found',
+                    attachment.fname)
+                continue
+            if not self._is_dte_enabled_company(company):
+                _logger.info('Attachment %s has been discarded! It is not a valid company (id: %s)',
+                    attachment.fname, company.id)
                 continue
             file_data = {
                 'name': attachment.fname,
@@ -266,13 +271,18 @@ class FetchmailServer(models.Model):
         status = xml_tree.findtext('IDENTIFICACION/ESTADO')
         error_status = xml_tree.findtext('REVISIONENVIO/REVISIONDTE/ESTADO')
         if error_status is not None:
-            msg = _('Incoming SII DTE result:<br/> '
-                    '<li><b>ESTADO</b>: %(status)s</li>'
-                    '<li><b>REVISIONDTE/ESTADO</b>: %(error_status)s</li>'
-                    '<li><b>REVISIONDTE/DETALLE</b>: %(details)s</li>',
-                      status=status, error_status=error_status, details=xml_tree.findtext('REVISIONENVIO/REVISIONDTE/DETALLE'))
+            msg = _(
+                "Incoming SII DTE result: %s",
+                Markup("<br/>")
+                + Markup("<li><b>ESTADO</b>: %s</li>") % status
+                + Markup("<li><b>REVISIONDTE/ESTADO</b>: %s</li>") % error_status
+                + Markup("<li><b>REVISIONDTE/DETALLE</b>: %s</li>") % xml_tree.findtext('REVISIONENVIO/REVISIONDTE/DETALLE'),
+            )
         else:
-            msg = _('Incoming SII DTE result:<br/><li><b>ESTADO</b>: %s</li>', status)
+            msg = _(
+                "Incoming SII DTE result: %s",
+                Markup("<br/><li><b>ESTADO</b>: %s</li>") % status,
+            )
         for move in moves:
             move.message_post(body=msg)
 

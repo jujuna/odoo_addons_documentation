@@ -39,10 +39,9 @@ test("hr.timesheet (kanban)(kpi)(leaderboard): Check that headers displays curre
         type: "kanban",
     });
     await checkKpiHeader();
-    // default date is 2019-03-11, as defined by the framework
-    expect("div[name=worked_time_kpi][title*='March']").toHaveCount(1);
-    expect("div[name=billable_time_kpi][title*='March']").toHaveCount(1);
-    expect("div[name=billing_rate_kpi][title*='March']").toHaveCount(1);
+    expect("div[name=worked_time_kpi][title*='January']").toHaveCount(1);
+    expect("div[name=billable_time_kpi][title*='January']").toHaveCount(1);
+    expect("div[name=billing_rate_kpi][title*='January']").toHaveCount(1);
 });
 
 test("hr.timesheet (kanban)(kpi)(leaderboard): Check basics, view is grouped.", async () => {

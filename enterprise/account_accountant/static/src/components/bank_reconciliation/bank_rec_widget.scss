@@ -208,8 +208,8 @@
         }
     }
 
-    &:where(:has(.o_bank_rec_widget_chatter_container)) {
-        .o_kanban_record:focus, .o_kanban_record:has(.o_selected_statement_line) {
+    :where(.o_bank_reconciliation_kanban_renderer_mobile) {
+        .o_kanban_record:focus, .o_kanban_record.o_bank_rec_statement_line_selected {
             outline: none;
             box-shadow: inset 0 0 0 $border-width $primary;
         }

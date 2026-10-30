@@ -57,3 +57,21 @@ class TestPayrollDepartureNotice(TestPayrollCommon):
         })
         self.assertEqual(wizard.l10n_be_first_contract_id, second_version_cdi)
         self.assertEqual(wizard.l10n_be_first_contract_date, date(2025, 2, 1))
+
+    def test_departure_fictive_hire_date_after_dismissal(self):
+        """
+        A fictive hire date later than the dismissal date must be ignored, otherwise the seniority becomes negative.
+        """
+        employee = self.env['hr.employee'].create({
+            'name': 'Future Fictive Hire Date',
+            'date_version': date(2025, 7, 1),
+            'contract_date_start': date(2025, 7, 1),
+            'employee_type_id': self.env.ref('hr.contract_type_employee').id,
+            'l10n_be_fictive_hire_date': date(2027, 12, 15),
+        })
+        departure = self.env['hr.employee.departure'].with_context(allowed_company_ids=self.belgian_company.ids, active_id=employee.id).create({
+            'dismissal_date': date(2026, 4, 1),
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+        })
+        self.assertEqual(departure.l10n_be_first_contract_date, date(2025, 7, 1))
+        self.assertNotIn('-', departure.l10n_be_seniority_description)

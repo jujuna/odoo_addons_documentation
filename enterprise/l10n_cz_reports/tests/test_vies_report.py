@@ -123,7 +123,7 @@ class CzechVIESReportTest(CzechReportsCommon):
         expected_xml = f"""
             <Pisemnost nazevSW="Odoo SA" verzeSW="{release.version}">
             <DPHSHV verzePis="02.01">
-                <VetaD shvies_forma="N" dokument="SHV" k_uladis="DPH" mesic="11" rok="2019" d_poddp="31.12.2019"/>
+                <VetaD shvies_forma="R" dokument="SHV" k_uladis="DPH" mesic="11" rok="2019" d_poddp="31.12.2019"/>
                 <VetaP typ_ds="P" zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679"
                        ulice="Pařížská Street" c_orient="25" naz_obce="PRAGUE 1" stat="ČESKÁ REPUBLIKA"
                        sest_jmeno="Because" sest_prijmeni="I am accountman!"/>
@@ -152,7 +152,7 @@ class CzechVIESReportTest(CzechReportsCommon):
         expected_xml = f"""
             <Pisemnost nazevSW="Odoo SA" verzeSW="{release.version}">
             <DPHSHV verzePis="02.01">
-                <VetaD shvies_forma="N" dokument="SHV" k_uladis="DPH" ctvrt="3" rok="2018" d_poddp="31.12.2019"/>
+                <VetaD shvies_forma="R" dokument="SHV" k_uladis="DPH" ctvrt="3" rok="2018" d_poddp="31.12.2019"/>
                 <VetaP typ_ds="P" zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679"
                        ulice="Pařížská Street" c_orient="25" naz_obce="PRAGUE 1" stat="ČESKÁ REPUBLIKA"
                        sest_jmeno="Because" sest_prijmeni="I am accountman!"/>

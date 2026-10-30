@@ -17,6 +17,18 @@ from odoo.tools import date_utils, float_round
 from odoo.tools.float_utils import float_compare
 from odoo.fields import Domain
 
+# old worker_code → new worker_code
+L10N_BE_YOUNG_WORKER_CODE_MAPPING = {
+    '035': '015',
+    '439': '495',
+    '487': '495',
+    '486': '496',
+    '020': '011',
+    # pupils and trainees, until the end of the year they turn 18
+    '027': '015',
+    '022': '011',
+}
+
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
@@ -47,7 +59,7 @@ class HrEmployee(models.Model):
 
     l10n_be_scale_seniority = fields.Integer(readonly=False, related="version_id.l10n_be_scale_seniority", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_be_scale_seniority_months = fields.Integer(readonly=False, related="version_id.l10n_be_scale_seniority_months", inherited=True, groups="hr_payroll.group_hr_payroll_user")
-    l10n_be_fictive_hire_date = fields.Date(string="Fictive Hire Date", groups="hr_payroll.group_hr_payroll_user", compute='_compute_l10n_be_fictive_hire_date', store=True, readonly=False)
+    l10n_be_fictive_hire_date = fields.Date(string="Fictive Hire Date", groups="hr_payroll.group_hr_payroll_user")
 
     first_contract_year_n1 = fields.Char(compute='_compute_first_contract_year', groups="hr_payroll.group_hr_payroll_user")
     first_contract_year_n2 = fields.Char(compute='_compute_first_contract_year', groups="hr_payroll.group_hr_payroll_user")
@@ -299,7 +311,7 @@ class HrEmployee(models.Model):
             else:
                 employee.l10n_be_show_effective_marital_warning = employee._get_effective_marital_at_date(min(date.today(), employee.version_id.date_end or date.max)) != employee.marital
 
-    def _get_effective_marital_at_date(self, target_date=date.today()):
+    def _get_effective_marital_at_date(self, target_date=None):
         """
         Determine the marital status used for withholding taxes at a given date.
 
@@ -309,6 +321,8 @@ class HrEmployee(models.Model):
         from the start of the calendar year.
         """
         self.ensure_one()
+        if target_date is None:
+            target_date = fields.Date.context_today(self)
         non_isolated = {'married', 'cohabitant'}
 
         # Get the version active at the date
@@ -340,10 +354,14 @@ class HrEmployee(models.Model):
 
     def _get_split_name(self):
         self.ensure_one()
-        names = re.sub(r"\([^()]*\)", "", self.name).strip().split()
-        first_name = names[-1]
-        last_name = ' '.join(names[:-1])
-        return first_name, last_name
+        if self.l10n_be_legal_first_name and self.l10n_be_legal_last_name:
+            return self.l10n_be_legal_first_name, self.l10n_be_legal_last_name
+        return self._l10n_be_split_name()
+
+    def _l10n_be_split_name(self):
+        self.ensure_one()
+        names = re.sub(r"\([^()]*\)", "", self.name or '').strip().split()
+        return ' '.join(names[:-1]), names[-1] if names else ''
 
     def _get_last_year_variable_revenues(self, date_from=None, excluded_codes=None):
         self.ensure_one()
@@ -387,15 +405,17 @@ class HrEmployee(models.Model):
                     v.contract_date_start <= self.contract_date_start and
                     v.contract_date_start >= date.today() - relativedelta(years=2)
                 )
-            if len(anterior_versions) < 4:
-                return False
-
-            if relativedelta(anterior_versions[-1].contract_date_end, anterior_versions[-4].contract_date_start).years >= 2:
-                return False
-
+            # All the versions of a contract share the same contract dates
             versions_by_contract_dates = anterior_versions.grouped(lambda v: (v.contract_date_start, v.contract_date_end))
+            last_contracts = sorted(versions_by_contract_dates.items())[-4:]  # Only take the last four contracts
+            if len(last_contracts) < 4:
+                return False
+
+            if relativedelta(last_contracts[-1][0][1], last_contracts[0][0][0]).years >= 2:
+                return False
+
             cdd_counter = 0
-            for (date_start, date_end), versions in list(versions_by_contract_dates.items())[-4:]:  # Only take the last four contracts
+            for (date_start, date_end), versions in last_contracts:
                 all_cdd_versions = all(v.fixed_term for v in versions)
                 at_least_3_months_contract = (date_start + relativedelta(months=3) - relativedelta(days=1)) <= date_end
                 if all_cdd_versions and at_least_3_months_contract:
@@ -489,43 +509,49 @@ class HrEmployee(models.Model):
         """
         self.ensure_one()
         periods = self.l10n_be_dimona_relation_id.period_ids.sorted('date_start')
-        versions = self.version_ids.filtered('contract_date_start').sorted('contract_date_start')
+        # All the versions of a contract share the same contract dates: one entry per contract.
+        versions_by_contract = self.version_ids.filtered('contract_date_start').sorted('date_version').grouped(
+            lambda v: (v.contract_date_start, v.contract_date_end))
+        contracts = sorted(versions_by_contract.items(), key=lambda item: item[0][0])
         if not periods:
             return ''
         period_index = version_index = 0
         # Both cursors hold the first day still to be covered on their own side.
         period_start = version_start = None
         wrong_category = wrong_committee = False
-        while period_index < len(periods) and version_index < len(versions):
-            period, version = periods[period_index], versions[version_index]
+        while period_index < len(periods) and version_index < len(contracts):
+            period = periods[period_index]
+            (contract_date_start, contract_date_end), contract_versions = contracts[version_index]
             period_start = period_start or period.date_start
-            version_start = version_start or version.contract_date_start
-            # An open ended period may only be covered by an open ended version and vice versa.
-            if period_start != version_start or bool(period.date_end) != bool(version.contract_date_end):
+            version_start = version_start or contract_date_start
+            # An open ended period may only be covered by an open ended contract and vice versa.
+            if period_start != version_start or bool(period.date_end) != bool(contract_date_end):
                 break
+            # Compare with the version effective at the start of the period
+            version = contract_versions.filtered(lambda v: v.date_start <= period_start)[-1:] or contract_versions[0]
             for declaration in period.declaration_ids.filtered(lambda d: d.declaration_type == 'dimona_in'):
                 features = (declaration.content or {}).get('dimonaIn', {}).get('features', {})
                 # The ONSS returns the worker type upper cased, unlike the version category.
                 wrong_category = wrong_category or (features.get('workerType') or '').lower() != version.l10n_be_dimona_category
                 wrong_committee = wrong_committee or features.get('jointCommissionNumber') != version.l10n_be_joint_committee_id.egov3_code
-            if period.date_end == version.contract_date_end:
+            if period.date_end == contract_date_end:
                 # Both sides end together, jump to the next pair.
                 period_index += 1
                 version_index += 1
                 period_start = version_start = None
-            elif version.contract_date_end < period.date_end:
-                # Several versions share that period, resume it the day after the version.
+            elif contract_date_end < period.date_end:
+                # Several contracts share that period, resume it the day after the contract.
                 version_index += 1
                 version_start = None
-                period_start = version.contract_date_end + timedelta(days=1)
+                period_start = contract_date_end + timedelta(days=1)
             else:
-                # Several periods share that version, resume it the day after the period.
+                # Several periods share that contract, resume it the day after the period.
                 period_index += 1
                 period_start = None
                 version_start = period.date_end + timedelta(days=1)
         messages = []
         # Leftovers on either side mean the two sequences stopped matching somewhere.
-        if period_index != len(periods) or version_index != len(versions):
+        if period_index != len(periods) or version_index != len(contracts):
             messages.append(self.env._("Dimona periods and contract versions are not aligned."))
         if wrong_category:
             messages.append(self.env._("The Dimona category does not match the contract version one."))
@@ -548,14 +574,6 @@ class HrEmployee(models.Model):
         for employee in self:
             first_contract_date = employee._get_first_contract_date()
             employee.l10n_be_company_seniority_years, employee.l10n_be_company_seniority_months = employee.version_id._difference_years_months(first_contract_date, today)
-
-    @api.depends('version_ids.contract_date_start')
-    def _compute_l10n_be_fictive_hire_date(self):
-        for employee in self:
-            if employee.company_id.country_id.code != 'BE':
-                employee.l10n_be_fictive_hire_date = False
-            elif not employee.l10n_be_fictive_hire_date and employee.first_contract_date:
-                employee.l10n_be_fictive_hire_date = employee.first_contract_date
 
     def adjust_wage_to_minimum_scale(self, minimum_wage, wage_type, seniority, is_cp302=False):
         self.ensure_one()
@@ -658,6 +676,60 @@ class HrEmployee(models.Model):
             },
         }
 
+    @api.model
+    def _get_l10n_be_too_old_worker_code_domain(self):
+        return [
+            ('l10n_be_worker_code_id.dmfa_code', 'in', list(L10N_BE_YOUNG_WORKER_CODE_MAPPING)),
+            ('birthday', '<', 'today =1d =1m -18y'),
+        ]
+
+    @api.model
+    def _get_l10n_be_too_old_worker_code_employees(self, employees=None):
+        belgian_companies = self.env.companies.filtered(lambda c: c.country_id.code == 'BE')
+        if not belgian_companies:
+            return self.browse()
+        domain = [
+            ('company_id', 'in', belgian_companies.ids),
+            *self._get_l10n_be_too_old_worker_code_domain(),
+        ]
+        if employees is None:
+            return self.search(domain)
+        return employees.filtered_domain(domain)
+
+    def l10n_be_action_update_worker_codes(self):
+        worker_codes = self.env['l10n.be.worker.code'].search([
+            ('dmfa_code', 'in', list(L10N_BE_YOUNG_WORKER_CODE_MAPPING.values())),
+        ])
+        worker_code_by_dmfa_code = {code.dmfa_code: code for code in worker_codes}
+        updated_employees = self.browse()
+        for employee in self._get_l10n_be_too_old_worker_code_employees(employees=self):
+            new_dmfa_code = L10N_BE_YOUNG_WORKER_CODE_MAPPING[employee.l10n_be_worker_code_id.dmfa_code]
+            new_worker_code = worker_code_by_dmfa_code.get(new_dmfa_code)
+            if not new_worker_code:
+                continue
+            employee.l10n_be_worker_code_id = new_worker_code
+            updated_employees |= employee
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': self.env._(
+                    "%(count)s employees have been updated",
+                    count=len(updated_employees),
+                ),
+                'type': 'success',
+                'sticky': False,
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'name': self.env._('Employees'),
+                    'res_model': 'hr.employee',
+                    'views': [(False, 'list'), (False, 'form')],
+                    'domain': [('id', 'in', updated_employees.ids)],
+                    'target': 'main',
+                },
+            },
+        }
+
     def _compute_spouse_fiscal_status_explanation_tooltip(self):
         no_income_threshold = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code('spouse_no_income_threshold')
         low_income_threshold = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code('spouse_low_income_threshold')
@@ -681,10 +753,10 @@ class HrEmployee(models.Model):
         for employee in self:
             if not employee.name or employee.l10n_be_legal_first_name or employee.l10n_be_legal_last_name:
                 continue
-            names = re.sub(r"\([^()]*\)", "", employee.name).strip().split()
+            first_name, last_name = employee._l10n_be_split_name()
             employee.update({
-                'l10n_be_legal_first_name': ' '.join(names[:-1]),
-                'l10n_be_legal_last_name': names[-1],
+                'l10n_be_legal_first_name': first_name,
+                'l10n_be_legal_last_name': last_name,
             })
 
     def _get_splitting_legal_name_countries(self):
@@ -845,7 +917,7 @@ class HrEmployee(models.Model):
         if not public_holiday_compensation_type:
             return
 
-        eligible_employees = self.filtered(lambda emp: emp.active and emp.l10n_be_worker_code_id)
+        eligible_employees = self.filtered(lambda emp: emp.active and emp.l10n_be_worker_code_id and emp.l10n_be_joint_committee_id.egov3_code != '999')
         if not eligible_employees:
             return
 
@@ -894,8 +966,8 @@ class HrEmployee(models.Model):
                     if leave.calendar_id and leave.calendar_id != version.resource_calendar_id:
                         continue
 
-                    version_start = version.contract_date_start
-                    version_end = version.contract_date_end
+                    version_start = version.date_start
+                    version_end = version.date_end
 
                     overlap_start = max(leave_date_from, version_start)
                     overlap_end = min(leave_date_to, version_end or leave_date_to)
@@ -938,6 +1010,9 @@ class HrEmployee(models.Model):
             lang = self.env['res.lang'].with_context(active_test=False).search([('code', '=', vals['lang'])])
             if lang and not lang.active:
                 self.env['base.language.install'].create({'lang_ids': [(6, 0, lang.ids)]}).lang_install()
+        contract_dates_changed = 'contract_date_start' in vals or 'contract_date_end' in vals
+        if contract_dates_changed:
+            old_contract_dates = {employee: (employee.contract_date_start, employee.contract_date_end) for employee in self}
         result = super().write(vals)
 
         if 'mobility_card' in vals:
@@ -946,27 +1021,28 @@ class HrEmployee(models.Model):
             ])
             car_ids._compute_mobility_card()
 
-        if 'contract_date_start' in vals:
-            contract_date_start = vals['contract_date_start']
-            if isinstance(contract_date_start, str):
-                contract_date_start = datetime.strptime(contract_date_start, "%Y-%m-%d")
-            outside_contract_public_holidays = self.env['hr.leave.allocation'].search([
-                ('employee_id', 'in', self.ids),
-                ('public_holiday_id.date_from', '<', contract_date_start),
-            ])
-            outside_contract_public_holidays.action_refuse()
-            outside_contract_public_holidays.unlink()
-
-            self.sudo()._create_public_holiday_allocations()
-
-        if 'contract_date_end' in vals:
-            contract_date_end = vals['contract_date_end']
-            if isinstance(contract_date_end, str):
-                contract_date_end = datetime.strptime(contract_date_end, "%Y-%m-%d")
-            outside_contract_public_holidays = self.env['hr.leave.allocation'].search([
-                ('employee_id', 'in', self.ids),
-                ('public_holiday_id.date_to', '>', contract_date_end),
-            ])
+        if contract_dates_changed:
+            # Only remove the public holiday allocations of the modified contract
+            # that are now outside of its new period
+            outside_contract_public_holidays = self.env['hr.leave.allocation']
+            for employee in self:
+                old_start, old_end = old_contract_dates[employee]
+                new_start, new_end = employee.contract_date_start, employee.contract_date_end
+                if not old_start:
+                    continue
+                removed_periods = []
+                if new_start and new_start > old_start:
+                    removed_periods.append((old_start, min(new_start - timedelta(days=1), old_end or date.max)))
+                if new_end and (not old_end or new_end < old_end):
+                    removed_periods.append((max(new_end + timedelta(days=1), old_start), old_end))
+                for period_start, period_end in removed_periods:
+                    domain = [
+                        ('employee_id', '=', employee.id),
+                        ('public_holiday_id.date_to', '>=', datetime.combine(period_start, datetime.min.time())),
+                    ]
+                    if period_end:
+                        domain.append(('public_holiday_id.date_from', '<=', datetime.combine(period_end, datetime.max.time())))
+                    outside_contract_public_holidays |= self.env['hr.leave.allocation'].search(domain)
             outside_contract_public_holidays.action_refuse()
             outside_contract_public_holidays.unlink()
 
@@ -976,6 +1052,10 @@ class HrEmployee(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        if lang_codes := [vals['lang'] for vals in vals_list if vals.get('lang')]:
+            langs = self.env['res.lang'].with_context(active_test=False).search([('code', 'in', lang_codes), ('active', '=', False)])
+            if langs:
+                self.env['base.language.install'].create({'lang_ids': [(6, 0, langs.ids)]}).lang_install()
         employees = super(HrEmployee, self.with_context(pending_employee_creation=True)).create(vals_list)
         updated_context = dict(employees.env.context)
         updated_context.pop('pending_employee_creation')
@@ -1012,36 +1092,14 @@ class HrEmployee(models.Model):
             technical_usage='l10n_be_hr_payroll_part_time',
         )
 
-    def _create_dimona_next_activity(self):
-        dimona_link = "https://www.socialsecurity.be/site_fr/employer/applics/dimona/index.htm"
-        dimona_link = '<a href="%s" target="_blank">%s</a>' % (dimona_link, dimona_link)
-        for employee in self:
-            employee.activity_schedule(
-                'mail.mail_activity_data_todo',
-                note=self.env._('State the Dimona at %(link)s to declare the arrival of %(employee)s.',
-                    link=dimona_link,
-                    employee=employee.name),
-                user_id=employee.current_version_id.hr_responsible_id.id or self.env.user.id,
-                summary='Dimona',
-                technical_usage='l10n_be_hr_payroll_dimona',
-            )
-
     def _trigger_l10n_be_next_activities(self):
         if self.env.context.get('pending_employee_creation'):
             return
-        activities_by_usage = dict(
-            self.env['mail.activity']._read_group(
-                domain=[
-                    ('res_model', '=', 'hr.employee'),
-                    ('res_id', 'in', self.ids),
-                    ('technical_usage', 'in', ['l10n_be_hr_payroll_dimona', 'l10n_be_hr_payroll_part_time']),
-                ],
-                groupby=['technical_usage'],
-                aggregates=['id:recordset'],
-            )
-        )
-        dimona_activities = activities_by_usage.get('l10n_be_hr_payroll_dimona', self.env['mail.activity'])
-        part_time_activities = activities_by_usage.get('l10n_be_hr_payroll_part_time', self.env['mail.activity'])
+        part_time_activities = self.env['mail.activity'].search([
+            ('res_model', '=', 'hr.employee'),
+            ('res_id', 'in', self.ids),
+            ('technical_usage', '=', 'l10n_be_hr_payroll_part_time'),
+        ])
 
         for employee in self.filtered('id'):
             has_part_time_activity = any(activity.res_id == employee.id
@@ -1049,14 +1107,6 @@ class HrEmployee(models.Model):
                 for activity in part_time_activities)
             if employee.current_version_id.l10n_be_time_credit and not has_part_time_activity:
                 employee._create_credit_time_next_activity()
-
-        dimona_to_do_employees = self.filtered(
-            lambda e: e.id
-            and e.id not in dimona_activities.mapped('res_id')
-            and e.current_version_id.l10n_be_joint_committee_id.egov3_code != '999'
-        )
-        if dimona_to_do_employees:
-            dimona_to_do_employees._create_dimona_next_activity()
 
     def action_open_relation(self):
         self.ensure_one()
@@ -1093,16 +1143,16 @@ class HrEmployee(models.Model):
             return []
         occupations = []
         occupation_dates = versions._get_occupation_dates()
-        for idx, (occ_versions, date_from, date_to) in enumerate(occupation_dates):
+        for occ_versions, date_from, date_to in occupation_dates:
             base_version = occ_versions[0]
-            next_occupation = occupation_dates[idx + 1] if idx < len(occupation_dates) - 1 else None
-            date_start_next_occupation = next_occupation[1] - relativedelta(days=1) if next_occupation else False
+            occupation_start = max(first_of_year, date_from)
+            occupation_end = min(date_to or date.max, last_of_year)
             attest_worked_days = occ_versions._get_l10n_be_holiday_attest_worked_days(
-                max(first_of_year, date_from), min(date_to or date.max, last_of_year)
+                occupation_start, occupation_end
             )
             occupations.append({
-                'date_start': max(first_of_year, base_version.date_version),
-                'date_end': date_start_next_occupation or last_of_year,
+                'date_start': occupation_start,
+                'date_end': occupation_end,
                 'hours_per_week': float_round(base_version.resource_calendar_id.hours_per_week, 2),
                 'days_per_week': float_round(base_version.resource_calendar_id.days_per_week, 2),
                 'reference_hours_per_week': float_round(base_version.reference_calendar_id.hours_per_week, 2) if base_version.reference_calendar_id else 0,
@@ -1469,7 +1519,11 @@ class HrEmployee(models.Model):
         year_end = date(year, 12, 31)
 
         # the last in contract day of the year can be the last work day of the year
-        contract_ends = self.version_ids.filtered_domain(Domain.OR([
+        # (only the contracts started by the end of the year)
+        contract_ends = self.version_ids.filtered_domain(Domain([
+            ('contract_date_start', '!=', False),
+            ('contract_date_start', '<=', year_end),
+        ]) & Domain.OR([
             Domain('contract_date_end', '=', False),
             Domain([
                 ('contract_date_end', '>=', year_beg),

@@ -7,10 +7,17 @@
             <form>
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="draft,ready,done"/>
-                    <button name="generate_declaration_xml_report" string="Generate XML Report" type="object" class="oe_highlight" invisible="xml_file"/>
-                    <button name="generate_declaration_xml_report" string="Re-Generate XML Report" type="object" invisible="not xml_file"/>
-                    <button name="action_post_onss_declaration" string="Post ONSS Declaration" type="object" class="oe_highlight" invisible="not xml_file"/>
+                    <button name="generate_declaration_xml_report" string="Generate XML Report" type="object" class="oe_highlight" invisible="xml_file or has_blocking_issues"/>
+                    <button name="generate_declaration_xml_report" string="Generate XML Report" type="object" class="oe_highlight" invisible="xml_file or not has_blocking_issues" disabled='1'/>
+                    <button name="generate_declaration_xml_report" string="Re-Generate XML Report" type="object" invisible="not xml_file or has_blocking_issues"/>
+                    <button name="generate_declaration_xml_report" string="Re-Generate XML Report" type="object" invisible="not xml_file or not has_blocking_issues" disabled='1'/>
+                    <button name="action_post_onss_declaration" string="Post ONSS Declaration" type="object" class="oe_highlight" invisible="not xml_file or state == 'error'"/>
                     <button name="create_onss_declaration" string="Create ONSS Declaration" type="object" groups="base.group_no_one" invisible="not xml_file"/>
+                    <button name="action_modify_declaration" string="Modify" type="object" invisible="state not in ('pending', 'in_progress', 'done')"
+                        help="Create a new declaration replacing this one, to send after correcting the data of the employee"/>
+                    <button name="action_cancel_declaration" string="Cancel" type="object" invisible="state not in ('pending', 'in_progress', 'done')"
+                        help="Create and generate the declaration cancelling this one at the ONSS"
+                        confirm="The declaration cancelling this one will be generated, it still has to be posted to the ONSS. Continue?"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -31,8 +38,9 @@
                     <group name="batch_declaration_info">
                         <group>
                             <field name="is_automatically_created" invisible="1"/>
+                            <field name="identification" invisible="1"/>
                             <field name="sector" readonly="is_automatically_created or state not in ('draft', 'error')"/>
-                            <field name="risk_id" readonly="is_automatically_created or state not in ('draft', 'error')" options="{'no_create': True}"/>
+                            <field name="risk_id" readonly="(is_automatically_created and identification != 'ZIMA001') or state not in ('draft', 'error')" options="{'no_create': True}"/>
                         </group>
                         <group name="batch_declaration_main">
                             <field name="environment"/>
@@ -45,12 +53,113 @@
                         </group>
                     </group>
                     <notebook>
+                        <page string="WECH001" invisible="identification != 'WECH001'">
+                            <div>
+                                <label for="month" string="Month of the end of the contract" class="me-3"/>
+                                <field name="month" required="identification == 'WECH001'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'WECH001'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                            <group>
+                                <group string="End of the Contract">
+                                    <field name="departure_id" invisible="not departure_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="WECH002" invisible="identification != 'WECH002'">
+                            <group>
+                                <group>
+                                    <label for="month" string="Declaration month"/>
+                                    <div class="o_row">
+                                        <field name="month" required="identification == 'WECH002'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                        <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                            required="identification == 'WECH002'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                    </div>
+                                    <field name="unemployment_start_date"/>
+                                    <field name="major_force_reason" invisible="code != '004'"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="WECH005" invisible="identification != 'WECH005'">
+                            <group>
+                                <group>
+                                    <label for="month" string="Declaration month"/>
+                                    <div class="o_row">
+                                        <field name="month" required="identification == 'WECH005'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                        <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                            required="identification == 'WECH005'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="WECH003" invisible="identification != 'WECH003'">
+                            <div>
+                                <label for="month" string="Month of the start of the part-time occupation" class="me-3"/>
+                                <field name="month" required="identification == 'WECH003'" class="me-3" readonly="state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'WECH003'" readonly="state not in ('draft', 'error')"/>
+                            </div>
+                            <group>
+                                <group string="Part-time Occupation">
+                                    <field name="version_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="WECH006" invisible="identification != 'WECH006'">
+                            <div>
+                                <label for="month" string="Declaration month" class="me-3"/>
+                                <field name="month" required="identification == 'WECH006'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'WECH006'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                            <group>
+                                <group string="Payslip">
+                                    <field name="payslip_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="WECH007" invisible="identification != 'WECH007'">
+                            <div>
+                                <label for="month" string="Declaration month" class="me-3"/>
+                                <field name="month" required="identification == 'WECH007'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'WECH007'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                        </page>
+                        <page string="WECH008" invisible="identification != 'WECH008'">
+                            <div>
+                                <label for="month" string="Declaration month" class="me-3"/>
+                                <field name="month" required="identification == 'WECH008'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'WECH008'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                            <group>
+                                <group string="Payslip">
+                                    <field name="payslip_id"/>
+                                    <field name="paid_hours" class="o_hr_narrow_field" widget="float_time"/>
+                                    <field name="net_salary" class="o_hr_narrow_field"/>
+                                    <field name="work_allowance" class="o_hr_narrow_field"/>
+                                </group>
+                                <group string="Occupation">
+                                    <field name="work_accident_indicator"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Validation Errors" name="validation_errors" invisible="not issues">
+                            <field name="issues" class="w-100" widget="actionable_warnings" invisible="not issues"/>
+                        </page>
                         <page string="WECH009" invisible="identification != 'WECH009'">
+                            <div>
+                                <label for="month" string="Month of the first youth or senior holidays" class="me-3"/>
+                                <field name="month" required="identification == 'WECH009'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'WECH009'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
                             <group>
                                 <group string="Holiday">
-                                    <field name="leave_allocation_id" readonly="is_automatically_created or state not in ('draft', 'error')"/>
-                                    <field name="holiday_hours" class="o_hr_narrow_field" readonly="is_automatically_created or state not in ('draft', 'error')"
-                                        widget="float_time" required="identification == 'WECH009'"/>
+                                    <field name="leave_allocation_id" readonly="1" invisible="not leave_allocation_id"/>
+                                    <field name="holiday_hours" string="Legal holidays taken before" class="o_hr_narrow_field" readonly="state not in ('draft', 'error')"
+                                        widget="float_time"/>
                                 </group>
                             </group>
                         </page>
@@ -62,10 +171,60 @@
                                     required="identification == 'WECH010'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
                             </div>
                         </page>
+                        <page string="ZIMA001" invisible="identification != 'ZIMA001'">
+                            <div>
+                                <label for="month" string="Month of the start of the risk" class="me-3"/>
+                                <field name="month" required="identification == 'ZIMA001'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'ZIMA001'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                            <group>
+                                <group string="Risk Period">
+                                    <field name="risk_start_date"/>
+                                    <field name="risk_end_date"/>
+                                    <field name="leave_ids" widget="many2many_tags"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="ZIMA002" invisible="identification != 'ZIMA002'">
+                            <div>
+                                <label for="month" string="Declaration month" class="me-3"/>
+                                <field name="month" required="identification == 'ZIMA002'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'ZIMA002'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                            <group>
+                                <group string="Payslip">
+                                    <field name="payslip_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="ZIMA003" invisible="identification != 'ZIMA003'">
+                            <div>
+                                <label for="month" string="Declaration month" class="me-3"/>
+                                <field name="month" required="identification == 'ZIMA003'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'ZIMA003'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                        </page>
+                        <page string="ZIMA006" name="zima006" invisible="identification != 'ZIMA006'">
+                            <div>
+                                <label for="month" string="Month of the return to work" class="me-3"/>
+                                <field name="month" required="identification == 'ZIMA006'" class="me-3" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                                <field name="year" class="o_hr_narrow_field" options="{'type': 'number', 'enable_formatting': false}"
+                                    required="identification == 'ZIMA006'" readonly="is_automatically_created or state not in ('draft', 'error')"/>
+                            </div>
+                            <group>
+                                <group string="Return to Work">
+                                    <field name="work_recovery_date"/>
+                                    <field name="origin_drs_id"/>
+                                </group>
+                            </group>
+                        </page>
                         <page name="raw_xml" string="File Content" invisible="not xml_file" groups="base.group_no_one">
                             <field name="xml_raw_content" widget="code" options="{'mode': 'xml', 'lineWrapping': True}"/>
                         </page>
-                        <page name="errors" string="Errors" invisible="not error_message">
+                        <page name="errors" string="ONSS Errors" invisible="not error_message">
                             <div class="alert alert-warning" role="alert" invisible="state != 'error'">
                                 <field name="error_message"/>
                             </div>
@@ -87,6 +246,7 @@
                 <field name="sector"/>
                 <field name="identification"/>
                 <field name="code"/>
+                <field name="work_recovery_date" optional="show"/>
                 <field name="xml_filename" string="Reference"/>
                 <field name="state" widget="state_selection" column_invisible="not context.get('onss_certificate_id')"
                     options="{'hide_label': False}"/>

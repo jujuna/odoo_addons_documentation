@@ -5,6 +5,12 @@ import { fields, models } from "@web/../tests/web_test_helpers";
 export class PlatformOrderProvider extends models.ServerModel {
     _name = "platform.order.provider";
 
+    code = fields.Selection({
+        selection: [
+            ["none", "No Provider Set"],
+            ["odoo_food", "Odoo Food"],
+        ],
+    });
     // `module_state` is a related field on `module_id` (comodel `ir.module.module`), which
     // isn't part of the mocked POS model set, so the server-fetched field definitions never
     // include it. Declare it locally so `model._fields` has it and `_order` can sort by it.

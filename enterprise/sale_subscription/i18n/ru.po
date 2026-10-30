@@ -6,14 +6,15 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 04:06+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-02 17:46+0000\n"
+"PO-Revision-Date: 2026-10-08 13:34+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-20/"
 "sale_subscription/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -49,6 +50,13 @@ msgid ""
 "    - Modify subscriptions with sales orders\n"
 "    - Generate invoice automatically at fixed intervals\n"
 msgstr ""
+"\n"
+"Этот модуль позволяет управлять подписками.\n"
+"\n"
+"Возможности:\n"
+"    - Создание и редактирование подписок\n"
+"    - Изменение подписок с помощью заказов покупателя\n"
+"    - Автоматическая генерация счетов через фиксированные интервалы\n"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__nbr
@@ -401,7 +409,7 @@ msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Вернуться к подп�
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> To Renew"
-msgstr ""
+msgstr "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> К продлению"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -431,7 +439,7 @@ msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Закрытие"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "<i class=\"oi\" data-icon=\"add\"/> Create address"
-msgstr ""
+msgstr "<i class=\"oi\" data-icon=\"add\"/> Создать адрес"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.payment_method_form
@@ -446,7 +454,7 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<small class=\"text-muted\">Plan</small>"
-msgstr ""
+msgstr "<small class=\"text-muted\">План</small>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -481,6 +489,8 @@ msgid ""
 "<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
 "data-icon=\"check\"/> Upsell</span>"
 msgstr ""
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Допродажа</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -544,7 +554,7 @@ msgstr "<span class=\"text-muted\">Следующий платеж</span>"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<span class=\"text-muted\">→</span>"
-msgstr ""
+msgstr "<span class=\"text-muted\">→</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -572,22 +582,22 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "<span>·</span>"
-msgstr ""
+msgstr "<span>·</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Invoices</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">Счета</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Period</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">Период</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "<strong class=\"smaller text-uppercase text-muted\">Plan</strong>"
-msgstr ""
+msgstr "<strong class=\"smaller text-uppercase text-muted\">План</strong>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
@@ -1014,7 +1024,7 @@ msgstr "Количество вложений"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
 msgid "Attributes"
-msgstr ""
+msgstr "Атрибуты"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__authorized
@@ -1210,6 +1220,8 @@ msgstr ""
 msgid ""
 "Cannot close %(subscriptions_name)s: subscription order with recurring plan."
 msgstr ""
+"Нельзя закрыть %(subscriptions_name)s: заказ подписки содержит регулярный "
+"план."
 
 #. module: sale_subscription
 #: model:product.template,name:sale_subscription.product_car_leasing_product_template
@@ -1266,7 +1278,7 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Choose a reason..."
-msgstr ""
+msgstr "Укажите причину..."
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -1315,7 +1327,7 @@ msgstr "Закрыть"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_date
 msgid "Close Date"
-msgstr ""
+msgstr "Дата закрытия"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__close_reason_id
@@ -1343,7 +1355,7 @@ msgstr "Закрыть подписку"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Close the recurring plan dropdown."
-msgstr ""
+msgstr "Свернуть список регулярных планов."
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__user_closable_options
@@ -1617,7 +1629,7 @@ msgstr "Состояние клиента"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_tag_ids
 msgid "Customer Tags"
-msgstr ""
+msgstr "Теги клиентов"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_zip
@@ -1672,37 +1684,37 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s months"
-msgstr ""
+msgstr "Доставка каждые %s мес."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s weeks"
-msgstr ""
+msgstr "Доставка каждые %s нед."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every %s years"
-msgstr ""
+msgstr "Доставка каждые %s г."
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every month"
-msgstr ""
+msgstr "Доставка каждый месяц"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every week"
-msgstr ""
+msgstr "Доставка каждую неделю"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "Deliver every year"
-msgstr ""
+msgstr "Доставка каждый год"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
@@ -1712,7 +1724,7 @@ msgstr "Адрес доставки"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__delivery_period_display
 msgid "Delivery Period Display"
-msgstr ""
+msgstr "Отображение периодичности доставки"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
@@ -1722,7 +1734,7 @@ msgstr "Детали"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Discard"
-msgstr ""
+msgstr "Сбросить"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -1808,7 +1820,7 @@ msgstr "Черновик"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Due"
-msgstr ""
+msgstr "К оплате"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template__duration_unit
@@ -1871,7 +1883,7 @@ msgstr "Конец периода"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid "Error during renewal of contract %(order_ids)s %(order_refs)s"
-msgstr ""
+msgstr "Ошибка при продлении договора %(order_ids)s %(order_refs)s"
 
 #. module: sale_subscription
 #. odoo-python
@@ -1901,7 +1913,7 @@ msgstr "Экспансия"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__purchase_price
 msgid "Expected Cost"
-msgstr ""
+msgstr "Плановые расходы"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -1950,7 +1962,7 @@ msgstr "Подписчики"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "For"
-msgstr ""
+msgstr "Для"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
@@ -1976,7 +1988,7 @@ msgstr "Ссылка для оплаты продаж"
 #. module: sale_subscription
 #: model:ir.module.module,summary:base.module_sale_subscription
 msgid "Generate recurring invoices and manage renewals"
-msgstr ""
+msgstr "Формирование регулярных счетов и управление продлением подписок"
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2124,6 +2136,8 @@ msgid ""
 "If you change the pricelist, the prices of all order lines will be updated "
 "accordingly."
 msgstr ""
+"При изменении прайс-листа цены во всех строках заказа будут обновлены "
+"автоматически."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2461,7 +2475,7 @@ msgstr "Отступ"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin_percent
 msgid "Margin (%)"
-msgstr ""
+msgstr "Маржа (%)"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__medium_id
@@ -2771,7 +2785,7 @@ msgstr "Статус счета заказа"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_name
 msgid "Order Line Name"
-msgstr ""
+msgstr "Наименование позиции заказа"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__name
@@ -2786,7 +2800,7 @@ msgstr "Статус заказа"
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_order_template
 msgid "Order Templates"
-msgstr ""
+msgstr "Шаблоны заказов"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__origin_order_id
@@ -2950,7 +2964,7 @@ msgstr "План"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/product/product.xml:0
 msgid "Plan not available"
-msgstr ""
+msgstr "План недоступен"
 
 #. module: sale_subscription
 #. odoo-python
@@ -3073,7 +3087,7 @@ msgstr "Товары"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Prorated"
-msgstr ""
+msgstr "Пропорционально"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_prorated_price
@@ -3221,7 +3235,7 @@ msgstr "Регулярная сумма"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
 msgid "Recurring Invoice"
-msgstr ""
+msgstr "Регулярный счет"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__plan_id
@@ -3504,7 +3518,7 @@ msgstr "Сохранить"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Save your subscription."
-msgstr ""
+msgstr "Сохранить подписку."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
@@ -3526,13 +3540,13 @@ msgstr "Выберите товар по подписке"
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select this product."
-msgstr ""
+msgstr "Выбрать этот товар."
 
 #. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select this recurring plan."
-msgstr ""
+msgstr "Выбрать этот регулярный план."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -3596,7 +3610,7 @@ msgstr "Настройки"
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_account_move_send
 msgid "Shared Send Invoice Wizard Functions"
-msgstr ""
+msgstr "Общие функции мастера отправки счетов"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__starred
@@ -3629,7 +3643,7 @@ msgstr "Дата начала:"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "Started"
-msgstr ""
+msgstr "Действует с"
 
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_state_change
@@ -3639,7 +3653,7 @@ msgstr "Изменение штата"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
 msgid "State before"
-msgstr ""
+msgstr "Предыдущее состояние"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4068,6 +4082,8 @@ msgid ""
 "The payment method you selected can only pay amounts starting from %s. "
 "Please create or select another one."
 msgstr ""
+"Выбранный метод оплаты позволяет оплачивать только суммы от %s. Пожалуйста, "
+"добавьте или выберите другой метод оплаты."
 
 #. module: sale_subscription
 #. odoo-python
@@ -4190,6 +4206,8 @@ msgid ""
 "the\n"
 "                following active subscriptions:"
 msgstr ""
+"Этот метод оплаты нельзя удалить, так как он привязан к\n"
+"                следующим активным подпискам:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -4290,7 +4308,7 @@ msgstr "Тип мероприятия"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__utm_reference
 msgid "UTM Reference"
-msgstr ""
+msgstr "UTM-метка"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -4326,7 +4344,7 @@ msgstr "Неоплаченная подписка"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_delivered_amount
 msgid "Untaxed Amount Delivered"
-msgstr ""
+msgstr "Сумма поставки без НДС"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_amount_invoiced
@@ -4417,7 +4435,7 @@ msgstr "Начало паузы пользователем"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Valid until"
-msgstr ""
+msgstr "Действителен до"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__visible_in_portal
@@ -4499,7 +4517,7 @@ msgstr "Недель"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
 msgid "When"
-msgstr ""
+msgstr "Когда"
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order__starred
@@ -4822,8 +4840,8 @@ msgstr ""
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/res_partner.py:0
-msgid "is_subscription"
-msgstr "is_subscription"
+msgid "id"
+msgstr ""
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,retention_button_link:sale_subscription.close_reason_1
@@ -4943,6 +4961,9 @@ msgstr ""
 #: model:mail.template,subject:sale_subscription.mail_template_subscription_rating
 msgid "{{ object.company_id.name }}: Service Rating Request"
 msgstr "{{ object.company_id.name }}: Запрос на оценку услуг"
+
+#~ msgid "is_subscription"
+#~ msgstr "is_subscription"
 
 #~ msgid "<i class=\"oi oi-fw\" data-icon=\"redo\"/> To Renew"
 #~ msgstr "<i class=\"oi oi-fw\" data-icon=\"redo\"/> Обновить"

@@ -1,15 +1,16 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* purchase_accountant
+# * purchase_accountant
 #
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:55+0000\n"
-"PO-Revision-Date: 2026-09-18 04:00+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-02 17:51+0000\n"
+"PO-Revision-Date: 2026-10-20 12:16+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "purchase_accountant/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -25,12 +26,31 @@ msgid ""
 "Add accrued menus and specific filters on purchase order lines for an easier "
 "closing process.\n"
 msgstr ""
+"\n"
+"Kapanış sürecini kolaylaştırmak için satınalma siparişi satırlarına birikmiş "
+"menüler ve özel filtreler ekleyin.\n"
 
 #. module: purchase_accountant
 #: model_terms:ir.ui.view,arch_db:purchase_accountant.res_config_settings_view_form
 msgid ""
 "Accounts used by the inventory valuation report to accrue the value of goods "
 "received but not billed yet, or billed but not received yet."
+msgstr ""
+"Stok değerleme raporu tarafından, teslim alınan ancak henüz "
+"faturalandırılmamış veya faturalandırılmış ancak henüz teslim alınmamış "
+"malların değerini tahakkuk ettirmek için kullanılan hesaplar."
+
+#. module: purchase_accountant
+#. odoo-python
+#: code:addons/purchase_accountant/models/purchase_order.py:0
+#: model:ir.model.fields,field_description:purchase_accountant.field_purchase_order__accrual_move_ids
+#: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_view_form
+msgid "Accrual Entries"
+msgstr ""
+
+#. module: purchase_accountant
+#: model:ir.model.fields,field_description:purchase_accountant.field_purchase_order__accrual_move_count
+msgid "Accrual Move Count"
 msgstr ""
 
 #. module: purchase_accountant
@@ -116,6 +136,7 @@ msgstr ""
 
 #. module: purchase_accountant
 #: model:ir.model.fields,field_description:purchase_accountant.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:purchase_accountant.field_purchase_order__display_name
 #: model:ir.model.fields,field_description:purchase_accountant.field_purchase_order_line__display_name
 #: model:ir.model.fields,field_description:purchase_accountant.field_res_config_settings__display_name
 msgid "Display Name"
@@ -127,12 +148,8 @@ msgid "For the Last 365 Days"
 msgstr ""
 
 #. module: purchase_accountant
-#: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_search
-msgid "Goods"
-msgstr ""
-
-#. module: purchase_accountant
 #: model:ir.model.fields,field_description:purchase_accountant.field_account_move_line__id
+#: model:ir.model.fields,field_description:purchase_accountant.field_purchase_order__id
 #: model:ir.model.fields,field_description:purchase_accountant.field_purchase_order_line__id
 #: model:ir.model.fields,field_description:purchase_accountant.field_res_config_settings__id
 msgid "ID"
@@ -145,12 +162,17 @@ msgstr ""
 
 #. module: purchase_accountant
 #: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_search
-msgid "Only goods lines"
+msgid "Only non-storable goods lines"
 msgstr ""
 
 #. module: purchase_accountant
 #: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_search
 msgid "Only service lines"
+msgstr ""
+
+#. module: purchase_accountant
+#: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_search
+msgid "Only storable goods lines"
 msgstr ""
 
 #. module: purchase_accountant
@@ -172,6 +194,11 @@ msgstr ""
 #. module: purchase_accountant
 #: model_terms:ir.ui.view,arch_db:purchase_accountant.res_config_settings_view_form
 msgid "Purchase Accruals:"
+msgstr ""
+
+#. module: purchase_accountant
+#: model:ir.model,name:purchase_accountant.model_purchase_order
+msgid "Purchase Order"
 msgstr ""
 
 #. module: purchase_accountant
@@ -200,6 +227,27 @@ msgid "Service"
 msgstr ""
 
 #. module: purchase_accountant
+#: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_list
+msgid "Total"
+msgstr ""
+
+#. module: purchase_accountant
+#: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_search
+msgid "Tracked Goods"
+msgstr ""
+
+#. module: purchase_accountant
+#: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_search
+msgid "Untracked Goods"
+msgstr ""
+
+#. module: purchase_accountant
 #: model_terms:ir.ui.view,arch_db:purchase_accountant.purchase_order_line_view_search
 msgid "Vendor"
+msgstr ""
+
+#. module: purchase_accountant
+#. odoo-python
+#: code:addons/purchase_accountant/models/purchase_order.py:0
+msgid "id"
 msgstr ""

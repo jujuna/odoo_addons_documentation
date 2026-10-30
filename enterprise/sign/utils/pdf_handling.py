@@ -5,7 +5,7 @@ import logging
 from io import BytesIO
 
 from odoo.exceptions import ValidationError
-from odoo.tools.pdf import DependencyError, errors, NameObject, PdfFileReader, PdfFileWriter, PdfReadError, NumberObject, DictionaryObject
+from odoo.tools.pdf import ArrayObject, DependencyError, errors, NameObject, PdfFileReader, PdfFileWriter, PdfReadError, NumberObject, DictionaryObject
 from odoo.tools.translate import LazyTranslate
 
 _lt = LazyTranslate(__name__)
@@ -72,9 +72,13 @@ def lock_pdf_interactive_forms(pdf_bytes):
         output_pdf.append_pages_from_reader(pdf_reader)
 
         for page in output_pdf.pages:
-            if "/Annots" in page:
-                for annot_ref in page["/Annots"]:
+            annots = page.get("/Annots")
+            # Skip malformed annotation data (e.g. /Annots pointing to a stream instead of an array)
+            if isinstance(annots, ArrayObject):
+                for annot_ref in annots:
                     annot_obj = annot_ref.get_object()
+                    if not isinstance(annot_obj, DictionaryObject):
+                        continue
 
                     # If the annotation is an interactive form Widget
                     if annot_obj.get("/Subtype") == "/Widget":
@@ -82,9 +86,13 @@ def lock_pdf_interactive_forms(pdf_bytes):
                             parent_annot_obj = annot_obj
                         else:
                             parent_annot_obj = annot_obj.get("/Parent", DictionaryObject()).get_object()
+                            if not isinstance(parent_annot_obj, DictionaryObject):
+                                continue
 
                         # Bit 1 (Value 1) = Read-Only Data
                         current_ff = parent_annot_obj.get("/Ff", 0)
+                        if not isinstance(current_ff, int):
+                            current_ff = 0
                         parent_annot_obj[NameObject("/Ff")] = NumberObject(current_ff | 1)
 
     except errors.PyPdfError as e:

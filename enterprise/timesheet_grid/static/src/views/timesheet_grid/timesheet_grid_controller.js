@@ -54,6 +54,7 @@ export class TimesheetGridController extends GridController {
             }
         }
         super.createRecord({
+            expandedFormRef: "hr_timesheet.timesheet_view_form_user",
             ...(params || {}),
             context,
         });

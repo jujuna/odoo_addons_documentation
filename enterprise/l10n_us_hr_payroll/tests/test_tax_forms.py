@@ -1,4 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import date
+
 from odoo.addons.l10n_us_hr_payroll.tests.common import CommonTestPayslips
 from odoo.tests import tagged, freeze_time
 
@@ -32,7 +34,8 @@ class TestTaxForms(CommonTestPayslips):
         })
 
         # don't call action_payslip_done() because when l10n_us_hr_payroll_account is installed, it will require accounting fields to be set
-        cls.create_payslip_run().slip_ids.write({'state': 'validated'})
+        cls.payslips = cls.create_payslip_run().slip_ids
+        cls.payslips.write({'state': 'validated'})
 
     def test_form_940(self):
         form_940 = self.env['l10n.us.940'].create({
@@ -62,3 +65,34 @@ Form 941,,US Company (Tax Form test),C Corporation or LLC as C Corp,,No,,,,,,,,,
 
         for expected, generated in zip(expected.splitlines(), content.splitlines()):
             self.assertEqual(expected, generated)
+
+    def test_forms_use_payment_date(self):
+        late_payslip = self.payslips[0]
+        late_payslip.paid_date = date(2025, 10, 2)
+        form_941_q3, form_941_q4 = self.env['l10n.us.941'].create([{
+            'irs_payment_option': 'eftps',
+            'tax_liability': 'monthly',
+            'quarter': quarter,
+        } for quarter in ('3', '4')])
+        self.assertEqual(form_941_q3.payslip_ids, self.payslips - late_payslip)
+        self.assertEqual(form_941_q4.payslip_ids, late_payslip)
+
+        late_payslip.paid_date = date(2026, 1, 2)
+        form_940_2025, form_940_2026 = self.env['l10n.us.940'].create([{
+            'irs_payment_option': 'eftps',
+            'year': year,
+        } for year in ('2025', '2026')])
+        self.assertEqual(form_940_2025.payslip_ids, self.payslips - late_payslip)
+        self.assertEqual(form_940_2026.payslip_ids, late_payslip)
+
+    def test_w2_uses_payment_date(self):
+        # l10n_us_hr_payroll_account only allows payslips with an accounting entry
+        if self.env['ir.module.module']._get('l10n_us_hr_payroll_account').state == 'installed':
+            self.skipTest("Payslips are validated without accounting entries")
+        late_payslip = self.payslips[0]
+        late_payslip.paid_date = date(2026, 1, 2)
+        form_w2_2025, form_w2_2026 = self.env['l10n.us.w2'].create([
+            {'date_start': date(year, 1, 1)} for year in (2025, 2026)
+        ])
+        self.assertEqual(form_w2_2025.payslip_ids, self.payslips - late_payslip)
+        self.assertEqual(form_w2_2026.payslip_ids, late_payslip)

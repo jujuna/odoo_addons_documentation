@@ -45,7 +45,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         payslip_results = {
             'HRA': 1846.15,
             'BASIC': 8153.85,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 10200.0,
             'GROSS': 10200.0,
             'EEMC': -350.0,
@@ -70,7 +70,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         payslip_results = {
             'HRA': 3692.31,
             'BASIC': 16307.69,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 20200.0,
             'GROSS': 20200.0,
             'EEMC': -700.0,
@@ -95,7 +95,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         payslip_results = {
             'HRA': 369.23,
             'BASIC': 1130.77,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 1700.0,
             'GROSS': 1700.0,
             'EEMC': -50.0,
@@ -120,7 +120,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         payslip_results = {
             'HRA': 4000.0,
             'BASIC': 16000.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 20200.0,
             'GROSS': 20200.0,
             'EEMC': -750.0,
@@ -148,7 +148,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         )
         payslip_results = {
             'BASIC': 10000.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 10200.0,
             'GROSS': 10200.0,
             'EEMC': -350.0,
@@ -178,7 +178,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         )
         payslip_results = {
             'BASIC': 20000.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 20200.0,
             'GROSS': 20200.0,
             'EEMC': -700.0,
@@ -208,7 +208,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         )
         payslip_results = {
             'BASIC': 1500.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 1700.0,
             'GROSS': 1700.0,
             'EEMC': -50.0,
@@ -238,7 +238,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         )
         payslip_results = {
             'BASIC': 20000.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 20200.0,
             'GROSS': 20200.0,
             'EEMC': -750.0,
@@ -286,7 +286,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         first_payslip_results = {
             'HRA': 4000.0,
             'BASIC': 9333.33,
-            'ALW.INT': 133.33,
+            'ALW_INT': 133.33,
             '713_GROSS': 13466.66,
             'GROSS': 13466.66,
             'EEMC': -673.33,
@@ -302,7 +302,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         second_payslip_results = {
             'HRA': 0.0,
             'BASIC': 6666.66,
-            'ALW.INT': 66.67,
+            'ALW_INT': 66.67,
             '713_GROSS': 6733.33,
             'GROSS': 6733.33,
             'EEMC': -76.67,
@@ -327,7 +327,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         control_payslip_results = {
             'HRA': 4000.0,
             'BASIC': 16000.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 20200.0,
             'GROSS': 20200.0,
             'EEMC': -750.0,
@@ -358,7 +358,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         payslip_results = {
             'HRA': 16480.0,
             'BASIC': 3520.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 20200.0,
             'GROSS': 20200.0,
             'EEMC': -750.0,
@@ -387,7 +387,7 @@ class TestSalaryRulesSchedulePays(TestL10NHkHrPayrollAccountCommon):
         )
         payslip_results = {
             'BASIC': 20000.0,
-            'ALW.INT': 200.0,
+            'ALW_INT': 200.0,
             '713_GROSS': 20200.0,
             'GROSS': 20200.0,
             'EEMC': -750.0,

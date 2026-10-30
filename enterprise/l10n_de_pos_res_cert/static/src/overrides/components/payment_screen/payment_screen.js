@@ -9,7 +9,7 @@ patch(PaymentScreen.prototype, {
             result &&
             !this.pos.data.network.offline &&
             this.pos.isRestaurantCountryGermanyAndFiskaly() &&
-            this.currentOrder.isReceiptInactive
+            (this.currentOrder.isReceiptInactive || this.currentOrder.isReceiptCancelled)
         ) {
             try {
                 await this.pos.createTransaction(this.currentOrder);

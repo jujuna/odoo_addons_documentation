@@ -110,7 +110,8 @@ class AccountReport(models.Model):
         We also drop the NOT NULL constraints for fields who are not required in account_analytic_line.
         """
         project_plan, other_plans = self.env['account.analytic.plan']._get_all_plans()
-        analytic_cols = SQL(", ").join(SQL('"account_analytic_line".%s', SQL.identifier(n._column_name())) for n in (project_plan + other_plans))
+        plan_cols = [plan._column_name() for plan in project_plan + other_plans]
+        analytic_cols = SQL(", ").join(SQL.identifier("account_analytic_line", col) for col in plan_cols)
         analytic_distribution_equivalent = SQL('to_jsonb(UNNEST(ARRAY_REMOVE(ARRAY[%s], NULL)))', analytic_cols)
 
         change_equivalence_dict = {
@@ -136,6 +137,7 @@ class AccountReport(models.Model):
                 change_equivalence_dict[aml_field] = SQL('"account_move_line".%s', SQL.identifier(aml_field))
 
         _stored_fields, fields_to_insert = self.env['account.move.line']._prepare_aml_shadowing_for_report(change_equivalence_dict)
+        fields_to_insert = SQL(", ").join([fields_to_insert, *(SQL("%s AS %s", SQL.identifier("account_analytic_line", col), SQL.identifier(f"analytic_plan_{col}")) for col in plan_cols)])
 
         return SQL("""
             (
@@ -151,8 +153,16 @@ class AccountReport(models.Model):
     def _get_report_query(self, options, date_scope, domain=None, cta_date_to=None) -> Query:
         # Override to add the context key which will eventually trigger the shadowing of the table
         context_self = self.with_context(account_report_analytic_groupby=options.get('analytic_groupby_option'))
+        query = super(AccountReport, context_self)._get_report_query(options, date_scope, domain, cta_date_to=cta_date_to)
 
-        return super(AccountReport, context_self)._get_report_query(options, date_scope, domain, cta_date_to=cta_date_to)
+        if options.get('analytic_groupby_option') and options.get('analytic_accounts_list') and not options.get('report_cash_basis'):
+            accounts = self.env['account.analytic.account'].browse(options['analytic_accounts_list'])
+            query.add_where(SQL("(%s)", SQL(" OR ").join(
+                SQL("%s IN %s", SQL.identifier("account_move_line", f"analytic_plan_{plan._column_name()}"), tuple(plan_accounts.ids))
+                for plan, plan_accounts in accounts.grouped('root_plan_id').items()
+            )))
+
+        return query
 
     def action_audit_cell(self, options, params):
         column_group_options = self._get_column_group_options(options, params['column_group_index'])

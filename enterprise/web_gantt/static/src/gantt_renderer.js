@@ -564,18 +564,6 @@ export class GanttRenderer extends Component {
         onWillStart(this.onWillStart);
         useBus(this.model.bus, "update", () => this.computeDerivedParams());
 
-        useEffect(() => {
-            // Re-compute grid columns on change
-            this.virtualGrid.firstColumn();
-            this.virtualGrid.lastColumn();
-            this.shouldComputeGridColumns = true;
-        });
-        useEffect(() => {
-            // Re-compute grid rows on change
-            this.virtualGrid.firstRow();
-            this.virtualGrid.lastRow();
-            this.shouldComputeGridRows = true;
-        });
         useListener(this.scrollRef, "scroll", this.throttledComputeHoverParams);
 
         onWillRender(this.onWillRender);
@@ -2644,28 +2632,13 @@ export class GanttRenderer extends Component {
             delete this.noDisplayedConnectors;
             this.computeDerivedParams();
         }
-
         if (this.shouldComputeSomeWidths) {
             this.computeSomeWidths();
         }
-
-        if (this.shouldComputeSomeWidths || this.shouldComputeGridColumns) {
-            this.computeVisibleColumns();
-        }
-
-        if (this.shouldComputeGridRows) {
-            this.virtualGrid.setRowHeights(this.gridRows);
-            this.computeVisibleRows();
-        }
-
-        if (
-            this.shouldComputeSomeWidths ||
-            this.shouldComputeGridColumns ||
-            this.shouldComputeGridRows
-        ) {
+        const columnsComputed = this.updateVisibleColumns();
+        const rowsComputed = this.updateVisibleRows();
+        if (columnsComputed || rowsComputed) {
             this.shouldComputeSomeWidths = false;
-            this.shouldComputeGridColumns = false;
-            this.shouldComputeGridRows = false;
             this.computeVisiblePills();
             if (this.shouldRenderConnectors()) {
                 this.computeVisibleConnectors();
@@ -2677,14 +2650,48 @@ export class GanttRenderer extends Component {
         if (this.containsReadonlyGroup()) {
             this.setupInitialReadonly();
         }
-
-        this.shouldComputeSomeWidths = false;
-        this.shouldComputeGridColumns = false;
-        this.shouldComputeGridRows = false;
     }
 
     onWillUnmount() {
         this.closeNotificationFn?.();
+    }
+
+    updateVisibleColumns() {
+        const firstCol = this.virtualGrid.firstColumn();
+        const lastCol = this.virtualGrid.lastColumn();
+        if (
+            this.shouldComputeSomeWidths ||
+            this.shouldComputeGridColumns ||
+            firstCol !== this.lastComputedFirstColumn ||
+            lastCol !== this.lastComputedLastColumn
+        ) {
+            this.computeVisibleColumns();
+            this.lastComputedFirstColumn = firstCol;
+            this.lastComputedLastColumn = lastCol;
+            this.shouldComputeGridColumns = false;
+            return true;
+        }
+        return false;
+    }
+
+    updateVisibleRows() {
+        if (this.shouldComputeGridRows) {
+            this.virtualGrid.setRowHeights(this.gridRows);
+        }
+        const firstRow = this.virtualGrid.firstRow();
+        const lastRow = this.virtualGrid.lastRow();
+        if (
+            this.shouldComputeGridRows ||
+            firstRow !== this.lastComputedFirstRow ||
+            lastRow !== this.lastComputedLastRow
+        ) {
+            this.computeVisibleRows();
+            this.lastComputedFirstRow = firstRow;
+            this.lastComputedLastRow = lastRow;
+            this.shouldComputeGridRows = false;
+            return true;
+        }
+        return false;
     }
 
     pushGridRows(gridRows) {
@@ -2822,7 +2829,8 @@ export class GanttRenderer extends Component {
             }
         }
 
-        const progressBar = this.getRowProgressBar(groupedByField, resId);
+        // hide progress bar for rows in sparse mode (i.e., only display it for group headers)
+        const progressBar = processAsGroup ? this.getRowProgressBar(groupedByField, resId) : null;
         if (row.id !== "[]") {
             this.pushGridRows(gridRowTypes);
         }
@@ -3307,8 +3315,8 @@ export class GanttRenderer extends Component {
                             j === 0
                                 ? index * cellPart + (i <= halfCut ? i : halfCut + 1)
                                 : j === val - 1
-                                ? index * cellPart + (i <= halfCut ? halfCut + 1 : i)
-                                : index * cellPart + halfCut + 1;
+                                  ? index * cellPart + (i <= halfCut ? halfCut + 1 : i)
+                                  : index * cellPart + halfCut + 1;
                         this.offHoursState.mappingTotalGridToFoldedGridSubColumns.set(
                             count * cellPart + i,
                             targetIndex

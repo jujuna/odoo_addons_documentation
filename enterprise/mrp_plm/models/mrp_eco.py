@@ -988,6 +988,7 @@ class MrpEco(models.Model):
             'context': {
                 'default_product_tmpl_id': self.product_tmpl_id.id,
                 'default_product_id': self.product_tmpl_id.product_variant_id.id,
+                'from_eco': True,
                 'create': self.state != 'done',
                 'edit': self.state != 'done',
                 'delete': self.state != 'done',

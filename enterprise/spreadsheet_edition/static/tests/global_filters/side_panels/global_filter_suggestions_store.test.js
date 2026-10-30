@@ -1,7 +1,7 @@
-import { describe, expect, test } from "@odoo/hoot";
+import { animationFrame, describe, expect, test } from "@odoo/hoot";
 import { defineSpreadsheetModels, Partner } from "@spreadsheet/../tests/helpers/data";
 import { makeStore } from "@spreadsheet/../tests/helpers/stores";
-import { onRpc, fields } from "@web/../tests/web_test_helpers";
+import { onRpc, fields, makeServerError } from "@web/../tests/web_test_helpers";
 
 import { GlobalFilterSuggestionsStore } from "@spreadsheet_edition/bundle/global_filters/global_filter_suggestions/global_filter_suggestions_store";
 
@@ -272,5 +272,35 @@ test("don't suggest if multiple matches are possible with different archs", asyn
         actionXmlId: "action_product",
     });
     const suggestions = await store.suggestionsPromise;
+    expect(suggestions).toEqual([]);
+});
+
+test("no suggestion when a data source targets a model that does not exist", async () => {
+    onRpc("get_search_view_archs", () => ({
+        partner: [
+            /*xml*/ `
+                <search>
+                    <field name="currency_id"/>
+                </search>
+                `,
+        ],
+    }));
+    onRpc("fields_get", ({ model }) => {
+        if (model === "unknown") {
+            throw makeServerError({ code: 404 });
+        }
+    });
+    const { store, model } = await makeStore(GlobalFilterSuggestionsStore);
+    insertListInSpreadsheet(model, {
+        model: "partner",
+        columns: [],
+        actionXmlId: "action_partner",
+    });
+    insertListInSpreadsheet(model, {
+        model: "unknown",
+        columns: [],
+    });
+    const suggestions = await store.suggestionsPromise;
+    await animationFrame();
     expect(suggestions).toEqual([]);
 });

@@ -5,6 +5,7 @@ class PosPrinter(models.Model):
     _inherit = "pos.printer"
 
     obox_device_id = fields.Many2one("obox.device", domain=[("type", "=", "printer")])
+    obox_serial = fields.Char(related="obox_device_id.obox_id.serial_number")
     printer_type = fields.Selection(
         selection_add=[("obox", "Obox")],
         ondelete={"obox": "set default"}
@@ -35,4 +36,4 @@ class PosPrinter(models.Model):
     @api.model
     def _load_pos_data_fields(self, config):
         fields = super()._load_pos_data_fields(config)
-        return fields + ['proxy_obox_id']
+        return fields + ['proxy_obox_id', 'obox_serial']

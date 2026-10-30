@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models, _
 from odoo.addons.resource.models.utils import HOURS_PER_DAY
-from odoo.fields import Domain
+from odoo.fields import Date, Domain
 from odoo.tools import format_time
 from odoo.tools.intervals import Intervals
 from odoo.tools.misc import get_lang
@@ -46,7 +46,7 @@ class HrLeave(models.Model):
                 if unit == 'hour' or (unit == 'half_day' and duration in ['am', 'pm']):
                     single_date_to = self.env.context.get('gantt_single_request_date_to')
                     if single_date_to:
-                        defaults['request_date_to'] = fields.Date.to_date(single_date_to)
+                        defaults['request_date_to'] = Date.to_date(single_date_to)
 
                     # Force the hourly/partial split template to show a single template day initially
                     if 'number_of_days' in defaults:
@@ -140,7 +140,7 @@ class HrLeave(models.Model):
             for employee in employee_ids:
                 if (not leave.company_id or leave.company_id == employee.company_id) and\
                    (not leave.resource_id or leave.resource_id == employee.resource_id) and\
-                   (not leave.calendar_id or leave.calendar_id == employee.resource_calendar_id):
+                   (not leave.calendar_id or leave.calendar_id == employee.sudo()._get_version(leave.date_from.date()).resource_calendar_id):
                     leaves[employee.id].append(leave)
 
         # Get non-validated time off

@@ -1,9 +1,10 @@
 import { useProps, t } from "@odoo/owl";
-import { AvatarCard } from "@mail/core/web/avatar_card/avatar_card";
+import { HrHolidaysGanttAvatarCard } from "@hr_holidays_gantt/core/web/avatar_card/hr_holidays_gantt_avatar_card";
 import { Avatar } from "@mail/views/web/fields/avatar/avatar";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { _t } from "@web/core/l10n/translation";
 import { formatMonetary } from "@web/views/fields/formatters";
+import { user } from "@web/core/user";
 
 const wageOverrideType = t.object({
     hourlyWage: t.number().optional(),
@@ -11,10 +12,74 @@ const wageOverrideType = t.object({
     wageType: t.string().optional(),
 });
 
-export class PayrollAvatarCard extends AvatarCard {
+const payrollPropsType = {
+    wageOverride: wageOverrideType.optional(),
+    versionId: t.or([t.number(), t.literal(false)]).optional(),
+    payslipId: t.or([t.number(), t.literal(false)]).optional(),
+    payslipDate: t.customValidator(t.string(), (v) => v?.match(/^\d{4}-\d{2}-\d{2}$/)).optional(),
+};
+
+export class PayrollAvatarCard extends HrHolidaysGanttAvatarCard {
+    static template = "hr_payroll.PayrollAvatarCard";
+    payrollProps = useProps(payrollPropsType);
+
     setup() {
         super.setup(...arguments);
-        this.payrollProps = useProps({ wageOverride: wageOverrideType.optional() });
+        this.state.salaryAttachments = [];
+    }
+
+    /**
+     * @override
+     */
+    async _loadPayrollCardData() {
+        this.isPayrollUser = await user.hasGroup("hr_payroll.group_hr_payroll_user");
+        this.canCreateSalaryAttachment = this.isPayrollUser && this.payrollProps.payslipId;
+        if (!this.isPayrollUser) {
+            return;
+        }
+        const payslipId = this.payrollProps.payslipId;
+        const salaryAttachmentPromise = payslipId
+            ? this.orm.searchRead(
+                  "hr.salary.attachment",
+                  [["payslip_ids", "in", [payslipId]]],
+                  ["salary_rule_id", "amount", "currency_id"]
+              )
+            : Promise.resolve([]);
+
+        const [, salaryAttachmentData] = await Promise.all([
+            super._loadPayrollCardData(),
+            salaryAttachmentPromise,
+        ]);
+
+        if (!salaryAttachmentData.length) {
+            return;
+        }
+        this.state.salaryAttachments = salaryAttachmentData.map((attachment) => {
+            const currencyId = attachment.currency_id && attachment.currency_id[0];
+            return {
+                id: attachment.id,
+                salaryRule: attachment.salary_rule_id ? attachment.salary_rule_id[1] : "",
+                amount: currencyId
+                    ? formatMonetary(attachment.amount, { currencyId })
+                    : attachment.amount,
+            };
+        });
+    }
+
+    openSalaryAttachment(attachmentId) {
+        const name = attachmentId ? _t("Edit Salary Attachment") : _t("New Salary Attachment");
+        this.action.doAction({
+            name: name,
+            type: "ir.actions.act_window",
+            res_model: "hr.salary.attachment",
+            res_id: attachmentId,
+            views: [[false, "form"]],
+            target: "new",
+            context: {
+                default_employee_id: this.employee?.id,
+                default_date_start: this.payrollProps.payslipDate,
+            },
+        });
     }
 
     get hasFooter() {
@@ -35,8 +100,12 @@ export class PayrollAvatarCard extends AvatarCard {
         } else {
             wageAmount = isHourly ? emp.hourly_wage : emp.wage;
         }
+        const currencyDecimals = emp.currency_id?.decimal_places || 2;
         return {
-            wage: `${formatMonetary(wageAmount, { currencyId: emp.currency_id?.id })} ${suffix}`,
+            wage: `${formatMonetary(wageAmount, {
+                currencyId: emp.currency_id?.id,
+                digits: [16, isHourly ? 4 : currencyDecimals],
+            })} ${suffix}`,
             category: emp.employee_type_id?.name || null,
             seniority: this._getSeniority(emp.first_contract_date),
         };
@@ -70,16 +139,17 @@ export class PayrollAvatar extends Avatar {
 
     setup() {
         super.setup(...arguments);
-        this.payrollProps = useProps({ wageOverride: wageOverrideType.optional() });
+        this.payrollProps = useProps(payrollPropsType);
         this.avatarCard = usePopover(PayrollAvatarCard);
     }
 
+    /**
+     * @override
+     */
     get popoverProps() {
         return {
             ...super.popoverProps,
-            ...(this.payrollProps.wageOverride
-                ? { wageOverride: this.payrollProps.wageOverride }
-                : {}),
+            ...this.payrollProps,
         };
     }
 

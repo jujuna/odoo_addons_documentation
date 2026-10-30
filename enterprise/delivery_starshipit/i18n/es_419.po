@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-18 03:21+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-23 01:33+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-master/delivery_starshipit/es_419/>\n"
+"odoo-20/delivery_starshipit/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,6 +34,15 @@ msgid ""
 "you can streamline every step of your fulfilment process,\n"
 "reduce handling time and improve customer experience.\n"
 msgstr ""
+"\n"
+"Realiza tus envíos con Starshipit y rastréalos en línea\n"
+"============================================================\n"
+"\n"
+"Starshipit es un proveedor líder de soluciones integradas de envío y rastreo "
+"para empresas de comercio electrónico en crecimiento.\n"
+"Está integrado con una amplia variedad de transportistas y plataformas,\n"
+"optimiza cada paso de tu proceso de cumplimiento,\n"
+"reduce el tiempo de gestión y mejora la experiencia del cliente.\n"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -56,7 +65,8 @@ msgstr ""
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.choose_delivery_carrier_view_form
 msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Get more delivery methods"
-msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Obtener más métodos de entrega"
+msgstr ""
+"<i class=\"oi me-1\" data-icon=\"east\"/>Obtener más métodos de entrega"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -85,11 +95,11 @@ msgid ""
 "creations and some shipping carriers may automatically validate the shipment "
 "when printing labels."
 msgstr ""
-"<i class=\"oi\" data-icon=\"warning\"/> En el <b>entorno de prueba</b>, sus "
+"<i class=\"oi\" data-icon=\"warning\"/> En el <b>entorno de prueba</b>, tus "
 "envíos se <b>archivan</b> de forma automática luego de crear las etiquetas. "
 "<br/>\n"
-"                        Tenga en cuenta que aún se pueden realizar cargos  "
-"al crear etiquetas y que algunos transportistas validen el envío en "
+"                        Ten en cuenta que aún se pueden realizar cargos al "
+"crear etiquetas y que algunos transportistas pueden validar el envío en "
 "automático al imprimirlas."
 
 #. module: delivery_starshipit
@@ -448,7 +458,7 @@ msgstr "Referencia del paquete de devolución de Starshipit"
 #. module: delivery_starshipit
 #: model:ir.module.module,shortdesc:base.module_delivery_starshipit
 msgid "Starshipit Shipping"
-msgstr ""
+msgstr "Envíos con Starshipit"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_subscription_key
@@ -528,6 +538,18 @@ msgid "The Shipping Cost is being fetched in the background."
 msgstr "Estamos obteniendo el costo del envío en segundo plano."
 
 #. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The address of your company/warehouse is incomplete or wrong (Missing "
+"field(s):  \n"
+" %s)"
+msgstr ""
+"La dirección de tu empresa o almacén está incompleta o es incorrecta (faltan "
+"los siguientes campos:\n"
+" %s)"
+
+#. module: delivery_starshipit
 #: model:ir.model.fields,help:delivery_starshipit.field_delivery_carrier__starshipit_carrier_code
 msgid ""
 "The carrier on starshipit used by this carrier. The service code belongs to "
@@ -568,6 +590,17 @@ msgstr ""
 "La secuencia de la recolección %(picking_name)s es demasiado larga para "
 "Starshipit. Actualice la secuencia de la recolección para que use 50 "
 "caracteres como máximo."
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The recipient address is incomplete or wrong (Missing field(s):  \n"
+" %s)"
+msgstr ""
+"La dirección del destinatario está incompleta o es incorrecta (faltan los "
+"siguientes campos:\n"
+" %s)"
 
 #. module: delivery_starshipit
 #. odoo-python

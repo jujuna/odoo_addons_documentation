@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import date
 
+from odoo import Command
 from odoo.tests import tagged, Form, new_test_user
 from .common import TestL10nAUPayrollAPICommon
 
@@ -168,6 +169,47 @@ class TestAuditLogging(TestL10nAUPayrollAPICommon):
         user_logs = self._get_logs(user)
         log_message = f"User mel (base.group_user) (model: res.users, id:{user.id}) was removed from group {self.hr_group.display_name} by {self.env.user.display_name}"
         self.assertIn(log_message, user_logs[0], "There should be a log for removing Test HR Group group")
+
+    def test_group_user_ids_link_command_audit_logging(self):
+        """Adding/removing a user from the Groups form must be logged and must not raise IndexError."""
+        user = new_test_user(self.env, login="jane")
+
+        with self.with_user("admin"):
+            self.hr_group.write({"user_ids": [Command.link(user.id)]})
+        user_logs = self._get_logs(user)
+        log_message = f"was granted access to group {self.hr_group.display_name} by {self.env.user.display_name}"
+        self.assertTrue(
+            any(log_message in log for log in user_logs),
+            "There should be a log for adding the user to the group via a LINK command",
+        )
+
+        self.Logs.search([]).unlink()
+        with self.with_user("admin"):
+            self.hr_group.write({"user_ids": [Command.unlink(user.id)]})
+        user_logs = self._get_logs(user)
+        log_message = f"was removed from group {self.hr_group.display_name} by {self.env.user.display_name}"
+        self.assertTrue(
+            any(log_message in log for log in user_logs),
+            "There should be a log for removing the user from the group via an UNLINK command",
+        )
+
+    def test_group_user_ids_multi_group_audit_logging(self):
+        """Linking a user already in one written group into another must log only the new grant."""
+        user = new_test_user(self.env, login="jane")
+        hr_group_2 = self.env["res.groups"].create({
+            "name": "Test HR Group Two",
+            "privilege_id": self.env.ref("hr_payroll.res_groups_privilege_payroll").id,
+        })
+        with self.with_user("admin"):
+            self.hr_group.write({"user_ids": [Command.link(user.id)]})
+        self.Logs.search([]).unlink()
+
+        with self.with_user("admin"):
+            (self.hr_group | hr_group_2).write({"user_ids": [Command.link(user.id)]})
+        user_logs = self._get_logs(user)
+        self.assertEqual(len(user_logs), 1, "Only the newly granted group should be logged")
+        log_message = f"was granted access to group {hr_group_2.display_name} by {self.env.user.display_name}"
+        self.assertIn(log_message, user_logs[0], "There should be a log for granting the second group")
 
     def test_reified_groups_audit_logs(self):
         """Test that a change on a reified fields trigger the onchange of groups_id."""

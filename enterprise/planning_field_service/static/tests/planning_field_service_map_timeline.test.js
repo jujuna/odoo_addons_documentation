@@ -19,11 +19,13 @@ import {
     getTestApp,
     mountWebClient,
     onRpc,
+    patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
 import { clickCell, dragPill } from "@web_gantt/../tests/web_gantt_test_helpers";
 import { GanttController } from "@web_gantt/gantt_controller";
 import { MapController } from "@web_map/map_view/map_controller";
 
+import { PlanningGanttModel } from "@planning/views/planning_gantt/planning_gantt_model";
 import {
     definePlanningFieldServiceModels,
     planningFieldServiceModels,
@@ -1012,5 +1014,37 @@ test("a material resource's color matches across the gantt row header, the map p
     });
     expect(pinListColor).toBe(ganttColor, {
         message: "the map pin-list's color should match the gantt row header avatar's color",
+    });
+});
+
+test("returning to the map timeline initializes the nested Gantt with its own metadata", async () => {
+    const ganttLoadProm = Promise.withResolvers();
+    patchWithCleanup(PlanningGanttModel.prototype, {
+        async load(...args) {
+            expect.step("load");
+            await ganttLoadProm.promise;
+            return super.load(...args);
+        },
+    });
+
+    await mountWebClient();
+    await getService("action").doAction(1);
+
+    expect.verifySteps(["load"]);
+    expect(".o_gantt_view").toHaveCount(0, {
+        message: "The view should not be loaded yet.",
+    });
+
+    await click("button.o_map_button_add");
+    await waitFor(".o_form_view");
+    await click(".o_breadcrumb .o_back_button");
+    await waitFor(".o_map_view");
+
+    ganttLoadProm.resolve();
+
+    await waitFor(".o_gantt_view");
+    expect.verifySteps(["load"]);
+    expect(".o_gantt_view").toHaveCount(1, {
+        message: "The view should be loaded.",
     });
 });

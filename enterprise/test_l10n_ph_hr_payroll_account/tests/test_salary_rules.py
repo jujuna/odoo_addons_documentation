@@ -675,8 +675,10 @@ class TestPayslipValidation(TestL10NPhHrPayrollCommon):
         self._set_test_employee(self.high_earner_employee)
 
         payslip = self._generate_payslip(date(2026, 1, 1), date(2026, 1, 15))
-        payslip._set_input_value('CFB', 25_000)
-        payslip._set_input_value('NCFB', 50_000)
+        payslip._set_input_values({
+            'CFB': 25_000,
+            'NCFB': 50_000,
+        })
         payslip.compute_sheet()
 
         payslip_results = {
@@ -705,8 +707,10 @@ class TestPayslipValidation(TestL10NPhHrPayrollCommon):
         self.high_earner_employee.l10n_ph_hr_payroll_employee_rank = 'supervisory'
 
         payslip = self._generate_payslip(date(2026, 1, 1), date(2026, 1, 15))
-        payslip._set_input_value('CFB', 25_000)
-        payslip._set_input_value('NCFB', 50_000)
+        payslip._set_input_values({
+            'CFB': 25_000,
+            'NCFB': 50_000,
+        })
         payslip.compute_sheet()
 
         # Exact same as manager
@@ -735,8 +739,10 @@ class TestPayslipValidation(TestL10NPhHrPayrollCommon):
         self._set_test_employee(self.average_employee)
 
         payslip = self._generate_payslip(date(2026, 1, 1), date(2026, 1, 15))
-        payslip._set_input_value('CFB', 2500)
-        payslip._set_input_value('NCFB', 5000)
+        payslip._set_input_values({
+            'CFB': 2500,
+            'NCFB': 5000,
+        })
         payslip.compute_sheet()
 
         # Exact same as manager
@@ -1449,10 +1455,12 @@ class TestPayslipValidation(TestL10NPhHrPayrollCommon):
 
         payslip = self._generate_payslip(date(2026, 1, 1), date(2026, 1, 15))
         payslip.l10n_ph_hr_payroll_includes_13th_month = True
-        payslip._set_input_value('DM_RICE', 93_500)  # For DM_EXCESS
-        payslip._set_input_value('CA', 25_000)
-        payslip._set_input_value('CFB', 10_000)
-        payslip._set_input_value('NCFB', 15_000)
+        payslip._set_input_values({
+            'DM_RICE': 93_500,
+            'CA': 25_000,
+            'CFB': 10_000,
+            'NCFB': 15_000,
+        })
         payslip.compute_sheet()
         payslip.action_validate()
 

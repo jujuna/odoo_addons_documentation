@@ -38,9 +38,9 @@ class SaleOrder(models.Model):
         return super()._cart_add(product_id, *args, plan_id=plan_id, **kwargs)
 
     def _verify_cart_after_update(self, *args, **kwargs):
-        super()._verify_cart_after_update(*args, **kwargs)
         if not self.order_line.filtered(lambda sol: sol.product_id.recurring_invoice):
             self.plan_id = False
+        super()._verify_cart_after_update(*args, **kwargs)
 
     def _has_one_time_sale(self):
         return (

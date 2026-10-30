@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:55+0000\n"
-"PO-Revision-Date: 2026-09-18 00:13+0000\n"
+"POT-Creation-Date: 2026-10-02 17:51+0000\n"
+"PO-Revision-Date: 2026-10-15 13:35+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-20/"
 "sale_account_accountant/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,30 @@ msgid ""
 "\n"
 "Notify that a matching sale order exists in the reconciliation widget.\n"
 msgstr ""
+"\n"
+"Ilmoita, että täsmäytyswidgetissä on vastaava myyntitilaus.\n"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.res_config_settings_view_form
 msgid ""
 "Accounts used by the inventory valuation report to accrue the value of goods "
 "delivered but not invoiced yet, or invoiced but not delivered yet."
+msgstr ""
+"Varaston arvonmääritysraportissa käytettävät tilit, joille kirjataan "
+"toimitettujen mutta vielä laskuttamattomien tai laskuttujen mutta vielä "
+"toimittamattomien tavaroiden arvo."
+
+#. module: sale_account_accountant
+#. odoo-python
+#: code:addons/sale_account_accountant/models/sale_order.py:0
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__accrual_move_ids
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_view_form
+msgid "Accrual Entries"
+msgstr "Suoriteperusteiset kirjaukset"
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__accrual_move_count
+msgid "Accrual Move Count"
 msgstr ""
 
 #. module: sale_account_accountant
@@ -54,6 +72,11 @@ msgstr "Yritys"
 #. module: sale_account_accountant
 #: model:ir.model,name:sale_account_accountant.model_res_config_settings
 msgid "Config Settings"
+msgstr ""
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__unit_cost
+msgid "Cost by Unit"
 msgstr ""
 
 #. module: sale_account_accountant
@@ -81,14 +104,10 @@ msgstr "Asiakas"
 #. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_advance_payment_inv__display_name
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__display_name
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__display_name
 msgid "Display Name"
 msgstr "Näyttönimi"
-
-#. module: sale_account_accountant
-#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
-msgid "Display only goods lines"
-msgstr "Näytä vain tuoterivit"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
@@ -102,8 +121,18 @@ msgstr "Näytä vain tilattujen määrien perusteella laskutettavat rivit"
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Display only non-storable goods lines"
+msgstr ""
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
 msgid "Display only service lines"
 msgstr "Näytä vain palveluiden rivit"
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Display only storable goods lines"
+msgstr ""
 
 #. module: sale_account_accountant
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
@@ -111,13 +140,9 @@ msgid "For the Last 365 Days"
 msgstr "Viimeisen 365 päivän ajalta"
 
 #. module: sale_account_accountant
-#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
-msgid "Goods"
-msgstr "Tavarat"
-
-#. module: sale_account_accountant
 #: model:ir.model.fields,field_description:sale_account_accountant.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_advance_payment_inv__id
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order__id
 #: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__id
 msgid "ID"
 msgstr "Tunnus"
@@ -203,6 +228,11 @@ msgid "Sales Advance Payment Invoice"
 msgstr "Myynnin ennakkolasku"
 
 #. module: sale_account_accountant
+#: model:ir.model,name:sale_account_accountant.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: sale_account_accountant
 #: model:ir.model,name:sale_account_accountant.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Myyntitilausrivi"
@@ -221,6 +251,47 @@ msgstr "Viimeisten 365 päivän aikana käsitellyt myyntitilausrivit"
 #: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
 msgid "Service"
 msgstr "Palvelu"
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,field_description:sale_account_accountant.field_sale_order_line__total_cost
+msgid "Total Cost"
+msgstr ""
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Tracked Goods"
+msgstr ""
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_list
+msgid "Unit Cost"
+msgstr ""
+
+#. module: sale_account_accountant
+#: model_terms:ir.ui.view,arch_db:sale_account_accountant.sale_order_line_view_search
+msgid "Untracked Goods"
+msgstr ""
+
+#. module: sale_account_accountant
+#: model:ir.model.fields,help:sale_account_accountant.field_sale_order_line__unit_cost
+msgid ""
+"Value of the product (automatically computed in AVCO).\n"
+"        Used to value the product when the purchase cost is not known (e.g. "
+"inventory adjustment).\n"
+"        Used to compute margins on sale orders."
+msgstr ""
+
+#. module: sale_account_accountant
+#. odoo-python
+#: code:addons/sale_account_accountant/models/sale_order.py:0
+msgid "id"
+msgstr ""
+
+#~ msgid "Display only goods lines"
+#~ msgstr "Näytä vain tuoterivit"
+
+#~ msgid "Goods"
+#~ msgstr "Tavarat"
 
 #~ msgid "Deferred Revenue"
 #~ msgstr "Tuloennakko"

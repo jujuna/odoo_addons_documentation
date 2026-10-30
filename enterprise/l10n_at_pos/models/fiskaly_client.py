@@ -78,6 +78,7 @@ class FiskalyClient:
         self.base_url = f"https://rksv.fiskaly.com/api/v{version}/"
         # Company is here just in case there is a need to refresh the token
         self.company = company
+        self.env = company.env
         self.api_key = api_key
         self.api_secret = api_secret
 
@@ -116,7 +117,14 @@ class FiskalyClient:
                 _logger.info('Successfully responded %s %s', method, url)
                 return resp.json()
             except requests.exceptions.RequestException as error:
-                raise ValidationError(_("Fiskaly API request failed, %s", error))
+                detail = ""
+                if error.response is not None:
+                    try:
+                        body = error.response.json()
+                        detail = f" ({body.get('code')}: {body.get('message')})"
+                    except ValueError:
+                        pass
+                raise ValidationError(_("Fiskaly API request failed, %(error)s%(detail)s", error=error, detail=detail))
         with session:
             yield request
 
@@ -148,14 +156,20 @@ class FiskalyClient:
         if error:
             raise ValidationError(_("Fiskaly schema validation error, %s", error))
         with self._make_session(bearer_token) as req:
-            # Reuse existing active SCU if limit is already reached
-            existing = req("GET", endpoint='signature-creation-unit', params={"states[]": ["INITIALIZED", "OUTAGE"]})
-            if existing.get('data'):
-                return existing['data'][0]['_id']
-            scuid = str(uuid.uuid4())
-            req("PUT", endpoint=f'signature-creation-unit/{scuid}', data=data)
-            req("PATCH", endpoint=f'signature-creation-unit/{scuid}', data={"state": "INITIALIZED"})
-        return scuid
+            # Only one SCU per organization: reuse it, preferring a usable one over one whose initialization failed
+            states = ["INITIALIZED", "OUTAGE", "CREATED", "PENDING"]
+            existing = req("GET", endpoint='signature-creation-unit', params={"states[]": states})
+            scu = min((s for s in existing.get('data', []) if s['state'] in states), key=lambda s: states.index(s['state']), default=None)
+            if not scu:
+                scu = req("PUT", endpoint=f'signature-creation-unit/{uuid.uuid4()}', data=data)
+            if scu['state'] not in ('INITIALIZED', 'OUTAGE'):
+                scu = req("PATCH", endpoint=f"signature-creation-unit/{scu['_id']}", data={"state": "INITIALIZED"})
+                if scu['state'] != 'INITIALIZED':
+                    raise ValidationError(_(
+                        "The Fiskaly signature creation unit is still being created (state %(state)s). Please try again in a few minutes.",
+                        state=scu['state'],
+                    ))
+        return scu['_id']
 
     def setup_cash_reg(self, bearer_token):
         reg_id = str(uuid.uuid4())

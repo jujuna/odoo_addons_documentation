@@ -1026,11 +1026,10 @@ class WhatsappTemplate(models.Model):
         if self.variable_type == 'named':
             # sort by appearance in body to preserve order of parameters
             body_variables = body_variables.sorted(key=lambda var: self.body.find(var.name))
-            for i, body_variable in enumerate(body_variables, start=1):
-                demo_values[f'free_text_{i}'] = body_variable.demo_value
         else:
-            for body_variable in body_variables:
-                demo_values[f'free_text_{body_variable._extract_variable_value()}'] = body_variable.demo_value
+            body_variables = body_variables.sorted(key=lambda var: var._extract_variable_value())
+        for i, body_variable in enumerate(body_variables, start=1):
+            demo_values[f'free_text_{i}'] = body_variable.demo_value
 
         # Button placeholders
         freetext_btn_vars = self.variable_ids.filtered(lambda line: line.line_type == 'button' and line.field_type == 'free_text')

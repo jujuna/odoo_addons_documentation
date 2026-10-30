@@ -56,12 +56,15 @@ class HrPayrollHeadcount(models.Model):
             self.date_to = self.date_from
         versions = self.env['hr.version'].search([
             ('company_id', '=', self.company_id.id),
+            ('employee_id', '!=', False),
             '|',
                 ('contract_date_end', '=', False),
                 ('contract_date_end', '>=', self.date_from),
             ('contract_date_start', '!=', False),
             ('contract_date_start', '<=', self.date_to),
-        ], order='employee_id, contract_date_start DESC')
+        ], order='employee_id, contract_date_start DESC, date_version DESC')
+        # Only keep the versions effective during the period (not the amendments before or after it)
+        versions = versions.filtered(lambda v: v._is_overlapping_period(self.date_from, self.date_to))
 
         versions_by_employee_id = defaultdict(lambda: self.env['hr.version'])
         working_rates = set()

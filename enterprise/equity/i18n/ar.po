@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 17:49+0000\n"
-"PO-Revision-Date: 2026-09-17 22:49+0000\n"
+"POT-Creation-Date: 2026-10-09 17:47+0000\n"
+"PO-Revision-Date: 2026-10-12 10:38+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
-"equity/ar/>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/equity/"
+"ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,7 +31,7 @@ msgstr "عدد الأوراق المالية"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__shares
 msgid "# Shares"
-msgstr ""
+msgstr "عدد الأسهم "
 
 #. module: equity
 #. odoo-python
@@ -55,19 +55,19 @@ msgstr "معاملات %(partner_name)s"
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 msgid "%(partner_name)s's Valuations"
-msgstr ""
+msgstr "تقييمات %(partner_name)s"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "%(transaction_type)s %(securities).2f %(class_name)s"
-msgstr ""
+msgstr "%(transaction_type)s %(securities).2f %(class_name)s"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 msgid "(Completed through portal Form)"
-msgstr ""
+msgstr "(تم إكماله عبر استمارة البوابة)"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -78,19 +78,19 @@ msgstr "ID"
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "(Non-positive options don't expire)"
-msgstr ""
+msgstr "(الخيارات غير الإيجابية لا تنتهي صلاحيتها)"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 msgid "(Optional)"
-msgstr ""
+msgstr "(اختياري)"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "(expired)"
-msgstr ""
+msgstr "(منتهي الصلاحية)"
 
 #. module: equity
 #: model:ir.actions.report,print_report_name:equity.action_equity_ubo_report
@@ -103,11 +103,13 @@ msgid ""
 "<br/>\n"
 "                                            Politically Exposed Person:"
 msgstr ""
+"<br/>\n"
+"                                            شخصية سياسية بارزة:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<br/> Nationality:"
-msgstr ""
+msgstr "<br/> الجنسية:"
 
 #. module: equity
 #: model:mail.template,body_html:equity.equity_ubo_form_email_template
@@ -134,8 +136,8 @@ msgstr ""
 "                        امتثالاً لالتزاماتنا القانونية المتعلقة بتحديد هوية "
 "العملاء، يتعين علينا الإبلاغ عن الأشخاص الطبيعيين الذين يمتلكون أو يتحكمون\n"
 "                        بشكل مباشر أو غير مباشر، بنسبة لا تقل عن 25% من رأس "
-"المال أو حقوق التصويت في <b><t t-out=\"user_id.company_id.name\"/></b>. "
-"<br/> <br/>\n"
+"المال أو حقوق التصويت في <b><t t-out=\"user_id.company_id.name\"/></b>. <br/"
+"> <br/>\n"
 "                        يرجى تعبئة طلب الكشف عن المالك النهائي (UBO) من خلال "
 "الرابط أعلاه.<br/> <br/>\n"
 "                        شكراً لك،\n"
@@ -195,12 +197,12 @@ msgstr ""
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
 msgid "<span class=\"o_stat_text\">Shareholders</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">المساهمون</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
 msgid "<span class=\"text-muted\">Valuation</span>"
-msgstr ""
+msgstr "<span class=\"text-muted\">التقييم</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -208,6 +210,8 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
+"<span><span invisible=\"equity_shareholders_count == 1\"> المساهمين</span></"
+"span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -215,16 +219,18 @@ msgid ""
 "<span> Transaction<span invisible=\"equity_transaction_count == 1\">s</"
 "span></span>"
 msgstr ""
+"<span><span invisible=\"equity_transaction_count == 1\"> المعاملات</span></"
+"span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "<span>Missing supporting documents! Attach them in the chatter.</span>"
-msgstr ""
+msgstr "<span>المستندات الداعمة مفقودة! يرجى إرفاقها في الدردشة.</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_form
 msgid "<span>per share</span>"
-msgstr ""
+msgstr "<span>للسهم الواحد</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -234,24 +240,24 @@ msgstr "<strong>العنوان:</strong>"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<strong>Company Name:</strong>"
-msgstr ""
+msgstr "<strong>اسم الشركة:</strong>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<strong>OR</strong>"
-msgstr ""
+msgstr "<strong>أو</strong>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<strong>Tax ID Number:</strong>"
-msgstr ""
+msgstr "<strong>رقم التعريف الضريبي:</strong>"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/valuation_chart/valuation_chart.xml:0
 msgid ""
 "= Your shares / Total number of shares (i.e., options not taken into account)"
-msgstr ""
+msgstr "= أسهمك / إجمالي عدد الأسهم (أي دون احتساب الخيارات)"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -273,12 +279,15 @@ msgid ""
 "Member States of the European\n"
 "                            Economic Area; or"
 msgstr ""
+"شركة مدرجة: شركة يتم تداول أسهمها في سوق منظمة في إحدى الدول الأعضاء في "
+"المنطقة\n"
+"                            الاقتصادية الأوروبية؛ أو"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "A partner cannot have transactions in different currencies."
-msgstr ""
+msgstr "لا يمكن للشريك إجراء معاملات بعملات مختلفة."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -286,6 +295,8 @@ msgid ""
 "According to laws related to anti money laundering, the notary must identify "
 "the beneficial owners of their customer."
 msgstr ""
+"وفقًا للقوانين المتعلقة بمكافحة غسل الأموال، يجب على كاتب العدل تحديد هوية "
+"المالكين المستفيدين لعملائه."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_needaction
@@ -299,13 +310,13 @@ msgstr "يتطلب اتخاذ إجراء"
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
 msgid "Add Beneficial Owner"
-msgstr ""
+msgstr "إضافة المالك المستفيد"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/valuation_chart_action/valuation_chart_action.js:0
 msgid "Add some valuations over the past year to see some data here."
-msgstr ""
+msgstr "أضف بعض التقييمات خلال العام الماضي للاطلاع على بعض البيانات هنا."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_attachment_count
@@ -318,7 +329,7 @@ msgstr "عدد المرفقات"
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__attachment_number
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__attachment_number
 msgid "Attachment Number"
-msgstr ""
+msgstr "رقم المرفق"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__attachment_ids
@@ -336,7 +347,7 @@ msgstr "تدقيق"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__auditor
 msgid "Auditor"
-msgstr ""
+msgstr "المُدقّق"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__author_id
@@ -348,14 +359,14 @@ msgstr ""
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model:ir.model.fields,help:equity.field_equity_ubo__auth_rep_role
 msgid "Authorized Representative Role"
-msgstr ""
+msgstr "دور الممثل المفوض"
 
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_ubo
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_list
 msgid "Beneficial Owners"
-msgstr ""
+msgstr "المالكين المستفيدين"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -383,18 +394,18 @@ msgstr ""
 #: model:ir.model.fields,field_description:equity.field_res_partner__birth_date
 #: model:ir.model.fields,field_description:equity.field_res_users__birth_date
 msgid "Birth Date"
-msgstr ""
+msgstr "تاريخ الميلاد"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__ubo_birth_place
 #: model:ir.model.fields,field_description:equity.field_res_users__ubo_birth_place
 msgid "Birth Place"
-msgstr ""
+msgstr "مكان الميلاد"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__board_member
 msgid "Board Member"
-msgstr ""
+msgstr "عضو مجلس الإدارة"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body_has_template_value
@@ -414,7 +425,7 @@ msgstr "المدير التنفيذي"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__can_change_currency
 msgid "Can Change Currency"
-msgstr ""
+msgstr "يمكن تغيير العملة"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__can_edit_body
@@ -425,7 +436,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Can only exercise options, please select an options class"
-msgstr ""
+msgstr "لا يمكنك إلّا تنفيذ الخيارات، يرجى تحديد فئة الخيارات"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_transaction__transaction_type__cancellation
@@ -437,6 +448,12 @@ msgstr "الإلغاء"
 #. odoo-python
 #: code:addons/equity/models/equity_security_class.py:0
 msgid "Cannot change security class type because it has linked transactions"
+msgstr "لا يمكن تغيير نوع فئة الأوراق المالية لأنها تحتوي على معاملات مرتبطة"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Cannot create new UBO for an existing holder"
 msgstr ""
 
 #. module: equity
@@ -446,19 +463,19 @@ msgstr ""
 #: model:ir.model,name:equity.model_equity_cap_table
 #: model:ir.ui.menu,name:equity.menu_equity_reporting_cap_table
 msgid "Cap Table"
-msgstr ""
+msgstr "جدول رأس المال"
 
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_cap_table_pivot
 #: model:ir.ui.menu,name:equity.menu_equity_reporting_cap_table_pivot
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_cap_table_pivot
 msgid "Cap Table Pivot"
-msgstr ""
+msgstr "جدول رأس المال المحوري"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__chairman
 msgid "Chairman of the Board"
-msgstr ""
+msgstr "رئيس مجلس الإدارة"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__security_class_id
@@ -487,24 +504,24 @@ msgstr "الشركة"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__co_1
 msgid "Company - Cat 1. Capital Ownership or voting rights"
-msgstr ""
+msgstr "الشركة - الفئة 1. ملكية رأس المال أو حقوق التصويت"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__co_2
 msgid "Company - Cat 2. Control by other means"
-msgstr ""
+msgstr "الشركة - الفئة 2. التحكم عبر وسائل أخرى"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__co_3
 msgid "Company - Cat 3. Executive officer"
-msgstr ""
+msgstr "الشركة - الفئة 3. المسؤول التنفيذي"
 
 #. module: equity
 #: model:ir.model.fields,help:equity.field_equity_transaction__company_id
 #: model:ir.model.fields,help:equity.field_equity_ubo__company_id
 #: model:ir.model.fields,help:equity.field_equity_valuation__company_id
 msgid "Company to which this record is visible"
-msgstr ""
+msgstr "الشركة التي يمكنها الاطلاع على هذا السجل"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
@@ -534,14 +551,14 @@ msgstr ""
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.js:0
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__end_date
 msgid "Control End Date"
-msgstr ""
+msgstr "تاريخ انتهاء المراقبة"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.js:0
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__control_method
 msgid "Control Method"
-msgstr ""
+msgstr "طريقة التحكم"
 
 #. module: equity
 #. odoo-javascript
@@ -549,13 +566,13 @@ msgstr ""
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.js:0
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__start_date
 msgid "Control Start Date"
-msgstr ""
+msgstr "تاريخ بدء المراقبة"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "Control Start Date is mandatory"
-msgstr ""
+msgstr "تاريخ بدء المراقبة إلزامي"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -565,17 +582,19 @@ msgid ""
 "                    directors or managers or over the direction of its "
 "operations."
 msgstr ""
+"السيطرة هي الحق القانوني أو الفعلي في ممارسة تأثير حاسم على تعيين غالبية\n"
+"                    مديريها أو مسؤوليها أو على توجيه عملياتها."
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 msgid "Controlling Method"
-msgstr ""
+msgstr "طريقة التحكم"
 
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_valuation_form
 msgid "Create Valuation"
-msgstr ""
+msgstr "إنشاء تقييم"
 
 #. module: equity
 #: model:ir.model,website_form_label:equity.model_res_partner
@@ -620,7 +639,7 @@ msgstr "التاريخ"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Decision maker"
-msgstr ""
+msgstr "صانع القرار"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -628,23 +647,25 @@ msgid ""
 "Definitions: \"beneficial owners\", \"control\", \"shareholder holding 25% "
 "or more\", \"decision makers\""
 msgstr ""
+"التعاريف: \"المستفيدون الفعليون\"، \"السيطرة\"، \"مساهم يملك 25% أو أكثر\"، "
+"\"صناع القرار\""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__destination_class_id
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Destination Class"
-msgstr ""
+msgstr "فئة الوجهة"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Destination class can only be set in exercise transactions."
-msgstr ""
+msgstr "لا يمكن تحديد فئة الوجهة إلا في معاملات التنفيذ."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__dilution
 msgid "Dilution"
-msgstr ""
+msgstr "التخفيف"
 
 #. module: equity
 #. odoo-javascript
@@ -670,24 +691,24 @@ msgstr "اسم العرض"
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__dividend_payout
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__dividend_payout
 msgid "Dividend Payout"
-msgstr ""
+msgstr "توزيع الأرباح"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__attachment_expiration_date
 msgid "Document Exp. Date"
-msgstr ""
+msgstr "تاريخ صلاحية المستند"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 msgid "Document Expiration Date"
-msgstr ""
+msgstr "تاريخ انتهاء صلاحية المستند"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "Edit Beneficial Owner"
-msgstr ""
+msgstr "تحرير المالك المستفيد"
 
 #. module: equity
 #. odoo-python
@@ -706,7 +727,7 @@ msgstr "رأس المال"
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_access_token
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_access_token
 msgid "Equity Access Token"
-msgstr ""
+msgstr "رمز الوصول إلى الأسهم"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button
@@ -728,7 +749,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_currency_id
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_currency_id
 msgid "Equity Currency"
-msgstr ""
+msgstr "العملة الماليّة"
 
 #. module: equity
 #: model:ir.model,name:equity.model_equity_mail_compose_message
@@ -745,53 +766,53 @@ msgstr ""
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_kanban_dashboard_graph
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_kanban_dashboard_graph
 msgid "Equity Kanban Dashboard Graph"
-msgstr ""
+msgstr "رسم بياني للوحة بيانات كانبان الخاصة بالأسهم"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_last_valuation
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_last_valuation
 msgid "Equity Last Valuation"
-msgstr ""
+msgstr "آخر تقييم لقيمة الأسهم"
 
 #. module: equity
 #: model:mail.template,name:equity.equity_shareholder_email_template
 msgid "Equity Shareholder Email"
-msgstr ""
+msgstr "البريد الإلكتروني للمساهمين في الأسهم"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_shareholders_count
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_shareholders_count
 msgid "Equity Shareholders Count"
-msgstr ""
+msgstr "عدد المساهمين في الأسهم"
 
 #. module: equity
 #: model:ir.model,name:equity.model_equity_transaction
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_transaction_ids
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_transaction_ids
 msgid "Equity Transaction"
-msgstr ""
+msgstr "معاملة الأسهم"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_transaction_count
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_transaction_count
 msgid "Equity Transaction Count"
-msgstr ""
+msgstr "عدد معاملات الأسهم"
 
 #. module: equity
 #: model:mail.template,name:equity.equity_ubo_form_email_template
 msgid "Equity UBO Form Email"
-msgstr ""
+msgstr "نموذج UBO الخاص بالأسهم عبر البريد الإلكتروني"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_valuation_ids
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_valuation_ids
 msgid "Equity Valuation"
-msgstr ""
+msgstr "تقييم الأسهم"
 
 #. module: equity
 #: model:mail.template,subject:equity.equity_shareholder_email_template
 msgid "Equity notice"
-msgstr ""
+msgstr "إشعار بالأسهم"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__event
@@ -802,13 +823,13 @@ msgstr "الفعالية"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Exemption from the identification of beneficial"
-msgstr ""
+msgstr "الإعفاء من تحديد المستفيد الفعلي"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Exercise transactions must have a destination 'Share' class"
-msgstr ""
+msgstr "يجب تحديد فئة الأسهم الموجهة إليها معاملات التنفيذ"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__expiration_date
@@ -823,12 +844,12 @@ msgstr "تاريخ الانتهاء"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__expiration_diff
 msgid "Expiration Diff"
-msgstr ""
+msgstr "اختلاف تاريخ انتهاء الصلاحية"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_search
 msgid "Expired Documents"
-msgstr ""
+msgstr "المستندات منتهية الصلاحية"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -837,6 +858,9 @@ msgid ""
 "persons considered as equivalent to the\n"
 "                        spouse; the parents;"
 msgstr ""
+"أفراد الأسرة: الزوج أو الزوجة، وأي شخص يعتبر معادلاً للأشخاص الذين يعتبرون "
+"معادلين\n"
+"                        للزوج أو الزوجة؛ الوالدان؛"
 
 #. module: equity
 #. odoo-python
@@ -847,7 +871,7 @@ msgstr ""
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "First and Last Name:"
-msgstr ""
+msgstr "الاسم الأول واسم العائلة:"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_follower_ids
@@ -871,12 +895,15 @@ msgid ""
 "                <b>hold or control at least 25% in the capital or voting "
 "rights</b> of"
 msgstr ""
+"وفقًا لالتزاماتنا القانونية بتحديد هوية العملاء، يرجى الإبلاغ عن الأشخاص الطبيعيين "
+"الذين يمتلكون أو يتحكمون بشكل مباشر أو غير مباشر\n"
+"               <b> في ما لا يقل عن 25% من رأس المال أو حقوق التصويت</b> في"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_formation_date
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_formation_date
 msgid "Formation Date"
-msgstr ""
+msgstr "تاريخ الإنشاء"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__email_from
@@ -887,13 +914,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/equity/static/src/components/cap_table/cap_table.js:0
 msgid "Fully Diluted"
-msgstr ""
+msgstr "مخفف بالكامل"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.js:0
 msgid "Function end: %s"
-msgstr ""
+msgstr "نهاية الوظيفة: %s"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -903,11 +930,15 @@ msgid ""
 "                            drawing up a list of European governing "
 "authorities, bodies and specialized agencies for a simplified due diligence."
 msgstr ""
+"السلطات الحاكمة في الاتحاد الأوروبي والهيئات والوكالات على النحو المحدد في "
+"المرسوم الملكي الصادر في 19 يوليو 2013\n"
+"                            تضع قائمة بالسلطات الحاكمة والهيئات والوكالات "
+"المتخصصة الأوروبية من أجل تبسيط إجراءات العناية الواجبة."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__has_auth_rep_role
 msgid "Has Auth Rep Role"
-msgstr ""
+msgstr "لديه دور ”ممثل المصادقة“"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__has_message
@@ -919,7 +950,7 @@ msgstr "يحتوي على رسالة"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__has_percentages
 msgid "Has Percentages"
-msgstr ""
+msgstr "تحتوي على نسب مئوية"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -941,8 +972,8 @@ msgstr ""
 "البرلمانات؛\n"
 "                        أعضاء الهيئات الإدارية للأحزاب السياسية؛ وأعضاء "
 "المحاكم العليا، والمحاكم الدستورية أو غيرها من\n"
-"                        الهيئات القضائية العليا التي لا تخضع قراراتها للاستئناف"
-"، إلا في ظروف استثنائية؛ وأعضاء\n"
+"                        الهيئات القضائية العليا التي لا تخضع قراراتها "
+"للاستئناف، إلا في ظروف استثنائية؛ وأعضاء\n"
 "                        محاكم المراجعين أو مجالس البنوك المركزية؛ والسفراء، "
 "والقناصل، وكبار ضباط القوات المسلحة؛\n"
 "                        أعضاء الهيئات الإدارية أو التنفيذية أو الإشرافية "
@@ -955,12 +986,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__holder_id
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_form
 msgid "Holder"
-msgstr ""
+msgstr "المالك"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
 msgid "Holdings"
-msgstr ""
+msgstr "المقتنيات"
 
 #. module: equity
 #. odoo-javascript
@@ -968,7 +999,7 @@ msgstr ""
 msgid ""
 "I hereby declare on honor that the information provided is truthful and "
 "accurate."
-msgstr ""
+msgstr "أقرّ هنا وأتعهد بأن المعلومات المقدمة صحيحة ودقيقة."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__id
@@ -986,7 +1017,7 @@ msgstr "المُعرف"
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
 msgid "ID Number"
-msgstr ""
+msgstr "رقم الهوية"
 
 #. module: equity
 #: model:ir.model.fields,help:equity.field_equity_transaction__message_needaction
@@ -1012,11 +1043,15 @@ msgid ""
 "persons in the main interests of whom the\n"
 "                                    legal entity was formed or operates."
 msgstr ""
+"إذا لم يتم تحديد المستفيد (المستفيدين) المستقبليين بعد، فهم مجموعة الأشخاص "
+"الذين تم تشكيل \n"
+"                                    الكيان القانوني أو تشغيله لصالحهم بشكل "
+"أساسي."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "If the shareholder holding more than 25% is"
-msgstr ""
+msgstr "إذا كان المساهم الذي يمتلك أكثر من 25% "
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
@@ -1024,6 +1059,8 @@ msgid ""
 "If you are returning to an already submitted form, please note that your "
 "information has been securely stored."
 msgstr ""
+"إذا عدت إلى استمارة تم إرسالها بالفعل، يرجى ملاحظة أن معلوماتك قد تم تخزينها "
+"بشكل آمن."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
@@ -1031,22 +1068,24 @@ msgid ""
 "If your form has been successfully submitted, our team will review it and "
 "keep you informed of any updates."
 msgstr ""
+"إذا تم إرسال الاستمارة الخاصة بك بنجاح، سيقوم فريقنا بمراجعتها وإخطارك بأي "
+"تحديثات قادمة إن وجدت."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_search
 msgid "In Control"
-msgstr ""
+msgstr "المتحكم"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__invalid_securities_error
 msgid "Invalid Securities Error"
-msgstr ""
+msgstr "خطأ في الأوراق المالية غير الصالحة"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_ubo.py:0
 msgid "Invalid data: %s"
-msgstr ""
+msgstr "بيانات غير صالحة: %s"
 
 #. module: equity
 #. odoo-python
@@ -1070,7 +1109,7 @@ msgstr "متابع"
 #: model:ir.model.fields.selection,name:equity.selection__equity_transaction__transaction_type__issuance
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_search
 msgid "Issuance"
-msgstr ""
+msgstr "الإصدار"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -1109,7 +1148,7 @@ msgstr "استمارة قانونية"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Legal persons governed by public national laws;"
-msgstr ""
+msgstr "الأشخاص الاعتباريون الخاضعون للقوانين الوطنية العامة؛"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__liquidator
@@ -1130,7 +1169,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/equity/static/src/components/cap_table/cap_table.js:0
 msgid "Manage transactions, equity, cap table, and shareholders."
-msgstr ""
+msgstr "إدارة المعاملات، والأسهم، وجدول رأس المال، والمساهمين."
 
 #. module: equity
 #: model:res.groups,name:equity.group_equity_manager
@@ -1140,7 +1179,7 @@ msgstr "المدير"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__managing_director
 msgid "Managing Director"
-msgstr ""
+msgstr "المدير التنفيذي"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_has_error
@@ -1159,7 +1198,7 @@ msgstr "الرسائل"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_search
 msgid "Missing Documents"
-msgstr ""
+msgstr "المستندات الناقصة"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__model
@@ -1169,27 +1208,27 @@ msgstr ""
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
 msgid "My Companies"
-msgstr ""
+msgstr "شركاتي"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_1
 msgid "NGO - Cat 1. Directors"
-msgstr ""
+msgstr "المنظمات غير الحكومية - الفئة 1. المديرون"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_2
 msgid "NGO - Cat 2. Individuals with representation authority"
-msgstr ""
+msgstr "المنظمات غير الحكومية - الفئة 2. الأفراد الذين يتمتعون بسلطة التمثيل"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_3
 msgid "NGO - Cat 3. Individuals responsible for day-to-day management"
-msgstr ""
+msgstr "المنظمات غير الحكومية - الفئة 3. الأفراد المسؤولون عن الإدارة اليومية"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_4
 msgid "NGO - Cat 4. Founders of a foundation"
-msgstr ""
+msgstr "المنظمات غير الحكومية - الفئة 4. مؤسسو إحدى المؤسسات"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_5
@@ -1197,6 +1236,8 @@ msgid ""
 "NGO - Cat 5. Individuals or categories of individuals in whose main interest "
 "the association or foundation has been established or operates"
 msgstr ""
+"منظمة غير حكومية - الفئة 5. الأفراد أو فئات الأفراد الذين أنشئت الجمعية أو "
+"المؤسسة من أجلهم أو تعمل من أجلهم"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_6
@@ -1204,6 +1245,8 @@ msgid ""
 "NGO - Cat 6. Any other individual who ultimately exercises control by other "
 "means"
 msgstr ""
+"المنظمات غير الحكومية - الفئة 6. أي فرد آخر يمارس السيطرة في نهاية المطاف "
+"بوسائل أخرى"
 
 #. module: equity
 #. odoo-javascript
@@ -1221,7 +1264,7 @@ msgstr "الاسم"
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "Name is mandatory"
-msgstr ""
+msgstr "الاسم إلزامي"
 
 #. module: equity
 #. odoo-javascript
@@ -1241,13 +1284,13 @@ msgid ""
 "formal mandate of any kind but who are de facto exercising similar control "
 "over the company."
 msgstr ""
-"الأشخاص الطبيعيون الذين لديهم تفويض رسمي داخل مجلس إدارة الشركة. وهؤلاء هم على "
-"سبيل المثال الأشخاص الذين يحملون لقب (أو ما يعادله) الرئيس التنفيذي (CEO) أو "
-"المدير المالي (CFO) أو أمين الصندوق. إذا كان هناك كيان قانوني يمارس تفويضًا "
-"في مجلس إدارة الشركة، فيجب إدراج جميع حاملي التفويض على مستوى مجلس الإدارة "
-"بما في ذلك وظائفهم. <br/> الأشخاص الطبيعيون الذين لا يمتلكون حصة مسيطرة في "
-"الشركة أو تفويضًا رسميًا من أي نوع، ولكنهم يمارسون فعليًا سيطرة مماثلة على "
-"الشركة."
+"الأشخاص الطبيعيون الذين لديهم تفويض رسمي داخل مجلس إدارة الشركة. وهؤلاء هم "
+"على سبيل المثال الأشخاص الذين يحملون لقب (أو ما يعادله) الرئيس التنفيذي "
+"(CEO) أو المدير المالي (CFO) أو أمين الصندوق. إذا كان هناك كيان قانوني يمارس "
+"تفويضًا في مجلس إدارة الشركة، فيجب إدراج جميع حاملي التفويض على مستوى مجلس "
+"الإدارة بما في ذلك وظائفهم. <br/> الأشخاص الطبيعيون الذين لا يمتلكون حصة "
+"مسيطرة في الشركة أو تفويضًا رسميًا من أي نوع، ولكنهم يمارسون فعليًا سيطرة "
+"مماثلة على الشركة."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
@@ -1263,7 +1306,7 @@ msgstr "معاملة جديدة"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "New Valuation"
-msgstr ""
+msgstr "تقييم جديد"
 
 #. module: equity
 #: model:res.groups.privilege,placeholder:equity.res_groups_privilege_equity
@@ -1274,7 +1317,7 @@ msgstr "لا"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "No UBOs recorded for this company."
-msgstr ""
+msgstr "لم يتم تسجيل أي مُلّاك مستفيدين نهائيين (UBOs) لهذه الشركة."
 
 #. module: equity
 #. odoo-python
@@ -1286,13 +1329,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/equity/static/src/components/cap_table/cap_table.js:0
 msgid "No shareholders yet!"
-msgstr ""
+msgstr "لا يوجد مساهمون حتى الآن!"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/valuation_chart_action/valuation_chart_action.js:0
 msgid "No valuations yet!"
-msgstr ""
+msgstr "لا توجد تقييمات حتى الآن!"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__notes
@@ -1335,13 +1378,14 @@ msgid ""
 "Only %(seller_options)s %(security_class_name)s options available for "
 "transfer"
 msgstr ""
+"وحدها الخيارات %(seller_options)s %(security_class_name)s هي التي يمكن نقلها"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid ""
 "Only %(seller_shares)s %(security_class_name)s shares available for transfer"
-msgstr ""
+msgstr "وحدها أسهم %(seller_shares)s %(security_class_name)s هي التي يمكن نقلها"
 
 #. module: equity
 #. odoo-python
@@ -1350,6 +1394,8 @@ msgid ""
 "Only %(subscriber_options)s %(security_class_name)s options available for "
 "cancellation"
 msgstr ""
+"وحدها خيارات %(subscriber_options)s %(security_class_name)s هي التي يمكن "
+"إلغاؤها"
 
 #. module: equity
 #. odoo-python
@@ -1358,6 +1404,8 @@ msgid ""
 "Only %(subscriber_options)s %(security_class_name)s options available for "
 "exercise"
 msgstr ""
+"وحدها خيارات %(subscriber_options)s%(security_class_name)s هي المتاحة "
+"لتنفيذها"
 
 #. module: equity
 #. odoo-python
@@ -1366,17 +1414,19 @@ msgid ""
 "Only %(subscriber_shares)s %(security_class_name)s shares available for "
 "cancellation"
 msgstr ""
+"وحدها الأسهم %(subscriber_shares)s%(security_class_name)s هي المتاحة ليتم "
+"إلغاؤها"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_transaction__transaction_type__exercise
 msgid "Option Exercise"
-msgstr ""
+msgstr "ممارسة الخيارات"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Option Pool"
-msgstr ""
+msgstr "مجموعة الخيارات"
 
 #. module: equity
 #: model:ir.model.fields,help:equity.field_equity_mail_compose_message__lang
@@ -1395,7 +1445,7 @@ msgstr "الخيارات"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_search
 msgid "Options Exercise"
-msgstr ""
+msgstr "ممارسة الخيارات"
 
 #. module: equity
 #. odoo-javascript
@@ -1413,12 +1463,12 @@ msgstr "ملكية"
 #: model:ir.model.fields,field_description:equity.field_res_partner__ubo_pep
 #: model:ir.model.fields,field_description:equity.field_res_users__ubo_pep
 msgid "PEP"
-msgstr ""
+msgstr "PEP"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "PEP - Politically Exposed Person"
-msgstr ""
+msgstr "PEP - شخصية معروفة سياسيًا"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__partner_id
@@ -1431,12 +1481,18 @@ msgid "Partner Ids All Have Email"
 msgstr ""
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_ubo.py:0
+msgid "Partner is not allowed to fill UBO form"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model:ir.model.fields,help:equity.field_res_partner__ubo_pep
 #: model:ir.model.fields,help:equity.field_res_users__ubo_pep
 msgid "Politically Exposed Person"
-msgstr ""
+msgstr "شخصية سياسية بارزة"
 
 #. module: equity
 #. odoo-javascript
@@ -1452,28 +1508,28 @@ msgstr "السعر"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Price FD"
-msgstr ""
+msgstr "السعر المخفّض بالكامل"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Price ND"
-msgstr ""
+msgstr "السعر غير المخفّض"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__security_price
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__security_price
 msgid "Price per Security"
-msgstr ""
+msgstr "السعر لكل ورقة مالية"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__share_price
 msgid "Price per Share"
-msgstr ""
+msgstr "سعر السهم الواحد"
 
 #. module: equity
 #: model:ir.actions.report,name:equity.action_equity_ubo_report
 msgid "Print UBO"
-msgstr ""
+msgstr "طباعة تقرير المستفيد الحقيقي (UBO)"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__rating_ids
@@ -1485,7 +1541,7 @@ msgstr "التقييمات"
 #. module: equity
 #: model:ir.model.fields,help:equity.field_equity_transaction__subscriber_id
 msgid "Recipient of the securities of the transaction."
-msgstr ""
+msgstr "المستلم للأوراق المالية الخاصة بالمعاملة."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids
@@ -1496,13 +1552,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
 msgid "Remove Shareholder"
-msgstr ""
+msgstr "إزالة المساهم"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
 msgid "Remove holder exit date."
-msgstr ""
+msgstr "حذف تاريخ خروج حامل السهم."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__render_model
@@ -1517,7 +1573,7 @@ msgstr "إعداد التقارير"
 #. module: equity
 #: model:ir.actions.server,name:equity.action_equity_request_ubo_form
 msgid "Request UBO Form"
-msgstr ""
+msgstr "طلب نموذج UBO"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__res_ids
@@ -1539,7 +1595,7 @@ msgstr "خطأ في تسليم الرسائل النصية القصيرة"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__secretary
 msgid "Secretary"
-msgstr ""
+msgstr "الأمين العام"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__securities
@@ -1551,31 +1607,31 @@ msgstr "ضمانات"
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Securities must be positive"
-msgstr ""
+msgstr "يجب أن تكون قيمة الأوراق المالية موجبة"
 
 #. module: equity
 #: model:ir.model,name:equity.model_equity_security_class
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__security_class_id
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_form
 msgid "Security Class"
-msgstr ""
+msgstr "فئة الأوراق المالية"
 
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_security_class
 #: model:ir.ui.menu,name:equity.menu_equity_configuration_security_classes
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_list
 msgid "Security Classes"
-msgstr ""
+msgstr "فئات الأوراق المالية"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
 msgid "Security Price"
-msgstr ""
+msgstr "سعر الأوراق المالية"
 
 #. module: equity
 #: model:portal.entry,description:equity.equity_portal_entry
 msgid "See your shares and transactions"
-msgstr ""
+msgstr "اطلع على أسهمك ومعاملاتك"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__seller_id
@@ -1585,19 +1641,19 @@ msgstr "البائع"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__seller_name
 msgid "Seller Name"
-msgstr ""
+msgstr "اسم البائع"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Seller and Buyer must be different."
-msgstr ""
+msgstr "يجب أن يكون البائع والمشتري شخصين مختلفين."
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Seller id can only be set in transfer transactions."
-msgstr ""
+msgstr "لا يمكن تعيين معرّف البائع إلا في معاملات التحويل."
 
 #. module: equity
 #. odoo-javascript
@@ -1615,7 +1671,7 @@ msgstr "تسلسل"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Shareholders who hold more than 25%"
-msgstr ""
+msgstr "المساهمون الذين يمتلكون أكثر من 25%"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__shares
@@ -1626,18 +1682,18 @@ msgstr "المشاركات"
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Shares transactions must have a subscriber"
-msgstr ""
+msgstr "تتطلب عمليات الأسهم وجود مكتتِب"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "Signature date:"
-msgstr ""
+msgstr "تاريخ التوقيع:"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
 msgid "Signature of Representative"
-msgstr ""
+msgstr "توقيع النائب"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -1647,7 +1703,7 @@ msgstr "التوقيع:"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Strike Price"
-msgstr ""
+msgstr "سعر التنفيذ"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__subject
@@ -1668,12 +1724,12 @@ msgstr "المشترك"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__subscriber_id_placeholder
 msgid "Subscriber Id Placeholder"
-msgstr ""
+msgstr "خانة معرّف المكتتِب"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__subscriber_name
 msgid "Subscriber Name"
-msgstr ""
+msgstr "اسم المشترك"
 
 #. module: equity
 #. odoo-javascript
@@ -1685,7 +1741,7 @@ msgstr "المستند المساند"
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
 msgid ""
 "Thank you for providing your Ultimate Beneficial Owner (UBO) information."
-msgstr ""
+msgstr "شكرًا لك على تقديم معلومات المالك المستفيد النهائي (UBO)."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
@@ -1695,9 +1751,9 @@ msgid ""
 "The \"Transaction Price\" total is not counting the prices of options "
 "issuance transactions because that is a strike price."
 msgstr ""
-"لا يشمل إجمالي ”لأوراق المالية“ معاملات ”ممارسة الخيارات“ (لأنها يتم احتسابها في "
-"وقت ”إصدار الخيارات“). لا يشمل إجمالي ”سعر المعاملة“ أسعار معاملات إصدار "
-"الخيارات لأنها تعتبر سعر التنفيذ."
+"لا يشمل إجمالي ”لأوراق المالية“ معاملات ”ممارسة الخيارات“ (لأنها يتم "
+"احتسابها في وقت ”إصدار الخيارات“). لا يشمل إجمالي ”سعر المعاملة“ أسعار "
+"معاملات إصدار الخيارات لأنها تعتبر سعر التنفيذ."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1705,6 +1761,8 @@ msgid ""
 "The declaration must be completed by the persons authorized to represent the "
 "company or entity according to its Articles of Association."
 msgstr ""
+"يجب أن يتم ملء الإقرار من قبل الأشخاص المخولين بتمثيل الشركة أو الكيان وفقاً "
+"لنظامها الأساسي."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1719,8 +1777,8 @@ msgid ""
 msgstr ""
 "الأشخاص الطبيعيون الذين يمتلكون أو يتحكمون في نهاية المطاف في هذه الكيانات "
 "الاعتبارية من خلال ملكية أو سيطرة مباشرة أو غير مباشرة على 25٪ من الأسهم أو "
-"حقوق التصويت في تلك الكيانات الاعتبارية. <br/> مثال: تمتلك الشركة B والشركة C "
-"حصة 20% في الشركة A. يمتلك الفرد Z 90% من أسهم الشركة B والشركة C. يعتبر Z "
+"حقوق التصويت في تلك الكيانات الاعتبارية. <br/> مثال: تمتلك الشركة B والشركة "
+"C حصة 20% في الشركة A. يمتلك الفرد Z 90% من أسهم الشركة B والشركة C. يعتبر Z "
 "مساهمًا يمتلك أكثر من 25% من A، لأن Z يمتلك - بشكل غير مباشر - 36% من أسهم A."
 
 #. module: equity
@@ -1728,27 +1786,27 @@ msgstr ""
 msgid ""
 "The undersigned (executive officer or administrator) acting as a "
 "representative of the company:"
-msgstr ""
+msgstr "الطرف المُوقّع أدناه (المسؤول التنفيذي أو المدير) بصفته ممثلاً للشركة:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
 msgid "There are currently no transactions for your account."
-msgstr ""
+msgstr "لا توجد حاليًا أي معاملات لحسابك."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "There are two classes of beneficial owners:"
-msgstr ""
+msgstr "توجد فئتان من المالكين المستفيدين:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
 msgid "There is currently no equity for your account."
-msgstr ""
+msgstr "لا توجد حالياً أي أسهم في حسابك."
 
 #. module: equity
 #: model:ir.model.constraint,message:equity.constraint_equity_ubo_unique_ubo
 msgid "This contact is already a holder of this company"
-msgstr ""
+msgstr "هذا الشخص هو أحد مُلاك هذه الشركة بالفعل"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1756,6 +1814,8 @@ msgid ""
 "This said, where a shareholder holding more than 25% is a legal arrangement "
 "other than a registered company, beneficial owners are:"
 msgstr ""
+"ومع ذلك، عندما يكون المساهم الذي يمتلك أكثر من 25% هو ترتيب قانوني بخلاف شركة "
+"مسجلة، فإن المالكين المستفيدين هم:"
 
 #. module: equity
 #. odoo-javascript
@@ -1782,7 +1842,7 @@ msgstr "معاملة"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
 msgid "Transaction Price"
-msgstr ""
+msgstr "سعر المعاملة"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__transaction_type
@@ -1807,7 +1867,7 @@ msgstr "تحويل"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__treasurer
 msgid "Treasurer"
-msgstr ""
+msgstr "أمين الصندوق"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__securities_type
@@ -1821,25 +1881,25 @@ msgstr "النوع"
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_ubos
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
 msgid "UBO"
-msgstr ""
+msgstr "المالك المستفيد النهائي (UBO)"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 #: model:mail.activity.type,name:equity.equity_ubo_form_mail_activity
 msgid "UBO Form Request"
-msgstr ""
+msgstr "طلب نموذج UBO"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__ubo_national_identifier
 #: model:ir.model.fields,field_description:equity.field_res_users__ubo_national_identifier
 msgid "UBO ID Number"
-msgstr ""
+msgstr "رقم معرّف UBO"
 
 #. module: equity
 #: model:mail.template,subject:equity.equity_ubo_form_email_template
 msgid "UBO form"
-msgstr ""
+msgstr "استمارة المستفيد الحقيقي"
 
 #. module: equity
 #. odoo-python
@@ -1847,34 +1907,34 @@ msgstr ""
 msgid ""
 "UBO portal form will become unavailable once this activity will be marked as "
 "done"
-msgstr ""
+msgstr "سيصبح نموذج بوابة UBO غير متاح بمجرد وضع علامة \"تم\" على هذه النشاط"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__ubo_owned_company_ids
 #: model:ir.model.fields,field_description:equity.field_res_users__ubo_owned_company_ids
 msgid "Ubo Owned Company"
-msgstr ""
+msgstr "شركة تابعة للمالك المستفيد التهائي (UBO)"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__ubo_owner_ids
 #: model:ir.model.fields,field_description:equity.field_res_users__ubo_owner_ids
 msgid "Ubo Owner"
-msgstr ""
+msgstr "مالك المستفيد الحقيقي"
 
 #. module: equity
 #: model:ir.model,name:equity.model_equity_ubo
 msgid "Ultimate Beneficial Owner"
-msgstr ""
+msgstr "المالك المستفيد النهائي"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Ultimate Beneficial Owners (UBO) Request"
-msgstr ""
+msgstr "طلب تحديد المالكين الفعليين النهائيين (UBO)"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "Ultimate Beneficial Owners (UBO) statement"
-msgstr ""
+msgstr "بيان المالكين الفعليين النهائيين (UBO)"
 
 #. module: equity
 #. odoo-javascript
@@ -1891,13 +1951,13 @@ msgstr "رفع"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Upload Files"
-msgstr ""
+msgstr "رفع الملفات"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 msgid "Upload UBO Form"
-msgstr ""
+msgstr "تحميل نموذج UBO"
 
 #. module: equity
 #. odoo-javascript
@@ -1919,12 +1979,12 @@ msgstr "التقييم"
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_valuations
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Valuations"
-msgstr ""
+msgstr "التقييمات"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Vesting period, exercise deadline, etc."
-msgstr ""
+msgstr "فترة الاستحقاق، الموعد النهائي للممارسة، إلخ."
 
 #. module: equity
 #. odoo-python
@@ -1942,7 +2002,7 @@ msgstr "العارض"
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__company_id
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__company_id
 msgid "Visible to"
-msgstr ""
+msgstr "مرئي لـ"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__votes
@@ -1953,7 +2013,7 @@ msgstr "التصويتات"
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__share_votes
 msgid "Votes per Share"
-msgstr ""
+msgstr "عدد الأصوات لكل مشاركة"
 
 #. module: equity
 #. odoo-javascript
@@ -1964,13 +2024,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__voting_rights
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__voting_rights
 msgid "Voting Rights"
-msgstr ""
+msgstr "حقوق التصويت"
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
 msgid "When did the shareholder lose its 25% stake in control or in votes?"
-msgstr ""
+msgstr "متى فقد المساهم حصته البالغة 25%، سواء في السيطرة أو في الأصوات؟"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1980,11 +2040,14 @@ msgid ""
 "                                    more of the property of a legal "
 "arrangement or entity or"
 msgstr ""
+"في حال تم تحديد المستفيدين المستقبليين مسبقًا، فإن الشخص الطبيعي (الأشخاص "
+"الطبيعيين) المستفيد بنسبة 25% أو\n"
+"                                    أكثر من ممتلكات ترتيب أو كيان قانوني أو"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Who should complete and sign the declaration?"
-msgstr ""
+msgstr "من الذي يجب أن يملأ الإقرار ويوقع عليه؟"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
@@ -2002,7 +2065,7 @@ msgstr "نعم"
 msgid ""
 "You can remove any shareholder holding less than 25% of the shares or voting "
 "rights."
-msgstr ""
+msgstr "يمكنك حذف أي مساهم يمتلك أقل من 25% من الأسهم أو حقوق التصويت."
 
 #. module: equity
 #. odoo-python
@@ -2010,13 +2073,13 @@ msgstr ""
 msgid ""
 "You cannot change the equity currency because this partner already has "
 "existing transactions."
-msgstr ""
+msgstr "لا يمكنك تغيير عملة الأسهم لأن هذا الشريك لديه معاملات قائمة بالفعل."
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "You must provide either the date of birth, or the ID number"
-msgstr ""
+msgstr "عليك كتابة تاريخ الميلاد أو رقم الهوية"
 
 #. module: equity
 #. odoo-javascript
@@ -2028,18 +2091,18 @@ msgstr "اسمك"
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
 msgid "Your Position"
-msgstr ""
+msgstr "منصبك"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
 msgid "Your UBO Declaration Has Been Submitted!"
-msgstr ""
+msgstr "تم إرسال إقرار UBO الخاص بك!"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/controllers/portal.py:0
 msgid "Your Value ND"
-msgstr ""
+msgstr "قيمتك غير المخفّضة"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -2048,6 +2111,8 @@ msgid ""
 "legal arrangement which is known to have\n"
 "                        been set up for the benefit de facto of a PEP."
 msgstr ""
+"أي شخص طبيعي يمتلك ملكية مفيدة حصرية لكيان قانوني أو ترتيب قانوني معروف أنه\n"
+"                        تم إنشاؤه لصالح شخصية سياسية بارزة."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -2056,6 +2121,9 @@ msgid ""
 "entities or legal arrangements, or any\n"
 "                        other close business relations, with a PEP;"
 msgstr ""
+"أي شخص طبيعي معروف بملكيته المشتركة لكيانات قانونية أو ترتيبات قانونية، أو "
+"أي\n"
+"                        علاقات تجارية وثيقة أخرى مع شخصية سياسية بارزة؛"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2063,6 +2131,8 @@ msgid ""
 "are the following individuals who have control by other means on the "
 "direction of the company (administrators)"
 msgstr ""
+"هم الأفراد التالية أسماؤهم الذين يتحكمون بوسائل أخرى في توجه الشركة "
+"(المسؤولون الإداريون)"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2071,16 +2141,18 @@ msgid ""
 "or indirectly more than 25% of the shares or of the voting rights of this "
 "company"
 msgstr ""
+"هم الأفراد التالية أسماؤهم الذين يمتلكون أو يتحكمون بشكل مباشر أو غير مباشر "
+"في أكثر من 25% من أسهم أو حقوق التصويت في هذه الشركة"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "are the following publicly traded companies."
-msgstr ""
+msgstr "هي الشركات التالية المتداولة في البورصة."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "born"
-msgstr ""
+msgstr "تاريخ الميلاد"
 
 #. module: equity
 #. odoo-python
@@ -2097,12 +2169,12 @@ msgstr "أيام"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "declares that the beneficial owners of the company:"
-msgstr ""
+msgstr "يفيد بأن المالكين المستفيدين للشركة:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_form
 msgid "e.g. Seed, Series A, ..."
-msgstr ""
+msgstr "على سبيل المثال: Seed، Series A، ..."
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
@@ -2146,7 +2218,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "please keep percentages between 0 and 100"
-msgstr ""
+msgstr "يرجى الحفاظ على النسب المئوية بين 0 و100"
 
 #. module: equity
 #. odoo-python
@@ -2171,8 +2243,8 @@ msgstr "سنة"
 msgid "years"
 msgstr "سنوات"
 
-msgid "Website Messages"
-msgstr "رسائل الموقع الإلكتروني"
+#~ msgid "Website Messages"
+#~ msgstr "رسائل الموقع الإلكتروني"
 
-msgid "Website communication history"
-msgstr "سجل تواصل الموقع الإلكتروني"
+#~ msgid "Website communication history"
+#~ msgstr "سجل تواصل الموقع الإلكتروني"

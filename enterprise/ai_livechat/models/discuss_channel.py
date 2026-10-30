@@ -2,6 +2,9 @@
 
 from odoo import api, fields, models
 
+from odoo.addons.im_livechat.models.discuss_channel import is_livechat_channel
+from odoo.addons.mail.tools.discuss import Store
+
 
 class DiscussChannel(models.Model):
     _inherit = "discuss.channel"
@@ -68,4 +71,22 @@ class DiscussChannel(models.Model):
         if ai_agent and ai_agent._is_user_access_allowed():
             non_persisted_channel_params['ai_agent_id'] = ai_agent.id
             persisted_channel_params['ai_agent_id'] = ai_agent.id
+            livechat_channel = kwargs.get('livechat_channel', self.env['im_livechat.channel'])
+            non_persisted_channel_params['livechat_channel_has_agents'] = bool(livechat_channel.user_ids)
         return non_persisted_channel_params, persisted_channel_params
+
+    def _store_channel_fields(self, res: Store.FieldList):
+        super()._store_channel_fields(res)
+        res.attr(
+            "livechat_channel_has_agents",
+            value=lambda channel: bool(channel.sudo().livechat_channel_id.user_ids),
+            predicate=is_livechat_channel,
+        )
+
+    def _sync_field_names(self, res):
+        super()._sync_field_names(res)
+        res[None].attr(
+            "livechat_channel_has_agents",
+            value=lambda channel: bool(channel.sudo().livechat_channel_id.user_ids),
+            predicate=is_livechat_channel,
+        )

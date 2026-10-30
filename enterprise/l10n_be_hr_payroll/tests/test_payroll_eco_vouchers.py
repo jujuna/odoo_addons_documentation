@@ -1,4 +1,7 @@
-from datetime import date
+from datetime import date, datetime
+
+from dateutil.relativedelta import relativedelta
+
 from odoo.tests import tagged
 from .common import TestPayrollCommon
 
@@ -286,6 +289,110 @@ class TestPayrollEcoVouchers(TestPayrollCommon):
         self.assertTrue(line)
         # Should be exactly 250, not 1.2 * 250 = 300
         self.assertEqual(line.amount, 250.0)
+
+    def test_eco_vouchers_individual_public_holidays(self):
+        # A public holiday registered for the employee alone (a replacement day) is neither a worked nor a theoretical
+        # working day, like the calendar's own: a full reference period still gets the full amount
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Replacement public holiday",
+            'calendar_id': self.employee_test.resource_calendar_id.id,
+            'company_id': self.belgian_company.id,
+            'resource_id': self.employee_test.resource_id.id,
+            'date_from': datetime(2025, 3, day, 0, 0, 0),
+            'date_to': datetime(2025, 3, day, 23, 59, 59),
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_bank_holiday').id,
+        } for day in (3, 4, 5)])
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee_test.id,
+            'version_id': self.employee_test.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        self.assertAlmostEqual(line.amount, 250.0, places=2)
+
+    def test_eco_vouchers_partially_worked_days(self):
+        # A day partly worked stays a working day: two hours of a reintegration journey (122.04, unpaid) on ten days
+        # take none of them off the reference period, a whole day of it does
+        self.env['resource.calendar.leaves'].create([{
+            'name': "Reintegration journey",
+            'calendar_id': self.employee_test.resource_calendar_id.id,
+            'company_id': self.belgian_company.id,
+            'resource_id': self.employee_test.resource_id.id,
+            'date_from': date_from,
+            'date_to': date_to,
+            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_be_work_entry_type_partial_incapacity').id,
+        } for date_from, date_to in [
+            (datetime(2025, 3, day, 12, 0, 0), datetime(2025, 3, day, 14, 0, 0)) for day in (3, 4, 5, 6, 7, 10, 11, 12, 13, 14)
+        ] + [(datetime(2025, 3, 17, 0, 0, 0), datetime(2025, 3, 17, 23, 59, 59))]])
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee_test.id,
+            'version_id': self.employee_test.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        self.assertAlmostEqual(line.amount, 259 / 260 * 250, places=2)
+
+    def test_eco_vouchers_cp302_student(self):
+        # The Horeca agreement leaves out the students' contracts on the solidarity contribution
+        student = self.create_employee({
+            'name': 'CP302 Student',
+            'l10n_be_joint_committee_id': self.cp302.id,
+            'contract_date_start': date(2024, 1, 1),
+            'l10n_be_dimona_category': 'stu',
+            'l10n_be_salary_scale_id': self.env.ref('l10n_be_hr_payroll.cp302_4').id,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': student.id,
+            'version_id': student.version_id.id,
+            'date_from': date(2025, 12, 1),
+            'date_to': date(2025, 12, 31),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        self.assertFalse(line.amount if line else 0.0)
+
+    def test_eco_vouchers_full_amount_cap(self):
+        # A version planned day by day only schedules its own days: worked in full, it counts for the whole of its
+        # calendar's reference period, and with the version before it the sum would pass the full amount (0.5 + 1 of
+        # 250); one reference period never grants more than the full amount
+        emp = self.create_employee({
+            'name': 'Planned CP200',
+            'l10n_be_joint_committee_id': self.cp200.id,
+            'contract_date_start': date(2024, 1, 1),
+        })
+        attendance = self.env.ref('hr_work_entry.be_work_entry_type_attendance')
+        planned = self.env['resource.calendar'].create({
+            'name': "Planned day by day",
+            'company_id': self.belgian_company.id,
+            'calendar_type': 'variable',
+            'hours_per_week': 38,
+            'full_time_required_hours': 38,
+            'attendance_ids': [(5, 0, 0)] + [(0, 0, {
+                'date': day,
+                'hour_from': 8.0,
+                'hour_to': 15.6,
+                'work_entry_type_id': attendance.id,
+            }) for day in (date(2024, 12, 1) + relativedelta(days=offset) for offset in range(182)) if day.weekday() < 5],
+        })
+        emp.version_id.copy({'date_version': date(2024, 12, 1), 'resource_calendar_id': planned.id})
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': emp.id,
+            'version_id': emp.version_id.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.belgian_company.id,
+        })
+        payslip.compute_sheet()
+        line = payslip.line_ids.filtered(lambda l: l.code == 'ECOVOUCHERS')
+        self.assertTrue(line)
+        self.assertLessEqual(line.amount, 250.0)
 
     def test_eco_vouchers_departing_employee(self):
         """

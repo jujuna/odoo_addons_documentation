@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models
+from odoo import models, _
 
 
 class ReportMrpReport_Mo_Overview(models.AbstractModel):
@@ -34,8 +34,7 @@ class ReportMrpReport_Mo_Overview(models.AbstractModel):
                 index += 1
             else:
                 for employee, time_ids in workorder.time_ids.grouped('employee_id').items():
-                    if not employee:
-                        continue
+                    employee_name = employee.display_name if employee else _("Employee")
                     for times in time_ids.grouped('employee_cost').values():
                         hourly_cost = times[0].employee_cost
                         duration = sum(times.mapped('duration'))
@@ -45,7 +44,7 @@ class ReportMrpReport_Mo_Overview(models.AbstractModel):
                             'level': level,
                             'index': f"{current_index}WE{index}",
                             'model': workorder._name,
-                            'name': f"{employee.display_name}: {workorder.display_name}",
+                            'name': f"{employee_name}: {workorder.display_name}",
                             'quantity': duration / 60,
                             'uom_name': "",
                             'uom_precision': 4,

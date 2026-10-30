@@ -45,6 +45,18 @@ class TestPayroll274XXReport(TestPayrollCommon):
             ])
         )
 
+    def test_274_56_sme_exemption(self):
+        self.belgian_company._get_payroll_config(date(2023, 6, 1)).l10n_be_ipa_reduction = True
+        payslips = self.employee_a_payslip | self.employee_b_payslip
+        category_codes = self.env['hr.payslip']._get_child_category_ids('IPA_REDUCTION_BASE')
+        ipa_lines = payslips.line_ids.filtered(lambda line: set(line.salary_rule_id.category_ids.mapped('code')) & set(category_codes))
+        self.assertTrue(ipa_lines)
+
+        sheet = self.env['l10n_be.274_xx'].with_company(self.belgian_company).create({'year': 2023, 'month': '6'})
+        self.assertAlmostEqual(sheet.sme_taxable_amount, sum(ipa_lines.mapped('total')), places=2)
+        self.assertEqual(sheet.line_274_56_ids.employee_id, self.employee_a | self.employee_b)
+        self.assertAlmostEqual(sheet.sme_exempted_amount, round(sheet.sme_taxable_amount * sheet.sme_exemption_rate, 2), places=2)
+
     def test_report_can_only_be_generated_from_root_company(self):
         companies = self.multibranch_company
         with self.assertRaises(UserError):
@@ -276,7 +288,7 @@ class TestPayroll274XXReport(TestPayrollCommon):
         # payslips: unused theoretical exemption from a low-withholding employee is pooled
         # and can cover the shortfall of a higher-withholding employee processed after them.
         (employee_low, employee_high), payslips = self._create_shift_premium_payslips(
-            'PREMIUM_PAY_TEAM', [1300.0, 4000.0],
+            'PREMIUM_PAY_TEAM', [1300.0, 9000.0],
         )
         payslip_low = payslips.filtered(lambda p: p.employee_id == employee_low)
         payslip_high = payslips.filtered(lambda p: p.employee_id == employee_high)
@@ -329,7 +341,7 @@ class TestPayroll274XXReport(TestPayrollCommon):
     def test_274_75_exemption_pooling_matches_actual_payslip_grants(self):
         # Same pooling mechanism as 274.74, applied to the 274.75 (night shift) exemption.
         (employee_low, employee_high), payslips = self._create_shift_premium_payslips(
-            'PREMIUM_PAY_NIGHT', [1300.0, 4000.0],
+            'PREMIUM_PAY_NIGHT', [1300.0, 9000.0],
         )
         payslip_low = payslips.filtered(lambda p: p.employee_id == employee_low)
         payslip_high = payslips.filtered(lambda p: p.employee_id == employee_high)

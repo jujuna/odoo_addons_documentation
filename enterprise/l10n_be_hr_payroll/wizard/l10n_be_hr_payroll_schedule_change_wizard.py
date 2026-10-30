@@ -239,31 +239,27 @@ class L10n_BeHrPayrollScheduleChangeWizard(models.TransientModel):
         if self.version_id.contract_date_end and self.date_end and self.version_id.contract_date_end < self.date_end:
             raise ValidationError(self.env._('Current contract is finished before the end of the new contract.'))
 
-        # Set a closing date on the current contract
+        # The schedule change is an amendment of the current contract: only
+        # create versions, never touch the contract dates
+        employee = self.version_id.employee_id
         previous_contract_date_end = self.version_id.contract_date_end
         previous_wage = self.version_id._get_contract_wage()
-        contract_date_end = False
-        if self.date_start != self.version_id.contract_date_start:
-            contract_date_end = self.date_start - timedelta(days=1)
-        elif self.date_end:
-            contract_date_end = self.date_end
-
-        if contract_date_end:
-            self.with_context(close_contract=False).version_id.contract_date_end = contract_date_end
-
         new_wage = self.wage if self.adapt_wage else self.version_id._get_contract_wage()
         wage_field = self.version_id._get_contract_wage_field()
-        new_version = self.version_id.employee_id.create_version({
-            'date_version': self.date_start,
-            'contract_date_start': self.date_start,
-            'contract_date_end': self.date_end,
+        existing_versions = employee.version_ids
+        new_version_vals = {
             wage_field: new_wage,
             'resource_calendar_id': self.resource_calendar_id.id,
-        })
-        new_contracts = new_version
+        }
         # Since _get_contract_wage_field is not always 'wage' we also want to change the original wage
-        if new_contracts._get_contract_wage_field() != 'wage':
-            new_contracts.wage = new_wage
+        if wage_field != 'wage':
+            new_version_vals['wage'] = new_wage
+        new_version = employee.create_version({
+            'date_version': self.date_start,
+            **new_version_vals,
+        })
+        version_created = new_version not in existing_versions
+        new_contracts = new_version
 
         # Process allocation changes
         if self.leave_allocation_id and self.adapt_allocation:
@@ -277,39 +273,39 @@ class L10n_BeHrPayrollScheduleChangeWizard(models.TransientModel):
             )
 
         if self.date_end:
-            # Create a contract for the rest of the original contrat's time period if it exists
+            # Revert to the original schedule for the rest of the contract if it exists
             if not previous_contract_date_end or self.date_end < previous_contract_date_end:
-                post_contract = self.version_id.employee_id.create_version({
-                    'date_version': self.date_end + timedelta(days=1),
-                    'contract_date_start': self.date_end + timedelta(days=1),
-                    'contract_date_end': previous_contract_date_end,
+                post_date = self.date_end + timedelta(days=1)
+                post_contract_vals = {
+                    'date_version': post_date,
                     # resource_calendar_id is copy=False
                     'resource_calendar_id': self.version_id.resource_calendar_id.id,
                     wage_field: previous_wage,
                     'work_time_rate': self.version_id.work_time_rate,
-                })
+                }
+                if wage_field != 'wage':
+                    post_contract_vals['wage'] = self.version_id.wage
+                post_contract = employee.create_version(post_contract_vals)
                 new_contracts |= post_contract
-                # We also need to update the allocation when this contract starts,
+                # We also need to update the allocation when this version starts,
                 #  basically revert back changes
                 if self.leave_allocation_id and self.adapt_allocation:
                     self._update_allocation_or_schedule(
-                        post_contract.contract_date_start,
+                        post_date,
                         post_contract,
                         self.resource_calendar_id,
                         self.current_resource_calendar_id,
                         original_allocated_days,
                     )
 
+        if not version_created:
+            # create_version returned the existing version at that date (possibly the
+            # current one): update it once the original values are no longer needed
+            new_version.write(new_version_vals)
+
         # When changing the schedule from the contract history we can just reload the view instead of going on to a separate view
         if self.env.context.get('from_history', False):
             return True
-
-        version_created = new_version != self.version_id
-        if not version_created:
-            new_version.write({
-                wage_field: new_wage,
-                'resource_calendar_id': self.resource_calendar_id.id,
-            })
 
         next_action = {
             'res_model': 'hr.employee',

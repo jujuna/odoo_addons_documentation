@@ -100,36 +100,20 @@ class Website_GeneratorRequest(models.Model):
                 generation_progress[last_record_id] = min(len(blog_entity_vals), generation_progress[last_record_id] + batch_size)
 
     def _create_blog_blogs(self, generation_progress, batch_blog_data):
-        blog_names = [blog.get('name', '') for _, blog in batch_blog_data]
-        # Check if the blog already exists for the website.
-        # This could occur when the user already started manually adding blogs but wanted the tool to do the rest.
-        already_existing_blogs = self.env['blog.blog'].search([('name', 'in', blog_names), ('website_id', '=', self.website_id.id)])
-        batched_blog_names = {existing_blog.name for existing_blog in already_existing_blogs}
-
+        # 2 separate blogs can have the same name but different ids.
         batched_blog_vals = []
-        # Used for linking the created odoo record to the corresponding blog info in batch_blog_data
-        blog_name_mapping = {}
         for blog_path, blog in batch_blog_data:
             blog_name = blog.get('name', '')
-            blog_name_mapping[blog_name] = {
-                'id': blog['id'],
-                'path': blog_path,
-            }
-            if blog_name in batched_blog_names:
-                continue
-            batched_blog_names.add(blog_name)
 
             batched_blog_vals.append({
                 'name': blog_name,
                 'subtitle': blog.get('description', ''),
                 'website_id': self.website_id.id,
             })
-        odoo_blogs = already_existing_blogs + self.env['blog.blog'].sudo().create(batched_blog_vals)
-        for odoo_blog in odoo_blogs:
-            blog_path = blog_name_mapping[odoo_blog.name]['path']
+        odoo_blogs = self.env['blog.blog'].sudo().create(batched_blog_vals)
+        for (blog_path, blog), odoo_blog in zip(batch_blog_data, odoo_blogs):
             generation_progress['direct_html_replacements_mapping'][blog_path] = odoo_blog.website_url
-            blog_id = blog_name_mapping[odoo_blog.name]['id']
-            generation_progress['blog_id_mapping'][blog_id] = odoo_blog.id
+            generation_progress['blog_id_mapping'][blog['id']] = odoo_blog.id
 
         return generation_progress
 
@@ -168,7 +152,6 @@ class Website_GeneratorRequest(models.Model):
 
     def _create_blog_posts(self, generation_progress, batch_blog_post_data, pattern_sorted_html, direct_html_replacements_mapping, all_blog_images):
         batched_blog_post_vals = []
-        blog_name_path_mapping = {}
         for i, (blog_post_path, blog_post) in enumerate(batch_blog_post_data):
             blog_post_name = blog_post.get('name')
             blog_post_vals = {
@@ -177,7 +160,6 @@ class Website_GeneratorRequest(models.Model):
                 'content': blog_post.get('content'),
                 'is_published': blog_post.get('is_published'),
             }
-            blog_name_path_mapping[blog_post_name] = blog_post_path
 
             # In WordPress, blog posts can belong to multiple blogs.
             # However, this is not the case in Odoo.
@@ -197,8 +179,10 @@ class Website_GeneratorRequest(models.Model):
 
             # Odoo only allows for a blog post to be associated with 1 blog
             # If not blog id, it will default to the base blog.
-            if valid_blog_id:
+            if valid_blog_id in generation_progress['blog_id_mapping']:
                 blog_post_vals['blog_id'] = generation_progress['blog_id_mapping'][valid_blog_id]
+            else:
+                logger.warning('No valid blog id found for blog post %s', blog_post_name)
 
             tag_ids = []
             for tag_id in blog_post.get('tag_ids', []):
@@ -230,9 +214,8 @@ class Website_GeneratorRequest(models.Model):
 
         odoo_blog_posts = self.env['blog.post'].sudo().create(batched_blog_post_vals)
 
-        for odoo_blog_post in odoo_blog_posts:
-            blog_path = blog_name_path_mapping[odoo_blog_post.name]
-            generation_progress['direct_html_replacements_mapping'][blog_path] = odoo_blog_post.website_url
+        for (blog_post_path, blog_post), odoo_blog_post in zip(batch_blog_post_data, odoo_blog_posts):
+            generation_progress['direct_html_replacements_mapping'][blog_post_path] = odoo_blog_post.website_url
         generation_progress['created_blog_post_ids'].extend(odoo_blog_posts.ids)
         return generation_progress
 

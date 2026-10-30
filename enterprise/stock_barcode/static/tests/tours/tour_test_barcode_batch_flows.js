@@ -1687,3 +1687,39 @@ registry.category("web_tour.tours").add("test_barcode_batch_GS1_scan_barcode_wit
         ...stepUtils.validateBarcodeOperation(),
     ],
 });
+
+registry.category("web_tour.tours").add("test_change_dest_location_multi_pickings", {
+    steps: () => [
+        {
+            content: "Scan first product of batch transfer",
+            trigger: ".o_barcode_line:contains(product1)",
+            run: "scan product1",
+        },
+        {
+            content: "Change destination location of the first product",
+            trigger: ".o_barcode_line:contains(product1)",
+            run: "scan child1",
+        },
+        {
+            content: "Assert the destination location was changed",
+            trigger:
+                '.o_barcode_line:contains(product1) div[title="Destination Location"]:contains("Child 1")',
+        },
+        {
+            content: "Scan second product of batch transfer",
+            trigger: ".o_barcode_line:contains(product2)",
+            run: "scan product2",
+        },
+        {
+            content: "Change destination location of the second product",
+            trigger: ".o_barcode_line:contains(product2)",
+            run: "scan child2",
+        },
+        {
+            content: "Assert the destination location was changed",
+            trigger:
+                '.o_barcode_line:contains(product2) div[title="Destination Location"]:contains("Child 2")',
+        },
+        ...stepUtils.validateBarcodeOperation(),
+    ],
+});

@@ -5,7 +5,7 @@ import re
 from requests.exceptions import ConnectionError
 from socket import AF_INET, IPPROTO_TCP, SOCK_STREAM
 from unittest.mock import MagicMock, patch
-import urllib.parse
+from urllib3.util import parse_url
 
 from odoo import api
 from odoo.fields import Domain
@@ -45,17 +45,27 @@ class TestDatabasesCommon(TransactionCase):
         super().setUp()
 
         self.json2_mocked_calls = defaultdict(lambda: defaultdict(dict))
+        self.kpi_summary_return_value = None
 
         def mock_requests_request(method, uri, *args, **kwargs):
-            parsed_url = urllib.parse.urlparse(uri)
+            parsed_url = parse_url(uri)
 
-            if parsed_url.hostname not in self.json2_mocked_calls:
-                raise ConnectionError(f'Could not connect to {parsed_url.hostname}')
-            hostname_calls = self.json2_mocked_calls[parsed_url.hostname]
+            if method == 'post' and parsed_url.path.endswith('/kpi/summary'):
+                if self.kpi_summary_return_value is None:
+                    return MagicMock(status_code=HTTPStatus.NOT_FOUND)
+
+                return MagicMock(**{
+                    'status_code': HTTPStatus.OK,
+                    'json.return_value': self.kpi_summary_return_value,
+                })
+
+            if parsed_url.host not in self.json2_mocked_calls:
+                raise ConnectionError(f'Could not connect to {parsed_url.host}')
+            hostname_calls = self.json2_mocked_calls[parsed_url.host]
 
             # To handle /json/version, add a line like this in your test:
             # json2_mocked_calls[hostname]['version'] = '19.0+e'
-            if parsed_url.path == '/json/version':
+            if parsed_url.path.endswith('/json/version'):
                 self.assertEqual(method, 'get')
                 if 'version' not in hostname_calls:
                     return MagicMock(status_code=HTTPStatus.SEE_OTHER)
@@ -64,12 +74,12 @@ class TestDatabasesCommon(TransactionCase):
                     # 'version_info': ...,  # We should not rely on this field
                 }
                 return MagicMock(status_code=HTTPStatus.OK, **{'json.return_value': value})
-            m = re.match(r'^/json/2/(?P<model>[^/]*)/(?P<method>[^/]*)$', parsed_url.path)
+            m = re.search(r'/json/2/(?P<model>[^/]*)/(?P<method>[^/]*)$', parsed_url.path)
             self.assertTrue(m, f'{uri!r} is not a valid /json/2 route')
             self.assertEqual(method, 'post')
 
             model_name = m.group('model')
-            self.assertIn(model_name, hostname_calls, f'No json2_mocked_calls defined for {parsed_url.hostname!r}/{model_name!r}')
+            self.assertIn(model_name, hostname_calls, f'No json2_mocked_calls defined for {parsed_url.host!r}/{model_name!r}')
             model = hostname_calls[model_name]
 
             method_name = m.group('method')

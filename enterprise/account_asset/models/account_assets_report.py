@@ -11,6 +11,12 @@ class AccountAssetReportHandler(models.AbstractModel):
     _inherit = ['account.report.custom.handler']
     _description = 'Assets Report Custom Handler'
 
+    def _customize_warnings(self, report, options, all_column_groups_expression_totals, warnings):
+        if asset_ids := options.get('account_mismatch_ids'):
+            warnings['account_asset.common_warning_discrepancy_detected'] = {
+                'asset_ids': asset_ids,
+            }
+
     def _get_custom_groupby_map(self):
         def asset_label_builder(grouping_keys):
             key_to_label = {}
@@ -177,8 +183,16 @@ class AccountAssetReportHandler(models.AbstractModel):
 
         sql = SQL(
             """
+                WITH asset_account_mismatches AS (
+                        SELECT amlr.asset_id,
+                               BOOL_OR(aml.account_id IS DISTINCT FROM aa.account_asset_id) AS has_mismatch
+                          FROM asset_move_line_rel amlr
+                          JOIN account_move_line aml ON aml.id = amlr.line_id
+                          JOIN account_asset aa ON aa.id = amlr.asset_id
+                      GROUP BY amlr.asset_id
+                ),
                 -- Filters variants and calculates accumulated depreciation totals (prior and current) within the specified reporting period.
-                WITH variant_data AS (
+                variant_data AS (
                     SELECT
                         asset.id AS asset_id,
                         variant.id AS variant_id,
@@ -236,10 +250,13 @@ class AccountAssetReportHandler(models.AbstractModel):
                         SUM(variant.depreciated_before) AS depre_date_from,
                         SUM(variant.depreciated_during) AS depre_plus,
                         0.0 AS depre_minus,
-                        SUM(variant.depreciated_before + variant.depreciated_during) AS depre_date_to
+                        SUM(variant.depreciated_before + variant.depreciated_during) AS depre_date_to,
+                        BOOL_OR(COALESCE(aam.has_mismatch, FALSE)) AS account_mismatch
                     FROM variant_data variant
                     JOIN variant_data parent_variant
                         ON parent_variant.variant_id = variant.parent_variant_id
+                    LEFT JOIN asset_account_mismatches aam
+                        ON aam.asset_id = variant.asset_id
                     GROUP BY
                             variant.parent_variant_id,
                             parent_variant.asset_currency_id,
@@ -276,7 +293,8 @@ class AccountAssetReportHandler(models.AbstractModel):
                         (CASE WHEN %(assets_closing_check)s
                                 THEN 0.0
                                 ELSE depre_date_to
-                            END) AS depre_date_to
+                            END) AS depre_date_to,
+                        account_mismatch
                     FROM variants_grouped_by_parent
                     LEFT JOIN res_currency currency
                         ON currency.id = asset_currency_id
@@ -291,6 +309,7 @@ class AccountAssetReportHandler(models.AbstractModel):
                         SUBSTRING(account_account.code_store->>asset.company_id::text, 1, 2) AS account_root,
                         %(account_code)s AS account_code,
                         %(account_name)s AS account_name,
+                        account_mismatch,
                         CASE WHEN %(selected_ledger_count)s > 1 THEN NULL
                              WHEN %(selected_ledger_count)s = 1 THEN ledger_model.method
                              ELSE main_model.method END AS asset_method,
@@ -370,7 +389,8 @@ class AccountAssetReportHandler(models.AbstractModel):
                         ELSE depre_minus
                         END) AS depre_minus,
                     SUM(depre_date_to) AS depre_date_to,
-                    SUM(assets_date_to) - SUM(depre_date_to) AS balance
+                    SUM(assets_date_to) - SUM(depre_date_to) AS balance,
+                    ARRAY_AGG(asset_id) FILTER (WHERE account_mismatch) AS account_mismatch_ids
                 FROM final_adjustments AS %(table_references)s       -- local shadowing of account.move.line
                 WHERE %(search_condition)s
                       %(grouping_filter)s
@@ -443,6 +463,9 @@ class AccountAssetReportHandler(models.AbstractModel):
                     'duration_rate': self._get_depreciation_rate(asset_method, res.get('asset_method_number'), res.get('asset_method_period'), res.get('asset_method_progress_factor')) if asset_method else None,
                     'has_sublines': True,
                 })
+            if res['account_mismatch_ids']:
+                account_mismatch_ids = set(options['account_mismatch_ids'])
+                options['account_mismatch_ids'].extend(aid for aid in res['account_mismatch_ids'] if aid not in account_mismatch_ids)
             results.append((res[current_groupby], full_res))
 
         return {next(iter(formulas_dict.values())): results}
@@ -451,8 +474,9 @@ class AccountAssetReportHandler(models.AbstractModel):
         """Compute the depreciation rate string"""
         match asset_method:
             case 'linear':
-                rate = 100.0 / asset_method_number if asset_method_number else 0.0
-                period_suffix = ' p.m.' if asset_method_period == '1' else ' p.a.'
+                multiplier = 12 if asset_method_period == '1' else 1
+                rate = (100.0 * multiplier / asset_method_number) if asset_method_number else 0.0
+                period_suffix = ' p.a.'
             case 'degressive':
                 rate = 100.0 * asset_method_progress_factor
                 period_suffix = ' p.a.'
@@ -461,9 +485,20 @@ class AccountAssetReportHandler(models.AbstractModel):
                 period_suffix = ''
         return f'{rate:.2f} %{period_suffix}'
 
+    def open_discrepancy_assets(self, options, params=None):
+        ''' Open the list of assets whose account do not match with the account of the related move line '''
+        action = self.env["ir.actions.actions"]._for_xml_id("account_asset.action_account_asset_form")
+        if params and params.get('asset_ids'):
+            action['domain'] = [('id', 'in', params['asset_ids'])]
+        return action
+
 
 class AccountReport(models.Model):
     _inherit = 'account.report'
+
+    def _init_options_asset_report(self, options, previous_options):
+        if self.custom_handler_model_name == 'account.asset.report.handler':
+            options['account_mismatch_ids'] = []
 
     def _get_caret_option_view_map(self):
         view_map = super()._get_caret_option_view_map()

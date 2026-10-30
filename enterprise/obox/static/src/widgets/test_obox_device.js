@@ -123,7 +123,7 @@ export class TestOboxDevice extends Component {
     async testPrinter() {
         const printData = await this.testPrintData();
         if (this.state.printType === "epos") {
-            await browser.fetch(
+            const response = await browser.fetch(
                 `http://${this.device.local_ip}/usb/v1/printer/${this.device.identifier}/cgi-bin/epos/service.cgi`,
                 {
                     method: "POST",
@@ -132,6 +132,16 @@ export class TestOboxDevice extends Component {
                     body: printData,
                 }
             );
+            const result = new DOMParser()
+                .parseFromString(await response.text(), "application/xml")
+                .getElementsByTagName("response")[0];
+            if (result?.getAttribute("success") !== "true") {
+                this.notification.add(
+                    _t("Test print failed: %s", result?.getAttribute("code") || response.status),
+                    { type: "danger" }
+                );
+                return;
+            }
         } else {
             await this.orm.create("obox.queue", [
                 {

@@ -1179,3 +1179,42 @@ class TestDeferredManagement(AccountTestInvoicingCommon):
         # Leading to inconsistencies between lines partner_id in the deferred moves
         invoice.with_context(default_partner_id=self.partner_b).action_post()
         self.assertEqual(invoice.deferred_move_ids.line_ids.mapped('partner_id'), self.partner_a)
+
+    def test_system_default_deferred_expense_apply_fiscal_position_mapping(self):
+        """Deferred entries map the company default deferred account correctly."""
+        fiscal_position = self.env['account.fiscal.position'].create({'name': 'Export Mapping'})
+        acc_def_dom = self.env['account.account'].create({
+            'code': 'TEST1010', 'name': 'Deferred Expense', 'account_type': 'asset_current'})
+        acc_def_exp = self.env['account.account'].create({
+            'code': 'TEST1011', 'name': 'Export Deferred Expense', 'account_type': 'asset_current'})
+        misc_journal = self.env['account.chart.template'].ref('general')
+        self.company.write({
+            'deferred_expense_account_id': acc_def_dom.id,
+            'deferred_expense_journal_id': misc_journal.id,
+        })
+        fiscal_position.account_ids = [
+            Command.create({'account_src_id': acc_def_dom.id, 'account_dest_id': acc_def_exp.id}),
+        ]
+
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.partner.id,
+            'fiscal_position_id': fiscal_position.id,
+            'invoice_date': '2026-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product.id,
+                    'price_unit': 1200.0,
+                    'deferred_start_date': '2026-01-01',
+                    'deferred_end_date': '2026-12-31',
+                })
+            ]
+        })
+        bill.action_post()
+
+        deferred_moves = self.env['account.move'].search([('deferred_original_move_ids', 'in', bill.ids)])
+        self.assertTrue(deferred_moves, "Deferred moves were not generated.")
+
+        deferred_lines = deferred_moves.line_ids.filtered(lambda l: l.account_id == acc_def_exp)
+        self.assertTrue(deferred_lines, "Mapped deferred account was not used in the deferred entries.")
+        self.assertFalse(deferred_moves.line_ids.filtered(lambda l: l.account_id == acc_def_dom))

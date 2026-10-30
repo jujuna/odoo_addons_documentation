@@ -7,6 +7,7 @@ import {
     useListener,
     useProps,
 } from "@odoo/owl";
+import { localization } from "@web/core/l10n/localization";
 import { _t } from "@web/core/l10n/translation";
 
 import { normalizeConnectionValidation, validateConnection } from "./connection_validator";
@@ -14,7 +15,12 @@ import { FlowConnection } from "./flow_connection";
 import { createFlowEditorStore } from "./flow_editor_store";
 import { FlowNode } from "./flow_node";
 import { buildConnectionGeometry } from "./geometry/connections";
-import { clampScale, screenToWorld } from "./geometry/coordinates";
+import {
+    clampScale,
+    getInlineOffsetX,
+    screenToWorld,
+    toInlineDeltaX,
+} from "./geometry/coordinates";
 import { getNodeRect, getNodeSize, getObstacleRects } from "./geometry/nodes";
 import { DEFAULT_NODE_HEADER_HEIGHT, getPortAnchor } from "./geometry/ports";
 import { buildOrthogonalPath } from "./geometry/router";
@@ -88,12 +94,13 @@ export class FlowEditor extends Component {
     get canvasStyle() {
         const { x, y, scale } = this.store.viewport;
         const gridSize = Math.max(this.props.gridSize, 1) * scale;
-        return `background-size: ${gridSize}px ${gridSize}px; background-position: ${x}px ${y}px;`;
+        const inlineStart = localization.direction === "rtl" ? "right" : "left";
+        return `background-size: ${gridSize}px ${gridSize}px; background-position: ${inlineStart} ${x}px top ${y}px;`;
     }
 
     get contentStyle() {
         const { x, y, scale } = this.store.viewport;
-        return `transform: translate(${x}px, ${y}px) scale(${scale});`;
+        return `transform: translate(${toInlineDeltaX(x)}px, ${y}px) scale(${scale});`;
     }
 
     get connectionGeometries() {
@@ -326,7 +333,9 @@ export class FlowEditor extends Component {
             y: (view.y1 + view.y2) / 2,
         };
         const angle =
-            (Math.atan2(target.y - viewCenter.y, target.x - viewCenter.x) * 180) / Math.PI + 45;
+            (Math.atan2(target.y - viewCenter.y, toInlineDeltaX(target.x - viewCenter.x)) * 180) /
+                Math.PI +
+            45;
         return {
             angle,
             x: canvasRect.width / 2,
@@ -609,7 +618,7 @@ export class FlowEditor extends Component {
             const size = {
                 width: Math.max(
                     this.props.minNodeSize.width,
-                    origin.width + (ev.clientX - this.pointerStart.x) / scale
+                    origin.width + toInlineDeltaX(ev.clientX - this.pointerStart.x) / scale
                 ),
                 height: Math.max(
                     this.props.minNodeSize.height,
@@ -639,7 +648,7 @@ export class FlowEditor extends Component {
             );
         } else {
             this.setViewport({
-                x: this.panOrigin.x + ev.clientX - this.pointerStart.x,
+                x: this.panOrigin.x + toInlineDeltaX(ev.clientX - this.pointerStart.x),
                 y: this.panOrigin.y + ev.clientY - this.pointerStart.y,
             });
         }
@@ -914,7 +923,7 @@ export class FlowEditor extends Component {
         );
         const scale = clampScale(this.store.viewport.scale * (ev.deltaY > 0 ? 0.9 : 1.1));
         this.setViewport({
-            x: ev.clientX - canvasRect.left - pointer.x * scale,
+            x: getInlineOffsetX(ev.clientX, canvasRect) - pointer.x * scale,
             y: ev.clientY - canvasRect.top - pointer.y * scale,
             scale,
         });

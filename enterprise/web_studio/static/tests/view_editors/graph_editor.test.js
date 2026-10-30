@@ -24,13 +24,18 @@ defineMailModels();
 class Stage extends models.Model {
     _name = "stage";
 
-    name = fields.Char();
-    char_field = fields.Char();
+    name = fields.Char({ string: "name" });
+    char_field = fields.Char({ string: "char_field" });
+    date = fields.Date({ string: "date" });
 
-    _records = [{ name: "stage1" }, { name: "stage2" }];
+    _records = [{ name: "stage1", char_field: "char1", date: "2023-01-01" }, { name: "stage2", char_field: "char2", date: "2023-02-01" }];
 
     _views = {
         "graph,1": `<graph/>`,
+        "graph,2": `<graph string="Stage Graph">
+            <field name="date" interval="month"/>
+            <field name="char_field"/>
+        </graph>`
     };
 }
 
@@ -193,4 +198,108 @@ test("open xml editor of graph component view and close it", async () => {
     expect(".o_ace_view_editor").toHaveCount(0);
     expect(".o_web_studio_xml_editor").toHaveCount(0);
     expect(".o_graph_renderer").toHaveCount(1);
+});
+
+test("groupby fields with date interval in graph editor", async () => {
+    let editViewCount = 0;
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        editViewCount++;
+        expect.step("edit_view");
+        if (editViewCount === 1) {
+            expect(params.operations[0].target.old_field_names).toBe("date");
+            expect(params.operations[0].target.field_names[0]).toBe("name");
+            const arch = `
+                <graph string="Stage Graph">
+                    <field name="name"/>
+                    <field name="char_field"/>
+                </graph>`;
+            return editView(params, "graph", arch);
+        } else if (editViewCount === 2) {
+            expect(params.operations[1].target.old_field_names).toBe("char_field");
+            expect(params.operations[1].target.field_names[0]).toBe("date");
+            const arch = `
+                <graph string="Stage Graph">
+                    <field name="name"/>
+                    <field name="date" interval="month"/>
+                </graph>`;
+            return editView(params, "graph", arch);
+        }
+    });
+
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+
+    await getService("action").doAction({
+        name: "Stage",
+        res_model: "stage",
+        type: "ir.actions.act_window",
+        view_mode: "graph",
+        views: [
+            [2, "graph"],
+            [false, "search"],
+        ],
+        group_ids: [],
+    });
+
+    await contains(".o_web_studio_navbar_item").click();
+
+    expect(".o_web_studio_sidebar input[name='first_groupby']").toHaveValue("date");
+    expect(".o_web_studio_sidebar input[name='second_groupby']").toHaveValue("char_field");
+
+    // Change first dimension to name
+    await contains(".o_web_studio_sidebar input[name='first_groupby']").click();
+    await contains(".o-dropdown-item:contains(name):not(:contains(Display))").click();
+
+    expect.verifySteps(["edit_view"]);
+    expect(".o_web_studio_sidebar input[name='first_groupby']").toHaveValue("name");
+    expect(".o_web_studio_sidebar input[name='second_groupby']").toHaveValue("char_field");
+
+    // Change second dimension to date
+    await contains(".o_web_studio_sidebar input[name='second_groupby']").click();
+    await contains(".o-dropdown-item:contains(date)").click();
+
+    expect.verifySteps(["edit_view"]);
+    expect(".o_web_studio_sidebar input[name='first_groupby']").toHaveValue("name");
+    expect(".o_web_studio_sidebar input[name='second_groupby']").toHaveValue("date");
+});
+
+test("graph sorting selection in graph editor", async () => {
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        expect.step("edit_view");
+        expect(params.operations[0].new_attrs.order).toBe("ASC");
+        const arch = `
+            <graph string="Stage Graph" order="ASC">
+                <field name="name"/>
+                <field name="char_field"/>
+            </graph>`;
+        return editView(params, "graph", arch);
+    });
+
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+
+    await getService("action").doAction({
+        name: "Stage",
+        res_model: "stage",
+        type: "ir.actions.act_window",
+        view_mode: "graph",
+        views: [
+            [2, "graph"],
+            [false, "search"],
+        ],
+        group_ids: [],
+    });
+
+    await contains(".o_web_studio_navbar_item").click();
+
+    expect(".o_web_studio_sidebar input[name='order']").toHaveValue("");
+
+    await contains(".o_web_studio_sidebar input[name='order']").click();
+    await contains(".o-dropdown-item:contains(Ascending)").click();
+
+    expect.verifySteps(["edit_view"]);
+    expect(".o_web_studio_sidebar input[name='order']").toHaveValue("Ascending");
 });

@@ -44,7 +44,7 @@ class TestDmfaUnexperiencedReduction(TestPayrollCommon):
 
         cls.env['hr.work.location'].create({
             'address_id': cls.fl_employee.address_id.id,
-            'bce_code': '8888888852',
+            'bce_code': '8888888572',
             'location_type': 'dmfa_unit',
             'competence': 'fl',
             'company_id': cls.belgian_company.id,
@@ -73,7 +73,7 @@ class TestDmfaUnexperiencedReduction(TestPayrollCommon):
 
         cls.env['hr.work.location'].create({
             'address_id': cls.wa_employee.address_id.id,
-            'bce_code': '8888888890',
+            'bce_code': '8888888671',
             'location_type': 'dmfa_unit',
             'competence': 'wa',
             'company_id': cls.belgian_company.id,
@@ -131,6 +131,17 @@ class TestDmfaUnexperiencedReduction(TestPayrollCommon):
         self.assertAlmostEqual(unexperienced_line.amount, 1000.0)
         occupation_deductions = dmfa_dict['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']['OccupationDeduction']
         self.assertTrue(any(d.get('DeductionCode') == '6340' and d.get('DeductionAmount') == '00000100000' for d in occupation_deductions))
+
+    def test_reference_wage_above_ceiling(self):
+        """The quarterly reference wage must be below 10.000 EUR: no 6340 deduction above it."""
+        self.fl_employee.version_id.wage = 4000.0
+        self._create_and_validate_payslip(self.fl_employee, date(2025, 1, 1), date(2025, 1, 31))
+        self._create_and_validate_payslip(self.fl_employee, date(2025, 2, 1), date(2025, 2, 28))
+        self._create_and_validate_payslip(self.fl_employee, date(2025, 3, 1), date(2025, 3, 31))
+
+        dmfa = self._generate_dmfa_declaration(year=2025, quarter='1', return_declaration=True)
+        self.assertFalse(dmfa.unexperienced_reduction_line_ids.filtered(lambda l: l.employee_id == self.fl_employee))
+        self.assertNotIn('<DeductionCode>6340</DeductionCode>', dmfa.xml_file.content.decode())
 
     def test_non_flanders_address(self):
         """Flag=True but work address is Wallonia → no 6340 deduction."""
@@ -197,7 +208,8 @@ class TestDmfaUnexperiencedReduction(TestPayrollCommon):
         unexperienced_line = dmfa.unexperienced_reduction_line_ids.filtered(lambda l: l.employee_id == self.fl_employee)
         self.assertTrue(unexperienced_line)
         occupation_deductions = dmfa_dict['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']['OccupationDeduction']
-        self.assertTrue(any(d.get('DeductionCode') == '6340' for d in occupation_deductions))
+        # Back within 4 quarters: the same cycle, its right still starts at the first engagement
+        self.assertTrue(any(d.get('DeductionCode') == '6340' and d.get('DeductionRightStartingDate') == '2025-01-01' for d in occupation_deductions))
 
         # Create payslips in Q1 2026
         self._create_and_validate_payslip(self.fl_employee, date(2026, 1, 1), date(2026, 1, 31))
@@ -263,7 +275,8 @@ class TestDmfaUnexperiencedReduction(TestPayrollCommon):
         unexperienced_line = dmfa.unexperienced_reduction_line_ids.filtered(lambda l: l.employee_id == self.fl_employee)
         self.assertTrue(unexperienced_line)
         occupation_deductions = dmfa_dict['DmfAOriginal']['Form']['EmployerDeclaration']['NaturalPerson']['WorkerRecord']['Occupation']['OccupationDeduction']
-        self.assertTrue(any(d.get('DeductionCode') == '6340' for d in occupation_deductions))
+        # The right of the new cycle starts at the new engagement
+        self.assertTrue(any(d.get('DeductionCode') == '6340' and d.get('DeductionRightStartingDate') == '2026-04-01' for d in occupation_deductions))
 
         # Create payslips in Q3 2026
         self._create_and_validate_payslip(self.fl_employee, date(2026, 7, 1), date(2026, 7, 31))

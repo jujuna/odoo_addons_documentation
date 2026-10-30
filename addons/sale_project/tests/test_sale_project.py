@@ -891,6 +891,36 @@ class TestSaleProject(TestSaleProjectCommon):
             self.assertEqual(sale_order_action["type"], "ir.actions.act_window")
             self.assertEqual(sale_order_action["res_model"], "sale.order")
 
+    def test_sale_order_amount_total_multi_currency(self):
+        eur = self.setup_other_currency('EUR', rates=[('2016-01-01', 2.0)])
+        eur_pricelist = self.env['product.pricelist'].create({
+            'name': 'EUR Pricelist',
+            'currency_id': eur.id,
+        })
+        project = self.env['project.project'].create({
+            'name': 'Multi-currency Project',
+            'allow_billable': True,
+        })
+        product = self.env['product.product'].create({
+            'name': 'Service in multi-currency project',
+            'type': 'service',
+            'service_tracking': 'task_global_project',
+            'project_id': project.id,
+        })
+        sale_orders = self.env['sale.order'].create([{
+            'partner_id': self.partner.id,
+            'pricelist_id': pricelist.id,
+            'order_line': [Command.create({
+                'product_id': product.id,
+                'price_unit': 200,
+                'tax_ids': False,
+            })],
+        } for pricelist in (self.env['product.pricelist'], eur_pricelist)])
+        sale_orders.action_confirm()
+
+        self.assertEqual(project.sale_order_count, 2)
+        self.assertEqual(project.sale_order_amount_total, 300, "The EUR order should be converted to the project currency")
+
     def test_multi_company_so_creation(self):
         # SO with project template with non-superuser company_id able creates project with proper company
         company = self.env['res.company'].create({
@@ -1349,6 +1379,36 @@ class TestSaleProject(TestSaleProjectCommon):
             so2.order_line.project_id,
             "The project of `so1` should be set to the project that was generated at SO confirmation."
         )
+
+    def test_so_confirmation_batch_task_template(self):
+        """
+        Sales order lines from different sales orders should generate 1 task
+        by task template for every sale order when they are confirmed in batch.
+        """
+        product = self.env['product.product'].create({
+            'name': 'Test product with task template',
+            'type': 'service',
+            'service_tracking': 'task_global_project',
+            'project_id': self.project_global.id,
+            'task_template_id': self.task_template.id,
+            'service_policy': 'ordered_prepaid',
+        })
+        so_1, so_2 = self.env['sale.order'].create([
+            {
+                'partner_id': self.partner.id,
+                'order_line': [Command.create({'product_id': product.id, 'product_uom_qty': 1})],
+            },
+            {
+                'partner_id': self.partner.id,
+                'order_line': [
+                    Command.create({'product_id': product.id, 'product_uom_qty': 1}),
+                    Command.create({'product_id': product.id, 'product_uom_qty': 1}),
+                ],
+            },
+        ])
+        (so_1 | so_2).action_confirm()
+        self.assertEqual(len(so_1.tasks_ids), 1)
+        self.assertEqual(len(so_2.tasks_ids), 1, "Only 1 task should be created if multiple SOLs share the same task template")
 
     def test_group_expand_sales_order(self):
         """

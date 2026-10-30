@@ -2254,7 +2254,59 @@ describe("grid_view_desktop", () => {
             "GHI (BS task)",
         ]);
     });
+
+    test("groupBy with a secondary date field is not supported in grid views", async () => {
+        Line._fields.other_date = fields.Date({ string: "Other Date" });
+
+        mockDate("2017-01-25 00:00:00");
+
+        mockService("notification", {
+            add: (message, options) => {
+                expect.step("notification");
+                expect(message).toBe("Grouping by date is not supported.");
+                expect(options.type).toBe("warning");
+            },
+        });
+
+        onRpc((args) => {
+            if (args.method === "formatted_read_group") {
+                expect.step("formatted_read_group"); 
+                expect(args.kwargs.groupby).toEqual(["date:day", "task_id", "project_id"]);
+            }
+        });
+
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch: `<grid>
+                    <field name="project_id" type="row" section="1"/>
+                    <field name="task_id" type="row"/>
+                    <field name="date" type="col">
+                        <range name="week" string="Week" span="week" step="day"/>
+                        <range name="month" string="Month" span="month" step="day"/>
+                    </field>
+                    <field name="unit_amount" type="measure" widget="float_time"/>
+                </grid>`,
+            searchViewArch: `
+                    <search>
+                        <filter string="Other Date" name="other_date" domain="[]" context="{'group_by': 'other_date'}"/>
+                    </search>
+                `,
+        });
+
+        expect.verifySteps(["formatted_read_group"]); // initial load
+
+        await toggleSearchBarMenu();
+        await toggleMenuItem("Other Date");
+
+        const dateOptionNodes = queryAll(".o_item_option");
+        await contains(dateOptionNodes[0]).click();
+
+        // warning shown, then a reload that must not include other_date
+        expect.verifySteps(["notification", "formatted_read_group"]);
+    });
 });
+
 describe.tags("mobile");
 describe("grid_view_mobile", () => {
     test("basic empty grid view in mobile", async () => {

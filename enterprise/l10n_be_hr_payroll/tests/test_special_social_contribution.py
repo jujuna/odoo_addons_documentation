@@ -147,9 +147,9 @@ class TestSpecialSocialContribution(TestPayrollCommon):
                 frequency = 'quarterly'
 
             # to describe the worker uplift in error messages if needed
-            error_msg_worker_extra = ' * 1.08 for workers' if payslip.version_id.is_worker() else ''
+            error_msg_worker_extra = f' * {payslip._rule_parameter("worker_onss_calculation_basis_uplift")} for workers' if payslip.version_id.is_worker() else ''
             # no worker uplift if employee is not a worker
-            worker_uplift = 1.08 if payslip.version_id.is_worker() else 1
+            worker_uplift = payslip._rule_parameter('worker_onss_calculation_basis_uplift') if payslip.version_id.is_worker() else 1
 
             if frequency == 'monthly':
                 month_gross_wage = self._get_payslips_gross_onss_wage(payslip)
@@ -262,7 +262,6 @@ minus the contributions paid in the two previous months.
             'resource_calendar_id': self.resource_calendar_40.id,
             'l10n_be_worker_code_id': self.ordinary_worker_code.id,
         })
-        worker_uplift = 1.08
         employee.version_id.marital = 'married'
         employee.version_id.spouse_fiscal_status = 'high_income'
 
@@ -290,6 +289,8 @@ minus the contributions paid in the two previous months.
         payslip_april.action_validate()
         payslip_may.compute_sheet()
         payslip_may.action_validate()
+
+        worker_uplift = payslip_april._rule_parameter('worker_onss_calculation_basis_uplift')
 
         april_gross_wage = self._get_payslips_gross_onss_wage(payslip_april)
         expected_april_csss = self._get_owed_csss(april_gross_wage * worker_uplift, payslip_april.date_to, 'couple_dual_income', 'monthly')
@@ -469,9 +470,6 @@ Got {csss} instead of 0.0 for the month of {self._get_months(2025)[payslip.date_
             'resource_calendar_id': self.resource_calendar_40.id,
             'l10n_be_worker_code_id': self.ordinary_worker_code.id,
         })
-        # employee is a worker (ouvrier). He will be subject to the 108% uplift
-        # on all his ONSS-subject salaries during the computation
-        uplift = 1.08
 
         # we have to validate the following payslips one by one, otherwise
         # payslip_november won't know that there is a validated payslip in october
@@ -494,6 +492,9 @@ Got {csss} instead of 0.0 for the month of {self._get_months(2025)[payslip.date_
             },
         ])
         payslip_october.action_validate()
+        # employee is a worker (ouvrier). He will be subject to the 108% uplift
+        # on all his ONSS-subject salaries during the computation
+        uplift = payslip_october._rule_parameter('worker_onss_calculation_basis_uplift')
         wanted_csss_october = -(self._get_owed_csss(
             self._get_payslips_gross_onss_wage(payslip_october) * uplift,
             payslip_october.date_to,
@@ -596,13 +597,13 @@ should not happen as they don't belong in the same quarter.
             'resource_calendar_id': self.resource_calendar_40.id,
             'l10n_be_worker_code_id': self.ordinary_worker_code.id,
         })
-        uplift = 1.08
 
         # the employee worked up to the end of september, when
         # he leaves the company (third quarter's last month)
         payslip_july, payslip_august, payslip_september = self._generate_monthly_payslips_range(
             date(2025, 7, 1), date(2025, 9, 30), employee,
         )
+        uplift = payslip_july._rule_parameter('worker_onss_calculation_basis_uplift')
         wanted_csss_july = -(self._get_owed_csss(
             self._get_payslips_gross_onss_wage(payslip_july) * uplift,
             payslip_july.date_to,
@@ -772,15 +773,15 @@ If the employee's contract ends on may the May payslip should:
             'resource_calendar_id': self.resource_calendar_40.id,
             'l10n_be_worker_code_id': self.ordinary_worker_code.id,
         })
-        # employee is a worker (ouvrier). He will be subject to the 108% uplift
-        # on all his ONSS-subject salaries during the computation
-        uplift = 1.08
 
         # we need to generate payslips for the previous year up to now so that
         # the holiday attests (n-1) have some value, and at least one payslip is
         # in the quarter we will test to see if its CSSS is used in the
         # quarterly computation
         payslip_october = self._generate_monthly_payslips_range(date(2024, 1, 1), date(2025, 10, 31), employee)[-1]
+        # employee is a worker (ouvrier). He will be subject to the 108% uplift
+        # on all his ONSS-subject salaries during the computation
+        uplift = payslip_october._rule_parameter('worker_onss_calculation_basis_uplift')
         expected_october_csss = self._get_owed_csss(
             employee.wage * uplift, payslip_october.date_to,
             "single", "monthly",
@@ -968,9 +969,6 @@ the unprestated notice and the CSSS tax must then be applied on each quarter.
             'resource_calendar_id': self.resource_calendar_40.id,
             'l10n_be_worker_code_id': self.ordinary_worker_code.id,
         })
-        # employee is a worker (ouvrier). He will be subject to the 108% uplift
-        # on all his ONSS-subject salaries during the computation
-        uplift = 1.08
 
         # so that the holiday attests (n-1) have some value
         self._generate_monthly_payslips_range(date(2025, 1, 1), date(2025, 12, 31), employee)
@@ -1030,6 +1028,9 @@ the unprestated notice and the CSSS tax must then be applied on each quarter.
         payslip_feb.action_validate()
         payslip_mar.compute_sheet()
         payslip_mar.action_validate()
+        # employee is a worker (ouvrier). He will be subject to the 108% uplift
+        # on all his ONSS-subject salaries during the computation
+        uplift = payslip_jan._rule_parameter('worker_onss_calculation_basis_uplift')
         monthly_wages = self._get_payslips_gross_onss_wage(payslip_jan | payslip_feb | payslip_mar)
         expected_csss = self._get_owed_csss(monthly_wages * uplift, payslip_mar.date_to, "single", "quarterly")
         already_paid_csss = -self._get_payslips_csss(payslip_jan | payslip_feb | payslip_mar)

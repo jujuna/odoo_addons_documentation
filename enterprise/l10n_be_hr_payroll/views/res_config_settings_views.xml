@@ -77,12 +77,18 @@
                             <button name="l10n_be_hr_payroll.l10n_be_fetch_dimona_sandbox_action" icon="east" type="action" string="Fetch Declarations (Sandbox)" class="btn-link" invisible="l10n_be_dimona_environment != 'sandbox'"/>
                         </div>
                     </setting>
-                    <setting id="cash_register" string="Cash Register" company_dependent="1" help="Configure cash register settings (CP302)" invisible="not l10n_be_employer_category_has_cp302">
+                    <setting id="cash_register" string="Cash Register" company_dependent="1" help="Configure cash register settings (CP302). A registered cash system raises the overtime limits." invisible="not l10n_be_employer_category_has_cp302">
                         <div class="mt16">
                             <div class="row mb-2 align-items-center">
                                 <div class="col-lg-5 d-flex align-items-start gap-2">
                                     <label string="Active" for="l10n_be_cash_register_active"/>
                                     <field name="l10n_be_cash_register_active" nolabel="1" />
+                                </div>
+                            </div>
+                            <div class="row mb-2 align-items-center" invisible="not l10n_be_has_white_cash_register">
+                                <div class="col-lg-5 d-flex align-items-start gap-2">
+                                    <label string="White Cash Register (deprecated)" for="l10n_be_has_white_cash_register"/>
+                                    <field name="l10n_be_has_white_cash_register" nolabel="1" />
                                 </div>
                             </div>
                             <div class="row mb-2 align-items-center">

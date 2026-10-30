@@ -21,14 +21,15 @@
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:45+0000\n"
-"PO-Revision-Date: 2026-09-17 23:13+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-16 17:50+0000\n"
+"PO-Revision-Date: 2026-10-14 13:34+0000\n"
+"Last-Translator: Burkay Yıldızhan <seyil@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-20/"
 "stock_barcode/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -557,13 +558,13 @@ msgstr "Kontak"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Count Entire Locations"
-msgstr ""
+msgstr "Tüm Konumları Say"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
 msgid "Count Inventory"
-msgstr ""
+msgstr "Envanter Sayımı"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_quant_barcode
@@ -618,7 +619,7 @@ msgstr "Kişiselleştirilmiş Dolap (ABD)"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Delete"
-msgstr ""
+msgstr "Sil"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_res_config_settings__stock_barcode_demo_active
@@ -1414,7 +1415,7 @@ msgstr "Satış veya satın alma siparişlerinden paketleme birimi"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/line.xml:0
 msgid "Packaging:"
-msgstr ""
+msgstr "Paketleme"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__parent_location_id
@@ -1479,7 +1480,7 @@ msgstr "Taramayı Doğrula veya Baka bir Ürün Barkodunu Tara"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Print"
-msgstr ""
+msgstr "Yazdır"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1598,7 +1599,7 @@ msgstr "Özellikler"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Put In Pack"
-msgstr ""
+msgstr "Pakete Koy"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_view_picking_type_form
@@ -1675,7 +1676,7 @@ msgstr "Onu Kaldır"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Return Products"
-msgstr ""
+msgstr "İadeler"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2066,10 +2067,18 @@ msgstr "Daha fazla ürün tarayın veya yeni bir kaynak konum tarayın"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/main.xml:0
+msgid ""
+"Scan more quantities or scan a lot number to apply the scanned quantity to "
+"it."
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
 #: code:addons/stock_barcode/static/src/main_scanner/main_scanner.xml:0
 msgid "Scan or tap"
-msgstr ""
+msgstr "Tara yada Elle Giriş Yap"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2172,7 +2181,7 @@ msgstr "Ayrılmış parti/seri numaralarını göster"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Sign"
-msgstr ""
+msgstr "İmzala"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -2491,7 +2500,7 @@ msgstr "Birim"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/package_line.xml:0
 msgid "Unpack"
-msgstr ""
+msgstr "Paketi Aç"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.view_stock_quant_tree
@@ -2571,6 +2580,14 @@ msgstr "Evet"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_model.js:0
+msgid ""
+"You already scanned %(packaging_name)s, please scan a lot before scanning "
+"another type of packaging."
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid ""
 "You are about to take the product %(productName)s from the location %"
@@ -2647,8 +2664,28 @@ msgstr "Bir Ürün Taraması yapmanız gerek"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/main.xml:0
+msgid "You scanned"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_model.js:0
+msgid ""
+"You still have unassigned quantities for product %(product)s. Scan a lot to "
+"assign them before scanning another product."
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
 msgid "e.g. LOT-PR-00012"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/main.xml:0
+msgid "of"
 msgstr ""
 
 #. module: stock_barcode

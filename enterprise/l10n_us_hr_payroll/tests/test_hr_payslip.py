@@ -67,6 +67,7 @@ class TestHrPayslip(TransactionCase):
         """ Without a payment date, a US payslip is computed on its close date
         and warns the user about it.
         """
+        self.env = self.env(context=dict(self.env.context, hr_payroll_force_compute_issue=True))
         slip = self._make_slip(date(2026, 3, 1), date(2026, 3, 31))
         slip.compute_sheet()
         self.assertEqual(slip._get_ytd_reference_date(), date(2026, 3, 31),

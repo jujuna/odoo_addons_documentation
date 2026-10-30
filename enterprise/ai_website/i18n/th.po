@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-18 01:50+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
-"ai_website/th/>\n"
+"POT-Creation-Date: 2026-10-23 17:52+0000\n"
+"PO-Revision-Date: 2026-10-08 09:40+0000\n"
+"Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-20/ai_website/"
+"th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -77,6 +77,47 @@ msgid ""
 "child position matches the other components of the selector.\n"
 "        "
 msgstr ""
+"\n"
+"เครื่องมือนี้จะทำการปรับเปลี่ยนโค้ด HTML บนหน้าเว็บตามคำสั่งและ CSS selector ที่ระบุไว้\n"
+"โดยหากเป็นการปรับเปลี่ยนทั้งหน้าเว็บ ระบบจะถือเป็นการจบเทิร์นในรอบนั้นทันที\n"
+"คุณสามารถใช้เครื่องมือนี้เพื่อแก้ไขส่วนต่างๆ บนหน้าเว็บ ได้ทั้งส่วนเนื้อหาหลักและส่วนท้าย\n"
+"\n"
+"ปล่อยให้ selector ว่างหากการดำเนินการคือ \"การแทนที่\" และคุณต้องการแทนที่โซนทั้งโซน\n"
+"สำหรับการแก้ไขแค่บางส่วน ให้ระบุ CSS selector "
+"เพื่อกำหนดเป้าหมายไปยังองค์ประกอบเฉพาะที่ต้องการ\n"
+"แก้ไข และต้องรักษาโครงสร้าง HTML ส่วนที่เหลือให้คงเดิม\n"
+"\n"
+"เพื่อแก้ไขค่าของแอตทริบิวต์ ให้แทนที่องค์ประกอบทั้งหมดด้วย HTML ใหม่ที่ประกอบด้วย\n"
+"แอตทริบิวต์ที่อัปเดตแล้ว\n"
+"\n"
+"การแทรกโค้ด JavaScript ทำได้โดยวางแท็ก <script data-ai-script-id=\"...\"> "
+"ที่บรรจุโค้ด JS แบบข้อความดิบ (Raw JS code) ไว้ในส่วน \"content\" ของการดำเนินการภาษา "
+"HTML สามารถฝังไว้ในการดำเนินการเดียวกับ\n"
+"Markup ที่สคริปต์นั้นควบคุม หรือจะส่งแยกเป็นการดำเนินการของสคริปต์โดยเฉพาะ (มีเฉพาะแท็ก "
+"<script>)\n"
+"ในกรณีที่ Markup บนหน้าเว็บมีอยู่แล้วและไม่จำเป็นต้องเขียนใหม่\n"
+"แท็ก <script> ทุกแท็กจำเป็นต้องมีแอททริบิวต์ data-ai-script-id ที่ระบุชื่อระบุตัวตนในรูปแบบ "
+"snake-case แบบสั้น\n"
+"(ประกอบด้วยตัวอักษร ตัวเลข และเครื่องหมายขีดล่าง _ เท่านั้น) และต้องไม่ซ้ำกันบนหน้าเว็บ\n"
+"สคริปต์ที่ไม่มีแอททริบิวต์นี้จะไม่ถูกจัดการโดย Editor และจะถูกตัดทิ้งทันที\n"
+"วางแท็ก <script> ไว้เป็นองค์ประกอบย่อยตัวสุดท้าย (Last child) ของเซกชันหรือ Snippet "
+"ที่สคริปต์นั้นสังกัดอยู่ เพื่อให้สคริปต์ถูกคัดลอก ย้าย หรือลบไปพร้อมกับส่วนนั้น "
+"กรณีส่งการดำเนินการเฉพาะสคริปต์: ให้ใช้ mode=\"after\"\n"
+"ร่วมกับ Selector ที่ชี้ไปยังองค์ประกอบย่อยตัวสุดท้าย (Last child) ภายในเซกชัน "
+"เพื่อให้สคริปต์ถูกวางอยู่ภายใน\n"
+"เซกชันนั้นแทนที่จะวางอยู่ระดับเดียวกันกับเซกชันนั้น\n"
+"สคริปต์จะทำงานเหมือนสคริปต์อินไลน์ทั่วไปทันทีที่ Markup โดยรอบถูกโหลดเข้าสู่ DOM\n"
+"เรียบร้อยแล้ว ทำให้ Element ทั้งหมดในการดำเนินการพร้อมใช้งานทันทีขณะสคริปต์ทำงาน\n"
+"เพื่ออัปเดตสคริปต์ ให้ส่งสคริปต์ที่มีองค์ประกอบ mode=”replace” อีกครั้งพร้อมกับแท็ก <script>\n"
+"ที่ถูกแก้ไขเรียบร้อย ถ้าหากอยากลบสคริปต์ ให้ส่งองค์ประกอบที่ไม่มีแท็ก <script> อีกครั้ง\n"
+"ในทั้งสองกรณึนี้จะไม่กระทบสคริปต์ตัวอื่นๆ ที่ไม่ได้ถูกอัปเดตหรือลบออก\n"
+"หลีกเลี่ยงการใช้ตัวเลือก `:nth-of-type` เนื่องจากพฤติกรรมนี้อาจก่อให้เกิดความสับสนได้\n"
+"หากต้องการกำหนดเป้าหมายไปยังการปรากฏตัวเฉพาะขององค์ประกอบ ให้ใช้ `:nth-child` แทน\n"
+"หมายเหตุ: ใน syntax element:nth-child() ลำดับการนับ Child จะนับรวมโหนดพี่น้อง "
+"(Sibling children)\n"
+"ขององค์ประกอบทุกประเภท แต่จะถือว่าตรงกันก็ต่อเมื่อองค์ประกอบที่อยู่ใน\n"
+"ตำแหน่งลูกนั้นตรงกับส่วนประกอบอื่นๆ ของตัวเลือก\n"
+"        "
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_description:ai_website.ir_actions_server_edit_website_menus
@@ -95,6 +136,17 @@ msgid ""
 "Use the \"Get Website Menus\" tool first to get the current menu item IDs.\n"
 "        "
 msgstr ""
+"\n"
+"นำรายการการดำเนินการไปใช้กับเมนูนำทางของเว็บไซต์: สร้างรายการเมนูใหม่\n"
+"อัปเดตรายการที่มีอยู่ (เปลี่ยนชื่อ, เปลี่ยน URL, ย้าย/จัดชั้น, จัดลำดับใหม่, ...) หรือ\n"
+"ลบรายการเหล่านั้น การลบรายการเมนูจะลบรายการย่อยไปด้วย\n"
+"\n"
+"การดำเนินการจะถูกนำไปใช้ตามลำดับ เพื่อสร้างรายการหลักและรายการย่อยใน\n"
+"การเรียกใช้ครั้งเดียว ให้กำหนด \"temp_id\" ให้กับรายการหลัก และอ้างอิงด้วย\n"
+"\"parent_temp_id\" ในรายการย่อย\n"
+"\n"
+"ใช้เครื่องมือ \"เรียกเมนูเว็บไซต์\" ก่อนเพื่อรับ ID ของรายการเมนูปัจจุบัน\n"
+"        "
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_description:ai_website.ir_actions_server_create_page
@@ -106,6 +158,11 @@ msgid ""
 "discard them before proceeding.\n"
 "        "
 msgstr ""
+"\n"
+"สร้างหน้าเว็บไซต์ใหม่และเปิดในเครื่องมือการสร้างเว็บไซต์ หากมุมมอง\n"
+"ปัจจุบันมีการเปลี่ยนแปลงที่กำลังดำเนินการอยู่ เครื่องมือจะขอให้ผู้ใช้งานเลือกที่จะบันทึกหรือ\n"
+"ลบทิ้งก่อนดำเนินการต่อ\n"
+"        "
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_description:ai_website.ir_actions_server_create_image_attachments
@@ -178,6 +235,37 @@ msgid ""
 "Pick the pair that matches the palette and fonts.\n"
 "        "
 msgstr ""
+"\n"
+"กำหนดชุดแบรนด์ทั้งหมดในครั้งเดียว: พาเลตสี การจัดวางตัวอักษร\n"
+"(การจับคู่ฟอนต์) และรูปแบบมุม + เงา ใช้ทั่วทั้งเว็บไซต์ ดังนั้นให้เรียกใช้\n"
+"เพียงครั้งเดียวเมื่อเริ่มสร้างหน้าใหม่ หรือเมื่อผู้ใช้ขอเปลี่ยน\n"
+"รูปลักษณ์โดยรวมก่อนที่จะเขียน HTML ใดๆ อย่าเรียกใช้เมื่อเพิ่มหรือแก้ไข\n"
+"ส่วนเดียวบนหน้าที่มีอยู่ (ส่วนนั้นต้องใช้รูปลักษณ์ที่มีอยู่)\n"
+"\n"
+"ทั้งสามส่วนเป็นตัวเลือก ให้กำหนดอย่างน้อยหนึ่งส่วน (หน้าใหม่ทั้งหมดควรตั้งค่า\n"
+"ทั้งสามส่วนเพื่อการกำกับงานภาพที่สอดคล้องกัน)\n"
+"\n"
+"พาเลตและฟอนต์ใช้ทั่วทั้งเว็บไซต์ ดังนั้นเครื่องมือนี้จะขอให้ผู้ใช้ยืนยัน\n"
+"ก่อนที่จะเขียนอะไรก็ตาม: หน้าที่ของคุณจะหยุดลงตรงนั่นและจะเริ่มใหม่เมื่อผู้ใช้ยอมรับ ให้เรียก\n"
+"เครื่องมือนี้พร้อมตัวเลือกทั้งหมดของคุณในครั้งเดียว และอย่าประกาศหรือถามซ้ำในแชท\n"
+"ด้วยตัวเอง ข้อความยืนยันจะแสดงให้คุณเห็น หากผู้ใช้ปฏิเสธ ให้รักษา\n"
+"รูปลักษณ์ที่มีอยู่และสร้างหน้าด้วยรูปลักษณ์นั้น\n"
+"\n"
+"# พาเลต\n"
+"สีแบรนด์ 5 สีในรูปแบบ hex 6 หลัก: o_color_1 สีหลัก, o_color_2 สีรอง\n"
+"สีเน้น, o_color_3 โทนสีอ่อน/นุ่ม, o_color_4 สีอ่อนที่สุด (ใกล้สีขาว), o_color_5\n"
+"สีเข้มที่สุด (ใกล้สีดำ) cc_presets (ไม่บังคับ): การแทนที่ตาม o_ccN (พื้นหลัง, ข้อความ,\n"
+"หัวข้อ, ลิงก์, ปุ่มหลัก, ปุ่มรอง)  ใช้อย่างระมัดระวัง\n"
+"\n"
+"# การจัดวางตัวอักษร\n"
+"heading_font + body_font (ต้องใช้ร่วมกัน) button_font เป็นตัวเลือกเสริม จับคู่\n"
+"หัวข้อที่มีลักษณะเฉพาะกับตัวข้อความหลักที่อ่านง่ายและสะอาดตา ใช้ชื่อฟอนต์จาก\n"
+"แคตตาล็อกฟอนต์ที่ได้รับอนุญาตเท่านั้นในคำแนะนำของคุณ\n"
+"\n"
+"# การออกแบบ\n"
+"มุม: แหลม | ไม่คมมาก | มน | เม็ดยา เงา: ไม่มี | เรียบ | เบา | เข้ม\n"
+"เลือกคู่ที่เข้ากับพาเลตสีและฟอนต์\n"
+"        "
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_description:ai_website.ir_actions_server_fetch_website_styles
@@ -423,19 +511,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_website/models/ai_website_service.py:0
 msgid " (added)"
-msgstr ""
+msgstr " (เพิ่มแล้ว)"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_website_service.py:0
 msgid " (changed)"
-msgstr ""
+msgstr " (แก้ไขแล้ว)"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_website_service.py:0
 msgid " (removed)"
-msgstr ""
+msgstr " (ลบแล้ว)"
 
 #. module: ai_website
 #. odoo-python
@@ -455,7 +543,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_website/models/ai_website_service.py:0
 msgid ", mega menu"
-msgstr ""
+msgstr ", เมนูแบบใหญ่"
 
 #. module: ai_website
 #. odoo-python
@@ -467,7 +555,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_website/models/ai_website_service_brand_kit.py:0
 msgid "A new colour palette:"
-msgstr ""
+msgstr "สีพาเลตใหม่:"
 
 #. module: ai_website
 #. odoo-python
@@ -494,7 +582,7 @@ msgstr "ผู้ช่วย AI"
 #: model:ir.model.fields,field_description:ai_website.field_website__ai_allow_scripts
 #: model_terms:ir.ui.view,arch_db:ai_website.res_config_settings_view_form
 msgid "AI JavaScript"
-msgstr ""
+msgstr "AI JavaScript"
 
 #. module: ai_website
 #: model_terms:ir.ui.view,arch_db:ai_website.snippets
@@ -520,7 +608,7 @@ msgstr "เครื่องมือ AI: ใช้ HTML กับหน้า"
 #. module: ai_website
 #: model:ir.actions.server,name:ai_website.ir_actions_server_create_page
 msgid "AI Tool: Create Page"
-msgstr ""
+msgstr "เครื่องมือ AI: สร้างหน้า"
 
 #. module: ai_website
 #: model:ir.actions.server,name:ai_website.ir_actions_server_edit_website_menus
@@ -560,7 +648,7 @@ msgstr ""
 #. module: ai_website
 #: model:ir.actions.server,name:ai_website.ir_actions_server_get_website_menus
 msgid "AI Tool: Get Website Menus"
-msgstr ""
+msgstr "เครื่องมือ AI: เรียกใช้เมนูเว็บไซต์"
 
 #. module: ai_website
 #: model:ir.actions.server,name:ai_website.ir_actions_server_create_image_attachments
@@ -605,7 +693,7 @@ msgstr "เครื่องมือ AI: เขียน CSS แบบกำ�
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_ai_web_page
 msgid "AI Web Page"
-msgstr ""
+msgstr "หน้าเว็บ AI"
 
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_ai_web_scraper_batch
@@ -615,12 +703,12 @@ msgstr ""
 #. module: ai_website
 #: model:ir.module.module,shortdesc:base.module_ai_website
 msgid "AI Website Integration"
-msgstr ""
+msgstr "เว็บไซต์ผสานการใช้งานเข้ากับ AI"
 
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_ai_website_service
 msgid "AI Website Service"
-msgstr ""
+msgstr "บริการเว็บไซต์ AI"
 
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_ai_composer
@@ -630,18 +718,18 @@ msgstr ""
 #. module: ai_website
 #: model:ir.module.module,summary:base.module_ai_website
 msgid "AI website integration"
-msgstr ""
+msgstr "เว็บไซต์ผสานการใช้งานเข้ากับ AI"
 
 #. module: ai_website
 #. odoo-javascript
 #: code:addons/ai_website/static/src/builder/ai_generated_scripts_panel.xml:0
 msgid "AI-generated scripts"
-msgstr ""
+msgstr "สคริปต์ที่ AI เขียนขึ้นมา"
 
 #. module: ai_website
 #: model:ir.actions.server,name:ai_website.ir_actions_server_apply_brand_kit
 msgid "AI: Apply Brand Kit"
-msgstr ""
+msgstr "AI: ใช้ Brand Kit"
 
 #. module: ai_website
 #: model:ir.model.fields,field_description:ai_website.field_ai_composer__interface_key
@@ -689,12 +777,12 @@ msgstr "การนำการเปลี่ยนแปลงไปใช้
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_request_ai_scripts
 msgid "Asking to enable JavaScript"
-msgstr ""
+msgstr "ขอเปิดใช้งาน JavaScript"
 
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_ir_attachment
 msgid "Attachment"
-msgstr ""
+msgstr "ไฟล์แนบ"
 
 #. module: ai_website
 #. odoo-python
@@ -711,7 +799,7 @@ msgstr "กระชับ"
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "ตั้งค่าการกำหนดค่า"
 
 #. module: ai_website
 #. odoo-javascript
@@ -729,12 +817,12 @@ msgstr "สร้างด้วย AI"
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Created Attachments"
-msgstr ""
+msgstr "ไฟล์แนบที่สร้างแล้ว"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_create_page
 msgid "Creating a new page"
-msgstr ""
+msgstr "กำลังสร้างหน้าใหม่"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_create_image_attachments
@@ -758,7 +846,7 @@ msgstr "อธิบายหน้าด้วยคำสำคัญ..."
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_discuss_channel
 msgid "Discussion Channel"
-msgstr ""
+msgstr "กลุ่มการสนทนา"
 
 #. module: ai_website
 #: model:ir.model.fields,field_description:ai_website.field_ai_composer__display_name
@@ -794,13 +882,13 @@ msgstr "แก้ไขหน้าเว็บไซต์"
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Edited custom style"
-msgstr ""
+msgstr "สไตล์ที่กำหนดเองได้ถูกแก้ไขแล้ว"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Enabled JavaScript"
-msgstr ""
+msgstr "เปิดใช้ JavaScript"
 
 #. module: ai_website
 #. odoo-javascript
@@ -923,18 +1011,18 @@ msgstr "คำแนะนำ"
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Keep editing this page"
-msgstr ""
+msgstr "แก้ไขหน้านี้ต่อ"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Looked up snippets"
-msgstr ""
+msgstr "ตัวอย่างข้อความที่ถูกค้นหา"
 
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_mail_message
 msgid "Message"
-msgstr ""
+msgstr "ข้อความ"
 
 #. module: ai_website
 #. odoo-python
@@ -970,7 +1058,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Page created successfully."
-msgstr ""
+msgstr "หน้าได้สร้างเสร็จสมบูรณ์แล้ว"
 
 #. module: ai_website
 #. odoo-python
@@ -1001,24 +1089,24 @@ msgstr "มืออาชีพ"
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Read backend routes docs"
-msgstr ""
+msgstr "อ่านเอกสารประกอบเกี่ยวกับเส้นทางจากหลังบ้าน"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Read custom style"
-msgstr ""
+msgstr "อ่านสไตล์ที่กำหนดเอง"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Read the website menu"
-msgstr ""
+msgstr "อ่านเมนูเว็บไซต์"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_get_backend_action_docs
 msgid "Reading backend route docs"
-msgstr ""
+msgstr "อ่านเอกสารประกอบเกี่ยวกับเส้นทางจากหลังบ้าน"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_read_custom_css
@@ -1028,17 +1116,17 @@ msgstr "สไตล์การอ่านที่กำหนดเอง"
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_fetch_website_styles
 msgid "Reading element styles"
-msgstr ""
+msgstr "อ่านสไตล์ขององค์ประกอบ"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_get_page_html
 msgid "Reading page HTML"
-msgstr ""
+msgstr "อ่านหน้า HTML"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_get_site_profile
 msgid "Reading site profile"
-msgstr ""
+msgstr "อ่านหน้าโปรไฟล์เว็บไซต์"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_get_snippets
@@ -1048,22 +1136,28 @@ msgstr "อ่านเนื้อหาตัวอย่าง"
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_get_website_menus
 msgid "Reading the website menu"
-msgstr ""
+msgstr "อ่านเมนูเว็บไซต์"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_get_webform_info
 msgid "Reading webform actions"
-msgstr ""
+msgstr "อ่านการดำเนินการของเว็บฟอร์ม"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_scrape_website_pages
 msgid "Reading webpage content"
-msgstr ""
+msgstr "อ่านเนื้อหาหน้าเว็บไซต์"
 
 #. module: ai_website
 #. odoo-javascript
 #: code:addons/ai_website/static/src/discuss/composer_patch.js:0
 msgid "Remove %(element)s"
+msgstr "ลบ %(element)s"
+
+#. module: ai_website
+#. odoo-javascript
+#: code:addons/ai_website/static/src/builder/ai_generated_scripts_panel.js:0
+msgid "Removing a script requires 'Editor and Designer' access"
 msgstr ""
 
 #. module: ai_website
@@ -1084,35 +1178,35 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Searched backend routes"
-msgstr ""
+msgstr "เส้นทางหลังบ้านที่ถูกค้นหา"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Searched images on Unsplash"
-msgstr ""
+msgstr "รูปภาพการค้นหาจาก Unsplash"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_search_backend_routes
 msgid "Searching backend routes"
-msgstr ""
+msgstr "เส้นทางหลังบ้านที่ถูกค้นหา"
 
 #. module: ai_website
 #. odoo-javascript
 #: code:addons/ai_website/static/src/discuss/composer_patch.js:0
 msgid "Select Elements"
-msgstr ""
+msgstr "เลือกองค์ประกอบ"
 
 #. module: ai_website
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Set the art direction"
-msgstr ""
+msgstr "กำหนดทิศทางศิลปะ"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_apply_brand_kit
 msgid "Setting the art direction"
-msgstr ""
+msgstr "กำหนดทิศทางศิลปะ"
 
 #. module: ai_website
 #. odoo-javascript
@@ -1181,7 +1275,7 @@ msgstr "การเลือกโทน"
 #. module: ai_website
 #: model:ir.model.fields,field_description:ai_website.field_ai_web_scraper_batch__tool_call_id
 msgid "Tool Call ID"
-msgstr ""
+msgstr "รหัสการเรียกใช้เครื่องมือ"
 
 #. module: ai_website
 #. odoo-javascript
@@ -1193,12 +1287,12 @@ msgstr "อัปเดตด้วย AI"
 #. odoo-python
 #: code:addons/ai_website/models/ai_tool.py:0
 msgid "Updated the website menu"
-msgstr ""
+msgstr "อัปเดตเมนูเว็บไซต์"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_edit_website_menus
 msgid "Updating the website menu"
-msgstr ""
+msgstr "กำลังอัปเดตเมนูเว็บไซต์"
 
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_ir_ui_view
@@ -1208,12 +1302,12 @@ msgstr "ดู"
 #. module: ai_website
 #: model:ir.model,name:ai_website.model_website
 msgid "Website"
-msgstr ""
+msgstr "เว็บไซต์"
 
 #. module: ai_website
 #: model:ir.model.fields,field_description:ai_website.field_ai_session__website_builder_context
 msgid "Website Builder Context"
-msgstr ""
+msgstr "เนื้อหาเครื่องมือการสร้างเว็บไซต์"
 
 #. module: ai_website
 #: model:ir.actions.server,ai_tool_thinking_text:ai_website.ir_actions_server_set_webform_action
@@ -1237,7 +1331,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/ai_website/static/src/builder/ai_website_builder_plugin.js:0
 msgid "another page"
-msgstr ""
+msgstr "หน้าอื่น"
 
 #~ msgid ""
 #~ "\n"

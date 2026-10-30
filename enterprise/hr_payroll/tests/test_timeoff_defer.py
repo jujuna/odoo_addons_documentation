@@ -202,3 +202,122 @@ class TestTimeoffDefer(TestPayrollHolidaysBase):
 
         payslip.action_payslip_cancel()
         self.assertEqual(leave.payslip_state, "normal")
+
+    def test_manager_approve_leave_without_payroll_rights(self):
+        """
+        Ensures that a manager with Time Off rights but without Payroll rights
+        can approve a leave that overlaps with a validated payslip.
+        """
+        # Create a manager employee and set them as the manager of self.emp
+        manager_emp = self.env['hr.employee'].create({
+            'name': 'Manager Employee',
+            'user_id': self.joseph.id,
+        })
+        self.emp.parent_id = manager_emp.id
+
+        # Validate a payslip for the employee
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Done Payslip',
+            'employee_id': self.emp.id,
+            'date_from': '2026-08-01',
+            'date_to': '2026-08-31',
+        })
+        payslip.compute_sheet()
+        with freeze_time('2026-08-30'):
+            payslip.action_payslip_done()
+        self.assertEqual(payslip.state, 'validated')
+
+        # Create the leave for the employee (overlaps with the validated payslip)
+        leave = self.env['hr.leave'].with_user(self.vlad).create({
+            'name': 'Leave colliding with done payslip',
+            'work_entry_type_id': self.work_entry_type.id,
+            'employee_id': self.emp.id,
+            'request_date_from': '2026-08-08',
+            'request_date_to': '2026-08-10',
+        })
+        leave.with_user(self.joseph).action_approve()
+
+        self.assertEqual(
+            leave.sudo().payslip_state,
+            'blocked',
+            "Leave should be blocked because of the validated payslip."
+        )
+
+    def test_leave_payslip_state_lifecycle(self):
+        """
+        Ensure leave payslip_state is correctly kept up to date:
+        - Remains 'normal' while covered by a draft payslip (both for leaves approved
+          before payslip creation and leaves approved while payslip is in draft).
+        - Transitions to 'done' only once the payslip is validated.
+        - Restores to 'normal' when the payslip is cancelled.
+        - Updates to 'done' again if reset to draft and re-validated.
+        """
+        leave = self.env['hr.leave'].create({
+            'name': 'Test Leave',
+            'work_entry_type_id': self.work_entry_type.id,
+            'employee_id': self.emp.id,
+            'request_date_from': (date.today() + relativedelta(day=13)),
+            'request_date_to': (date.today() + relativedelta(day=16)),
+        })
+        leave.action_approve()
+        self.assertEqual(leave.state, 'validate')
+        self.assertEqual(leave.payslip_state, 'normal', "Approved leave should initially have payslip_state 'normal'")
+
+        payslip = self.env['hr.payslip'].create({
+            'name': 'John Doe Payslip',
+            'employee_id': self.emp.id,
+        })
+        payslip.compute_sheet()
+        self.assertEqual(payslip.state, 'draft')
+        self.assertEqual(
+            leave.payslip_state,
+            'normal',
+            "Leave payslip_state should remain 'normal' while the payslip is in draft",
+        )
+
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.state, 'validated')
+        self.assertEqual(
+            leave.payslip_state,
+            'done',
+            "Leave payslip_state should transition to 'done' once the payslip is validated",
+        )
+
+        leave2 = self.env['hr.leave'].create({
+            'name': 'Test Leave 2',
+            'work_entry_type_id': self.work_entry_type.id,
+            'employee_id': self.emp.id,
+            'request_date_from': (date.today() + relativedelta(day=20)),
+            'request_date_to': (date.today() + relativedelta(day=23)),
+        })
+        leave2.action_approve()
+        self.assertEqual(
+            leave2.payslip_state,
+            'blocked',
+            "Leave payslip_state should be 'blocked' when added for an already validated payslip period",
+        )
+
+        payslip.action_payslip_cancel()
+        self.assertEqual(payslip.state, 'cancel')
+        self.assertEqual(
+            leave.payslip_state,
+            'normal',
+            "Leave payslip_state should be reset to 'normal' when the payslip is cancelled",
+        )
+        self.assertEqual(
+            leave2.payslip_state,
+            'normal',
+            "Late leave payslip_state should also be reset to 'normal' when the payslip is cancelled",
+        )
+
+        payslip.action_payslip_draft()
+        self.assertEqual(payslip.state, 'draft')
+        self.assertEqual(leave.payslip_state, 'normal')
+
+        payslip.action_payslip_done()
+        self.assertEqual(payslip.state, 'validated')
+        self.assertEqual(
+            leave.payslip_state,
+            'done',
+            "Leave payslip_state should be 'done' after re-validating the payslip",
+        )

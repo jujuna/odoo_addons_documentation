@@ -1,6 +1,6 @@
 from datetime import date
 
-from odoo.tests.common import tagged, TransactionCase
+from odoo.tests import Form, tagged, TransactionCase
 
 
 @tagged("post_install", "-at_install")
@@ -66,3 +66,23 @@ class TestExcludeOutDays(TransactionCase):
         self.assertEqual(payslip.sum_worked_paid_hours, 96, "sum_worked_hours should only count paid hours.")
         self.assertEqual(payslip.sum_worked_days, 23, "sum_worked_days should count paid and unpaid days.")
         self.assertEqual(payslip.sum_worked_hours, 184, "sum_worked_hours should count paid and unpaid hours.")
+
+    def test_manual_changes_worked_day_line_amount(self):
+        """
+        Checks that when a user manually changes the amount on a worked day lines, the change is persistent and isn't
+        overwritten by the system.
+        """
+        payslip = self.env["hr.payslip"].create({
+            "name": "January Payslip",
+            "employee_id": self.employee.id,
+            "version_id": self.contract.id,
+            "struct_id": self.structure.id,
+            "date_from": date(2018, 1, 1),
+            "date_to": date(2018, 1, 31),
+        })
+        payslip.worked_days_line_ids.filtered(lambda l: l.name == 'Work').unlink()  # only keep one line for deterministic behavior
+        with Form(payslip) as payslip_form:
+            with payslip_form.worked_days_line_ids.edit(0) as line:
+                line.amount = 3000
+            payslip_form.save()
+        self.assertEqual(payslip.worked_days_line_ids[0].amount, 3000)

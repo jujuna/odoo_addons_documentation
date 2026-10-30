@@ -1,13 +1,12 @@
 import { browser } from "@web/core/browser/browser";
-import { hasMobileNative, mobileNative } from "@pos_mobile_android/app/utils/native";
+import { mobileNative } from "@pos_mobile_android/app/utils/native";
 
 const POS_ICON_URL = "/point_of_sale/static/description/icon.png";
 
 export function canAddHomeShortcut() {
-    return hasMobileNative("addHomeShortcut");
+    return Boolean(mobileNative.addHomeShortcut);
 }
 
-/** An Android home screen shortcut that opens this point of sale  */
 export async function addPosHomeShortcut(config) {
     await mobileNative.addHomeShortcut({
         title: config.display_name,

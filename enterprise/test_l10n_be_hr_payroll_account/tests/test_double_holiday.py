@@ -241,6 +241,63 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
 
         self._validate_payslip(payslip)
 
+    def test_double_holidays_credit_time_unassimilated_month(self):
+        # 4/5 time credit all through the reference year 2020 and the whole of February on unpaid leave (unassimilated):
+        # February counts for nothing, the 11 other months in full
+        self.version.write({
+            'resource_calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week,
+            'work_time_rate': 1.0,
+            'wage': 2120.0,
+            'transport_mode_car': False,
+        })
+        self.env['hr.leave'].create({
+            'name': 'Unpaid leave',
+            'work_entry_type_id': self.env.ref('hr_work_entry.be_work_entry_type_unpaid_leave').id,
+            'request_date_from': datetime.date(2020, 2, 1),
+            'request_date_to': datetime.date(2020, 2, 29),
+            'employee_id': self.employee.id,
+        })
+
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': self.version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        _amount, explanation = payslip._l10n_be_get_paid_double_holiday(get_explanation=True)
+        self.assertAlmostEqual(explanation['months'], 11, 2)
+        payslip.compute_sheet()
+        self.assertTrue(payslip._get_line_values(['DOUBLE'])['DOUBLE'][payslip.id]['total'])
+
+    def test_double_holidays_time_credit_after_reference_year(self):
+        # Full time all through the reference year 2020, 4/5 time credit from January 2021: the double holiday pay of
+        # June 2021 is 92% of June's gross pay (art. 38, 2° AR 30.03.1967), the time credit's, for the 12 months of 2020
+        time_credit_version = self.employee.create_version({
+            'date_version': datetime.date(2021, 1, 1),
+            'resource_calendar_id': self.resource_calendar_4_5_wednesday_off_time_credit.id,
+            'reference_calendar_id': self.resource_calendar_38_hours_per_week.id,
+            'work_time_rate': 1.0,
+        })
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'version_id': time_credit_version.id,
+            'company_id': self.env.company.id,
+            'vehicle_id': self.car.id,
+            'struct_id': self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday').id,
+            'date_from': datetime.date(2021, 6, 1),
+            'date_to': datetime.date(2021, 6, 30)
+        })
+        # June's gross pay: 2650 x 4/5 = 2120, and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 2129, 2)
+        payslip.compute_sheet()
+        line_values = payslip._get_line_values(['DOUBLE', 'DOUBLE_COMPLEMENTARY'])
+        self.assertAlmostEqual(line_values['DOUBLE'][payslip.id]['total'], 1809.65, 2)  # 2129 x 85%
+        self.assertAlmostEqual(line_values['DOUBLE_COMPLEMENTARY'][payslip.id]['total'], 149.03, 2)  # 2129 x 7%
+
     def test_double_holidays_complete_year_part_time(self):
         self.version.write({
             'resource_calendar_id': self.resource_calendar_38_hours_per_week.id,
@@ -820,7 +877,7 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
 
         payslip_results = {
             'DOUBLERECOVERY': -1891.45,
-            'DH_BASIC': 2300,
+            'DH_BASIC': 2308.28,  # (2500 + internet 5 + mobile subscription 4) x 92%
         }
 
         self._validate_payslip(double_pay_payslip, payslip_results, skip_lines=True)
@@ -880,7 +937,7 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
 
         payslip_results = {
             'DOUBLERECOVERY': -1967.36,
-            'DH_BASIC': 2300,
+            'DH_BASIC': 2308.28,  # (2500 + internet 5 + mobile subscription 4) x 92%
         }
 
         self._validate_payslip(double_pay_payslip, payslip_results, skip_lines=True)
@@ -1618,7 +1675,7 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
             'date_from': datetime.date(2026, 6, 1),
             'date_to': datetime.date(2026, 6, 30)
         })
-        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 3276.77, 2)
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 3276.77 + 9, 2)  # the wage and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
 
     def test_part_time_med_02(self):
         self.version.write({
@@ -1651,7 +1708,7 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
             'date_from': datetime.date(2026, 6, 1),
             'date_to': datetime.date(2026, 6, 30)
         })
-        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1981.49, 2)
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1981.49 + 9, 2)  # the wage and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
 
     def test_part_time_med_03(self):
         self.version.write({
@@ -1749,7 +1806,7 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
             'date_from': datetime.date(2026, 6, 1),
             'date_to': datetime.date(2026, 6, 30)
         })
-        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1242.20, 2)
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1245.22, 2)
 
     def test_part_time_med_04(self):
         self.version.write({
@@ -1826,7 +1883,7 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
             'date_from': datetime.date(2026, 6, 1),
             'date_to': datetime.date(2026, 6, 30)
         })
-        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 3616.76, 2)
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 3616.76 + 9, 2)  # the wage and the benefits in kind bearing ONSS: internet 5 + mobile subscription 4
 
     def test_part_time_med_05(self):
         self.version.write({
@@ -1904,7 +1961,7 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
             'date_from': datetime.date(2026, 6, 1),
             'date_to': datetime.date(2026, 6, 30)
         })
-        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 2083.16, 2)
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 2091.30, 2)
 
     def test_long_unpaid_leave(self):
         self.version.write({
@@ -1931,4 +1988,4 @@ class TestDoubleHoliday(TestPayslipValidation, TestBelgiumCommon):
             'date_from': datetime.date(2026, 6, 1),
             'date_to': datetime.date(2026, 6, 30)
         })
-        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1435.76, 2)
+        self.assertAlmostEqual(payslip._l10n_be_get_paid_double_holiday(), 1437.98, 2)

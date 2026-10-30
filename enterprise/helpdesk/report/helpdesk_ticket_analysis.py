@@ -85,7 +85,7 @@ class HelpdeskTicketReportAnalysis(models.Model):
                    NULLIF(T.first_response_hours, 0) AS first_response_hours,
                    NULLIF(T.avg_response_hours, 0) AS avg_response_hours,
                    CASE
-                       WHEN (T.sla_deadline IS NOT NULL AND T.sla_deadline > NOW() AT TIME ZONE 'UTC') THEN TRUE ELSE FALSE
+                       WHEN T.sla_reached IS TRUE AND T.sla_reached_late IS NOT TRUE AND (T.sla_deadline IS NULL OR T.sla_deadline >= NOW() AT TIME ZONE 'UTC') THEN TRUE ELSE FALSE
                    END AS sla_success
         """)
 

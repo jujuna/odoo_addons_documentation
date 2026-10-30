@@ -19,7 +19,7 @@ class AIMessagingMenuController(DiscussMessagingMenuController):
     def _get_menu_tab_domain(self, tab_id):
         if not tab_id.startswith("ai-chat"):
             return super()._get_menu_tab_domain(tab_id)
-        domain = Domain("channel_type", "=", "ai_chat")
+        domain = Domain([("channel_type", "=", "ai_chat"), ("is_member", "=", True)])
         if ":" in tab_id:
             domain &= self._get_ai_agent_channels_domain(int(tab_id.split(":")[1]))
         return domain

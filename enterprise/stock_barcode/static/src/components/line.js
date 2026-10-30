@@ -20,6 +20,10 @@ export default class LineComponent extends Component {
         this.imageSource = this.props.line.product_id.has_image
             ? `/web/image/product.product/${this.props.line.product_id.id}/image_128`
             : null;
+        this.displayPackaging =
+            !this.props.subline &&
+            this.line.packaging_uom_id &&
+            this.line.packaging_uom_id.id !== this.line.uom_id.id;
     }
 
     get destinationLocationPath() {

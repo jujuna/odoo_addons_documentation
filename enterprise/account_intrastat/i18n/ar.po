@@ -8,14 +8,15 @@
 # Martin Trigaux, 2023
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:47+0000\n"
-"PO-Revision-Date: 2026-09-17 23:33+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-23 17:51+0000\n"
+"PO-Revision-Date: 2026-10-22 06:39+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "account_intrastat/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -32,11 +33,13 @@ msgid ""
 "Intrastat Reports\n"
 "==================\n"
 msgstr ""
+"\n"
+"تقارير الشروط التجارية\n"
+"==================\n"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid ", which cannot be reported."
 msgstr "، والذي لا يمكن إعداد تقرير عنه"
 
@@ -47,6 +50,7 @@ msgid "1 000 kWh"
 msgstr "1 000 kWh"
 
 #. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__1_000_m3
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__1_000_m3
 msgid "1 000 m3"
 msgstr "1 000 m3"
@@ -123,20 +127,17 @@ msgstr "حسب النوع"
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "Check the expired"
 msgstr "التحقق من منتهية الصلاحية"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "Check the premature"
 msgstr "Check the premature"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_commodity_code
-#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__commodity
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Commodity"
 msgstr "سلعة"
@@ -153,11 +154,10 @@ msgstr "كود السلعة"
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Commodity codes configuration"
-msgstr ""
+msgstr "تكوين رموز السلع"
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_res_company
-#, fuzzy
 msgid "Company"
 msgstr "الشركة "
 
@@ -182,6 +182,12 @@ msgstr "الدولة"
 #: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_origin_country_id
 msgid "Country of Origin"
 msgstr "بلد المنشأ"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_return.py:0
+msgid "Customers without a VAT number"
+msgstr "العملاء الذين ليس لديهم رقم ضريبة القيمة المضافة"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_company__intrastat_default_invoice_transaction_code_id
@@ -225,24 +231,23 @@ msgstr "اسم العرض"
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Exclude any domestic or extra-EU sales from the Intrastat report."
-msgstr ""
+msgstr "استبعاد أي مبيعات محلية أو خارج الاتحاد الأوروبي من تقرير «إنتراستات»."
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Exclude sales made to private individuals from the listing."
-msgstr ""
+msgstr "استبعاد المبيعات التي تتم للأفراد من القائمة."
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Exclude services from the report."
-msgstr ""
+msgstr "استبعاد الخدمات من التقرير."
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filter_intrastat_report.xml:0
-#, fuzzy
 msgid "Extended Mode"
 msgstr "الوضع التفصيلي"
 
@@ -343,7 +348,7 @@ msgstr "المعالج المخصص لتقارير نظام إحصاءات ال�
 #. module: account_intrastat
 #: model:ir.module.module,shortdesc:base.module_account_intrastat
 msgid "Intrastat Reports"
-msgstr ""
+msgstr "تقارير نظام إحصاءات التجارة بين دول الاتحاد الأوروبي"
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_account_intrastat_services_report_handler
@@ -364,7 +369,7 @@ msgstr "Intrastat Supplementary Unit Amount"
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Intrastat Thresholds"
-msgstr ""
+msgstr "عتبات إنترستات"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_account_bank_statement_line__intrastat_transport_mode_id
@@ -394,7 +399,6 @@ msgstr "منطقة نظام الإحصاءات البيئية الأوروبية
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
-#, fuzzy
 msgid ""
 "Intrastat thresholds may change annually. Verify that your transactions "
 "exceed the threshold for reporting."
@@ -411,7 +415,7 @@ msgstr "رمز معاملة Intrastat"
 #. odoo-python
 #: code:addons/account_intrastat/models/product.py:0
 msgid "Invalid Intrastat Code"
-msgstr ""
+msgstr "رمز إنترستات غير صالح"
 
 #. module: account_intrastat
 #. odoo-python
@@ -440,7 +444,7 @@ msgstr "بنود الفاتورة"
 #: model:ir.model.fields,field_description:account_intrastat.field_account_return__is_intrastat_return
 #: model:ir.model.fields,field_description:account_intrastat.field_account_return_type__is_intrastat_return_type
 msgid "Is an Intrastat Return Type"
-msgstr ""
+msgstr "نوع إقرار إنتراستات"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.account_move_tree_view_account_intrastat_transport_codes
@@ -459,7 +463,6 @@ msgstr "عنصر اليومية"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.account_move_line_tree_view_account_intrastat_transaction_codes
-#, fuzzy
 msgid "Journal Items"
 msgstr "عناصر اليومية"
 
@@ -482,6 +485,8 @@ msgid ""
 "Note that the selected commodity code is invalid based on its start or "
 "expiry date. You can still select it."
 msgstr ""
+"يرجى ملاحظة أن رمز السلعة المحدد غير صالح بناءً على تاريخ البدء أو انتهاء "
+"الصلاحية. لا يزال بإمكانك تحديده."
 
 #. module: account_intrastat
 #. odoo-python
@@ -493,18 +498,17 @@ msgstr "العملاء التجاريون فقط"
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Only goods included"
-msgstr ""
+msgstr "السلع المشمولة فقط"
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Only intra-EU transactions"
-msgstr ""
+msgstr "المعاملات داخل الاتحاد الأوروبي فقط"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filter_intrastat_report.xml:0
-#, fuzzy
 msgid "Only with VAT numbers"
 msgstr "فقط مع أرقام الضريبة"
 
@@ -553,6 +557,7 @@ msgstr "متغير المنتج"
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_region_code
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_services_region_code
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__region
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Region"
 msgstr "المنطقة"
@@ -566,7 +571,7 @@ msgstr "إعادة الضبط"
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/m2o_cell_with_extra_fields/m2o_cell_with_extra_fields.js:0
 msgid "Select a Product Country"
-msgstr ""
+msgstr "اختر بلد المنتج"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_services_commodity_code
@@ -583,28 +588,24 @@ msgstr "Service Code"
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "Some lines have expired intrastat"
 msgstr "لدى بعض البنود Intrastat منتهية الصلاحية"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "Some lines have premature intrastat"
 msgstr "Some lines have premature intrastat"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "Some lines have undefined"
 msgstr "Some lines have undefined"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "Some products have undefined"
 msgstr "Some products have undefined"
 
@@ -673,17 +674,18 @@ msgid ""
 "The product template has no products/variants. At least one variant is "
 "required to set the Intrastat values."
 msgstr ""
+"لا يحتوي قالب المنتج على أي منتجات/متغيرات. يلزم وجود متغير واحد على الأقل "
+"لتعيين قيم Intrastat."
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "The value of goods should be VAT exclusive."
-msgstr ""
+msgstr "يجب أن تكون قيمة البضائع غير شاملة ضريبة القيمة المضافة."
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "There are some"
 msgstr "هناك بعض"
 
@@ -722,13 +724,13 @@ msgstr "Undefined weight products."
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Unit of measure configuration"
-msgstr ""
+msgstr "تكوين وحدات القياس"
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "VAT exclusive"
-msgstr ""
+msgstr "لا يشمل ضريبة القيمة المضافة"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_services_value
@@ -745,12 +747,11 @@ msgstr "Value Currency"
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
 msgid "Verify that each good is assigned the right unit of measure."
-msgstr ""
+msgstr "تأكد من تعيين وحدة القياس الصحيحة لكل سلعة."
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_return.py:0
-#, fuzzy
 msgid ""
 "Verify that each item has the appropriate code and description according to "
 "the CN (Combined Nomenclature) codes."
@@ -778,7 +779,6 @@ msgstr "ce/el"
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "commodity codes"
 msgstr "commodity codes"
 
@@ -792,7 +792,7 @@ msgstr "ct/l"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__g
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__g
 msgid "g"
-msgstr ""
+msgstr "g"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__gi_f_/_s
@@ -803,12 +803,10 @@ msgstr "gi F / S"
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "journals items with no product"
 msgstr "عناصر دفتر اليومية بلا منتج"
 
 #. module: account_intrastat
-#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_90_%_sdt
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_90_%_sdt
 msgid "kg 90 % sdt"
 msgstr "kg 90 % sdt"
@@ -871,7 +869,7 @@ msgstr "kg/net eda"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__l
 msgid "l"
-msgstr ""
+msgstr "l"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l_alc__100_%
@@ -883,7 +881,7 @@ msgstr "l alc. 100 %"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__m
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m2
@@ -917,42 +915,36 @@ msgstr "المنتج"
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "product commodity codes"
 msgstr "أكواد سلع المنتجات"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "product service codes"
 msgstr "product service codes"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "product's commodity codes"
 msgstr "product's commodity codes"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "product's service codes"
 msgstr "product's service codes"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "service codes"
 msgstr "service codes"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "supplementary units"
 msgstr "supplementary units"
 
@@ -965,20 +957,17 @@ msgstr "t. CO2"
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "transaction codes"
 msgstr "transaction codes"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "weights"
 msgstr "الأوزان"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
-#, fuzzy
 msgid "when they are required."
 msgstr "when they are required."

@@ -156,6 +156,86 @@ class TestAssistant(TestCommonTimesheet):
                     f"{rule.name} should extract the right groups from the web app title",
                 )
 
+    def test_teams_rule_match(self):
+        cases = [
+            (
+                "timesheet_grid.aw_rule_microsoft_teams_chat",
+                ("OdooTest",),
+                "Chat | OdooTest | Microsoft Teams|https://teams.live.com/v2/",
+            ),
+            (
+                "timesheet_grid.aw_rule_microsoft_teams_meet",
+                ("Meeting with xyz",),
+                "Meet | Meeting with xyz | Microsoft Teams|https://teams.live.com/v2/",
+            ),
+            (
+                "timesheet_grid.aw_rule_microsoft_teams_chat_desktop_app",
+                ("OdooTest",),
+                "Chat | OdooTest | Microsoft Teams",
+            ),
+            (
+                "timesheet_grid.aw_rule_microsoft_teams_meet_desktop_app",
+                ("Meeting with xyz",),
+                "Meet | Meeting with xyz | Microsoft Teams",
+            ),
+        ]
+        for xmlid, expected_groups, webstring_or_app_title in cases:
+            rule = self.env.ref(xmlid)
+            with self.subTest(rule=rule.name):
+                reg_match = re.search(rule.regex, webstring_or_app_title)
+                self.assertTrue(reg_match, f"{rule.name} should match the webstring or desktop app title : {webstring_or_app_title}")
+                self.assertEqual(reg_match.groups(), expected_groups, f"{rule.name} should extract the right groups")
+
+    def test_onlyoffice_rules_match(self):
+        cases = [
+            (
+                "timesheet_grid.aw_rule_onlyoffice_presentation",
+                ("test.pptx",),
+                "test.pptx — ONLYOFFICE",
+            ),
+            (
+                "timesheet_grid.aw_rule_onlyoffice_spreadsheet",
+                ("test.xlsx",),
+                "test.xlsx — ONLYOFFICE",
+            ),
+            (
+                "timesheet_grid.aw_rule_onlyoffice_generic",
+                ("test.docx",),
+                "test.docx — ONLYOFFICE",
+            ),
+        ]
+        for xmlid, expected_groups, app_title in cases:
+            rule = self.env.ref(xmlid)
+            with self.subTest(rule=rule.name):
+                reg_match = re.search(rule.regex, app_title)
+                self.assertTrue(reg_match, f"{rule.name} should match the desktop app title : {app_title}")
+                self.assertEqual(reg_match.groups(), expected_groups, f"{rule.name} should extract the right groups")
+
+    def test_wps_rules_match(self):
+        cases = [
+            (
+                "timesheet_grid.aw_rule_wps_presentation",
+                ("test.pptx",),
+                "test.pptx - WPS Office",
+            ),
+            (
+                "timesheet_grid.aw_rule_wps_spreadsheet",
+                ("test.xlsx",),
+                "test.xlsx - WPS Office",
+            ),
+            (
+                "timesheet_grid.aw_rule_wps_generic",
+                ("test.docx",),
+                "test.docx - WPS Office",
+            ),
+        ]
+        for xmlid, expected_groups, app_title in cases:
+            rule = self.env.ref(xmlid)
+            with self.subTest(rule=rule.name):
+                reg_match = re.search(rule.regex, app_title)
+                self.assertTrue(reg_match, f"{rule.name} should match the desktop app title : {app_title}")
+                self.assertEqual(reg_match.groups(), expected_groups, f"{rule.name} should extract the right groups")
+
     def test_get_aw_timesheet_data_working_hours(self):
         """
         Test that the `get_aw_timesheet_data` method returns the expected working hours for the current employee
@@ -220,7 +300,7 @@ class TestAssistant(TestCommonTimesheet):
         self.env["ir.actions.act_window"].create({
             "name": "Test Action",
             "res_model": model_name,
-            "view_mode": "tree,form",
+            "view_mode": "list,form",
             "path": "test-path",
         })
 

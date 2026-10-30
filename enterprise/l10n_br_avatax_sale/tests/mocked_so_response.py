@@ -1,10 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from copy import deepcopy
+
+
 def generate_response(sale_order_line_ids):
     assert len(sale_order_line_ids) == 4, "the mocked response is for 4 lines"
     # negative lines are distributed to positive lines and not sent to avatax
-    for i, line in enumerate(RESPONSE['lines']):
+    response = deepcopy(RESPONSE)
+    for i, line in enumerate(response['lines']):
         line['lineCode'] = sale_order_line_ids[i].id
-    return RESPONSE
+    return response
 
 
 # To reduce the size of this mocked response it was trimmed as follows:

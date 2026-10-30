@@ -41,26 +41,23 @@ class ResPartner(models.Model):
 
     def open_related_subscription(self):
         self.ensure_one()
+        all_partners = self.with_context(active_test=False).search([('id', 'child_of', self.ids)])
+        domain = [('partner_id', 'in', all_partners.ids), ('is_subscription', '=', True), ('subscription_state', 'in', ['3_progress', '6_churn', '4_paused'])]
+        subscriptions = self.env['sale.order'].search(domain)
+
         action = {
             "type": "ir.actions.act_window",
             "res_model": "sale.order",
             "name": _("Partner Subscription"),
-            "domain": [('is_subscription', '=', True), ('subscription_state', 'in', ['3_progress', '6_churn', '4_paused'])],
+            "domain": [('id', 'in', subscriptions.ids)],
             "context": {
-                'search_default_partner_id': [self.id],
                 'default_partner_id': self.id,
             }
         }
-        all_partners = self.with_context(active_test=False).search([('id', 'child_of', self.ids)])
 
-        subscription_ids = self.env['sale.order'].search_read(
-            domain=[('partner_id', 'in', all_partners.ids), ('is_subscription', '=', True), ('subscription_state', 'in', ['3_progress', '6_churn', '4_paused'])],
-            fields=['id']
-        )
-        if len(subscription_ids) == 1:
-            action['res_id'] = subscription_ids[0]['id']
+        if len(subscriptions) == 1:
+            action['res_id'] = subscriptions.id
             action['views'] = [(self.env.ref('sale_subscription.sale_subscription_primary_form_view').id, 'form')]
         else:
             action['views'] = [(self.env.ref('sale_subscription.sale_subscription_view_tree').id, 'list'), (self.env.ref('sale_subscription.sale_subscription_primary_form_view').id, 'form')]
-            action['search_view_id'] = [self.env.ref('sale_subscription.sale_subscription_view_search').id]
         return action

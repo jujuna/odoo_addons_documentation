@@ -695,6 +695,21 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         )
 
     @freeze_time('2019-12-31')
+    def test_generate_bs_pnl_xml_with_variant(self):
+        """ Test that the balance sheet's XML export loads with
+        an account.report that has a country specific variant, and no root_report_id """
+        trial_balance = self.env.ref('account_reports.trial_balance_report')
+        trial_balance.copy({
+            'root_report_id': trial_balance.id,
+            'country_id': self.env.ref('base.lu').id,
+        })
+        report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_bs')
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
+        wizard = self.env['l10n_lu.generate.accounts.report'].create({})
+        wizard.with_context(report_generation_options=options).get_xml()
+        self.assertTrue(wizard.report_data)
+
+    @freeze_time('2019-12-31')
     def test_xml_export_with_annotations(self):
         """Test that annotations on the P&L report are exported as references when the checkbox is checked."""
         pl_report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_pl')

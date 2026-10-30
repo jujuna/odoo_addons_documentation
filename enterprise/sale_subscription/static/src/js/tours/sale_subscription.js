@@ -2,7 +2,7 @@
 
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
-import { stepUtils } from "@web_tour/tour_utils";
+import { searchOrCreateMany2X } from "@web_tour/tour_scenarios";
 import { markup } from "@odoo/owl";
 
 registry.category("web_tour.tours").add('sale_subscription_tour', {
@@ -67,13 +67,12 @@ registry.category("web_tour.tours").add('sale_subscription_tour', {
     content: _t("Add a recurring plan for this product, or create a new one with the desired recurrence (e.g., Monthly)"),
     run: "click",
 },
-...stepUtils.searchOrCreateMany2X(
-    '.o_list_many2one[name="plan_id"] input',
-    "recurring plan",
-    "Monthly",
-    {},
-    true
-),
+...searchOrCreateMany2X({
+    trigger: '.o_list_many2one[name="plan_id"] input',
+    label: "recurring plan",
+    searchText: "Monthly",
+    selectExisting: true,
+}),
 {
     trigger: '.o_form_editable',
 },
@@ -100,15 +99,15 @@ registry.category("web_tour.tours").add('sale_subscription_tour', {
     tooltipPosition: 'right',
     run: "click",
 },
-...stepUtils.searchOrCreateMany2X(
-    '.o_field_widget[name="partner_id"] input',
-    "customer",
-    "Agrolait",
-    {
+...searchOrCreateMany2X({
+    trigger: '.o_field_widget[name="partner_id"] input',
+    label: "customer",
+    searchText: "Agrolait",
+    fields: {
         name: "Agrolait",
         email: "agrolait@example.com",
-    }
-),
+    },
+}),
 {
     trigger: ".o_field_x2many_list_row_add > button",
     content:  _t('Click here to add some products or services'),

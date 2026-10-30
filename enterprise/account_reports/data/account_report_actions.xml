@@ -6,7 +6,7 @@
             <field name="name">Cash Flow Statement</field>
             <field name="tag">account_report</field>
             <field name="path">cash-flow</field>
-            <field name="context" eval="{'report_id': ref('account_reports.cash_flow_report')}"/>
+            <field name="context" eval="{'report_id': ref('account_reports.cash_flow_report_indirect')}"/>
         </record>
 
         <record id="action_account_report_bs" model="ir.actions.client">
@@ -28,6 +28,13 @@
             <field name="tag">account_report</field>
             <field name="path">profit-and-loss</field>
             <field name="context" eval="{'report_id': ref('account_reports.profit_and_loss')}"/>
+        </record>
+
+        <record id="action_account_report_pl_generic" model="ir.actions.client">
+            <field name="name">Profit and Loss - Generic</field>
+            <field name="tag">account_report</field>
+            <field name="path">profit-and-loss-generic</field>
+            <field name="context" eval="{'report_id': ref('account_reports.profit_and_loss'), 'no_report_reroute': True}"/>
         </record>
 
         <record id="action_account_report_gt" model="ir.actions.client">
@@ -129,6 +136,10 @@
 
         <record id="account_financial_report_current_years_earnings" model="account.report.line">
             <field name="action_id" ref="action_account_report_pl"/>
+        </record>
+
+        <record id="cash_flow_indirect_op_net_income" model="account.report.line">
+            <field name="action_id" ref="action_account_report_pl_generic"/>
         </record>
 
         <record id="account_financial_report_executivesummary_profitability0" model="account.report.line">

@@ -1,6 +1,6 @@
 import functools
 
-from contextlib import contextmanager, AbstractContextManager
+from contextlib import contextmanager, nullcontext, AbstractContextManager
 from typing import TypeVar
 
 from odoo.http.requestlib import Request
@@ -62,11 +62,28 @@ def _hr_version_ctx_request(req: Request, **overrides):
         req.update_env(old_env.user, old_env.context, old_env.su)
 
 
+def _protect_payslips(employees: BaseModel | None) -> AbstractContextManager[None]:
+    """
+    Prevent the recomputation of the payslips of the simulated employees.
+
+    The simulation writes on the employees' versions, which marks their payslips to recompute.
+    It is useless (as the simulation is rolled back) and harmful, e.g., recomputing the payslip
+    inputs unlinks some of them, which invalidates the whole cache and drops the values of the
+    offer being edited.
+    """
+    if not employees:
+        return nullcontext()
+    payslips = employees.env['hr.payslip'].sudo().search([('employee_id', 'in', employees.ids)])
+    fields = [field for field in payslips._fields.values() if field.compute and field.store]
+    return employees.env.protecting(fields, payslips)
+
+
 @contextmanager
 def hr_version_context(
     container: T,
     key: str = HR_VERSION_CTX_KEY,
     invalidate: bool = False,
+    employees: BaseModel | None = None,
     **overrides,
 ) -> AbstractContextManager[T]:
     """
@@ -76,6 +93,8 @@ def hr_version_context(
     then rolls back all changes made within the context.
 
     If `container` is a Request, the global `request` object is mutated, so the yielded result can be ignored at the caller site.
+
+    If `employees` is given, their existing payslips are not recomputed during the simulation.
     """
     assert key not in overrides
 
@@ -97,7 +116,7 @@ def hr_version_context(
             raise TypeError(f"Expected BaseModel or Request, got {container!r} instead.")
 
     container.env.flush_all()
-    with container_ctx(container, **ctx_overrides) as container:
+    with _protect_payslips(employees), container_ctx(container, **ctx_overrides) as container:
         with container.env.cr.savepoint(flush=False) as sp:
             yield container
 

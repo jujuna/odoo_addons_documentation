@@ -21,11 +21,4 @@ export class HrGanttModel extends GanttModel {
         };
         await super._fetchData(metaData, additionalContext);
     }
-
-    /**
-     * @override
-     */
-    _getGroupedBy() {
-        return ["employee_id"];
-    }
 }

@@ -1,5 +1,6 @@
 import { registerThreadAction } from "@mail/core/common/thread_actions";
 import "@mail/discuss/call/common/thread_actions";
+import { attClassObjectToString } from "@mail/utils/common/format";
 
 import { LivechatCommandDialog } from "@im_livechat/core/common/livechat_command_dialog";
 
@@ -21,7 +22,10 @@ registerThreadAction("create-ticket", {
             this.actionPanelComponentProps
         );
     },
-    actionPanelOuterClass: "bg-100",
+    actionPanelOuterClass: ({ owner, store }) =>
+        attClassObjectToString({
+            [store.discussDropdownMenuClass(owner)]: !owner.env.inMeetingView,
+        }),
     condition: false, // managed by ThreadAction patch
     icon: "support",
     name: _t("Create Ticket"),

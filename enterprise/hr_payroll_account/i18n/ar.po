@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 17:53+0000\n"
-"PO-Revision-Date: 2026-09-18 03:35+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"POT-Creation-Date: 2026-10-02 17:49+0000\n"
+"PO-Revision-Date: 2026-10-23 12:52+0000\n"
+"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-20/"
 "hr_payroll_account/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +37,13 @@ msgid ""
 "    * Payment Encoding\n"
 "    * Company Contribution Management\n"
 msgstr ""
+"\n"
+"نظام كشوف مرتبات عام مدمج مع المحاسبة.\n"
+"==================================================\n"
+"\n"
+"    * ترميز النفقات\n"
+"    * ترميز الدفع\n"
+"    * إدارة مساهمات الشركة\n"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_count
@@ -71,10 +78,10 @@ msgid ""
 msgstr ""
 "<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">قيد اليومية "
 "<br/>(مسودة)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state "
-"!= 'posted'\">قيد اليومية <br/>(تم ترحيله)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state "
-"!= 'cancel'\">قيد اليومية <br/>(تم إلغاؤه)</span>"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">قيد اليومية <br/>(تم ترحيله)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">قيد اليومية <br/>(تم إلغاؤه)</span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
@@ -83,6 +90,9 @@ msgid ""
 "                            Journal Entry <br/> (Preview)\n"
 "                        </span>"
 msgstr ""
+"<span class=\"o_stat_text\">\n"
+"                            قيد اليومية <br/> (معاينة)\n"
+"                       </span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -93,11 +103,13 @@ msgstr "<span class=\"o_stat_text\">إيصال الدفع</span>"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
 msgid "<span invisible=\"reference\">No payrun id passed in context.</span>"
 msgstr ""
+"<span invisible=\"reference\">تعذر إكمال العملية نظراً لعدم توفر المُرّف "
+"المرجعي لدورة تشغيل الرواتب (payrun id) في سياق النظام الحالي.</span>"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__account
 msgid "Account"
-msgstr ""
+msgstr "الحساب"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_chart_template
@@ -113,7 +125,7 @@ msgstr "المحاسبة"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__accounting_date
 msgid "Accounting Date"
-msgstr ""
+msgstr "تاريخ المحاسبة"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__move_id
@@ -143,7 +155,7 @@ msgstr "الدقة التحليلية"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
 msgid "Anonymize Journal Entries"
-msgstr ""
+msgstr "إخفاء هوية قيود اليومية"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
@@ -153,7 +165,7 @@ msgstr "هل أنت متأكد من أنك ترغب بالاستمرار؟"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__batch_payroll_move_lines
 msgid "Batch Payroll Journal Items"
-msgstr ""
+msgstr "بنود دفتر يومية الرواتب المجمعة"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__batch_payroll_move_lines
@@ -166,12 +178,12 @@ msgstr "Batch Payroll Move Lines"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_company
 msgid "Company"
-msgstr ""
+msgstr "الشركة"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__company_currency_id
 msgid "Company Currency"
-msgstr ""
+msgstr "عملة الشركة"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_config_settings
@@ -182,18 +194,18 @@ msgstr "تهيئة الإعدادات"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_uid
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "تم إنشاؤه بواسطة"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_date
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "تم الإنشاء في"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__credit
 msgid "Credit"
-msgstr ""
+msgstr "الرصيد"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_credit
@@ -210,7 +222,7 @@ msgstr "شبكات ضرائب الائتمان"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__debit
 msgid "Debit"
-msgstr ""
+msgstr "الخصم"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
@@ -261,7 +273,7 @@ msgstr "حساب التوزيع التحليلي"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_move_line__employee_bank_account_id
 msgid "Employee Bank Account"
-msgstr ""
+msgstr "الحساب البنكي للموظف"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_version
@@ -280,6 +292,9 @@ msgid ""
 "into a single journal item. This will anonymize the accounting entries but "
 "also disable single payment generations."
 msgstr ""
+"قم بتمكين هذا الخيار لدمج كافة القيود المحاسبية لنفس الفترة في عنصر يومية "
+"واحد. سيؤدي ذلك إلى إخفاء هوية القيود المحاسبية، ولكنه سيعطل أيضاً إنشاء "
+"الدفعات الفردية."
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
@@ -288,6 +303,9 @@ msgid ""
 "individual employee amount are not distinguishable in accounting. This also "
 "disables the pay button on individual payslips."
 msgstr ""
+"قم بتمكين هذا الخيار لدمج قيود اليومية عند معالجة دورة الرواتب، حتى لا يمكن "
+"تمييز مبالغ الموظف الفردية في المحاسبة. كما يؤدي هذا إلى تعطيل زر الدفع في "
+"إيصالات الرواتب الفردية."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__employee_move_line
@@ -306,7 +324,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid "Excluded from Net"
-msgstr ""
+msgstr "مستبعد من الصافي"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
@@ -346,6 +364,9 @@ msgid ""
 "Net salary rule in the journal entries. A specific debit/credit account "
 "should be set to consider it independently."
 msgstr ""
+"إذا تم تحديد هذا الخيار، فلن يتم أخذ نتيجة هذه القاعدة بعين الاعتبار عند "
+"تطبيق قاعدة الراتب الصافي في قيود دفتر اليومية. يجب تعيين حساب خصم/إيداع "
+"محدد لاعتباره بشكل مستقل."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -409,7 +430,7 @@ msgstr "اتركه فارغاً لاستخدام تاريخ تصديق (إيصا
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__label
 msgid "Label"
-msgstr ""
+msgstr "ملصق"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_uid
@@ -426,7 +447,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__line_ids
 msgid "Line"
-msgstr ""
+msgstr "البند "
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_mock_account_move_line
@@ -462,7 +483,7 @@ msgstr "لا شيء"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__partner
 msgid "Partner"
-msgstr ""
+msgstr "الشريك"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -482,7 +503,7 @@ msgstr "إيصال الدفع"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment
 msgid "Payment"
-msgstr ""
+msgstr "الدفع"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -524,7 +545,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__reference
 msgid "Reference"
-msgstr ""
+msgstr "الرقم المرجعي "
 
 #. module: hr_payroll_account
 #: model:hr.payroll.warning,button_name:hr_payroll_account.hr_payroll_warning_no_journal
@@ -562,12 +583,12 @@ msgstr "هيكل الراتب"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__employee_move_line
 msgid "Set employee on account line"
-msgstr ""
+msgstr "تعيين الموظف في بند الحساب"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__split_move_lines
 msgid "Split on names"
-msgstr ""
+msgstr "التقسيم حسب الأسماء"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -610,6 +631,15 @@ msgstr ""
 msgid ""
 "The Expense Journal \"%s\" has not properly configured the default Account!"
 msgstr "لم يقم دفتر يومية النفقات \"%s\" بتهيئة الحساب الافتراضي بشكل صحيح!"
+
+#. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid ""
+"The following payslips are linked to a posted journal entry, only a user "
+"with accounting rights can cancel them:\n"
+"%s"
+msgstr ""
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form

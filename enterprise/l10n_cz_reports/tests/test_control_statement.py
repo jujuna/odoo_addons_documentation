@@ -239,3 +239,25 @@ class CzechControlStatementTest(CzechReportsCommon):
             self.get_xml_tree_from_string(actual_xml),
             self.get_xml_tree_from_string(expected_xml)
         )
+
+    @freeze_time('2024-02-01')
+    def test_control_statement_return_no_closing_entry(self):
+        """ Test that validating the VAT Control Statement return does not create a tax closing entry """
+        invoice = self.env['account.move'].create({
+            'invoice_date': '2024-01-01',
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_cz_1.id,
+            'invoice_line_ids': [Command.create({'price_unit': 1000, 'tax_ids': self.l10n_cz_12_domestic_supplies.ids})],
+        })
+        invoice.action_post()
+
+        return_type = self.env.ref('l10n_cz_reports.cz_vat_control_statement_return_type')
+        return_type._try_create_return_for_period(invoice.invoice_date, self.company, False)
+        control_statement_return = self.env['account.return'].search([('type_id', '=', return_type.id), ('date_from', '=', '2024-01-01')])
+
+        with self.allow_pdf_render():
+            control_statement_return.action_validate()
+
+        self.assertFalse(control_statement_return.closing_move_ids)
+        self.assertFalse(self.company.tax_lock_date)
+        self.assertEqual(control_statement_return.type_id.states_workflow, 'generic_state_review_submit')

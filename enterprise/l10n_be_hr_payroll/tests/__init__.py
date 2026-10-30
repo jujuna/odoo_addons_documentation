@@ -55,6 +55,7 @@ from . import test_dmfa_unexperienced_reduction
 from . import test_payroll_holiday_attest
 from . import test_payroll_thirteen_month_departure
 from . import test_payroll_transport_exemption
+from . import test_public_transport
 from . import test_payrun
 from . import test_payroll_config_settings
 from . import test_payslip_multi_validation
@@ -64,7 +65,18 @@ from . import test_res_company
 from . import test_hr_dmfa_first_hire_reductions
 from . import test_cafeteria_plan
 from . import test_payroll_salary_sacrifice
+from . import test_l10n_be_281_10
+from . import test_l10n_be_281_13
 from . import test_l10n_be_281_mapping
 from . import test_payroll_fiscal_period
 from . import test_time_rule_premium_pay
 from . import test_be_time_rules
+from . import test_payroll_starterjob
+from . import test_payroll_economic_unemployment
+from . import test_payroll_training_time_off
+from . import test_seniority_lost_period
+from . import test_payroll_salary_attachment
+from . import test_mobility_budget
+from . import test_l10n_be_281_18
+from . import test_l10n_be_281_20
+from . import test_l10n_be_274_281_consistency

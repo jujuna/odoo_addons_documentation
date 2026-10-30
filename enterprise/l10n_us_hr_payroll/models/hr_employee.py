@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-    l10n_us_ssn = fields.Char('US: Social Security Number', groups="hr.group_hr_user", tracking=True)
+    l10n_us_ssn = fields.Char('US: Social Security Number', groups="hr.group_hr_user", tracking=False)
     l10n_us_old_w4 = fields.Boolean(readonly=False, related="version_id.l10n_us_old_w4", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_us_w4_step_2 = fields.Boolean(readonly=False, related="version_id.l10n_us_w4_step_2", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_us_w4_step_3 = fields.Float(readonly=False, related="version_id.l10n_us_w4_step_3", inherited=True, groups="hr_payroll.group_hr_payroll_user")

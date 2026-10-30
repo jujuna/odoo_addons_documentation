@@ -13,15 +13,16 @@
 # "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Yoshi Tashiro <tashiro@quartile.co>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 17:38+0000\n"
-"PO-Revision-Date: 2026-08-31 17:32+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-s19-4/sale/"
-"ja/>\n"
+"POT-Creation-Date: 2026-10-16 17:42+0000\n"
+"PO-Revision-Date: 2026-10-08 08:42+0000\n"
+"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-20/sale/ja/"
+">\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,8 +83,16 @@ msgstr "%(attribute)s: %(values)s"
 #. odoo-python
 #: code:addons/sale/wizard/accrued_orders.py:0
 msgid ""
-"%(order)s - %(order_line)s; %(qty_invoiced)s invoiced, %(qty_delivered)s "
-"delivered at %(unit_price)s"
+"%(order)s - %(order_line)s: Goods Delivered not Invoiced (perpetual "
+"valuation)"
+msgstr ""
+
+#. module: sale
+#. odoo-python
+#: code:addons/sale/wizard/accrued_orders.py:0
+msgid ""
+"%(order)s - %(order_line)s: Goods Invoiced not Delivered (perpetual "
+"valuation)"
 msgstr ""
 
 #. module: sale
@@ -1438,7 +1447,8 @@ msgstr "選択した項目を本当にキャンセルしますか?"
 msgid ""
 "Are you sure you want to void the authorized transaction? This action can't "
 "be undone."
-msgstr "承認された取引を無効にしますか?このアクションは元に戻せません。"
+msgstr ""
+"承認済みの取引を無効にしてよろしいですか?この操作は取り消すことができません。"
 
 #. module: sale
 #. odoo-python
@@ -2742,18 +2752,6 @@ msgid "Go ahead and send the quotation."
 msgstr "進めて、見積を送りましょう。"
 
 #. module: sale
-#. odoo-python
-#: code:addons/sale/wizard/accrued_orders.py:0
-msgid "Goods Delivered not Invoiced (perpetual valuation)"
-msgstr ""
-
-#. module: sale
-#. odoo-python
-#: code:addons/sale/wizard/accrued_orders.py:0
-msgid "Goods Invoiced not Delivered (perpetual valuation)"
-msgstr ""
-
-#. module: sale
 #: model:ir.model.fields,help:sale.field_sale_order_line__product_type
 msgid ""
 "Goods are tangible materials and merchandise you provide.\n"
@@ -2810,7 +2808,7 @@ msgstr "前受金あり"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
 msgid "Hide Composition"
-msgstr ""
+msgstr "構成を非表示"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
@@ -3315,6 +3313,11 @@ msgstr "数クリックで美しい見積を作成しましょう。"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
 msgid "Line"
+msgstr ""
+
+#. module: sale
+#: model:ir.model.fields,field_description:sale.field_sale_order_line__line_number_offset
+msgid "Line Number Offset"
 msgstr ""
 
 #. module: sale
@@ -6066,17 +6069,6 @@ msgstr "確認済オーダの価格表を変えることはできません！"
 
 #. module: sale
 #. odoo-python
-#: code:addons/sale/models/product_product.py:0
-#: code:addons/sale/models/product_template.py:0
-msgid ""
-"You cannot change the product's type because it is already used in sales "
-"orders."
-msgstr ""
-"プロダクトの種類は、すでに販売オーダで使用されているため、変更することができ"
-"ません。"
-
-#. module: sale
-#. odoo-python
 #: code:addons/sale/models/sale_order_line.py:0
 msgid ""
 "You cannot change the type of a sale order line. Instead you should delete "
@@ -6120,6 +6112,16 @@ msgid ""
 msgstr ""
 "販売または購買するもの(在庫品、消耗品、サービス品等)は、プロダクトとして登録"
 "する必要があります。"
+
+#. module: sale
+#. odoo-python
+#: code:addons/sale/models/product_product.py:0
+#: code:addons/sale/models/product_template.py:0
+msgid ""
+"You should not change the product type because this product is already used "
+"in sales orders. Changing it may affect how the related order lines are "
+"delivered."
+msgstr ""
 
 #. module: sale
 #: model:portal.entry,name:sale.portal_your_orders
@@ -6289,6 +6291,13 @@ msgid ""
 "'Quotation' or 'Order' }} {{ object.name or 'n/a' }} "
 "{{ object.client_order_ref and ('(' + object.client_order_ref + ')') or '' }}"
 msgstr ""
+
+#~ msgid ""
+#~ "You cannot change the product's type because it is already used in sales "
+#~ "orders."
+#~ msgstr ""
+#~ "プロダクトの種類は、すでに販売オーダで使用されているため、変更することがで"
+#~ "きません。"
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px;\">\n"
