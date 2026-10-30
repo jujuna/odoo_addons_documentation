@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm -->
+<odoo>
+    <!-- Beginning of the form, common to all the DRS scenarios -->
+    <template id="drs_xml_header">
+        <Identification t-out="identification"/>
+        <FormCreationDate t-out="form_creation_date"/>
+        <FormCreationHour t-out="form_creation_hour"/>
+        <AttestationStatus t-out="attestation_status"/>
+        <TypeForm>SU</TypeForm>
+        <CoordinatesContactPerson t-if="contact">
+            <Name t-out="contact['name']"/>
+            <Communication>
+                <PhoneNbr t-if="contact['phone']" t-out="contact['phone']"/>
+                <EmailAddress t-out="contact['email']"/>
+            </Communication>
+        </CoordinatesContactPerson>
+        <DclInformation>
+            <LanguageCodePdf t-out="declaration_lang"/>
+        </DclInformation>
+        <RiskIdentification t-foreach="risk_codes" t-as="identified_risk_code">
+            <IdentificationOfRisk t-out="identified_risk_code"/>
+        </RiskIdentification>
+        <Reference t-foreach="references" t-as="reference">
+            <ReferenceType t-out="reference['type']"/>
+            <ReferenceOrigin t-out="reference['origin']"/>
+            <ReferenceNbr t-out="reference['number']"/>
+        </Reference>
+    </template>
+
+    <!-- Form of the scenarios declaring one worker, the content of the natural person is the body of the call -->
+    <template id="drs_xml_form">
+        <Form>
+            <t t-call="l10n_be_hr_payroll.drs_xml_header"/>
+            <CommentDeclaration t-if="form_comment">
+                <CommentOfDeclaration t-out="form_comment"/>
+            </CommentDeclaration>
+            <EmployerDeclarationLink>
+                <NOSSRegistrationNbr t-out="onss_registration_number"/>
+                <Trusteeship>0</Trusteeship>
+                <CompanyID t-out="l10n_be_company_number"/>
+                <NaturalPerson>
+                    <NaturalPersonSequenceNbr>1</NaturalPersonSequenceNbr>
+                    <INSS t-out="inss"/>
+                    <t t-out="0"/>
+                </NaturalPerson>
+            </EmployerDeclarationLink>
+        </Form>
+    </template>
+
+    <!-- Occupation of the worker, the declaration of the scenario is the body of the call.
+         A cancellation only identifies the cancelled declaration. -->
+    <template id="drs_xml_occupation">
+        <WorkerRecordLink t-if="attestation_status != '3'">
+            <EmployerClass t-out="employer_class"/>
+            <WorkerCode t-out="worker_code"/>
+            <OccupationLink>
+                <OccupationStartingDate t-out="occupation['start']"/>
+                <OccupationEndingDate t-if="occupation['end']" t-out="occupation['end']"/>
+                <JointCommissionNbr t-out="occupation['committee']"/>
+                <WorkingDaysSystem t-if="occupation['working_days_system']" t-out="occupation['working_days_system']"/>
+                <MeanWorkingHours t-out="occupation['mean_working_hours']"/>
+                <RefMeanWorkingHours t-out="occupation['ref_mean_working_hours']"/>
+                <WorkerStatus t-if="occupation['worker_status']" t-out="occupation['worker_status']"/>
+                <Retired t-if="occupation['retired']">1</Retired>
+                <Apprenticeship t-if="occupation['apprenticeship']" t-out="occupation['apprenticeship']"/>
+                <ContractType t-out="occupation['contract_type']"/>
+                <RemunMethod t-if="occupation['remun_method']" t-out="occupation['remun_method']"/>
+                <OccupationFeatures t-if="occupation_features">
+                    <OccupationInterruption t-out="occupation_features['interruption']"/>
+                    <WorkScheduleCode t-if="occupation_features['work_schedule_code']" t-out="occupation_features['work_schedule_code']"/>
+                </OccupationFeatures>
+                <t t-out="0"/>
+            </OccupationLink>
+        </WorkerRecordLink>
+    </template>
+
+    <!-- Days of the reference period with their nature, and their hours when declared -->
+    <template id="drs_xml_nature_of_days">
+        <NatureOfDay t-foreach="nature_of_day_list" t-as="day">
+            <DayIndicator t-out="day['date']"/>
+            <DayNatureCode t-out="day['nature_code']"/>
+            <HoursNumber t-if="'hours_amount' in day" t-out="day['hours_amount']"/>
+        </NatureOfDay>
+    </template>
+
+    <!-- Basic remuneration of the worker, monthly or hourly -->
+    <template id="drs_xml_calculation_base_allowance">
+        <CalculationBaseAllowance>
+            <RemunerationTimeUnit t-out="remuneration_time_unit"/>
+            <RemunerationBasisAmount t-if="remuneration_time_unit != '1'" t-out="remuneration_basis_amount"/>
+            <PieceTaskServicesCommissionRemunerationBasisAmount t-else="" t-out="remuneration_basis_amount"/>
+        </CalculationBaseAllowance>
+    </template>
+</odoo>

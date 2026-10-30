@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <template id="l10n_be_pos_blackbox.pos_order_receipt_header" inherit_id="point_of_sale.pos_order_receipt_header">
+            <div name="ticket_reference" position="after">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id')">
+                    <div class="mt-2 mb-2 blackbox-vat-label">
+                        <t t-if="conditions.get('l10n_be_is_pro_forma')">
+                            <strong>THIS IS NOT A VALID VAT TICKET</strong>
+                            <br/>
+                        </t>
+                        <span class="text-bold">
+                            <span class="me-2" t-out="extra_data.get('l10n_be_order_type_string')"/>
+                            <t t-out="order['pos_reference']" />
+                        </span>
+                    </div>
+                </t>
+            </div>
+            <div name="ticket_reference" position="attributes">
+                <attribute name="t-if">not conditions.get('l10n_be_blackbox_be_id')</attribute>
+            </div>
+            <div name="pro_forma_receipt" position="attributes">
+                <attribute name="t-if" add="not conditions.get('l10n_be_blackbox_be_id')" separator=" and " />
+            </div>
+        </template>
+
+        <template id="l10n_be_pos_blackbox.pos_order_receipt" inherit_id="point_of_sale.pos_order_receipt">
+            <tr name="subtotal" position="attributes">
+                <attribute name="t-if">not conditions.get('l10n_be_blackbox_be_id')</attribute>
+            </tr>
+            <t name="taxes_foreach" position="attributes">
+                <attribute name="t-if">not conditions.get('l10n_be_blackbox_be_id')</attribute>
+            </t>
+            <div name="prices" position="inside">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id') and order['l10n_be_vat_calc']">
+                    <table class="my-2 w-100 l10n_be_vat_table" style="font-size: 90%;">
+                        <thead>
+                            <tr>
+                                <th class="text-bold py-1 text-start">TVA%</th>
+                                <th class="text-bold py-1 text-end">TVA</th>
+                                <th class="text-bold py-1 text-end">Excl.</th>
+                                <th class="text-bold py-1 text-end">Incl.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="order['l10n_be_vat_calc']" t-as="tax">
+                                <tr>
+                                    <td class="py-1">
+                                        <t t-out="tax['rate']"/>%(<t t-out="tax['label']"/>)
+                                    </td>
+                                    <td class="py-1 text-end font-monospace">
+                                        <t t-out="tax['vatAmount']"/>
+                                    </td>
+                                    <td class="py-1 text-end font-monospace">
+                                        <t t-out="tax['taxableAmount']"/>
+                                    </td>
+                                    <td class="py-1 text-end font-monospace">
+                                        <t t-out="tax['totalAmount']"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
+
+            <div name="prices" position="attributes">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id')">
+                    <attribute name="t-if" add="not conditions.get('l10n_be_is_empty_receipt')" separator=" and " />
+                </t>
+            </div>
+
+            <div name="prices" position="after">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id') and conditions.get('l10n_be_is_empty_receipt')">
+                    <div class="text-center text-bold mb-5 text-large">Canceled order</div>
+                </t>
+            </div>
+        </template>
+
+        <template id="l10n_be_pos_blackbox.pos_order_receipt_footer" inherit_id="point_of_sale.pos_order_receipt_footer">
+            <div name="footer" position="after">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id')">
+                    <div class="blackbox-data text-start" style="font-size: 75%">
+                        <div t-if="extra_data.get('establishment_number')">
+                            EST No: <t t-out="extra_data.get('establishment_number')"/>
+                        </div>
+                        <div t-if="order['l10n_be_fdm_id']">
+                            fdmId: <t t-out="order['l10n_be_fdm_id']"/>
+                        </div>
+                        <div t-if="order['l10n_be_pos_id']">
+                            posId: <t t-out="order['l10n_be_pos_id']"/>
+                        </div>
+                        <div t-if="extra_data.get('fdmSwVersion')">
+                            fdmSwVersion: <t t-out="extra_data.get('fdmSwVersion')"/>
+                        </div>
+                        <div t-if="extra_data.get('posSwVersion')">
+                            posSwVersion: <t t-out="extra_data.get('posSwVersion')"/>
+                        </div>
+                        <div t-if="order['l10n_be_terminal_id']">
+                            terminal: <t t-out="order['l10n_be_terminal_id']"/>
+                        </div>
+                        <div t-if="order['l10n_be_device_id']">
+                            device: <t t-out="order['l10n_be_device_id']"/>
+                        </div>
+                        <div t-if="order['l10n_be_fdm_date_time']">
+                            fdmDateTime: <t t-out="order['l10n_be_fdm_date_time']"/>
+                        </div>
+                        <div t-if="order['l10n_be_event_label']">
+                            eventLabel: <t t-out="order['l10n_be_event_label']"/>
+                        </div>
+                        <div t-if="order['l10n_be_event_counter']">
+                            eventCounter: <t t-out="order['l10n_be_event_counter']"/>
+                        </div>
+                        <div t-if="order['l10n_be_total_counter']">
+                            totalCounter: <t t-out="order['l10n_be_total_counter']"/>
+                        </div>
+                        <div t-if="order['l10n_be_short_signature']">
+                            shortSignature: <t t-out="order['l10n_be_short_signature']"/>
+                        </div>
+                        <div t-if="order['l10n_be_verification_url']">
+                            <div>Verification QR code:</div>
+                            <img t-att-src="image['l10n_be_verification_qr']"/>
+                        </div>
+                        <t t-set="l10n_be_refunded_order" t-value="extra_data.get('refunded_order_id')"/>
+                        <div t-if="l10n_be_refunded_order">
+                            <br/>
+                            <div>
+                            Refund of ticket: <t t-out="l10n_be_refunded_order.get('pos_reference')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_fdm_id')">
+                                fdmId: <t t-out="l10n_be_refunded_order.get('l10n_be_fdm_id')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_pos_id')">
+                                posIdentifier: <t t-out="l10n_be_refunded_order.get('l10n_be_pos_id')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_terminal_id')">
+                                terminal: <t t-out="l10n_be_refunded_order.get('l10n_be_terminal_id')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_device_id')">
+                                device: <t t-out="l10n_be_refunded_order.get('l10n_be_device_id')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_fdm_date_time')">
+                                fdmDateTime: <t t-out="l10n_be_refunded_order.get('l10n_be_fdm_date_time')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_event_label')">
+                                eventLabel: <t t-out="l10n_be_refunded_order.get('l10n_be_event_label')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_event_counter')">
+                                eventCounter: <t t-out="l10n_be_refunded_order.get('l10n_be_event_counter')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_total_counter')">
+                                totalCounter: <t t-out="l10n_be_refunded_order.get('l10n_be_total_counter')"/>
+                            </div>
+                            <div t-if="l10n_be_refunded_order.get('l10n_be_short_signature')">
+                                shortSignature: <t t-out="l10n_be_refunded_order.get('l10n_be_short_signature')"/>
+                            </div>
+                        </div>
+                        <t t-set="l10n_be_copy_event" t-value="order.get('l10n_be_copy_event_data')"/>
+                        <div t-if="l10n_be_copy_event">
+                            <br/>
+                            <div t-if="l10n_be_copy_event.get('l10n_be_fdm_date_time')">
+                                Copy made on : <t t-out="l10n_be_copy_event.get('l10n_be_fdm_date_time')"/>
+                            </div>
+                            <div t-if="l10n_be_copy_event.get('l10n_be_fdm_id')">
+                                fdmId: <t t-out="l10n_be_copy_event.get('l10n_be_fdm_id')"/>
+                            </div>
+                            <div t-if="l10n_be_copy_event.get('l10n_be_event_label')">
+                                eventLabel: <t t-out="l10n_be_copy_event.get('l10n_be_event_label')"/>
+                            </div>
+                            <div t-if="l10n_be_copy_event.get('l10n_be_event_counter')">
+                                eventCounter: <t t-out="l10n_be_copy_event.get('l10n_be_event_counter')"/>
+                            </div>
+                            <div t-if="l10n_be_copy_event.get('l10n_be_total_counter')">
+                                totalCounter: <t t-out="l10n_be_copy_event.get('l10n_be_total_counter')"/>
+                            </div>
+                        </div>
+                        <t t-set="l10n_be_pre_bill_event" t-value="order.get('l10n_be_pre_bill_event_data')"/>
+                        <div t-if="l10n_be_pre_bill_event">
+                            <br/>
+                            <div t-if="l10n_be_pre_bill_event.get('l10n_be_fdm_date_time')">
+                                Pre-bill made on : <t t-out="l10n_be_pre_bill_event.get('l10n_be_fdm_date_time')"/>
+                            </div>
+                            <div t-if="l10n_be_pre_bill_event.get('l10n_be_fdm_id')">
+                                fdmId: <t t-out="l10n_be_pre_bill_event.get('l10n_be_fdm_id')"/>
+                            </div>
+                            <div t-if="l10n_be_pre_bill_event.get('l10n_be_event_label')">
+                                eventLabel: <t t-out="l10n_be_pre_bill_event.get('l10n_be_event_label')"/>
+                            </div>
+                            <div t-if="l10n_be_pre_bill_event.get('l10n_be_event_counter')">
+                                eventCounter: <t t-out="l10n_be_pre_bill_event.get('l10n_be_event_counter')"/>
+                            </div>
+                            <div t-if="l10n_be_pre_bill_event.get('l10n_be_total_counter')">
+                                totalCounter: <t t-out="l10n_be_pre_bill_event.get('l10n_be_total_counter')"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+            <div name="footer_powered_by" position="before">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id') and order.get('l10n_be_footer')">
+                    <t t-foreach="order['l10n_be_footer']" t-as="footerLine">
+                        <div class="text-small" t-out="footerLine" />
+                    </t>
+                </t>
+            </div>
+        </template>
+
+        <template id="l10n_be_pos_blackbox.pos_orderline_receipt_information" inherit_id="point_of_sale.pos_orderline_receipt_information">
+            <span name="standard-unit-price" position="inside">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id') and line['discount'] and line['discount'] &gt; 0">
+                    <div class="text-small" name="combo-unit-price">
+                        Old unit price <span class="font-monospace"><t t-out="line['product_unit_price']" /> / <t t-out="line['product_uom_name']" /></span>
+                    </div>
+                </t>
+            </span>
+        </template>
+
+        <template id="l10n_be_pos_blackbox.pos_orderline_receipt" inherit_id="point_of_sale.pos_orderline_receipt">
+            <td name="price_subtotal_incl" position="inside">
+                <t t-if="conditions.get('l10n_be_blackbox_be_id')">
+                    <span class="text-end ms-2" style="width: 2rem" t-out="line['tax_group_labels']"></span>
+                </t>
+            </td>
+        </template>
+    </data>
+</odoo>

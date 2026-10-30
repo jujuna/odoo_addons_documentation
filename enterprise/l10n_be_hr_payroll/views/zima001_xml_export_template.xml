@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryInami -->
+<odoo>
+    <template id="zima001_xml_export">
+        <ZIMA001 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <Form>
+                <t t-call="l10n_be_hr_payroll.drs_xml_header"/>
+                <CommentDeclaration t-if="form_comment">
+                    <CommentOfDeclaration t-out="form_comment"/>
+                </CommentDeclaration>
+                <RiskDetail>
+                    <RiskStartingDate t-out="risk_start_date"/>
+                </RiskDetail>
+                <EmployerDeclaration>
+                    <Quarter t-out="quarter"/>
+                    <NOSSRegistrationNbr t-out="onss_registration_number"/>
+                    <Trusteeship>0</Trusteeship>
+                    <CompanyID t-out="l10n_be_company_number"/>
+                    <NaturalPerson>
+                        <NaturalPersonSequenceNbr>1</NaturalPersonSequenceNbr>
+                        <INSS t-out="inss"/>
+                        <WorkerRecord t-if="attestation_status != '3'">
+                            <EmployerClass t-out="employer_class"/>
+                            <WorkerCode t-out="worker_code"/>
+                            <NOSSQuarterStartingDate t-out="quarter_start"/>
+                            <NOSSQuarterEndingDate t-out="quarter_end"/>
+                            <Border>0</Border>
+                            <Occupation>
+                                <OccupationSequenceNbr>1</OccupationSequenceNbr>
+                                <OccupationStartingDate t-out="occupation['start']"/>
+                                <OccupationEndingDate t-if="occupation['end']" t-out="occupation['end']"/>
+                                <JointCommissionNbr t-out="occupation['committee']"/>
+                                <WorkingDaysSystem t-out="occupation['working_days_system']"/>
+                                <ContractType t-out="occupation['contract_type']"/>
+                                <RefMeanWorkingHours t-out="occupation['ref_mean_working_hours']"/>
+                                <WorkerStatus t-if="occupation['worker_status']" t-out="occupation['worker_status']"/>
+                                <MeanWorkingHours t-out="occupation['mean_working_hours']"/>
+                                <EmploymentPromotion t-if="occupation['employment_promotion']" t-out="occupation['employment_promotion']"/>
+                                <Retired t-out="1 if occupation['retired'] else 0"/>
+                                <Apprenticeship t-if="occupation['apprenticeship']" t-out="occupation['apprenticeship']"/>
+                                <LocalUnitID t-out="local_unit_code"/>
+                                <RiskDetailOccupation>
+                                    <LastWorkingDayDate t-if="last_working_day" t-out="last_working_day"/>
+                                    <CalculationBaseAllowance>
+                                        <RemunerationTimeUnit t-out="remuneration_time_unit"/>
+                                        <RemunerationBasisAmount t-if="remuneration_time_unit != '1'" t-out="remuneration_basis_amount"/>
+                                        <PieceTaskServicesCommissionRemunerationBasisAmount t-else="" t-out="remuneration_basis_amount"/>
+                                        <StableOccupationIndicator t-out="stable_occupation"/>
+                                    </CalculationBaseAllowance>
+                                    <NatureAdvantage t-foreach="nature_advantages" t-as="nature_advantage">
+                                        <NatureAdvantageAmount t-out="nature_advantage['amount']"/>
+                                        <NatureAdvantageStartingDate t-out="nature_advantage['start']"/>
+                                    </NatureAdvantage>
+                                    <ReferencePeriod t-if="reference_period and nature_of_day_list">
+                                        <RefStartingDate t-out="reference_period[0]"/>
+                                        <RefEndingDate t-out="reference_period[1]"/>
+                                        <NatureOfDay t-foreach="nature_of_day_list" t-as="day">
+                                            <DayIndicator t-out="day['date']"/>
+                                            <DayNatureCode t-out="day['nature_code']"/>
+                                        </NatureOfDay>
+                                    </ReferencePeriod>
+                                </RiskDetailOccupation>
+                            </Occupation>
+                        </WorkerRecord>
+                        <ServiceData t-if="service_ending_date and attestation_status != '3'">
+                            <ServiceEndingDate t-out="service_ending_date"/>
+                        </ServiceData>
+                    </NaturalPerson>
+                </EmployerDeclaration>
+            </Form>
+        </ZIMA001>
+    </template>
+</odoo>

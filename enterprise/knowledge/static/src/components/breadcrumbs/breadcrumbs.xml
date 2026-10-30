@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="knowledge.Breadcrumbs" t-inherit="web.Breadcrumbs" t-inherit-mode="primary">
+        <xpath expr="//ol[hasclass('breadcrumb')]" position="attributes">
+            <attribute name="class" add="bg-transparent" separator=" "/>
+        </xpath>
+        <xpath expr="//div[hasclass('o_last_breadcrumb_item')]/.." position="replace"/>
+    </t>
+</templates>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.pos_hr_mobile_nfc</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='multiple_employee_session']" position="after">
+                <setting id="nfc_badges" string="NFC Badges" help="Identify employees with their NFC badge on the mobile terminal" invisible="not pos_module_pos_hr">
+                    <div class="content-group">
+                        <div>
+                            <field name="pos_nfc_secure_login" class="me-1"/>
+                            <label for="pos_nfc_secure_login"/>
+                        </div>
+                        <div class="mt8" invisible="not pos_nfc_secure_login">
+                            <div class="row">
+                                <label for="pos_nfc_encoding_key" class="col-lg-5 o_light_label"/>
+                                <field name="pos_nfc_encoding_key" password="True"/>
+                            </div>
+                            <div class="mt-2">
+                                <field name="pos_nfc_manager_pin_required" class="me-1"/>
+                                <label for="pos_nfc_manager_pin_required"/>
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

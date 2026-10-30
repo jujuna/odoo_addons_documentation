@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryInami -->
+<odoo>
+    <template id="zima002_xml_export">
+        <ZIMA002 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <t t-call="l10n_be_hr_payroll.drs_xml_form">
+                <t t-call="l10n_be_hr_payroll.drs_xml_occupation">
+                    <ExceptSituationCalculBase>
+                        <ExceptSituationMeanWorkingHours t-out="adapted_working_hours"/>
+                        <ExceptSituationWorkingDaysSystem t-out="adapted_working_days"/>
+                    </ExceptSituationCalculBase>
+                    <ReferencePeriod>
+                        <RefStartingDate t-out="date_from"/>
+                        <RefEndingDate t-out="date_to"/>
+                        <t t-call="l10n_be_hr_payroll.drs_xml_nature_of_days"/>
+                        <Service t-foreach="services" t-as="service">
+                            <ServiceSequenceNbr t-out="service_index + 1"/>
+                            <ServiceCode t-out="service['code']"/>
+                            <ServiceNbrHours t-out="service['hours']"/>
+                        </Service>
+                        <ExactSalary t-if="gross_salary is not False">
+                            <ExactSalaryCode>001</ExactSalaryCode>
+                            <ExactSalaryAmount t-out="gross_salary"/>
+                        </ExactSalary>
+                    </ReferencePeriod>
+                </t>
+            </t>
+        </ZIMA002>
+    </template>
+</odoo>

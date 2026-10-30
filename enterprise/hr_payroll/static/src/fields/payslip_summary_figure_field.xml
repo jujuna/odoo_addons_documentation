@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_payroll.PayslipSummaryFigureField">
+        <t t-set="parts" t-value="this.parts"/>
+        <span class="o_payslip_summary_figure text-nowrap">
+            <span t-if="parts.symbol and parts.symbolBefore" class="o_payslip_summary_figure_main me-1" t-out="parts.symbol"/>
+            <span class="o_payslip_summary_figure_main" t-out="parts.main"/>
+            <span class="o_payslip_summary_figure_decimals text-muted" t-out="parts.decimals"/>
+            <span t-if="parts.symbol and !parts.symbolBefore" class="o_payslip_summary_figure_main ms-1" t-out="parts.symbol"/>
+        </span>
+    </t>
+</templates>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryOnem -->
+<odoo>
+    <template id="wech001_xml_export">
+        <WECH001 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <Form>
+                <t t-call="l10n_be_hr_payroll.drs_xml_header"/>
+                <EmployerDeclaration t-foreach="quarters" t-as="quarter">
+                    <Quarter t-out="quarter['quarter']"/>
+                    <NOSSRegistrationNbr t-out="onss_registration_number"/>
+                    <Trusteeship>0</Trusteeship>
+                    <CompanyID t-out="l10n_be_company_number"/>
+                    <NaturalPerson>
+                        <NaturalPersonSequenceNbr>1</NaturalPersonSequenceNbr>
+                        <INSS t-out="inss"/>
+                        <WorkerRecord t-if="attestation_status != '3'">
+                            <EmployerClass t-out="employer_class"/>
+                            <WorkerCode t-out="quarter['worker_code']"/>
+                            <NOSSQuarterStartingDate t-out="quarter['start']"/>
+                            <NOSSQuarterEndingDate t-out="quarter['end']"/>
+                            <Occupation t-foreach="quarter['occupations']" t-as="occupation">
+                                <OccupationSequenceNbr t-out="occupation['sequence']"/>
+                                <OccupationStartingDate t-out="occupation['start']"/>
+                                <OccupationEndingDate t-if="occupation['end']" t-out="occupation['end']"/>
+                                <JointCommissionNbr t-out="occupation['committee']"/>
+                                <WorkingDaysSystem t-out="occupation['working_days_system']"/>
+                                <ContractType t-out="occupation['contract_type']"/>
+                                <RefMeanWorkingHours t-out="occupation['ref_mean_working_hours']"/>
+                                <WorkerStatus t-if="occupation['worker_status']" t-out="occupation['worker_status']"/>
+                                <MeanWorkingHours t-out="occupation['mean_working_hours']"/>
+                                <EmploymentPromotion t-if="occupation['employment_promotion']" t-out="occupation['employment_promotion']"/>
+                                <Retired t-out="1 if occupation['retired'] else 0"/>
+                                <Apprenticeship t-if="occupation['apprenticeship']" t-out="occupation['apprenticeship']"/>
+                                <RemunMethod t-if="occupation['remun_method']" t-out="occupation['remun_method']"/>
+                                <OccupationFeatures>
+                                    <OccupationInterruption t-out="occupation['interruption']"/>
+                                    <DeviationFromQ>0</DeviationFromQ>
+                                </OccupationFeatures>
+                                <SeverancePayment t-if="occupation['severance']">
+                                    <SeverancePaymentStartDate t-out="occupation['severance']['start']"/>
+                                    <SeverancePaymentEndDate t-out="occupation['severance']['end']"/>
+                                </SeverancePayment>
+                                <Service t-foreach="occupation['services']" t-as="service">
+                                    <ServiceSequenceNbr t-out="service_index + 1"/>
+                                    <ServiceCode t-out="service['code']"/>
+                                    <ServiceNbrDays t-out="service['days']"/>
+                                    <ServiceNbrHours t-if="service['hours']" t-out="service['hours']"/>
+                                </Service>
+                                <DclEndContractOrFTEarlyPension t-if="occupation['end_block']">
+                                    <t t-set="end_block" t-value="occupation['end_block']"/>
+                                    <CompensatoryRecoveryServiceDay t-out="end_block['compensatory_rest_days']"/>
+                                    <PaymentIndicator t-out="1 if end_block['public_holidays'] else 0"/>
+                                    <PublicHolidayIndicator t-foreach="end_block['public_holidays']" t-as="public_holiday" t-out="public_holiday"/>
+                                    <t t-call="l10n_be_hr_payroll.drs_xml_calculation_base_allowance"/>
+                                    <HolidaysSector>
+                                        <HolidaySectorIndicator t-out="end_block['holiday_sector']"/>
+                                        <HolidayDetail t-foreach="end_block['holidays']" t-as="holiday">
+                                            <HolidayCode t-out="holiday['code']"/>
+                                            <HolidayDaysNumber t-if="holiday['days'] is not False" t-out="holiday['days']"/>
+                                            <HolidayHoursNumber t-if="holiday['hours'] is not False" t-out="holiday['hours']"/>
+                                        </HolidayDetail>
+                                    </HolidaysSector>
+                                    <CommentDeclaration t-if="declaration_comment">
+                                        <CommentOfDeclaration t-out="declaration_comment"/>
+                                    </CommentDeclaration>
+                                </DclEndContractOrFTEarlyPension>
+                            </Occupation>
+                        </WorkerRecord>
+                    </NaturalPerson>
+                </EmployerDeclaration>
+            </Form>
+        </WECH001>
+    </template>
+</odoo>

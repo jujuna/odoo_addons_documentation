@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryOnem -->
+<odoo>
+    <template id="wech008_xml_export">
+        <WECH008 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <t t-call="l10n_be_hr_payroll.drs_xml_form">
+                <t t-call="l10n_be_hr_payroll.drs_xml_occupation">
+                    <MonthlyDeclarationOfWorkInProgramActivationOfUnemploymentAllowance>
+                        <WorkAccidentIndicator t-out="work_accident_indicator"/>
+                        <UninterruptedOcStartingDate t-if="uninterrupted_occupation_date" t-out="uninterrupted_occupation_date"/>
+                        <WorkAllowance t-if="has_work_allowance">
+                            <HadSalaryHoursNumber t-out="paid_hours"/>
+                            <WorkAllowanceAmount t-out="work_allowance"/>
+                        </WorkAllowance>
+                        <ReferencePeriod>
+                            <RefStartingDate t-out="date_from"/>
+                            <RefEndingDate t-out="date_to"/>
+                            <ExactSalary>
+                                <ExactSalaryCode>32</ExactSalaryCode>
+                                <BonusPaymentFrequency t-if="bonus_payment_frequency" t-out="bonus_payment_frequency"/>
+                                <ExactSalaryAmount t-out="net_salary"/>
+                            </ExactSalary>
+                        </ReferencePeriod>
+                        <CommentDeclaration t-if="declaration_comment">
+                            <CommentOfDeclaration t-out="declaration_comment"/>
+                        </CommentDeclaration>
+                    </MonthlyDeclarationOfWorkInProgramActivationOfUnemploymentAllowance>
+                </t>
+            </t>
+        </WECH008>
+    </template>
+</odoo>

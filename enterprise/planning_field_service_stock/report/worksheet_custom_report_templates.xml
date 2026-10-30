@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="worksheet_custom_page" inherit_id="planning_field_service.worksheet_custom_page">
+        <div name="intervention_equipment_section" position="inside">
+            <div name="intervention_equipment" t-if="doc.lot_ids and doc.env['res.groups']._is_feature_enabled('planning.group_field_service_allow_equipment')">
+                <h2>Equipment</h2>
+                <t t-call="planning_field_service_stock.worksheet_equipment"/>
+            </div>
+        </div>
+    </template>
+</odoo>

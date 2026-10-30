@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryOnem -->
+<odoo>
+    <template id="wech003_xml_export">
+        <WECH003 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <t t-call="l10n_be_hr_payroll.drs_xml_form">
+                <t t-call="l10n_be_hr_payroll.drs_xml_occupation">
+                    <DeclarationPartTimeWorkWithMaintenanceRights>
+                        <DBRIndicatorInEntrepriseCadreMap t-out="dbr_indicator"/>
+                        <FullTimeOccupationRequest t-out="full_time_occupation_request"/>
+                        <TheoreticalSalary>
+                            <HourlyTheoreticalSalaryAmount t-if="is_hourly_wage" t-out="theoretical_salary"/>
+                            <MonthlyTheoreticalSalaryAmount t-else="" t-out="theoretical_salary"/>
+                        </TheoreticalSalary>
+                        <CommentDeclaration t-if="declaration_comment">
+                            <CommentOfDeclaration t-out="declaration_comment"/>
+                        </CommentDeclaration>
+                    </DeclarationPartTimeWorkWithMaintenanceRights>
+                </t>
+            </t>
+        </WECH003>
+    </template>
+</odoo>

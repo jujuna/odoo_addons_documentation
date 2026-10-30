@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryOnem -->
+<odoo>
+    <template id="wech007_xml_export">
+        <WECH007 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <t t-call="l10n_be_hr_payroll.drs_xml_form">
+                <t t-call="l10n_be_hr_payroll.drs_xml_occupation">
+                    <MonthlyWorkDeclarationOfEmployeeWorkingInShelteredIndustry>
+                        <TotalHoursOfPayedHoliday t-out="paid_holiday_hours"/>
+                        <WorkerSituationIndicator t-out="worker_situation_changed"/>
+                        <ReferencePeriod>
+                            <RefStartingDate t-out="date_from"/>
+                            <RefEndingDate t-out="date_to"/>
+                            <t t-call="l10n_be_hr_payroll.drs_xml_nature_of_days"/>
+                        </ReferencePeriod>
+                        <CommentDeclaration t-if="declaration_comment">
+                            <CommentOfDeclaration t-out="declaration_comment"/>
+                        </CommentDeclaration>
+                    </MonthlyWorkDeclarationOfEmployeeWorkingInShelteredIndustry>
+                </t>
+            </t>
+        </WECH007>
+    </template>
+</odoo>

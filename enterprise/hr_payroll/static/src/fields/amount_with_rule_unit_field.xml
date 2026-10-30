@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_payroll.AmountWithRuleUnitField">
+        <span t-if="this.props.readonly" t-out="this.formattedValue"/>
+        <div t-else="" class="d-flex align-items-baseline gap-2">
+            <input
+                t-on-focusin="this.onFocusIn"
+                t-on-focusout="this.onFocusOut"
+                t-att-id="this.props.id"
+                t-ref="this.numpadDecimalRef"
+                t-att-type="this.props.inputType"
+                inputmode="decimal"
+                class="o_input"
+                autocomplete="off"
+                t-att-step="this.props.step"/>
+            <span t-if="this.unit" class="text-muted text-nowrap" t-out="this.unit"/>
+        </div>
+    </t>
+</templates>

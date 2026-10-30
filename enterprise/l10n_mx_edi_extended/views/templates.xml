@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="address_form_fields" inherit_id="portal.address_form_fields">
+        <div id="div_street2" position="after">
+            <div id="div_mx_colony" class="col-lg-12 mb-2"
+                 t-att-style="(not country or country.code != 'MX') and 'display: none' or None">
+                <label class="col-form-label label-optional" for="o_l10n_mx_edi_colony">Colony</label>
+                <input type="text"
+                       id="o_l10n_mx_edi_colony"
+                       name="l10n_mx_edi_colony"
+                       class="form-control"
+                       t-att-value="partner_sudo.l10n_mx_edi_colony"/>
+            </div>
+        </div>
+    </template>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="res_users_form_view" model="ir.ui.view">
+            <field name="name">res.users.form.view</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="before">
+                    <div class="alert alert-warning" role="alert" invisible="not context.get('insz_required')">
+                        To open a certified POS session, you must <span class="alert-link">enter your Belgian National Register number</span>.
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='phone']/.." position="after">
+                    <div name="l10n_be_insz_or_bis_number" class="d-flex align-items-baseline w-md-50 gap-2">
+                        <i class="d-none d-md-block oi oi-filled" data-icon="badge" title="Belgian National Register Number"/>
+                        <field name="l10n_be_insz_or_bis_number" placeholder="98031845556" required="context.get('insz_required')"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

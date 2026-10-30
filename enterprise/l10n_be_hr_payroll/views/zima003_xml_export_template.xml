@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryInami -->
+<odoo>
+    <template id="zima003_xml_export">
+        <ZIMA003 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <t t-call="l10n_be_hr_payroll.drs_xml_form">
+                <t t-call="l10n_be_hr_payroll.drs_xml_occupation">
+                    <ReferencePeriod>
+                        <RefStartingDate t-out="date_from"/>
+                        <RefEndingDate t-out="date_to"/>
+                        <BreastFeedingPause>
+                            <BreastFeedingPauseNbr t-out="breastfeeding_pause_count"/>
+                            <BreastFeedingHourlyGrossSalary t-out="breastfeeding_hourly_wage"/>
+                        </BreastFeedingPause>
+                    </ReferencePeriod>
+                </t>
+            </t>
+        </ZIMA003>
+    </template>
+</odoo>

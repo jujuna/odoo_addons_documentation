@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_sale.ControlButtons" t-inherit="point_of_sale.ControlButtons" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='this.props.showRemainingButtons']/div/t[@name='o_pricelist_button']" position="before">
+            <t t-if="this.pos.accessRight.cashier._role != 'minimal' and this.pos.blackbox.isActive" t-call="point_of_sale.controlButton"
+                icon="'file_save'"
+                btnText.translate="Sales reports"
+                btnClasses="'btn-secondary '"
+                onClick="() => this.onClickSalesReports()">
+            </t>
+            <t t-if="this.pos.accessRight.cashier._role != 'minimal' and this.pos.blackbox.isActive" t-call="point_of_sale.controlButton"
+                icon="'file_save'"
+                btnText.translate="Users reports"
+                btnClasses="'btn-secondary '"
+                onClick="() => this.onClickUserReports()">
+            </t>
+        </xpath>
+    </t>
+</templates>

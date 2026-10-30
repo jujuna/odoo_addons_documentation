@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://www.socialsecurity.be/site_fr/employer/general/techlib.htm#glossaryOnem -->
+<odoo>
+    <template id="wech006_xml_export">
+        <WECH006 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': schema_location}">
+            <t t-call="l10n_be_hr_payroll.drs_xml_form">
+                <t t-call="l10n_be_hr_payroll.drs_xml_occupation">
+                    <MonthlyDeclarationPartTimeWork>
+                        <OccupationRefused t-out="occupation_refused"/>
+                        <TheoreticalSalary>
+                            <HourlyTheoreticalSalaryAmount t-if="is_hourly_wage" t-out="theoretical_salary"/>
+                            <MonthlyTheoreticalSalaryAmount t-else="" t-out="theoretical_salary"/>
+                        </TheoreticalSalary>
+                        <HolidaysSector t-if="holiday_sector">
+                            <HolidaySectorIndicator t-out="holiday_sector"/>
+                        </HolidaysSector>
+                        <ReferencePeriod>
+                            <RefStartingDate t-out="date_from"/>
+                            <RefEndingDate t-out="date_to"/>
+                            <t t-call="l10n_be_hr_payroll.drs_xml_nature_of_days"/>
+                            <ExactSalary>
+                                <ExactSalaryCode>33</ExactSalaryCode>
+                                <ExactSalaryAmount t-out="gross_salary"/>
+                            </ExactSalary>
+                        </ReferencePeriod>
+                        <CommentDeclaration t-if="declaration_comment">
+                            <CommentOfDeclaration t-out="declaration_comment"/>
+                        </CommentDeclaration>
+                    </MonthlyDeclarationPartTimeWork>
+                </t>
+            </t>
+        </WECH006>
+    </template>
+</odoo>

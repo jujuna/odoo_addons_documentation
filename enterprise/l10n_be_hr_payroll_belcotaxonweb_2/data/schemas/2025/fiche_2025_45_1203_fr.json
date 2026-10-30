@@ -1,0 +1,162 @@
+{
+  "$id": "urn:f:d:2025:45:1203",
+  "$schema": "https://belcotax.be/fiches/schema/1",
+  "additionalProperties": false,
+  "description": "Droits d’auteur et droits voisins",
+  "properties": {
+    "$s": {
+      "oneOf": [
+        {
+          "const": "urn:f:d:2025:45:1203"
+        },
+        {
+          "const": "urn:f:d:2025:45:1203:fr"
+        },
+        {
+          "const": "urn:f:d:2025:45:1203:nl"
+        },
+        {
+          "const": "urn:f:d:2025:45:1203:de"
+        }
+      ],
+      "title": "Schéma de la fiche",
+      "type": "string"
+    },
+    "2010": {
+      "title": "Numéro de suite",
+      "type": "string"
+    },
+    "2031": {
+      "oneOf": [
+        {
+          "const": "0",
+          "title": "Pas d'application"
+        },
+        {
+          "const": "1",
+          "title": "D'application"
+        }
+      ],
+      "title": "Documents justificatifs pour l'exonération par convention du précompte mobilier tenues à la disposition de l'Administration",
+      "type": "string"
+    },
+    "2063": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "title": "Montant du précompte mobilier",
+      "type": "number",
+      "unit": "euro"
+    },
+    "2067": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "title": "Montant des revenus payés ou attribués",
+      "type": "number",
+      "unit": "euro"
+    },
+    "2068": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "title": "Montant comptabilisé en charge en 2025 si ce montant ne correspond pas au montant indiqué à a)",
+      "type": "number"
+    },
+    "2069": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "title": "Montant  qui n'excède pas les seuils fixés à l'art. 269, § 1er, 4°, CIR 92",
+      "type": "number",
+      "unit": "euro"
+    },
+    "2070": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "title": "Montant  qui excède les seuils fixés à l'art. 269, § 1er, 4°, CIR 92",
+      "type": "number",
+      "unit": "euro"
+    },
+    "2071": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "title": "Montant  comptabilisé en charge en 2025 si ce montant ne correspond pas au total des montants indiqués aux rubriques a)1) et a)2)",
+      "type": "number",
+      "unit": "euro"
+    },
+    "2099": {
+      "title": "Commentaire : précisions éventuelles sur les montants repris sous 4., 5. ou 6.",
+      "type": "string"
+    },
+    "2205": {
+      "oneOf": [
+        {
+          "const": "3",
+          "title": "Annule et remplace"
+        }
+      ],
+      "title": "Si modification, nature de la modification",
+      "type": "string"
+    },
+    "5100": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "readOnly": true,
+      "title": "Revenu imposable",
+      "type": "number",
+      "unit": "euro"
+    },
+    "5200": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "readOnly": true,
+      "title": "Précompte mobilier",
+      "type": "number",
+      "unit": "euro"
+    },
+    "5300": {
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "readOnly": true,
+      "title": "Cotisations sociales",
+      "type": "number",
+      "unit": "euro"
+    },
+    "b": {
+      "title": "Votre référence pour le bénéficiaire des revenus",
+      "type": "string",
+      "entities": [
+        "organisation",
+        "person"
+      ],
+      "role": "beneficiary",
+      "zoneType": "entity"
+    },
+    "c": {
+      "title": "Votre référence pour les données de contact",
+      "type": "string",
+      "zoneType": "contact"
+    },
+    "d": {
+      "title": "Votre référence pour le du débiteur de revenus",
+      "type": "string",
+      "entities": [
+        "organisation",
+        "person"
+      ],
+      "role": "debtor",
+      "zoneType": "entity"
+    },
+    "k": {
+      "title": "Votre référence pour la fiche",
+      "type": "string",
+      "zoneType": "key"
+    }
+  },
+  "required": [
+    "$s",
+    "b",
+    "c",
+    "d",
+    "k"
+  ],
+  "title": "281.45",
+  "type": "object"
+}

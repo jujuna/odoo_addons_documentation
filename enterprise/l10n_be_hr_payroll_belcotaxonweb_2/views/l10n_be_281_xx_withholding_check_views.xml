@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="l10n_be_281_xx_withholding_check_view_search" model="ir.ui.view">
+        <field name="name">l10n_be.281_xx.withholding.check.view.search</field>
+        <field name="model">l10n_be.281_xx.withholding.check</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="report"/>
+                <field name="source"/>
+                <filter string="Inconsistencies" name="inconsistent" domain="[('is_inconsistent', '=', True)]"/>
+                <separator/>
+                <filter string="Annual Forms" name="origin_281" domain="[('origin', '=', '281')]"/>
+                <filter string="Declared During the Year" name="origin_declared" domain="[('origin', '=', 'declared')]"/>
+                <filter string="Not Declared" name="origin_undeclared" domain="[('origin', '=', 'undeclared')]"/>
+                <group>
+                    <filter string="Form" name="group_report" context="{'group_by': 'report'}"/>
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Declaration" name="group_source" context="{'group_by': 'source'}"/>
+                    <filter string="Month" name="group_date" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_be_281_xx_withholding_check_view_list" model="ir.ui.view">
+        <field name="name">l10n_be.281_xx.withholding.check.view.list</field>
+        <field name="model">l10n_be.281_xx.withholding.check</field>
+        <field name="arch" type="xml">
+            <list string="Withholding Taxes Check" create="0" edit="0" delete="0"
+                  decoration-danger="is_inconsistent" decoration-muted="origin == 'undeclared'">
+                <field name="report"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="origin"/>
+                <field name="source"/>
+                <field name="document"/>
+                <field name="date" optional="hide"/>
+                <field name="amount_281" sum="Total 281"/>
+                <field name="declared_amount" sum="Total Declared"/>
+                <field name="difference" sum="Total Difference"/>
+                <field name="note"/>
+                <field name="is_inconsistent" column_invisible="True"/> <!-- decoration-danger -->
+                <field name="currency_id" column_invisible="True"/> <!-- monetary fields -->
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_be_281_xx_withholding_check_view_pivot" model="ir.ui.view">
+        <field name="name">l10n_be.281_xx.withholding.check.view.pivot</field>
+        <field name="model">l10n_be.281_xx.withholding.check</field>
+        <field name="arch" type="xml">
+            <pivot string="Withholding Taxes Check">
+                <field name="report" type="row"/>
+                <field name="employee_id" type="row"/>
+                <field name="source" type="col"/>
+                <field name="amount_281" type="measure"/>
+                <field name="declared_amount" type="measure"/>
+                <field name="difference" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+</odoo>

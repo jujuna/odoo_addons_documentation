@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hr_payroll.WorkEntryTypeTileField">
+        <div class="o_calendar_renderer">
+            <div t-attf-class="o_hr_payroll_line_tile o_calendar_color_#{this.workEntryType?.color or 0}"
+                 t-att-title="this.workEntryType?.display_name"
+                 t-out="this.workEntryType?.display_code or ''"/>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo auto_sequence="1">
+    <record id="cash_flow_report_indirect" model="account.report">
+        <field name="name">Indirect Cash Flow Statement</field>
+        <field name="root_report_id" ref="account_reports.cash_flow_report"/>
+        <field name="custom_handler_model_id" ref="model_account_cash_flow_indirect_report_handler"/>
+        <field name="sequence">1</field>
+        <field name="column_ids">
+            <record id="cash_flow_report_balance_indirect" model="account.report.column">
+                <field name="name">Balance</field>
+                <field name="expression_label">balance</field>
+            </record>
+        </field>
+        <field name="line_ids">
+            <record id="cash_flow_indirect_operational_activities" model="account.report.line">
+                <field name="name">Cash Flows from operating activities</field>
+                <field name="code">CF_OP</field>
+                <field name="hierarchy_level">0</field>
+                <field name="sequence">20</field>
+                <field name="aggregation_formula">CF_OP_EBIT.balance + CF_OP_ADJ.balance + CF_OP_WCAP.balance + CF_OP_INC_TAX.balance + CF_OP_INT.balance</field>
+                <field name="children_ids">
+                    <record id="cash_flow_indirect_op_net_income" model="account.report.line">
+                        <field name="name">Net Profit</field>
+                        <field name="code">CF_OP_EBIT</field>
+                        <field name="sequence">30</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_op_net_income_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">NEP.balance</field>
+                                <field name="subformula">cross_report(account_reports.profit_and_loss, force_date_scope)</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_op_adjustment" model="account.report.line">
+                        <field name="name">Adjustments to reconcile net profit/(loss) to net cash flows:</field>
+                        <field name="code">CF_OP_ADJ</field>
+                        <field name="sequence">40</field>
+                        <field name="aggregation_formula">CF_OP_ADJ_DEP_AND_AMORT.balance + CF_OP_ADJ_PROV.balance + CF_OP_ADJ_SALE_INT_ASS.balance + CF_OP_ADJ_SALE_PPE.balance + CF_OP_ADJ_SALE_ROU.balance + CF_OP_ADJ_SALE_FIN_INSTR.balance + CF_OP_ADJ_FOREX.balance + CF_OP_ADJ_NET_FIN_RESULT.balance</field>
+                        <field name="children_ids">
+                            <record id="cash_flow_indirect_op_adjustment_depreciation" model="account.report.line">
+                                <field name="name">Depreciation and amortisation</field>
+                                <field name="code">CF_OP_ADJ_DEP_AND_AMORT</field>
+                                <field name="sequence">50</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_depreciation_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">domain</field>
+                                        <field name="formula" eval="['|', ('account_id.account_type', '=', 'expense_depreciation'), ('account_id.tag_ids', 'in', [ref('account.account_tag_adj_depreciation_and_amortization')])]"/>
+                                        <field name="subformula">sum</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_adjustment_provision" model="account.report.line">
+                                <field name="name">Provisions</field>
+                                <field name="code">CF_OP_ADJ_PROV</field>
+                                <field name="sequence">60</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_provision_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">tag(account.account_tag_adj_provisions)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_adjustment_intangible_assets" model="account.report.line">
+                                <field name="name">Gain (-)/Loss (+) on sale of intangible assets</field>
+                                <field name="code">CF_OP_ADJ_SALE_INT_ASS</field>
+                                <field name="sequence">70</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_intangible_assets_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">tag(account.account_tag_adj_intangible_asset)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_adjustment_sale_ppe" model="account.report.line">
+                                <field name="name">Gain (-)/Loss (+) on sale of property, plant and equipment</field>
+                                <field name="code">CF_OP_ADJ_SALE_PPE</field>
+                                <field name="sequence">80</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_sale_ppe_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">tag(account.account_tag_adj_PPE_sale)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_adjustment_sale_rou" model="account.report.line">
+                                <field name="name">Gain (-)/Loss (+) on sale of right-of-use assets</field>
+                                <field name="code">CF_OP_ADJ_SALE_ROU</field>
+                                <field name="sequence">90</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_sale_rou_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">tag(account.account_tag_adj_ROU_sale)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_adjustment_sale_fin_instr" model="account.report.line">
+                                <field name="name">Gain (-)/Loss (+) on sale of financial instruments</field>
+                                <field name="code">CF_OP_ADJ_SALE_FIN_INSTR</field>
+                                <field name="sequence">100</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_sale_fin_instr_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">tag(account.account_tag_adj_fin_instr_sale)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_adjustment_forex" model="account.report.line">
+                                <field name="name">Unrealized FX Gain (-)/Loss (+)</field>
+                                <field name="code">CF_OP_ADJ_FOREX</field>
+                                <field name="sequence">110</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_forex_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">tag(account.account_tag_adj_unrealized_forex)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_adjustment_net_financial_result" model="account.report.line">
+                                <field name="name">Net financial result : income (-)/cost (+)</field>
+                                <field name="code">CF_OP_ADJ_NET_FIN_RESULT</field>
+                                <field name="sequence">120</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_adjustment_net_financial_result_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">tag(account.account_tag_adj_net_fin_result)</field>
+                                    </record>
+                                </field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_op_working_cap_adjustment" model="account.report.line">
+                        <field name="name">Working capital adjustments</field>
+                        <field name="code">CF_OP_WCAP</field>
+                        <field name="sequence">130</field>
+                        <field name="aggregation_formula">CF_OP_WCAP_TRA_REC.balance + CF_OP_WCAP_OTH_REC.balance + CF_OP_WCAP_TRA_PAY.balance + CF_OP_WCAP_OTH_PAY.balance + CF_OP_WCAP_INV.balance + CF_OP_WCAP_DEF_REV.balance</field>
+                        <field name="children_ids">
+                            <record id="cash_flow_indirect_op_working_cap_adjustment_trade_receivable" model="account.report.line">
+                                <field name="name">Trade receivables</field>
+                                <field name="code">CF_OP_WCAP_TRA_REC</field>
+                                <field name="sequence">140</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_working_cap_adjustment_trade_receivable_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-tag(account.account_tag_wcap_trade_receivable)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_working_cap_adjustment_other_receivable" model="account.report.line">
+                                <field name="name">Other receivables</field>
+                                <field name="code">CF_OP_WCAP_OTH_REC</field>
+                                <field name="sequence">150</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_working_cap_adjustment_other_receivable_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">domain</field>
+                                        <field name="formula" eval="['|', ('account_id.tag_ids', 'in', [ref('account.account_tag_wcap_other_receivable')]), ('account_id.related_taxes_amount', '>=', 1), ('account_id.account_type', '=', 'asset_current')]"/>
+                                        <field name="subformula">-sum</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_working_cap_adjustment_trade_payable" model="account.report.line">
+                                <field name="name">Trade payables</field>
+                                <field name="code">CF_OP_WCAP_TRA_PAY</field>
+                                <field name="sequence">160</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_working_cap_adjustment_trade_payable_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-tag(account.account_tag_wcap_trade_payable)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_working_cap_adjustment_other_payable" model="account.report.line">
+                                <field name="name">Other payables</field>
+                                <field name="code">CF_OP_WCAP_OTH_PAY</field>
+                                <field name="sequence">170</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_working_cap_adjustment_other_payable_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">domain</field>
+                                        <field name="formula" eval="['|', ('account_id.tag_ids', 'in', [ref('account.account_tag_wcap_other_payable')]), ('account_id.related_taxes_amount', '>=', 1), ('account_id.account_type', '=', 'liability_current')]"/>
+                                        <field name="subformula">-sum</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_working_cap_adjustment_inventory" model="account.report.line">
+                                <field name="name">Inventory</field>
+                                <field name="code">CF_OP_WCAP_INV</field>
+                                <field name="sequence">180</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_working_cap_adjustment_inventory_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-tag(account.account_tag_wcap_inventory)</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="cash_flow_indirect_op_working_cap_adjustment_deferred_revenue" model="account.report.line">
+                                <field name="name">Deferred revenue</field>
+                                <field name="code">CF_OP_WCAP_DEF_REV</field>
+                                <field name="sequence">190</field>
+                                <field name="expression_ids">
+                                    <record id="cash_flow_indirect_op_working_cap_adjustment_deferred_revenue_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="green_on_positive" eval="False"/>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-tag(account.account_tag_wcap_deferred_revenue)</field>
+                                    </record>
+                                </field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_op_income_tax_paid" model="account.report.line">
+                        <field name="name">Income tax paid (-)/received (+)</field>
+                        <field name="code">CF_OP_INC_TAX</field>
+                        <field name="sequence">200</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_op_income_tax_paid_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">account_codes</field>
+                                <field name="formula">-tag(account.account_tag_op_income_tax_paid_received)</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_op_interest_paid" model="account.report.line">
+                        <field name="name">Interest paid</field>
+                        <field name="code">CF_OP_INT</field>
+                        <field name="sequence">210</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_op_interest_paid_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">account_codes</field>
+                                <field name="formula">-tag(account.account_tag_op_interest_paid)</field>
+                            </record>
+                        </field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_investing_activities" model="account.report.line">
+                <field name="name">Cash Flows from investing activities</field>
+                <field name="code">CF_INV</field>
+                <field name="hierarchy_level">0</field>
+                <field name="sequence">220</field>
+                <field name="aggregation_formula">CF_INV_RECEP_RECOV_CASH_ADV.balance + CF_INV_REPAY_RECOV_CASH_ADV.balance + CF_INV_INT_PAID.balance</field>
+                <field name="children_ids">
+                    <record id="cash_flow_indirect_inv_recep_recov_cash_adv" model="account.report.line">
+                        <field name="name">Receipt of recoverable cash advances</field>
+                        <field name="code">CF_INV_RECEP_RECOV_CASH_ADV</field>
+                        <field name="sequence">350</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_recep_recov_cash_adv_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_cash_advances')]), ('journal_id.type', 'in', ['bank','cash']), ('credit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_inv_repay_recov_cash_adv" model="account.report.line">
+                        <field name="name">Cash advances made to third parties</field>
+                        <field name="code">CF_INV_REPAY_RECOV_CASH_ADV</field>
+                        <field name="sequence">360</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_repay_recov_cash_adv_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_cash_advances')]), ('journal_id.type', 'in', ['bank','cash']), ('debit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_inv_interest_received" model="account.report.line">
+                        <field name="name">Interest received</field>
+                        <field name="code">CF_INV_INT_PAID</field>
+                        <field name="sequence">370</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_interest_received_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">account_codes</field>
+                                <field name="formula">-tag(account.account_tag_inv_interest_received)</field>
+                            </record>
+                        </field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_financial_activities" model="account.report.line">
+                <field name="name">Cash Flows from financing activities</field>
+                <field name="code">CF_FIN</field>
+                <field name="hierarchy_level">0</field>
+                <field name="sequence">380</field>
+                <field name="aggregation_formula">CF_FIN_PROC_SHARE_ISS.balance + CF_FIN_INT_DIV_PAID.balance + CF_FIN_PROC_BORR.balance + CF_FIN_REPAY_BORR.balance + CF_FIN_LEASE_REPAY.balance + CF_FIN_PROC_RECOV_ADV.balance + CF_FIN_REPAY_RECOV_ADV.balance</field>
+                <field name="children_ids">
+                    <record id="cash_flow_indirect_fin_share_issuance" model="account.report.line">
+                        <field name="name">Proceeds from share issuance</field>
+                        <field name="code">CF_FIN_PROC_SHARE_ISS</field>
+                        <field name="sequence">390</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_fin_share_issuance_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_fin_share_issuance')]), ('journal_id.type', 'in', ['bank','cash']), ('credit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_fin_int_dev_paid" model="account.report.line">
+                        <field name="name">Interests/Dividends paid</field>
+                        <field name="code">CF_FIN_INT_DIV_PAID</field>
+                        <field name="sequence">400</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_fin_int_dev_paid_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_fin_dividends')]), ('journal_id.type', 'in', ['bank','cash']), ('debit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_fin_proc_borrowings" model="account.report.line">
+                        <field name="name">Proceeds from borrowings</field>
+                        <field name="code">CF_FIN_PROC_BORR</field>
+                        <field name="sequence">410</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_fin_proc_borrowings_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="['|', ('account_id.tag_ids', 'in', [ref('account.account_tag_fin_borrowings_lt')]), ('account_id.tag_ids', 'in', [ref('account.account_tag_fin_borrowings_st')]), ('credit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_fin_repay_borrowings" model="account.report.line">
+                        <field name="name">Repayment of borrowings</field>
+                        <field name="code">CF_FIN_REPAY_BORR</field>
+                        <field name="sequence">420</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_fin_repay_borrowings_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_fin_borrowings_st')]), ('debit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                     <record id="cash_flow_indirect_fin_repay_lease" model="account.report.line">
+                        <field name="name">Repayment of lease</field>
+                        <field name="code">CF_FIN_LEASE_REPAY</field>
+                         <field name="sequence">430</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_fin_repay_lease_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_fin_lease')]), ('debit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_fin_proc_recov_adv" model="account.report.line">
+                        <field name="name">Proceeds from recoverable advances</field>
+                        <field name="code">CF_FIN_PROC_RECOV_ADV</field>
+                        <field name="sequence">440</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_fin_proc_recov_adv_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_fin_recov_adv')]), ('credit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_fin_repay_recov_adv" model="account.report.line">
+                        <field name="name">Repayment of recoverable advances</field>
+                        <field name="code">CF_FIN_REPAY_RECOV_ADV</field>
+                        <field name="sequence">450</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_fin_repay_recov_adv_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_fin_recov_adv')]), ('debit', '>', 0)]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_cash_flow_not_reconciled" model="account.report.line">
+                <field name="name">Not reconciled yet</field>
+                <field name="code">CF_NOT_RECON</field>
+                <field name="hierarchy_level">0</field>
+                <field name="sequence">460</field>
+                <field name="hide_if_zero" eval="1"/>
+                <field name="expression_ids">
+                    <record id="cash_flow_indirect_cash_flow_not_reconciled_balance" model="account.report.expression">
+                        <field name="label">balance</field>
+                        <field name="green_on_positive" eval="False"/>
+                        <field name="auditable" eval="True"/>
+                        <field name="engine">custom</field>
+                        <field name="formula">_report_engine_cash_flow_indirect_cash_variation</field>
+                        <field name="subformula">not_reconciled</field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_cash_flow" model="account.report.line">
+                <field name="name">CASH FLOW</field>
+                <field name="code">CF_CASH</field>
+                <field name="hierarchy_level">0</field>
+                <field name="sequence">470</field>
+                <field name="aggregation_formula">CF_OP.balance + CF_INV.balance + CF_FIN.balance + CF_NOT_RECON.balance</field>
+            </record>
+            <record id="cash_flow_indirect_cash_bop" model="account.report.line">
+                <field name="name">Cash and cash equivalents at beginning</field>
+                <field name="code">CF_CASH_BOP</field>
+                <field name="hierarchy_level">0</field>
+                <field name="sequence">480</field>
+                <field name="expression_ids">
+                    <record id="cash_flow_indirect_cash_bop_balance" model="account.report.expression">
+                        <field name="label">balance</field>
+                        <field name="green_on_positive" eval="False"/>
+                        <field name="engine">domain</field>
+                        <field name="formula" eval="('journal_id.type', 'in', ['cash', 'bank', 'credit']), ('exclude_bank_lines', '=', True)"/>
+                        <field name="subformula">-sum</field>
+                        <field name="date_scope">to_beginning_of_period</field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_cash_var" model="account.report.line">
+                <field name="name">Variation</field>
+                <field name="code">CF_CASH_VAR</field>
+                <field name="sequence">490</field>
+                <field name="foldability">foldable</field>
+                <field name="expression_ids">
+                    <record id="cash_flow_indirect_cash_var_balance" model="account.report.expression">
+                        <field name="label">balance</field>
+                        <field name="green_on_positive" eval="False"/>
+                        <field name="engine">domain</field>
+                        <field name="formula" eval="('journal_id.type', '=', 'bank'), ('exclude_bank_lines', '=', True)"/>
+                        <field name="subformula">-sum</field>
+                    </record>
+                </field>
+                <field name="children_ids">
+                    <record id="cash_flow_indirect_cash_var_cash" model="account.report.line">
+                        <field name="name">Variation of Cash</field>
+                        <field name="code">CF_CASH_VAR_CASH</field>
+                        <field name="sequence">500</field>
+                        <field name="hide_if_zero" eval="1"/>
+                        <field name="foldability">never_unfolded</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_cash_var_cash_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">custom</field>
+                                <field name="formula">_report_engine_cash_flow_indirect_cash_variation</field>
+                                <field name="subformula">cash_variation</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_cash_var_non_cash" model="account.report.line">
+                        <field name="name">Variation of NON Cash</field>
+                        <field name="code">CF_CASH_VAR_NON_CASH</field>
+                        <field name="sequence">510</field>
+                        <field name="hide_if_zero" eval="1"/>
+                        <field name="foldability">never_unfolded</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_cash_var_non_cash_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">custom</field>
+                                <field name="formula">_report_engine_cash_flow_indirect_cash_variation</field>
+                                <field name="subformula">non_cash_variation</field>
+                            </record>
+                        </field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_cash_eop" model="account.report.line">
+                <field name="name">Cash and cash equivalents at end</field>
+                <field name="code">CF_CASH_EOP</field>
+                <field name="sequence">520</field>
+                <field name="hierarchy_level">0</field>
+                <field name="expression_ids">
+                    <record id="cash_flow_indirect_cash_eop_balance" model="account.report.expression">
+                        <field name="label">balance</field>
+                        <field name="green_on_positive" eval="False"/>
+                        <field name="engine">domain</field>
+                        <field name="formula" eval="('journal_id.type', 'in', ['cash', 'bank', 'credit']), ('exclude_bank_lines', '=', True)"/>
+                        <field name="subformula">-sum</field>
+                        <field name="date_scope">from_beginning</field>
+                    </record>
+                </field>
+            </record>
+        </field>
+    </record>
+</odoo>

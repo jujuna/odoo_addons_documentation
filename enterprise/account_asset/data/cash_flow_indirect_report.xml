@@ -1,0 +1,135 @@
+<odoo>
+    <record id="account_reports.cash_flow_report_indirect" model="account.report">
+        <field name="line_ids">
+            <record id="account_reports.cash_flow_indirect_investing_activities" model="account.report.line">
+                <field name="aggregation_formula">CF_INV_INT_ASS.balance + CF_INV_PPE.balance + CF_INV_ROU.balance + CF_INV_FIN_INSTR.balance + CF_INV_RECEP_RECOV_CASH_ADV.balance + CF_INV_REPAY_RECOV_CASH_ADV.balance + CF_INV_INT_PAID.balance</field>
+            </record>
+            <record id="cash_flow_indirect_inv_int_ass" model="account.report.line">
+                <field name="name">Intangible assets</field>
+                <field name="parent_id" ref="account_reports.cash_flow_indirect_investing_activities"/>
+                <field name="code">CF_INV_INT_ASS</field>
+                <field name="sequence">230</field>
+                <field name="aggregation_formula">CF_INV_INT_ASS_SALE.balance + CF_INV_INT_ASS_PURCH.balance</field>
+                <field name="children_ids">
+                    <record id="cash_flow_indirect_inv_int_ass_sale" model="account.report.line">
+                        <field name="name">Proceeds from sale of intangible assets</field>
+                        <field name="code">CF_INV_INT_ASS_SALE</field>
+                        <field name="sequence">240</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_int_ass_sale_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_int_ass_sale')]),('move_id.asset_move_type', '=', 'sale')]"/>
+                                <field name="subformula">sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_inv_int_ass_purch" model="account.report.line">
+                        <field name="name">Purchase of intangible assets</field>
+                        <field name="code">CF_INV_INT_ASS_PURCH</field>
+                        <field name="sequence">250</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_int_ass_purch_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_int_ass_purchase')]), ('move_id.asset_move_type', 'not in', ['sale', 'disposal', 'depreciation'])]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_inv_ppe" model="account.report.line">
+                <field name="name">Property plant and equipment</field>
+                <field name="parent_id" ref="account_reports.cash_flow_indirect_investing_activities"/>
+                <field name="code">CF_INV_PPE</field>
+                <field name="sequence">260</field>
+                <field name="aggregation_formula">CF_INV_PPE_SALE.balance + CF_INV_PPE_PURCH.balance</field>
+                <field name="children_ids">
+                    <record id="cash_flow_indirect_inv_ppe_sale" model="account.report.line">
+                        <field name="name">Proceeds from sale of property, plant and equipment</field>
+                        <field name="code">CF_INV_PPE_SALE</field>
+                        <field name="sequence">270</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_ppe_sale_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_ppe_sale')]),('move_id.asset_move_type', '=', 'sale')]"/>
+                                <field name="subformula">sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_inv_ppe_purch" model="account.report.line">
+                        <field name="name">Purchase of property, plant and equipment</field>
+                        <field name="code">CF_INV_PPE_PURCH</field>
+                        <field name="sequence">280</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_ppe_purch_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_ppe_purchase')]), ('move_id.asset_move_type', 'not in', ['sale', 'disposal', 'depreciation'])]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_inv_rou" model="account.report.line">
+                <field name="name">Proceeds from sale of right-of-use assets</field>
+                <field name="parent_id" ref="account_reports.cash_flow_indirect_investing_activities"/>
+                <field name="code">CF_INV_ROU</field>
+                <field name="sequence">290</field>
+                <field name="expression_ids">
+                    <record id="cash_flow_indirect_inv_rou_sale_balance" model="account.report.expression">
+                        <field name="label">balance</field>
+                        <field name="green_on_positive" eval="False"/>
+                        <field name="engine">domain</field>
+                        <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_rou_sale')]),('move_id.asset_move_type', '=', 'sale')]"/>
+                        <field name="subformula">sum</field>
+                    </record>
+                </field>
+            </record>
+            <record id="cash_flow_indirect_inv_fin_instr" model="account.report.line">
+                <field name="name">Financial instruments</field>
+                <field name="parent_id" ref="account_reports.cash_flow_indirect_investing_activities"/>
+                <field name="code">CF_INV_FIN_INSTR</field>
+                <field name="sequence">320</field>
+                <field name="aggregation_formula">CF_INV_FIN_INSTR_SALE.balance + CF_INV_FIN_INSTR_PURCH.balance</field>
+                <field name="children_ids">
+                    <record id="cash_flow_indirect_inv_fin_instr_sale" model="account.report.line">
+                        <field name="name">Proceeds from financial instruments</field>
+                        <field name="code">CF_INV_FIN_INSTR_SALE</field>
+                        <field name="sequence">330</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_fin_instr_sale_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_fin_instr_sale')]),('move_id.asset_move_type', '=', 'sale')]"/>
+                                <field name="subformula">sum</field>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="cash_flow_indirect_inv_fin_instr_purch" model="account.report.line">
+                        <field name="name">Purchase of financial instruments</field>
+                        <field name="code">CF_INV_FIN_INSTR_PURCH</field>
+                        <field name="sequence">340</field>
+                        <field name="expression_ids">
+                            <record id="cash_flow_indirect_inv_fin_instr_purch_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="green_on_positive" eval="False"/>
+                                <field name="engine">domain</field>
+                                <field name="formula" eval="[('account_id.tag_ids', 'in', [ref('account.account_tag_inv_fin_instr_purchase')]), ('move_id.asset_move_type', 'not in', ['sale', 'disposal', 'depreciation'])]"/>
+                                <field name="subformula">-sum</field>
+                            </record>
+                        </field>
+                    </record>
+                </field>
+            </record>
+        </field>
+    </record>
+</odoo>

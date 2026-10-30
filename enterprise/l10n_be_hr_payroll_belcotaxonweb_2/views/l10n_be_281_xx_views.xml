@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="l10n_be_281_xx_view_form" model="ir.ui.view">
+        <field name="name">l10n_be.281_xx.view.form.belcotaxonweb_2</field>
+        <field name="model">l10n_be.281_xx</field>
+        <field name="inherit_id" ref="l10n_be_hr_payroll.l10n_be_281_xx_view_form"/>
+        <field name="arch" type="xml">
+            <button name="action_correct_declaration" position="after">
+                <button name="action_open_withholding_check" string="Check Withholding Taxes" type="object"
+                        invisible="state in ['draft', 'cancel'] and not test_xml_file"/>
+            </button>
+            <field name="withholding_warning" position="after">
+                <button name="action_open_withholding_check" type="object" class="btn-link p-0 mt-1"
+                        icon="arrow_forward" string="See the details per employee"/>
+            </field>
+            <xpath expr="//button[@name='action_generate_xml'][1]" position="attributes">
+                <attribute name="string">Create File</attribute>
+            </xpath>
+            <field name="year" position="after">
+                <field name="file_format" widget="radio" options="{'horizontal': true}"
+                       readonly="xml_file or state in ['done', 'cancel'] or year >= '2026'"/>
+            </field>
+            <field name="test_xml_file" position="attributes">
+                <attribute name="string">Test File</attribute>
+            </field>
+            <field name="xml_file" position="attributes">
+                <attribute name="string">File</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

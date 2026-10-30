@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.l10n_be_pos_blackbox</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="restaurant_section" position="after">
+                <block title="Belgian Blackbox" id="belgian_blackbox_section" invisible="pos_l10n_be_country_code != 'BE'">
+                    <setting string="Belgian Blackbox" help="Connect to the Belgian Blackbox for fiscal compliance.">
+                        <field name="pos_l10n_be_blackbox_be_id" widget="many2one" options="{'no_create': True}"/>
+                        <div groups="base.group_no_one">
+                            <field name="pos_l10n_be_training_mode"/>
+                            <label for="pos_l10n_be_training_mode" string="Training mode" class="fw-normal me-1"/>
+                        </div>
+                        <div class="mt-2">
+                            <label for="pos_establishment_number" string="Establishment Number" class="me-3"/>
+                            <field name="pos_establishment_number"/>
+                        </div>
+                        <div class="mt-2" invisible="not pos_l10n_be_blackbox_be_id">
+                            <label for="pos_l10n_be_pos_id" string="POS ID" class="me-3"/>
+                            <field name="pos_l10n_be_pos_id" readonly="pos_use_blackbox"/>
+                            <button name="action_request_pos_id" type="object" string="Request POS ID" class="btn btn-primary" invisible="pos_use_blackbox"/>
+                        </div>
+                    </setting>
+                </block>
+            </block>
+            <xpath expr="//field[@name='pos_set_tip_after_payment']/.." position="attributes">
+                <attribute name="invisible" add="pos_l10n_be_pos_id != False" separator=" or "/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,131 @@
+{
+  "$id": "urn:r:d:c:1:fr",
+  "$schema": "https://belcotax.be/resources/schema/1",
+  "additionalProperties": false,
+  "properties": {
+    "$s": {
+      "oneOf": [
+        {
+          "const": "urn:r:d:c:1"
+        },
+        {
+          "const": "urn:r:d:c:1:fr"
+        },
+        {
+          "const": "urn:r:d:c:1:nl"
+        },
+        {
+          "const": "urn:r:d:c:1:de"
+        }
+      ],
+      "title": "Schéma",
+      "type": "string"
+    },
+    "integrityHash": {
+      "description": "Integrity hash",
+      "title": "Integrity hash",
+      "type": "string"
+    },
+    "k": {
+      "description": "Clé utilisée pour identifier cette ressource",
+      "examples": [
+        "CONT-12345"
+      ],
+      "maxLength": 255,
+      "minLength": 1,
+      "title": "Clé",
+      "type": "string"
+    },
+    "fn": {
+      "examples": [
+        [
+          "John",
+          "David"
+        ]
+      ],
+      "items": {
+        "maxLength": 50,
+        "minLength": 1,
+        "title": "Prénom",
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Prénoms",
+      "type": "array"
+    },
+    "ln": {
+      "examples": [
+        [
+          "Doe",
+          "Smith"
+        ]
+      ],
+      "items": {
+        "maxLength": 50,
+        "minLength": 1,
+        "title": "Nom de famille",
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Noms de famille",
+      "type": "array"
+    },
+    "e": {
+      "examples": [
+        "john.doe@example.com"
+      ],
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "title": "Adresse email",
+      "type": "string"
+    },
+    "p": {
+      "additionalProperties": false,
+      "examples": [
+        "+32498123456"
+      ],
+      "minProperties": 1,
+      "properties": {
+        "m": {
+          "examples": [
+            "+32498123456"
+          ],
+          "pattern": "^\\+[0-9]{9,15}$",
+          "title": "Téléphone mobile",
+          "type": "string"
+        },
+        "l": {
+          "examples": [
+            "+3224567890"
+          ],
+          "pattern": "^\\+[0-9]{9,15}$",
+          "title": "Téléphone fixe",
+          "type": "string"
+        }
+      },
+      "title": "Numéros de téléphone",
+      "type": "object"
+    },
+    "l": {
+      "enum": [
+        "fr",
+        "nl",
+        "de"
+      ],
+      "examples": [
+        "nl"
+      ],
+      "title": "Langue préférée",
+      "type": "string"
+    }
+  },
+  "required": [
+    "$s",
+    "e",
+    "k",
+    "l"
+  ],
+  "title": "Contact",
+  "type": "object"
+}
